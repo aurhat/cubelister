@@ -191,10 +191,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CslDlgGeneric.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\CslDlgSettings.cpp"
 				>
 			</File>

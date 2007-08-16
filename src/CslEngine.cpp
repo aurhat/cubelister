@@ -453,7 +453,7 @@ int CslEngine::UpdateMaster()
     wxOperatingSystemId id=pinfo.GetOperatingSystemId();
     wxString os=pinfo.GetOperatingSystemFamilyName(id);
     wxString agent=wxT("Csl/");
-    agent+=CSL_VERSION_STR;
+    agent+=CSL_VERSION_LONG_STR;
     agent+=wxT("(")+os+wxT(")");
 
     wxHTTP http;

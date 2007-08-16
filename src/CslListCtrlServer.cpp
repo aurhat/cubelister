@@ -838,7 +838,7 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
         if (infoCmp->m_timeRemain != info->m_timeRemain)
         {
             if (info->m_timeRemain<0)
-                s=wxT("â");
+                s=_("no limit");
             else
                 s=s.Format(wxT("%d"),info->m_timeRemain);
             SetItem(i,5,s);

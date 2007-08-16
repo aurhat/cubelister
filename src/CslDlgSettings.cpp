@@ -168,7 +168,7 @@ void CslDlgSettings::set_properties()
 void CslDlgSettings::do_layout()
 {
 #ifdef __WXMSW__
-    wxString ext=_("Executables (*.exe;*.bat;*.cmd)|*.exe;*.bat;*.cmd");
+    wxString ext=_("Executables (*.exe; *.bat; *.cmd)|*.exe;*.bat;*.cmd");
 #else
     wxString ext=wxT("*");
 #endif

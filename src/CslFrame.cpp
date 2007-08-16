@@ -579,7 +579,7 @@ void CslFrame::OnTreeRightClick(wxTreeEvent& event)
 void CslFrame::OnCommandEvent(wxCommandEvent& event)
 {
     wxUint32 u=0;
-    bool checked;
+    bool checked=false;
 
     switch (event.GetId())
     {
@@ -1495,7 +1495,7 @@ IMPLEMENT_APP(CslApp)
 bool CslApp::OnInit()
 {
     m_locale.Init(wxLANGUAGE_DEFAULT,wxLOCALE_CONV_ENCODING);
-    m_locale.AddCatalogLookupPathPrefix(wxT("."));
+    m_locale.AddCatalogLookupPathPrefix(wxT("lang"));
 #ifndef __WXMSW__
     m_locale.AddCatalogLookupPathPrefix(wxT(LOCALEDIR));
 #endif
