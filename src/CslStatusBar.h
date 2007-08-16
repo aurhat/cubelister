@@ -1,0 +1,77 @@
+/***************************************************************************
+ *   Copyright (C) 2007 by Glen Masgai                                     *
+ *   mimosius@gmx.de                                                       *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+
+#ifndef CSLSTATUSBAR_H
+#define CSLSTATUSBAR_H
+
+/**
+ @author Glen Masgai <mimosius@gmx.de>
+*/
+
+#include "wx/wxprec.h"
+#ifdef __BORLANDC__
+#pragma hdrstop
+#endif
+#ifndef WX_PRECOMP
+#include "wx/wx.h"
+#endif
+#include <wx/statusbr.h>
+#include <wx/statbmp.h>
+
+
+enum { LIGHT_GREEN = 0, LIGHT_GREY, LIGHT_RED };
+
+class CslStatusBar : public wxStatusBar
+{
+    public:
+        CslStatusBar(wxWindow *parent);
+
+        static void InitBar(CslStatusBar *bar)
+        {
+            m_statusBar=bar;
+        }
+        static void SetText(wxString text,wxUint32 id);
+        static void Light(wxInt32 light)
+        {
+            m_statusBar->SetLight(light);
+        };
+        static wxInt32 Light()
+        {
+            return m_statusBar->GetLight();
+        };
+
+    private:
+        static CslStatusBar* m_statusBar;
+
+        void OnSize(wxSizeEvent& event);
+        DECLARE_EVENT_TABLE()
+
+    protected:
+        wxStaticBitmap *m_bmp;
+        wxInt32 m_light;
+
+        void SetLight(wxInt32 light);
+        wxInt32 GetLight()
+        {
+            return m_light;
+        };
+};
+
+#endif // CSLSTATUSBAR_H

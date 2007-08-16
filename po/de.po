@@ -1,0 +1,591 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: CSL\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-08-16 18:05+0200\n"
+"PO-Revision-Date: 2007-08-16 18:08+0100\n"
+"Last-Translator: Glen Masgai <mimosius@gmx.de>\n"
+"Language-Team: Glen Masgai <mimosius@gmx.de>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: German\n"
+"X-Poedit-Country: GERMANY\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: ../src/CslFrame.cpp:41
+#: ../src/CslDlgSettings.cpp:34
+#: ../src/CslListCtrlServer.cpp:43
+msgid "Error!"
+msgstr "Fehler!"
+
+#: ../src/CslFrame.cpp:177
+msgid "Filter servers"
+msgstr "Serverfilter"
+
+#: ../src/CslFrame.cpp:182
+msgid "&Settings"
+msgstr "Ein&stellungen"
+
+#: ../src/CslFrame.cpp:184
+msgid "&Exit"
+msgstr "B&eenden"
+
+#: ../src/CslFrame.cpp:185
+msgid "&File"
+msgstr "&Datei"
+
+#: ../src/CslFrame.cpp:187
+msgid "&Update from master\tF5"
+msgstr "Akt&ualisiere vom Master\tF5"
+
+#: ../src/CslFrame.cpp:189
+msgid "Add a &new master ..."
+msgstr "Master hi&nzufügen ..."
+
+#: ../src/CslFrame.cpp:190
+msgid "&Remove master"
+msgstr "Master entfe&rnen"
+
+#: ../src/CslFrame.cpp:191
+msgid "&Master"
+msgstr "&Master"
+
+#: ../src/CslFrame.cpp:193
+msgid "Show &search bar\tCTRL+S"
+msgstr "Zeige &Suchleiste\tCTRL+S"
+
+#: ../src/CslFrame.cpp:194
+msgid "Show &Filter\tCTRL+F"
+msgstr "Zeige &Filter\tCTRL+F"
+
+#: ../src/CslFrame.cpp:196
+msgid "Sort &lists automatically\tCTRL+L"
+msgstr "&Listen automatisch sortieren\tCTRL+L"
+
+#: ../src/CslFrame.cpp:197
+msgid "Fit list columns on &resize"
+msgstr "Listenspalten automatisch anpassen"
+
+#: ../src/CslFrame.cpp:199
+msgid "Live update spli&tter on resize"
+msgstr "Spli&tter Live-Update Modus"
+
+#: ../src/CslFrame.cpp:200
+msgid "&View"
+msgstr "&Ansicht"
+
+#: ../src/CslFrame.cpp:202
+msgid "A&bout"
+msgstr "Ü&ber"
+
+#: ../src/CslFrame.cpp:203
+msgid "&Help"
+msgstr "&Hilfe"
+
+#: ../src/CslFrame.cpp:206
+msgid "F&ull"
+msgstr "&Voll"
+
+#: ../src/CslFrame.cpp:207
+msgid "&Offline"
+msgstr "&Offline"
+
+#: ../src/CslFrame.cpp:208
+msgid "&Empty"
+msgstr "&Leer"
+
+#: ../src/CslFrame.cpp:209
+msgid "Mastermode &2"
+msgstr "Mastermode &2"
+
+#: ../src/CslFrame.cpp:210
+msgid "&Non empty"
+msgstr "&Nicht leer"
+
+#: ../src/CslFrame.cpp:211
+msgid "Mastermode &3"
+msgstr "Mastermode &3"
+
+#: ../src/CslFrame.cpp:212
+msgid "Filter fa&vourites as well"
+msgstr "&Favoriten auch filtern"
+
+#: ../src/CslFrame.cpp:213
+msgid "&Reset"
+msgstr "&Zurücksetzen"
+
+#: ../src/CslFrame.cpp:275
+msgid ""
+"Failed to initialize!\n"
+"Please restart the application"
+msgstr ""
+"Fehler beim Initialisieren!\n"
+"Bitte das Programm neu starten."
+
+#: ../src/CslFrame.cpp:276
+msgid "Fatal error!"
+msgstr "Kritischer Fehler!"
+
+#. begin wxGlade: CslFrame::set_properties
+#: ../src/CslFrame.cpp:312
+msgid "Cube Server Lister"
+msgstr "Cube Server Lister"
+
+#: ../src/CslFrame.cpp:399
+msgid "Search:"
+msgstr "Suchen:"
+
+#: ../src/CslFrame.cpp:627
+msgid "Master already exists!"
+msgstr "Master existiert bereits!"
+
+#: ../src/CslFrame.cpp:824
+msgid "CSL terminating"
+msgstr "CSL beendet sich"
+
+#: ../src/CslFrame.cpp:824
+msgid "Waiting for engine to terminate ..."
+msgstr "Warte auf das Beenden der Engine"
+
+#: ../src/CslFrame.cpp:965
+msgid "Sending request to master: "
+msgstr "Sende Anfrage zum Master: "
+
+#: ../src/CslFrame.cpp:973
+msgid "Error on update from master: "
+msgstr "Fehler beim Aktualisieren vom Master:"
+
+#: ../src/CslFrame.cpp:978
+#, c-format
+msgid "Got %d servers from master"
+msgstr "%d Server vom Master erhalten"
+
+#: ../src/CslDlgSettings.cpp:35
+msgid "For connect method \"Config\" you have to specify the game path (where autoexec.cfg is located)."
+msgstr "Verbindungsmethode \"Config\" benötigt das Spielverzeichnis (wo sich die autoexec.cfg befindet)"
+
+#: ../src/CslDlgSettings.cpp:80
+msgid "AssaultCube"
+msgstr "AssaultCube"
+
+#: ../src/CslDlgSettings.cpp:81
+msgid "Server lists"
+msgstr "Server Listen"
+
+#: ../src/CslDlgSettings.cpp:82
+msgid "Times && Intervals"
+msgstr "Zeiten und Intervalle"
+
+#: ../src/CslDlgSettings.cpp:83
+msgid "Ping thresholds"
+msgstr "Ping Schwellwerte"
+
+#: ../src/CslDlgSettings.cpp:84
+msgid "Sauerbraten"
+msgstr "Sauerbraten"
+
+#: ../src/CslDlgSettings.cpp:86
+#: ../src/CslDlgSettings.cpp:89
+msgid "Config (csl-connect.cfg)"
+msgstr "Config (csl-connect.cfg)"
+
+#: ../src/CslDlgSettings.cpp:87
+#: ../src/CslDlgSettings.cpp:90
+msgid "Parameter (-xS)"
+msgstr "Parameter (-xS)"
+
+#: ../src/CslDlgSettings.cpp:98
+msgid "Don't update when playing"
+msgstr "Nicht aktualisieren beim Spielen"
+
+#: ../src/CslDlgSettings.cpp:103
+#: ../src/CslDlgConnectWait.cpp:36
+msgid "&Ok"
+msgstr "&Ok"
+
+#: ../src/CslDlgSettings.cpp:104
+#: ../src/CslDlgAddMaster.cpp:59
+#: ../src/CslDlgConnectWait.cpp:37
+#: ../src/CslDlgAddServer.cpp:42
+msgid "&Cancel"
+msgstr "&Abbrechen"
+
+#. begin wxGlade: CslDlgSettings::set_properties
+#: ../src/CslDlgSettings.cpp:122
+msgid "Cube Server Lister - Settings"
+msgstr "Cube Server Lister - Einstellungen"
+
+#: ../src/CslDlgSettings.cpp:171
+msgid "Executables (*.exe;*.bat;*.cmd)|*.exe;*.bat;*.cmd"
+msgstr "Ausführbare Dateien (*.exe;*.bat;*.cmd)|*.exe;*.bat;*.cmd"
+
+#: ../src/CslDlgSettings.cpp:178
+msgid "Select Sauerbraten executable"
+msgstr "Sauerbraten Spielverzeichnis"
+
+#: ../src/CslDlgSettings.cpp:182
+msgid "Select AssaultCube executable"
+msgstr "AssaultCube Programmdatei wählen"
+
+#: ../src/CslDlgSettings.cpp:186
+msgid "Select Sauerbraten game path"
+msgstr "Wähle Sauerbraten Spielverzeichnis"
+
+#: ../src/CslDlgSettings.cpp:190
+msgid "Select AssaultCube game path"
+msgstr "Wähle AssaultCube Spielverzeichnis"
+
+#: ../src/CslDlgSettings.cpp:221
+#: ../src/CslDlgSettings.cpp:237
+msgid "Game executable:"
+msgstr "Programmdatei"
+
+#: ../src/CslDlgSettings.cpp:223
+#: ../src/CslDlgSettings.cpp:239
+msgid "Game directory:"
+msgstr "Spielverzeichnis:"
+
+#: ../src/CslDlgSettings.cpp:225
+#: ../src/CslDlgSettings.cpp:241
+msgid "Game paramters:"
+msgstr "Spielparameter:"
+
+#: ../src/CslDlgSettings.cpp:228
+#: ../src/CslDlgSettings.cpp:244
+msgid "Connect method:"
+msgstr "Verbindungsmethode:"
+
+#: ../src/CslDlgSettings.cpp:255
+msgid "Server empty"
+msgstr "Server leer"
+
+#: ../src/CslDlgSettings.cpp:258
+msgid "Mastermode 1"
+msgstr "Mastermode 1"
+
+#: ../src/CslDlgSettings.cpp:261
+msgid "Server offline"
+msgstr "Server offline"
+
+#: ../src/CslDlgSettings.cpp:264
+msgid "Mastermode 2"
+msgstr "Mastermode 2"
+
+#. begin wxGlade: CslDlgConnectWait::set_properties
+#: ../src/CslDlgSettings.cpp:267
+#: ../src/CslDlgConnectWait.cpp:48
+msgid "Server full"
+msgstr "Server voll"
+
+#: ../src/CslDlgSettings.cpp:270
+msgid "Mastermode 3"
+msgstr "Mastermode 3"
+
+#: ../src/CslDlgSettings.cpp:280
+msgid "Update interval (sec):"
+msgstr "Aktualisierungsintervall (sek):"
+
+#: ../src/CslDlgSettings.cpp:284
+msgid "Wait on full server (sec):"
+msgstr "Wartezeit bei vollem Server (sek):"
+
+#: ../src/CslDlgSettings.cpp:288
+msgid "Minimum playtime for statistics (sec):"
+msgstr "Minimale Spielzeit für Statistik (sek):"
+
+#: ../src/CslDlgSettings.cpp:295
+msgid "Good"
+msgstr "Gut"
+
+#: ../src/CslDlgSettings.cpp:299
+msgid "Bad"
+msgstr "Schlecht"
+
+#: ../src/CslDlgSettings.cpp:307
+msgid "Games"
+msgstr "Spiele"
+
+#: ../src/CslDlgSettings.cpp:308
+msgid "Colours"
+msgstr "Farben"
+
+#: ../src/CslDlgSettings.cpp:309
+msgid "Other"
+msgstr "Verschiedenes"
+
+#: ../src/CslDlgSettings.cpp:528
+msgid ""
+"Threshold for good ping can't be higher than\n"
+"threshold for bad ping."
+msgstr ""
+"Der Schwellwert für einen guten Ping kann nicht höher sein\n"
+"als der Schwellwert für einen schlechten Ping."
+
+#: ../src/CslListCtrlServer.cpp:42
+msgid "Warning!"
+msgstr "Warnung!"
+
+#: ../src/CslListCtrlServer.cpp:44
+msgid ""
+"\n"
+"Choose Yes to keep these servers, No to delete them or\n"
+"Cancel the operation."
+msgstr ""
+"\n"
+"Wähle Ja um diese Server zu behalten, Nein um sie zu löschen oder\n"
+"Abbrechen, um den Vorgang zu beenden."
+
+#: ../src/CslListCtrlServer.cpp:163
+#, c-format
+msgid " returned with code: %d"
+msgstr " beendet mit Code: %d"
+
+#: ../src/CslListCtrlServer.cpp:491
+msgid "You are about to delete servers which also are favourites!\n"
+msgstr "Es sollen Server gelöscht werden, die als Favoriten markiert sind!\n"
+
+#: ../src/CslListCtrlServer.cpp:501
+msgid "You are about to delete servers which have statistics!\n"
+msgstr "Es sollen Server gelöscht werden, die Statistiken enthalten!\n"
+
+#: ../src/CslListCtrlServer.cpp:612
+#, c-format
+msgid "Waiting %d seconds for a free slot on \"%s\" (press ESC to abort or join an other server)"
+msgstr "Warte %d Sekunden auf einen freien Slot auf \"%s\" (ESC drücken um abzubrechen oder einen anderen Server wählen)"
+
+#: ../src/CslListCtrlServer.cpp:647
+msgid "Host"
+msgstr "Host"
+
+#: ../src/CslListCtrlServer.cpp:650
+msgid "Description"
+msgstr "Titel"
+
+#: ../src/CslListCtrlServer.cpp:657
+msgid "Ping"
+msgstr "Ping"
+
+#: ../src/CslListCtrlServer.cpp:665
+msgid "Mode"
+msgstr "Modus"
+
+#: ../src/CslListCtrlServer.cpp:668
+msgid "Map"
+msgstr "Map"
+
+#: ../src/CslListCtrlServer.cpp:672
+msgid "Time"
+msgstr "Zeit"
+
+#: ../src/CslListCtrlServer.cpp:676
+msgid "Player"
+msgstr "Spieler"
+
+#: ../src/CslListCtrlServer.cpp:679
+msgid "MM"
+msgstr "MM"
+
+#: ../src/CslListCtrlServer.cpp:872
+msgid "n/a"
+msgstr "n/v"
+
+#: ../src/CslListCtrlServer.cpp:1107
+msgid "You are currently playing, so quit the game and try again."
+msgstr "Es läuft momentan schon ein Spiel."
+
+#: ../src/CslListCtrlServer.cpp:1135
+#, c-format
+msgid ""
+"There was no executable for game %s specified yet!\n"
+"Please check your settings."
+msgstr ""
+"Es wurde keine Programmdatei für das Spiel %s angegeben.\n"
+"Bitte die Einstellungen überprüfen."
+
+#: ../src/CslListCtrlServer.cpp:1146
+#, c-format
+msgid ""
+"The server \"%s\" is in private mode, so it's\n"
+"probably not possible to connect.\n"
+"\n"
+"Proceed anyway?"
+msgstr ""
+"Der Server \"%s\" ist im Private-Modus,\n"
+"deshalb wird es nicht möglich sein zu verbinden.\n"
+"\n"
+"Trotzdem verbinden?"
+
+#: ../src/CslListCtrlServer.cpp:1149
+msgid "Question"
+msgstr "Frage"
+
+#: ../src/CslListCtrlServer.cpp:1183
+msgid ""
+"No game path was specified!\n"
+"Please check your settings."
+msgstr ""
+"Es wurde kein Spielverzeichnis angegeben.\n"
+"Bitte die Einstellungen überprüfen."
+
+#: ../src/CslListCtrlServer.cpp:1194
+#, c-format
+msgid "Could not open %s%s for writing."
+msgstr "Konnte %s%s nicht zum Schreiben öffnen."
+
+#: ../src/CslListCtrlServer.cpp:1222
+msgid "Failed to start: "
+msgstr "Fehler beim Starten:"
+
+#: ../src/CslDlgAddMaster.cpp:51
+#: ../src/CslDlgAddServer.cpp:37
+msgid "default"
+msgstr "Standard"
+
+#: ../src/CslDlgAddMaster.cpp:56
+msgid "Custom"
+msgstr "Benutzerdefiniert"
+
+#: ../src/CslDlgAddMaster.cpp:57
+msgid "Add default master"
+msgstr "Standard Master"
+
+#: ../src/CslDlgAddMaster.cpp:58
+#: ../src/CslDlgAddServer.cpp:41
+msgid "&Add"
+msgstr "&Hinzufügen"
+
+#. begin wxGlade: CslDlgAddMaster::set_properties
+#: ../src/CslDlgAddMaster.cpp:69
+msgid "Add new Master"
+msgstr "Master hinzufügen"
+
+#: ../src/CslDlgAddMaster.cpp:91
+#: ../src/CslDlgAddServer.cpp:74
+msgid "Game:"
+msgstr "Spiel:"
+
+#: ../src/CslDlgAddMaster.cpp:94
+#: ../src/CslDlgAddServer.cpp:77
+msgid "Address:"
+msgstr "Adresse:"
+
+#: ../src/CslDlgAddMaster.cpp:97
+msgid "Path:"
+msgstr "Pfad:"
+
+#: ../src/CslGame.cpp:32
+#: ../src/CslGame.cpp:44
+#: ../src/CslListCtrlInfo.cpp:245
+msgid "unknown"
+msgstr "unbekannt"
+
+#: ../src/CslListCtrlInfo.cpp:170
+msgid "Address"
+msgstr "Adresse"
+
+#: ../src/CslListCtrlInfo.cpp:171
+msgid "Location"
+msgstr "Standort"
+
+#: ../src/CslListCtrlInfo.cpp:172
+msgid "Game"
+msgstr "Spiel"
+
+#: ../src/CslListCtrlInfo.cpp:173
+msgid "Version"
+msgstr "Version"
+
+#: ../src/CslListCtrlInfo.cpp:174
+msgid "Last seen"
+msgstr "Zuletzt gesehen"
+
+#: ../src/CslListCtrlInfo.cpp:175
+msgid "Last played"
+msgstr "Zuletzt gespielt"
+
+#: ../src/CslListCtrlInfo.cpp:176
+msgid "Last playtime"
+msgstr "Spielzeit (letzte)"
+
+#: ../src/CslListCtrlInfo.cpp:177
+msgid "Total playtime"
+msgstr "Spielzeit (gesamt)"
+
+#: ../src/CslListCtrlInfo.cpp:178
+msgid "Connects"
+msgstr "Verbindungen"
+
+#: ../src/CslListCtrlInfo.cpp:286
+msgid "GeoIP database not found"
+msgstr "GeoIP Datenbank nicht gefunden"
+
+#: ../src/CslDlgConnectWait.cpp:35
+msgid "Set as default waiting time."
+msgstr "Setze als standard Wartezeit."
+
+#: ../src/CslDlgConnectWait.cpp:64
+msgid ""
+"The server is full at the moment.\n"
+"You like to wait for a free slot?"
+msgstr ""
+"Der Server ist momentan voll.\n"
+"Auf einen freien Slot warten?"
+
+#: ../src/CslDlgConnectWait.cpp:66
+msgid "Time to wait (sec):"
+msgstr "Wartezeit (sek):"
+
+#. begin wxGlade: CslDlgAddServer::set_properties
+#: ../src/CslDlgAddServer.cpp:53
+msgid "Add new server"
+msgstr "Server hinzufügen"
+
+#. *
+#. @author Glen Masgai <mimosius@gmx.de>
+#.
+#: ../src/CslVersion.h:28
+msgid "Cube Server Lister (CSL)"
+msgstr "Cube Server Lister (CSL)"
+
+#: ../src/CslVersion.h:33
+msgid "Tool to ... Sauerbraten based servers."
+msgstr "Programm um Sauerbraten basierte Server zu ..."
+
+#: ../src/CslMenu.h:39
+msgid "&Connect to server"
+msgstr "&Verbinde zum Server"
+
+#: ../src/CslMenu.h:40
+msgid "C&opy to clipboard"
+msgstr "In &Zwischenablage kopieren"
+
+#: ../src/CslMenu.h:41
+msgid "&Add to favourites"
+msgstr "Zu F&avoriten hinzufügen"
+
+#: ../src/CslMenu.h:42
+msgid "&Remove from master"
+msgstr "Aus Masterliste entfe&rnen"
+
+#: ../src/CslMenu.h:43
+msgid "&Add server ..."
+msgstr "Server &hinzufügen ..."
+
+#: ../src/CslMenu.h:44
+msgid "&Remove from favourites"
+msgstr "Aus Favoritenliste entfe&rnen"
+
+#: ../src/CslMenu.h:45
+msgid "&Delete server"
+msgstr "Server &löschen"
+
+#: ../src/CslMenu.h:46
+msgid "&Delete servers"
+msgstr "Server &löschen"
+
+#~ msgid "Type:"
+#~ msgstr "Typ"
+#~ msgid "Game type:"
+#~ msgstr "Spieltyp:"
+

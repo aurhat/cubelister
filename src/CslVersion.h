@@ -1,0 +1,38 @@
+/***************************************************************************
+ *   Copyright (C) 2007 by Glen Masgai                                     *
+ *   mimosius@gmx.de                                                       *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+
+#ifndef CSL_VERSION_H
+#define CSL_VERSION_H
+
+/**
+ @author Glen Masgai <mimosius@gmx.de>
+*/
+
+#define CSL_NAME_STR          _("Cube Server Lister (CSL)")
+
+#define CSL_VERSION_STR       wxT("0.5")
+#define CSL_VERSION_ADD_STR   wxT("Beta2 (first public)")
+
+#define CSL_DESCRIPTION_STR   _("Tool to ... Sauerbraten based servers.")
+#define CSL_COPYRIGHT_STR     wxT("(C)2007 by WahnFred <wahnfred@the-conquerors.net>")
+
+#define CSL_VERSION_LONG_STR  wxString(CSL_VERSION_STR wxT(" ") CSL_VERSION_ADD_STR)
+
+#endif // CSL_VERSION_H

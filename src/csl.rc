@@ -1,0 +1,21 @@
+//#include "wx/msw/wx.rc"
+
+ICON_APPLICATION        ICON                    "img\\csl_32.ico"
+
+ICON_LIST_GREEN         ICON                    "img\\green_list_16.ico"
+ICON_LIST_YELLOW        ICON                    "img\\yellow_list_16.ico"
+ICON_LIST_RED           ICON                    "img\\red_list_16.ico"
+ICON_LIST_GREY          ICON                    "img\\grey_list_16.ico"
+ICON_LIST_ASC           ICON                    "img\\sortasc_16.ico"
+ICON_LIST_DSC           ICON                    "img\\sortdsc_16.ico"
+
+ICON_CLOSE_14           ICON                    "img\\close_14.ico"
+ICON_CLOSE_HIGH_14      ICON                    "img\\close_high_14.ico"
+ICON_CLOSE_PRESS_14     ICON                    "img\\close_press_14.ico"
+
+ICON_TREE_SB_24         ICON                    "img\\sb_24.ico"
+ICON_TREE_AC_24         ICON                    "img\\ac_24.ico"
+ICON_TREE_MASTER_24     ICON                    "img\\master_24.ico"
+
+ICON_LIST_SB_16         ICON                    "img\\sb_16.ico"
+ICON_LIST_AC_16         ICON                    "img\\ac_16.ico"

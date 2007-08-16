@@ -1,0 +1,71 @@
+AC_INIT(configure.in)
+AM_INIT_AUTOMAKE(csl, 0.5)
+
+DEFAULT_FLAGS="-fsigned-char -Wall -fno-strict-aliasing"
+CFLAGS="$CFLAGS $DEFAULT_FLAGS"
+CXXFLAGS="$CXXFLAGS $DEFAULT_FLAGS"
+
+AC_LANG_CPLUSPLUS
+AC_PROG_CXX
+AC_PROG_CC
+AM_PROG_LIBTOOL
+AC_PROG_INTLTOOL
+AC_PROG_RANLIB
+
+GETTEXT_PACKAGE=csl
+AC_SUBST(GETTEXT_PACKAGE)
+
+ALL_LINGUAS="de"
+
+AM_GLIB_GNU_GETTEXT
+if test x$MSGFMT = "xno"
+then
+        AC_ERROR([
+
+The msgfmt command is required to build bubblemaster.  If it is installed
+on your system, ensure that it is in your path.  If it is not, install
+GNU gettext to continue.
+])
+fi
+
+
+WXCONFIG=wx-config
+AC_ARG_WITH(wx-config,
+[[  --with-wx-config=FILE     Use the given path to wx-config when determining
+                            wxWidgets configuration; defaults to "wx-config"]],
+[
+    if test "$withval" != "yes" -a "$withval" != ""; then
+        WXCONFIG=$withval
+    fi
+])
+
+wxversion=0
+
+AC_DEFUN([WXTEST],
+[
+	AC_REQUIRE([AC_PROG_AWK])
+	AC_MSG_CHECKING([wxWidgets version])
+	if wxversion=`$WXCONFIG --version`; then
+		AC_MSG_RESULT([$wxversion])
+	else
+		AC_MSG_RESULT([not found])
+		AC_MSG_ERROR([wxWidgets is required. Try --with-wx-config.])
+	fi])
+
+dnl Call WXTEST function
+WXTEST
+
+dnl Check for minimum wx version
+vers=`echo $wxversion | $AWK 'BEGIN { FS = "."; } { printf "% d", ($1 * 1000 + $2) * 1000 + $3;}'`
+if test -n "$vers" && test "$vers" -ge 2008000; then
+	WX_CXXFLAGS="`$WXCONFIG --cxxflags | sed -e 's/-fno-exceptions//'`"
+	WX_LIBS="`$WXCONFIG --libs`"
+else
+	AC_MSG_ERROR([wxWidgets 2.8.0 or newer is required])
+fi
+
+CXXFLAGS="$CXXFLAGS $WX_CXXFLAGS"
+
+AC_SUBST(WX_LIBS)
+
+AC_OUTPUT(Makefile po/Makefile.in data/Makefile src/Makefile src/img/flags/Makefile src/libGeoIP/Makefile)
