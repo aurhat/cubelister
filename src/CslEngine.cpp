@@ -45,7 +45,7 @@ BEGIN_EVENT_TABLE(CslEngine,wxEvtHandler)
 END_EVENT_TABLE()
 
 
-//#ifdef __WXDEBUG__
+#ifdef __WXDEBUG__
 void Debug_Printf(const char *DbgFunc, const char *FmtStr,...)
 {
     va_list ArgList;
@@ -55,7 +55,7 @@ void Debug_Printf(const char *DbgFunc, const char *FmtStr,...)
     fflush(stdout);
     va_end(ArgList);
 }
-//#endif
+#endif
 
 
 void putint(ucharbuf &p, int n)

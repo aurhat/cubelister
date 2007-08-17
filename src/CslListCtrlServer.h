@@ -143,6 +143,7 @@ class CslListServer : public CslServerInfo
             m_players=-1;
             m_playersMax=-1;
             m_mm=-1;
+            m_imgId=-1;
         }
 
         CslServerInfo* GetPtr()
