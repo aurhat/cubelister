@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CSL\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-08-16 18:05+0200\n"
-"PO-Revision-Date: 2007-08-16 18:08+0100\n"
+"POT-Creation-Date: 2007-08-17 20:35+0200\n"
+"PO-Revision-Date: 2007-08-17 20:48+0100\n"
 "Last-Translator: Glen Masgai <mimosius@gmx.de>\n"
 "Language-Team: Glen Masgai <mimosius@gmx.de>\n"
 "MIME-Version: 1.0\n"
@@ -20,8 +20,8 @@ msgid "Error!"
 msgstr "Fehler!"
 
 #: ../src/CslFrame.cpp:177
-msgid "Filter servers"
-msgstr "Serverfilter"
+msgid "Filter out these servers"
+msgstr "Server herausfiltern"
 
 #: ../src/CslFrame.cpp:182
 msgid "&Settings"
@@ -64,12 +64,12 @@ msgid "Sort &lists automatically\tCTRL+L"
 msgstr "&Listen automatisch sortieren\tCTRL+L"
 
 #: ../src/CslFrame.cpp:197
-msgid "Fit list columns on &resize"
+msgid "Fit columns on window &resize"
 msgstr "Listenspalten automatisch anpassen"
 
 #: ../src/CslFrame.cpp:199
-msgid "Live update spli&tter on resize"
-msgstr "Spli&tter Live-Update Modus"
+msgid "Redraw while dragging spli&tters"
+msgstr "Fensterinhalt beim ziehen der Splitter zeichnen"
 
 #: ../src/CslFrame.cpp:200
 msgid "&View"
@@ -100,7 +100,7 @@ msgid "Mastermode &2"
 msgstr "Mastermode &2"
 
 #: ../src/CslFrame.cpp:210
-msgid "&Non empty"
+msgid "&Not empty"
 msgstr "&Nicht leer"
 
 #: ../src/CslFrame.cpp:211
@@ -205,9 +205,9 @@ msgid "&Ok"
 msgstr "&Ok"
 
 #: ../src/CslDlgSettings.cpp:104
-#: ../src/CslDlgAddMaster.cpp:59
+#: ../src/CslDlgAddMaster.cpp:58
 #: ../src/CslDlgConnectWait.cpp:37
-#: ../src/CslDlgAddServer.cpp:42
+#: ../src/CslDlgAddServer.cpp:41
 msgid "&Cancel"
 msgstr "&Abbrechen"
 
@@ -217,8 +217,8 @@ msgid "Cube Server Lister - Settings"
 msgstr "Cube Server Lister - Einstellungen"
 
 #: ../src/CslDlgSettings.cpp:171
-msgid "Executables (*.exe;*.bat;*.cmd)|*.exe;*.bat;*.cmd"
-msgstr "Ausführbare Dateien (*.exe;*.bat;*.cmd)|*.exe;*.bat;*.cmd"
+msgid "Executables (*.exe; *.bat; *.cmd)|*.exe;*.bat;*.cmd"
+msgstr "Ausführbare Dateien (*.exe; *.bat; *.cmd)|*.exe;*.bat;*.cmd"
 
 #: ../src/CslDlgSettings.cpp:178
 msgid "Select Sauerbraten executable"
@@ -342,7 +342,7 @@ msgid " returned with code: %d"
 msgstr " beendet mit Code: %d"
 
 #: ../src/CslListCtrlServer.cpp:491
-msgid "You are about to delete servers which also are favourites!\n"
+msgid "You are about to delete servers which are also favourites!\n"
 msgstr "Es sollen Server gelöscht werden, die als Favoriten markiert sind!\n"
 
 #: ../src/CslListCtrlServer.cpp:501
@@ -351,7 +351,7 @@ msgstr "Es sollen Server gelöscht werden, die Statistiken enthalten!\n"
 
 #: ../src/CslListCtrlServer.cpp:612
 #, c-format
-msgid "Waiting %d seconds for a free slot on \"%s\" (press ESC to abort or join an other server)"
+msgid "Waiting %d seconds for a free slot on \"%s\" (press ESC to abort or join another server)"
 msgstr "Warte %d Sekunden auf einen freien Slot auf \"%s\" (ESC drücken um abzubrechen oder einen anderen Server wählen)"
 
 #: ../src/CslListCtrlServer.cpp:647
@@ -385,6 +385,10 @@ msgstr "Spieler"
 #: ../src/CslListCtrlServer.cpp:679
 msgid "MM"
 msgstr "MM"
+
+#: ../src/CslListCtrlServer.cpp:841
+msgid "no limit"
+msgstr "kein Limit"
 
 #: ../src/CslListCtrlServer.cpp:872
 msgid "n/a"
@@ -437,40 +441,40 @@ msgstr "Konnte %s%s nicht zum Schreiben öffnen."
 msgid "Failed to start: "
 msgstr "Fehler beim Starten:"
 
-#: ../src/CslDlgAddMaster.cpp:51
-#: ../src/CslDlgAddServer.cpp:37
+#: ../src/CslDlgAddMaster.cpp:50
+#: ../src/CslDlgAddServer.cpp:36
 msgid "default"
 msgstr "Standard"
 
-#: ../src/CslDlgAddMaster.cpp:56
+#: ../src/CslDlgAddMaster.cpp:55
 msgid "Custom"
 msgstr "Benutzerdefiniert"
 
-#: ../src/CslDlgAddMaster.cpp:57
+#: ../src/CslDlgAddMaster.cpp:56
 msgid "Add default master"
 msgstr "Standard Master"
 
-#: ../src/CslDlgAddMaster.cpp:58
-#: ../src/CslDlgAddServer.cpp:41
+#: ../src/CslDlgAddMaster.cpp:57
+#: ../src/CslDlgAddServer.cpp:40
 msgid "&Add"
 msgstr "&Hinzufügen"
 
 #. begin wxGlade: CslDlgAddMaster::set_properties
-#: ../src/CslDlgAddMaster.cpp:69
+#: ../src/CslDlgAddMaster.cpp:68
 msgid "Add new Master"
 msgstr "Master hinzufügen"
 
-#: ../src/CslDlgAddMaster.cpp:91
-#: ../src/CslDlgAddServer.cpp:74
+#: ../src/CslDlgAddMaster.cpp:90
+#: ../src/CslDlgAddServer.cpp:73
 msgid "Game:"
 msgstr "Spiel:"
 
-#: ../src/CslDlgAddMaster.cpp:94
-#: ../src/CslDlgAddServer.cpp:77
+#: ../src/CslDlgAddMaster.cpp:93
+#: ../src/CslDlgAddServer.cpp:76
 msgid "Address:"
 msgstr "Adresse:"
 
-#: ../src/CslDlgAddMaster.cpp:97
+#: ../src/CslDlgAddMaster.cpp:96
 msgid "Path:"
 msgstr "Pfad:"
 
@@ -527,7 +531,7 @@ msgstr "Setze als standard Wartezeit."
 #: ../src/CslDlgConnectWait.cpp:64
 msgid ""
 "The server is full at the moment.\n"
-"You like to wait for a free slot?"
+"Wait for a free slot?"
 msgstr ""
 "Der Server ist momentan voll.\n"
 "Auf einen freien Slot warten?"
@@ -537,7 +541,7 @@ msgid "Time to wait (sec):"
 msgstr "Wartezeit (sek):"
 
 #. begin wxGlade: CslDlgAddServer::set_properties
-#: ../src/CslDlgAddServer.cpp:53
+#: ../src/CslDlgAddServer.cpp:52
 msgid "Add new server"
 msgstr "Server hinzufügen"
 
@@ -583,9 +587,4 @@ msgstr "Server &löschen"
 #: ../src/CslMenu.h:46
 msgid "&Delete servers"
 msgstr "Server &löschen"
-
-#~ msgid "Type:"
-#~ msgstr "Typ"
-#~ msgid "Game type:"
-#~ msgstr "Spieltyp:"
 

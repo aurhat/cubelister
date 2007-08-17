@@ -61,7 +61,7 @@ void CslDlgConnectWait::do_layout()
     wxFlexGridSizer* grid_sizer_button = new wxFlexGridSizer(1, 3, 0, 0);
     wxFlexGridSizer* grid_sizer_top = new wxFlexGridSizer(3, 1, 0, 0);
     wxFlexGridSizer* grid_sizer_spin = new wxFlexGridSizer(1, 2, 0, 0);
-    wxStaticText* label_static = new wxStaticText(this, wxID_ANY, _("The server is full at the moment.\nYou like to wait for a free slot?"));
+    wxStaticText* label_static = new wxStaticText(this, wxID_ANY, _("The server is full at the moment.\nWait for a free slot?"));
     grid_sizer_top->Add(label_static, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
     wxStaticText* label_spin_static = new wxStaticText(this, wxID_ANY, _("Time to wait (sec):"));
     grid_sizer_spin->Add(label_spin_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);

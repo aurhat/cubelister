@@ -174,7 +174,7 @@ CslFrame::CslFrame(wxWindow* parent, int id, const wxString& title,const wxPoint
     pane_main_left = new wxPanel(splitter_main, wxID_ANY);
     splitter_games_info = new wxSplitterWindow(pane_main_left, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3DSASH);
     pane_info = new wxPanel(splitter_games_info, wxID_ANY);
-    sizer_filter_staticbox = new wxStaticBox(pane_main_left, -1, _("Filter servers"));
+    sizer_filter_staticbox = new wxStaticBox(pane_main_left, -1, _("Filter out these servers"));
     pane_games = new wxPanel(splitter_games_info, wxID_ANY);
     frame_csl_menubar = new wxMenuBar();
     SetMenuBar(frame_csl_menubar);
@@ -194,9 +194,9 @@ CslFrame::CslFrame(wxWindow* parent, int id, const wxString& title,const wxPoint
     wxglade_tmp_menu_3->Append(MENU_VIEW_FILTER, _("Show &Filter\tCTRL+F"), wxEmptyString, wxITEM_CHECK);
     wxglade_tmp_menu_3->AppendSeparator();
     wxglade_tmp_menu_3->Append(MENU_VIEW_AUTO_SORT, _("Sort &lists automatically\tCTRL+L"), wxEmptyString, wxITEM_CHECK);
-    wxglade_tmp_menu_3->Append(MENU_VIEW_AUTO_FIT, _("Fit list columns on &resize"), wxEmptyString, wxITEM_CHECK);
+    wxglade_tmp_menu_3->Append(MENU_VIEW_AUTO_FIT, _("Fit columns on window &resize"), wxEmptyString, wxITEM_CHECK);
     wxglade_tmp_menu_3->AppendSeparator();
-    wxglade_tmp_menu_3->Append(MENU_VIEW_SPLITTER_LIVE, _("Live update spli&tter on resize"), wxEmptyString, wxITEM_CHECK);
+    wxglade_tmp_menu_3->Append(MENU_VIEW_SPLITTER_LIVE, _("Redraw while dragging spli&tters"), wxEmptyString, wxITEM_CHECK);
     frame_csl_menubar->Append(wxglade_tmp_menu_3, _("&View"));
     wxMenu* wxglade_tmp_menu_4 = new wxMenu();
     wxglade_tmp_menu_4->Append(wxID_ABOUT, _("A&bout"), wxEmptyString, wxITEM_NORMAL);
@@ -207,7 +207,7 @@ CslFrame::CslFrame(wxWindow* parent, int id, const wxString& title,const wxPoint
     checkbox_filter_offline = new wxCheckBox(pane_main_left, CSL_CHECK_FILTER_OFFLINE, _("&Offline"));
     checkbox_filter_empty = new wxCheckBox(pane_main_left, CSL_CHECK_FILTER_EMPTY, _("&Empty"));
     checkbox_filter_mm2 = new wxCheckBox(pane_main_left, CSL_CHECK_FILTER_MM2, _("Mastermode &2"));
-    checkbox_filter_nonempty = new wxCheckBox(pane_main_left, CSL_CHECK_FILTER_NONEMPTY, _("&Non empty"));
+    checkbox_filter_nonempty = new wxCheckBox(pane_main_left, CSL_CHECK_FILTER_NONEMPTY, _("&Not empty"));
     checkbox_filter_mm3 = new wxCheckBox(pane_main_left, CSL_CHECK_FILTER_MM3, _("Mastermode &3"));
     checkbox_filter_favourites = new wxCheckBox(pane_main_left, CSL_CHECK_FILTER_FAVOURITES, _("Filter fa&vourites as well"));
     button_filter_reset = new wxButton(pane_main_left, CSL_BUTTON_FILTER_RESET, _("&Reset"));

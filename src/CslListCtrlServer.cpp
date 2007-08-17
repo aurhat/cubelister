@@ -488,7 +488,7 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
 
                 if (skipFav==wxCANCEL && ls->IsFavourite())
                 {
-                    msg=_("You are about to delete servers which also are favourites!\n");
+                    msg=_("You are about to delete servers which are also favourites!\n");
                     msg+=CSL_DELETE_YESNOCANCEL_STR;
                     skipFav=wxMessageBox(msg,CSL_WARNING_STR,wxYES_NO|wxCANCEL|wxICON_WARNING,this);
                     if (skipFav==wxCANCEL)
@@ -610,7 +610,7 @@ void CslListCtrlServer::OnTimer(wxTimerEvent& event)
         {
             CslStatusBar::SetText(
                 wxString::Format(_("Waiting %d seconds for a free slot on \"%s\" " \
-                                   "(press ESC to abort or join an other server)"),
+                                   "(press ESC to abort or join another server)"),
                                  CslConnectionState::GetWaitTime(),info->m_desc.IsEmpty() ?
                                  info->m_host.c_str() : info->m_desc.c_str()),1);
         }
