@@ -10,8 +10,6 @@ find . -iname "Makefile.in" -exec rm -f {} \;
 find . -iname "Makefile" -exec rm -f {} \;
 find . -iname "*.plg" -exec rm -f {} \;
 find . -iname "*.ncb" -exec rm -f {} \;
-find . -iname "*.kdevelop.pcs" -exec rm -f {} \;
-find . -iname "*.kdevses" -exec rm -f {} \;
 find . -iname "gmon.out" -exec rm -f {} \;
 find . -type d -iname "debug" -exec rm -Rf {} \;
 find . -type d -iname "release" -exec rm -Rf {} \;

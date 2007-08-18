@@ -391,7 +391,7 @@ void CslFrame::do_layout()
     grid_sizer_filter->Add(button_filter_reset, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
     grid_sizer_filter->AddGrowableCol(1);
     sizer_filter->Add(grid_sizer_filter, 1, wxEXPAND, 0);
-    grid_sizer_main_left->Add(sizer_filter, 1, wxALL|wxEXPAND, 4);
+    grid_sizer_main_left->Add(sizer_filter, 1, wxLEFT|wxRIGHT|wxTOP|wxEXPAND, 4);
     pane_main_left->SetSizer(grid_sizer_main_left);
     grid_sizer_main_left->AddGrowableRow(0);
     grid_sizer_main_left->AddGrowableCol(0);

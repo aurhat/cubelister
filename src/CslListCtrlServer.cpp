@@ -1203,7 +1203,7 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info)
                     return;
             }
             else
-                cmd+=wxT(" -x\"connect ")+info->m_host+wxT("\"");
+                cmd+=wxT(" -xconnect\\ ")+info->m_host;
 
         default:
             break;

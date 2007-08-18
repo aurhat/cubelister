@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CSL\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-08-17 20:35+0200\n"
-"PO-Revision-Date: 2007-08-17 20:48+0100\n"
+"POT-Creation-Date: 2007-08-17 21:35+0200\n"
+"PO-Revision-Date: 2007-08-17 22:39+0100\n"
 "Last-Translator: Glen Masgai <mimosius@gmx.de>\n"
 "Language-Team: Glen Masgai <mimosius@gmx.de>\n"
 "MIME-Version: 1.0\n"
@@ -205,9 +205,9 @@ msgid "&Ok"
 msgstr "&Ok"
 
 #: ../src/CslDlgSettings.cpp:104
-#: ../src/CslDlgAddMaster.cpp:58
+#: ../src/CslDlgAddMaster.cpp:59
 #: ../src/CslDlgConnectWait.cpp:37
-#: ../src/CslDlgAddServer.cpp:41
+#: ../src/CslDlgAddServer.cpp:42
 msgid "&Cancel"
 msgstr "&Abbrechen"
 
@@ -441,40 +441,40 @@ msgstr "Konnte %s%s nicht zum Schreiben öffnen."
 msgid "Failed to start: "
 msgstr "Fehler beim Starten:"
 
-#: ../src/CslDlgAddMaster.cpp:50
-#: ../src/CslDlgAddServer.cpp:36
+#: ../src/CslDlgAddMaster.cpp:51
+#: ../src/CslDlgAddServer.cpp:37
 msgid "default"
 msgstr "Standard"
 
-#: ../src/CslDlgAddMaster.cpp:55
+#: ../src/CslDlgAddMaster.cpp:56
 msgid "Custom"
 msgstr "Benutzerdefiniert"
 
-#: ../src/CslDlgAddMaster.cpp:56
+#: ../src/CslDlgAddMaster.cpp:57
 msgid "Add default master"
 msgstr "Standard Master"
 
-#: ../src/CslDlgAddMaster.cpp:57
-#: ../src/CslDlgAddServer.cpp:40
+#: ../src/CslDlgAddMaster.cpp:58
+#: ../src/CslDlgAddServer.cpp:41
 msgid "&Add"
 msgstr "&Hinzufügen"
 
 #. begin wxGlade: CslDlgAddMaster::set_properties
-#: ../src/CslDlgAddMaster.cpp:68
+#: ../src/CslDlgAddMaster.cpp:69
 msgid "Add new Master"
 msgstr "Master hinzufügen"
 
-#: ../src/CslDlgAddMaster.cpp:90
-#: ../src/CslDlgAddServer.cpp:73
+#: ../src/CslDlgAddMaster.cpp:91
+#: ../src/CslDlgAddServer.cpp:74
 msgid "Game:"
 msgstr "Spiel:"
 
-#: ../src/CslDlgAddMaster.cpp:93
-#: ../src/CslDlgAddServer.cpp:76
+#: ../src/CslDlgAddMaster.cpp:94
+#: ../src/CslDlgAddServer.cpp:77
 msgid "Address:"
 msgstr "Adresse:"
 
-#: ../src/CslDlgAddMaster.cpp:96
+#: ../src/CslDlgAddMaster.cpp:97
 msgid "Path:"
 msgstr "Pfad:"
 
@@ -541,7 +541,7 @@ msgid "Time to wait (sec):"
 msgstr "Wartezeit (sek):"
 
 #. begin wxGlade: CslDlgAddServer::set_properties
-#: ../src/CslDlgAddServer.cpp:52
+#: ../src/CslDlgAddServer.cpp:53
 msgid "Add new server"
 msgstr "Server hinzufügen"
 
