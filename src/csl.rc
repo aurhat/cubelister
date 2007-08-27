@@ -8,6 +8,8 @@ ICON_LIST_RED           ICON                    "img\\red_list_16.ico"
 ICON_LIST_GREY          ICON                    "img\\grey_list_16.ico"
 ICON_LIST_ASC           ICON                    "img\\sortasc_16.ico"
 ICON_LIST_DSC           ICON                    "img\\sortdsc_16.ico"
+ICON_LIST_ASC_LIGHT     ICON                    "img\\sortasclight_16.ico"
+ICON_LIST_DSC_LIGHT     ICON                    "img\\sortdsclight_16.ico"
 
 ICON_CLOSE_14           ICON                    "img\\close_14.ico"
 ICON_CLOSE_HIGH_14      ICON                    "img\\close_high_14.ico"
@@ -15,7 +17,9 @@ ICON_CLOSE_PRESS_14     ICON                    "img\\close_press_14.ico"
 
 ICON_TREE_SB_24         ICON                    "img\\sb_24.ico"
 ICON_TREE_AC_24         ICON                    "img\\ac_24.ico"
+ICON_TREE_CB_24         ICON                    "img\\cb_24.ico"
 ICON_TREE_MASTER_24     ICON                    "img\\master_24.ico"
 
 ICON_LIST_SB_16         ICON                    "img\\sb_16.ico"
 ICON_LIST_AC_16         ICON                    "img\\ac_16.ico"
+ICON_LIST_CB_16         ICON                    "img\\cb_16.ico"

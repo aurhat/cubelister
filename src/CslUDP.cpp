@@ -19,7 +19,7 @@
  ***************************************************************************/
 
 #include "CslUDP.h"
-#include "tools.h"
+#include "CslTools.h"
 
 DEFINE_EVENT_TYPE(wxCSL_EVT_PING)
 

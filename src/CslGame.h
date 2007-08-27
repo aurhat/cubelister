@@ -33,10 +33,11 @@
 #include "wx/wx.h"
 #endif
 #include <wx/sckaddr.h>
-#include "tools.h"
+#include "cube_tools.h"
 
 #define CSL_DEFAULT_NAME_SB           wxT("Sauerbraten")
 #define CSL_DEFAULT_NAME_AC           wxT("AssaultCube")
+#define CSL_DEFAULT_NAME_CB           wxT("Cube")
 
 #define CSL_DEFAULT_MASTER_SB         wxT("sauerbraten.org")
 #define CSL_DEFAULT_MASTER_PATH_SB    wxT("/masterserver/retrieve.do?item=list")
@@ -44,8 +45,16 @@
 #define CSL_DEFAULT_MASTER_AC         wxT("masterserver.cubers.net")
 #define CSL_DEFAULT_MASTER_PATH_AC    wxT("/cgi-bin/actioncube.pl/retrieve.do?item=list")
 
+#define CSL_DEFAULT_MASTER_CB         wxT("wouter.fov120.com")
+#define CSL_DEFAULT_MASTER_PATH_CB    wxT("/cube/masterserver/retrieve.do?item=list")
+
 #define CSL_DEFAULT_INFO_PORT_SB      28786
 #define CSL_DEFAULT_INFO_PORT_AC      28764
+#define CSL_DEFAULT_INFO_PORT_CB      28766
+
+#define CSL_LAST_PROTOCOL_SB  254
+#define CSL_LAST_PROTOCOL_AC  1125
+#define CSL_LAST_PROTOCOL_CB  122
 
 #define CSL_VIEW_DEFAULT      1
 #define CSL_VIEW_FAVOURITE    2
@@ -54,10 +63,15 @@ enum { MM_OPEN = 0, MM_VETO, MM_LOCKED, MM_PRIVATE };
 
 typedef enum
 {
-    CSL_GAME_OTHER = 0, CSL_GAME_SB, CSL_GAME_AC, CSL_GAME_END
+    CSL_GAME_START = 0,
+    CSL_GAME_SB, CSL_GAME_AC, CSL_GAME_CB,
+    CSL_GAME_END
 } CSL_GAMETYPE;
 
 
+extern const wxChar* GetVersionStrSB(int n);
+extern const wxChar* GetVersionStrAC(int n);
+extern const wxChar* GetVersionStrCB(int n);
 extern const wxChar* GetModeStrSB(int n);
 extern const wxChar* GetModeStrAC(int n);
 extern const wxChar* GetGameStr(int n);
@@ -73,7 +87,7 @@ class CslServerInfo
         friend class CslMaster;
 
     public:
-        CslServerInfo(wxString host=wxT("localhost"),CSL_GAMETYPE type=CSL_GAME_OTHER,
+        CslServerInfo(wxString host=wxT("localhost"),CSL_GAMETYPE type=CSL_GAME_START,
                       wxUint32 view=CSL_VIEW_DEFAULT, wxUint32 lastSeen=0,
                       wxUint32 playLast=0,wxUint32 playTimeLastGame=0,
                       wxUint32 playTimeTotal=0,wxUint32 connectedTimes=0)
@@ -88,7 +102,20 @@ class CslServerInfo
             m_mm=-1;
             m_view=view;
             m_addr.Hostname(host);
-            m_addr.Service(type==CSL_GAME_SB ? CSL_DEFAULT_INFO_PORT_SB : CSL_DEFAULT_INFO_PORT_AC);
+            switch (type)
+            {
+                case CSL_GAME_SB:
+                    m_addr.Service(CSL_DEFAULT_INFO_PORT_SB);
+                    break;
+                case CSL_GAME_AC:
+                    m_addr.Service(CSL_DEFAULT_INFO_PORT_AC);
+                    break;
+                case CSL_GAME_CB:
+                    m_addr.Service(CSL_DEFAULT_INFO_PORT_CB);
+                    break;
+                default:
+                    break;
+            }
             m_pingSend=0;
             m_pingResp=0;
             m_lastSeen=lastSeen;
@@ -105,7 +132,7 @@ class CslServerInfo
             return (m_type==i2.m_type && m_host==i2.m_host);
         }
 
-        void CreateFavourite(wxString host=wxT("localhost"),CSL_GAMETYPE type=CSL_GAME_OTHER)
+        void CreateFavourite(wxString host=wxT("localhost"),CSL_GAMETYPE type=CSL_GAME_START)
         {
             m_host=host;
             m_type=type;
@@ -120,31 +147,13 @@ class CslServerInfo
             m_playTimeTotal+=time;
         }
 
-        void Lock(bool lock=true)
-        {
-            m_locked=lock;
-        }
-        void SetWaiting(bool wait=true)
-        {
-            m_waiting=wait;
-        }
+        void Lock(bool lock=true) { m_locked=lock; }
+        void SetWaiting(bool wait=true) { m_waiting=wait; }
 
-        bool IsLocked()
-        {
-            return m_locked;
-        }
-        bool IsUnused()
-        {
-            return m_view==0;
-        }
-        bool IsDefault()
-        {
-            return (m_view&CSL_VIEW_DEFAULT)>0;
-        }
-        bool IsFavourite()
-        {
-            return (m_view&CSL_VIEW_FAVOURITE)>0;
-        }
+        bool IsLocked() { return m_locked; }
+        bool IsUnused() { return m_view==0; }
+        bool IsDefault() { return (m_view&CSL_VIEW_DEFAULT)>0; }
+        bool IsFavourite() { return (m_view&CSL_VIEW_FAVOURITE)>0; }
 
         wxString m_host,m_domain;
         vector<wxInt32> m_masterIDs;
@@ -174,22 +183,10 @@ class CslServerInfo
             if (m_masterIDs.length()==0) RemoveDefault();
         }
 
-        void SetDefault()
-        {
-            m_view|=CSL_VIEW_DEFAULT;
-        }
-        void SetFavourite()
-        {
-            m_view|=CSL_VIEW_FAVOURITE;
-        }
-        void RemoveDefault()
-        {
-            m_view&=~CSL_VIEW_DEFAULT;
-        }
-        void RemoveFavourite()
-        {
-            m_view&=~CSL_VIEW_FAVOURITE;
-        }
+        void SetDefault() { m_view|=CSL_VIEW_DEFAULT; }
+        void SetFavourite() { m_view|=CSL_VIEW_FAVOURITE; }
+        void RemoveDefault() { m_view&=~CSL_VIEW_DEFAULT; }
+        void RemoveFavourite() { m_view&=~CSL_VIEW_FAVOURITE; }
 };
 
 
@@ -198,14 +195,11 @@ class CslMaster
         friend class CslGame;
 
     public:
-        CslMaster(CSL_GAMETYPE type=CSL_GAME_OTHER,wxString address=wxEmptyString,
+        CslMaster(CSL_GAMETYPE type=CSL_GAME_START,wxString address=wxEmptyString,
                   wxString path=wxEmptyString,bool def=false)
                 : m_game(NULL),m_address(address),m_path(path),m_type(type),m_id(0) {}
 
-        ~CslMaster()
-        {
-            RemoveServers();
-        }
+        ~CslMaster() { RemoveServers(); }
 
         bool operator==(const CslMaster& m2)
         {
@@ -247,30 +241,12 @@ class CslMaster
             RemoveServer(m_servers[i]);
         }
 
-        CslGame* GetGame()
-        {
-            return m_game;
-        }
-        wxString GetAddress()
-        {
-            return m_address;
-        }
-        wxString GetPath()
-        {
-            return m_path;
-        }
-        CSL_GAMETYPE GetType()
-        {
-            return m_type;
-        }
-        wxInt32 GetID()
-        {
-            return m_id;
-        }
-        vector<CslServerInfo*>* GetServers()
-        {
-            return &m_servers;
-        }
+        CslGame* GetGame() { return m_game; }
+        wxString GetAddress() { return m_address; }
+        wxString GetPath() { return m_path; }
+        CSL_GAMETYPE GetType() { return m_type; }
+        wxInt32 GetID() { return m_id; }
+        vector<CslServerInfo*>* GetServers() { return &m_servers; }
 
     protected:
         CslGame *m_game;
@@ -296,22 +272,10 @@ class CslGame
         CslGame(CSL_GAMETYPE type);
         ~CslGame();
 
-        CSL_GAMETYPE GetType()
-        {
-            return m_type;
-        }
-        wxString GetName()
-        {
-            return m_name;
-        }
-        vector<CslMaster*>* GetMasters()
-        {
-            return &m_masters;
-        }
-        vector<CslServerInfo*>* GetServers()
-        {
-            return &m_servers;
-        }
+        CSL_GAMETYPE GetType() { return m_type; }
+        wxString GetName() { return m_name; }
+        vector<CslMaster*>* GetMasters() { return &m_masters; }
+        vector<CslServerInfo*>* GetServers() { return &m_servers; }
         CslServerInfo* FindServerByAddr(wxIPV4address addr);
 
     protected:

@@ -21,6 +21,7 @@
 #include <wx/protocol/http.h>
 #include <wx/platinfo.h>
 #include "CslEngine.h"
+#include "CslTools.h"
 #include "CslVersion.h"
 
 
@@ -95,6 +96,15 @@ int getint(ucharbuf &p)
     }
     else return c;
 }
+
+int getint2(uchar *p)
+{
+    int c = *((char *)p);
+    p++;
+    if (c==-128) { int n = *p++; n |= *((char *)p)<<8; p++; return n;}
+    else if (c==-127) { int n = *p++; n |= *p++<<8; n |= *p++<<16; return n|(*p++<<24); }
+    else return c;
+};
 
 void getstring(char *text, ucharbuf &p, int len)
 {
@@ -577,7 +587,11 @@ void CslEngine::UpdateServerInfo(CslServerInfo *info,CslUDPPacket *packet,wxUint
             if (numattr>=2)
                 info->m_gameMode=GetModeStrSB(attr[1]);
             if (numattr>=3)
-                info->m_timeRemain=attr[2]+1;
+            {
+                info->m_timeRemain=attr[2];
+                if (info->m_protocol<254)
+                    info->m_timeRemain++;
+            }
             if (numattr>=4)
                 info->m_playersMax=attr[3];
             if (numattr>=5)
@@ -590,17 +604,28 @@ void CslEngine::UpdateServerInfo(CslServerInfo *info,CslUDPPacket *packet,wxUint
             break;
         }
 
+        case CSL_GAME_CB:
+        {
+            wxInt32 i;
+            for (i=0;i<p.maxlength();i++)
+                *p.at(i)^=0x61;
+        }
         case CSL_GAME_AC:
         {
-            info->m_protocol=getint(p);
-            info->m_gameMode=GetModeStrAC(getint(p));
+            wxInt32 prot=getint(p);
+            if (info->m_type==CSL_GAME_CB && prot!=CSL_LAST_PROTOCOL_CB)
+                return;
+            info->m_protocol=prot;
+            info->m_gameMode=info->m_type==CSL_GAME_AC ?
+                             GetModeStrAC(getint(p)) : GetModeStrSB(getint(p));
             info->m_players=getint(p);
             info->m_timeRemain=getint(p);
             getstring(text,p,sizeof(text));
             info->m_map=A2U(text);
             getstring(text,p,sizeof(text));
             info->m_desc=A2U(text);
-            info->m_playersMax=getint(p);
+            if (info->m_type==CSL_GAME_AC)
+                info->m_playersMax=getint(p);
             break;
         }
 

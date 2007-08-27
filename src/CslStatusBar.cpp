@@ -23,6 +23,7 @@
 #include "img/green_16.xpm"
 #include "img/grey_16.xpm"
 #include "img/red_16.xpm"
+#include "img/yellow_16.xpm"
 
 BEGIN_EVENT_TABLE(CslStatusBar, wxStatusBar)
     EVT_SIZE(CslStatusBar::OnSize)
@@ -83,6 +84,9 @@ void CslStatusBar::SetLight(wxInt32 light)
             break;
         case LIGHT_RED:
             m_bmp->SetIcon(wxIcon(red_16_xpm));
+            break;
+        case LIGHT_YELLOW:
+            m_bmp->SetIcon(wxIcon(yellow_16_xpm));
             break;
     }
 }

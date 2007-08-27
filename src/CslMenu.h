@@ -47,15 +47,25 @@
 
 enum
 {
-    MENU_MASTER_ADD            =  wxID_HIGHEST + 1,
-    MENU_MASTER_DEL,
-    MENU_MASTER_UPDATE,
+    MENU_MASTER_ADD = wxID_ADD,
+    MENU_MASTER_DEL = wxID_REMOVE,
+    MENU_MASTER_UPDATE = wxID_REFRESH,
 
-    MENU_SERVER_ADD,
-    MENU_SERVER_CONNECT,
-    MENU_SERVER_REM,
-    MENU_SERVER_COPYTEXT,
-    MENU_SERVER_DEL,
+    MENU_SERVER_ADD = wxID_ADD,
+    MENU_SERVER_REM = wxID_REMOVE,
+    MENU_SERVER_DEL = wxID_DELETE,
+    MENU_SERVER_COPYTEXT = wxID_COPY,
+    MENU_SERVER_CONNECT = wxID_HIGHEST +1,
+
+    MENU_VIEW_HOST,
+    MENU_VIEW_DESC,
+    MENU_VIEW_PING,
+    MENU_VIEW_VER,
+    MENU_VIEW_MODE,
+    MENU_VIEW_MAP,
+    MENU_VIEW_TIME,
+    MENU_VIEW_PLAY,
+    MENU_VIEW_MM,
 
     MENU_VIEW_SEARCH,
     MENU_VIEW_FILTER,
@@ -74,7 +84,6 @@ enum
     MENU_END
 };
 
-
 class CslMenu
 {
     public:
@@ -83,11 +92,6 @@ class CslMenu
             EnableMenuItem(MENU_MASTER_ADD,false);
             EnableMenuItem(MENU_MASTER_DEL,false);
             EnableMenuItem(MENU_MASTER_UPDATE,false);
-
-//             EnableMenuItem(MENU_SERVER_CONNECT,false);
-//             EnableMenuItem(MENU_SERVER_ADD,false);
-//             EnableMenuItem(MENU_SERVER_DEL,false);
-//             EnableMenuItem(MENU_SERVER_COPYTEXT,false);
 
             CheckMenuItem(MENU_VIEW_FILTER,g_cslSettings->m_showFilter);
             CheckMenuItem(MENU_VIEW_SEARCH,g_cslSettings->m_showSearch);
@@ -98,13 +102,10 @@ class CslMenu
 
         void EnableMenuItem(wxInt32 id,bool enable=true)
         {
-            //m_toolBar->EnableTool(id,enable);
             m_menuBar->Enable(id,enable);
         }
-
         void CheckMenuItem(wxInt32 id,bool check=true)
         {
-            //m_toolBar->EnableTool(id,enable);
             m_menuBar->Check(id,check);
         }
 

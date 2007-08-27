@@ -1,17 +1,7 @@
 // generic useful stuff for any C++ program
 
-#ifndef _TOOLS_H
-#define _TOOLS_H
-
-#define A2U(PSZA_CHART) wxString(wxConvertMB2WX(PSZA_CHART))
-#define U2A(PSZT_CHART) (char*)(const char*)wxConvertWX2MB(PSZT_CHART)
-
-#ifdef __WXDEBUG__
-void Debug_Printf(const char *DbgFunc, const char *FmtStr,...);
-#define LOG_DEBUG(...) Debug_Printf(__FUNCTION__,## __VA_ARGS__);
-#else
-#define LOG_DEBUG(...)
-#endif
+#ifndef CUBE_TOOLS_H
+#define CUBE_TOOLS_H
 
 typedef unsigned char uchar;
 typedef unsigned short ushort;
@@ -109,6 +99,11 @@ struct databuf
     template<class U>
     databuf(T *buf, U maxlen) : buf(buf), len(0), maxlen((int)maxlen), flags(0) {}
 
+    T* at(const int pos)
+    {
+        return &buf[pos];
+    }
+
     const T &get()
     {
         static T overreadval;
@@ -149,6 +144,10 @@ struct databuf
     int length() const
     {
         return len;
+    }
+    int maxlength() const
+    {
+        return maxlen;
     }
     int remaining() const
     {
@@ -400,5 +399,5 @@ template <class T> struct vector
     }
 };
 
-#endif
+#endif // CUBE_TOOLS_H
 

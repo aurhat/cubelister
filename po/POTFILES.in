@@ -1,8 +1,11 @@
 [encoding: UTF-8]
 src/CslFrame.cpp
+src/CslArt.cpp
 src/CslDlgSettings.cpp
 src/CslListCtrlServer.cpp
+src/CslDlgOutput.cpp
 src/CslDlgAddMaster.cpp
+src/CslTools.cpp
 src/CslGame.cpp
 src/CslListCtrlInfo.cpp
 src/CslUDP.cpp
@@ -10,21 +13,24 @@ src/CslDlgConnectWait.cpp
 src/CslStatusBar.cpp
 src/CslEngine.cpp
 src/CslDlgAddServer.cpp
+src/CslDlgOutput.h
 src/CslEngine.h
 src/CslVersion.h
 src/CslDlgConnectWait.h
 src/CslDlgAddMaster.h
 src/CslListCtrlServer.h
 src/CslDlgGeneric.h
-src/tools.h
 src/CslDlgAddServer.h
 src/CslDlgSettings.h
 src/CslGame.h
 src/CslSettings.h
+src/CslArt.h
 src/CslUDP.h
 src/CslMenu.h
 src/CslListCtrlInfo.h
 src/libGeoIP/GeoIP.h
+src/cube_tools.h
 src/CslFlags.h
 src/CslFrame.h
+src/CslTools.h
 src/CslStatusBar.h

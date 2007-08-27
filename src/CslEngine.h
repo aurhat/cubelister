@@ -58,10 +58,7 @@ class CslResolverThread : public wxThread
             m_condition=new wxCondition(m_mutex);
             Create();
         }
-        ~CslResolverThread()
-        {
-            delete m_condition;
-        }
+        ~CslResolverThread() { delete m_condition; }
 
         virtual void *Entry();
         void AddPacket(CslResolverPacket *packet);
@@ -86,10 +83,7 @@ class CslEngine : public wxEvtHandler
 
         bool InitEngine(wxUint32 updateInterval);
         void DeInitEngine();
-        void SetUpdateInterval(wxUint32 interval)
-        {
-            m_updateInterval=interval;
-        }
+        void SetUpdateInterval(wxUint32 interval) { m_updateInterval=interval; }
 
         CslGame* AddMaster(CslMaster *master);
         void DeleteMaster(CslMaster *master);
@@ -104,22 +98,10 @@ class CslEngine : public wxEvtHandler
 
         CslGame* FindGame(CSL_GAMETYPE type);
         bool SetCurrentGame(CslGame *game,CslMaster *master);
-        CslGame* GetCurrentGame()
-        {
-            return m_currentGame;
-        }
-        CslMaster* GetCurrentMaster()
-        {
-            return m_currentMaster;
-        }
-        vector<CslGame*>* GetGames()
-        {
-            return &m_games;
-        }
-        vector<CslServerInfo*>* GetFavourites()
-        {
-            return &m_favourites;
-        }
+        CslGame* GetCurrentGame() { return m_currentGame; }
+        CslMaster* GetCurrentMaster() { return m_currentMaster; }
+        vector<CslGame*>* GetGames() { return &m_games; }
+        vector<CslServerInfo*>* GetFavourites() { return &m_favourites; }
 
         wxUint32 PingServers();
         int UpdateMaster();

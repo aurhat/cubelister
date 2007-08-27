@@ -60,6 +60,7 @@ void CslDlgAddServer::set_properties()
     choice_type->Clear();
     choice_type->Append(CSL_DEFAULT_NAME_SB,(void*)CSL_GAME_SB);
     choice_type->Append(CSL_DEFAULT_NAME_AC,(void*)CSL_GAME_AC);
+    choice_type->Append(CSL_DEFAULT_NAME_CB,(void*)CSL_GAME_CB);
     choice_type->SetSelection(0);
 }
 

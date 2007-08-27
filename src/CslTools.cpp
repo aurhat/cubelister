@@ -18,60 +18,75 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef CSLSTATUSBAR_H
-#define CSLSTATUSBAR_H
-
-/**
- @author Glen Masgai <mimosius@gmx.de>
-*/
-
-#include "wx/wxprec.h"
+#include <wx/wxprec.h>
 #ifdef __BORLANDC__
 #pragma hdrstop
 #endif
 #ifndef WX_PRECOMP
-#include "wx/wx.h"
+#include <wx/wx.h>
 #endif
-#include <wx/statusbr.h>
-#include <wx/statbmp.h>
+#include <wx/regex.h>
 
-
-enum { LIGHT_GREEN = 0, LIGHT_GREY, LIGHT_RED, LIGHT_YELLOW };
-
-class CslStatusBar : public wxStatusBar
+char* StripColours(const char *s)
 {
-    public:
-        CslStatusBar(wxWindow *parent);
+    int i=0,j=0;
+    int l=strlen(s);
 
-        static void InitBar(CslStatusBar *bar)
+    if (!l)
+        return NULL;
+
+    char *buf=strdup(s);
+
+    for (;i<l;i++)
+    {
+        char c=s[i];
+        if (c!=0xc)
         {
-            m_statusBar=bar;
+            buf[j]=c;
+            j++;
         }
-        static void SetText(wxString text,wxUint32 id);
-        static void Light(wxInt32 light)
+        else
+            i++;
+    }
+
+    buf[j]=0;
+    return buf;
+}
+
+bool IsIP(const wxString& s)
+{
+    const wxChar* dot=wxT(".");
+    wxString digit=wxT("0*[0-9]{1,3}");
+    wxString exp=wxT("^")+digit+dot+digit+dot+digit+dot+digit+wxT("$");
+    wxRegEx regex;
+
+    regex.Compile(exp);
+    return regex.Matches(s);
+}
+
+bool IP2Int(const wxString& s,wxUint32 *ip)
+{
+    long unsigned int l;
+    wxUint32 mult=0x1000000;
+    wxUint32 len=s.Len();
+    wxUint32 i=0,v=0;
+    wxString m;
+
+    for (;i<=len;i++)
+    {
+        if (i<len && s.Mid(i,1).IsNumber())
+            m+=s.Mid(i,1);
+        else
         {
-            m_statusBar->SetLight(light);
-        };
-        static wxInt32 Light()
-        {
-            return m_statusBar->GetLight();
-        };
+            m.ToULong(&l,10);
+            if (l>255)
+                return false;
+            v+=l*mult;
+            mult>>=8;
+            m.Empty();
+        }
+    }
 
-    private:
-        static CslStatusBar* m_statusBar;
-
-        void OnSize(wxSizeEvent& event);
-        DECLARE_EVENT_TABLE()
-
-    protected:
-        wxStaticBitmap *m_bmp;
-        wxInt32 m_light;
-
-        void SetLight(wxInt32 light);
-        wxInt32 GetLight()
-        {
-            return m_light;
-        };
-};
-
-#endif // CSLSTATUSBAR_H
+    *ip=v;
+    return true;
+}

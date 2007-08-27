@@ -44,7 +44,7 @@
 #include "CslDlgSettings.h"
 #include "CslListCtrlServer.h"
 #include "CslListCtrlInfo.h"
-
+#include "CslDlgOutput.h"
 
 class CslFrame: public wxFrame
 {
@@ -72,6 +72,9 @@ class CslFrame: public wxFrame
         wxInt32 m_lightCount,m_statusCount;
         bool m_timerInit;
         wxTimer m_timer;
+
+         // TODO Output from Game
+        //CslDlgOutput *m_outputDlg;
 
         // begin wxGlade: CslFrame::methods
         void set_properties();

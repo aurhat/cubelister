@@ -44,7 +44,8 @@ enum { CSL_LIST_MASTER = 0, CSL_LIST_FAVOURITE };
 enum { CSL_SORT_ASC = 0, CSL_SORT_DSC };
 enum
 {
-    SORT_HOST = 0, SORT_DESC, SORT_PING, SORT_MODE,
+    SORT_HOST = 0, SORT_DESC, SORT_VER,
+    SORT_PING, SORT_MODE,
     SORT_MAPS, SORT_TIME, SORT_PLAY, SORT_MM, SORT_UNKNOWN
 };
 
@@ -53,28 +54,21 @@ class CslListCtrlServer;
 
 class CslConnectionState
 {
-    private:
-        static bool m_playing;
-        static wxInt32 m_waitTime;
-        static wxInt32 m_timerTicks;
-        static CslListCtrlServer *m_waitList;
-        static CslServerInfo *m_waitInfo;
-
     public:
         static void Reset()
         {
-            if (m_waitInfo) m_waitInfo->SetWaiting(false);
+            if (m_activeInfo) m_activeInfo->SetWaiting(false);
             m_playing=false;
             m_waitTime=0;
-            m_waitList=NULL,m_waitInfo=NULL;
+            m_activeList=NULL,m_activeInfo=NULL;
             CslStatusBar::SetText(wxT(""),1);
         }
 
         static void CreateWaitingState(CslServerInfo *info,wxInt32 time,CslListCtrlServer *list)
         {
-            m_waitInfo=info;
+            m_activeInfo=info;
             m_waitTime=time;
-            m_waitList=list;
+            m_activeList=list;
             info->SetWaiting(true);
         }
         static bool DecTime()
@@ -88,31 +82,24 @@ class CslConnectionState
             return true;
         }
 
-        static void SetPlaying(bool val)
+        static void SetPlaying(CslListCtrlServer *list,bool val)
         {
+            m_activeList=list;
             m_playing=val;
         }
 
-        static bool IsPlaying()
-        {
-            return m_playing;
-        }
-        static bool IsWaiting()
-        {
-            return m_waitTime>0;
-        }
-        static wxInt32 GetWaitTime()
-        {
-            return m_waitTime;
-        }
-        static CslListCtrlServer* GetList()
-        {
-            return m_waitList;
-        }
-        static CslServerInfo* GetInfo()
-        {
-            return m_waitInfo;
-        }
+        static bool IsPlaying() { return m_playing; }
+        static bool IsWaiting() { return m_waitTime>0; }
+        static wxInt32 GetWaitTime() { return m_waitTime; }
+        static CslListCtrlServer* GetList() { return m_activeList; }
+        static CslServerInfo* GetInfo() { return m_activeInfo; }
+
+    private:
+        static bool m_playing;
+        static wxInt32 m_waitTime;
+        static wxInt32 m_timerTicks;
+        static CslListCtrlServer *m_activeList;
+        static CslServerInfo *m_activeInfo;
 };
 
 
@@ -127,6 +114,7 @@ class CslSortHelper
         wxInt32 m_sortType;
 };
 
+
 class CslListServer : public CslServerInfo
 {
     public:
@@ -138,6 +126,7 @@ class CslListServer : public CslServerInfo
             m_desc.Empty();
             m_gameMode.Empty();
             m_map.Empty();
+            m_protocol=-1;
             m_ping=-1;
             m_timeRemain=-2;
             m_players=-1;
@@ -146,23 +135,15 @@ class CslListServer : public CslServerInfo
             m_imgId=-1;
         }
 
-        CslServerInfo* GetPtr()
-        {
-            return m_info;
-        }
+        CslServerInfo* GetPtr() { return m_info; }
         bool HasStats()
         {
             return m_playLast>0 || m_playTimeLastGame>0 ||
                    m_playTimeTotal>0 || m_connectedTimes>0;
         }
-        wxInt32 ImgId()
-        {
-            return m_imgId;
-        }
-        void ImgId(wxInt32 imgId)
-        {
-            m_imgId=imgId;
-        }
+
+        wxInt32 ImgId() { return m_imgId; }
+        void ImgId(wxInt32 imgId) { m_imgId=imgId; }
 
     protected:
         CslServerInfo *m_info;
@@ -191,10 +172,7 @@ class CslListCtrlServer : public wxListCtrl
         wxUint32 ListFilter(wxUint32 filterFlags);
         void ClearStartConfig(wxString path);
         void ListAdjustSize(wxSize size,bool init=false);
-        void SetMasterSelected(bool selected)
-        {
-            m_masterSelected=selected;
-        }
+        void SetMasterSelected(bool selected) { m_masterSelected=selected; }
 
     private:
         wxInt32 m_id;
@@ -245,6 +223,8 @@ class CslListCtrlServer : public wxListCtrl
         void RemoveServer(CslListServer *server,CslServerInfo *info,wxInt32 id);
         void ListSort(wxInt32 column);
         void ConnectToServer(CslServerInfo *info);
+        void ListRemoveServers();
+        void ListDeleteServers();
 };
 
 #endif // CSLLISTCTRLSERVER_H

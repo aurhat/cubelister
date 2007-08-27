@@ -32,6 +32,7 @@
 #include "img/csl_32.xpm"
 #include "img/sb_24.xpm"
 #include "img/ac_24.xpm"
+#include "img/cb_24.xpm"
 #include "img/master_24.xpm"
 #include "img/close_14.xpm"
 #include "img/close_high_14.xpm"
@@ -79,7 +80,8 @@ enum
 {
     IMG_LIST_TREE_MASTER = 0,
     IMG_LIST_TREE_SB,
-    IMG_LIST_TREE_AC
+    IMG_LIST_TREE_AC,
+    IMG_LIST_TREE_CB
 };
 
 
@@ -102,14 +104,8 @@ class CslTreeItemData : public wxTreeItemData
         CslTreeItemData(CslGame* game) : m_game(game), m_master(NULL) {}
         CslTreeItemData(CslMaster* master) : m_game(NULL), m_master(master) {}
 
-        CslGame* GetGame()
-        {
-            return m_game;
-        }
-        CslMaster* GetMaster()
-        {
-            return m_master;
-        }
+        CslGame* GetGame() { return m_game; }
+        CslMaster* GetMaster() { return m_master; }
 
     protected:
         CslGame *m_game;
@@ -143,10 +139,12 @@ CslFrame::CslFrame(wxWindow* parent, int id, const wxString& title,const wxPoint
     m_imgListTree.Add(wxBitmap(master_24_xpm));
     m_imgListTree.Add(wxBitmap(sb_24_xpm));
     m_imgListTree.Add(wxBitmap(ac_24_xpm));
+    m_imgListTree.Add(wxBitmap(cb_24_xpm));
 #else
     m_imgListTree.Add(wxIcon(wxT("ICON_TREE_MASTER_24"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imgListTree.Add(wxIcon(wxT("ICON_TREE_SB_24"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imgListTree.Add(wxIcon(wxT("ICON_TREE_AC_24"),wxBITMAP_TYPE_ICO_RESOURCE));
+    m_imgListTree.Add(wxIcon(wxT("ICON_TREE_CB_24"),wxBITMAP_TYPE_ICO_RESOURCE));
 #endif
 
     m_imgListButton.Create(14,14,true);
@@ -239,15 +237,13 @@ CslFrame::CslFrame(wxWindow* parent, int id, const wxString& title,const wxPoint
             master=new CslMaster(CSL_GAME_SB,CSL_DEFAULT_MASTER_SB,CSL_DEFAULT_MASTER_PATH_SB,true);
             game=m_engine->AddMaster(master);
             m_engine->SetCurrentGame(game,NULL);
-
-            /*
-            master=new CslMaster(CSL_GAME_SB,wxT("localhost"),wxT("/~mimosius/master.list"),false);
-            game=m_engine->AddMaster(master);
-            */
-
             TreeAddGame(game,true);
 
             master=new CslMaster(CSL_GAME_AC,CSL_DEFAULT_MASTER_AC,CSL_DEFAULT_MASTER_PATH_AC,true);
+            game=m_engine->AddMaster(master);
+            TreeAddGame(game);
+
+            master=new CslMaster(CSL_GAME_CB,CSL_DEFAULT_MASTER_CB,CSL_DEFAULT_MASTER_PATH_CB,true);
             game=m_engine->AddMaster(master);
             TreeAddGame(game);
         }
@@ -267,6 +263,8 @@ CslFrame::CslFrame(wxWindow* parent, int id, const wxString& title,const wxPoint
         list_ctrl_favourites->ListUpdate(m_engine->GetFavourites());
         //tree_ctrl_games->ExpandAll();
 
+        // TODO Output from Game
+        // m_outputDlg=new CslDlgOutput(this);
         m_timerInit=true;
         m_timer.Start(CSL_TIMER_SHOT);
     }
@@ -391,7 +389,7 @@ void CslFrame::do_layout()
     grid_sizer_filter->Add(button_filter_reset, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
     grid_sizer_filter->AddGrowableCol(1);
     sizer_filter->Add(grid_sizer_filter, 1, wxEXPAND, 0);
-    grid_sizer_main_left->Add(sizer_filter, 1, wxLEFT|wxRIGHT|wxTOP|wxEXPAND, 4);
+    grid_sizer_main_left->Add(sizer_filter, 1, wxTOP|wxEXPAND, 4);
     pane_main_left->SetSizer(grid_sizer_main_left);
     grid_sizer_main_left->AddGrowableRow(0);
     grid_sizer_main_left->AddGrowableCol(0);
@@ -489,6 +487,13 @@ void CslFrame::OnTimer(wxTimerEvent& event)
     {
         wxPostEvent(CslConnectionState::GetList(),event);
         CslStatusBar::Light(LIGHT_RED);
+    }
+
+    if (CslConnectionState::IsPlaying())
+    {
+        //TODO Output from Game
+        //wxPostEvent(CslConnectionState::GetList(),event);
+        CslStatusBar::Light(LIGHT_YELLOW);
     }
 
     if (CslStatusBar::Light()!=LIGHT_GREY)
@@ -600,7 +605,7 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
 
         case MENU_MASTER_ADD:
         {
-            CSL_GAMETYPE type=CSL_GAME_OTHER;
+            CSL_GAMETYPE type=CSL_GAME_START;
             wxTreeItemId item=tree_ctrl_games->GetSelection();
             if (item.IsOk())
             {
@@ -1072,6 +1077,9 @@ void CslFrame::TreeAddGame(CslGame *game,bool activate)
             case CSL_GAME_AC:
                 img=IMG_LIST_TREE_AC;
                 break;
+            case CSL_GAME_CB:
+                img=IMG_LIST_TREE_CB;
+                break;
             default:
                 return;
         }
@@ -1159,6 +1167,7 @@ void CslFrame::LoadSettings()
     if (config->Read(wxT("ColMult6"),&dval)) g_cslSettings->m_colServerS6=(float)dval;
     if (config->Read(wxT("ColMult7"),&dval)) g_cslSettings->m_colServerS7=(float)dval;
     if (config->Read(wxT("ColMult8"),&dval)) g_cslSettings->m_colServerS8=(float)dval;
+    if (config->Read(wxT("ColMult9"),&dval)) g_cslSettings->m_colServerS9=(float)dval;
     if (config->Read(wxT("ColourEmpty"),&val)) g_cslSettings->m_colServerEmpty=INT2COLOUR(val);
     if (config->Read(wxT("ColourOffline"),&val)) g_cslSettings->m_colServerOff=INT2COLOUR(val);
     if (config->Read(wxT("ColourFull"),&val)) g_cslSettings->m_colServerFull=INT2COLOUR(val);
@@ -1180,6 +1189,10 @@ void CslFrame::LoadSettings()
     if (config->Read(wxT("OptionsAC"),&s)) g_cslSettings->m_clientOptsAC=s;
     if (config->Read(wxT("PathAC"),&s)) g_cslSettings->m_configPathAC=s;
     if (config->Read(wxT("MinPlaytime"),&val))
+        if (config->Read(wxT("ConnectModeCB"),&val)) g_cslSettings->m_connectModeCB=val;
+    if (config->Read(wxT("BinaryCB"),&s)) g_cslSettings->m_clientBinCB=s;
+    if (config->Read(wxT("OptionsCB"),&s)) g_cslSettings->m_clientOptsCB=s;
+    if (config->Read(wxT("PathCB"),&s)) g_cslSettings->m_configPathCB=s;
     {
         if (val<CSL_MIN_PLAYTIME_MIN || val>CSL_MIN_PLAYTIME_MAX)
             val=CSL_MIN_PLAYTIME_STD;
@@ -1240,6 +1253,7 @@ void CslFrame::SaveSettings()
     config->Write(wxT("ColMult6"),g_cslSettings->m_colServerS6);
     config->Write(wxT("ColMult7"),g_cslSettings->m_colServerS7);
     config->Write(wxT("ColMult8"),g_cslSettings->m_colServerS8);
+    config->Write(wxT("ColMult9"),g_cslSettings->m_colServerS9);
     config->Write(wxT("ColourEmpty"),COLOUR2INT(g_cslSettings->m_colServerEmpty));
     config->Write(wxT("ColourOffline"),COLOUR2INT(g_cslSettings->m_colServerOff));
     config->Write(wxT("ColourFull"),COLOUR2INT(g_cslSettings->m_colServerFull));
@@ -1260,6 +1274,10 @@ void CslFrame::SaveSettings()
     config->Write(wxT("BinaryAC"),g_cslSettings->m_clientBinAC);
     config->Write(wxT("OptionsAC"),g_cslSettings->m_clientOptsAC);
     config->Write(wxT("PathAC"),g_cslSettings->m_configPathAC);
+    config->Write(wxT("ConnectModeCB"),(long int)g_cslSettings->m_connectModeCB);
+    config->Write(wxT("BinaryCB"),g_cslSettings->m_clientBinCB);
+    config->Write(wxT("OptionsCB"),g_cslSettings->m_clientOptsCB);
+    config->Write(wxT("PathCB"),g_cslSettings->m_configPathCB);
     config->Write(wxT("MinPlaytime"),(long int)g_cslSettings->m_minPlaytime);
 
     delete config;
@@ -1292,7 +1310,7 @@ bool CslFrame::LoadServers(wxUint32 *numm,wxUint32 *nums)
     config=new wxFileConfig(wxEmptyString,wxEmptyString,file,
                             wxEmptyString,wxCONFIG_USE_LOCAL_FILE);
 
-    for (wxUint32 g=CSL_GAME_OTHER+1;g<CSL_GAME_END;g++)
+    for (wxUint32 g=CSL_GAME_START+1;g<CSL_GAME_END;g++)
     {
         wxString s=wxT("/")+wxString(GetGameStr(g));
         config->SetPath(s);

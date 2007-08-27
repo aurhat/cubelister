@@ -93,27 +93,12 @@ class CslUDPPacket
             m_data=data;
             m_size=size;
         }
-        void SetSize(wxUint32 size)
-        {
-            m_size=size;
-        }
-        void SetAddr(wxIPV4address& addr)
-        {
-            m_addr=addr;
-        }
+        void SetSize(wxUint32 size) { m_size=size; }
+        void SetAddr(wxIPV4address& addr) { m_addr=addr; }
 
-        void* Data()
-        {
-            return m_data;
-        }
-        wxUint32 Size()
-        {
-            return m_size;
-        }
-        wxIPV4address& Address()
-        {
-            return m_addr;
-        }
+        void* Data() { return m_data; }
+        wxUint32 Size() { return m_size; }
+        wxIPV4address& Address() { return m_addr; }
 
     private:
         wxUint32 m_size;
@@ -127,10 +112,8 @@ class CslUDP : public wxEvtHandler
         CslUDP(wxEvtHandler *handler,wxUint32 interval);
         ~CslUDP();
 
-        bool IsInit()
-        {
-            return m_init;
-        }
+        bool IsInit() { return m_init; }
+
         bool SendPing(CslUDPPacket *packet);
         wxUint32 GetTicks(bool init=false);
 

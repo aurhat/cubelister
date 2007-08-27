@@ -49,12 +49,12 @@ enum
     CONNECT_MODE_PARAM
 };
 
-#define CSL_FILTER_FULL        0x1
-#define CSL_FILTER_EMPTY       0x2
-#define CSL_FILTER_NONEMPTY    0x4
-#define CSL_FILTER_OFFLINE     0x8
-#define CSL_FILTER_MM2         0x10
-#define CSL_FILTER_MM3         0x20
+#define CSL_FILTER_FULL        1<<0
+#define CSL_FILTER_EMPTY       1<<1
+#define CSL_FILTER_NONEMPTY    1<<2
+#define CSL_FILTER_OFFLINE     1<<3
+#define CSL_FILTER_MM2         1<<4
+#define CSL_FILTER_MM3         1<<5
 
 #define CSL_WAIT_SERVER_FULL_MIN   10
 #define CSL_WAIT_SERVER_FULL_MAX   600
@@ -92,14 +92,15 @@ class CslSettings
                 /* ListCtrl */
                 m_autoFitColumns(true),
                 m_autoSortColumns(true),
-                m_colServerS1(0.20f),
-                m_colServerS2(0.20f),
-                m_colServerS3(0.1f),
-                m_colServerS4(0.1f),
-                m_colServerS5(0.15f),
-                m_colServerS6(0.08f),
-                m_colServerS7(0.08f),
-                m_colServerS8(0.08f),
+                m_colServerS1(0.18f),
+                m_colServerS2(0.18f),
+                m_colServerS3(0.09f),
+                m_colServerS4(0.09f),
+                m_colServerS5(0.10f),
+                m_colServerS6(0.14f),
+                m_colServerS7(0.07f),
+                m_colServerS8(0.07f),
+                m_colServerS9(0.07f),
                 m_colServerEmpty(wxColour(60,15,15)),
                 m_colServerOff(wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT)),
                 m_colServerFull(*wxRED),
@@ -123,6 +124,10 @@ class CslSettings
                 m_clientBinAC(wxEmptyString),
                 m_clientOptsAC(wxEmptyString),
                 m_configPathAC(wxEmptyString),
+                m_connectModeCB(CONNECT_MODE_CONFIG),
+                m_clientBinCB(wxEmptyString),
+                m_clientOptsCB(wxEmptyString),
+                m_configPathCB(wxEmptyString),
                 m_minPlaytime(CSL_MIN_PLAYTIME_STD)
         {}
 
@@ -144,7 +149,7 @@ class CslSettings
         /* ListCtrl*/
         bool m_autoFitColumns,m_autoSortColumns;
         float m_colServerS1,m_colServerS2,m_colServerS3,m_colServerS4;
-        float m_colServerS5,m_colServerS6,m_colServerS7,m_colServerS8;
+        float m_colServerS5,m_colServerS6,m_colServerS7,m_colServerS8,m_colServerS9;
         wxColour m_colServerEmpty,m_colServerOff,m_colServerFull;
         wxColour m_colServerMM1,m_colServerMM2,m_colServerMM3;
         wxColour m_colServerHigh;
@@ -160,6 +165,10 @@ class CslSettings
         wxString m_clientBinAC;
         wxString m_clientOptsAC;
         wxString m_configPathAC;
+        wxInt32 m_connectModeCB;
+        wxString m_clientBinCB;
+        wxString m_clientOptsCB;
+        wxString m_configPathCB;
         wxUint32 m_minPlaytime;
 };
 

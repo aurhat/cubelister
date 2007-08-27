@@ -20,6 +20,42 @@
 
 #include "CslGame.h"
 
+const wxChar* GetVersionStrSB(int n)
+{
+    static const wxChar* sb_versions[] =
+    {
+        wxT("Summer"), wxT("Spring"), wxT("Gui"), wxT("Water"),
+        wxT("Normalmap"), wxT("Sp"), wxT("Occlusion"), wxT("Shader"),
+        wxT("Physics"), wxT("Mp"), wxT(""), wxT("Agc"), wxT("Quakecon"),
+        wxT("Independence")
+    };
+    size_t v=CSL_LAST_PROTOCOL_SB-n;
+    return (v>=0 && v<sizeof(sb_versions)/sizeof(sb_versions[0])) ?
+           sb_versions[v] : wxString::Format(wxT("%d"),n).c_str();
+}
+
+const wxChar* GetVersionStrAC(int n)
+{
+    static const wxChar* ac_versions[] =
+    {
+        wxT("0.93.x"), wxT("0.92"), wxT("0.91.x"), wxT("0.90")
+    };
+    size_t v=CSL_LAST_PROTOCOL_AC-n;
+    return (v>=0 && v<sizeof(ac_versions)/sizeof(ac_versions[0])) ?
+           ac_versions[v] : wxString::Format(wxT("%d"),n).c_str();
+}
+
+const wxChar* GetVersionStrCB(int n)
+{
+    static const wxChar* cb_versions[] =
+    {
+        wxT("122")
+    };
+    size_t v=CSL_LAST_PROTOCOL_CB-n;
+    return (v>=0 && v<sizeof(cb_versions)/sizeof(cb_versions[0])) ?
+           cb_versions[v] : wxString::Format(wxT("%d"),n).c_str();
+}
+
 const wxChar* GetModeStrSB(int n)
 {
     static const wxChar* sb_modenames[] =
@@ -48,9 +84,9 @@ const wxChar* GetGameStr(int n)
 {
     static const wxChar *game_names[] =
     {
-        wxT("Sauerbraten"), wxT("AssaultCube")
+        wxT("Sauerbraten"), wxT("AssaultCube"), wxT("Cube")
     };
-    return (n>CSL_GAME_OTHER && n<=CSL_GAME_END &&
+    return (n>CSL_GAME_START && n<=CSL_GAME_END &&
             (size_t)(n-1)<sizeof(game_names)/sizeof(game_names[0])) ? game_names[n-1] : wxT("none");
 }
 
@@ -64,6 +100,9 @@ CslGame::CslGame(CSL_GAMETYPE type) : m_type(type), m_masterID(0)
             break;
         case CSL_GAME_AC:
             m_name=CSL_DEFAULT_NAME_AC;
+            break;
+        case CSL_GAME_CB:
+            m_name=CSL_DEFAULT_NAME_CB;
             break;
         default:
             wxASSERT_MSG(!m_type,wxT("unknown game"));

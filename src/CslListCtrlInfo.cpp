@@ -20,6 +20,7 @@
 
 #include "CslListCtrlInfo.h"
 #include "CslSettings.h"
+#include "CslTools.h"
 #include "CslFlags.h"
 #ifdef __WXMSW__
 #include "img/info_23_12.xpm"
@@ -30,8 +31,6 @@
 BEGIN_EVENT_TABLE(CslListCtrlInfo, wxListCtrl)
     EVT_SIZE(CslListCtrlInfo::OnSize)
 END_EVENT_TABLE()
-
-extern bool IsIP(wxString s);
 
 #ifdef _MSC_VER
 #define strcasecmp _stricmp
@@ -170,7 +169,7 @@ CslListCtrlInfo::CslListCtrlInfo(wxWindow* parent,wxWindowID id,const wxPoint& p
     InsertItem(i++,_("Address"),0);
     InsertItem(i++,_("Location"),0);
     InsertItem(i++,_("Game"),0);
-    InsertItem(i++,_("Version"),0);
+    InsertItem(i++,_("Protocol version"),0);
     InsertItem(i++,_("Last seen"),0);
     InsertItem(i++,_("Last played"),0);
     InsertItem(i++,_("Last playtime"),0);
@@ -300,6 +299,9 @@ void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
             break;
         case CSL_GAME_AC:
             s=CSL_DEFAULT_NAME_AC;
+            break;
+        case CSL_GAME_CB:
+            s=CSL_DEFAULT_NAME_CB;
             break;
         default:
             s=CSL_UNKNOWN_STR;

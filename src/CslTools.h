@@ -18,60 +18,25 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef CSLSTATUSBAR_H
-#define CSLSTATUSBAR_H
+#ifndef CSLTOOLS_H
+#define CSLTOOLS_H
 
 /**
- @author Glen Masgai <mimosius@gmx.de>
+    @author Glen Masgai <mimosius@gmx.de>
 */
 
-#include "wx/wxprec.h"
-#ifdef __BORLANDC__
-#pragma hdrstop
+#define A2U(PSZA_CHART) wxString(wxConvertMB2WX(PSZA_CHART))
+#define U2A(PSZT_CHART) (char*)(const char*)wxConvertWX2MB(PSZT_CHART)
+
+#ifdef __WXDEBUG__
+void Debug_Printf(const char *DbgFunc, const char *FmtStr,...);
+#define LOG_DEBUG(...) Debug_Printf(__FUNCTION__,## __VA_ARGS__);
+#else
+#define LOG_DEBUG(...)
 #endif
-#ifndef WX_PRECOMP
-#include "wx/wx.h"
-#endif
-#include <wx/statusbr.h>
-#include <wx/statbmp.h>
 
+extern char* StripColours(const char *s);
+extern bool IsIP(const wxString& s);
+extern bool IP2Int(const wxString& s,wxUint32 *ip);
 
-enum { LIGHT_GREEN = 0, LIGHT_GREY, LIGHT_RED, LIGHT_YELLOW };
-
-class CslStatusBar : public wxStatusBar
-{
-    public:
-        CslStatusBar(wxWindow *parent);
-
-        static void InitBar(CslStatusBar *bar)
-        {
-            m_statusBar=bar;
-        }
-        static void SetText(wxString text,wxUint32 id);
-        static void Light(wxInt32 light)
-        {
-            m_statusBar->SetLight(light);
-        };
-        static wxInt32 Light()
-        {
-            return m_statusBar->GetLight();
-        };
-
-    private:
-        static CslStatusBar* m_statusBar;
-
-        void OnSize(wxSizeEvent& event);
-        DECLARE_EVENT_TABLE()
-
-    protected:
-        wxStaticBitmap *m_bmp;
-        wxInt32 m_light;
-
-        void SetLight(wxInt32 light);
-        wxInt32 GetLight()
-        {
-            return m_light;
-        };
-};
-
-#endif // CSLSTATUSBAR_H
+#endif // CSLTOOLS_H

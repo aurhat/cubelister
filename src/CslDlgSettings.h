@@ -34,9 +34,10 @@
 #endif
 #include <wx/image.h>
 // begin wxGlade: ::dependencies
-#include <wx/spinctrl.h>
 #include <wx/notebook.h>
+#include <wx/spinctrl.h>
 // end wxGlade
+#include <wx/listbook.h>
 #include <wx/filepicker.h>
 
 #include "CslSettings.h"
@@ -57,6 +58,7 @@ class CslDlgSettings: public wxDialog
         void set_properties();
         void do_layout();
         // end wxGlade
+
         CslSettings m_settings;
 
         void OnPicker(wxFileDirPickerEvent& event);
@@ -70,14 +72,17 @@ class CslDlgSettings: public wxDialog
         wxStaticBox* sizer_ping_threshold_staticbox;
         wxStaticBox* sizer_times_staticbox;
         wxStaticBox* sizer_colours_staticbox;
-        wxStaticBox* sizer_assault_path_staticbox;
-        wxStaticBox* sizer_sauer_path_staticbox;
         wxTextCtrl* text_ctrl_sauer_options;
-        wxRadioButton* radio_btn_sauer_config_start;
-        wxRadioButton* radio_btn_sauer_param_start;
+        wxRadioButton* radio_btn_sauer_start_param;
+        wxRadioButton* radio_btn_sauer_start_config;
+        wxPanel* notebook_pane_sauer;
         wxTextCtrl* text_ctrl_assault_options;
-        wxRadioButton* radio_btn_assault_config_start;
-        wxRadioButton* radio_btn_assault_param_start;
+        wxRadioButton* radio_btn_assault_start_config;
+        wxPanel* notebook_pane_assault;
+        wxTextCtrl* text_ctrl_cube_options;
+        wxRadioButton* radio_btn_cube_start_config;
+        wxPanel* notebook_pane_cube;
+        wxListbook* notebook_games;
         wxPanel* notebook_pane_games;
         wxBitmapButton* button_colour_empty;
         wxBitmapButton* button_colour_mm1;
@@ -98,8 +103,8 @@ class CslDlgSettings: public wxDialog
         wxButton* button_cancel;
         // end wxGlade
 
-        wxFilePickerCtrl *fpickSauer,*fpickAssault;
-        wxDirPickerCtrl *dpickSauer,*dpickAssault;
+        wxFilePickerCtrl *fpickSauer,*fpickAssault,*fpickCube;
+        wxDirPickerCtrl *dpickSauer,*dpickAssault,*dpickCube;
 
         void SetButtonColour(wxBitmapButton *button,wxButton *refButton,wxColour& colour);
         bool Validate();

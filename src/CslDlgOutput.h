@@ -17,13 +17,10 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#if 0
 
-#ifndef CSLSTATUSBAR_H
-#define CSLSTATUSBAR_H
-
-/**
- @author Glen Masgai <mimosius@gmx.de>
-*/
+#ifndef CSLDLGOUTPUT_H
+#define CSLDLGOUTPUT_H
 
 #include "wx/wxprec.h"
 #ifdef __BORLANDC__
@@ -32,46 +29,39 @@
 #ifndef WX_PRECOMP
 #include "wx/wx.h"
 #endif
-#include <wx/statusbr.h>
-#include <wx/statbmp.h>
+#include <wx/image.h>
 
 
-enum { LIGHT_GREEN = 0, LIGHT_GREY, LIGHT_RED, LIGHT_YELLOW };
+// begin wxGlade: ::dependencies
+// end wxGlade
 
-class CslStatusBar : public wxStatusBar
+
+class CslDlgOutput: public wxDialog
 {
     public:
-        CslStatusBar(wxWindow *parent);
+        // begin wxGlade: CslDlgOutput::ids
+        // end wxGlade
 
-        static void InitBar(CslStatusBar *bar)
-        {
-            m_statusBar=bar;
-        }
-        static void SetText(wxString text,wxUint32 id);
-        static void Light(wxInt32 light)
-        {
-            m_statusBar->SetLight(light);
-        };
-        static wxInt32 Light()
-        {
-            return m_statusBar->GetLight();
-        };
+        CslDlgOutput(wxWindow* parent,int id=wxID_ANY,const wxString& title=wxEmptyString,
+                     const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize,
+                     long style=wxDEFAULT_DIALOG_STYLE);
 
     private:
-        static CslStatusBar* m_statusBar;
-
-        void OnSize(wxSizeEvent& event);
-        DECLARE_EVENT_TABLE()
+        // begin wxGlade: CslDlgOutput::methods
+        void set_properties();
+        void do_layout();
+        // end wxGlade
 
     protected:
-        wxStaticBitmap *m_bmp;
-        wxInt32 m_light;
+        // begin wxGlade: CslDlgOutput::attributes
+        wxTextCtrl* text_ctrl_output;
+        wxCheckBox* checkbox_conversation;
+        wxButton* button_save;
+        wxButton* button_close;
+        // end wxGlade
+}; // wxGlade: end class
 
-        void SetLight(wxInt32 light);
-        wxInt32 GetLight()
-        {
-            return m_light;
-        };
-};
 
-#endif // CSLSTATUSBAR_H
+#endif // CSLDLGOUTPUT_H
+
+#endif

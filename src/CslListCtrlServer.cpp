@@ -19,24 +19,28 @@
  ***************************************************************************/
 
 #include <wx/clipbrd.h>
-#include <wx/regex.h>
 #include <wx/file.h>
 #include "CslDlgAddServer.h"
 #include "CslDlgConnectWait.h"
 #include "CslListCtrlServer.h"
 #include "CslStatusBar.h"
+#include "CslArt.h"
 #include "CslMenu.h"
 #include "CslSettings.h"
+#include "CslTools.h"
 
 #ifndef _MSC_VER
 #include "img/sortasc_16.xpm"
 #include "img/sortdsc_16.xpm"
+#include "img/sortasclight_16.xpm"
+#include "img/sortdsclight_16.xpm"
 #include "img/red_list_16.xpm"
 #include "img/green_list_16.xpm"
 #include "img/yellow_list_16.xpm"
 #include "img/grey_list_16.xpm"
 #include "img/sb_16.xpm"
 #include "img/ac_16.xpm"
+#include "img/cb_16.xpm"
 #endif
 
 #define CSL_WARNING_STR            _("Warning!")
@@ -76,73 +80,8 @@ END_EVENT_TABLE()
 
 bool               CslConnectionState::m_playing=false;
 wxInt32            CslConnectionState::m_waitTime=0;
-CslListCtrlServer* CslConnectionState::m_waitList=NULL;
-CslServerInfo*     CslConnectionState::m_waitInfo=NULL;
-
-
-char* StripColours(char *s)
-{
-    int i=0,j=0;
-    int l=strlen(s);
-
-    if (!l)
-        return NULL;
-
-    char *buf=strdup(s);
-
-    for (;i<l;i++)
-    {
-        char c=s[i];
-        if (c!=0xc)
-        {
-            buf[j]=c;
-            j++;
-        }
-        else
-            i++;
-    }
-
-    buf[j]=0;
-    return buf;
-}
-
-bool IsIP(wxString s)
-{
-    const wxChar* dot=wxT(".");
-    wxString digit=wxT("0*[0-9]{1,3}");
-    wxString exp=wxT("^")+digit+dot+digit+dot+digit+dot+digit+wxT("$");
-    wxRegEx regex;
-
-    regex.Compile(exp);
-    return regex.Matches(s);
-}
-
-bool IP2Int(const wxString s,wxUint32 *ip)
-{
-    long unsigned int l;
-    wxUint32 mult=0x1000000;
-    wxUint32 len=s.Len();
-    wxUint32 i=0,v=0;
-    wxString m;
-
-    for (;i<=len;i++)
-    {
-        if (i<len && s.Mid(i,1).IsNumber())
-            m+=s.Mid(i,1);
-        else
-        {
-            m.ToULong(&l,10);
-            if (l>255)
-                return false;
-            v+=l*mult;
-            mult>>=8;
-            m.Empty();
-        }
-    }
-
-    *ip=v;
-    return true;
-}
+CslListCtrlServer* CslConnectionState::m_activeList=NULL;
+CslServerInfo*     CslConnectionState::m_activeInfo=NULL;
 
 
 class CslProcess : public wxProcess
@@ -152,7 +91,9 @@ class CslProcess : public wxProcess
                    wxString cmd,wxString path=wxEmptyString,bool clear=false) :
                 wxProcess((CslListCtrlServer*)parent),
                 m_parent(parent),m_info(info),m_cmd(cmd),m_path(path),m_clear(clear)
-        {}
+        {
+            m_self=this;
+        }
 
         virtual void OnTerminate(int pid,int code)
         {
@@ -181,7 +122,10 @@ class CslProcess : public wxProcess
             m_watch.Start(0);
         }
 
+        static wxInputStream *GetStream() { return m_self->GetInputStream(); }
+
     protected:
+        static CslProcess *m_self;
         CslListCtrlServer *m_parent;
         CslServerInfo *m_info;
         wxString m_cmd;
@@ -189,6 +133,8 @@ class CslProcess : public wxProcess
         bool m_clear;
         wxStopWatch m_watch;
 };
+
+CslProcess* CslProcess::m_self=NULL;
 
 
 CslListCtrlServer::CslListCtrlServer(wxWindow* parent,wxWindowID id,const wxPoint& pos,
@@ -199,14 +145,18 @@ CslListCtrlServer::CslListCtrlServer(wxWindow* parent,wxWindowID id,const wxPoin
         m_listInfo(NULL),m_listMaster(NULL),m_listFavourites(NULL),
         m_dontUpdateInfo(false),m_dontRemoveOnDeselect(false),m_filterFlags(0)
 {
-#define CSL_LIST_IMG_GREEN     0
-#define CSL_LIST_IMG_YELLOW    1
-#define CSL_LIST_IMG_RED       2
-#define CSL_LIST_IMG_GREY      3
-#define CSL_LIST_IMG_SORT_ASC  4
-#define CSL_LIST_IMG_SORT_DSC  5
-#define CSL_LIST_IMG_SB        6
-#define CSL_LIST_IMG_AC        7
+
+#define CSL_LIST_IMG_GREEN            0
+#define CSL_LIST_IMG_YELLOW           1
+#define CSL_LIST_IMG_RED              2
+#define CSL_LIST_IMG_GREY             3
+#define CSL_LIST_IMG_SORT_ASC         4
+#define CSL_LIST_IMG_SORT_DSC         5
+#define CSL_LIST_IMG_SORT_ASC_LIGHT   6
+#define CSL_LIST_IMG_SORT_DSC_LIGHT   7
+#define CSL_LIST_IMG_SB               8
+#define CSL_LIST_IMG_AC               9
+#define CSL_LIST_IMG_CB              10
 
     m_imageList.Create(16,16,true);
 
@@ -217,8 +167,11 @@ CslListCtrlServer::CslListCtrlServer(wxWindow* parent,wxWindowID id,const wxPoin
     m_imageList.Add(wxBitmap(grey_list_16_xpm));
     m_imageList.Add(wxBitmap(sortasc_16_xpm));
     m_imageList.Add(wxBitmap(sortdsc_16_xpm));
+    m_imageList.Add(wxBitmap(sortasclight_16_xpm));
+    m_imageList.Add(wxBitmap(sortdsclight_16_xpm));
     m_imageList.Add(wxBitmap(sb_16_xpm));
     m_imageList.Add(wxBitmap(ac_16_xpm));
+    m_imageList.Add(wxBitmap(cb_16_xpm));
 #else
     m_imageList.Add(wxIcon(wxT("ICON_LIST_GREEN"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imageList.Add(wxIcon(wxT("ICON_LIST_YELLOW"),wxBITMAP_TYPE_ICO_RESOURCE));
@@ -226,9 +179,14 @@ CslListCtrlServer::CslListCtrlServer(wxWindow* parent,wxWindowID id,const wxPoin
     m_imageList.Add(wxIcon(wxT("ICON_LIST_GREY"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imageList.Add(wxIcon(wxT("ICON_LIST_ASC"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imageList.Add(wxIcon(wxT("ICON_LIST_DSC"),wxBITMAP_TYPE_ICO_RESOURCE));
+    m_imageList.Add(wxIcon(wxT("ICON_LIST_ASC_LIGHT"),wxBITMAP_TYPE_ICO_RESOURCE));
+    m_imageList.Add(wxIcon(wxT("ICON_LIST_DSC_LIGHT"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imageList.Add(wxIcon(wxT("ICON_LIST_SB_16"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imageList.Add(wxIcon(wxT("ICON_LIST_AC_16"),wxBITMAP_TYPE_ICO_RESOURCE));
+    m_imageList.Add(wxIcon(wxT("ICON_LIST_CB_16"),wxBITMAP_TYPE_ICO_RESOURCE));
 #endif
+
+    wxArtProvider::Push(new CslArt);
 }
 
 CslListCtrlServer::~CslListCtrlServer()
@@ -241,6 +199,7 @@ void CslListCtrlServer::OnSize(wxSizeEvent& event)
     ListAdjustSize(event.GetSize());
     event.Skip();
 }
+
 void CslListCtrlServer::OnKeyDown(wxKeyEvent &event)
 {
     wxInt32 i;
@@ -248,8 +207,6 @@ void CslListCtrlServer::OnKeyDown(wxKeyEvent &event)
 
     if (event.ControlDown() && code=='A')
     {
-        wxStopWatch sw;
-        sw.Start(0);
         m_dontUpdateInfo=true;
         for (i=0;i<GetItemCount();i++)
             SetItemState(i,wxLIST_STATE_SELECTED,wxLIST_STATE_SELECTED);
@@ -257,6 +214,13 @@ void CslListCtrlServer::OnKeyDown(wxKeyEvent &event)
     }
     else if (code==WXK_DELETE || code == WXK_NUMPAD_DELETE)
     {
+        //TODO problem - multiple events
+        /*
+        if (event.ShiftDown())
+            ListDeleteServers();
+        else
+            ListRemoveServers();
+        */
     }
 
     event.Skip();
@@ -269,9 +233,6 @@ void CslListCtrlServer::OnColumnLeftClick(wxListEvent& event)
 
 void CslListCtrlServer::OnItemActivated(wxListEvent& event)
 {
-//     if (CslConnectionState::IsPlaying())
-//         return;
-
     wxListItem item;
     item.SetId(event.GetIndex());
     CslListServer *server=(CslListServer*)GetItemData(item);
@@ -321,7 +282,7 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
     wxPoint point=event.GetPosition();
     wxInt32 c;
 
-    //If from keyboard
+    //from keyboard
     if (point.x==-1 && point.y==-1)
     {
         //TODO handler mouse pos if pointer is outside window
@@ -331,13 +292,17 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
         point=wxGetMousePosition();
     }
 
-    wxMenu menu(_(""));
+    wxMenu menu;
 
     c=m_selected.GetCount();
     if (c==1)
     {
-        menu.Append(MENU_SERVER_CONNECT,MENU_SERVER_CONN_STR);
+        // no stock item here
+        wxMenuItem *item=new wxMenuItem(&menu,MENU_SERVER_CONNECT,MENU_SERVER_CONN_STR);
+        item->SetBitmap(GET_ART_MENU(CSL_ART_CONNECT));
+        menu.Append(item);
         menu.AppendSeparator();
+
         if (CslConnectionState::IsPlaying())
             menu.Enable(MENU_SERVER_CONNECT,false);
     }
@@ -376,12 +341,106 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
     PopupMenu(&menu,point);
 }
 
+void CslListCtrlServer::ListRemoveServers()
+{
+    wxInt32 c,i;
+    CslServerInfo *info;
+    wxListItem item;
+
+    for (i=m_selected.GetCount()-1;i>=0;i--)
+    {
+        CslListServer *ls=m_selected.Item(i);
+        info=ls->GetPtr();
+
+        if ((c=ListFindItem(info))==wxNOT_FOUND)
+            continue;
+
+        item.SetId(c);
+        ListDeleteItem(&item);
+        m_selected.RemoveAt(i);
+
+        m_servers.Remove(ls);
+
+        switch (m_id)
+        {
+            case CSL_LIST_MASTER:
+                m_engine->RemoveServerFromMaster(info);
+                break;
+            case CSL_LIST_FAVOURITE:
+                m_engine->RemoveServerFromFavourites(info);
+                break;
+        }
+    }
+}
+
+void CslListCtrlServer::ListDeleteServers()
+{
+    wxInt32 c,i;
+    wxString msg;
+    CslServerInfo *info;
+    wxInt32 skipFav=wxCANCEL,skipStats=wxCANCEL;
+
+    for (i=m_selected.GetCount()-1;i>=0;i--)
+    {
+        msg.Empty();
+        CslListServer *ls=m_selected.Item(i);
+
+        if (skipFav==wxCANCEL && ls->IsFavourite())
+        {
+            msg=_("You are about to delete servers which are also favourites!\n");
+            msg+=CSL_DELETE_YESNOCANCEL_STR;
+            skipFav=wxMessageBox(msg,CSL_WARNING_STR,wxYES_NO|wxCANCEL|wxICON_WARNING,this);
+            if (skipFav==wxCANCEL)
+                return;
+            if (skipFav!=wxNO)
+                continue;
+        }
+        if (skipStats==wxCANCEL && ls->HasStats())
+        {
+            msg=_("You are about to delete servers which have statistics!\n");
+            msg+=CSL_DELETE_YESNOCANCEL_STR;
+            skipStats=wxMessageBox(msg,CSL_WARNING_STR,wxYES_NO|wxCANCEL|wxICON_WARNING,this);
+            if (skipStats==wxCANCEL)
+                return;
+            if (skipStats!=wxNO)
+                continue;
+        }
+    }
+
+    for (i=m_selected.GetCount()-1;i>=0;i--)
+    {
+        CslListServer *ls=m_selected.Item(i);
+        info=ls->GetPtr();
+
+        if ((c=ListFindItem(info))==wxNOT_FOUND)
+            continue;
+
+        if (ls->IsLocked())
+            continue;
+
+        if (ls->IsFavourite() && skipFav!=wxNO)
+            continue;
+
+        if (ls->HasStats() && skipStats!=wxNO)
+            continue;
+
+        RemoveServer(ls,info,i);
+
+        if (m_id==CSL_LIST_MASTER && ls->IsFavourite())
+            m_listFavourites->RemoveServer(NULL,info,-1);
+        else if (m_id==CSL_LIST_FAVOURITE)
+            m_listMaster->RemoveServer(NULL,info,-1);
+
+        m_engine->DeleteServer(info);
+    }
+}
+
 void CslListCtrlServer::OnMenu(wxCommandEvent& event)
 {
     CslServerInfo *info;
     wxListItem item;
-    wxUint32 i;
-    wxInt32 c;
+    wxUint32 i=0;
+    wxInt32 c=0;
     wxString s;
 
     wxInt32 id=event.GetId();
@@ -446,94 +505,13 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
 
         case MENU_SERVER_REM:
         {
-            wxInt32 j;
-
-            for (j=m_selected.GetCount()-1;j>=0;j--)
-            {
-                CslListServer *ls=m_selected.Item(j);
-                info=ls->GetPtr();
-
-                if ((c=ListFindItem(info))==wxNOT_FOUND)
-                    continue;
-
-                item.SetId(c);
-                ListDeleteItem(&item);
-                m_selected.RemoveAt(j);
-
-                m_servers.Remove(ls);
-
-                switch (m_id)
-                {
-                    case CSL_LIST_MASTER:
-                        m_engine->RemoveServerFromMaster(info);
-                        break;
-                    case CSL_LIST_FAVOURITE:
-                        m_engine->RemoveServerFromFavourites(info);
-                        break;
-                }
-            }
+            ListRemoveServers();
             break;
         }
 
         case MENU_SERVER_DEL:
         {
-            wxInt32 j;
-            wxInt32 skipFav=wxCANCEL,skipStats=wxCANCEL;
-            wxString msg;
-
-            for (j=m_selected.GetCount()-1;j>=0;j--)
-            {
-                msg.Empty();
-                CslListServer *ls=m_selected.Item(j);
-
-                if (skipFav==wxCANCEL && ls->IsFavourite())
-                {
-                    msg=_("You are about to delete servers which are also favourites!\n");
-                    msg+=CSL_DELETE_YESNOCANCEL_STR;
-                    skipFav=wxMessageBox(msg,CSL_WARNING_STR,wxYES_NO|wxCANCEL|wxICON_WARNING,this);
-                    if (skipFav==wxCANCEL)
-                        return;
-                    if (skipFav!=wxNO)
-                        continue;
-                }
-                if (skipStats==wxCANCEL && ls->HasStats())
-                {
-                    msg=_("You are about to delete servers which have statistics!\n");
-                    msg+=CSL_DELETE_YESNOCANCEL_STR;
-                    skipStats=wxMessageBox(msg,CSL_WARNING_STR,wxYES_NO|wxCANCEL|wxICON_WARNING,this);
-                    if (skipStats==wxCANCEL)
-                        return;
-                    if (skipStats!=wxNO)
-                        continue;
-                }
-            }
-
-            for (j=m_selected.GetCount()-1;j>=0;j--)
-            {
-                CslListServer *ls=m_selected.Item(j);
-                info=ls->GetPtr();
-
-                if ((c=ListFindItem(info))==wxNOT_FOUND)
-                    continue;
-
-                if (ls->IsLocked())
-                    continue;
-
-                if (ls->IsFavourite() && skipFav!=wxNO)
-                    continue;
-
-                if (ls->HasStats() && skipStats!=wxNO)
-                    continue;
-
-                RemoveServer(ls,info,j);
-
-                if (m_id==CSL_LIST_MASTER && ls->IsFavourite())
-                    m_listFavourites->RemoveServer(NULL,info,-1);
-                else if (m_id==CSL_LIST_FAVOURITE)
-                    m_listMaster->RemoveServer(NULL,info,-1);
-
-                m_engine->DeleteServer(info);
-            }
+            ListDeleteServers();
             break;
         }
 
@@ -573,8 +551,9 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
             }
             break;
         }
+
         default:
-            return;
+            break;;
     }
 }
 
@@ -582,7 +561,7 @@ void CslListCtrlServer::OnEndProcess(wxCommandEvent& event)
 {
     CslServerInfo *info=(CslServerInfo*)event.GetClientData();
 
-    CslConnectionState::SetPlaying(false);
+    CslConnectionState::SetPlaying(NULL,false);
 
     if (!info)
     {
@@ -599,33 +578,45 @@ void CslListCtrlServer::OnEndProcess(wxCommandEvent& event)
 void CslListCtrlServer::OnTimer(wxTimerEvent& event)
 {
     CslServerInfo *info=CslConnectionState::GetInfo();
-    if (info->m_players!=info->m_playersMax)
+
+    if (CslConnectionState::IsPlaying())
     {
-        CslConnectionState::Reset();
-        ConnectToServer(info);
-    }
-    else if (m_timerCount%2==0)
-    {
-        if (CslConnectionState::DecTime())
-        {
-            CslStatusBar::SetText(
-                wxString::Format(_("Waiting %d seconds for a free slot on \"%s\" " \
-                                   "(press ESC to abort or join another server)"),
-                                 CslConnectionState::GetWaitTime(),info->m_desc.IsEmpty() ?
-                                 info->m_host.c_str() : info->m_desc.c_str()),1);
-        }
+        wxInputStream *stream=CslProcess::GetStream();
+        if (!stream)
+            CslStatusBar::SetText("have no stream",1);
         else
-            CslStatusBar::SetText(wxT(""),1);
+            CslStatusBar::SetText("have stream",1);
+
     }
-    m_timerCount++;
+    else if (CslConnectionState::IsWaiting())
+    {
+        if (info->m_players!=info->m_playersMax)
+        {
+            CslConnectionState::Reset();
+            ConnectToServer(info);
+        }
+        else if (m_timerCount%2==0)
+        {
+            if (CslConnectionState::DecTime())
+            {
+                CslStatusBar::SetText(
+                    wxString::Format(_("Waiting %d seconds for a free slot on \"%s\" " \
+                                       "(press ESC to abort or join another server)"),
+                                     CslConnectionState::GetWaitTime(),info->m_desc.IsEmpty() ?
+                                     info->m_host.c_str() : info->m_desc.c_str()),1);
+            }
+            else
+                CslStatusBar::SetText(wxT(""),1);
+        }
+        m_timerCount++;
+    }
 }
 
 void CslListCtrlServer::ListInit(CslEngine *engine,
                                  CslListCtrlInfo *listInfo,
                                  CslListCtrlServer *listMaster,
                                  CslListCtrlServer *listFavourites,
-                                 wxUint32 filterFlags
-                                )
+                                 wxUint32 filterFlags)
 {
     m_engine=engine;
     m_listInfo=listInfo;
@@ -633,9 +624,8 @@ void CslListCtrlServer::ListInit(CslEngine *engine,
     m_listFavourites=listFavourites;
     m_filterFlags=filterFlags;
 
-    //Connect(wxEVT_CHAR,wxKeyEventHandler(CslListCtrlServer::OnChar),NULL,this);
-
     m_stdColourListText=GetTextColour();
+    m_stdColourListItem=GetBackgroundColour();
 
     SetImageList(&m_imageList,wxIMAGE_LIST_SMALL);
 
@@ -650,39 +640,33 @@ void CslListCtrlServer::ListInit(CslEngine *engine,
     item.SetText(_("Description"));
     InsertColumn(1,item);
 
-    item.SetMask(wxLIST_MASK_TEXT|wxLIST_MASK_IMAGE);
-    item.SetImage(CSL_LIST_IMG_SORT_ASC);
+    item.SetText(_("Version"));
+    InsertColumn(2,item);
 
     item.SetAlign(wxLIST_FORMAT_RIGHT);
     item.SetText(_("Ping"));
-    InsertColumn(2,item);
-
-    item.SetMask(wxLIST_MASK_TEXT);
-    item.SetImage(-1);
+    InsertColumn(3,item);
 
     item.SetMask(wxLIST_MASK_TEXT);
     item.SetAlign(wxLIST_FORMAT_LEFT);
     item.SetText(_("Mode"));
-    InsertColumn(3,item);
+    InsertColumn(4,item);
 
     item.SetText(_("Map"));
-    InsertColumn(4,item);
+    InsertColumn(5,item);
 
     item.SetAlign(wxLIST_FORMAT_RIGHT);
     item.SetText(_("Time"));
-    InsertColumn(5,item);
+    InsertColumn(6,item);
 
     item.SetAlign(wxLIST_FORMAT_LEFT);
     item.SetText(_("Player"));
-    InsertColumn(6,item);
-
-    item.SetText(_("MM"));
     InsertColumn(7,item);
 
-    m_stdColourListItem=GetBackgroundColour();
+    item.SetText(_("MM"));
+    InsertColumn(8,item);
 
     ToggleSortArrow();
-    //ListAdjustSize(GetClientSize(),true);
 }
 
 void CslListCtrlServer::ListAdjustSize(wxSize size,bool init)
@@ -690,11 +674,7 @@ void CslListCtrlServer::ListAdjustSize(wxSize size,bool init)
     if (!g_cslSettings->m_autoFitColumns && !init)
         return;
 
-#if 0 //#ifndef __WXMSW__
-    wxInt32 w=size.x-4;
-#else
     wxInt32 w=size.x-8;
-#endif // __WXMSW__
 
     SetColumnWidth(0,(wxInt32)(w*g_cslSettings->m_colServerS1));
     SetColumnWidth(1,(wxInt32)(w*g_cslSettings->m_colServerS2));
@@ -704,6 +684,7 @@ void CslListCtrlServer::ListAdjustSize(wxSize size,bool init)
     SetColumnWidth(5,(wxInt32)(w*g_cslSettings->m_colServerS6));
     SetColumnWidth(6,(wxInt32)(w*g_cslSettings->m_colServerS7));
     SetColumnWidth(7,(wxInt32)(w*g_cslSettings->m_colServerS8));
+    SetColumnWidth(8,(wxInt32)(w*g_cslSettings->m_colServerS9));
 }
 
 bool CslListCtrlServer::PingOk(CslServerInfo *info)
@@ -766,7 +747,7 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
     {
         if (m_filterFlags&CSL_FILTER_OFFLINE && !pingOk)
             found=true;
-        else if (m_filterFlags&CSL_FILTER_FULL && info->m_playersMax!=0 &&
+        else if (m_filterFlags&CSL_FILTER_FULL && info->m_playersMax>0 &&
                  info->m_players==info->m_playersMax)
             found=true;
         else if (m_filterFlags&CSL_FILTER_EMPTY && info->m_players==0)
@@ -814,7 +795,6 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
     if (pingOk || info->m_pingResp)
     {
         if (infoCmp->m_desc != info->m_desc)
-        {
             if (info->m_type==CSL_GAME_AC)
             {
                 char *p=StripColours(U2A(info->m_desc));
@@ -824,16 +804,36 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
             }
             else
                 SetItem(i,1,info->m_desc);
+
+
+        if (infoCmp->m_protocol != info->m_protocol)
+        {
+            s.Empty();
+            switch (info->m_type)
+            {
+                case CSL_GAME_SB:
+                    s=GetVersionStrSB(info->m_protocol);
+                    break;
+                case CSL_GAME_AC:
+                    s=GetVersionStrAC(info->m_protocol);
+                    break;
+                case CSL_GAME_CB:
+                    s=GetVersionStrCB(info->m_protocol);
+                    break;
+                default:
+                    break;
+            }
+            SetItem(i,2,s);
         }
 
         if (infoCmp->m_ping != info->m_ping)
-            SetItem(i,2,wxString::Format(wxT("%d"),info->m_ping));
+            SetItem(i,3,wxString::Format(wxT("%d"),info->m_ping));
 
         if (infoCmp->m_gameMode != info->m_gameMode)
-            SetItem(i,3,info->m_gameMode);
+            SetItem(i,4,info->m_gameMode);
 
         if (infoCmp->m_map != info->m_map)
-            SetItem(i,4,info->m_map);
+            SetItem(i,5,info->m_map);
 
         if (infoCmp->m_timeRemain != info->m_timeRemain)
         {
@@ -841,17 +841,17 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
                 s=_("no limit");
             else
                 s=s.Format(wxT("%d"),info->m_timeRemain);
-            SetItem(i,5,s);
+            SetItem(i,6,s);
         }
 
         if (infoCmp->m_players != info->m_players ||
             infoCmp->m_playersMax != info->m_playersMax)
         {
-            if (info->m_playersMax==0)
+            if (info->m_playersMax<=0)
                 s=s.Format(wxT("%d"),info->m_players);
             else
                 s=s.Format(wxT("%d/%d"),info->m_players,info->m_playersMax);
-            SetItem(i,6,s);
+            SetItem(i,7,s);
         }
 
         if (infoCmp->m_mm != info->m_mm)
@@ -867,10 +867,8 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
                     s+=wxT(" (L)");
                 else if (info->m_mm==MM_PRIVATE)
                     s+=wxT(" (P)");
+                SetItem(i,8,s);
             }
-            else
-                s=_("n/a");
-            SetItem(i,7,s);
         }
     }
     /*else
@@ -883,7 +881,7 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
     wxColour colour=m_stdColourListText;
     if (!pingOk)
         colour=g_cslSettings->m_colServerOff;
-    else if (info->m_playersMax!=0 && info->m_players==info->m_playersMax)
+    else if (info->m_playersMax>0 && info->m_players==info->m_playersMax)
         colour=g_cslSettings->m_colServerFull;
     else if (info->m_mm==MM_VETO)
         colour=g_cslSettings->m_colServerMM1;
@@ -950,6 +948,9 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
                 break;
             case CSL_GAME_AC:
                 i=CSL_LIST_IMG_AC;
+                break;
+            case CSL_GAME_CB:
+                i=CSL_LIST_IMG_CB;
                 break;
             default:
                 i=-1;
@@ -1037,6 +1038,7 @@ wxUint32 CslListCtrlServer::ListUpdate(vector<CslServerInfo*> *servers)
 
     //WORKAROUND create an event and sending it elimates flicker
     //SortItems(ListSortCompareFunc,(long)&m_sortMast);
+    //ListSort(-1);
     wxListEvent event(wxEVT_COMMAND_LIST_COL_CLICK);
     event.m_col=-1;
     wxPostEvent(this,event);
@@ -1124,7 +1126,16 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info)
             cmd=g_cslSettings->m_clientBinAC;
             path=g_cslSettings->m_configPathAC;
             opts=g_cslSettings->m_clientOptsAC;
-            mode=g_cslSettings->m_connectModeAC;
+            //TODO wait for AC supporting parameter based connect
+            //mode=g_cslSettings->m_connectModeAC;
+            mode=CONNECT_MODE_CONFIG;
+            break;
+        case CSL_GAME_CB:
+            cmd=g_cslSettings->m_clientBinCB;
+            path=g_cslSettings->m_configPathCB;
+            opts=g_cslSettings->m_clientOptsCB;
+            //mode=g_cslSettings->m_connectModeCB;
+            mode=CONNECT_MODE_CONFIG;
             break;
         default:
             return;
@@ -1176,6 +1187,7 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info)
     {
         case CSL_GAME_SB:
         case CSL_GAME_AC:
+        case CSL_GAME_CB:
             if (mode==CONNECT_MODE_CONFIG)
             {
                 if (path.IsEmpty())
@@ -1203,7 +1215,11 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info)
                     return;
             }
             else
+#ifdef __WXMSW__
+                cmd+=wxT(" -x\"connect ")+info->m_host+wxT("\"");
+#else
                 cmd+=wxT(" -xconnect\\ ")+info->m_host;
+#endif
 
         default:
             break;
@@ -1217,6 +1233,7 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info)
         ::wxSetWorkingDirectory(path);
 
     CslProcess *process=new CslProcess(this,info,cmd,path,mode==CONNECT_MODE_CONFIG);
+    process->Redirect();
     if (!(::wxExecute(cmd,wxEXEC_ASYNC,process)>0))
     {
         wxMessageBox(_("Failed to start: ")+cmd
@@ -1226,7 +1243,7 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info)
         return;
     }
     process->StartStopWatch();
-    CslConnectionState::SetPlaying(true);
+    CslConnectionState::SetPlaying(this,true);
 
     wxDateTime now=wxDateTime::Now();
     info->m_playLast=now.GetTicks();
@@ -1264,14 +1281,16 @@ void CslListCtrlServer::ListSort(wxInt32 column)
         item.SetMask(wxLIST_MASK_IMAGE);
         GetColumn(column,item);
 
-        if (item.GetImage()==-1||item.GetImage()==CSL_LIST_IMG_SORT_DSC)
+        if (item.GetImage()==-1 ||
+            item.GetImage()==CSL_LIST_IMG_SORT_DSC ||
+            item.GetImage()==CSL_LIST_IMG_SORT_DSC_LIGHT)
         {
-            img=CSL_LIST_IMG_SORT_ASC;
+            g_cslSettings->m_autoSortColumns ? img=CSL_LIST_IMG_SORT_ASC : img=CSL_LIST_IMG_SORT_ASC_LIGHT;
             m_sortHelper.m_sortMode=CSL_SORT_ASC;
         }
         else
         {
-            img=CSL_LIST_IMG_SORT_DSC;
+            g_cslSettings->m_autoSortColumns ? img=CSL_LIST_IMG_SORT_DSC : img=CSL_LIST_IMG_SORT_DSC_LIGHT;
             m_sortHelper.m_sortMode=CSL_SORT_DSC;
         }
 
@@ -1350,6 +1369,12 @@ int wxCALLBACK CslListCtrlServer::ListSortCompareFunc(long item1,long item2,long
             type=CSL_SORT_UINT;
             vui1=info1->m_ping;
             vui2=info2->m_ping;
+            break;
+
+        case SORT_VER:
+            type=CSL_SORT_INT;
+            vi1=info1->m_protocol;
+            vi2=info2->m_protocol;
             break;
 
         case SORT_MODE:
