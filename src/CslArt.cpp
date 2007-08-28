@@ -1,16 +1,16 @@
 
 #include "CslArt.h"
 
-#ifdef __WXMSW__
 #ifndef _MSC_VER
 #include "img/connect_16.xpm"
+#ifdef __WXMSW__
 #include "img/add_16.xpm"
 #include "img/delete_16.xpm"
 #include "img/reload_16.xpm"
 #include "img/settings_16.xpm"
 #include "img/about_16.xpm"
-#endif // _MSC_VER
 #endif // __WXMSW__
+#endif // _MSC_VER
 
 wxBitmap CslArt::CreateBitmap(const wxArtID& id,const wxArtClient& client,const wxSize& size)
 {

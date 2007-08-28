@@ -111,9 +111,9 @@ class CslMenu
         }
 
         static void AddItemToMenu(wxMenu *menu,const wxInt32 id,
-                            const wxString& text,const wxArtID& art,
-                            const wxItemKind kind=wxITEM_NORMAL,
-                            const wxString help=wxEmptyString)
+                                  const wxString& text,const wxArtID& art,
+                                  const wxItemKind kind=wxITEM_NORMAL,
+                                  const wxString help=wxEmptyString)
         {
             wxMenuItem *item=new wxMenuItem(menu,id,text,help,kind);
             if (id<wxID_HIGHEST || (wxPlatformInfo().GetOperatingSystemId()|wxOS_WINDOWS))

@@ -801,26 +801,8 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
             else
                 SetItem(i,1,info->m_desc);
 
-
         if (infoCmp->m_protocol != info->m_protocol)
-        {
-            s.Empty();
-            switch (info->m_type)
-            {
-                case CSL_GAME_SB:
-                    s=GetVersionStrSB(info->m_protocol);
-                    break;
-                case CSL_GAME_AC:
-                    s=GetVersionStrAC(info->m_protocol);
-                    break;
-                case CSL_GAME_CB:
-                    s=GetVersionStrCB(info->m_protocol);
-                    break;
-                default:
-                    break;
-            }
-            SetItem(i,2,s);
-        }
+            SetItem(i,2,info->GetVersionStr());
 
         if (infoCmp->m_ping != info->m_ping)
             SetItem(i,3,wxString::Format(wxT("%d"),info->m_ping));
@@ -902,14 +884,20 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
                 found=true;
             else
             {
-                s=info->m_gameMode.Lower();
+                s=info->GetVersionStr().Lower();
                 if (s.Find(m_searchString)!=wxNOT_FOUND)
                     found=true;
                 else
                 {
-                    s=info->m_map.Lower();
+                    s=info->m_gameMode.Lower();
                     if (s.Find(m_searchString)!=wxNOT_FOUND)
                         found=true;
+                    else
+                    {
+                        s=info->m_map.Lower();
+                        if (s.Find(m_searchString)!=wxNOT_FOUND)
+                            found=true;
+                    }
                 }
             }
         }
@@ -1229,7 +1217,7 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info)
         ::wxSetWorkingDirectory(path);
 
     CslProcess *process=new CslProcess(this,info,cmd,path,mode==CONNECT_MODE_CONFIG);
-    // TODO game output 
+    // TODO game output
     //process->Redirect();
     if (!(::wxExecute(cmd,wxEXEC_ASYNC,process)>0))
     {

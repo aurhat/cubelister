@@ -140,6 +140,22 @@ class CslServerInfo
             m_playTimeTotal+=time;
         }
 
+        wxString GetVersionStr()
+        {
+            switch (m_type)
+            {
+                case CSL_GAME_SB:
+                    return GetVersionStrSB(m_protocol);
+                case CSL_GAME_AC:
+                    return GetVersionStrAC(m_protocol);
+                case CSL_GAME_CB:
+                    return GetVersionStrCB(m_protocol);
+                default:
+                    break;
+            }
+            return wxEmptyString;
+        }
+
         void Lock(bool lock=true) { m_locked=lock; }
         void SetWaiting(bool wait=true) { m_waiting=wait; }
 

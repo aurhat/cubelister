@@ -73,7 +73,7 @@ class CslFrame: public wxFrame
         bool m_timerInit;
         wxTimer m_timer;
 
-         // TODO Output from Game
+        // TODO Output from Game
         //CslDlgOutput *m_outputDlg;
 
         // begin wxGlade: CslFrame::methods
