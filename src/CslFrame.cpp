@@ -174,31 +174,6 @@ CslFrame::CslFrame(wxWindow* parent, int id, const wxString& title,const wxPoint
     pane_info = new wxPanel(splitter_games_info, wxID_ANY);
     sizer_filter_staticbox = new wxStaticBox(pane_main_left, -1, _("Filter out these servers"));
     pane_games = new wxPanel(splitter_games_info, wxID_ANY);
-    frame_csl_menubar = new wxMenuBar();
-    SetMenuBar(frame_csl_menubar);
-    wxMenu* wxglade_tmp_menu_1 = new wxMenu();
-    wxglade_tmp_menu_1->Append(wxID_PREFERENCES, _("&Settings"), wxEmptyString, wxITEM_NORMAL);
-    wxglade_tmp_menu_1->AppendSeparator();
-    wxglade_tmp_menu_1->Append(wxID_EXIT, _("&Exit"), wxEmptyString, wxITEM_NORMAL);
-    frame_csl_menubar->Append(wxglade_tmp_menu_1, _("&File"));
-    wxMenu* wxglade_tmp_menu_2 = new wxMenu();
-    wxglade_tmp_menu_2->Append(MENU_MASTER_UPDATE, _("&Update from master\tF5"), wxEmptyString, wxITEM_NORMAL);
-    wxglade_tmp_menu_2->AppendSeparator();
-    wxglade_tmp_menu_2->Append(MENU_MASTER_ADD, _("Add a &new master ..."), wxEmptyString, wxITEM_NORMAL);
-    wxglade_tmp_menu_2->Append(MENU_MASTER_DEL, _("&Remove master"), wxEmptyString, wxITEM_NORMAL);
-    frame_csl_menubar->Append(wxglade_tmp_menu_2, _("&Master"));
-    wxMenu* wxglade_tmp_menu_3 = new wxMenu();
-    wxglade_tmp_menu_3->Append(MENU_VIEW_SEARCH, _("Show &search bar\tCTRL+S"), wxEmptyString, wxITEM_CHECK);
-    wxglade_tmp_menu_3->Append(MENU_VIEW_FILTER, _("Show &Filter\tCTRL+F"), wxEmptyString, wxITEM_CHECK);
-    wxglade_tmp_menu_3->AppendSeparator();
-    wxglade_tmp_menu_3->Append(MENU_VIEW_AUTO_SORT, _("Sort &lists automatically\tCTRL+L"), wxEmptyString, wxITEM_CHECK);
-    wxglade_tmp_menu_3->Append(MENU_VIEW_AUTO_FIT, _("Fit columns on window &resize"), wxEmptyString, wxITEM_CHECK);
-    wxglade_tmp_menu_3->AppendSeparator();
-    wxglade_tmp_menu_3->Append(MENU_VIEW_SPLITTER_LIVE, _("Redraw while dragging spli&tters"), wxEmptyString, wxITEM_CHECK);
-    frame_csl_menubar->Append(wxglade_tmp_menu_3, _("&View"));
-    wxMenu* wxglade_tmp_menu_4 = new wxMenu();
-    wxglade_tmp_menu_4->Append(wxID_ABOUT, _("A&bout"), wxEmptyString, wxITEM_NORMAL);
-    frame_csl_menubar->Append(wxglade_tmp_menu_4, _("&Help"));
     tree_ctrl_games = new wxTreeCtrl(pane_games, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_HAS_BUTTONS|wxTR_NO_LINES|wxTR_LINES_AT_ROOT|wxTR_DEFAULT_STYLE);
     list_ctrl_info = new CslListCtrlInfo(pane_info, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_NO_HEADER);
     checkbox_filter_full = new wxCheckBox(pane_main_left, CSL_CHECK_FILTER_FULL, _("F&ull"));
@@ -216,8 +191,6 @@ CslFrame::CslFrame(wxWindow* parent, int id, const wxString& title,const wxPoint
     set_properties();
     do_layout();
     // end wxGlade
-
-    m_menuMaster=wxglade_tmp_menu_2;
 
     tree_ctrl_games->SetImageList(&m_imgListTree);
     m_treeGamesRoot=tree_ctrl_games->AddRoot(wxEmptyString,-1,-1);
@@ -246,6 +219,14 @@ CslFrame::CslFrame(wxWindow* parent, int id, const wxString& title,const wxPoint
             master=new CslMaster(CSL_GAME_CB,CSL_DEFAULT_MASTER_CB,CSL_DEFAULT_MASTER_PATH_CB,true);
             game=m_engine->AddMaster(master);
             TreeAddGame(game);
+
+            CslServerInfo *info;
+            info=new CslServerInfo();
+            info->CreateFavourite(CSL_DEFAULT_SERVER_ADDR_SB1,CSL_GAME_SB);
+            m_engine->AddServer(info,-1);
+            info=new CslServerInfo();
+            info->CreateFavourite(CSL_DEFAULT_SERVER_ADDR_SB2,CSL_GAME_SB);
+            m_engine->AddServer(info,-1);
         }
         else
         {
@@ -275,14 +256,6 @@ CslFrame::CslFrame(wxWindow* parent, int id, const wxString& title,const wxPoint
         delete m_engine;
         m_engine=NULL;
     }
-
-#ifdef __WXMSW__  // key events from childs doesn't send to its parent
-    list_ctrl_master->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeyDown),NULL,this);
-    list_ctrl_favourites->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeyDown),NULL,this);
-    list_ctrl_info->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeyDown),NULL,this);
-    tree_ctrl_games->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeyDown),NULL,this);
-    text_ctrl_search->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeyDown),NULL,this);
-#endif
 }
 
 CslFrame::~CslFrame()
@@ -310,7 +283,17 @@ void CslFrame::set_properties()
     SetTitle(_("Cube Server Lister"));
     // end wxGlade
 
+    CreateMainMenu();
+
     UpdateFilterCheckBoxes();
+
+#ifdef __WXMSW__  // key events from childs doesn't send to its parent
+    list_ctrl_master->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeyDown),NULL,this);
+    list_ctrl_favourites->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeyDown),NULL,this);
+    list_ctrl_info->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeyDown),NULL,this);
+    tree_ctrl_games->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeyDown),NULL,this);
+    text_ctrl_search->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeyDown),NULL,this);
+#endif
 
     bitmap_button_search_clear=new wxBitmapButton(panel_search,CSL_BUTTON_SEARCH_CLEAR,
             wxNullBitmap,wxDefaultPosition,wxDefaultSize,wxNO_BORDER);
@@ -349,8 +332,6 @@ void CslFrame::do_layout()
                                list_ctrl_favourites,g_cslSettings->m_filterFlags);
     list_ctrl_favourites->ListInit(m_engine,list_ctrl_info,list_ctrl_master,NULL,
                                    g_cslSettings->m_filterFavourites ? g_cslSettings->m_filterFlags : 0);
-
-    //Hide();
 
     // begin wxGlade: CslFrame::do_layout
     wxBoxSizer* sizer_frame = new wxBoxSizer(wxHORIZONTAL);
@@ -423,14 +404,14 @@ void CslFrame::do_layout()
 #ifdef __WXMSW__
     bboffset=2;
 #endif
-    grid_sizer_search->Insert(0,bitmap_button_search_clear,0,wxRIGHT|wxLEFT|wxTOP|wxALIGN_CENTER_VERTICAL,bboffset);
+    grid_sizer_search->Insert(0,bitmap_button_search_clear,0,
+                              wxRIGHT|wxLEFT|wxTOP|wxALIGN_CENTER_VERTICAL,
+                              bboffset);
 
     m_sizerMaster=grid_sizer_master;
     m_sizerLeft=grid_sizer_main_left;
     m_sizerSearch=grid_sizer_search;
     m_sizerFilter=sizer_filter;
-
-    g_cslMenu=new CslMenu(frame_csl_menubar);
 
     splitter_main->SetMinimumPaneSize(sizer_filter->GetMinSize().GetWidth()+4);
     splitter_games_info->SetMinimumPaneSize(20);
@@ -444,8 +425,6 @@ void CslFrame::do_layout()
     ToggleSplitterUpdate();
 
     SetSize(g_cslSettings->m_frameSize);
-
-    //Show();
 }
 
 void CslFrame::OnTimer(wxTimerEvent& event)
@@ -879,6 +858,42 @@ void CslFrame::OnMouseLeftDown(wxMouseEvent& event)
     }
 }
 
+void CslFrame::CreateMainMenu()
+{
+    m_menubar=new wxMenuBar();
+    SetMenuBar(m_menubar);
+    wxMenu* tmp_menu_1=new wxMenu();
+    CslMenu::AddItemToMenu(tmp_menu_1,wxID_PREFERENCES,_("&Settings"),wxART_SETTINGS);
+    CslMenu::AddItemToMenu(tmp_menu_1,wxID_EXIT,_("&Exit"),wxART_QUIT);
+    m_menubar->Append(tmp_menu_1,_("&File"));
+    wxMenu* tmp_menu_2=new wxMenu();
+    CslMenu::AddItemToMenu(tmp_menu_2,MENU_MASTER_UPDATE,_("&Update from master\tF5"),wxART_RELOAD);
+    tmp_menu_2->AppendSeparator();
+    CslMenu::AddItemToMenu(tmp_menu_2,MENU_MASTER_ADD,_("Add a &new master ..."),wxART_ADD_BOOKMARK);
+    CslMenu::AddItemToMenu(tmp_menu_2,MENU_MASTER_DEL,_("&Remove master"),wxART_DEL_BOOKMARK);
+    m_menubar->Append(tmp_menu_2,_("&Master"));
+    wxMenu* tmp_menu_3=new wxMenu();
+    CslMenu::AddItemToMenu(tmp_menu_3,MENU_VIEW_SEARCH,_("Show &search bar\tCTRL+S"),
+                           wxART_NONE,wxITEM_CHECK);
+    CslMenu::AddItemToMenu(tmp_menu_3,MENU_VIEW_FILTER,_("Show &Filter\tCTRL+F"),
+                           wxART_NONE,wxITEM_CHECK);
+    tmp_menu_3->AppendSeparator();
+    CslMenu::AddItemToMenu(tmp_menu_3,MENU_VIEW_AUTO_SORT,_("Sort &lists automatically\tCTRL+L"),
+                           wxART_NONE,wxITEM_CHECK);
+    CslMenu::AddItemToMenu(tmp_menu_3,MENU_VIEW_AUTO_FIT,_("Fit columns on window &resize"),
+                           wxART_NONE,wxITEM_CHECK);
+    tmp_menu_3->AppendSeparator();
+    CslMenu::AddItemToMenu(tmp_menu_3,MENU_VIEW_SPLITTER_LIVE,_("Redraw while dragging spli&tters"),
+                           wxART_NONE,wxITEM_CHECK);
+    m_menubar->Append(tmp_menu_3,_("&View"));
+    wxMenu* tmp_menu_4=new wxMenu();
+    CslMenu::AddItemToMenu(tmp_menu_4,wxID_ABOUT,_("A&bout"),wxART_ABOUT);
+    m_menubar->Append(tmp_menu_4,_("&Help"));
+
+    m_menuMaster=tmp_menu_2;
+    g_cslMenu=new CslMenu(m_menubar);
+}
+
 void CslFrame::ToggleSearchBar()
 {
     if (g_cslSettings->m_showSearch && !panel_search->IsShown())
@@ -1104,6 +1119,7 @@ void CslFrame::LoadSettings()
 {
     long int val;
     double dval;
+    wxUint32 version=0;
     wxString s=wxStandardPaths().GetUserDataDir();
     wxString file=s+PATHDIV+wxT("settings.ini");
 
@@ -1114,6 +1130,9 @@ void CslFrame::LoadSettings()
 
     wxFileConfig *config=new wxFileConfig(wxEmptyString,wxEmptyString,file,
                                           wxEmptyString,wxCONFIG_USE_LOCAL_FILE);
+
+    config->SetPath(wxT("/Version"));
+    if (config->Read(wxT("Version"),&val)) version=val;
 
     config->SetPath(wxT("/Gui"));
     if (config->Read(wxT("SizeX"),&val)) g_cslSettings->m_frameSize.SetWidth(val);
@@ -1159,15 +1178,18 @@ void CslFrame::LoadSettings()
     config->SetPath(wxT("/List"));
     if (config->Read(wxT("AutoFit"),&val)) g_cslSettings->m_autoFitColumns=val>0;
     if (config->Read(wxT("AutoSort"),&val)) g_cslSettings->m_autoSortColumns=val>0;
-    if (config->Read(wxT("ColMult1"),&dval)) g_cslSettings->m_colServerS1=(float)dval;
-    if (config->Read(wxT("ColMult2"),&dval)) g_cslSettings->m_colServerS2=(float)dval;
-    if (config->Read(wxT("ColMult3"),&dval)) g_cslSettings->m_colServerS3=(float)dval;
-    if (config->Read(wxT("ColMult4"),&dval)) g_cslSettings->m_colServerS4=(float)dval;
-    if (config->Read(wxT("ColMult5"),&dval)) g_cslSettings->m_colServerS5=(float)dval;
-    if (config->Read(wxT("ColMult6"),&dval)) g_cslSettings->m_colServerS6=(float)dval;
-    if (config->Read(wxT("ColMult7"),&dval)) g_cslSettings->m_colServerS7=(float)dval;
-    if (config->Read(wxT("ColMult8"),&dval)) g_cslSettings->m_colServerS8=(float)dval;
-    if (config->Read(wxT("ColMult9"),&dval)) g_cslSettings->m_colServerS9=(float)dval;
+    if (version)
+    {
+        if (config->Read(wxT("ColMult1"),&dval)) g_cslSettings->m_colServerS1=(float)dval;
+        if (config->Read(wxT("ColMult2"),&dval)) g_cslSettings->m_colServerS2=(float)dval;
+        if (config->Read(wxT("ColMult3"),&dval)) g_cslSettings->m_colServerS3=(float)dval;
+        if (config->Read(wxT("ColMult4"),&dval)) g_cslSettings->m_colServerS4=(float)dval;
+        if (config->Read(wxT("ColMult5"),&dval)) g_cslSettings->m_colServerS5=(float)dval;
+        if (config->Read(wxT("ColMult6"),&dval)) g_cslSettings->m_colServerS6=(float)dval;
+        if (config->Read(wxT("ColMult7"),&dval)) g_cslSettings->m_colServerS7=(float)dval;
+        if (config->Read(wxT("ColMult8"),&dval)) g_cslSettings->m_colServerS8=(float)dval;
+        if (config->Read(wxT("ColMult9"),&dval)) g_cslSettings->m_colServerS9=(float)dval;
+    }
     if (config->Read(wxT("ColourEmpty"),&val)) g_cslSettings->m_colServerEmpty=INT2COLOUR(val);
     if (config->Read(wxT("ColourOffline"),&val)) g_cslSettings->m_colServerOff=INT2COLOUR(val);
     if (config->Read(wxT("ColourFull"),&val)) g_cslSettings->m_colServerFull=INT2COLOUR(val);
@@ -1217,6 +1239,9 @@ void CslFrame::SaveSettings()
 
     wxSize size=GetSize();
     long int pos;
+
+    config->SetPath(wxT("/Version"));
+    config->Write(wxT("Version"),CSL_CONFIG_VERSION);
 
     /* GUI */
     config->SetPath(wxT("/Gui"));
@@ -1453,9 +1478,8 @@ void CslFrame::SaveServers()
     if (!games->length())
         goto finish;
 
-#define  CSL_SERVERCONFIG_VERSION  1
     config->SetPath(wxT("/Version"));
-    config->Write(wxT("version"),CSL_SERVERCONFIG_VERSION);
+    config->Write(wxT("Version"),CSL_SERVERCONFIG_VERSION);
 
     servers=m_engine->GetFavourites();
 

@@ -179,6 +179,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\CslArt.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CslDlgAddMaster.cpp"
 				>
 			</File>
@@ -188,6 +192,10 @@
 			</File>
 			<File
 				RelativePath=".\CslDlgConnectWait.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CslDlgOutput.cpp"
 				>
 			</File>
 			<File
@@ -219,6 +227,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CslTools.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CslUDP.cpp"
 				>
 			</File>
@@ -237,6 +249,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CslArt.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CslDlgAddMaster.h"
 				>
 			</File>
@@ -249,11 +265,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CslDlgOutput.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CslDlgSettings.h"
 				>
 			</File>
 			<File
 				RelativePath=".\CslEngine.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CslFlags.h"
 				>
 			</File>
 			<File
@@ -285,6 +309,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CslTools.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CslUDP.h"
 				>
 			</File>
@@ -293,7 +321,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\tools.h"
+				RelativePath=".\cube_tools.h"
 				>
 			</File>
 		</Filter>

@@ -17,4 +17,4 @@ noinst_HEADERS = CslArt.h CslDlgAddMaster.h CslDlgAddServer.h \
 	CslDlgConnectWait.h CslDlgOutput.h CslDlgSettings.h CslFrame.h CslGame.h CslListCtrlInfo.h \
 	CslListCtrlServer.h CslMenu.h CslSettings.h CslStatusBar.h CslTools.h CslUDP.h cube_tools.h
 SUBDIRS = libGeoIP img/flags
-INCLUDES = -I$(top_srcdir)/src/libGeoIP -I$(top_srcdir)/src/img/flags
+INCLUDES = -I$(top_srcdir)/src/libGeoIP -I$(top_srcdir)/$(CSL_FLAGS_INCLUDE)

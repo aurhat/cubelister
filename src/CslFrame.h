@@ -97,7 +97,6 @@ class CslFrame: public wxFrame
     protected:
         // begin wxGlade: CslFrame::attributes
         wxStaticBox* sizer_filter_staticbox;
-        wxMenuBar* frame_csl_menubar;
         wxTreeCtrl* tree_ctrl_games;
         wxPanel* pane_games;
         CslListCtrlInfo* list_ctrl_info;
@@ -127,6 +126,9 @@ class CslFrame: public wxFrame
         wxBitmapButton* bitmap_button_search_clear;
         wxFlexGridSizer *m_sizerMaster,*m_sizerLeft,*m_sizerSearch;
         wxStaticBoxSizer *m_sizerFilter;
+        wxMenuBar *m_menubar;
+
+        void CreateMainMenu();
 
         void ToggleSearchBar();
         void ToggleFilter();

@@ -279,8 +279,9 @@ void CslListCtrlServer::OnItemDeselected(wxListEvent& event)
 
 void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
 {
-    wxPoint point=event.GetPosition();
     wxInt32 c;
+    wxMenu menu;
+    wxPoint point=event.GetPosition();
 
     //from keyboard
     if (point.x==-1 && point.y==-1)
@@ -292,15 +293,10 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
         point=wxGetMousePosition();
     }
 
-    wxMenu menu;
-
     c=m_selected.GetCount();
     if (c==1)
     {
-        // no stock item here
-        wxMenuItem *item=new wxMenuItem(&menu,MENU_SERVER_CONNECT,MENU_SERVER_CONN_STR);
-        item->SetBitmap(GET_ART_MENU(CSL_ART_CONNECT));
-        menu.Append(item);
+        CslMenu::AddItemToMenu(&menu,MENU_SERVER_CONNECT,MENU_SERVER_CONN_STR,wxART_CONNECT);
         menu.AppendSeparator();
 
         if (CslConnectionState::IsPlaying())
@@ -312,20 +308,18 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
         case CSL_LIST_MASTER:
             if (!c)
                 break;
-            menu.Append(MENU_SERVER_ADD,MENU_SERVER_MAS_ADD_STR);
+            CslMenu::AddItemToMenu(&menu,MENU_SERVER_ADD,MENU_SERVER_MAS_ADD_STR,wxART_ADD_BOOKMARK);
             if (m_masterSelected)
-                menu.Append(MENU_SERVER_REM,MENU_SERVER_MAS_REM_STR);
+                CslMenu::AddItemToMenu(&menu,MENU_SERVER_REM,MENU_SERVER_MAS_REM_STR,wxART_DEL_BOOKMARK);
             menu.AppendSeparator();
-            menu.Append(MENU_SERVER_COPYTEXT,MENU_SERVER_COPY_STR);
             break;
 
         case CSL_LIST_FAVOURITE:
-            menu.Append(MENU_SERVER_ADD,MENU_SERVER_FAV_ADD_STR);
+            CslMenu::AddItemToMenu(&menu,MENU_SERVER_ADD,MENU_SERVER_FAV_ADD_STR,wxART_ADD_BOOKMARK);
             if (!c)
                 break;
-            menu.Append(MENU_SERVER_REM,MENU_SERVER_FAV_REM_STR);
+            CslMenu::AddItemToMenu(&menu,MENU_SERVER_REM,MENU_SERVER_FAV_REM_STR,wxART_DEL_BOOKMARK);
             menu.AppendSeparator();
-            menu.Append(MENU_SERVER_COPYTEXT,MENU_SERVER_COPY_STR);
             break;
         default:
             return;
@@ -333,8 +327,10 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
 
     if (c)
     {
+        CslMenu::AddItemToMenu(&menu,MENU_SERVER_COPYTEXT,MENU_SERVER_COPY_STR,wxART_COPY);
         menu.AppendSeparator();
-        menu.Append(MENU_SERVER_DEL,c>1 ? MENU_SERVER_DELM_STR : MENU_SERVER_DEL_STR);
+        CslMenu::AddItemToMenu(&menu,MENU_SERVER_DEL,
+                               c>1 ? MENU_SERVER_DELM_STR : MENU_SERVER_DEL_STR,wxART_DELETE);
     }
 
     point=ScreenToClient(point);
@@ -1233,7 +1229,8 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info)
         ::wxSetWorkingDirectory(path);
 
     CslProcess *process=new CslProcess(this,info,cmd,path,mode==CONNECT_MODE_CONFIG);
-    process->Redirect();
+    // TODO game output 
+    //process->Redirect();
     if (!(::wxExecute(cmd,wxEXEC_ASYNC,process)>0))
     {
         wxMessageBox(_("Failed to start: ")+cmd

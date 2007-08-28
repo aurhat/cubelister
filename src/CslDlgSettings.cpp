@@ -402,7 +402,13 @@ void CslDlgSettings::do_layout()
     wxSize a=notebook_settings->GetBestSize();
     wxSize b=notebook_pane_sauer->GetBestSize();
     wxSize c=grid_sizer_button->GetMinSize();
-    wxSize d(a.x,b.y+c.y*2);
+    wxUint32 hmult;
+#ifdef __WXMSW__
+    hmult=4;
+#else
+    hmult=2;
+#endif
+    wxSize d(a.x,b.y+c.y*hmult);
     notebook_settings->SetMinSize(d);
 
     grid_sizer_main->SetSizeHints(this);

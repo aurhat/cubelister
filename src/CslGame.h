@@ -56,6 +56,11 @@
 #define CSL_LAST_PROTOCOL_AC  1125
 #define CSL_LAST_PROTOCOL_CB  122
 
+#define CSL_DEFAULT_SERVER_ADDR_SB1  wxT("81.169.170.173")   // TC1
+#define CSL_DEFAULT_SERVER_ADDR_SB2  wxT("85.214.41.161")    // TC2
+#define CSL_DEFAULT_SERVER_DESC_SB1  wxT("The-Conquerors")
+#define CSL_DEFAULT_SERVER_DESC_SB2  wxT("The-Conquerors 2")
+
 #define CSL_VIEW_DEFAULT      1
 #define CSL_VIEW_FAVOURITE    2
 
@@ -102,20 +107,7 @@ class CslServerInfo
             m_mm=-1;
             m_view=view;
             m_addr.Hostname(host);
-            switch (type)
-            {
-                case CSL_GAME_SB:
-                    m_addr.Service(CSL_DEFAULT_INFO_PORT_SB);
-                    break;
-                case CSL_GAME_AC:
-                    m_addr.Service(CSL_DEFAULT_INFO_PORT_AC);
-                    break;
-                case CSL_GAME_CB:
-                    m_addr.Service(CSL_DEFAULT_INFO_PORT_CB);
-                    break;
-                default:
-                    break;
-            }
+            m_addr.Service(GetDefaultPort(type));
             m_pingSend=0;
             m_pingResp=0;
             m_lastSeen=lastSeen;
@@ -132,13 +124,14 @@ class CslServerInfo
             return (m_type==i2.m_type && m_host==i2.m_host);
         }
 
-        void CreateFavourite(wxString host=wxT("localhost"),CSL_GAMETYPE type=CSL_GAME_START)
+        void CreateFavourite(const wxString& host=wxT("localhost"),
+                             CSL_GAMETYPE type=CSL_GAME_START)
         {
             m_host=host;
             m_type=type;
             m_view=CSL_VIEW_FAVOURITE;
             m_addr.Hostname(host);
-            m_addr.Service(type==CSL_GAME_SB ? CSL_DEFAULT_INFO_PORT_SB : CSL_DEFAULT_INFO_PORT_AC);
+            m_addr.Service(GetDefaultPort(type));
         }
 
         void SetLastPlayTime(wxUint32 time)
@@ -187,6 +180,25 @@ class CslServerInfo
         void SetFavourite() { m_view|=CSL_VIEW_FAVOURITE; }
         void RemoveDefault() { m_view&=~CSL_VIEW_DEFAULT; }
         void RemoveFavourite() { m_view&=~CSL_VIEW_FAVOURITE; }
+
+        wxUint32 GetDefaultPort(CSL_GAMETYPE type)
+        {
+            switch (type)
+            {
+                case CSL_GAME_SB:
+                    return CSL_DEFAULT_INFO_PORT_SB;
+                    break;
+                case CSL_GAME_AC:
+                    return CSL_DEFAULT_INFO_PORT_AC;
+                    break;
+                case CSL_GAME_CB:
+                    return CSL_DEFAULT_INFO_PORT_CB;
+                    break;
+                default:
+                    break;
+            }
+            return 0;
+        }
 };
 
 

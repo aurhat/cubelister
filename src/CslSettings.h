@@ -34,6 +34,9 @@
 #endif
 #include "CslEngine.h"
 
+#define  CSL_CONFIG_VERSION        1
+#define  CSL_SERVERCONFIG_VERSION  1
+
 
 enum
 {
@@ -66,6 +69,7 @@ enum
 
 #define CSL_PING_GOOD_STD    200
 #define CSL_PING_BAD_STD     400
+
 
 class CslSettings
 {

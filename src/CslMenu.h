@@ -33,7 +33,8 @@
 #ifndef WX_PRECOMP
 #include "wx/wx.h"
 #endif
-
+#include <wx/platinfo.h>
+#include "CslArt.h"
 #include "CslSettings.h"
 
 #define MENU_SERVER_CONN_STR      _("&Connect to server")
@@ -107,6 +108,17 @@ class CslMenu
         void CheckMenuItem(wxInt32 id,bool check=true)
         {
             m_menuBar->Check(id,check);
+        }
+
+        static void AddItemToMenu(wxMenu *menu,const wxInt32 id,
+                            const wxString& text,const wxArtID& art,
+                            const wxItemKind kind=wxITEM_NORMAL,
+                            const wxString help=wxEmptyString)
+        {
+            wxMenuItem *item=new wxMenuItem(menu,id,text,help,kind);
+            if (id<wxID_HIGHEST || (wxPlatformInfo().GetOperatingSystemId()|wxOS_WINDOWS))
+                item->SetBitmap(GET_ART_MENU(art));
+            menu->Append(item);
         }
 
     protected:
