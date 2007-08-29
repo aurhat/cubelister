@@ -16,5 +16,5 @@ csl_LDADD = $(LIBSDL_LIBS) $(top_builddir)/src/libGeoIP/libGeoIP.a ${WX_LIBS}
 noinst_HEADERS = CslArt.h CslDlgAddMaster.h CslDlgAddServer.h \
 	CslDlgConnectWait.h CslDlgOutput.h CslDlgSettings.h CslFrame.h CslGame.h CslListCtrlInfo.h \
 	CslListCtrlServer.h CslMenu.h CslSettings.h CslStatusBar.h CslTools.h CslUDP.h cube_tools.h
-SUBDIRS = libGeoIP img/flags
+SUBDIRS = libGeoIP
 INCLUDES = -I$(top_srcdir)/src/libGeoIP -I$(top_srcdir)/$(CSL_FLAGS_INCLUDE)

@@ -92,10 +92,11 @@ class CslServerInfo
         friend class CslMaster;
 
     public:
-        CslServerInfo(wxString host=wxT("localhost"),CSL_GAMETYPE type=CSL_GAME_START,
-                      wxUint32 view=CSL_VIEW_DEFAULT, wxUint32 lastSeen=0,
-                      wxUint32 playLast=0,wxUint32 playTimeLastGame=0,
-                      wxUint32 playTimeTotal=0,wxUint32 connectedTimes=0)
+        CslServerInfo(const wxString& host=wxT("localhost"),
+                      const CSL_GAMETYPE type=CSL_GAME_START,
+                      const wxUint32 view=CSL_VIEW_DEFAULT,const wxUint32 lastSeen=0,
+                      const wxUint32 playLast=0,const wxUint32 playTimeLastGame=0,
+                      const wxUint32 playTimeTotal=0,const wxUint32 connectedTimes=0)
         {
             m_host=host;
             m_type=type;
@@ -156,6 +157,25 @@ class CslServerInfo
             return wxEmptyString;
         }
 
+        wxUint32 GetDefaultPort(const CSL_GAMETYPE type)
+        {
+            switch (type)
+            {
+                case CSL_GAME_SB:
+                    return CSL_DEFAULT_INFO_PORT_SB;
+                    break;
+                case CSL_GAME_AC:
+                    return CSL_DEFAULT_INFO_PORT_AC;
+                    break;
+                case CSL_GAME_CB:
+                    return CSL_DEFAULT_INFO_PORT_CB;
+                    break;
+                default:
+                    break;
+            }
+            return 0;
+        }
+
         void Lock(bool lock=true) { m_locked=lock; }
         void SetWaiting(bool wait=true) { m_waiting=wait; }
 
@@ -180,12 +200,12 @@ class CslServerInfo
         bool m_locked,m_waiting;
 
     protected:
-        void AddMaster(wxInt32 id)
+        void AddMaster(const wxInt32 id)
         {
             m_masterIDs.add(id);
             SetDefault();
         }
-        void RemoveMaster(wxInt32 id)
+        void RemoveMaster(const wxInt32 id)
         {
             wxInt32 i=m_masterIDs.find(id);
             if (id>=0) m_masterIDs.remove(i);
@@ -196,25 +216,6 @@ class CslServerInfo
         void SetFavourite() { m_view|=CSL_VIEW_FAVOURITE; }
         void RemoveDefault() { m_view&=~CSL_VIEW_DEFAULT; }
         void RemoveFavourite() { m_view&=~CSL_VIEW_FAVOURITE; }
-
-        wxUint32 GetDefaultPort(CSL_GAMETYPE type)
-        {
-            switch (type)
-            {
-                case CSL_GAME_SB:
-                    return CSL_DEFAULT_INFO_PORT_SB;
-                    break;
-                case CSL_GAME_AC:
-                    return CSL_DEFAULT_INFO_PORT_AC;
-                    break;
-                case CSL_GAME_CB:
-                    return CSL_DEFAULT_INFO_PORT_CB;
-                    break;
-                default:
-                    break;
-            }
-            return 0;
-        }
 };
 
 
@@ -223,8 +224,10 @@ class CslMaster
         friend class CslGame;
 
     public:
-        CslMaster(CSL_GAMETYPE type=CSL_GAME_START,wxString address=wxEmptyString,
-                  wxString path=wxEmptyString,bool def=false)
+        CslMaster(const CSL_GAMETYPE type=CSL_GAME_START,
+                  const wxString& address=wxEmptyString,
+                  const wxString& path=wxEmptyString,
+                  const bool def=false)
                 : m_game(NULL),m_address(address),m_path(path),m_type(type),m_id(0) {}
 
         ~CslMaster() { RemoveServers(); }
@@ -234,7 +237,9 @@ class CslMaster
             return m_address==m2.m_address && m_path==m2.m_path;
         }
 
-        void Create(CSL_GAMETYPE type,wxString address=wxEmptyString,wxString path=wxEmptyString)
+        void Create(const CSL_GAMETYPE type,
+                    const wxString& address=wxEmptyString,
+                    const wxString& path=wxEmptyString)
         {
             m_type=type;
             m_address=address;
@@ -304,7 +309,7 @@ class CslGame
         wxString GetName() { return m_name; }
         vector<CslMaster*>* GetMasters() { return &m_masters; }
         vector<CslServerInfo*>* GetServers() { return &m_servers; }
-        CslServerInfo* FindServerByAddr(wxIPV4address addr);
+        CslServerInfo* FindServerByAddr(const wxIPV4address addr);
 
     protected:
         CSL_GAMETYPE m_type;

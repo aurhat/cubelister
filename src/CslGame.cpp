@@ -258,7 +258,7 @@ bool CslGame::DeleteServer(CslServerInfo *info)
     return false;
 }
 
-CslServerInfo* CslGame::FindServerByAddr(wxIPV4address addr)
+CslServerInfo* CslGame::FindServerByAddr(const wxIPV4address addr)
 {
     CslServerInfo *info;
 

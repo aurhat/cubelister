@@ -45,17 +45,14 @@ enum
 {
     FILE_PICKER_SB = wxID_HIGHEST + 1,
     DIR_PICKER_SB,
-    TEXT_OPTIONS_SB,
     RADIO_CONFIG_SB,
     RADIO_PARAM_SB,
     FILE_PICKER_AC,
     DIR_PICKER_AC,
-    TEXT_OPTIONS_AC,
     RADIO_CONFIG_AC,
     RADIO_PARAM_AC,
     FILE_PICKER_CB,
     DIR_PICKER_CB,
-    TEXT_OPTIONS_CB,
     RADIO_CONFIG_CB,
     RADIO_PARAM_CB,
 
@@ -66,10 +63,6 @@ enum
     BUTTON_COLOUR_MM2,
     BUTTON_COLOUR_MM3,
 
-    SPIN_UPDATE,
-    SPIN_WAIT,
-    CHECK_UPDATE,
-    CHECK_SORT,
     SPIN_PING_GOOD,
     SPIN_PING_BAD
 };
@@ -102,12 +95,12 @@ CslDlgSettings::CslDlgSettings(wxWindow* parent,int id,const wxString& title,
     sizer_times_staticbox = new wxStaticBox(notebook_pane_other, -1, _("Times && Intervals"));
     sizer_ping_threshold_staticbox = new wxStaticBox(notebook_pane_other, -1, _("Ping thresholds"));
     notebook_pane_sauer = new wxPanel(notebook_games, wxID_ANY);
-    text_ctrl_sauer_options = new wxTextCtrl(notebook_pane_sauer, TEXT_OPTIONS_SB, wxEmptyString);
+    text_ctrl_sauer_options = new wxTextCtrl(notebook_pane_sauer, wxID_ANY, wxEmptyString);
     radio_btn_sauer_start_param = new wxRadioButton(notebook_pane_sauer, RADIO_PARAM_SB, _("Parameter (Default)"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
     radio_btn_sauer_start_config = new wxRadioButton(notebook_pane_sauer, RADIO_CONFIG_SB, _("Config (csl-connect.cfg)"));
-    text_ctrl_assault_options = new wxTextCtrl(notebook_pane_assault, TEXT_OPTIONS_AC, wxEmptyString);
+    text_ctrl_assault_options = new wxTextCtrl(notebook_pane_assault, wxID_ANY, wxEmptyString);
     radio_btn_assault_start_config = new wxRadioButton(notebook_pane_assault, RADIO_CONFIG_AC, _("Config (csl-connect.cfg)"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
-    text_ctrl_cube_options = new wxTextCtrl(notebook_pane_cube, TEXT_OPTIONS_CB, wxEmptyString);
+    text_ctrl_cube_options = new wxTextCtrl(notebook_pane_cube, wxID_ANY, wxEmptyString);
     radio_btn_cube_start_config = new wxRadioButton(notebook_pane_cube, RADIO_CONFIG_CB, _("Config (csl-connect.cfg)"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
     button_colour_empty = new wxBitmapButton(notebook_pane_colour, BUTTON_COLOUR_EMPTY, wxNullBitmap);
     button_colour_mm1 = new wxBitmapButton(notebook_pane_colour, BUTTON_COLOUR_MM1, wxNullBitmap);
@@ -115,10 +108,10 @@ CslDlgSettings::CslDlgSettings(wxWindow* parent,int id,const wxString& title,
     button_colour_mm2 = new wxBitmapButton(notebook_pane_colour, BUTTON_COLOUR_MM2, wxNullBitmap);
     button_colour_full = new wxBitmapButton(notebook_pane_colour, BUTTON_COLOUR_FULL, wxNullBitmap);
     button_colour_mm3 = new wxBitmapButton(notebook_pane_colour, BUTTON_COLOUR_MM3, wxNullBitmap);
-    spin_ctrl_update = new wxSpinCtrl(notebook_pane_other, SPIN_UPDATE, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100);
-    checkbox_play_update = new wxCheckBox(notebook_pane_other, CHECK_UPDATE, _("Don't update when playing"));
-    spin_ctrl_wait = new wxSpinCtrl(notebook_pane_other, SPIN_WAIT, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100);
-    spin_ctrl_min_playtime = new wxSpinCtrl(notebook_pane_other, SPIN_WAIT, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100);
+    spin_ctrl_update = new wxSpinCtrl(notebook_pane_other, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100);
+    checkbox_play_update = new wxCheckBox(notebook_pane_other, wxID_ANY, _("Don't update when playing"));
+    spin_ctrl_wait = new wxSpinCtrl(notebook_pane_other, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100);
+    spin_ctrl_min_playtime = new wxSpinCtrl(notebook_pane_other, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100);
     spin_ctrl_ping_good = new wxSpinCtrl(notebook_pane_other, SPIN_PING_GOOD, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100);
     spin_ctrl_ping_bad = new wxSpinCtrl(notebook_pane_other, SPIN_PING_BAD, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100);
     button_ok = new wxButton(this, wxID_OK, _("&Ok"));
@@ -265,7 +258,7 @@ void CslDlgSettings::do_layout()
     wxFlexGridSizer* grid_sizer_times = new wxFlexGridSizer(3, 3, 0, 0);
     wxFlexGridSizer* grid_sizer_pane_colours = new wxFlexGridSizer(1, 1, 0, 0);
     wxStaticBoxSizer* sizer_colours = new wxStaticBoxSizer(sizer_colours_staticbox, wxHORIZONTAL);
-    wxFlexGridSizer* grid_sizer_colours = new wxFlexGridSizer(3, 4, 0, 0);
+    wxFlexGridSizer* grid_sizer_colours = new wxFlexGridSizer(3, 5, 0, 0);
     wxBoxSizer* sizer_games = new wxBoxSizer(wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_cube_path = new wxFlexGridSizer(3, 2, 0, 0);
     wxFlexGridSizer* grid_sizer_cube_connect = new wxFlexGridSizer(1, 1, 0, 0);
@@ -323,22 +316,24 @@ void CslDlgSettings::do_layout()
     wxStaticText* label_6 = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Server empty"));
     grid_sizer_colours->Add(label_6, 0, wxALL|wxALIGN_CENTER_VERTICAL, 6);
     grid_sizer_colours->Add(button_colour_empty, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_colours->Add(1, 1, 0, wxADJUST_MINSIZE, 0);
     wxStaticText* label_3 = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Mastermode 1"));
     grid_sizer_colours->Add(label_3, 0, wxALL|wxALIGN_CENTER_VERTICAL, 6);
     grid_sizer_colours->Add(button_colour_mm1, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
     wxStaticText* label_1 = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Server offline"));
     grid_sizer_colours->Add(label_1, 0, wxALL|wxALIGN_CENTER_VERTICAL, 6);
     grid_sizer_colours->Add(button_colour_off, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_colours->Add(1, 1, 0, wxADJUST_MINSIZE, 0);
     wxStaticText* label_4 = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Mastermode 2"));
     grid_sizer_colours->Add(label_4, 0, wxALL|wxALIGN_CENTER_VERTICAL, 6);
     grid_sizer_colours->Add(button_colour_mm2, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
     wxStaticText* label_2 = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Server full"));
     grid_sizer_colours->Add(label_2, 0, wxALL|wxALIGN_CENTER_VERTICAL, 6);
     grid_sizer_colours->Add(button_colour_full, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_colours->Add(1, 1, 0, wxADJUST_MINSIZE, 0);
     wxStaticText* label_5 = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Mastermode 3"));
     grid_sizer_colours->Add(label_5, 0, wxALL|wxALIGN_CENTER_VERTICAL, 6);
     grid_sizer_colours->Add(button_colour_mm3, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_colours->AddGrowableCol(0);
     grid_sizer_colours->AddGrowableCol(2);
     sizer_colours->Add(grid_sizer_colours, 1, wxEXPAND, 0);
     grid_sizer_pane_colours->Add(sizer_colours, 1, wxALL|wxEXPAND, 4);

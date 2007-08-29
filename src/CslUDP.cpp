@@ -59,7 +59,8 @@ int gettimeofday(struct timeval* tv,void *dummy)
 
 
 
-CslUDP::CslUDP(wxEvtHandler *handler,wxUint32 interval) : wxEvtHandler()
+CslUDP::CslUDP(wxEvtHandler *handler,const wxUint32 interval) :
+        wxEvtHandler()
 {
     m_init=false;
     m_evtHandler=handler;
@@ -74,6 +75,7 @@ CslUDP::CslUDP(wxEvtHandler *handler,wxUint32 interval) : wxEvtHandler()
     wxIPV4address address;
     address.AnyAddress();
 
+    LOG_DEBUG("Listen port: %d\n",address.Service());
     m_socket=new wxDatagramSocket(address,wxSOCKET_NOWAIT);
     if (!m_socket->IsOk())
     {
@@ -139,7 +141,7 @@ bool CslUDP::SendPing(CslUDPPacket *packet)
     return true;
 }
 
-wxUint32 CslUDP::GetTicks(bool init)
+wxUint32 CslUDP::GetTicks(const bool init)
 {
     if (init)
         return m_initTicks;

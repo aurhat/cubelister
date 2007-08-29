@@ -32,6 +32,7 @@
 #ifndef WX_PRECOMP
 #include "wx/wx.h"
 #endif
+#include <wx/snglinst.h>
 #include <wx/image.h>
 #include <wx/imaglist.h>
 // begin wxGlade: ::dependencies
@@ -155,8 +156,10 @@ class CslApp: public wxApp
 {
     public:
         bool OnInit();
+        virtual int OnExit();
 
     private:
+        wxSingleInstanceChecker *m_single;
         wxLocale m_locale;
 };
 

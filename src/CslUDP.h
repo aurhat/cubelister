@@ -53,17 +53,13 @@ END_DECLARE_EVENT_TYPES()
 class CslUDPPacket
 {
     public:
-        CslUDPPacket(wxUint32 size=0)
-        {
-            Create(size);
-        }
-        CslUDPPacket(wxUint32 size,void *data) : m_size(size), m_data(data) {};
-        ~CslUDPPacket()
-        {
-            FreeData();
-        }
+        CslUDPPacket(const wxUint32 size=0) { Create(size); }
+        CslUDPPacket(const wxUint32 size,void *data) :
+                m_size(size),m_data(data) {};
 
-        void* Create(wxUint32 size)
+        ~CslUDPPacket() { FreeData(); }
+
+        void* Create(const wxUint32 size)
         {
             if (size>0)
             {
@@ -87,14 +83,14 @@ class CslUDPPacket
             }
         }
 
-        void Set(wxIPV4address& addr,void *data,wxUint32 size)
+        void Set(const wxIPV4address& addr,void *data,const wxUint32 size)
         {
             m_addr=addr;
             m_data=data;
             m_size=size;
         }
-        void SetSize(wxUint32 size) { m_size=size; }
-        void SetAddr(wxIPV4address& addr) { m_addr=addr; }
+        void SetSize(const wxUint32 size) { m_size=size; }
+        void SetAddr(const wxIPV4address& addr) { m_addr=addr; }
 
         void* Data() { return m_data; }
         wxUint32 Size() { return m_size; }
@@ -109,13 +105,13 @@ class CslUDPPacket
 class CslUDP : public wxEvtHandler
 {
     public:
-        CslUDP(wxEvtHandler *handler,wxUint32 interval);
+        CslUDP(wxEvtHandler *handler,const wxUint32 interval);
         ~CslUDP();
 
         bool IsInit() { return m_init; }
 
         bool SendPing(CslUDPPacket *packet);
-        wxUint32 GetTicks(bool init=false);
+        wxUint32 GetTicks(const bool init=false);
 
     private:
         bool m_init;

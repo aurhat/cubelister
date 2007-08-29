@@ -26,6 +26,7 @@
 #include "CslDlgAddMaster.h"
 #include "CslDlgGeneric.h"
 #include "CslMenu.h"
+#include "CslTools.h"
 #include "CslVersion.h"
 
 #ifndef _MSC_VER
@@ -39,12 +40,9 @@
 #include "img/close_press_14.xpm"
 #endif
 
-#define CSL_ERROR_STR              _("Error!")
+#define CSL_ERROR_STR _("Error!")
 
 #define CSL_TIMER_SHOT 500
-
-#define COLOUR2INT(col) ((col.Red()<<16)|(col.Green()<<8)|col.Blue())
-#define INT2COLOUR(int) wxColour((int>>16)&0xFF,(int>>8)&0xFF,int&0xFF)
 
 BEGIN_EVENT_TABLE(CslFrame, wxFrame)
     EVT_TIMER(wxID_ANY,CslFrame::OnTimer)
@@ -321,7 +319,6 @@ void CslFrame::set_properties()
     SetIcon(icon);
 }
 
-
 void CslFrame::do_layout()
 {
     CslStatusBar *statusBar=new CslStatusBar(this);
@@ -427,6 +424,42 @@ void CslFrame::do_layout()
     SetSize(g_cslSettings->m_frameSize);
 }
 
+void CslFrame::CreateMainMenu()
+{
+    m_menubar=new wxMenuBar();
+    SetMenuBar(m_menubar);
+    wxMenu* menu_1=new wxMenu();
+    CslMenu::AddItemToMenu(menu_1,wxID_PREFERENCES,_("&Settings"),wxART_SETTINGS);
+    CslMenu::AddItemToMenu(menu_1,wxID_EXIT,_("&Exit"),wxART_QUIT);
+    m_menubar->Append(menu_1,_("&File"));
+    wxMenu* menu_2=new wxMenu();
+    CslMenu::AddItemToMenu(menu_2,MENU_MASTER_UPDATE,_("&Update from master\tF5"),wxART_RELOAD);
+    menu_2->AppendSeparator();
+    CslMenu::AddItemToMenu(menu_2,MENU_MASTER_ADD,_("Add a &new master ..."),wxART_ADD_BOOKMARK);
+    CslMenu::AddItemToMenu(menu_2,MENU_MASTER_DEL,_("&Remove master"),wxART_DEL_BOOKMARK);
+    m_menubar->Append(menu_2,_("&Master"));
+    wxMenu* menu_3=new wxMenu();
+    CslMenu::AddItemToMenu(menu_3,MENU_VIEW_SEARCH,_("Show &search bar\tCTRL+S"),
+                           wxART_NONE,wxITEM_CHECK);
+    CslMenu::AddItemToMenu(menu_3,MENU_VIEW_FILTER,_("Show &Filter\tCTRL+F"),
+                           wxART_NONE,wxITEM_CHECK);
+    menu_3->AppendSeparator();
+    CslMenu::AddItemToMenu(menu_3,MENU_VIEW_AUTO_SORT,_("Sort &lists automatically\tCTRL+L"),
+                           wxART_NONE,wxITEM_CHECK);
+    CslMenu::AddItemToMenu(menu_3,MENU_VIEW_AUTO_FIT,_("Fit columns on window &resize"),
+                           wxART_NONE,wxITEM_CHECK);
+    menu_3->AppendSeparator();
+    CslMenu::AddItemToMenu(menu_3,MENU_VIEW_SPLITTER_LIVE,_("Redraw while dragging spli&tters"),
+                           wxART_NONE,wxITEM_CHECK);
+    m_menubar->Append(menu_3,_("&View"));
+    wxMenu* menu_4=new wxMenu();
+    CslMenu::AddItemToMenu(menu_4,wxID_ABOUT,_("A&bout"),wxART_ABOUT);
+    m_menubar->Append(menu_4,_("&Help"));
+
+    m_menuMaster=menu_2;
+    g_cslMenu=new CslMenu(m_menubar);
+}
+
 void CslFrame::OnTimer(wxTimerEvent& event)
 {
     if (!(g_cslSettings->m_dontUpdatePlaying && CslConnectionState::IsPlaying()))
@@ -486,7 +519,6 @@ void CslFrame::OnTimer(wxTimerEvent& event)
             m_lightCount++;
     }
 }
-
 
 void CslFrame::OnTreeLeftClick(wxTreeEvent& event)
 {
@@ -805,10 +837,12 @@ void CslFrame::OnShow(wxShowEvent& event)
 
 void CslFrame::OnClose(wxCloseEvent& event)
 {
-    CslDlgGeneric *dlg=new CslDlgGeneric(this,_("CSL terminating"),_("Waiting for engine to terminate ..."),
+    CslDlgGeneric *dlg=new CslDlgGeneric(this,_("CSL terminating"),
+                                         _("Waiting for engine to terminate ..."),
                                          wxArtProvider::GetBitmap(wxART_INFORMATION,wxART_CMN_DIALOG),
                                          wxDefaultPosition);
     dlg->Show();
+
     event.Skip();
 }
 
@@ -856,42 +890,6 @@ void CslFrame::OnMouseLeftDown(wxMouseEvent& event)
         default:
             break;
     }
-}
-
-void CslFrame::CreateMainMenu()
-{
-    m_menubar=new wxMenuBar();
-    SetMenuBar(m_menubar);
-    wxMenu* tmp_menu_1=new wxMenu();
-    CslMenu::AddItemToMenu(tmp_menu_1,wxID_PREFERENCES,_("&Settings"),wxART_SETTINGS);
-    CslMenu::AddItemToMenu(tmp_menu_1,wxID_EXIT,_("&Exit"),wxART_QUIT);
-    m_menubar->Append(tmp_menu_1,_("&File"));
-    wxMenu* tmp_menu_2=new wxMenu();
-    CslMenu::AddItemToMenu(tmp_menu_2,MENU_MASTER_UPDATE,_("&Update from master\tF5"),wxART_RELOAD);
-    tmp_menu_2->AppendSeparator();
-    CslMenu::AddItemToMenu(tmp_menu_2,MENU_MASTER_ADD,_("Add a &new master ..."),wxART_ADD_BOOKMARK);
-    CslMenu::AddItemToMenu(tmp_menu_2,MENU_MASTER_DEL,_("&Remove master"),wxART_DEL_BOOKMARK);
-    m_menubar->Append(tmp_menu_2,_("&Master"));
-    wxMenu* tmp_menu_3=new wxMenu();
-    CslMenu::AddItemToMenu(tmp_menu_3,MENU_VIEW_SEARCH,_("Show &search bar\tCTRL+S"),
-                           wxART_NONE,wxITEM_CHECK);
-    CslMenu::AddItemToMenu(tmp_menu_3,MENU_VIEW_FILTER,_("Show &Filter\tCTRL+F"),
-                           wxART_NONE,wxITEM_CHECK);
-    tmp_menu_3->AppendSeparator();
-    CslMenu::AddItemToMenu(tmp_menu_3,MENU_VIEW_AUTO_SORT,_("Sort &lists automatically\tCTRL+L"),
-                           wxART_NONE,wxITEM_CHECK);
-    CslMenu::AddItemToMenu(tmp_menu_3,MENU_VIEW_AUTO_FIT,_("Fit columns on window &resize"),
-                           wxART_NONE,wxITEM_CHECK);
-    tmp_menu_3->AppendSeparator();
-    CslMenu::AddItemToMenu(tmp_menu_3,MENU_VIEW_SPLITTER_LIVE,_("Redraw while dragging spli&tters"),
-                           wxART_NONE,wxITEM_CHECK);
-    m_menubar->Append(tmp_menu_3,_("&View"));
-    wxMenu* tmp_menu_4=new wxMenu();
-    CslMenu::AddItemToMenu(tmp_menu_4,wxID_ABOUT,_("A&bout"),wxART_ABOUT);
-    m_menubar->Append(tmp_menu_4,_("&Help"));
-
-    m_menuMaster=tmp_menu_2;
-    g_cslMenu=new CslMenu(m_menubar);
 }
 
 void CslFrame::ToggleSearchBar()
@@ -1536,16 +1534,43 @@ IMPLEMENT_APP(CslApp)
 
 bool CslApp::OnInit()
 {
+    wxString name=wxString::Format(wxT("%s-%s"),CSL_NAME_SHORT_STR,wxGetUserId().c_str());
+    m_single=new wxSingleInstanceChecker(name);
+
+    if (m_single->IsAnotherRunning())
+    {
+        CslDlgGeneric *dlg=new CslDlgGeneric(NULL,_("CSL already running"),
+                                             _("CSL is already running."),
+                                             wxArtProvider::GetBitmap(wxART_INFORMATION,wxART_CMN_DIALOG),
+                                             wxDefaultPosition);
+        dlg->Show();
+        wxYield();
+        wxSleep(3);
+        dlg->Destroy();
+
+        delete dlg;
+        delete m_single;
+
+        return false;
+    }
+
     m_locale.Init(wxLANGUAGE_DEFAULT,wxLOCALE_CONV_ENCODING);
     m_locale.AddCatalogLookupPathPrefix(wxT("lang"));
 #ifndef __WXMSW__
     m_locale.AddCatalogLookupPathPrefix(wxT(LOCALEDIR));
 #endif
-    m_locale.AddCatalog(wxT("csl"));
+    m_locale.AddCatalog(CSL_NAME_SHORT_STR);
 
     //wxInitAllImageHandlers();
-    CslFrame* frame_csl = new CslFrame(NULL, wxID_ANY, wxEmptyString);
+    CslFrame* frame_csl=new CslFrame(NULL,wxID_ANY,wxEmptyString);
     frame_csl->Show();
     SetTopWindow(frame_csl);
+
     return true;
+}
+
+int CslApp::OnExit()
+{
+    delete m_single;
+    return 0;
 }

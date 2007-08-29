@@ -16,7 +16,7 @@ find . -type d -iname "release" -exec rm -Rf {} \;
 find . -type d -iname "release-static" -exec rm -Rf {} \;
 find . -type d -iname "release-static-engine" -exec rm -Rf {} \;
 
-DIRS=(. src/enet)
+DIRS=(.)
 for i in ${DIRS[*]}
 do
  if test -d "$i"; then

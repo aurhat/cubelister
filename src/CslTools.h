@@ -28,6 +28,9 @@
 #define A2U(PSZA_CHART) wxString(wxConvertMB2WX(PSZA_CHART))
 #define U2A(PSZT_CHART) (char*)(const char*)wxConvertWX2MB(PSZT_CHART)
 
+#define COLOUR2INT(col) ((col.Red()<<16)|(col.Green()<<8)|col.Blue())
+#define INT2COLOUR(int) wxColour((int>>16)&0xFF,(int>>8)&0xFF,int&0xFF)
+
 #ifdef __WXDEBUG__
 void Debug_Printf(const char *DbgFunc, const char *FmtStr,...);
 #define LOG_DEBUG(...) Debug_Printf(__FUNCTION__,## __VA_ARGS__);
