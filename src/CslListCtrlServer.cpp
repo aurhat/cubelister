@@ -1194,7 +1194,9 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info)
                     return;
                 skipPrepare=true;
             }
-            else if (info->m_map.IsEmpty() || info->m_map.CmpNoCase(CSL_DEFAULT_INJECT_FIL_SB)==0)
+            else if (info->m_mm!=MM_LOCKED && 
+				     (info->m_map.IsEmpty() ||
+					 info->m_map.CmpNoCase(CSL_DEFAULT_INJECT_FIL_SB)==0))
                 skipPrepare=true;
 
             if (skipPrepare)

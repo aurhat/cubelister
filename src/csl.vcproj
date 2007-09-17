@@ -195,6 +195,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CslDlgExtended.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CslDlgOutput.cpp"
 				>
 			</File>
@@ -258,6 +262,10 @@
 			</File>
 			<File
 				RelativePath=".\CslDlgAddServer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CslDlgExtended.h"
 				>
 			</File>
 			<File

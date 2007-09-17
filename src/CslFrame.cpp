@@ -275,13 +275,13 @@ CslFrame::~CslFrame()
             CslGame::ConnectCleanup(info->m_type,CslConnectionState::GetConfig());
     }
 
+    tree_ctrl_games->DeleteAllItems();
+
     if (m_engine)
     {
         SaveServers();
         delete m_engine;
     }
-
-    tree_ctrl_games->DeleteAllItems();
 
     delete g_cslMenu;
 

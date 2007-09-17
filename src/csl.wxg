@@ -1270,7 +1270,7 @@
                 <option>0</option>
                 <object class="wxTextCtrl" name="text_ctrl_output" base="EditTextCtrl">
                     <style>wxTE_MULTILINE|wxTE_READONLY|wxHSCROLL|wxTE_RICH|wxTE_RICH2|wxTE_AUTO_URL</style>
-                    <size>400,200</size>
+                    <size>550,300</size>
                 </object>
             </object>
             <object class="sizeritem">

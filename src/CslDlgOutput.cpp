@@ -72,7 +72,7 @@ void CslDlgOutput::set_properties()
 {
     // begin wxGlade: CslDlgOutput::set_properties
     SetTitle(_("CSL - Game output"));
-    text_ctrl_output->SetMinSize(wxSize(400,200));
+    text_ctrl_output->SetMinSize(wxSize(550,300));
     choice_conv_filter->SetSelection(0);
     // end wxGlade
 
@@ -156,6 +156,8 @@ void CslDlgOutput::OnCommandEvent(wxCommandEvent& event)
             s=text_ctrl_search->GetValue();
             if (!s.IsEmpty())
                 SetSearchbarColour(Search(s));
+
+			text_ctrl_output->ShowPosition(0);
             break;
         }
 
@@ -398,6 +400,8 @@ void CslDlgOutput::HandleOutput(char *text,wxUint32 size,bool freemem)
         text_ctrl_output->AppendText(checkbox_conv_filter->GetValue() ?
                                      Filter(start,end) : m_text);
     }
+
+	text_ctrl_output->ShowPosition(0);
 
     wxString s=text_ctrl_search->GetValue();
     if (!s.IsEmpty())

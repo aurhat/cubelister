@@ -347,21 +347,10 @@ void CslDlgSettings::do_layout()
 
     // what a crap
     wxSize a=notebook_settings->GetBestSize();
-    wxSize b=notebook_pane_sauer->GetBestSize();
-    wxSize c=grid_sizer_button->GetMinSize();
-    wxUint32 hmult;
-#ifdef __WXMSW__
-    hmult=4;
-#else
-    hmult=2;
-#endif
-    wxSize d(a.x,a.y+10);
+    wxSize d(a.x,a.y+48);
     notebook_settings->SetMinSize(d);
 
     grid_sizer_main->SetSizeHints(this);
-
-    //notebook_games->GetListView()->SetColumnWidth(0,wxLIST_AUTOSIZE_USEHEADER);
-    notebook_games->SetSize(wxSize((GetBestSize().x-8),GetBestSize().y));
 }
 
 void CslDlgSettings::OnPicker(wxFileDirPickerEvent& event)

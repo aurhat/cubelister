@@ -21,13 +21,17 @@
 #ifndef CSLTOOLS_H
 #define CSLTOOLS_H
 
+/**
+    @author Glen Masgai <mimosius@gmx.de>
+*/
+
 #ifdef __WXDEBUG__
 #define CSL_EXT_SERVER_INFO
 #endif
 
-/**
-    @author Glen Masgai <mimosius@gmx.de>
-*/
+#ifndef DATADIR
+#define DATADIR wxString(wxT("."))+wxString(PATHDIV)+wxString(wxT("data"))
+#endif
 
 #define A2U(PSZA_CHART) wxString(wxConvertMB2WX(PSZA_CHART))
 #define U2A(PSZT_CHART) (char*)(const char*)wxConvertWX2MB(PSZT_CHART)
