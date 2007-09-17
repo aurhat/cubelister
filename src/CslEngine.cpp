@@ -38,7 +38,7 @@ END_DECLARE_EVENT_TYPES()
                              ),
 
 DEFINE_EVENT_TYPE(wxCSL_EVT_RESOLVE)
-
+DEFINE_EVENT_TYPE(wxCSL_EVT_PING_STATS)
 
 BEGIN_EVENT_TABLE(CslEngine,wxEvtHandler)
     CSL_EVT_PING(wxID_ANY,CslEngine::OnPong)
@@ -97,31 +97,28 @@ int getint(ucharbuf &p)
     else return c;
 }
 
-int getint2(uchar *p)
+void putstring(const char *t, ucharbuf &p)
 {
-    int c = *((char *)p);
-    p++;
-    if (c==-128) { int n = *p++; n |= *((char *)p)<<8; p++; return n;}
-    else if (c==-127) { int n = *p++; n |= *p++<<8; n |= *p++<<16; return n|(*p++<<24); }
-    else return c;
-};
+    while (*t) putint(p,*t++);
+    putint(p,0);
+}
 
 void getstring(char *text, ucharbuf &p, int len)
 {
-    char *t = text;
+    char *t=text;
     do
     {
         if (t>=&text[len])
         {
-            text[len-1] = 0;
+            text[len-1]=0;
             return;
         }
         if (!p.remaining())
         {
-            *t = 0;
+            *t=0;
             return;
         }
-        *t = getint(p);
+        *t=getint(p);
     }
     while (*t++);
 }
@@ -190,6 +187,7 @@ CslEngine::CslEngine(wxEvtHandler *evtHandler) : wxEvtHandler(),
 {
     if (m_evtHandler)
         SetNextHandler(m_evtHandler);
+    GetTicks();
 };
 
 CslEngine::~CslEngine()
@@ -203,7 +201,7 @@ bool CslEngine::InitEngine(wxUint32 updateInterval)
         return false;
 
     SetUpdateInterval(updateInterval);
-    m_pingSock=new CslUDP(this,updateInterval);
+    m_pingSock=new CslUDP(this);
     m_isOk=m_pingSock->IsInit();
 
     if (m_isOk)
@@ -211,6 +209,8 @@ bool CslEngine::InitEngine(wxUint32 updateInterval)
         m_resolveThread=new CslResolverThread(this);
         m_resolveThread->Run();
     }
+
+    m_firstPing=true;
 
     return m_isOk;
 }
@@ -372,12 +372,12 @@ bool CslEngine::SetCurrentGame(CslGame *game,CslMaster *master)
     return true;
 }
 
-bool CslEngine::SendPing(CslServerInfo *info)
+bool CslEngine::Ping(CslServerInfo *info,bool force)
 {
     CslUDPPacket *packet;
-    uchar ping[5];
+    uchar ping[16];
 
-    wxUint32 ticks=m_pingSock->GetTicks();
+    wxUint32 ticks=GetTicks();
     wxUint32 interval=m_updateInterval;
 
     if (info->m_waiting)
@@ -386,22 +386,68 @@ bool CslEngine::SendPing(CslServerInfo *info)
         LOG_DEBUG("iswaiting\n");
     }
 
-    //LOG_DEBUG("ticks:%li, pingsend:%li, diff:%li\n",ticks,info->m_pingSend,ticks-info->m_pingSend);
-    if ((ticks-info->m_pingSend)<interval && info->m_pingSend!=0)
+    //LOG_DEBUG("%s - ticks:%li, pingsend:%li, diff:%li\n",U2A(info->GetBestDescription()).c_str(),
+    //          ticks,info->m_pingSend,ticks-info->m_pingSend);
+    if (!force && (ticks-info->m_pingSend)<interval)
         return false;
     if (info->m_addr.IPAddress()==wxT("255.255.255.255"))
         return false;
 
-    //LOG_DEBUG("Ping %s - %d\n",info->m_host.c_str(),ticks);
+    info->m_pingSend=ticks;
 
+#ifdef CSL_EXT_SERVER_INFO
+    // Send uptime cmd first and check for ack in UpdateServerInfo()
+    if ((info->m_type==CSL_GAME_SB) &&
+        (info->m_ping<0 || info->m_extended) &&
+        (info->CanPingUptime()))
+    {
+        return PingUptime(info);
+    }
+
+#endif
+
+    // default ping packet
     packet=new CslUDPPacket();
-    ucharbuf p(ping, sizeof(ping));
+    ucharbuf p(ping,sizeof(ping));
     putint(p,info->m_pingSend);
     packet->Set(info->m_addr,ping,p.length());
-    info->m_pingSend=ticks;
+    m_pingSock->SendPing(packet);
+
+    //LOG_DEBUG("Ping %s - %d\n",U2A(info->GetBestDescription()).c_str(),ticks);
+
+    return true;
+}
+
+bool CslEngine::PingUptime(CslServerInfo *info)
+{
+    //LOG_DEBUG("uptime %s - %d\n",U2A(info->GetBestDescription()).c_str(),GetTicks());
+    uchar ping[16];
+
+    CslUDPPacket *packet=new CslUDPPacket();
+    ucharbuf p(ping,sizeof(ping));
+    putint(p,0);
+    putstring("uptime",p);
+    packet->Set(info->m_addr,ping,p.length());
     m_pingSock->SendPing(packet);
 
     return true;
+}
+
+bool CslEngine::PingStats(CslServerInfo *info)
+{
+    if (!info->m_extended)
+        return false;
+
+    CslUDPPacket *packet;
+    uchar ping[16];
+
+    ucharbuf p(ping, sizeof(ping));
+    putint(p,0);
+//    putstring("stats",p);
+
+    packet=new CslUDPPacket();
+    packet->Set(info->m_addr,ping,p.length());
+    return m_pingSock->SendPing(packet);
 }
 
 wxUint32 CslEngine::PingServers()
@@ -411,7 +457,7 @@ wxUint32 CslEngine::PingServers()
 
     if (m_mutex.TryLock()==wxMUTEX_BUSY)
     {
-        LOG_DEBUG("wxMUTEX_BUSY");
+        LOG_DEBUG("wxMUTEX_BUSY\n");
         return 0;
     }
 
@@ -430,23 +476,26 @@ wxUint32 CslEngine::PingServers()
         continue;
         }*/
 
-        if (SendPing(info))
+        bool force=m_firstPing&&i<5;
+        if (Ping(info,force))
             pc++;
     }
 
     loopv(m_favourites)
     {
         info=m_favourites[i];
-        if (SendPing(info))
+        if (Ping(info))
             pc++;
     }
 
-// #ifdef __WXDEBUG__
-//     if (pc)
-//         LOG_DEBUG("Pinged %d of %d\n",pc,servers->length()+m_favourites.length());
-// #endif
+//  #ifdef __WXDEBUG__
+//      if (pc)
+//          LOG_DEBUG("Pinged %d of %d\n",pc,servers->length()+m_favourites.length());
+//  #endif
 
     m_mutex.Unlock();
+
+    m_firstPing=false;
 
     return pc;
 }
@@ -469,9 +518,9 @@ int CslEngine::UpdateMaster()
     wxHTTP http;
     if (!http.Connect(m_currentMaster->GetAddress(),80))
         return -2;
-
     http.SetHeader(wxT("User-Agent"),agent);
     wxInputStream *data=http.GetInputStream(m_currentMaster->GetPath());
+
     wxUint32 code=http.GetResponse();
 
     if (!data||code!=200)
@@ -553,7 +602,7 @@ void CslEngine::FuzzPingSends()
     else
         return;
 
-    wxUint32 ticks=m_pingSock->GetTicks();
+    wxUint32 ticks=GetTicks();
 
     CslServerInfo *info;
     loopv(*servers)
@@ -563,13 +612,11 @@ void CslEngine::FuzzPingSends()
     }
 }
 
-void CslEngine::UpdateServerInfo(CslServerInfo *info,CslUDPPacket *packet,wxUint32 now)
+void CslEngine::UpdateServerInfo(CslServerInfo *info,ucharbuf *buf,wxUint32 now)
 {
     char text[128];
-    ucharbuf p((uchar*)packet->Data(),packet->Size());
-    // TODO evaluate ping read back from packet?
-    info->m_pingResp=m_pingSock->GetTicks();
-    info->m_ping=info->m_pingResp-getint(p);
+
+    info->m_pingResp=GetTicks();
     info->m_ping=info->m_pingResp-info->m_pingSend;
     info->m_lastSeen=now;
 
@@ -577,11 +624,11 @@ void CslEngine::UpdateServerInfo(CslServerInfo *info,CslUDPPacket *packet,wxUint
     {
         case CSL_GAME_SB:
         {
-            info->m_players=getint(p);
-            int numattr=getint(p);
+            info->m_players=getint(*buf);
+            int numattr=getint(*buf);
             vector<int>attr;
             attr.setsize(0);
-            loopj(numattr) attr.add(getint(p));
+            loopj(numattr) attr.add(getint(*buf));
             if (numattr>=1)
                 info->m_protocol=attr[0];
             if (numattr>=2)
@@ -597,40 +644,175 @@ void CslEngine::UpdateServerInfo(CslServerInfo *info,CslUDPPacket *packet,wxUint
             if (numattr>=5)
                 info->m_mm=attr[4];
 
-            getstring(text,p,sizeof(text));
+            getstring(text,*buf,sizeof(text));
             info->m_map=A2U(text);
-            getstring(text,p,sizeof(text));
+            getstring(text,*buf,sizeof(text));
             info->m_desc=A2U(text);
             break;
         }
 
         case CSL_GAME_CB:
         {
+            // this sucks!
             wxInt32 i;
-            for (i=0;i<p.maxlength();i++)
-                *p.at(i)^=0x61;
+            for (i=0;i<buf->maxlength();i++)
+                *buf->at(i)^=0x61;
+            // dont break, nearly same as AC
         }
         case CSL_GAME_AC:
         {
-            wxInt32 prot=getint(p);
+
+            wxInt32 prot=getint(*buf);
             if (info->m_type==CSL_GAME_CB && prot!=CSL_LAST_PROTOCOL_CB)
                 return;
             info->m_protocol=prot;
             info->m_gameMode=info->m_type==CSL_GAME_AC ?
-                             GetModeStrAC(getint(p)) : GetModeStrSB(getint(p));
-            info->m_players=getint(p);
-            info->m_timeRemain=getint(p);
-            getstring(text,p,sizeof(text));
+                             GetModeStrAC(getint(*buf)):
+                             GetModeStrSB(getint(*buf));
+            info->m_players=getint(*buf);
+            info->m_timeRemain=getint(*buf);
+            getstring(text,*buf,sizeof(text));
             info->m_map=A2U(text);
-            getstring(text,p,sizeof(text));
+            getstring(text,*buf,sizeof(text));
             info->m_desc=A2U(text);
             if (info->m_type==CSL_GAME_AC)
-                info->m_playersMax=getint(p);
+                info->m_playersMax=getint(*buf);
             break;
         }
 
         default:
             wxASSERT(info->m_type);
+    }
+}
+
+void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 now)
+{
+    char text[128];
+    wxUint32 v=0;
+    bool extended=false;
+    ucharbuf p((uchar*)packet->Data(),packet->Size());
+
+#ifdef __WXDEBUG__
+    wxString dbg_type;
+#endif
+
+    v=getint(p);
+    if (!v)
+        extended=true;
+
+    while (packet->Size() > (wxUint32)p.length())
+    {
+        switch (info->m_type)
+        {
+            case CSL_GAME_SB:
+            {
+                if (extended)
+                {
+                    getstring(text,p,sizeof(text));
+
+                    if (strcmp(text,"uptime")==0)
+                    {
+#ifdef __WXDEBUG__
+                        dbg_type=wxT("uptime");
+#endif
+                        v=p.length();
+                        if (getint(p)!=-1)
+                        {
+                            p.len=v;
+                            UpdateServerInfo(info,&p,now);
+                            break;
+                        }
+                        else
+                            Ping(info,true);
+
+                        info->m_uptime=getint(p);
+                        if (info->m_uptime)
+                            info->m_extended=true;
+                        LOG_DEBUG("uptime (%s) %s\n",U2A(info->GetBestDescription()).c_str(),
+                                  U2A(FormatSeconds(info->m_uptime)).c_str());
+                    }
+                    else if (strcmp(text,"stats")==0)
+                    {
+#ifdef __WXDEBUG__
+                        dbg_type=wxT("stats");
+#endif
+                        if (getint(p)!=-1)
+                            break;
+
+                        wxUint32 extProt=getint(p);
+                        if (extProt<101)
+                            return;
+
+                        LOG_DEBUG("stats (%s) prot:%d\n",
+                                  U2A(info->GetBestDescription()).c_str(),extProt);
+
+                        CslPlayerStats *stats=NULL;
+                        loopv(info->m_playerStats)
+                        {
+                            if (info->m_playerStats[i]->m_ok)
+                                continue;
+                            stats=info->m_playerStats.at(i);
+                        }
+
+                        if (!stats)
+                        {
+                            stats=new CslPlayerStats;
+                            info->m_playerStats.add(stats);
+                        }
+
+                        stats->m_id=getint(p);
+                        getstring(text,p,sizeof(text));
+                        stats->m_player=A2U(text);
+                        getstring(text,p,sizeof(text));
+                        stats->m_team=A2U(text);
+                        stats->m_frags=getint(p);
+                        stats->m_deaths=getint(p);
+                        stats->m_teamkills=getint(p);
+
+                        if (p.overread())
+                        {
+                            LOG_DEBUG("stats(%s) OVERREAD!\n",U2A(info->GetBestDescription()).c_str());
+                            break;
+                        }
+
+                        stats->m_ok=true;
+
+                        LOG_DEBUG("stats (%s): player:%s, team:%s, frags:%d, deaths:%d, tk:%d,\n",
+                                  U2A(info->GetBestDescription()).c_str(),
+                                  U2A(stats->m_player).c_str(),U2A(stats->m_team).c_str(),
+                                  stats->m_frags,stats->m_deaths,stats->m_teamkills);
+
+                        wxCommandEvent evt(wxCSL_EVT_PING_STATS);
+                        evt.SetClientData((void*)info);
+                        wxPostEvent(m_evtHandler,evt);
+                    }
+                    else
+                    {
+#ifdef __WXDEBUG__
+                        dbg_type=wxT("unknown");
+#endif
+                        break;
+                    }
+                }
+                else
+                    UpdateServerInfo(info,&p,now);
+
+                break;
+            }
+
+            case CSL_GAME_AC:
+            case CSL_GAME_CB:
+                UpdateServerInfo(info,&p,now);
+                break;
+
+            default:
+                break;
+        }
+#ifdef __WXDEBUG__
+        if (p.length()<(wxInt32)packet->Size())
+            LOG_DEBUG("%s: %d bytes left (type=%s)\n",U2A(info->GetBestDescription()).c_str(),
+                      packet->Size()-p.length(),U2A(dbg_type).c_str());
+#endif
     }
 }
 
@@ -657,7 +839,7 @@ void CslEngine::OnPong(wxCommandEvent& event)
     if ((info=m_currentGame->FindServerByAddr(packet->Address()))!=NULL)
     {
         skip=true;
-        UpdateServerInfo(info,packet,ticks);
+        ParsePongCmd(info,packet,ticks);
     }
 
     if (!skip)
@@ -669,12 +851,11 @@ void CslEngine::OnPong(wxCommandEvent& event)
                 info->m_addr.Service()==packet->Address().Service())
             {
                 skip=true;
-                UpdateServerInfo(info,packet,ticks);
+                ParsePongCmd(info,packet,ticks);
                 break;
             }
         }
     }
-
 
     delete packet;
 

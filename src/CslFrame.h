@@ -62,8 +62,6 @@ class CslFrame: public wxFrame
 
         wxMenu *m_menuMaster;
 
-        wxColour m_textctrlText,m_textctrlBack;
-
         wxTreeItemId m_treeGamesRoot;
 
         wxImageList m_imgListTree;
@@ -74,14 +72,16 @@ class CslFrame: public wxFrame
         bool m_timerInit;
         wxTimer m_timer;
 
-        // TODO Output from Game
-        //CslDlgOutput *m_outputDlg;
+        CslDlgOutput *m_outputDlg;
+
+        CslDlgExtended *m_extendedDlg;
 
         // begin wxGlade: CslFrame::methods
         void set_properties();
         void do_layout();
         // end wxGlade
 
+        void OnPingStats(wxCommandEvent& event);
         void OnTimer(wxTimerEvent& event);
         void OnTreeLeftClick(wxTreeEvent& event);
         void OnTreeRightClick(wxTreeEvent& event);
@@ -124,6 +124,7 @@ class CslFrame: public wxFrame
         wxPanel* panel_main;
         wxPanel* panel_frame;
         // end wxGlade
+
         wxBitmapButton* bitmap_button_search_clear;
         wxFlexGridSizer *m_sizerMaster,*m_sizerLeft,*m_sizerSearch;
         wxStaticBoxSizer *m_sizerFilter;

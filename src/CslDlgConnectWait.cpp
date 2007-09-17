@@ -45,7 +45,7 @@ CslDlgConnectWait::CslDlgConnectWait(wxWindow* parent,wxInt32 *time,int id,const
 void CslDlgConnectWait::set_properties()
 {
     // begin wxGlade: CslDlgConnectWait::set_properties
-    SetTitle(_("Server full"));
+    SetTitle(_("CSL - Server full"));
     button_ok->SetFocus();
     // end wxGlade
 
@@ -82,9 +82,8 @@ void CslDlgConnectWait::do_layout()
 
 void CslDlgConnectWait::OnButton(wxCommandEvent& event)
 {
-    wxInt32 time=spin_ctrl_time->GetValue();
-    *m_time=time;
+    *m_time=spin_ctrl_time->GetValue();
     if (checkbox_default->IsChecked())
-        g_cslSettings->m_waitServerFull=time;
+        g_cslSettings->m_waitServerFull=*m_time;
     EndModal(wxID_OK);
 }

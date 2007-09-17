@@ -73,14 +73,10 @@ class CslDlgSettings: public wxDialog
         wxStaticBox* sizer_times_staticbox;
         wxStaticBox* sizer_colours_staticbox;
         wxTextCtrl* text_ctrl_sauer_options;
-        wxRadioButton* radio_btn_sauer_start_param;
-        wxRadioButton* radio_btn_sauer_start_config;
         wxPanel* notebook_pane_sauer;
         wxTextCtrl* text_ctrl_assault_options;
-        wxRadioButton* radio_btn_assault_start_config;
         wxPanel* notebook_pane_assault;
         wxTextCtrl* text_ctrl_cube_options;
-        wxRadioButton* radio_btn_cube_start_config;
         wxPanel* notebook_pane_cube;
         wxListbook* notebook_games;
         wxPanel* notebook_pane_games;

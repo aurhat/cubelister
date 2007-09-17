@@ -141,6 +141,9 @@ const char * GeoIP_country_name[251] = {"N/A","Asia/Pacific Region","Europe","An
 	"Virgin Islands, British","Virgin Islands, U.S.","Vietnam","Vanuatu","Wallis and Futuna","Samoa","Yemen","Mayotte","Serbia","South Africa",
 	"Zambia","Montenegro","Zimbabwe","Anonymous Proxy","Satellite Provider","Other","Aland Islands","Guernsey","Isle of Man","Jersey"};
 
+/* Possible continent codes are AF, AS, EU, NA, OC, SA for Africa, Asia, Europe, North America, Oceania
+and South America. */
+
 const char GeoIP_country_continent[251][3] = {"--","AS","EU","EU","AS","AS","SA","SA","EU","AS","SA",
 	"AF","AN","SA","OC","EU","OC","SA","AS","EU","SA",
 	"AS","EU","AF","EU","AS","AF","AF","SA","AS","SA",
@@ -242,6 +245,7 @@ int GeoIP_db_avail(int type) {
 	if (type < 0 || type >= NUM_DB_TYPES) {
 		return 0;
 	}
+	_GeoIP_setup_dbfilename();
 	filePath = GeoIPDBFileName[type];
 	if (NULL == filePath) {
 		return 0;
@@ -422,6 +426,7 @@ unsigned int _GeoIP_seek_record (GeoIP *gi, unsigned long ipnum) {
 		}
 
 		if (x >= gi->databaseSegments[0]) {
+			gi->netmask = 32 - depth;
 			return x;
 		}
 		offset = x;
@@ -550,6 +555,8 @@ GeoIP* GeoIP_open (const char * filename, int flags) {
 			gi->cache = NULL;
 		}
 		gi->flags = flags;
+		gi->charset = GEOIP_CHARSET_ISO_8859_1;
+
 		_setup_segments(gi);
 		if (flags & GEOIP_INDEX_CACHE) {                        
 			gi->index_cache = (unsigned char *) malloc(sizeof(unsigned char) * ((gi->databaseSegments[0] * (long)gi->record_length * 2)));
@@ -770,7 +777,7 @@ char *GeoIP_database_info (GeoIP* gi) {
 		fseek(gi->GeoIPDatabase, -4l, SEEK_CUR);
 	}
 	if (hasStructureInfo == 1) {
-		fseek(gi->GeoIPDatabase, -3l, SEEK_CUR);
+		fseek(gi->GeoIPDatabase, -6l, SEEK_CUR);
 	} else {
 		/* no structure info, must be pre Sep 2002 database, go back to end */
 		fseek(gi->GeoIPDatabase, -3l, SEEK_END);
@@ -967,3 +974,18 @@ char *GeoIP_org_by_name (GeoIP* gi, const char *name) {
 unsigned char GeoIP_database_edition (GeoIP* gi) {
 	return gi->databaseType;
 }
+
+int GeoIP_charset( GeoIP* gi){
+  return gi->charset;
+}
+
+int GeoIP_set_charset(  GeoIP* gi, int charset ){
+  int old_charset = gi->charset;
+  gi->charset = charset;
+  return old_charset;
+}
+
+int GeoIP_last_netmask (GeoIP* gi) {
+  return gi->netmask;
+}
+

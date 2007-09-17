@@ -21,6 +21,10 @@
 #ifndef CSLTOOLS_H
 #define CSLTOOLS_H
 
+#ifdef __WXDEBUG__
+#define CSL_EXT_SERVER_INFO
+#endif
+
 /**
     @author Glen Masgai <mimosius@gmx.de>
 */
@@ -31,6 +35,9 @@
 #define COLOUR2INT(col) ((col.Red()<<16)|(col.Green()<<8)|col.Blue())
 #define INT2COLOUR(int) wxColour((int>>16)&0xFF,(int>>8)&0xFF,int&0xFF)
 
+#define SYSCOLOUR(x) wxSystemSettings::GetColour(x)
+
+
 #ifdef __WXDEBUG__
 void Debug_Printf(const char *DbgFunc, const char *FmtStr,...);
 #define LOG_DEBUG(...) Debug_Printf(__FUNCTION__,## __VA_ARGS__);
@@ -38,8 +45,30 @@ void Debug_Printf(const char *DbgFunc, const char *FmtStr,...);
 #define LOG_DEBUG(...)
 #endif
 
+
 extern char* StripColours(const char *s);
 extern bool IsIP(const wxString& s);
 extern bool IP2Int(const wxString& s,wxUint32 *ip);
+extern wxString FormatSeconds(wxUint32 time);
+
+
+enum { CSL_SORT_ASC = 0, CSL_SORT_DSC };
+enum { CSL_LIST_SORT_INT = 0, CSL_LIST_SORT_UINT, CSL_LIST_SORT_STRING };
+
+class CslListSortHelper
+{
+    public:
+        void Init(wxUint32 mode,wxUint32 type)
+        {
+            m_sortMode=mode;
+            m_sortType=type;
+        }
+
+        wxInt32 m_sortMode;
+        wxInt32 m_sortType;
+};
+
+extern wxUint32 GetTicks();
+
 
 #endif // CSLTOOLS_H

@@ -49,7 +49,6 @@ class CslListCtrlInfo : public wxListCtrl
         ~CslListCtrlInfo();
 
         void UpdateInfo(CslServerInfo *info);
-        wxString FormatSeconds(wxUint32 time);
 
     private:
         GeoIP *m_geoIP;

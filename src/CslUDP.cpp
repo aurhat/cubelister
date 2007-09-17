@@ -27,55 +27,17 @@ BEGIN_EVENT_TABLE(CslUDP,wxEvtHandler)
     EVT_SOCKET(wxID_ANY,CslUDP::OnSocketEvent)
 END_EVENT_TABLE()
 
-#define CSL_USE_WIN32_TICK
 
-#ifdef _MSC_VER
-#ifndef CSL_USE_WIN32_TICK
-#include <time.h>
-#if !defined(_WINSOCK2API_) && !defined(_WINSOCKAPI_)
-struct timeval
-{
-    long tv_sec;
-    long tv_usec;
-};
-#endif
-int gettimeofday(struct timeval* tv,void *dummy)
-{
-    union
-    {
-        long long ns100;
-        FILETIME ft;
-    } now;
-
-    GetSystemTimeAsFileTime(&now.ft);
-    tv->tv_usec = (long)((now.ns100 / 10LL) % 1000000LL);
-    tv->tv_sec = (long)((now.ns100 - 116444736000000000LL) / 10000000LL);
-    return 0;
-}
-#endif //USE_WIN32_TICK
-#else
-#include <sys/time.h>
-#endif //_MSC_VER
-
-
-
-CslUDP::CslUDP(wxEvtHandler *handler,const wxUint32 interval) :
+CslUDP::CslUDP(wxEvtHandler *handler) :
         wxEvtHandler()
 {
     m_init=false;
     m_evtHandler=handler;
 
-#if defined(__WXMSW__) && defined(CSL_USE_WIN32_TICK)
-    m_initTicks = GetTickCount();
-#else
-    struct timeval tv;
-    gettimeofday(&tv,NULL);
-    m_initTicks=tv.tv_sec*1000+tv.tv_usec/1000-interval;
-#endif
     wxIPV4address address;
     address.AnyAddress();
+    LOG_DEBUG("Listen port: %li\n",address.Service());
 
-    LOG_DEBUG("Listen port: %d\n",address.Service());
     m_socket=new wxDatagramSocket(address,wxSOCKET_NOWAIT);
     if (!m_socket->IsOk())
     {
@@ -139,20 +101,4 @@ bool CslUDP::SendPing(CslUDPPacket *packet)
     }
 
     return true;
-}
-
-wxUint32 CslUDP::GetTicks(const bool init)
-{
-    if (init)
-        return m_initTicks;
-
-#if defined(__WXMSW__) && defined(CSL_USE_WIN32_TICK)
-    return GetTickCount()-m_initTicks;
-#else
-    struct timeval tv;
-    gettimeofday(&tv,NULL);
-    wxUint32 r=tv.tv_usec/1000;
-    wxUint64 v=tv.tv_sec*1000;
-    return v+r-m_initTicks;
-#endif
 }

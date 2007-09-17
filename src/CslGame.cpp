@@ -18,7 +18,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <wx/file.h>
 #include "CslGame.h"
+#include "CslTools.h"
 
 const wxChar* GetVersionStrSB(int n)
 {
@@ -113,7 +115,11 @@ CslGame::CslGame(CSL_GAMETYPE type) : m_type(type), m_masterID(0)
 CslGame::~CslGame()
 {
     DeleteMaster();
-    loopv(m_servers) delete m_servers[i];
+    loopv(m_servers)
+    {
+        m_servers[i]->DeleteStats();
+        delete m_servers[i];
+    }
 }
 
 wxInt32 CslGame::AddMaster(CslMaster *master)
@@ -250,6 +256,7 @@ bool CslGame::DeleteServer(CslServerInfo *info)
         if (m_servers[i]==info)
         {
             m_servers.remove(i);
+            info->DeleteStats();
             delete info;
             return true;
         }
@@ -271,4 +278,119 @@ CslServerInfo* CslGame::FindServerByAddr(const wxIPV4address addr)
     }
 
     return NULL;
+}
+
+wxInt32 CslGame::ConnectCleanup(const CSL_GAMETYPE type,const wxString& cfg)
+{
+    if (cfg.IsEmpty())
+        return CSL_ERROR_NONE;
+
+    switch (type)
+    {
+        case CSL_GAME_SB:
+            return ConnectWriteConfig(type,cfg,wxT("\r\n"));
+
+        case CSL_GAME_AC:
+        case CSL_GAME_CB:
+        {
+            wxString bak=cfg+wxT(".csl");
+            if (!::wxFileExists(cfg) || !::wxFileExists(bak))
+                return CSL_ERROR_FILE_DONT_EXIST;
+            if (!::wxRenameFile(bak,cfg))
+                return CSL_ERROR_FILE_OPERATION;
+            break;
+        }
+
+        default:
+            return CSL_ERROR_GAME_UNKNOWN;
+    }
+
+    return CSL_ERROR_NONE;
+}
+
+wxInt32 CslGame::ConnectWriteConfig(const CSL_GAMETYPE type,const wxString& cfg,const wxString& str)
+{
+    wxUint32 c,l;
+    wxFile file;
+
+    switch (type)
+    {
+        case CSL_GAME_SB:
+            file.Open(cfg,wxFile::write);
+            break;
+
+        case CSL_GAME_AC:
+        case CSL_GAME_CB:
+            file.Open(cfg,wxFile::write_append);
+            break;
+
+        default:
+            return CSL_ERROR_GAME_UNKNOWN;
+    }
+
+    if (!file.IsOpened())
+        return CSL_ERROR_FILE_OPERATION;
+    l=str.Len();
+    c=file.Write(U2A(str),l);
+    file.Close();
+    if (l!=c)
+        return CSL_ERROR_FILE_OPERATION;
+
+    return 0;
+}
+
+wxInt32 CslGame::ConnectPrepare(const CslServerInfo *info,const wxString& path,wxString *out)
+{
+    wxString s;
+    wxString src;
+    wxString cfg;
+
+    switch (info->m_type)
+    {
+        case CSL_GAME_SB:
+        {
+            wxString map=wxString(CSL_DEFAULT_INJECT_FIL_SB)+wxString(wxT(".ogz"));
+            wxString dst=path+CSL_DEFAULT_INJECT_DIR_SB+map;
+            cfg=path+CSL_DEFAULT_INJECT_DIR_SB+CSL_DEFAULT_INJECT_FIL_SB+wxT(".cfg");
+
+            if (!::wxFileExists(dst))
+            {
+                src=A2U(DATADIR)+PATHDIV+map;
+                if (!::wxFileExists(src))
+                {
+                    src=::wxPathOnly(wxTheApp->argv[0])+PATHDIV+wxT("data")+PATHDIV+map;
+                    if (!::wxFileExists(src))
+                    {
+                        *out=wxString::Format(_("Couldn't find \"%s\""),map.c_str());
+                        return CSL_ERROR_FILE_DONT_EXIST;
+                    }
+                }
+                if (!::wxCopyFile(src,dst))
+                    return CSL_ERROR_FILE_OPERATION;
+            }
+            break;
+        }
+
+        case CSL_GAME_AC:
+            cfg=path+CSL_DEFAULT_INJECT_DIR_AC+CSL_DEFAULT_INJECT_FIL_AC;
+            if (::wxFileExists(cfg))
+                if (!::wxCopyFile(cfg,cfg+wxT(".csl")))
+                    return CSL_ERROR_FILE_OPERATION;
+            break;
+
+        case CSL_GAME_CB:
+            cfg=path+CSL_DEFAULT_INJECT_DIR_CB+CSL_DEFAULT_INJECT_FIL_CB;
+            if (::wxFileExists(cfg))
+                if (!::wxCopyFile(cfg,cfg+wxT(".csl")))
+                    return CSL_ERROR_FILE_OPERATION;
+            break;
+
+        default:
+            wxASSERT_MSG(false,wxT("unknown game"));
+            return CSL_ERROR_GAME_UNKNOWN;
+    }
+
+    *out=cfg;
+    s=wxString::Format(wxT("\r\n/connect %s\r\n"),info->m_host.c_str());
+    return ConnectWriteConfig(info->m_type,cfg,s);
 }

@@ -36,25 +36,14 @@ BEGIN_EVENT_TABLE(CslDlgSettings,wxDialog)
     EVT_SPINCTRL(wxID_ANY,CslDlgSettings::OnSpinCtrl)
 END_EVENT_TABLE()
 
-
-#define CSL_ERROR_STR                 _("Error!")
-#define CSL_ERROR_CONNECT_CONFIG_STR  _("For connect method \"Config\" you have to specify "\
-                                        "the game path (Installation path).")
-
 enum
 {
     FILE_PICKER_SB = wxID_HIGHEST + 1,
     DIR_PICKER_SB,
-    RADIO_CONFIG_SB,
-    RADIO_PARAM_SB,
     FILE_PICKER_AC,
     DIR_PICKER_AC,
-    RADIO_CONFIG_AC,
-    RADIO_PARAM_AC,
     FILE_PICKER_CB,
     DIR_PICKER_CB,
-    RADIO_CONFIG_CB,
-    RADIO_PARAM_CB,
 
     BUTTON_COLOUR_EMPTY,
     BUTTON_COLOUR_OFF,
@@ -96,12 +85,8 @@ CslDlgSettings::CslDlgSettings(wxWindow* parent,int id,const wxString& title,
     sizer_ping_threshold_staticbox = new wxStaticBox(notebook_pane_other, -1, _("Ping thresholds"));
     notebook_pane_sauer = new wxPanel(notebook_games, wxID_ANY);
     text_ctrl_sauer_options = new wxTextCtrl(notebook_pane_sauer, wxID_ANY, wxEmptyString);
-    radio_btn_sauer_start_param = new wxRadioButton(notebook_pane_sauer, RADIO_PARAM_SB, _("Parameter (Default)"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
-    radio_btn_sauer_start_config = new wxRadioButton(notebook_pane_sauer, RADIO_CONFIG_SB, _("Config (csl-connect.cfg)"));
     text_ctrl_assault_options = new wxTextCtrl(notebook_pane_assault, wxID_ANY, wxEmptyString);
-    radio_btn_assault_start_config = new wxRadioButton(notebook_pane_assault, RADIO_CONFIG_AC, _("Config (csl-connect.cfg)"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
     text_ctrl_cube_options = new wxTextCtrl(notebook_pane_cube, wxID_ANY, wxEmptyString);
-    radio_btn_cube_start_config = new wxRadioButton(notebook_pane_cube, RADIO_CONFIG_CB, _("Config (csl-connect.cfg)"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
     button_colour_empty = new wxBitmapButton(notebook_pane_colour, BUTTON_COLOUR_EMPTY, wxNullBitmap);
     button_colour_mm1 = new wxBitmapButton(notebook_pane_colour, BUTTON_COLOUR_MM1, wxNullBitmap);
     button_colour_off = new wxBitmapButton(notebook_pane_colour, BUTTON_COLOUR_OFF, wxNullBitmap);
@@ -156,29 +141,14 @@ void CslDlgSettings::set_properties()
     button_colour_mm2->SetSize(button_colour_mm2->GetBestSize());
     button_colour_full->SetSize(button_colour_full->GetBestSize());
     button_colour_mm3->SetSize(button_colour_mm3->GetBestSize());
-    spin_ctrl_update->SetMinSize(wxSize(50, -1));
-    spin_ctrl_wait->SetMinSize(wxSize(50, -1));
-    spin_ctrl_min_playtime->SetMinSize(wxSize(50, -1));
+    spin_ctrl_update->SetMinSize(wxDLG_UNIT(spin_ctrl_update, wxSize(48, -1)));
+    spin_ctrl_wait->SetMinSize(wxDLG_UNIT(spin_ctrl_wait, wxSize(48, -1)));
+    spin_ctrl_min_playtime->SetMinSize(wxDLG_UNIT(spin_ctrl_min_playtime, wxSize(48, -1)));
     // end wxGlade
 
     text_ctrl_sauer_options->SetValue(m_settings.m_clientOptsSB);
     text_ctrl_assault_options->SetValue(m_settings.m_clientOptsAC);
     text_ctrl_cube_options->SetValue(m_settings.m_clientOptsCB);
-
-    if (m_settings.m_connectModeSB==CONNECT_MODE_CONFIG)
-        radio_btn_sauer_start_config->SetValue(true);
-    else
-        radio_btn_sauer_start_param->SetValue(true);
-
-//    if (m_settings.m_connectModeAC==CONNECT_MODE_CONFIG)
-    radio_btn_assault_start_config->SetValue(true);
-//     else
-//         radio_btn_assault_param_start->SetValue(true);
-
-//    if (m_settings.m_connectModeCB==CONNECT_MODE_CONFIG)
-    radio_btn_cube_start_config->SetValue(true);
-//     else
-//         radio_btn_cube_param_start->SetValue(true);
 
     checkbox_play_update->SetValue(m_settings.m_dontUpdatePlaying);
     spin_ctrl_update->SetRange(CSL_UPDATE_INTERVAL_MIN/1000,CSL_UPDATE_INTERVAL_MAX/1000);
@@ -261,23 +231,15 @@ void CslDlgSettings::do_layout()
     wxFlexGridSizer* grid_sizer_colours = new wxFlexGridSizer(3, 5, 0, 0);
     wxBoxSizer* sizer_games = new wxBoxSizer(wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_cube_path = new wxFlexGridSizer(3, 2, 0, 0);
-    wxFlexGridSizer* grid_sizer_cube_connect = new wxFlexGridSizer(1, 1, 0, 0);
     wxFlexGridSizer* grid_sizer_assault_path = new wxFlexGridSizer(3, 2, 0, 0);
-    wxFlexGridSizer* grid_sizer_assault_connect = new wxFlexGridSizer(1, 1, 0, 0);
     wxFlexGridSizer* grid_sizer_sauer_path = new wxFlexGridSizer(3, 2, 0, 0);
-    wxFlexGridSizer* grid_sizer_sauer_connect = new wxFlexGridSizer(2, 1, 0, 0);
     wxStaticText* label_sauer_exe = new wxStaticText(notebook_pane_sauer, wxID_ANY, _("Game executable:"));
     grid_sizer_sauer_path->Add(label_sauer_exe, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
     wxStaticText* label_sauer_path = new wxStaticText(notebook_pane_sauer, wxID_ANY, _("Game directory:"));
     grid_sizer_sauer_path->Add(label_sauer_path, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
     wxStaticText* label_sauer_options = new wxStaticText(notebook_pane_sauer, wxID_ANY, _("Game paramters:"));
-    grid_sizer_sauer_path->Add(label_sauer_options, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
+    grid_sizer_sauer_path->Add(label_sauer_options, 0, wxALL|wxALIGN_CENTER_VERTICAL, 8);
     grid_sizer_sauer_path->Add(text_ctrl_sauer_options, 0, wxALL|wxEXPAND, 4);
-    wxStaticText* label_sauer_connect = new wxStaticText(notebook_pane_sauer, wxID_ANY, _("Connect method:"));
-    grid_sizer_sauer_path->Add(label_sauer_connect, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
-    grid_sizer_sauer_connect->Add(radio_btn_sauer_start_param, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_sauer_connect->Add(radio_btn_sauer_start_config, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_sauer_path->Add(grid_sizer_sauer_connect, 1, wxEXPAND, 0);
     notebook_pane_sauer->SetSizer(grid_sizer_sauer_path);
     grid_sizer_sauer_path->AddGrowableCol(1);
     wxStaticText* label_assault_exe = new wxStaticText(notebook_pane_assault, wxID_ANY, _("Game executable:"));
@@ -287,11 +249,6 @@ void CslDlgSettings::do_layout()
     wxStaticText* label_assault_options = new wxStaticText(notebook_pane_assault, wxID_ANY, _("Game paramters:"));
     grid_sizer_assault_path->Add(label_assault_options, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
     grid_sizer_assault_path->Add(text_ctrl_assault_options, 0, wxALL|wxEXPAND, 4);
-    wxStaticText* label_assault_connect = new wxStaticText(notebook_pane_assault, wxID_ANY, _("Connect method:"));
-    grid_sizer_assault_path->Add(label_assault_connect, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
-    grid_sizer_assault_connect->Add(radio_btn_assault_start_config, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_assault_connect->AddGrowableCol(1);
-    grid_sizer_assault_path->Add(grid_sizer_assault_connect, 1, wxEXPAND, 0);
     notebook_pane_assault->SetSizer(grid_sizer_assault_path);
     grid_sizer_assault_path->AddGrowableCol(1);
     wxStaticText* label_cube_exe = new wxStaticText(notebook_pane_cube, wxID_ANY, _("Game executable:"));
@@ -301,17 +258,12 @@ void CslDlgSettings::do_layout()
     wxStaticText* label_cube_options = new wxStaticText(notebook_pane_cube, wxID_ANY, _("Game paramters:"));
     grid_sizer_cube_path->Add(label_cube_options, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
     grid_sizer_cube_path->Add(text_ctrl_cube_options, 0, wxALL|wxEXPAND, 4);
-    wxStaticText* label_cube_connect = new wxStaticText(notebook_pane_cube, wxID_ANY, _("Connect method:"));
-    grid_sizer_cube_path->Add(label_cube_connect, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
-    grid_sizer_cube_connect->Add(radio_btn_cube_start_config, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_cube_connect->AddGrowableCol(1);
-    grid_sizer_cube_path->Add(grid_sizer_cube_connect, 1, wxEXPAND, 0);
     notebook_pane_cube->SetSizer(grid_sizer_cube_path);
     grid_sizer_cube_path->AddGrowableCol(1);
     notebook_games->AddPage(notebook_pane_sauer, _("Sauerbraten"));
     notebook_games->AddPage(notebook_pane_assault, _("AssaultCube"));
     notebook_games->AddPage(notebook_pane_cube, _("Cube"));
-    sizer_games->Add(notebook_games, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 4);
+    sizer_games->Add(notebook_games, 1, wxALL|wxEXPAND, 4);
     notebook_pane_games->SetSizer(sizer_games);
     wxStaticText* label_6 = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Server empty"));
     grid_sizer_colours->Add(label_6, 0, wxALL|wxALIGN_CENTER_VERTICAL, 6);
@@ -403,10 +355,13 @@ void CslDlgSettings::do_layout()
 #else
     hmult=2;
 #endif
-    wxSize d(a.x,b.y+c.y*hmult);
+    wxSize d(a.x,a.y+10);
     notebook_settings->SetMinSize(d);
 
     grid_sizer_main->SetSizeHints(this);
+
+    //notebook_games->GetListView()->SetColumnWidth(0,wxLIST_AUTOSIZE_USEHEADER);
+    notebook_games->SetSize(wxSize((GetBestSize().x-8),GetBestSize().y));
 }
 
 void CslDlgSettings::OnPicker(wxFileDirPickerEvent& event)
@@ -488,25 +443,6 @@ void CslDlgSettings::OnCommandEvent(wxCommandEvent& event)
 
     switch (event.GetId())
     {
-        case RADIO_CONFIG_SB:
-            m_settings.m_connectModeSB=CONNECT_MODE_CONFIG;
-            break;
-        case RADIO_PARAM_SB:
-            m_settings.m_connectModeSB=CONNECT_MODE_PARAM;
-            break;
-        case RADIO_CONFIG_AC:
-            m_settings.m_connectModeAC=CONNECT_MODE_CONFIG;
-            break;
-//      case RADIO_PARAM_AC:
-//          m_settings.m_connectModeAC=CONNECT_MODE_PARAM;
-//          break;
-        case RADIO_CONFIG_CB:
-            m_settings.m_connectModeCB=CONNECT_MODE_CONFIG;
-            break;
-//      case RADIO_PARAM_CB:
-//          m_settings.m_connectModeCB=CONNECT_MODE_PARAM;
-//          break;
-
         case BUTTON_COLOUR_EMPTY:
             colour=&m_settings.m_colServerEmpty;
             colButton=button_colour_empty;
@@ -587,52 +523,81 @@ void CslDlgSettings::SetButtonColour(wxBitmapButton *button,wxButton *refButton,
     button->SetBitmapLabel(bmp);
 }
 
+
+#define CSL_ERROR_SETTINGS_CONNECT_FMT_STR \
+    _("Game installation path missing!\n" \
+      "For game %s the folder containing\n"\
+      "%s is necessary to connect to a server.")
+
 bool CslDlgSettings::Validate()
 {
-    if (!m_settings.m_clientBinSB.IsEmpty())
-        if (m_settings.m_connectModeSB==CONNECT_MODE_CONFIG)
-            if (m_settings.m_configPathSB.IsEmpty())
-            {
-                wxMessageBox(CSL_ERROR_CONNECT_CONFIG_STR,CSL_ERROR_STR,wxICON_ERROR,this);
-                return false;
-            }
+    wxString msg;
 
+    msg=wxString::Format(CSL_ERROR_SETTINGS_CONNECT_FMT_STR,
+                         GetGameStr(CSL_GAME_SB),
+                         CSL_DEFAULT_INJECT_DIR_SB);
+    if (!m_settings.m_clientBinSB.IsEmpty())
+    {
+        if (m_settings.m_configPathSB.IsEmpty())
+        {
+            wxMessageBox(msg,_("Error"),wxICON_ERROR,this);
+            return false;
+        }
+
+        if (!m_settings.m_configPathSB.EndsWith(wxString(PATHDIV)))
+            m_settings.m_configPathSB+=PATHDIV;
+
+        if (!::wxDirExists(m_settings.m_configPathSB+CSL_DEFAULT_INJECT_DIR_SB))
+        {
+            wxMessageBox(msg,_("Error"),wxICON_ERROR,this);
+            return false;
+        }
+    }
+
+    msg=wxString::Format(CSL_ERROR_SETTINGS_CONNECT_FMT_STR,
+                         GetGameStr(CSL_GAME_AC),
+                         CSL_DEFAULT_INJECT_DIR_AC);
     if (!m_settings.m_clientBinAC.IsEmpty())
-//      if (m_settings.m_connectModeAC==CONNECT_MODE_CONFIG)
+    {
         if (m_settings.m_configPathAC.IsEmpty())
         {
-            wxMessageBox(CSL_ERROR_CONNECT_CONFIG_STR,CSL_ERROR_STR,wxICON_ERROR,this);
+            wxMessageBox(msg,_("Error"),wxICON_ERROR,this);
             return false;
         }
+        if (!m_settings.m_configPathAC.EndsWith(wxString(PATHDIV)))
+            m_settings.m_configPathAC+=PATHDIV;
+        if (!::wxDirExists(m_settings.m_configPathAC+CSL_DEFAULT_INJECT_DIR_AC))
+        {
+            wxMessageBox(msg,_("Error"),wxICON_ERROR,this);
+            return false;
+        }
+    }
 
+    msg=wxString::Format(CSL_ERROR_SETTINGS_CONNECT_FMT_STR,
+                         GetGameStr(CSL_GAME_CB),
+                         CSL_DEFAULT_INJECT_DIR_CB);
     if (!m_settings.m_clientBinCB.IsEmpty())
-//      if (m_settings.m_connectModeAC==CONNECT_MODE_CONFIG)
+    {
         if (m_settings.m_configPathCB.IsEmpty())
         {
-            wxMessageBox(CSL_ERROR_CONNECT_CONFIG_STR,CSL_ERROR_STR,wxICON_ERROR,this);
+            wxMessageBox(msg,_("Error"),wxICON_ERROR,this);
             return false;
         }
-
-    if (!m_settings.m_configPathSB.IsEmpty() &&
-        !m_settings.m_configPathSB.EndsWith(wxString(PATHDIV)))
-        m_settings.m_configPathSB+=PATHDIV;
-
-    if (!m_settings.m_configPathAC.IsEmpty() &&
-        !m_settings.m_configPathAC.EndsWith(wxString(PATHDIV)))
-        m_settings.m_configPathAC+=PATHDIV;
-
-    if (!m_settings.m_configPathCB.IsEmpty() &&
-        !m_settings.m_configPathCB.EndsWith(wxString(PATHDIV)))
-        m_settings.m_configPathCB+=PATHDIV;
+        if (!m_settings.m_configPathCB.EndsWith(wxString(PATHDIV)))
+            m_settings.m_configPathCB+=PATHDIV;
+        if (!::wxDirExists(m_settings.m_configPathCB+CSL_DEFAULT_INJECT_DIR_CB))
+        {
+            wxMessageBox(msg,_("Error"),wxICON_ERROR,this);
+            return false;
+        }
+    }
 
     if (m_settings.m_ping_good>m_settings.m_ping_bad)
     {
         wxMessageBox(_("Threshold for good ping can't be higher than\n" \
-                       "threshold for bad ping."),CSL_ERROR_STR,wxICON_ERROR,this);
+                       "threshold for bad ping."),_("Error"),wxICON_ERROR,this);
         return false;
     }
 
     return true;
 }
-#undef ERROR
-#undef ERROR_CONNECT_CONFIG

@@ -37,17 +37,12 @@
 #include "CslEngine.h"
 #include "CslListCtrlInfo.h"
 #include "CslStatusBar.h"
+#include "CslDlgExtended.h"
+#include "CslTools.h"
 
 
 enum { CSL_LIST_MASTER = 0, CSL_LIST_FAVOURITE };
 
-enum { CSL_SORT_ASC = 0, CSL_SORT_DSC };
-enum
-{
-    SORT_HOST = 0, SORT_DESC, SORT_VER,
-    SORT_PING, SORT_MODE,
-    SORT_MAPS, SORT_TIME, SORT_PLAY, SORT_MM, SORT_UNKNOWN
-};
 
 class CslListCtrlServer;
 
@@ -60,21 +55,24 @@ class CslConnectionState
             if (m_activeInfo) m_activeInfo->SetWaiting(false);
             m_playing=false;
             m_waitTime=0;
-            m_activeList=NULL,m_activeInfo=NULL;
-            CslStatusBar::SetText(wxT(""),1);
+            m_activeList=NULL;
+            m_activeInfo=NULL;
+            m_activeCfg.Empty();
+            CslStatusBar::SetText(wxEmptyString,1);
         }
 
-        static void CreateWaitingState(CslServerInfo *info,wxInt32 time,CslListCtrlServer *list)
+        static void CreateWaitingState(CslServerInfo *info,CslListCtrlServer *list,
+                                       const wxInt32 time)
         {
             m_activeInfo=info;
             m_waitTime=time;
             m_activeList=list;
             info->SetWaiting(true);
         }
-        static bool DecTime()
+
+        static bool CountDown()
         {
-            m_waitTime--;
-            if (m_waitTime==0)
+            if (--m_waitTime==0)
             {
                 Reset();
                 return false;
@@ -82,10 +80,13 @@ class CslConnectionState
             return true;
         }
 
-        static void SetPlaying(CslListCtrlServer *list,bool val)
+        static void CreatePlayingState(CslServerInfo *info,CslListCtrlServer *list,
+                                       const wxString& cfg)
         {
+            m_activeInfo=info;
             m_activeList=list;
-            m_playing=val;
+            m_activeCfg=cfg;
+            m_playing=true;
         }
 
         static bool IsPlaying() { return m_playing; }
@@ -93,27 +94,15 @@ class CslConnectionState
         static wxInt32 GetWaitTime() { return m_waitTime; }
         static CslListCtrlServer* GetList() { return m_activeList; }
         static CslServerInfo* GetInfo() { return m_activeInfo; }
+        static wxString& GetConfig() { return m_activeCfg; }
 
     private:
         static bool m_playing;
         static wxInt32 m_waitTime;
-        static wxInt32 m_timerTicks;
         static CslListCtrlServer *m_activeList;
         static CslServerInfo *m_activeInfo;
+        static wxString m_activeCfg;
 };
-
-
-class CslSortHelper
-{
-    public:
-        CslSortHelper() :
-                m_sortMode(CSL_SORT_ASC),
-                m_sortType(SORT_PING) {}
-
-        wxInt32 m_sortMode;
-        wxInt32 m_sortType;
-};
-
 
 class CslListServer : public CslServerInfo
 {
@@ -136,6 +125,7 @@ class CslListServer : public CslServerInfo
         }
 
         CslServerInfo* GetPtr() { return m_info; }
+
         bool HasStats()
         {
             return m_playLast>0 || m_playTimeLastGame>0 ||
@@ -163,14 +153,17 @@ class CslListCtrlServer : public wxListCtrl
 
         ~CslListCtrlServer();
 
-        void ListInit(CslEngine *engine,CslListCtrlInfo *listInfo,CslListCtrlServer *listMaster,
-                      CslListCtrlServer *istFavourites,wxUint32 filterFlags);
+        void ListInit(CslEngine *engine,
+                      CslListCtrlInfo *listInfo,
+                      CslListCtrlServer *listMaster,
+                      CslListCtrlServer *listFavourites,
+                      CslDlgExtended *extendedDlg,
+                      wxUint32 filterFlags);
         wxUint32 ListUpdate(vector<CslServerInfo*> *servers);
         void ListClear();
         void ToggleSortArrow();
         wxUint32 ListSearch(wxString search);
         wxUint32 ListFilter(wxUint32 filterFlags);
-        void ClearStartConfig(wxString path);
         void ListAdjustSize(wxSize size,bool init=false);
         void SetMasterSelected(bool selected) { m_masterSelected=selected; }
 
@@ -185,6 +178,8 @@ class CslListCtrlServer : public wxListCtrl
         CslListCtrlInfo *m_listInfo;
         CslListCtrlServer *m_listMaster;
         CslListCtrlServer *m_listFavourites;
+        CslDlgExtended *m_extendedDlg;
+
         bool m_dontUpdateInfo;  // don't update info list on ctrl+a
         bool m_dontRemoveOnDeselect;
 
@@ -197,7 +192,7 @@ class CslListCtrlServer : public wxListCtrl
         wxColour m_stdColourListText;
         wxColour m_stdColourListItem;
 
-        CslSortHelper m_sortHelper;
+        CslListSortHelper m_sortHelper;
 
         void OnShow(wxShowEvent& event);
         void OnSize(wxSizeEvent& event);

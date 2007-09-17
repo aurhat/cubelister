@@ -32,7 +32,6 @@
 #ifndef WX_PRECOMP
 #include "wx/wx.h"
 #endif
-
 #include <wx/socket.h>
 #include <wx/sckaddr.h>
 
@@ -105,13 +104,11 @@ class CslUDPPacket
 class CslUDP : public wxEvtHandler
 {
     public:
-        CslUDP(wxEvtHandler *handler,const wxUint32 interval);
+        CslUDP(wxEvtHandler *handler);
         ~CslUDP();
 
         bool IsInit() { return m_init; }
-
         bool SendPing(CslUDPPacket *packet);
-        wxUint32 GetTicks(const bool init=false);
 
     private:
         bool m_init;

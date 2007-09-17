@@ -66,7 +66,7 @@ CslDlgAddMaster::CslDlgAddMaster(wxWindow* parent,CslMaster *master,int id,
 void CslDlgAddMaster::set_properties()
 {
     // begin wxGlade: CslDlgAddMaster::set_properties
-    SetTitle(_("Add new Master"));
+    SetTitle(_("CSL - Add new Master"));
     choice_type->SetSelection(0);
     text_ctrl_address->SetMinSize(wxSize(250,-1));
     text_ctrl_address->SetFocus();

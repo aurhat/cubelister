@@ -50,7 +50,7 @@ CslDlgAddServer::CslDlgAddServer(wxWindow* parent,CslServerInfo *info,int id,con
 void CslDlgAddServer::set_properties()
 {
     // begin wxGlade: CslDlgAddServer::set_properties
-    SetTitle(_("Add new server"));
+    SetTitle(_("CSL - Add new server"));
     choice_type->SetSelection(0);
     text_ctrl_address->SetMinSize(wxSize(250,-1));
     text_ctrl_address->SetFocus();

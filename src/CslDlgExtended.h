@@ -18,74 +18,75 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef CSLDLGOUTPUT_H
-#define CSLDLGOUTPUT_H
+#ifndef CSLDLGEXTENDED_H
+#define CSLDLGEXTENDED_H
 
-#include "wx/wxprec.h"
+#include <wx/wxprec.h>
 #ifdef __BORLANDC__
 #pragma hdrstop
 #endif
 #ifndef WX_PRECOMP
-#include "wx/wx.h"
+#include <wx/wx.h>
 #endif
-#include <wx/image.h>
-
+#include <wx/imaglist.h>
 // begin wxGlade: ::dependencies
-#include <wx/statline.h>
+#include <wx/listctrl.h>
 // end wxGlade
+#include "CslEngine.h"
+#include "CslTools.h"
 
-class CslDlgOutput: public wxDialog
+class CslDlgExtended: public wxDialog
 {
     public:
-        // begin wxGlade: CslDlgOutput::ids
+        // begin wxGlade: CslDlgExtended::ids
         // end wxGlade
 
-        CslDlgOutput(wxWindow* parent,int id=wxID_ANY,const wxString& title=wxEmptyString,
-                     const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize,
-                     long style=wxDEFAULT_DIALOG_STYLE);
+        CslDlgExtended(wxWindow* parent,int id=wxID_ANY,const wxString& title=wxEmptyString,
+                       const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize,
+                       long style=wxDEFAULT_DIALOG_STYLE);
 
-        void HandleOutput(char *text,wxUint32 size,bool freemem=false);
-
-        static void AddOutput(char *text,wxUint32 size);
-        static void Reset(const wxString& title);
+        void ListInit(CslEngine *engine);
+        void DoShow(CslServerInfo *info);
+        CslServerInfo* GetInfo() { return m_info; }
 
     private:
-        // begin wxGlade: CslDlgOutput::methods
+        // begin wxGlade: CslDlgExtended::methods
         void set_properties();
         void do_layout();
         // end wxGlade
 
-        wxString m_lastPath;
+        wxTimer m_timer;
+
+        CslEngine *m_engine;
+        CslServerInfo *m_info;
+
+        wxImageList m_imageList;
+        CslListSortHelper m_sortHelper;
 
         void OnClose(wxCloseEvent& event);
+        void OnSize(wxSizeEvent& event);
+        void OnColumnLeftClick(wxListEvent& event);
+        void OnTimer(wxTimerEvent& event);
         void OnCommandEvent(wxCommandEvent& event);
+        void OnPingStats(wxCommandEvent& event);
 
         DECLARE_EVENT_TABLE()
 
     protected:
-        // begin wxGlade: CslDlgOutput::attributes
-        wxTextCtrl* text_ctrl_output;
-        wxTextCtrl* text_ctrl_search;
-        wxStaticText* label_matches;
-        wxCheckBox* checkbox_conv_filter;
-        wxChoice* choice_conv_filter;
-        wxStaticLine* static_line;
-        wxButton* button_load;
-        wxButton* button_save;
-        wxButton* button_close_copy;
+        // begin wxGlade: CslDlgExtended::attributes
+        wxListCtrl* list_ctrl_extended;
+        wxStaticText* label_status;
+        wxButton* button_refresh;
+        wxButton* button_close;
         // end wxGlade
 
-        static CslDlgOutput* m_self;
+        void QueryInfo();
+        void ListAdjustSize(wxSize size);
+        void ListSort(wxInt32 column);
+        void ToggleSortArrow();
 
-        wxString m_text;
-        wxUint32 m_filterLevel;
-
-        void SetSearchbarColour(wxInt32 count);
-        wxInt32 Search(const wxString& needle);
-        wxString Filter(wxUint32 start,wxUint32 end);
-
-
+        static int wxCALLBACK ListSortCompareFunc(long item1,long item2,long data);
 }; // wxGlade: end class
 
 
-#endif // CSLDLGOUTPUT_H
+#endif // CSLDLGEXTENDED_H

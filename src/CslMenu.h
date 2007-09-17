@@ -56,7 +56,8 @@ enum
     MENU_SERVER_REM = wxID_REMOVE,
     MENU_SERVER_DEL = wxID_DELETE,
     MENU_SERVER_COPYTEXT = wxID_COPY,
-    MENU_SERVER_CONNECT = wxID_HIGHEST +1,
+    MENU_SERVER_CONNECT = wxID_HIGHEST+1,
+    MENU_SERVER_EXTENDED,
 
     MENU_VIEW_HOST,
     MENU_VIEW_DESC,
@@ -70,6 +71,7 @@ enum
 
     MENU_VIEW_SEARCH,
     MENU_VIEW_FILTER,
+    MENU_VIEW_OUTPUT,
     MENU_VIEW_AUTO_SORT,
     MENU_VIEW_AUTO_FIT,
     MENU_VIEW_SPLITTER_LIVE,
@@ -116,7 +118,7 @@ class CslMenu
                                   const wxString help=wxEmptyString)
         {
             wxMenuItem *item=new wxMenuItem(menu,id,text,help,kind);
-            if (id<wxID_HIGHEST || (wxPlatformInfo().GetOperatingSystemId()|wxOS_WINDOWS))
+            if (id>wxID_HIGHEST || (wxPlatformInfo().GetOperatingSystemId()&wxOS_WINDOWS))
                 item->SetBitmap(GET_ART_MENU(art));
             menu->Append(item);
         }

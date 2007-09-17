@@ -39,6 +39,18 @@
 #define CSL_UPDATE_INTERVAL_MAX    60000
 #define CSL_UPDATE_INTERVAL_WAIT   2500
 
+BEGIN_DECLARE_EVENT_TYPES()
+DECLARE_EVENT_TYPE(wxCSL_EVT_PING_STATS,wxID_ANY)
+END_DECLARE_EVENT_TYPES()
+
+#define CSL_EVT_PING_STATS(id,fn) \
+    DECLARE_EVENT_TABLE_ENTRY( \
+                               wxCSL_EVT_PING_STATS,id,wxID_ANY, \
+                               (wxObjectEventFunction)(wxEventFunction) \
+                               wxStaticCastEvent(wxCommandEventFunction,&fn), \
+                               (wxObject*)NULL \
+                             ),
+
 class CslResolverPacket
 {
     public:
@@ -103,11 +115,16 @@ class CslEngine : public wxEvtHandler
         vector<CslGame*>* GetGames() { return &m_games; }
         vector<CslServerInfo*>* GetFavourites() { return &m_favourites; }
 
+        bool Ping(CslServerInfo *info,bool force=false);
+        bool PingUptime(CslServerInfo *info);
+        bool PingStats(CslServerInfo *info);
         wxUint32 PingServers();
+
         int UpdateMaster();
 
     private:
         bool m_isOk;
+        bool m_firstPing;
         wxEvtHandler *m_evtHandler;
 
         wxMutex m_mutex;
@@ -122,7 +139,9 @@ class CslEngine : public wxEvtHandler
         vector<CslGame*> m_games;
         vector<CslServerInfo*> m_favourites;
 
-        void UpdateServerInfo(CslServerInfo *info,CslUDPPacket *packet,wxUint32 now);
+        void UpdateServerInfo(CslServerInfo *info,ucharbuf *buf,wxUint32 now);
+        void ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 now);
+
         void OnPong(wxCommandEvent& event);
         void OnResolve(wxCommandEvent& event);
 
@@ -130,7 +149,7 @@ class CslEngine : public wxEvtHandler
 
     protected:
         CslGame* FindOrCreateGame(CSL_GAMETYPE type);
-        bool SendPing(CslServerInfo *info);
 };
+
 
 #endif // CSLENGINE_H

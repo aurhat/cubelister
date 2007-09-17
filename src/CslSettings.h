@@ -37,21 +37,6 @@
 #define  CSL_CONFIG_VERSION        1
 #define  CSL_SERVERCONFIG_VERSION  1
 
-
-enum
-{
-    TOOLBAR_POS_TOP,
-    TOOLBAR_POS_BOTTOM,
-    TOOLBAR_POS_LEFT,
-    TOOLBAR_POS_RIGHT
-};
-
-enum
-{
-    CONNECT_MODE_CONFIG=0,
-    CONNECT_MODE_PARAM
-};
-
 #define CSL_FILTER_FULL        1<<0
 #define CSL_FILTER_EMPTY       1<<1
 #define CSL_FILTER_NONEMPTY    1<<2
@@ -81,8 +66,6 @@ class CslSettings
                 m_splitterGamePos(150),
                 m_splitterListPos(280),
                 m_splitterLive(true),
-                m_toolbarPosition(TOOLBAR_POS_TOP),
-                m_toolbarStyle(wxTB_FLAT|wxTB_TEXT),
                 m_updateInterval(CSL_UPDATE_INTERVAL_MIN),
                 m_dontUpdatePlaying(true),
                 m_showSearch(true),
@@ -116,19 +99,12 @@ class CslSettings
                 m_colInfoStripe(wxColour(235,255,235)),
 
                 /* Client */
-#ifdef __WXMSW__
-                m_connectModeSB(CONNECT_MODE_PARAM),
-#else
-                m_connectModeSB(CONNECT_MODE_CONFIG),
-#endif
                 m_clientBinSB(wxEmptyString),
                 m_clientOptsSB(wxEmptyString),
                 m_configPathSB(wxEmptyString),
-                m_connectModeAC(CONNECT_MODE_CONFIG),
                 m_clientBinAC(wxEmptyString),
                 m_clientOptsAC(wxEmptyString),
                 m_configPathAC(wxEmptyString),
-                m_connectModeCB(CONNECT_MODE_CONFIG),
                 m_clientBinCB(wxEmptyString),
                 m_clientOptsCB(wxEmptyString),
                 m_configPathCB(wxEmptyString),
@@ -149,6 +125,7 @@ class CslSettings
         wxUint32 m_filterFlags;
         wxInt32 m_waitServerFull;
         wxUint32 m_ping_good,m_ping_bad;
+        wxString m_outputPath;
 
         /* ListCtrl*/
         bool m_autoFitColumns,m_autoSortColumns;
@@ -161,15 +138,12 @@ class CslSettings
         wxColour m_colInfoStripe;
 
         /* Client */
-        wxInt32 m_connectModeSB;
         wxString m_clientBinSB;
         wxString m_clientOptsSB;
         wxString m_configPathSB;
-        wxInt32 m_connectModeAC;
         wxString m_clientBinAC;
         wxString m_clientOptsAC;
         wxString m_configPathAC;
-        wxInt32 m_connectModeCB;
         wxString m_clientBinCB;
         wxString m_clientOptsCB;
         wxString m_configPathCB;

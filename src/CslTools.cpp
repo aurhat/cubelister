@@ -90,3 +90,80 @@ bool IP2Int(const wxString& s,wxUint32 *ip)
     *ip=v;
     return true;
 }
+
+wxString FormatSeconds(wxUint32 time)
+{
+    wxUint32 rest=time;
+    wxUint32 dy,hr,mn,sc;
+    wxString s;
+
+    dy=rest/86400;
+    rest%=86400;
+    hr=rest/3600;
+    rest%=3600;
+    mn=rest/60;
+    sc=rest%60;
+
+    if (dy)
+        s+=s.Format(wxT("%dd "),dy);
+    if (hr)
+        s+=s.Format(wxT("%dh "),hr);
+    if (mn)
+        s+=s.Format(wxT("%dmin "),mn);
+    if (sc)
+        s+=s.Format(wxT("%dsec"),sc);
+
+    return s;
+}
+
+
+#define CSL_USE_WIN32_TICK
+
+#ifdef _MSC_VER
+#ifndef CSL_USE_WIN32_TICK
+#include <time.h>
+#if !defined(_WINSOCK2API_) && !defined(_WINSOCKAPI_)
+struct timeval
+{
+    long tv_sec;
+    long tv_usec;
+};
+#endif
+int gettimeofday(struct timeval* tv,void *dummy)
+{
+    union
+    {
+        long long ns100;
+        FILETIME ft;
+    } now;
+
+    GetSystemTimeAsFileTime(&now.ft);
+    tv->tv_usec = (long)((now.ns100 / 10LL) % 1000000LL);
+    tv->tv_sec = (long)((now.ns100 - 116444736000000000LL) / 10000000LL);
+    return 0;
+}
+#endif //USE_WIN32_TICK
+#else
+#include <sys/time.h>
+#endif //_MSC_VER
+
+wxUint32 GetTicks()
+{
+    static wxUint32 initTicks=0;
+    wxUint32 ticks;
+#if defined(__WXMSW__) && defined(CSL_USE_WIN32_TICK)
+    ticks=GetTickCount();
+#else
+    struct timeval tv;
+    gettimeofday(&tv,NULL);
+    wxUint32 r=tv.tv_usec/1000;
+    wxUint64 v=tv.tv_sec*1000;
+    ticks=v+r-initTicks;
+#endif
+    if (!initTicks)
+    {
+        initTicks=ticks;
+        return 0;
+    }
+    return ticks;
+}

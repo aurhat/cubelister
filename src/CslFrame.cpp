@@ -45,6 +45,7 @@
 #define CSL_TIMER_SHOT 500
 
 BEGIN_EVENT_TABLE(CslFrame, wxFrame)
+    CSL_EVT_PING_STATS(wxID_ANY,CslFrame::OnPingStats)
     EVT_TIMER(wxID_ANY,CslFrame::OnTimer)
     EVT_TREE_SEL_CHANGED(wxID_ANY,CslFrame::OnTreeLeftClick)
     EVT_TREE_ITEM_RIGHT_CLICK(wxID_ANY,CslFrame::OnTreeRightClick)
@@ -156,8 +157,11 @@ CslFrame::CslFrame(wxWindow* parent, int id, const wxString& title,const wxPoint
     m_imgListButton.Add(wxIcon(wxT("ICON_CLOSE_PRESS_14"),wxBITMAP_TYPE_ICO_RESOURCE));
 #endif
 
-    m_engine=new CslEngine();
-
+    m_engine=new CslEngine(this);
+    m_outputDlg=new CslDlgOutput(this);
+#ifdef CSL_EXT_SERVER_INFO
+    m_extendedDlg=new CslDlgExtended(this);
+#endif
     // begin wxGlade: CslFrame::CslFrame
     panel_frame = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL);
     panel_main = new wxPanel(panel_frame, wxID_ANY);
@@ -242,8 +246,7 @@ CslFrame::CslFrame(wxWindow* parent, int id, const wxString& title,const wxPoint
         list_ctrl_favourites->ListUpdate(m_engine->GetFavourites());
         //tree_ctrl_games->ExpandAll();
 
-        // TODO Output from Game
-        // m_outputDlg=new CslDlgOutput(this);
+
         m_timerInit=true;
         m_timer.Start(CSL_TIMER_SHOT);
     }
@@ -254,6 +257,10 @@ CslFrame::CslFrame(wxWindow* parent, int id, const wxString& title,const wxPoint
         delete m_engine;
         m_engine=NULL;
     }
+
+#ifdef CSL_EXT_SERVER_INFO
+    m_extendedDlg->ListInit(m_engine);
+#endif
 }
 
 CslFrame::~CslFrame()
@@ -261,9 +268,12 @@ CslFrame::~CslFrame()
     if (m_timer.IsRunning())
         m_timer.Stop();
 
-    tree_ctrl_games->DeleteAllItems();
-
-    SaveSettings();
+    if (CslConnectionState::IsPlaying())
+    {
+        CslServerInfo *info=CslConnectionState::GetInfo();
+        if (info)
+            CslGame::ConnectCleanup(info->m_type,CslConnectionState::GetConfig());
+    }
 
     if (m_engine)
     {
@@ -271,7 +281,11 @@ CslFrame::~CslFrame()
         delete m_engine;
     }
 
+    tree_ctrl_games->DeleteAllItems();
+
     delete g_cslMenu;
+
+    SaveSettings();
     delete g_cslSettings;
 }
 
@@ -305,9 +319,6 @@ void CslFrame::set_properties()
     bitmap_button_search_clear->Connect(wxEVT_LEFT_DOWN,
                                         wxMouseEventHandler(CslFrame::OnMouseLeftDown),NULL,this);
 
-    m_textctrlBack=text_ctrl_search->GetBackgroundColour();
-    m_textctrlText=text_ctrl_search->GetForegroundColour();
-
     SetMinSize(wxSize(640,480));
 
 #ifdef _MSC_VER
@@ -325,9 +336,9 @@ void CslFrame::do_layout()
     SetStatusBar(statusBar);
     CslStatusBar::InitBar(statusBar);
 
-    list_ctrl_master->ListInit(m_engine,list_ctrl_info,NULL,
-                               list_ctrl_favourites,g_cslSettings->m_filterFlags);
-    list_ctrl_favourites->ListInit(m_engine,list_ctrl_info,list_ctrl_master,NULL,
+    list_ctrl_master->ListInit(m_engine,list_ctrl_info,NULL,list_ctrl_favourites,
+                               m_extendedDlg,g_cslSettings->m_filterFlags);
+    list_ctrl_favourites->ListInit(m_engine,list_ctrl_info,list_ctrl_master,NULL,m_extendedDlg,
                                    g_cslSettings->m_filterFavourites ? g_cslSettings->m_filterFlags : 0);
 
     // begin wxGlade: CslFrame::do_layout
@@ -441,14 +452,15 @@ void CslFrame::CreateMainMenu()
     wxMenu* menu_3=new wxMenu();
     CslMenu::AddItemToMenu(menu_3,MENU_VIEW_SEARCH,_("Show &search bar\tCTRL+S"),
                            wxART_NONE,wxITEM_CHECK);
-    CslMenu::AddItemToMenu(menu_3,MENU_VIEW_FILTER,_("Show &Filter\tCTRL+F"),
+    CslMenu::AddItemToMenu(menu_3,MENU_VIEW_FILTER,_("Show &filter\tCTRL+F"),
+                           wxART_NONE,wxITEM_CHECK);
+    CslMenu::AddItemToMenu(menu_3,MENU_VIEW_OUTPUT,_("Show &game output\tCTRL+O"),
                            wxART_NONE,wxITEM_CHECK);
     menu_3->AppendSeparator();
     CslMenu::AddItemToMenu(menu_3,MENU_VIEW_AUTO_SORT,_("Sort &lists automatically\tCTRL+L"),
                            wxART_NONE,wxITEM_CHECK);
     CslMenu::AddItemToMenu(menu_3,MENU_VIEW_AUTO_FIT,_("Fit columns on window &resize"),
                            wxART_NONE,wxITEM_CHECK);
-    menu_3->AppendSeparator();
     CslMenu::AddItemToMenu(menu_3,MENU_VIEW_SPLITTER_LIVE,_("Redraw while dragging spli&tters"),
                            wxART_NONE,wxITEM_CHECK);
     m_menubar->Append(menu_3,_("&View"));
@@ -458,6 +470,11 @@ void CslFrame::CreateMainMenu()
 
     m_menuMaster=menu_2;
     g_cslMenu=new CslMenu(m_menubar);
+}
+
+void CslFrame::OnPingStats(wxCommandEvent& event)
+{
+    wxPostEvent(m_extendedDlg,event);
 }
 
 void CslFrame::OnTimer(wxTimerEvent& event)
@@ -504,7 +521,7 @@ void CslFrame::OnTimer(wxTimerEvent& event)
     if (CslConnectionState::IsPlaying())
     {
         //TODO Output from Game
-        //wxPostEvent(CslConnectionState::GetList(),event);
+        wxPostEvent(CslConnectionState::GetList(),event);
         CslStatusBar::Light(LIGHT_YELLOW);
     }
 
@@ -667,6 +684,10 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             ToggleFilter();
             break;
 
+        case MENU_VIEW_OUTPUT:
+            m_outputDlg->Show(!m_outputDlg->IsShown());
+            break;
+
         case MENU_VIEW_AUTO_SORT:
             g_cslSettings->m_autoSortColumns=event.IsChecked();
             list_ctrl_master->ToggleSortArrow();
@@ -677,22 +698,6 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             g_cslSettings->m_autoFitColumns=event.IsChecked();
             break;
 
-        case MENU_VIEW_TOOLBAR_TOP:
-            g_cslSettings->m_toolbarPosition=TOOLBAR_POS_TOP;
-            //RecreateToolbar();
-            break;
-        case MENU_VIEW_TOOLBAR_BOTTOM:
-            g_cslSettings->m_toolbarPosition=TOOLBAR_POS_BOTTOM;
-            //RecreateToolbar();
-            break;
-        case MENU_VIEW_TOOLBAR_LEFT:
-            g_cslSettings->m_toolbarPosition=TOOLBAR_POS_LEFT;
-            //RecreateToolbar();
-            break;
-        case MENU_VIEW_TOOLBAR_RIGHT:
-            g_cslSettings->m_toolbarPosition=TOOLBAR_POS_RIGHT;
-            //RecreateToolbar();
-            break;
         case MENU_VIEW_TOOLBAR_TEXT:
             if (event.IsChecked())
                 g_cslSettings->m_toolbarStyle|=wxTB_TEXT;
@@ -731,8 +736,8 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             wxString s=event.GetString();
             if (list_ctrl_master->ListSearch(s)||s.IsEmpty())
             {
-                text_ctrl_search->SetBackgroundColour(m_textctrlBack);
-                text_ctrl_search->SetForegroundColour(m_textctrlText);
+                text_ctrl_search->SetBackgroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOW));
+                text_ctrl_search->SetForegroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOWTEXT));
             }
             else
             {
@@ -837,11 +842,18 @@ void CslFrame::OnShow(wxShowEvent& event)
 
 void CslFrame::OnClose(wxCloseEvent& event)
 {
+    if (event.GetEventObject()==m_outputDlg)
+    {
+        g_cslMenu->CheckMenuItem(MENU_VIEW_OUTPUT,false);
+        return;
+    }
+
     CslDlgGeneric *dlg=new CslDlgGeneric(this,_("CSL terminating"),
                                          _("Waiting for engine to terminate ..."),
                                          wxArtProvider::GetBitmap(wxART_INFORMATION,wxART_CMN_DIALOG),
                                          wxDefaultPosition);
     dlg->Show();
+    wxYield();
 
     event.Skip();
 }
@@ -906,7 +918,7 @@ void CslFrame::ToggleSearchBar()
     {
         panel_search->Hide();
         text_ctrl_search->Clear();
-        text_ctrl_search->SetBackgroundColour(m_textctrlBack);
+        text_ctrl_search->SetBackgroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOW));
         list_ctrl_master->ListSearch(wxEmptyString);
         m_sizerMaster->Detach(panel_search);
         //m_sizerMaster->RemoveGrowableRow(1);
@@ -1164,13 +1176,13 @@ void CslFrame::LoadSettings()
         if (g_cslSettings->m_ping_good>9999)
             g_cslSettings->m_ping_good=CSL_PING_GOOD_STD;
     }
-
     if (config->Read(wxT("PingBad"),&val))
     {
         g_cslSettings->m_ping_bad=val;
         if (g_cslSettings->m_ping_bad<g_cslSettings->m_ping_good)
             g_cslSettings->m_ping_bad=g_cslSettings->m_ping_good;
     }
+    if (config->Read(wxT("LastOutputPath"),&s)) g_cslSettings->m_outputPath=s;
 
     /* ListCtrl */
     config->SetPath(wxT("/List"));
@@ -1200,17 +1212,14 @@ void CslFrame::LoadSettings()
 
     /* Client */
     config->SetPath(wxT("/Clients"));
-    if (config->Read(wxT("ConnectModeSB"),&val)) g_cslSettings->m_connectModeSB=val;
     if (config->Read(wxT("BinarySB"),&s)) g_cslSettings->m_clientBinSB=s;
     if (config->Read(wxT("OptionsSB"),&s)) g_cslSettings->m_clientOptsSB=s;
     if (config->Read(wxT("PathSB"),&s)) g_cslSettings->m_configPathSB=s;
-    if (config->Read(wxT("ConnectModeAC"),&val)) g_cslSettings->m_connectModeAC=val;
     if (config->Read(wxT("BinaryAC"),&s)) g_cslSettings->m_clientBinAC=s;
     if (config->Read(wxT("OptionsAC"),&s)) g_cslSettings->m_clientOptsAC=s;
     if (config->Read(wxT("PathAC"),&s)) g_cslSettings->m_configPathAC=s;
     if (config->Read(wxT("MinPlaytime"),&val))
-        if (config->Read(wxT("ConnectModeCB"),&val)) g_cslSettings->m_connectModeCB=val;
-    if (config->Read(wxT("BinaryCB"),&s)) g_cslSettings->m_clientBinCB=s;
+        if (config->Read(wxT("BinaryCB"),&s)) g_cslSettings->m_clientBinCB=s;
     if (config->Read(wxT("OptionsCB"),&s)) g_cslSettings->m_clientOptsCB=s;
     if (config->Read(wxT("PathCB"),&s)) g_cslSettings->m_configPathCB=s;
     {
@@ -1263,6 +1272,7 @@ void CslFrame::SaveSettings()
     config->Write(wxT("WaitOnFullServer"),(long int)g_cslSettings->m_waitServerFull);
     config->Write(wxT("PingGood"),(long int)g_cslSettings->m_ping_good);
     config->Write(wxT("PingBad"),(long int)g_cslSettings->m_ping_bad);
+    config->Write(wxT("LastOutputPath"),g_cslSettings->m_outputPath);
 
     /* ListCtrl */
     config->SetPath(wxT("/List"));
@@ -1289,15 +1299,12 @@ void CslFrame::SaveSettings()
 
     /* Client */
     config->SetPath(wxT("/Clients"));
-    config->Write(wxT("ConnectModeSB"),(long int)g_cslSettings->m_connectModeSB);
     config->Write(wxT("BinarySB"),g_cslSettings->m_clientBinSB);
     config->Write(wxT("OptionsSB"),g_cslSettings->m_clientOptsSB);
     config->Write(wxT("PathSB"),g_cslSettings->m_configPathSB);
-    config->Write(wxT("ConnectModeAC"),(long int)g_cslSettings->m_connectModeAC);
     config->Write(wxT("BinaryAC"),g_cslSettings->m_clientBinAC);
     config->Write(wxT("OptionsAC"),g_cslSettings->m_clientOptsAC);
     config->Write(wxT("PathAC"),g_cslSettings->m_configPathAC);
-    config->Write(wxT("ConnectModeCB"),(long int)g_cslSettings->m_connectModeCB);
     config->Write(wxT("BinaryCB"),g_cslSettings->m_clientBinCB);
     config->Write(wxT("OptionsCB"),g_cslSettings->m_clientOptsCB);
     config->Write(wxT("PathCB"),g_cslSettings->m_configPathCB);

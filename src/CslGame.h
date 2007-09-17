@@ -35,6 +35,20 @@
 #include <wx/sckaddr.h>
 #include "cube_tools.h"
 
+
+#define CSL_ERROR_NONE               0
+#define CSL_ERROR_GAME_UNKNOWN      -1
+#define CSL_ERROR_FILE_OPERATION   -20
+#define CSL_ERROR_FILE_DONT_EXIST  -21
+
+
+#define CSL_DEFAULT_INJECT_DIR_SB     wxT("packages/base/")
+#define CSL_DEFAULT_INJECT_FIL_SB     wxT("csl_start_sb")
+#define CSL_DEFAULT_INJECT_DIR_AC     wxT("config/")
+#define CSL_DEFAULT_INJECT_FIL_AC     wxT("autoexec.cfg")
+#define CSL_DEFAULT_INJECT_DIR_CB     wxT("packages/base/")
+#define CSL_DEFAULT_INJECT_FIL_CB     wxT("metl3.cfg")
+
 #define CSL_DEFAULT_NAME_SB           wxT("Sauerbraten")
 #define CSL_DEFAULT_NAME_AC           wxT("AssaultCube")
 #define CSL_DEFAULT_NAME_CB           wxT("Cube")
@@ -52,14 +66,16 @@
 #define CSL_DEFAULT_INFO_PORT_AC      28764
 #define CSL_DEFAULT_INFO_PORT_CB      28766
 
-#define CSL_LAST_PROTOCOL_SB  254
+#define CSL_LAST_PROTOCOL_SB   254
 #define CSL_LAST_PROTOCOL_AC  1125
-#define CSL_LAST_PROTOCOL_CB  122
+#define CSL_LAST_PROTOCOL_CB   122
 
 #define CSL_DEFAULT_SERVER_ADDR_SB1  wxT("81.169.170.173")   // TC1
 #define CSL_DEFAULT_SERVER_ADDR_SB2  wxT("85.214.41.161")    // TC2
 #define CSL_DEFAULT_SERVER_DESC_SB1  wxT("The-Conquerors")
 #define CSL_DEFAULT_SERVER_DESC_SB2  wxT("The-Conquerors 2")
+
+#define CSL_UPTIME_REFRESH_MULT 4
 
 #define CSL_VIEW_DEFAULT      1
 #define CSL_VIEW_FAVOURITE    2
@@ -84,6 +100,19 @@ extern const wxChar* GetGameStr(int n);
 
 class CslGame;
 class CslMaster;
+
+class CslPlayerStats
+{
+    public:
+        CslPlayerStats() :
+                m_rank(-1),m_frags(-1),m_deaths(-1),m_teamkills(-1),
+                m_id(-1),m_ok(false) {}
+
+        wxString m_player,m_team;
+        wxInt32 m_rank,m_frags,m_deaths,m_teamkills;
+        wxInt32 m_id;
+        bool m_ok;
+};
 
 class CslServerInfo
 {
@@ -116,14 +145,25 @@ class CslServerInfo
             m_playTimeLastGame=playTimeLastGame;
             m_playTimeTotal=playTimeTotal;
             m_connectedTimes=connectedTimes;
-            m_locked=false;
+            m_uptime=0;
+            m_uptimeRefresh=CSL_UPTIME_REFRESH_MULT;
+            m_lock=0;
             m_waiting=false;
+            m_extended=false;
         }
 
-        bool operator==(const CslServerInfo& i2)
+        bool operator==(const CslServerInfo& info)
         {
-            return (m_type==i2.m_type && m_host==i2.m_host);
+            return (m_type==info.m_type && m_host==info.m_host);
         }
+
+        void DeleteStats()
+        {
+            loopvrev(m_playerStats) delete m_playerStats.at(i);
+            m_playerStats.setsize(0);
+        }
+
+        void InvalidateStats() { loopv(m_playerStats) m_playerStats.at(i)->m_ok=false; }
 
         void CreateFavourite(const wxString& host=wxT("localhost"),
                              CSL_GAMETYPE type=CSL_GAME_START)
@@ -140,6 +180,8 @@ class CslServerInfo
             m_playTimeLastGame=time;
             m_playTimeTotal+=time;
         }
+
+        void SetWaiting(bool wait=true) { m_waiting=wait; }
 
         wxString GetVersionStr()
         {
@@ -176,10 +218,22 @@ class CslServerInfo
             return 0;
         }
 
-        void Lock(bool lock=true) { m_locked=lock; }
-        void SetWaiting(bool wait=true) { m_waiting=wait; }
+        wxString& GetBestDescription()
+        {
+            if (m_desc.IsEmpty()) return m_host;
+            return m_desc;
+        }
 
-        bool IsLocked() { return m_locked; }
+        void Lock(bool lock=true)
+        {
+            if (!lock)
+                if (--m_lock<0) m_lock=0;
+                else m_lock++;
+        }
+
+        bool CanPingUptime() { return m_uptimeRefresh++%CSL_UPTIME_REFRESH_MULT==0; }
+
+        bool IsLocked() { return m_lock>0; }
         bool IsUnused() { return m_view==0; }
         bool IsDefault() { return (m_view&CSL_VIEW_DEFAULT)>0; }
         bool IsFavourite() { return (m_view&CSL_VIEW_FAVOURITE)>0; }
@@ -197,7 +251,12 @@ class CslServerInfo
         wxUint32 m_lastSeen,m_pingSend,m_pingResp;
         wxUint32 m_playLast,m_playTimeLastGame,m_playTimeTotal;
         wxUint32 m_connectedTimes;
-        bool m_locked,m_waiting;
+        wxUint32 m_uptime;
+        wxUint32 m_uptimeRefresh;
+        wxInt32 m_lock;
+        bool m_waiting;
+        bool m_extended;
+        vector<CslPlayerStats*> m_playerStats;
 
     protected:
         void AddMaster(const wxInt32 id)
@@ -227,8 +286,9 @@ class CslMaster
         CslMaster(const CSL_GAMETYPE type=CSL_GAME_START,
                   const wxString& address=wxEmptyString,
                   const wxString& path=wxEmptyString,
-                  const bool def=false)
-                : m_game(NULL),m_address(address),m_path(path),m_type(type),m_id(0) {}
+                  const bool def=false) :
+                m_game(NULL),m_address(address),m_path(path),
+                m_type(type),m_id(0) {}
 
         ~CslMaster() { RemoveServers(); }
 
@@ -310,6 +370,10 @@ class CslGame
         vector<CslMaster*>* GetMasters() { return &m_masters; }
         vector<CslServerInfo*>* GetServers() { return &m_servers; }
         CslServerInfo* FindServerByAddr(const wxIPV4address addr);
+
+        static wxInt32 ConnectCleanup(const CSL_GAMETYPE type,const wxString& cfg);
+        static wxInt32 ConnectWriteConfig(const CSL_GAMETYPE type,const wxString& cfg,const wxString& str);
+        static wxInt32 ConnectPrepare(const CslServerInfo *info,const wxString& path,wxString *out);
 
     protected:
         CSL_GAMETYPE m_type;

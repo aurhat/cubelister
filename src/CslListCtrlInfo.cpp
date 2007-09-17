@@ -130,18 +130,17 @@ CslListCtrlInfo::CslListCtrlInfo(wxWindow* parent,wxWindowID id,const wxPoint& p
         : wxListCtrl(parent,id,pos,size,style,validator,name)
 {
 #ifdef __WXMSW__
-    m_geoIP=GeoIP_open(".\\GeoIP.dat",GEOIP_MEMORY_CACHE);
+    m_geoIP=GeoIP_open(".\\data\\GeoIP.dat",GEOIP_MEMORY_CACHE);
 #else
     wxString path;
 
-    path=A2U(GEOIPDATABASEDIR)+PATHDIV+wxT("GeoIP.dat");
+    path=A2U(DATADIR)+PATHDIV+wxT("GeoIP.dat");
     m_geoIP=GeoIP_open(U2A(path),GEOIP_MEMORY_CACHE);
 
     if (!m_geoIP)
     {
         path=wxTheApp->argv[0];
-        path=path.BeforeLast(PATHDIVA)+PATHDIV+wxT("GeoIP.dat");
-
+        path=path.BeforeLast(PATHDIVA)+PATHDIV+wxT("data")+PATHDIV+wxT("GeoIP.dat");
         m_geoIP=GeoIP_open(U2A(path),GEOIP_MEMORY_CACHE);
     }
 #endif
@@ -170,6 +169,9 @@ CslListCtrlInfo::CslListCtrlInfo(wxWindow* parent,wxWindowID id,const wxPoint& p
     InsertItem(i++,_("Location"),0);
     InsertItem(i++,_("Game"),0);
     InsertItem(i++,_("Protocol version"),0);
+#ifdef CSL_EXT_SERVER_INFO
+    InsertItem(i++,_("Uptime"),0);
+#endif
     InsertItem(i++,_("Last seen"),0);
     InsertItem(i++,_("Last played"),0);
     InsertItem(i++,_("Last playtime"),0);
@@ -207,31 +209,6 @@ void CslListCtrlInfo::AdjustSize(wxSize size)
 
     SetColumnWidth(0,(wxInt32)(w*0.35));
     SetColumnWidth(1,(wxInt32)(w*0.64));
-}
-
-wxString CslListCtrlInfo::FormatSeconds(wxUint32 time)
-{
-    wxUint32 rest=time;
-    wxUint32 dy,hr,mn,sc;
-    wxString s;
-
-    dy=rest/86400;
-    rest%=86400;
-    hr=rest/3600;
-    rest%=3600;
-    mn=rest/60;
-    sc=rest%60;
-
-    if (dy)
-        s+=s.Format(wxT("%dd "),dy);
-    if (hr)
-        s+=s.Format(wxT("%dh "),hr);
-    if (mn)
-        s+=s.Format(wxT("%dmin "),mn);
-    if (sc)
-        s+=s.Format(wxT("%dsec"),sc);
-
-    return s;
 }
 
 void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
@@ -313,7 +290,13 @@ void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
     else
         s=s.Format(wxT("%d"),info->m_protocol);
     SetItem(ic++,1,s);
-
+#ifdef CSL_EXT_SERVER_INFO
+    if (info->m_extended)
+        s=FormatSeconds(info->m_uptime);
+    else
+        s=_("Extended info not supported");
+    SetItem(ic++,1,s);
+#endif
     if (info->m_lastSeen)
     {
         dt.Set((time_t)info->m_lastSeen);
