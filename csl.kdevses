@@ -1,18 +1,10 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <!DOCTYPE KDevPrjSession>
 <KDevPrjSession>
- <DocsAndViews NumberOfDocuments="1" >
-  <Doc0 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/src/CslListCtrlServer.cpp" >
-   <View0 Encoding="" line="1160" Type="Source" />
-  </Doc0>
- </DocsAndViews>
+ <DocsAndViews NumberOfDocuments="0" />
  <pluginList>
   <kdevdebugger>
-   <breakpointList>
-    <breakpoint0 location="/home/mimosius/Documents/Development/csl/src/CslDlgOutput.cpp:313" type="1" tracingFormatString="" traceFormatStringEnabled="0" condition="" tracingEnabled="0" enabled="1" >
-     <tracedExpressions/>
-    </breakpoint0>
-   </breakpointList>
+   <breakpointList/>
    <showInternalCommands value="0" />
   </kdevdebugger>
   <kdevastyle>

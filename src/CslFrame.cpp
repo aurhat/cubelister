@@ -1557,9 +1557,9 @@ bool CslApp::OnInit()
                                              wxArtProvider::GetBitmap(wxART_INFORMATION,wxART_CMN_DIALOG),
                                              wxDefaultPosition);
         dlg->Show();
-		dlg->Update();
-			//Yield();
-		wxSleep(3);
+	dlg->Update();
+	Yield();
+	wxSleep(3);
         dlg->Destroy();
 
         delete dlg;
