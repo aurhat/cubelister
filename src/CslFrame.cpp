@@ -1540,6 +1540,13 @@ IMPLEMENT_APP(CslApp)
 
 bool CslApp::OnInit()
 {
+    m_locale.Init(wxLANGUAGE_DEFAULT,wxLOCALE_CONV_ENCODING);
+    m_locale.AddCatalogLookupPathPrefix(wxT("lang"));
+#ifndef __WXMSW__
+    m_locale.AddCatalogLookupPathPrefix(wxT(LOCALEDIR));
+#endif
+    m_locale.AddCatalog(CSL_NAME_SHORT_STR);
+
     wxString name=wxString::Format(wxT("%s-%s"),CSL_NAME_SHORT_STR,wxGetUserId().c_str());
     m_single=new wxSingleInstanceChecker(name);
 
@@ -1550,8 +1557,9 @@ bool CslApp::OnInit()
                                              wxArtProvider::GetBitmap(wxART_INFORMATION,wxART_CMN_DIALOG),
                                              wxDefaultPosition);
         dlg->Show();
-        wxYield();
-        wxSleep(3);
+		dlg->Update();
+			//Yield();
+		wxSleep(3);
         dlg->Destroy();
 
         delete dlg;
@@ -1559,13 +1567,6 @@ bool CslApp::OnInit()
 
         return false;
     }
-
-    m_locale.Init(wxLANGUAGE_DEFAULT,wxLOCALE_CONV_ENCODING);
-    m_locale.AddCatalogLookupPathPrefix(wxT("lang"));
-#ifndef __WXMSW__
-    m_locale.AddCatalogLookupPathPrefix(wxT(LOCALEDIR));
-#endif
-    m_locale.AddCatalog(CSL_NAME_SHORT_STR);
 
     //wxInitAllImageHandlers();
     CslFrame* frame_csl=new CslFrame(NULL,wxID_ANY,wxEmptyString);
