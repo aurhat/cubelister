@@ -386,7 +386,7 @@ bool CslEngine::Ping(CslServerInfo *info,bool force)
         LOG_DEBUG("iswaiting\n");
     }
 
-    //LOG_DEBUG("%s - ticks:%li, pingsend:%li, diff:%li\n",U2A(info->GetBestDescription()).c_str(),
+    //LOG_DEBUG("%s - ticks:%li, pingsend:%li, diff:%li\n",U2A(info->GetBestDescription()),
     //          ticks,info->m_pingSend,ticks-info->m_pingSend);
     if (!force && (ticks-info->m_pingSend)<interval)
         return false;
@@ -403,7 +403,6 @@ bool CslEngine::Ping(CslServerInfo *info,bool force)
     {
         return PingUptime(info);
     }
-
 #endif
 
     // default ping packet
@@ -413,14 +412,14 @@ bool CslEngine::Ping(CslServerInfo *info,bool force)
     packet->Set(info->m_addr,ping,p.length());
     m_pingSock->SendPing(packet);
 
-    //LOG_DEBUG("Ping %s - %d\n",U2A(info->GetBestDescription()).c_str(),ticks);
+    //LOG_DEBUG("Ping %s - %d\n",U2A(info->GetBestDescription()),ticks);
 
     return true;
 }
 
 bool CslEngine::PingUptime(CslServerInfo *info)
 {
-    //LOG_DEBUG("uptime %s - %d\n",U2A(info->GetBestDescription()).c_str(),GetTicks());
+    //LOG_DEBUG("uptime %s - %d\n",U2A(info->GetBestDescription()),GetTicks());
     uchar ping[16];
 
     CslUDPPacket *packet=new CslUDPPacket();
@@ -728,8 +727,8 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
                         info->m_uptime=getint(p);
                         if (info->m_uptime)
                             info->m_extended=true;
-                        LOG_DEBUG("uptime (%s) %s\n",U2A(info->GetBestDescription()).c_str(),
-                                  U2A(FormatSeconds(info->m_uptime)).c_str());
+                        LOG_DEBUG("uptime (%s) %s\n",U2A(info->GetBestDescription()),
+                                  U2A(FormatSeconds(info->m_uptime)));
                     }
                     else if (strcmp(text,"stats")==0)
                     {
@@ -743,8 +742,7 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
                         if (extProt<101)
                             return;
 
-                        LOG_DEBUG("stats (%s) prot:%d\n",
-                                  U2A(info->GetBestDescription()).c_str(),extProt);
+                        LOG_DEBUG("stats (%s) prot:%d\n",U2A(info->GetBestDescription()),extProt);
 
                         CslPlayerStats *stats=NULL;
                         loopv(info->m_playerStats)
@@ -771,15 +769,15 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
 
                         if (p.overread())
                         {
-                            LOG_DEBUG("stats(%s) OVERREAD!\n",U2A(info->GetBestDescription()).c_str());
+                            LOG_DEBUG("stats(%s) OVERREAD!\n",U2A(info->GetBestDescription()));
                             break;
                         }
 
                         stats->m_ok=true;
 
                         LOG_DEBUG("stats (%s): player:%s, team:%s, frags:%d, deaths:%d, tk:%d,\n",
-                                  U2A(info->GetBestDescription()).c_str(),
-                                  U2A(stats->m_player).c_str(),U2A(stats->m_team).c_str(),
+                                  U2A(info->GetBestDescription()),
+                                  U2A(stats->m_player),U2A(stats->m_team),
                                   stats->m_frags,stats->m_deaths,stats->m_teamkills);
 
                         wxCommandEvent evt(wxCSL_EVT_PING_STATS);
@@ -810,8 +808,8 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
         }
 #ifdef __WXDEBUG__
         if (p.length()<(wxInt32)packet->Size())
-            LOG_DEBUG("%s: %d bytes left (type=%s)\n",U2A(info->GetBestDescription()).c_str(),
-                      packet->Size()-p.length(),U2A(dbg_type).c_str());
+            LOG_DEBUG("%s: %d bytes left (type=%s)\n",U2A(info->GetBestDescription()),
+                      packet->Size()-p.length(),U2A(dbg_type));
 #endif
     }
 }

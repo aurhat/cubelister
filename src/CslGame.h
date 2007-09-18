@@ -226,9 +226,8 @@ class CslServerInfo
 
         void Lock(bool lock=true)
         {
-            if (!lock)
-                if (--m_lock<0) m_lock=0;
-                else m_lock++;
+            if (!lock && --m_lock<=0) m_lock=0;
+            else m_lock++;
         }
 
         bool CanPingUptime() { return m_uptimeRefresh++%CSL_UPTIME_REFRESH_MULT==0; }

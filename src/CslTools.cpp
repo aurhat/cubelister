@@ -27,30 +27,25 @@
 #endif
 #include <wx/regex.h>
 
-char* StripColours(const char *s)
+char* StripColours(char *s,wxUint32 *l,wxUint32 count)
 {
-    int i=0,j=0;
-    int l=strlen(s);
+    wxUint32 i;
 
-    if (!l)
+    if (!*l)
         return NULL;
 
-    char *buf=strdup(s);
-
-    for (;i<l;i++)
+    for (i=0;i<*l;i++)
     {
-        char c=s[i];
-        if (c!=0xc)
+        if (s[i]==0xc)
         {
-            buf[j]=c;
-            j++;
+            *l-=count;
+            memmove((void*)&s[i],(void*)&s[i+count],*l-i);
         }
-        else
-            i++;
     }
 
-    buf[j]=0;
-    return buf;
+    s[*l]=0;
+
+    return s;
 }
 
 bool IsIP(const wxString& s)

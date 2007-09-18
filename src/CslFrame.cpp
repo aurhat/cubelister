@@ -520,7 +520,6 @@ void CslFrame::OnTimer(wxTimerEvent& event)
 
     if (CslConnectionState::IsPlaying())
     {
-        //TODO Output from Game
         wxPostEvent(CslConnectionState::GetList(),event);
         CslStatusBar::Light(LIGHT_YELLOW);
     }

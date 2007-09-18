@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CSL\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-09-17 16:56+0200\n"
-"PO-Revision-Date: 2007-09-17 17:00+0100\n"
+"POT-Creation-Date: 2007-09-18 21:00+0200\n"
+"PO-Revision-Date: 2007-09-18 21:02+0100\n"
 "Last-Translator: Glen Masgai <mimosius@gmx.de>\n"
 "Language-Team: Glen Masgai <mimosius@gmx.de>\n"
 "MIME-Version: 1.0\n"
@@ -140,36 +140,36 @@ msgstr "Ü&ber"
 msgid "&Help"
 msgstr "&Hilfe"
 
-#: ../src/CslFrame.cpp:660
+#: ../src/CslFrame.cpp:659
 msgid "Master already exists!"
 msgstr "Master existiert bereits!"
 
-#: ../src/CslFrame.cpp:851
+#: ../src/CslFrame.cpp:850
 msgid "CSL terminating"
 msgstr "CSL beendet sich"
 
-#: ../src/CslFrame.cpp:852
+#: ../src/CslFrame.cpp:851
 msgid "Waiting for engine to terminate ..."
 msgstr "Warte auf das Beenden der Engine"
 
-#: ../src/CslFrame.cpp:995
+#: ../src/CslFrame.cpp:994
 msgid "Sending request to master: "
 msgstr "Sende Anfrage zum Master: "
 
-#: ../src/CslFrame.cpp:1003
+#: ../src/CslFrame.cpp:1002
 msgid "Error on update from master: "
 msgstr "Fehler beim Aktualisieren vom Master:"
 
-#: ../src/CslFrame.cpp:1008
+#: ../src/CslFrame.cpp:1007
 #, c-format
 msgid "Got %d servers from master"
 msgstr "%d Server vom Master erhalten"
 
-#: ../src/CslFrame.cpp:1549
+#: ../src/CslFrame.cpp:1548
 msgid "CSL already running"
 msgstr "CSL läuft bereits"
 
-#: ../src/CslFrame.cpp:1550
+#: ../src/CslFrame.cpp:1549
 msgid "CSL is already running."
 msgstr "Eine Instanz von CSL läuft bereits."
 
@@ -238,7 +238,7 @@ msgstr "Wähle Cube Spielverzeichnis"
 #: ../src/CslDlgSettings.cpp:245
 #: ../src/CslDlgSettings.cpp:254
 msgid "Game executable:"
-msgstr "Programmdatei"
+msgstr "Programmdatei:"
 
 #: ../src/CslDlgSettings.cpp:238
 #: ../src/CslDlgSettings.cpp:247
@@ -320,7 +320,7 @@ msgstr "Farben"
 msgid "Other"
 msgstr "Verschiedenes"
 
-#: ../src/CslDlgSettings.cpp:528
+#: ../src/CslDlgSettings.cpp:517
 #, c-format
 msgid ""
 "Game installation path missing!\n"
@@ -331,18 +331,18 @@ msgstr ""
 "Damit %s zu einem Server verbinden kann, muss der Ordner\n"
 " angegeben werden, in dem sich %s befindet."
 
-#: ../src/CslDlgSettings.cpp:543
-#: ../src/CslDlgSettings.cpp:552
-#: ../src/CslDlgSettings.cpp:564
-#: ../src/CslDlgSettings.cpp:571
-#: ../src/CslDlgSettings.cpp:583
-#: ../src/CslDlgSettings.cpp:590
-#: ../src/CslDlgSettings.cpp:598
-#: ../src/CslListCtrlServer.cpp:1252
+#: ../src/CslDlgSettings.cpp:532
+#: ../src/CslDlgSettings.cpp:541
+#: ../src/CslDlgSettings.cpp:553
+#: ../src/CslDlgSettings.cpp:560
+#: ../src/CslDlgSettings.cpp:572
+#: ../src/CslDlgSettings.cpp:579
+#: ../src/CslDlgSettings.cpp:587
+#: ../src/CslListCtrlServer.cpp:1276
 msgid "Error"
 msgstr "Fehler!"
 
-#: ../src/CslDlgSettings.cpp:597
+#: ../src/CslDlgSettings.cpp:586
 msgid ""
 "Threshold for good ping can't be higher than\n"
 "threshold for bad ping."
@@ -368,27 +368,27 @@ msgstr ""
 msgid "Extended information"
 msgstr "Erweiterte Informationen"
 
-#: ../src/CslListCtrlServer.cpp:119
+#: ../src/CslListCtrlServer.cpp:120
 #, c-format
 msgid " returned with code: %d"
 msgstr " beendet mit Code: %d"
 
-#: ../src/CslListCtrlServer.cpp:420
+#: ../src/CslListCtrlServer.cpp:424
 msgid "You are about to delete servers which are also favourites!\n"
 msgstr "Es sollen Server gelöscht werden, die als Favoriten markiert sind!\n"
 
-#: ../src/CslListCtrlServer.cpp:430
+#: ../src/CslListCtrlServer.cpp:434
 msgid "You are about to delete servers which have statistics!\n"
 msgstr "Es sollen Server gelöscht werden, die Statistiken enthalten!\n"
 
-#: ../src/CslListCtrlServer.cpp:450
+#: ../src/CslListCtrlServer.cpp:456
 #, c-format
 msgid ""
 "Server \"%s\" is currently locked,\n"
 "so deletion is not possible!"
 msgstr "Server \"%s\" kann nicht gelöscht werden, da er gesperrt ist!"
 
-#: ../src/CslListCtrlServer.cpp:458
+#: ../src/CslListCtrlServer.cpp:466
 #, c-format
 msgid ""
 "Player statistics are shown for Server \"%s\",\n"
@@ -397,56 +397,56 @@ msgstr ""
 "Server \"%s\" kann nicht gelöscht werden, da er durch das\n"
 "Spielerstatistik-Fenster gesperrt ist!"
 
-#: ../src/CslListCtrlServer.cpp:651
+#: ../src/CslListCtrlServer.cpp:666
 #, c-format
 msgid "Waiting %d seconds for a free slot on \"%s\" (press ESC to abort or join another server)"
 msgstr "Warte %d Sekunden auf einen freien Slot auf \"%s\" (ESC drücken um abzubrechen oder einen anderen Server wählen)"
 
-#: ../src/CslListCtrlServer.cpp:687
+#: ../src/CslListCtrlServer.cpp:701
 msgid "Host"
 msgstr "Host"
 
-#: ../src/CslListCtrlServer.cpp:690
+#: ../src/CslListCtrlServer.cpp:704
 msgid "Description"
 msgstr "Titel"
 
-#: ../src/CslListCtrlServer.cpp:693
+#: ../src/CslListCtrlServer.cpp:707
 msgid "Version"
 msgstr "Version"
 
-#: ../src/CslListCtrlServer.cpp:697
+#: ../src/CslListCtrlServer.cpp:711
 msgid "Ping"
 msgstr "Ping"
 
-#: ../src/CslListCtrlServer.cpp:702
+#: ../src/CslListCtrlServer.cpp:716
 msgid "Mode"
 msgstr "Modus"
 
-#: ../src/CslListCtrlServer.cpp:705
+#: ../src/CslListCtrlServer.cpp:719
 msgid "Map"
 msgstr "Map"
 
-#: ../src/CslListCtrlServer.cpp:709
+#: ../src/CslListCtrlServer.cpp:723
 msgid "Time"
 msgstr "Zeit"
 
-#: ../src/CslListCtrlServer.cpp:713
+#: ../src/CslListCtrlServer.cpp:727
 msgid "Player"
 msgstr "Spieler"
 
-#: ../src/CslListCtrlServer.cpp:716
+#: ../src/CslListCtrlServer.cpp:730
 msgid "MM"
 msgstr "MM"
 
-#: ../src/CslListCtrlServer.cpp:874
+#: ../src/CslListCtrlServer.cpp:888
 msgid "no limit"
 msgstr "kein Limit"
 
-#: ../src/CslListCtrlServer.cpp:1141
+#: ../src/CslListCtrlServer.cpp:1155
 msgid "You are currently playing, so quit the game and try again."
 msgstr "Es läuft momentan schon ein Spiel."
 
-#: ../src/CslListCtrlServer.cpp:1172
+#: ../src/CslListCtrlServer.cpp:1193
 #, c-format
 msgid ""
 "There was no executable for game %s specified yet!\n"
@@ -455,7 +455,7 @@ msgstr ""
 "Es wurde keine Programmdatei für das Spiel %s angegeben.\n"
 "Bitte die Einstellungen überprüfen."
 
-#: ../src/CslListCtrlServer.cpp:1179
+#: ../src/CslListCtrlServer.cpp:1200
 msgid ""
 "Invalid game path was specified!\n"
 "Please check your settings."
@@ -463,7 +463,7 @@ msgstr ""
 "Es wurde kein Spielverzeichnis angegeben.\n"
 "Bitte die Einstellungen überprüfen."
 
-#: ../src/CslListCtrlServer.cpp:1190
+#: ../src/CslListCtrlServer.cpp:1211
 #, c-format
 msgid ""
 "The server \"%s\" is in private mode, so it's\n"
@@ -476,11 +476,11 @@ msgstr ""
 "\n"
 "Trotzdem verbinden?"
 
-#: ../src/CslListCtrlServer.cpp:1193
+#: ../src/CslListCtrlServer.cpp:1214
 msgid "Question"
 msgstr "Frage"
 
-#: ../src/CslListCtrlServer.cpp:1252
+#: ../src/CslListCtrlServer.cpp:1276
 msgid ""
 "\n"
 "Please check your installation!"
@@ -488,12 +488,12 @@ msgstr ""
 "\n"
 "Bitte die Installation überprüfen!"
 
-#: ../src/CslListCtrlServer.cpp:1268
+#: ../src/CslListCtrlServer.cpp:1292
 msgid "Failed to start: "
 msgstr "Fehler beim Starten:"
 
 #: ../src/CslDlgOutput.cpp:50
-#: ../src/CslDlgOutput.cpp:289
+#: ../src/CslDlgOutput.cpp:291
 #, c-format
 msgid "%d matches"
 msgstr "%d Treffer"
@@ -528,7 +528,7 @@ msgstr "&Schliessen"
 
 #. begin wxGlade: CslDlgOutput::set_properties
 #: ../src/CslDlgOutput.cpp:74
-#: ../src/CslDlgOutput.cpp:420
+#: ../src/CslDlgOutput.cpp:421
 msgid "CSL - Game output"
 msgstr "CSL - Spielausgabe"
 
@@ -540,11 +540,11 @@ msgstr "Level:"
 msgid "Text files (*.txt)|*.txt"
 msgstr "Textdateien (*.txt)|*.txt"
 
-#: ../src/CslDlgOutput.cpp:166
+#: ../src/CslDlgOutput.cpp:168
 msgid "Open log file"
 msgstr "Logdatei öffnen"
 
-#: ../src/CslDlgOutput.cpp:204
+#: ../src/CslDlgOutput.cpp:206
 msgid "Save log file"
 msgstr "Logdatei speichern"
 

@@ -391,6 +391,6 @@ wxInt32 CslGame::ConnectPrepare(const CslServerInfo *info,const wxString& path,w
     }
 
     *out=cfg;
-    s=wxString::Format(wxT("\r\n/sleep 1000 [ connect %s ]\r\n" ),info->m_host.c_str());
+    s=wxString::Format(wxT("\r\n/sleep 1000 [ connect %s ]\r\n"),info->m_host.c_str());
     return ConnectWriteConfig(info->m_type,cfg,s);
 }

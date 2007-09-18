@@ -238,7 +238,7 @@ void CslDlgSettings::do_layout()
     wxStaticText* label_sauer_path = new wxStaticText(notebook_pane_sauer, wxID_ANY, _("Game directory:"));
     grid_sizer_sauer_path->Add(label_sauer_path, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
     wxStaticText* label_sauer_options = new wxStaticText(notebook_pane_sauer, wxID_ANY, _("Game paramters:"));
-    grid_sizer_sauer_path->Add(label_sauer_options, 0, wxALL|wxALIGN_CENTER_VERTICAL, 8);
+    grid_sizer_sauer_path->Add(label_sauer_options, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
     grid_sizer_sauer_path->Add(text_ctrl_sauer_options, 0, wxALL|wxEXPAND, 4);
     notebook_pane_sauer->SetSizer(grid_sizer_sauer_path);
     grid_sizer_sauer_path->AddGrowableCol(1);

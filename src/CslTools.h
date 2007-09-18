@@ -50,7 +50,7 @@ void Debug_Printf(const char *DbgFunc, const char *FmtStr,...);
 #endif
 
 
-extern char* StripColours(const char *s);
+extern char* StripColours(char *s,wxUint32 *l,wxUint32 count);
 extern bool IsIP(const wxString& s);
 extern bool IP2Int(const wxString& s,wxUint32 *ip);
 extern wxString FormatSeconds(wxUint32 time);

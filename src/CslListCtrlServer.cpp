@@ -115,7 +115,8 @@ class CslProcess : public wxProcess
             if (time>g_cslSettings->m_minPlaytime)
                 m_info->SetLastPlayTime(time);
 
-            if (code!=0)
+            // Cube returns with 1 - weird
+            if (code!=0 && m_info->m_type!=CSL_GAME_CB)
                 wxMessageBox(m_cmd+wxString::Format(_(" returned with code: %d"),code),
                              CSL_ERROR_STR,wxICON_ERROR,m_parent);
 
@@ -145,6 +146,8 @@ class CslProcess : public wxProcess
                 stream->Read((void*)buf,1024);
                 wxUint32 last=stream->LastRead();
                 buf[last]=0;
+                if (m_self->m_info->m_type==CSL_GAME_CB)
+                    StripColours(buf,&last,1);
                 CslDlgOutput::AddOutput(buf,last);
                 //LOG_DEBUG("%s", buf);
             }
@@ -312,7 +315,7 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
 //from keyboard
     if (point.x==-1 && point.y==-1)
     {
-        //TODO handler mouse pos if pointer is outside window
+        //TODO handle mouse pos if pointer is outside window
         //wxSize size=GetSize();
         //point.x=size.x/2;
         //point.y=size.y/2;
@@ -406,7 +409,8 @@ void CslListCtrlServer::ListRemoveServers()
 void CslListCtrlServer::ListDeleteServers()
 {
     wxInt32 c,i;
-    wxString msg;
+    wxUint32 l;
+    wxString msg,s;
     CslServerInfo *info;
     wxInt32 skipFav=wxCANCEL,skipStats=wxCANCEL;
 
@@ -447,16 +451,20 @@ void CslListCtrlServer::ListDeleteServers()
 
         if (ls->IsLocked())
         {
+            s=info->GetBestDescription();
+            l=s.Len();
             msg=wxString::Format(_("Server \"%s\" is currently locked,\nso deletion is not possible!"),
-                                 info->GetBestDescription().c_str());
+                                 A2U(StripColours(U2A(s),&l,2)).c_str());
             wxMessageBox(msg,CSL_ERROR_STR,wxICON_ERROR,this);
             continue;
         }
 #ifdef CSL_EXT_SERVER_INFO
         if (m_extendedDlg->IsShown() && m_extendedDlg->GetInfo()==info)
         {
+            s=info->GetBestDescription();
+            l=s.Len();
             msg=wxString::Format(_("Player statistics are shown for Server \"%s\",\nso deletion is not possible!"),
-                                 info->GetBestDescription().c_str());
+                                 A2U(StripColours(U2A(s),&l,2)).c_str());
             wxMessageBox(msg,CSL_ERROR_STR,wxICON_ERROR,this);
             continue;
         }
@@ -647,11 +655,17 @@ void CslListCtrlServer::OnTimer(wxTimerEvent& event)
         {
             if (CslConnectionState::CountDown())
             {
+                wxString s=info->GetBestDescription();
+                if (info->m_type==CSL_GAME_AC)
+                {
+                    wxUint32 l=s.Len();
+                    s=A2U(StripColours(U2A(s),&l,2));
+                }
+
                 CslStatusBar::SetText(
                     wxString::Format(_("Waiting %d seconds for a free slot on \"%s\" " \
                                        "(press ESC to abort or join another server)"),
-                                     CslConnectionState::GetWaitTime(),
-                                     info->GetBestDescription().c_str()),1);
+                                     CslConnectionState::GetWaitTime(),s.c_str()),1);
             }
             else
                 CslStatusBar::SetText(wxT(""),1);
@@ -846,15 +860,15 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
     if (pingOk || info->m_pingResp)
     {
         if (infoCmp->m_desc != info->m_desc)
+        {
+            s=info->m_desc;
             if (info->m_type==CSL_GAME_AC)
             {
-                char *p=StripColours(U2A(info->m_desc));
-                s=A2U(p);
-                SetItem(i,1,A2U(p));
-                free(p);
+                wxUint32 l=s.Len();
+                s=A2U(StripColours(U2A(info->m_desc),&l,2));
             }
-            else
-                SetItem(i,1,info->m_desc);
+            SetItem(i,1,s);
+        }
 
         if (infoCmp->m_protocol != info->m_protocol)
             SetItem(i,2,info->GetVersionStr());
@@ -1143,8 +1157,15 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info)
         return;
     }
 
+    bool sbUseParam=false;
     wxString cmd,path,opts,out;
-    bool skipPrepare=false;
+    wxString srvtitle=info->GetBestDescription();
+
+    if (info->m_type==CSL_GAME_AC)
+    {
+        wxUint32 l=srvtitle.Len();
+        srvtitle=A2U(StripColours(U2A(srvtitle),&l,2));
+    }
 
     switch (info->m_type)
     {
@@ -1189,17 +1210,18 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info)
             {
                 if (wxMessageBox(wxString::Format(_("The server \"%s\" is in private mode, so it's\n" \
                                                     "probably not possible to connect.\n\nProceed anyway?"),
-                                                  info->GetBestDescription().c_str()),
+                                                  srvtitle.c_str()),
                                  _("Question"),wxYES_NO|wxICON_QUESTION,this) != wxYES)
                     return;
-                skipPrepare=true;
+                sbUseParam=true;
             }
-            else if (info->m_mm!=MM_LOCKED && 
-				     (info->m_map.IsEmpty() ||
-					 info->m_map.CmpNoCase(CSL_DEFAULT_INJECT_FIL_SB)==0))
-                skipPrepare=true;
+            else if (info->m_mm!=MM_LOCKED &&
+                     (info->m_map.IsEmpty() ||
+                      info->m_map.CmpNoCase(CSL_DEFAULT_INJECT_FIL_SB)==0 ||
+                      info->m_timeRemain==0))
+                sbUseParam=true;
 
-            if (skipPrepare)
+            if (sbUseParam)
             {
 #ifdef __WXMSW__
                 opts+=wxT(" -x\"connect ")+info->m_host+wxT("\"");
@@ -1237,7 +1259,7 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info)
         return;
     }
 
-    if (!skipPrepare)
+    if (!sbUseParam)
     {
         switch (CslGame::ConnectPrepare(info,path,&out))
         {
@@ -1259,7 +1281,7 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info)
         }
     }
 
-    CslDlgOutput::Reset(info->GetBestDescription());
+    CslDlgOutput::Reset(srvtitle);
 
     info->Lock();
     ::wxSetWorkingDirectory(path);

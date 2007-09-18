@@ -157,7 +157,7 @@ void CslDlgOutput::OnCommandEvent(wxCommandEvent& event)
             if (!s.IsEmpty())
                 SetSearchbarColour(Search(s));
 
-			text_ctrl_output->ShowPosition(0);
+            text_ctrl_output->ShowPosition(0);
             break;
         }
 
@@ -351,10 +351,7 @@ wxString CslDlgOutput::Filter(wxUint32 start,wxUint32 end)
 
             case ' ':
                 if (!colon)
-                {
                     skip=true;
-                    continue;
-                }
                 break;
 
             case '\r':
@@ -401,7 +398,7 @@ void CslDlgOutput::HandleOutput(char *text,wxUint32 size,bool freemem)
                                      Filter(start,end) : m_text);
     }
 
-	text_ctrl_output->ShowPosition(0);
+    text_ctrl_output->ShowPosition(0);
 
     wxString s=text_ctrl_search->GetValue();
     if (!s.IsEmpty())
