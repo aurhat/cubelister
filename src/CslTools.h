@@ -30,8 +30,19 @@
 #endif
 
 #ifndef DATADIR
-#define DATADIR wxString(wxT("."))+wxString(PATHDIV)+wxString(wxT("data"))
-#endif
+#undef GEOIPDATADIR
+#undef LOCALEDIR
+
+#ifdef __WXMAC__
+#define DATADIR wxString(wxT("csl.app/Contents/Resources/"))
+#define LOCALEDIR DATADIR+wxT("lang")
+#else
+#define DATADIR wxString(wxT("."))+wxString(PATHDIV)+wxString(wxT("data")+wxString(wxT(PATHDIV))
+#define LOCALEDIR wxString(wxT("."))+wxString(PATHDIV)+wxString+wxT("lang")+wxString(wxT(PATHDIV))
+#endif //__WXMAC__
+
+#define GEOIPDATADIR DATADIR
+#endif //DATADIR
 
 #define A2U(PSZA_CHART) wxString(wxConvertMB2WX(PSZA_CHART))
 #define U2A(PSZT_CHART) (char*)(const char*)wxConvertWX2MB(PSZT_CHART)

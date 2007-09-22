@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <wx/file.h>
+#include <wx/wupdlock.h>
 #include "CslDlgOutput.h"
 #include "CslSettings.h"
 #include "CslTools.h"
@@ -42,7 +43,7 @@ CslDlgOutput* CslDlgOutput::m_self=NULL;
 
 CslDlgOutput::CslDlgOutput(wxWindow* parent,int id,const wxString& title,
                            const wxPoint& pos,const wxSize& size, long style):
-        wxDialog(parent, id, title, pos, size, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER)
+        wxDialog(parent, id, title, pos, size, style)
 {
     // begin wxGlade: CslDlgOutput::CslDlgOutput
     text_ctrl_output = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxHSCROLL|wxTE_RICH|wxTE_RICH2|wxTE_AUTO_URL);
@@ -66,6 +67,8 @@ CslDlgOutput::CslDlgOutput(wxWindow* parent,int id,const wxString& title,
     // end wxGlade
 
     m_self=this;
+
+    Reset(wxEmptyString);
 }
 
 void CslDlgOutput::set_properties()
@@ -74,6 +77,7 @@ void CslDlgOutput::set_properties()
     SetTitle(_("CSL - Game output"));
     text_ctrl_output->SetMinSize(wxSize(550,300));
     choice_conv_filter->SetSelection(0);
+    button_close_copy->SetDefault();
     // end wxGlade
 
     label_matches->SetLabel(wxString::Format(label_matches->GetLabel(),0));
@@ -117,6 +121,7 @@ void CslDlgOutput::do_layout()
     Layout();
     // end wxGlade
 
+    CentreOnScreen();
     grid_sizer_main->SetSizeHints(this);
 }
 
@@ -178,7 +183,7 @@ void CslDlgOutput::OnCommandEvent(wxCommandEvent& event)
                 break;
 
             wxUint32 size=file.Length();
-            char *buf=(char*)malloc(size+1);
+            char *buf=(char*)malloc(size);
             buf[size]=0;
 
             if (file.Read((void*)buf,size)!=(wxInt32)size)
@@ -186,10 +191,11 @@ void CslDlgOutput::OnCommandEvent(wxCommandEvent& event)
                 free(buf);
                 break;
             }
+            file.Close();
 
             Reset(wxString::Format(wxT("%s "),wxT("File"))+s);
-            HandleOutput(buf,size,true);
-            file.Close();
+            HandleOutput(buf,size);
+            free(buf);
             break;
         }
 
@@ -238,15 +244,25 @@ void CslDlgOutput::SetSearchbarColour(wxInt32 count)
 {
     if (count)
     {
+#ifdef __WXMAC__
+        // very ugly - setting back to black doesnt work, so add 1
+        text_ctrl_search->SetForegroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOWTEXT).Red()+1);
+#else
         text_ctrl_search->SetBackgroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOW));
         text_ctrl_search->SetForegroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOWTEXT));
+#endif
     }
     else
     {
+#ifdef __WXMAC__
+        text_ctrl_search->SetForegroundColour(*wxRED);
+#else
         text_ctrl_search->SetBackgroundColour(wxColour(255,100,100));
         text_ctrl_search->SetForegroundColour(*wxWHITE);
+#endif
     }
-#ifdef __WXMSW__ // very ugly
+
+#ifdef __WXMSW__
     text_ctrl_search->Refresh();
 #endif
 }
@@ -261,8 +277,15 @@ wxInt32 CslDlgOutput::Search(const wxString& needle)
     wxInt32 hlen=haystack.Len();
     wxInt32 nlen=needle.Len();
 
+    wxWindowUpdateLocker locler(text_ctrl_output);
+
+#ifdef __WXMAC__
+    attr.SetFlags(wxTEXT_ATTR_TEXT_COLOUR);
+    attr.SetTextColour(SYSCOLOUR(wxSYS_COLOUR_WINDOWTEXT));
+#else
     attr.SetFlags(wxTEXT_ATTR_BACKGROUND_COLOUR);
     attr.SetBackgroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOW));
+#endif
     text_ctrl_output->SetStyle(0,hlen,attr);
 
     if (!nlen)
@@ -271,7 +294,11 @@ wxInt32 CslDlgOutput::Search(const wxString& needle)
         goto finish;
     }
 
+#ifdef __WXMAC__
+    attr.SetTextColour(*wxGREEN);
+#else
     attr.SetBackgroundColour(g_cslSettings->m_colServerHigh);
+#endif
 
     while (pos<=hlen)
     {
@@ -376,7 +403,7 @@ wxString CslDlgOutput::Filter(wxUint32 start,wxUint32 end)
     return s;
 }
 
-void CslDlgOutput::HandleOutput(char *text,wxUint32 size,bool freemem)
+void CslDlgOutput::HandleOutput(char *text,wxUint32 size)
 {
     wxInt32 start=0,end=0;
 
@@ -384,10 +411,8 @@ void CslDlgOutput::HandleOutput(char *text,wxUint32 size,bool freemem)
     {
         start=m_text.Len();
         end=start+size;
-        m_text.Alloc(start+size);
+        m_text.Alloc(start+size+sizeof(wxChar));
         m_text+=A2U(text);
-        if (freemem)
-            free(text);
         text_ctrl_output->AppendText(checkbox_conv_filter->GetValue() ?
                                      Filter(start,end) : m_text.Mid(start,size));
     }
@@ -416,7 +441,7 @@ void CslDlgOutput::Reset(const wxString& title)
     if (!m_self)
         return;
 
-    m_self->m_text.Clear();
     m_self->text_ctrl_output->Clear();
+    m_self->m_text.Clear();
     m_self->SetTitle(wxString::Format(wxT("%s: "),_("CSL - Game output"))+title);
 }

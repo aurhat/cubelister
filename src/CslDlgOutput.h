@@ -42,9 +42,9 @@ class CslDlgOutput: public wxDialog
 
         CslDlgOutput(wxWindow* parent,int id=wxID_ANY,const wxString& title=wxEmptyString,
                      const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize,
-                     long style=wxDEFAULT_DIALOG_STYLE);
+                     long style=wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
 
-        void HandleOutput(char *text,wxUint32 size,bool freemem=false);
+        void HandleOutput(char *text,wxUint32 size);
 
         static void AddOutput(char *text,wxUint32 size);
         static void Reset(const wxString& title);
@@ -77,12 +77,14 @@ class CslDlgOutput: public wxDialog
 
         static CslDlgOutput* m_self;
 
+        wxTextAttr m_textDefaultStyle;
         wxString m_text;
         wxUint32 m_filterLevel;
 
         void SetSearchbarColour(wxInt32 count);
         wxInt32 Search(const wxString& needle);
         wxString Filter(wxUint32 start,wxUint32 end);
+        void ClearTextCtrl();
 
 
 }; // wxGlade: end class

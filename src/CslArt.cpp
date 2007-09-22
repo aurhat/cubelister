@@ -4,12 +4,12 @@
 #ifndef _MSC_VER
 #include "img/connect_16.xpm"
 #include "img/about_16.xpm"
-#ifdef __WXMSW__
+#if defined(__WXMSW__) || defined(__WXMAC__)
 #include "img/add_16.xpm"
 #include "img/delete_16.xpm"
 #include "img/reload_16.xpm"
 #include "img/settings_16.xpm"
-#endif // __WXMSW__
+#endif // __WXMSW__ || __WXMAC__
 #endif // _MSC_VER
 
 wxBitmap CslArt::CreateBitmap(const wxArtID& id,const wxArtClient& client,const wxSize& size)
@@ -31,7 +31,7 @@ wxBitmap CslArt::CreateBitmap(const wxArtID& id,const wxArtClient& client,const 
                 return wxBitmap(about_16_xpm);
 #endif
 
-#ifdef __WXMSW__
+#if defined(__WXMSW__) || defined(__WXMAC__)
             else if (id==wxART_ADD_BOOKMARK)
 #ifdef _MSC_VER
                 return wxBitmap(wxIcon(wxT("ICON_MENU_ADD"),wxBITMAP_TYPE_ICO_RESOURCE,16,16));
@@ -58,7 +58,7 @@ wxBitmap CslArt::CreateBitmap(const wxArtID& id,const wxArtClient& client,const 
 #else
                 return wxBitmap(settings_16_xpm);
 #endif
-#endif //__WXMSW__
+#endif //__WXMSW__ || __WXMAC__
         }
     }
     return wxNullBitmap;

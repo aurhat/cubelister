@@ -55,7 +55,6 @@ enum
 #define CSL_ERROR_STR              _("Error!")
 #define CSL_DELETE_YESNOCANCEL_STR _("\nChoose Yes to keep these servers, " \
                                      "No to delete them or\nCancel the operation.")
-#define CSL_CONNECT_CFG_STR        wxT("csl-connect.cfg")
 #define MENU_SERVER_EXTENDED_STR   _("Extended information")
 
 
@@ -220,7 +219,10 @@ CslListCtrlServer::CslListCtrlServer(wxWindow* parent,wxWindowID id,const wxPoin
 
 CslListCtrlServer::~CslListCtrlServer()
 {
+// avoids an assertion
+#ifndef __WXMAC__
     ListClear();
+#endif
 }
 
 void CslListCtrlServer::OnSize(wxSizeEvent& event)

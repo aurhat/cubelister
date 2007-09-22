@@ -41,7 +41,7 @@ enum
 CslDlgAddMaster::CslDlgAddMaster(wxWindow* parent,CslMaster *master,int id,
                                  const wxString& title,const wxPoint& pos,
                                  const wxSize& size,long style):
-        wxDialog(parent, id, title, pos, size, wxDEFAULT_DIALOG_STYLE),
+        wxDialog(parent, id, title, pos, size, style),
         m_master(master)
 {
     // begin wxGlade: CslDlgAddMaster::CslDlgAddMaster
@@ -71,6 +71,7 @@ void CslDlgAddMaster::set_properties()
     text_ctrl_address->SetMinSize(wxSize(250,-1));
     text_ctrl_address->SetFocus();
     button_add->Enable(false);
+    button_add->SetDefault();
     // end wxGlade
 
     choice_type->Clear();
@@ -117,6 +118,8 @@ void CslDlgAddMaster::do_layout()
     grid_sizer_main->Fit(this);
     Layout();
     // end wxGlade
+
+    CentreOnParent();
 }
 
 void CslDlgAddMaster::OnText(wxCommandEvent& WXUNUSED(event))
@@ -175,6 +178,12 @@ void CslDlgAddMaster::OnCommandEvent(wxCommandEvent& event)
         case TEXT_CTRL_PATH:
         case wxID_OK:
         {
+            // check again fore empty host - since setting a default button on wxMAC
+            // and hitting enter reaches this position, also if the the button was disabled
+            if (text_ctrl_address->GetValue().IsEmpty() ||
+                text_ctrl_path->GetValue().IsEmpty())
+                return;
+
             CSL_GAMETYPE type=(CSL_GAMETYPE)(long)choice_type->GetClientData(choice_type->GetSelection());
             wxString addr=text_ctrl_address->GetValue();
             wxString path=text_ctrl_path->GetValue();

@@ -49,7 +49,7 @@ class CslDlgSettings: public wxDialog
         // end wxGlade
         CslDlgSettings(wxWindow* parent,int id=wxID_ANY,
                        const wxString& title=wxEmptyString,const wxPoint& pos=wxDefaultPosition,
-                       const wxSize& size=wxDefaultSize,long style=wxDEFAULT_DIALOG_STYLE);
+                       const wxSize& size=wxDefaultSize,long style=wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
 
         ~CslDlgSettings();
 
@@ -99,7 +99,9 @@ class CslDlgSettings: public wxDialog
         wxButton* button_cancel;
         // end wxGlade
 
+#ifndef __WXMAC__
         wxFilePickerCtrl *fpickSauer,*fpickAssault,*fpickCube;
+#endif
         wxDirPickerCtrl *dpickSauer,*dpickAssault,*dpickCube;
 
         void SetButtonColour(wxBitmapButton *button,wxButton *refButton,wxColour& colour);

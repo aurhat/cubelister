@@ -28,7 +28,7 @@ END_EVENT_TABLE()
 
 CslDlgConnectWait::CslDlgConnectWait(wxWindow* parent,wxInt32 *time,int id,const wxString& title,
                                      const wxPoint& pos,const wxSize& size,long style):
-        wxDialog(parent,id,title,pos,size,wxDEFAULT_DIALOG_STYLE),m_time(time)
+        wxDialog(parent,id,title,pos,size,style),m_time(time)
 {
     // begin wxGlade: CslDlgConnectWait::CslDlgConnectWait
     spin_ctrl_time = new wxSpinCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 0, 100);
@@ -47,6 +47,7 @@ void CslDlgConnectWait::set_properties()
     // begin wxGlade: CslDlgConnectWait::set_properties
     SetTitle(_("CSL - Server full"));
     button_ok->SetFocus();
+    button_ok->SetDefault();
     // end wxGlade
 
     spin_ctrl_time->SetRange(CSL_WAIT_SERVER_FULL_MIN,CSL_WAIT_SERVER_FULL_MAX);
@@ -78,6 +79,8 @@ void CslDlgConnectWait::do_layout()
     grid_sizer_main->Fit(this);
     Layout();
     // end wxGlade
+
+    CentreOnParent();
 }
 
 void CslDlgConnectWait::OnButton(wxCommandEvent& event)

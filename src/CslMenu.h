@@ -118,7 +118,8 @@ class CslMenu
                                   const wxString help=wxEmptyString)
         {
             wxMenuItem *item=new wxMenuItem(menu,id,text,help,kind);
-            if (id>wxID_HIGHEST || (wxPlatformInfo().GetOperatingSystemId()&wxOS_WINDOWS))
+            wxOperatingSystemId os=wxPlatformInfo().GetOperatingSystemId();
+            if (id>wxID_HIGHEST || (os&wxOS_WINDOWS) || (os&wxOS_MAC))
                 item->SetBitmap(GET_ART_MENU(art));
             menu->Append(item);
         }

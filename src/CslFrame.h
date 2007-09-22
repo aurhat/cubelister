@@ -92,7 +92,9 @@ class CslFrame: public wxFrame
         void OnMouseEnter(wxMouseEvent& event);
         void OnMouseLeave(wxMouseEvent& event);
         void OnMouseLeftDown(wxMouseEvent& event);
-
+#ifdef __WXMAC__
+        void OnSplitter(wxSplitterEvent &event);
+#endif
         DECLARE_EVENT_TABLE()
 
     protected:

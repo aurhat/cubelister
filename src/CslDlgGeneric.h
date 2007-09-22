@@ -45,6 +45,7 @@ class CslDlgGeneric: public wxDialog
             SetSizer(grid_sizer_main);
             grid_sizer_main->Fit(this);
             Layout();
+            CentreOnParent();
         }
 };
 

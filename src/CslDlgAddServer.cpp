@@ -28,7 +28,7 @@ END_EVENT_TABLE()
 
 CslDlgAddServer::CslDlgAddServer(wxWindow* parent,CslServerInfo *info,int id,const wxString& title,
                                  const wxPoint& pos,const wxSize& size,long style):
-        wxDialog(parent, id, title, pos, size, wxDEFAULT_DIALOG_STYLE), m_info(info)
+        wxDialog(parent, id, title, pos, size, style), m_info(info)
 {
     // begin wxGlade: CslDlgAddServer::CslDlgAddServer
     sizer_address_staticbox = new wxStaticBox(this, -1, wxEmptyString);
@@ -55,6 +55,7 @@ void CslDlgAddServer::set_properties()
     text_ctrl_address->SetMinSize(wxSize(250,-1));
     text_ctrl_address->SetFocus();
     button_add->Enable(false);
+    button_add->SetDefault();
     // end wxGlade
 
     choice_type->Clear();
@@ -90,6 +91,8 @@ void CslDlgAddServer::do_layout()
     grid_sizer_main->Fit(this);
     Layout();
     // end wxGlade
+
+    CentreOnParent();
 }
 
 void CslDlgAddServer::OnText(wxCommandEvent& WXUNUSED(event))
@@ -101,6 +104,12 @@ void CslDlgAddServer::OnText(wxCommandEvent& WXUNUSED(event))
 void CslDlgAddServer::OnButton(wxCommandEvent& event)
 {
     wxString host=text_ctrl_address->GetValue();
+
+    // check again fore empty host - since setting a default button on wxMAC
+    // and hitting enter reaches this position, also if the the button was disabled
+    if (host.IsEmpty())
+        return;
+
     CSL_GAMETYPE type=(CSL_GAMETYPE)(long)choice_type->GetClientData(choice_type->GetSelection());
 
     m_info->CreateFavourite(host,type);

@@ -42,7 +42,7 @@ enum { BUTTON_REFRESH = wxID_HIGHEST +1 };
 
 CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
                                const wxPoint& pos, const wxSize& size, long style):
-        wxDialog(parent, id, title, pos, size, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER),
+        wxDialog(parent, id, title, pos, size, style),
         m_engine(NULL),m_info(NULL)
 {
     // begin wxGlade: CslDlgExtended::CslDlgExtended
@@ -72,6 +72,7 @@ void CslDlgExtended::set_properties()
     // begin wxGlade: CslDlgExtended::set_properties
     SetTitle(_("CSL - Extended info"));
     list_ctrl_extended->SetMinSize(wxSize(450,300));
+    button_close->SetDefault();
     // end wxGlade
 }
 
@@ -96,6 +97,7 @@ void CslDlgExtended::do_layout()
     Layout();
     // end wxGlade
 
+    CentreOnParent();
     grid_sizer_main->SetSizeHints(this);
 }
 
@@ -207,6 +209,9 @@ void CslDlgExtended::QueryInfo()
 
 void CslDlgExtended::ListAdjustSize(wxSize size)
 {
+    if (list_ctrl_extended->GetColumnCount()<6)
+        return;
+
     wxInt32 w=size.x-25;
 
     list_ctrl_extended->SetColumnWidth(0,(wxInt32)(w*0.15f));
@@ -300,7 +305,8 @@ void CslDlgExtended::ListInit(CslEngine *engine)
     item.SetText(_("Teamkills"));
     list_ctrl_extended->InsertColumn(5,item);
 
-    ListAdjustSize(GetClientSize());
+    // assertion on __WXMAC__
+    //ListAdjustSize(GetClientSize());
 
     m_sortHelper.Init(CSL_SORT_ASC,SORT_RANK);
     ToggleSortArrow();

@@ -68,7 +68,7 @@ CslSettings *g_cslSettings;
 
 CslDlgSettings::CslDlgSettings(wxWindow* parent,int id,const wxString& title,
                                const wxPoint& pos,const wxSize& size,long style):
-        wxDialog(parent, id, title, pos, size, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER)
+        wxDialog(parent, id, title, pos, size, style)
 {
     m_settings=*g_cslSettings;
 
@@ -125,10 +125,14 @@ CslDlgSettings::CslDlgSettings(wxWindow* parent,int id,const wxString& title,
 
 CslDlgSettings::~CslDlgSettings()
 {
+#ifndef __WXMAC__
     delete fpickSauer;
     delete fpickAssault;
+    delete fpickCube
+#endif
     delete dpickSauer;
     delete dpickAssault;
+    delete dpickCube;
 }
 
 void CslDlgSettings::set_properties()
@@ -144,6 +148,7 @@ void CslDlgSettings::set_properties()
     spin_ctrl_update->SetMinSize(wxDLG_UNIT(spin_ctrl_update, wxSize(48, -1)));
     spin_ctrl_wait->SetMinSize(wxDLG_UNIT(spin_ctrl_wait, wxSize(48, -1)));
     spin_ctrl_min_playtime->SetMinSize(wxDLG_UNIT(spin_ctrl_min_playtime, wxSize(48, -1)));
+    button_ok->SetDefault();
     // end wxGlade
 
     text_ctrl_sauer_options->SetValue(m_settings.m_clientOptsSB);
@@ -180,6 +185,8 @@ void CslDlgSettings::do_layout()
 #endif
 
     wxSize sizePicker(-1,-1);
+
+#ifndef __WXMAC__
     fpickSauer=new wxFilePickerCtrl(notebook_pane_sauer,FILE_PICKER_SB,wxEmptyString,
                                     _("Select Sauerbraten executable"),ext,
                                     wxDefaultPosition,sizePicker,
@@ -192,6 +199,7 @@ void CslDlgSettings::do_layout()
                                    _("Select Cube executable"),ext,
                                    wxDefaultPosition,sizePicker,
                                    wxFLP_DEFAULT_STYLE|wxFLP_USE_TEXTCTRL|wxFLP_FILE_MUST_EXIST);
+#endif
     dpickSauer=new wxDirPickerCtrl(notebook_pane_sauer,DIR_PICKER_SB,m_settings.m_configPathSB,
                                    _("Select Sauerbraten game path"),
                                    wxDefaultPosition,sizePicker,
@@ -205,12 +213,14 @@ void CslDlgSettings::do_layout()
                                   wxDefaultPosition,sizePicker,
                                   wxDIRP_DEFAULT_STYLE|wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST);
 
+#ifndef __WXMAC__
     if (!m_settings.m_clientBinSB.IsEmpty())
         fpickSauer->SetPath(m_settings.m_clientBinSB);
     if (!m_settings.m_clientBinAC.IsEmpty())
         fpickAssault->SetPath(m_settings.m_clientBinAC);
     if (!m_settings.m_clientBinCB.IsEmpty())
         fpickCube->SetPath(m_settings.m_clientBinCB);
+#endif
     if (!m_settings.m_configPathSB.IsEmpty())
         dpickSauer->SetPath(m_settings.m_configPathSB);
     if (!m_settings.m_configPathAC.IsEmpty())
@@ -335,12 +345,25 @@ void CslDlgSettings::do_layout()
     Layout();
     // end wxGlade
 
+    CentreOnParent();
+
+    wxInt32 dppos=3;
+#ifdef __WXMAC__
+    dppos=1;
+    label_sauer_exe->Hide();
+    label_assault_exe->Hide();
+    label_cube_exe->Hide();
+    grid_sizer_sauer_path->Detach(label_sauer_exe);
+    grid_sizer_assault_path->Detach(label_assault_exe);
+    grid_sizer_cube_path->Detach(label_cube_exe);
+#else
     grid_sizer_sauer_path->Insert(1,fpickSauer,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,4);
-    grid_sizer_sauer_path->Insert(3,dpickSauer,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,4);
     grid_sizer_assault_path->Insert(1,fpickAssault,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,4);
-    grid_sizer_assault_path->Insert(3,dpickAssault,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,4);
     grid_sizer_cube_path->Insert(1,fpickCube,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,4);
-    grid_sizer_cube_path->Insert(3,dpickCube,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,4);
+#endif
+    grid_sizer_sauer_path->Insert(dppos,dpickSauer,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,4);
+    grid_sizer_assault_path->Insert(dppos,dpickAssault,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,4);
+    grid_sizer_cube_path->Insert(dppos,dpickCube,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,4);
 
     Layout();
     grid_sizer_main->Fit(this);
@@ -360,6 +383,7 @@ void CslDlgSettings::OnPicker(wxFileDirPickerEvent& event)
 
     switch (event.GetId())
     {
+#ifndef __WXMAC__
         case FILE_PICKER_SB:
             m_settings.m_clientBinSB=path;
             if (dpickSauer->GetPath().IsEmpty())
@@ -388,14 +412,27 @@ void CslDlgSettings::OnPicker(wxFileDirPickerEvent& event)
                 m_settings.m_configPathCB=gpath;
             }
             break;
+#endif
         case DIR_PICKER_SB:
             m_settings.m_configPathSB=path;
+#ifdef __WXMAC__
+            m_settings.m_configPathSB+=wxT("/sauerbraten");
+            m_settings.m_clientBinSB=path+wxT("/sauerbraten/sauerbraten.app/Contents/MacOS/sauerbraten");
+#endif
             break;
         case DIR_PICKER_AC:
             m_settings.m_configPathAC=path;
+#ifdef __WXMAC__
+            m_settings.m_configPathAC+=wxT("/assaultcube");
+            m_settings.m_clientBinAC=path+wxT("/assaultcube/actioncube.app/Contents/MacOS/actioncube");
+#endif
             break;
         case DIR_PICKER_CB:
             m_settings.m_configPathCB=path;
+#ifdef __WXMAC__
+            m_settings.m_configPathCB+=wxT("/cube");
+            m_settings.m_clientBinCB=path+wxT("/cube/cube.app/Contents/MacOS/Cube");
+#endif
             break;
     }
 }

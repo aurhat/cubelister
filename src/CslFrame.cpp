@@ -22,6 +22,7 @@
 #include <wx/stdpaths.h>
 #include <wx/aboutdlg.h>
 #include <wx/artprov.h>
+#include <wx/sysopt.h>
 #include "CslFrame.h"
 #include "CslDlgAddMaster.h"
 #include "CslDlgGeneric.h"
@@ -44,26 +45,10 @@
 
 #define CSL_TIMER_SHOT 500
 
-BEGIN_EVENT_TABLE(CslFrame, wxFrame)
-    CSL_EVT_PING_STATS(wxID_ANY,CslFrame::OnPingStats)
-    EVT_TIMER(wxID_ANY,CslFrame::OnTimer)
-    EVT_TREE_SEL_CHANGED(wxID_ANY,CslFrame::OnTreeLeftClick)
-    EVT_TREE_ITEM_RIGHT_CLICK(wxID_ANY,CslFrame::OnTreeRightClick)
-    EVT_MENU(wxID_ANY,CslFrame::OnCommandEvent)
-    EVT_TEXT(wxID_ANY,CslFrame::OnCommandEvent)
-    EVT_CHECKBOX(wxID_ANY,CslFrame::OnCommandEvent)
-    EVT_BUTTON(wxID_ANY,CslFrame::OnCommandEvent)
-    EVT_CHAR(CslFrame::OnKeyDown)
-    EVT_SHOW(CslFrame::OnShow)
-    EVT_CLOSE(CslFrame::OnClose)
-END_EVENT_TABLE()
-
 enum
 {
-    CSL_BUTTON_SEARCH_CLEAR = MENU_END + 1,
+    CSL_BUTTON_SEARCH_CLOSE = MENU_END + 1,
     CSL_TEXT_SEARCH,
-
-    CSL_CHECK_PING_SERVERS,
 
     CSL_CHECK_FILTER_FULL,
     CSL_CHECK_FILTER_EMPTY,
@@ -72,7 +57,9 @@ enum
     CSL_CHECK_FILTER_MM2,
     CSL_CHECK_FILTER_MM3,
     CSL_CHECK_FILTER_FAVOURITES,
-    CSL_BUTTON_FILTER_RESET
+    CSL_BUTTON_FILTER_RESET,
+
+    CSL_SPLITTER_LISTS
 };
 
 enum
@@ -83,6 +70,22 @@ enum
     IMG_LIST_TREE_CB
 };
 
+
+BEGIN_EVENT_TABLE(CslFrame, wxFrame)
+    CSL_EVT_PING_STATS(wxID_ANY,CslFrame::OnPingStats)
+    EVT_TIMER(wxID_ANY,CslFrame::OnTimer)
+    EVT_TREE_SEL_CHANGED(wxID_ANY,CslFrame::OnTreeLeftClick)
+    EVT_TREE_ITEM_RIGHT_CLICK(wxID_ANY,CslFrame::OnTreeRightClick)
+    EVT_MENU(wxID_ANY,CslFrame::OnCommandEvent)
+    EVT_TEXT(wxID_ANY,CslFrame::OnCommandEvent)
+    EVT_CHECKBOX(wxID_ANY,CslFrame::OnCommandEvent)
+    // dont use wxID_ANY for EVT_BUTTON, because on wxMAC wxID_CANCEL is sent by pressing ESC
+    EVT_BUTTON(CSL_BUTTON_SEARCH_CLOSE,CslFrame::OnCommandEvent)
+    EVT_BUTTON(CSL_BUTTON_FILTER_RESET,CslFrame::OnCommandEvent)
+    EVT_CHAR(CslFrame::OnKeyDown)
+    EVT_SHOW(CslFrame::OnShow)
+    EVT_CLOSE(CslFrame::OnClose)
+END_EVENT_TABLE()
 
 CslMenu *g_cslMenu;
 
@@ -167,7 +170,7 @@ CslFrame::CslFrame(wxWindow* parent, int id, const wxString& title,const wxPoint
     panel_main = new wxPanel(panel_frame, wxID_ANY);
     splitter_main = new wxSplitterWindow(panel_main, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D|wxSP_BORDER);
     pane_main_right = new wxPanel(splitter_main, wxID_ANY);
-    splitter_lists = new wxSplitterWindow(pane_main_right, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3DSASH);
+    splitter_lists = new wxSplitterWindow(pane_main_right, CSL_SPLITTER_LISTS, wxDefaultPosition, wxDefaultSize, wxSP_3DSASH);
     pane_favourites = new wxPanel(splitter_lists, wxID_ANY);
     pane_master = new wxPanel(splitter_lists, wxID_ANY);
     panel_search = new wxPanel(pane_master, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL);
@@ -193,6 +196,14 @@ CslFrame::CslFrame(wxWindow* parent, int id, const wxString& title,const wxPoint
     set_properties();
     do_layout();
     // end wxGlade
+
+#ifdef __WXMSW__  // key events from childs doesn't send to its parent
+    list_ctrl_master->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeyDown),NULL,this);
+    list_ctrl_favourites->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeyDown),NULL,this);
+    list_ctrl_info->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeyDown),NULL,this);
+    tree_ctrl_games->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeyDown),NULL,this);
+    text_ctrl_search->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeyDown),NULL,this);
+#endif
 
     tree_ctrl_games->SetImageList(&m_imgListTree);
     m_treeGamesRoot=tree_ctrl_games->AddRoot(wxEmptyString,-1,-1);
@@ -299,15 +310,7 @@ void CslFrame::set_properties()
 
     UpdateFilterCheckBoxes();
 
-#ifdef __WXMSW__  // key events from childs doesn't send to its parent
-    list_ctrl_master->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeyDown),NULL,this);
-    list_ctrl_favourites->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeyDown),NULL,this);
-    list_ctrl_info->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeyDown),NULL,this);
-    tree_ctrl_games->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeyDown),NULL,this);
-    text_ctrl_search->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeyDown),NULL,this);
-#endif
-
-    bitmap_button_search_clear=new wxBitmapButton(panel_search,CSL_BUTTON_SEARCH_CLEAR,
+    bitmap_button_search_clear=new wxBitmapButton(panel_search,CSL_BUTTON_SEARCH_CLOSE,
             wxNullBitmap,wxDefaultPosition,wxDefaultSize,wxNO_BORDER);
     bitmap_button_search_clear->SetBitmapLabel(m_imgListButton.GetBitmap(0));
     bitmap_button_search_clear->SetSize(bitmap_button_search_clear->GetBestSize());
@@ -318,6 +321,10 @@ void CslFrame::set_properties()
                                         wxMouseEventHandler(CslFrame::OnMouseLeave),NULL,this);
     bitmap_button_search_clear->Connect(wxEVT_LEFT_DOWN,
                                         wxMouseEventHandler(CslFrame::OnMouseLeftDown),NULL,this);
+
+    // wxMAC: have to set minsize of the listctrl to prevent
+    //        hiding of the search panel while dragging
+    list_ctrl_master->SetMinSize(wxSize(0,0));
 
     SetMinSize(wxSize(640,480));
 
@@ -408,6 +415,12 @@ void CslFrame::do_layout()
     Layout();
     // end wxGlade
 
+#ifdef __WXMAC__
+    wxSizerItem *sitem=grid_sizer_main_left->GetItem(sizer_filter);
+    sitem->SetFlag(wxLEFT|wxTOP|wxBOTTOM|wxEXPAND);
+    sitem->SetBorder(4);
+#endif
+
     wxInt32 bboffset=0;
 #ifdef __WXMSW__
     bboffset=2;
@@ -421,24 +434,27 @@ void CslFrame::do_layout()
     m_sizerSearch=grid_sizer_search;
     m_sizerFilter=sizer_filter;
 
+    SetSize(g_cslSettings->m_frameSize);
+    CentreOnScreen();
+
+    ToggleSearchBar();
+    ToggleFilter();
+    ToggleSplitterUpdate();
+
+    splitter_games_info->SetSashGravity(1.0f);
+    splitter_lists->SetSashGravity(0.8f);
+
     splitter_main->SetMinimumPaneSize(sizer_filter->GetMinSize().GetWidth()+4);
     splitter_games_info->SetMinimumPaneSize(20);
     splitter_lists->SetMinimumPaneSize(100);
     splitter_main->SetSashPosition(g_cslSettings->m_splitterMainPos);
     splitter_games_info->SetSashPosition(g_cslSettings->m_splitterGamePos);
     splitter_lists->SetSashPosition(g_cslSettings->m_splitterListPos);
-
-    ToggleSearchBar();
-    ToggleFilter();
-    ToggleSplitterUpdate();
-
-    SetSize(g_cslSettings->m_frameSize);
 }
 
 void CslFrame::CreateMainMenu()
 {
     m_menubar=new wxMenuBar();
-    SetMenuBar(m_menubar);
     wxMenu* menu_1=new wxMenu();
     CslMenu::AddItemToMenu(menu_1,wxID_PREFERENCES,_("&Settings"),wxART_SETTINGS);
     CslMenu::AddItemToMenu(menu_1,wxID_EXIT,_("&Exit"),wxART_QUIT);
@@ -466,7 +482,13 @@ void CslFrame::CreateMainMenu()
     m_menubar->Append(menu_3,_("&View"));
     wxMenu* menu_4=new wxMenu();
     CslMenu::AddItemToMenu(menu_4,wxID_ABOUT,_("A&bout"),wxART_ABOUT);
+#ifdef __WXMAC__
+    m_menubar->Append(menu_4,wxEmptyString);
+#else
     m_menubar->Append(menu_4,_("&Help"));
+#endif
+
+    SetMenuBar(m_menubar);
 
     m_menuMaster=menu_2;
     g_cslMenu=new CslMenu(m_menubar);
@@ -724,7 +746,7 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             break;
         }
 
-        case CSL_BUTTON_SEARCH_CLEAR:
+        case CSL_BUTTON_SEARCH_CLOSE:
             g_cslSettings->m_showSearch=false;
             g_cslMenu->CheckMenuItem(MENU_VIEW_SEARCH,false);
             ToggleSearchBar();
@@ -733,17 +755,28 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
         case CSL_TEXT_SEARCH:
         {
             wxString s=event.GetString();
+
             if (list_ctrl_master->ListSearch(s)||s.IsEmpty())
             {
+#ifdef __WXMAC__
+                // very ugly - setting back to black doesnt work, so add 1
+                text_ctrl_search->SetForegroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOWTEXT).Red()+1);
+#else
                 text_ctrl_search->SetBackgroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOW));
                 text_ctrl_search->SetForegroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOWTEXT));
+#endif
             }
             else
             {
+#ifdef __WXMAC__
+                text_ctrl_search->SetForegroundColour(*wxRED);
+#else
                 text_ctrl_search->SetBackgroundColour(wxColour(255,100,100));
                 text_ctrl_search->SetForegroundColour(*wxWHITE);
+#endif
             }
-#ifdef __WXMSW__ // very ugly
+
+#ifdef __WXMSW__
             text_ctrl_search->Refresh();
 #endif
             break;
@@ -817,15 +850,22 @@ void CslFrame::OnKeyDown(wxKeyEvent& event)
 {
     event.Skip();
 
+    static wxUint32 lastTicks=0;
+    wxUint32 ticks=GetTicks();
+
+    if (ticks-lastTicks<500)
+        return;
+    lastTicks=ticks;
+
     if (event.GetKeyCode()==WXK_ESCAPE)
     {
         if (CslConnectionState::IsWaiting())
             CslConnectionState::Reset();
-        else if (g_cslSettings->m_showSearch)
+        else if (g_cslSettings->m_showSearch && FindFocus()==text_ctrl_search)
         {
-            g_cslSettings->m_showSearch=false;
-            g_cslMenu->CheckMenuItem(MENU_VIEW_SEARCH,false);
-            ToggleSearchBar();
+            text_ctrl_search->Clear();
+            wxCommandEvent evt(wxEVT_COMMAND_TEXT_UPDATED,CSL_TEXT_SEARCH);
+            wxPostEvent(this,evt);
             return;
         }
     }
@@ -833,8 +873,8 @@ void CslFrame::OnKeyDown(wxKeyEvent& event)
 
 void CslFrame::OnShow(wxShowEvent& event)
 {
-    splitter_games_info->SetSashGravity(1.0f);
-    splitter_lists->SetSashGravity(0.8f);
+//    splitter_games_info->SetSashGravity(1.0f);
+//    splitter_lists->SetSashGravity(0.8f);
     list_ctrl_master->ListAdjustSize(list_ctrl_master->GetClientSize(),true);
     list_ctrl_favourites->ListAdjustSize(list_ctrl_favourites->GetClientSize(),true);
 }
@@ -861,15 +901,18 @@ void CslFrame::OnMouseEnter(wxMouseEvent& event)
 {
     event.Skip();
 
-    switch (event.GetId())
+    bitmap_button_search_clear->SetBitmapLabel(m_imgListButton.GetBitmap(1));
+    bitmap_button_search_clear->Refresh();
+    // no event id on wxMAC
+    /*switch (event.GetId())
     {
-        case CSL_BUTTON_SEARCH_CLEAR:
+        case CSL_BUTTON_SEARCH_CLOSE:
             bitmap_button_search_clear->SetBitmapLabel(m_imgListButton.GetBitmap(1));
             break;
 
         default:
             break;
-    }
+    }*/
 }
 
 void CslFrame::OnMouseLeave(wxMouseEvent& event)
@@ -877,7 +920,9 @@ void CslFrame::OnMouseLeave(wxMouseEvent& event)
     event.Skip();
 
     bitmap_button_search_clear->SetBitmapLabel(m_imgListButton.GetBitmap(0));
-    /*switch (event.GetId()) // no event id on wxGTK?!
+    bitmap_button_search_clear->Refresh();
+    // no event id on wxGTK
+    /*switch (event.GetId())
     {
         case CSL_BUTTON_SEARCH_CLEAR:
             bitmap_button_search_clear->SetBitmapLabel(close_14_xpm);
@@ -894,8 +939,9 @@ void CslFrame::OnMouseLeftDown(wxMouseEvent& event)
 
     switch (event.GetId())
     {
-        case CSL_BUTTON_SEARCH_CLEAR:
+        case CSL_BUTTON_SEARCH_CLOSE:
             bitmap_button_search_clear->SetBitmapLabel(m_imgListButton.GetBitmap(2));
+            bitmap_button_search_clear->Refresh();
             break;
 
         default:
@@ -908,8 +954,6 @@ void CslFrame::ToggleSearchBar()
     if (g_cslSettings->m_showSearch && !panel_search->IsShown())
     {
         m_sizerMaster->Insert(1,panel_search,1,wxEXPAND|wxALL,4);
-        //m_sizerMaster->RemoveGrowableRow(0);
-        //m_sizerMaster->AddGrowableRow(1);
         panel_search->Show();
         text_ctrl_search->SetFocus();
     }
@@ -920,8 +964,6 @@ void CslFrame::ToggleSearchBar()
         text_ctrl_search->SetBackgroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOW));
         list_ctrl_master->ListSearch(wxEmptyString);
         m_sizerMaster->Detach(panel_search);
-        //m_sizerMaster->RemoveGrowableRow(1);
-        //m_sizerMaster->AddGrowableRow(0);
     }
     else
         return;
@@ -1541,11 +1583,15 @@ IMPLEMENT_APP(CslApp)
 bool CslApp::OnInit()
 {
     m_locale.Init(wxLANGUAGE_DEFAULT,wxLOCALE_CONV_ENCODING);
-    m_locale.AddCatalogLookupPathPrefix(wxT("lang"));
-#ifndef __WXMSW__
     m_locale.AddCatalogLookupPathPrefix(wxT(LOCALEDIR));
+#ifndef __WXMAC__
+    m_locale.AddCatalogLookupPathPrefix(::wxPathOnly(wxTheApp->argv[0]).BeforeLast(PATHDIVA)+wxT("/lang"));
 #endif
     m_locale.AddCatalog(CSL_NAME_SHORT_STR);
+
+#ifdef __WXMAC__
+    wxSystemOptions::SetOption(wxT("mac.listctrl.always_use_generic"),1);
+#endif
 
     wxString name=wxString::Format(wxT("%s-%s"),CSL_NAME_SHORT_STR,wxGetUserId().c_str());
     m_single=new wxSingleInstanceChecker(name);
@@ -1557,9 +1603,10 @@ bool CslApp::OnInit()
                                              wxArtProvider::GetBitmap(wxART_INFORMATION,wxART_CMN_DIALOG),
                                              wxDefaultPosition);
         dlg->Show();
-	dlg->Update();
-	Yield();
-	wxSleep(3);
+        dlg->Update();
+        SetTopWindow(dlg);
+        Yield();
+        wxSleep(3);
         dlg->Destroy();
 
         delete dlg;

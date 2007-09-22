@@ -57,31 +57,12 @@ void ShiftrFlags(int offset)
         {
             b=xpm[0][i];
             i++;
-            if (sc==4)
-            {
-                break;
-            }
-            if (b==' ')
-            {
-                sc++;
-                continue;
-            }
-            if (sc==0)
-            {
-                w=w*10+(b-'0');
-            }
-            if (sc==1)
-            {
-                h=h*10+(b-'0');
-            }
-            if (sc==2)
-            {
-                c=c*10+(b-'0');
-            }
-            if (sc==3)
-            {
-                a=a*10+(b-'0');
-            }
+            if (sc==4) { break; }
+            if (b==' ') { sc++; continue; }
+            if (sc==0) { w=w*10+(b-'0'); }
+            if (sc==1) { h=h*10+(b-'0'); }
+            if (sc==2) { c=c*10+(b-'0'); }
+            if (sc==3) { a=a*10+(b-'0'); }
         }
 
         for (i=1;i<=c;i++)
@@ -129,17 +110,12 @@ CslListCtrlInfo::CslListCtrlInfo(wxWindow* parent,wxWindowID id,const wxPoint& p
                                  const wxValidator& validator, const wxString& name)
         : wxListCtrl(parent,id,pos,size,style,validator,name)
 {
-#ifdef __WXMSW__
-    m_geoIP=GeoIP_open(".\\data\\GeoIP.dat",GEOIP_MEMORY_CACHE);
-#else
-    wxString path;
-
-    path=A2U(DATADIR)+PATHDIV+wxT("GeoIP.dat");
+    wxString path=GEOIPDATADIR+wxT("GeoIP.dat");
     m_geoIP=GeoIP_open(U2A(path),GEOIP_MEMORY_CACHE);
-
+#ifndef __WXMAC__
     if (!m_geoIP)
     {
-        path=wxTheApp->argv[0];
+        wxString path=wxTheApp->argv[0];
         path=path.BeforeLast(PATHDIVA)+PATHDIV+wxT("data")+PATHDIV+wxT("GeoIP.dat");
         m_geoIP=GeoIP_open(U2A(path),GEOIP_MEMORY_CACHE);
     }
