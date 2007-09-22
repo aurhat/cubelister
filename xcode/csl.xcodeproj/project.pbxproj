@@ -1,0 +1,546 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		9E015A240CA544C50029BEEF /* libwx_mac_static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E015A1F0CA544BA0029BEEF /* libwx_mac_static.a */; };
+		9E015AE10CA569950029BEEF /* csl_mac.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9E015AE00CA569950029BEEF /* csl_mac.icns */; };
+		9E3F16110CA1693800C3C8C9 /* GeoIP.c in Sources */ = {isa = PBXBuildFile; fileRef = 9E3F160F0CA1693800C3C8C9 /* GeoIP.c */; };
+		9ECC2F7C0CA1724E00578B5E /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9ECC2F7B0CA1724E00578B5E /* Carbon.framework */; };
+		9ECC2F7E0CA1726200578B5E /* System.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9ECC2F7D0CA1726200578B5E /* System.framework */; };
+		9ECC2F810CA172A500578B5E /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9ECC2F800CA172A500578B5E /* AppKit.framework */; };
+		9ECC2F840CA172BC00578B5E /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9ECC2F830CA172BC00578B5E /* IOKit.framework */; };
+		9ECC2F870CA172E500578B5E /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9ECC2F860CA172E500578B5E /* WebKit.framework */; };
+		9ECC32970CA1A9EC00578B5E /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9ECC32960CA1A9EC00578B5E /* AGL.framework */; };
+		9ECC32990CA1AA3400578B5E /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9ECC32980CA1AA3400578B5E /* OpenGL.framework */; };
+		9ECC329C0CA1AA6800578B5E /* csl_start_sb.ogz in Resources */ = {isa = PBXBuildFile; fileRef = 9ECC329A0CA1AA6800578B5E /* csl_start_sb.ogz */; };
+		9ECC329D0CA1AA6800578B5E /* GeoIP.dat in Resources */ = {isa = PBXBuildFile; fileRef = 9ECC329B0CA1AA6800578B5E /* GeoIP.dat */; };
+		9ED9D4760CA1622F00B0FC71 /* CslArt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED9D4520CA1622F00B0FC71 /* CslArt.cpp */; };
+		9ED9D4770CA1622F00B0FC71 /* CslDlgAddMaster.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED9D4540CA1622F00B0FC71 /* CslDlgAddMaster.cpp */; };
+		9ED9D4780CA1622F00B0FC71 /* CslDlgAddServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED9D4560CA1622F00B0FC71 /* CslDlgAddServer.cpp */; };
+		9ED9D4790CA1622F00B0FC71 /* CslDlgConnectWait.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED9D4580CA1622F00B0FC71 /* CslDlgConnectWait.cpp */; };
+		9ED9D47A0CA1622F00B0FC71 /* CslDlgExtended.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED9D45A0CA1622F00B0FC71 /* CslDlgExtended.cpp */; };
+		9ED9D47B0CA1622F00B0FC71 /* CslDlgOutput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED9D45D0CA1622F00B0FC71 /* CslDlgOutput.cpp */; };
+		9ED9D47C0CA1622F00B0FC71 /* CslDlgSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED9D45F0CA1622F00B0FC71 /* CslDlgSettings.cpp */; };
+		9ED9D47D0CA1622F00B0FC71 /* CslEngine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED9D4610CA1622F00B0FC71 /* CslEngine.cpp */; };
+		9ED9D47E0CA1622F00B0FC71 /* CslFrame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED9D4640CA1622F00B0FC71 /* CslFrame.cpp */; };
+		9ED9D47F0CA1622F00B0FC71 /* CslGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED9D4660CA1622F00B0FC71 /* CslGame.cpp */; };
+		9ED9D4800CA1622F00B0FC71 /* CslListCtrlInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED9D4680CA1622F00B0FC71 /* CslListCtrlInfo.cpp */; };
+		9ED9D4810CA1622F00B0FC71 /* CslListCtrlServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED9D46A0CA1622F00B0FC71 /* CslListCtrlServer.cpp */; };
+		9ED9D4820CA1622F00B0FC71 /* CslStatusBar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED9D46E0CA1622F00B0FC71 /* CslStatusBar.cpp */; };
+		9ED9D4830CA1622F00B0FC71 /* CslTools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED9D4700CA1622F00B0FC71 /* CslTools.cpp */; };
+		9ED9D4840CA1622F00B0FC71 /* CslUDP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED9D4720CA1622F00B0FC71 /* CslUDP.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		9E015A1E0CA544BA0029BEEF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9E015A150CA544BA0029BEEF /* wxWindows.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 4086C8CB063AB30000D4CD53;
+			remoteInfo = static;
+		};
+		9E015A200CA544BA0029BEEF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9E015A150CA544BA0029BEEF /* wxWindows.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 4086CBE1063AB30000D4CD53;
+			remoteInfo = dynamic;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		9E015A150CA544BA0029BEEF /* wxWindows.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = wxWindows.xcodeproj; path = "../../../Toolkits/wxMac-2.8.4/src/wxWindows.xcodeproj"; sourceTree = SOURCE_ROOT; };
+		9E015AE00CA569950029BEEF /* csl_mac.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = csl_mac.icns; path = ../src/img/csl_mac.icns; sourceTree = SOURCE_ROOT; };
+		9E3F160F0CA1693800C3C8C9 /* GeoIP.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = GeoIP.c; path = ../src/libGeoIP/GeoIP.c; sourceTree = SOURCE_ROOT; };
+		9E3F16100CA1693800C3C8C9 /* GeoIP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GeoIP.h; path = ../src/libGeoIP/GeoIP.h; sourceTree = SOURCE_ROOT; };
+		9ECC2F7B0CA1724E00578B5E /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
+		9ECC2F7D0CA1726200578B5E /* System.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = System.framework; path = /System/Library/Frameworks/System.framework; sourceTree = "<absolute>"; };
+		9ECC2F800CA172A500578B5E /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
+		9ECC2F830CA172BC00578B5E /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
+		9ECC2F860CA172E500578B5E /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
+		9ECC32960CA1A9EC00578B5E /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = /System/Library/Frameworks/AGL.framework; sourceTree = "<absolute>"; };
+		9ECC32980CA1AA3400578B5E /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
+		9ECC329A0CA1AA6800578B5E /* csl_start_sb.ogz */ = {isa = PBXFileReference; lastKnownFileType = file; name = csl_start_sb.ogz; path = ../data/csl_start_sb.ogz; sourceTree = SOURCE_ROOT; };
+		9ECC329B0CA1AA6800578B5E /* GeoIP.dat */ = {isa = PBXFileReference; lastKnownFileType = file; name = GeoIP.dat; path = ../data/GeoIP.dat; sourceTree = SOURCE_ROOT; };
+		9ED9D44A0CA161E000B0FC71 /* csl.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = csl.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9ED9D44D0CA161E000B0FC71 /* csl-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "csl-Info.plist"; sourceTree = "<group>"; };
+		9ED9D4520CA1622F00B0FC71 /* CslArt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslArt.cpp; path = ../src/CslArt.cpp; sourceTree = SOURCE_ROOT; };
+		9ED9D4530CA1622F00B0FC71 /* CslArt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslArt.h; path = ../src/CslArt.h; sourceTree = SOURCE_ROOT; };
+		9ED9D4540CA1622F00B0FC71 /* CslDlgAddMaster.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslDlgAddMaster.cpp; path = ../src/CslDlgAddMaster.cpp; sourceTree = SOURCE_ROOT; };
+		9ED9D4550CA1622F00B0FC71 /* CslDlgAddMaster.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslDlgAddMaster.h; path = ../src/CslDlgAddMaster.h; sourceTree = SOURCE_ROOT; };
+		9ED9D4560CA1622F00B0FC71 /* CslDlgAddServer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslDlgAddServer.cpp; path = ../src/CslDlgAddServer.cpp; sourceTree = SOURCE_ROOT; };
+		9ED9D4570CA1622F00B0FC71 /* CslDlgAddServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslDlgAddServer.h; path = ../src/CslDlgAddServer.h; sourceTree = SOURCE_ROOT; };
+		9ED9D4580CA1622F00B0FC71 /* CslDlgConnectWait.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslDlgConnectWait.cpp; path = ../src/CslDlgConnectWait.cpp; sourceTree = SOURCE_ROOT; };
+		9ED9D4590CA1622F00B0FC71 /* CslDlgConnectWait.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslDlgConnectWait.h; path = ../src/CslDlgConnectWait.h; sourceTree = SOURCE_ROOT; };
+		9ED9D45A0CA1622F00B0FC71 /* CslDlgExtended.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslDlgExtended.cpp; path = ../src/CslDlgExtended.cpp; sourceTree = SOURCE_ROOT; };
+		9ED9D45B0CA1622F00B0FC71 /* CslDlgExtended.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslDlgExtended.h; path = ../src/CslDlgExtended.h; sourceTree = SOURCE_ROOT; };
+		9ED9D45C0CA1622F00B0FC71 /* CslDlgGeneric.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslDlgGeneric.h; path = ../src/CslDlgGeneric.h; sourceTree = SOURCE_ROOT; };
+		9ED9D45D0CA1622F00B0FC71 /* CslDlgOutput.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslDlgOutput.cpp; path = ../src/CslDlgOutput.cpp; sourceTree = SOURCE_ROOT; };
+		9ED9D45E0CA1622F00B0FC71 /* CslDlgOutput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslDlgOutput.h; path = ../src/CslDlgOutput.h; sourceTree = SOURCE_ROOT; };
+		9ED9D45F0CA1622F00B0FC71 /* CslDlgSettings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslDlgSettings.cpp; path = ../src/CslDlgSettings.cpp; sourceTree = SOURCE_ROOT; };
+		9ED9D4600CA1622F00B0FC71 /* CslDlgSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslDlgSettings.h; path = ../src/CslDlgSettings.h; sourceTree = SOURCE_ROOT; };
+		9ED9D4610CA1622F00B0FC71 /* CslEngine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslEngine.cpp; path = ../src/CslEngine.cpp; sourceTree = SOURCE_ROOT; };
+		9ED9D4620CA1622F00B0FC71 /* CslEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslEngine.h; path = ../src/CslEngine.h; sourceTree = SOURCE_ROOT; };
+		9ED9D4630CA1622F00B0FC71 /* CslFlags.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslFlags.h; path = ../src/CslFlags.h; sourceTree = SOURCE_ROOT; };
+		9ED9D4640CA1622F00B0FC71 /* CslFrame.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslFrame.cpp; path = ../src/CslFrame.cpp; sourceTree = SOURCE_ROOT; };
+		9ED9D4650CA1622F00B0FC71 /* CslFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslFrame.h; path = ../src/CslFrame.h; sourceTree = SOURCE_ROOT; };
+		9ED9D4660CA1622F00B0FC71 /* CslGame.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslGame.cpp; path = ../src/CslGame.cpp; sourceTree = SOURCE_ROOT; };
+		9ED9D4670CA1622F00B0FC71 /* CslGame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslGame.h; path = ../src/CslGame.h; sourceTree = SOURCE_ROOT; };
+		9ED9D4680CA1622F00B0FC71 /* CslListCtrlInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslListCtrlInfo.cpp; path = ../src/CslListCtrlInfo.cpp; sourceTree = SOURCE_ROOT; };
+		9ED9D4690CA1622F00B0FC71 /* CslListCtrlInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslListCtrlInfo.h; path = ../src/CslListCtrlInfo.h; sourceTree = SOURCE_ROOT; };
+		9ED9D46A0CA1622F00B0FC71 /* CslListCtrlServer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslListCtrlServer.cpp; path = ../src/CslListCtrlServer.cpp; sourceTree = SOURCE_ROOT; };
+		9ED9D46B0CA1622F00B0FC71 /* CslListCtrlServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslListCtrlServer.h; path = ../src/CslListCtrlServer.h; sourceTree = SOURCE_ROOT; };
+		9ED9D46C0CA1622F00B0FC71 /* CslMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslMenu.h; path = ../src/CslMenu.h; sourceTree = SOURCE_ROOT; };
+		9ED9D46D0CA1622F00B0FC71 /* CslSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslSettings.h; path = ../src/CslSettings.h; sourceTree = SOURCE_ROOT; };
+		9ED9D46E0CA1622F00B0FC71 /* CslStatusBar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslStatusBar.cpp; path = ../src/CslStatusBar.cpp; sourceTree = SOURCE_ROOT; };
+		9ED9D46F0CA1622F00B0FC71 /* CslStatusBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslStatusBar.h; path = ../src/CslStatusBar.h; sourceTree = SOURCE_ROOT; };
+		9ED9D4700CA1622F00B0FC71 /* CslTools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslTools.cpp; path = ../src/CslTools.cpp; sourceTree = SOURCE_ROOT; };
+		9ED9D4710CA1622F00B0FC71 /* CslTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslTools.h; path = ../src/CslTools.h; sourceTree = SOURCE_ROOT; };
+		9ED9D4720CA1622F00B0FC71 /* CslUDP.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslUDP.cpp; path = ../src/CslUDP.cpp; sourceTree = SOURCE_ROOT; };
+		9ED9D4730CA1622F00B0FC71 /* CslUDP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslUDP.h; path = ../src/CslUDP.h; sourceTree = SOURCE_ROOT; };
+		9ED9D4740CA1622F00B0FC71 /* CslVersion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslVersion.h; path = ../src/CslVersion.h; sourceTree = SOURCE_ROOT; };
+		9ED9D4750CA1622F00B0FC71 /* cube_tools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cube_tools.h; path = ../src/cube_tools.h; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		9ED9D4480CA161E000B0FC71 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9E015A240CA544C50029BEEF /* libwx_mac_static.a in Frameworks */,
+				9ECC2F7C0CA1724E00578B5E /* Carbon.framework in Frameworks */,
+				9ECC2F7E0CA1726200578B5E /* System.framework in Frameworks */,
+				9ECC2F810CA172A500578B5E /* AppKit.framework in Frameworks */,
+				9ECC2F840CA172BC00578B5E /* IOKit.framework in Frameworks */,
+				9ECC2F870CA172E500578B5E /* WebKit.framework in Frameworks */,
+				9ECC32970CA1A9EC00578B5E /* AGL.framework in Frameworks */,
+				9ECC32990CA1AA3400578B5E /* OpenGL.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		9E015A160CA544BA0029BEEF /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9E015A1F0CA544BA0029BEEF /* libwx_mac_static.a */,
+				9E015A210CA544BA0029BEEF /* libwx_mac.dylib */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		9ECC30FD0CA1A8F500578B5E /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				9E3F160F0CA1693800C3C8C9 /* GeoIP.c */,
+				9E3F16100CA1693800C3C8C9 /* GeoIP.h */,
+				9ED9D4520CA1622F00B0FC71 /* CslArt.cpp */,
+				9ED9D4530CA1622F00B0FC71 /* CslArt.h */,
+				9ED9D4540CA1622F00B0FC71 /* CslDlgAddMaster.cpp */,
+				9ED9D4550CA1622F00B0FC71 /* CslDlgAddMaster.h */,
+				9ED9D4560CA1622F00B0FC71 /* CslDlgAddServer.cpp */,
+				9ED9D4570CA1622F00B0FC71 /* CslDlgAddServer.h */,
+				9ED9D4580CA1622F00B0FC71 /* CslDlgConnectWait.cpp */,
+				9ED9D4590CA1622F00B0FC71 /* CslDlgConnectWait.h */,
+				9ED9D45A0CA1622F00B0FC71 /* CslDlgExtended.cpp */,
+				9ED9D45B0CA1622F00B0FC71 /* CslDlgExtended.h */,
+				9ED9D45C0CA1622F00B0FC71 /* CslDlgGeneric.h */,
+				9ED9D45D0CA1622F00B0FC71 /* CslDlgOutput.cpp */,
+				9ED9D45E0CA1622F00B0FC71 /* CslDlgOutput.h */,
+				9ED9D45F0CA1622F00B0FC71 /* CslDlgSettings.cpp */,
+				9ED9D4600CA1622F00B0FC71 /* CslDlgSettings.h */,
+				9ED9D4610CA1622F00B0FC71 /* CslEngine.cpp */,
+				9ED9D4620CA1622F00B0FC71 /* CslEngine.h */,
+				9ED9D4630CA1622F00B0FC71 /* CslFlags.h */,
+				9ED9D4640CA1622F00B0FC71 /* CslFrame.cpp */,
+				9ED9D4650CA1622F00B0FC71 /* CslFrame.h */,
+				9ED9D4660CA1622F00B0FC71 /* CslGame.cpp */,
+				9ED9D4680CA1622F00B0FC71 /* CslListCtrlInfo.cpp */,
+				9ED9D4690CA1622F00B0FC71 /* CslListCtrlInfo.h */,
+				9ED9D46A0CA1622F00B0FC71 /* CslListCtrlServer.cpp */,
+				9ED9D46B0CA1622F00B0FC71 /* CslListCtrlServer.h */,
+				9ED9D46C0CA1622F00B0FC71 /* CslMenu.h */,
+				9ED9D46D0CA1622F00B0FC71 /* CslSettings.h */,
+				9ED9D46E0CA1622F00B0FC71 /* CslStatusBar.cpp */,
+				9ED9D46F0CA1622F00B0FC71 /* CslStatusBar.h */,
+				9ED9D4700CA1622F00B0FC71 /* CslTools.cpp */,
+				9ED9D4710CA1622F00B0FC71 /* CslTools.h */,
+				9ED9D4720CA1622F00B0FC71 /* CslUDP.cpp */,
+				9ED9D4730CA1622F00B0FC71 /* CslUDP.h */,
+				9ED9D4740CA1622F00B0FC71 /* CslVersion.h */,
+				9ED9D4750CA1622F00B0FC71 /* cube_tools.h */,
+				9ED9D4670CA1622F00B0FC71 /* CslGame.h */,
+			);
+			name = Sources;
+			sourceTree = "<group>";
+		};
+		9ECC31360CA1A96D00578B5E /* External Frameworks and Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				9ECC32980CA1AA3400578B5E /* OpenGL.framework */,
+				9ECC32960CA1A9EC00578B5E /* AGL.framework */,
+				9ECC2F7B0CA1724E00578B5E /* Carbon.framework */,
+				9ECC2F7D0CA1726200578B5E /* System.framework */,
+				9ECC2F800CA172A500578B5E /* AppKit.framework */,
+				9ECC2F860CA172E500578B5E /* WebKit.framework */,
+				9ECC2F830CA172BC00578B5E /* IOKit.framework */,
+			);
+			name = "External Frameworks and Libraries";
+			sourceTree = "<group>";
+		};
+		9ED9D43A0CA161B500B0FC71 = {
+			isa = PBXGroup;
+			children = (
+				9E015A150CA544BA0029BEEF /* wxWindows.xcodeproj */,
+				9EDC68A90CA1C2A4002A4C4B /* Resources */,
+				9ECC31360CA1A96D00578B5E /* External Frameworks and Libraries */,
+				9ECC30FD0CA1A8F500578B5E /* Sources */,
+				9ED9D44B0CA161E000B0FC71 /* Products */,
+				9ED9D44D0CA161E000B0FC71 /* csl-Info.plist */,
+			);
+			sourceTree = "<group>";
+		};
+		9ED9D44B0CA161E000B0FC71 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9ED9D44A0CA161E000B0FC71 /* csl.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		9EDC68A90CA1C2A4002A4C4B /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				9E015AE00CA569950029BEEF /* csl_mac.icns */,
+				9ECC329A0CA1AA6800578B5E /* csl_start_sb.ogz */,
+				9ECC329B0CA1AA6800578B5E /* GeoIP.dat */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		9ED9D4490CA161E000B0FC71 /* csl */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9ED9D44E0CA161E000B0FC71 /* Build configuration list for PBXNativeTarget "csl" */;
+			buildPhases = (
+				9ED9D4460CA161E000B0FC71 /* Resources */,
+				9ED9D4470CA161E000B0FC71 /* Sources */,
+				9ED9D4480CA161E000B0FC71 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = csl;
+			productName = csl;
+			productReference = 9ED9D44A0CA161E000B0FC71 /* csl.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		9ED9D43C0CA161B500B0FC71 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 9ED9D43D0CA161B500B0FC71 /* Build configuration list for PBXProject "csl" */;
+			hasScannedForEncodings = 0;
+			mainGroup = 9ED9D43A0CA161B500B0FC71;
+			productRefGroup = 9ED9D44B0CA161E000B0FC71 /* Products */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 9E015A160CA544BA0029BEEF /* Products */;
+					ProjectRef = 9E015A150CA544BA0029BEEF /* wxWindows.xcodeproj */;
+				},
+			);
+			targets = (
+				9ED9D4490CA161E000B0FC71 /* csl */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		9E015A1F0CA544BA0029BEEF /* libwx_mac_static.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libwx_mac_static.a;
+			remoteRef = 9E015A1E0CA544BA0029BEEF /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		9E015A210CA544BA0029BEEF /* libwx_mac.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			path = libwx_mac.dylib;
+			remoteRef = 9E015A200CA544BA0029BEEF /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		9ED9D4460CA161E000B0FC71 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9ECC329C0CA1AA6800578B5E /* csl_start_sb.ogz in Resources */,
+				9ECC329D0CA1AA6800578B5E /* GeoIP.dat in Resources */,
+				9E015AE10CA569950029BEEF /* csl_mac.icns in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		9ED9D4470CA161E000B0FC71 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9E3F16110CA1693800C3C8C9 /* GeoIP.c in Sources */,
+				9ED9D4760CA1622F00B0FC71 /* CslArt.cpp in Sources */,
+				9ED9D4770CA1622F00B0FC71 /* CslDlgAddMaster.cpp in Sources */,
+				9ED9D4780CA1622F00B0FC71 /* CslDlgAddServer.cpp in Sources */,
+				9ED9D4790CA1622F00B0FC71 /* CslDlgConnectWait.cpp in Sources */,
+				9ED9D47A0CA1622F00B0FC71 /* CslDlgExtended.cpp in Sources */,
+				9ED9D47B0CA1622F00B0FC71 /* CslDlgOutput.cpp in Sources */,
+				9ED9D47C0CA1622F00B0FC71 /* CslDlgSettings.cpp in Sources */,
+				9ED9D47D0CA1622F00B0FC71 /* CslEngine.cpp in Sources */,
+				9ED9D47E0CA1622F00B0FC71 /* CslFrame.cpp in Sources */,
+				9ED9D47F0CA1622F00B0FC71 /* CslGame.cpp in Sources */,
+				9ED9D4800CA1622F00B0FC71 /* CslListCtrlInfo.cpp in Sources */,
+				9ED9D4810CA1622F00B0FC71 /* CslListCtrlServer.cpp in Sources */,
+				9ED9D4820CA1622F00B0FC71 /* CslStatusBar.cpp in Sources */,
+				9ED9D4830CA1622F00B0FC71 /* CslTools.cpp in Sources */,
+				9ED9D4840CA1622F00B0FC71 /* CslUDP.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		9ED9D43E0CA161B500B0FC71 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "../../wxMac-2.8.4/include/wx/wxprec.h";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					NO_GCC_PRAGMA,
+					__WXMAC__,
+					"wxUSE_BASE=1",
+					"_FILE_OFFSET_BITS=64",
+					_LARGE_FILES,
+					"__WXMAC_XCODE__=1",
+					"WX_PRECOMP=1",
+					MACOS_CLASSIC,
+					"__WXDEBUG__=1",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "GEOIPDATADIR=\"\\\"data\\\"\"";
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_USE_GCC3_PFE_SUPPORT = NO;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
+				GENERATE_PKGINFO_FILE = YES;
+				HEADER_SEARCH_PATHS = ../src/img/flags;
+				INSTALL_PATH = "$(HOME)/Applications";
+				MACH_O_TYPE = mh_execute;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-liconv",
+					"-lz",
+				);
+				PRODUCT_NAME = csl;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				STRIP_INSTALLED_PRODUCT = NO;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Development;
+		};
+		9ED9D43F0CA161B500B0FC71 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = i386;
+				COPY_PHASE_STRIP = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "../../wxMac-2.8.4/include/wx/wxprec.h";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					NO_GCC_PRAGMA,
+					__WXMAC__,
+					"wxUSE_BASE=1",
+					"_FILE_OFFSET_BITS=64",
+					_LARGE_FILES,
+					"__WXMAC_XCODE__=1",
+					"WX_PRECOMP=1",
+					MACOS_CLASSIC,
+					"__WXDEBUG__=1",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "GEOIPDATADIR=\"\\\"data\\\"\"";
+				GCC_USE_GCC3_PFE_SUPPORT = NO;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
+				GENERATE_PKGINFO_FILE = YES;
+				HEADER_SEARCH_PATHS = ../src/img/flags;
+				INSTALL_PATH = "$(HOME)/Applications";
+				MACH_O_TYPE = mh_execute;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				OTHER_LDFLAGS = (
+					"-liconv",
+					"-lz",
+				);
+				PRODUCT_NAME = csl;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Deployment;
+		};
+		9ED9D44F0CA161E000B0FC71 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = i386;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G4;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "GEOIPDATADIR=\"\\\"../Resources/\\\"\"";
+				HEADER_SEARCH_PATHS = "";
+				INFOPLIST_FILE = "csl-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = "";
+				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../../wxMac-2.8.4/src/build/Development\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/../../wxMac-2.8.4/src/build/Development\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_3 = "\"$(SRCROOT)/../../wxMac-2.8.4/src/build/Deployment\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_4 = "\"$(SRCROOT)/../../wxMac-2.8.4/src/build/Development\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_5 = "\"$(SRCROOT)/../../wxMac-2.8.4/src/build/Development\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_6 = "\"$(SRCROOT)/../../wxMac-2.8.4/src/build/Deployment\"";
+				MACOSX_DEPLOYMENT_TARGET = "";
+				OTHER_CFLAGS = (
+					"-D__WXDEBUG__",
+					"-D__WXMAC__",
+					"-D_FILE_OFFSET_BITS=64",
+					"-D_LARGE_FILES",
+					"-DNO_GCC_PRAGMA",
+				);
+				OTHER_CPLUSPLUSFLAGS = (
+					"-D__WXDEBUG__",
+					"-D__WXMAC__",
+					"-D_FILE_OFFSET_BITS=64",
+					"-D_LARGE_FILES",
+					"-DNO_GCC_PRAGMA",
+				);
+				OTHER_LDFLAGS = (
+					"-liconv",
+					"-lz",
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = csl;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SKIP_INSTALL = YES;
+				USER_HEADER_SEARCH_PATHS = "$(inherited) \"$(SRCROOT)/../../../Toolkits/wxMac-2.8.4/include\" \"../src/img/flags\"";
+				WARNING_CFLAGS = "-Wall";
+				WRAPPER_EXTENSION = app;
+				ZERO_LINK = NO;
+			};
+			name = Development;
+		};
+		9ED9D4500CA161E000B0FC71 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					i386,
+					ppc,
+				);
+				COPY_PHASE_STRIP = YES;
+				DEPLOYMENT_POSTPROCESSING = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G4;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					NO_GCC_PRAGMA,
+					__WXMAC__,
+					wxUSE_BANO_GCC_PRAGMA,
+					__WXMAC__,
+					"wxUSE_BASE=1",
+					"_FILE_OFFSET_BITS=64",
+					_LARGE_FILES,
+					"__WXMAC_XCODE__=1",
+					"WX_PRECOMP=1",
+					MACOS_CLASSIC,
+				);
+				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "GEOIPDATADIR=\"\\\"../Resources/\\\"\"";
+				HEADER_SEARCH_PATHS = "";
+				INFOPLIST_FILE = "csl-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = "";
+				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../../wxMac-2.8.4/src/build/Deployment\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/../../wxMac-2.8.4/src/build/Development\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_3 = "\"$(SRCROOT)/../../wxMac-2.8.4/src/build/Deployment\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_4 = "\"$(SRCROOT)/../../wxMac-2.8.4/src/build/Development\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_5 = "\"$(SRCROOT)/../../wxMac-2.8.4/src/build/Development\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_6 = "\"$(SRCROOT)/../../wxMac-2.8.4/src/build/Deployment\"";
+				MACOSX_DEPLOYMENT_TARGET = "";
+				OTHER_CFLAGS = (
+					"-D__WXMAC__",
+					"-D_FILE_OFFSET_BITS=64",
+					"-D_LARGE_FILES",
+					"-DNO_GCC_PRAGMA",
+				);
+				OTHER_CPLUSPLUSFLAGS = (
+					"-D__WXMAC__",
+					"-D_FILE_OFFSET_BITS=64",
+					"-D_LARGE_FILES",
+					"-DNO_GCC_PRAGMA",
+				);
+				OTHER_LDFLAGS = (
+					"-liconv",
+					"-lz",
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = csl;
+				SKIP_INSTALL = YES;
+				STRIP_STYLE = debugging;
+				USER_HEADER_SEARCH_PATHS = "$(inherited) \"$(SRCROOT)/../../../Toolkits/wxMac-2.8.4/include\" \"../src/img/flags\"";
+				WARNING_CFLAGS = "-Wall";
+				WRAPPER_EXTENSION = app;
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		9ED9D43D0CA161B500B0FC71 /* Build configuration list for PBXProject "csl" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9ED9D43E0CA161B500B0FC71 /* Development */,
+				9ED9D43F0CA161B500B0FC71 /* Deployment */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Development;
+		};
+		9ED9D44E0CA161E000B0FC71 /* Build configuration list for PBXNativeTarget "csl" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9ED9D44F0CA161E000B0FC71 /* Development */,
+				9ED9D4500CA161E000B0FC71 /* Deployment */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Development;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 9ED9D43C0CA161B500B0FC71 /* Project object */;
+}
