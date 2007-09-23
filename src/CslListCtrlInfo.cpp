@@ -110,13 +110,12 @@ CslListCtrlInfo::CslListCtrlInfo(wxWindow* parent,wxWindowID id,const wxPoint& p
                                  const wxValidator& validator, const wxString& name)
         : wxListCtrl(parent,id,pos,size,style,validator,name)
 {
-    wxString path=GEOIPDATADIR+wxT("GeoIP.dat");
+    wxString path=DATADIR+wxString(wxT("/GeoIP.dat"));
     m_geoIP=GeoIP_open(U2A(path),GEOIP_MEMORY_CACHE);
-#ifndef __WXMAC__
+#ifdef __WXGTK__
     if (!m_geoIP)
     {
-        wxString path=wxTheApp->argv[0];
-        path=path.BeforeLast(PATHDIVA)+PATHDIV+wxT("data")+PATHDIV+wxT("GeoIP.dat");
+        wxString path=::wxPathOnly(wxTheApp->argv[0])+wxT("/data/GeoIP.dat");
         m_geoIP=GeoIP_open(U2A(path),GEOIP_MEMORY_CACHE);
     }
 #endif

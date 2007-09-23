@@ -26,7 +26,6 @@
 #include "CslFrame.h"
 #include "CslDlgAddMaster.h"
 #include "CslDlgGeneric.h"
-#include "CslMenu.h"
 #include "CslTools.h"
 #include "CslVersion.h"
 
@@ -40,8 +39,6 @@
 #include "img/close_high_14.xpm"
 #include "img/close_press_14.xpm"
 #endif
-
-#define CSL_ERROR_STR _("Error!")
 
 #define CSL_TIMER_SHOT 500
 
@@ -79,15 +76,14 @@ BEGIN_EVENT_TABLE(CslFrame, wxFrame)
     EVT_MENU(wxID_ANY,CslFrame::OnCommandEvent)
     EVT_TEXT(wxID_ANY,CslFrame::OnCommandEvent)
     EVT_CHECKBOX(wxID_ANY,CslFrame::OnCommandEvent)
-    // dont use wxID_ANY for EVT_BUTTON, because on wxMAC wxID_CANCEL is sent by pressing ESC
+    // dont use wxID_ANY for EVT_BUTTON, because on wxMAC
+    // wxID_CANCEL is sent when pressing ESC
     EVT_BUTTON(CSL_BUTTON_SEARCH_CLOSE,CslFrame::OnCommandEvent)
     EVT_BUTTON(CSL_BUTTON_FILTER_RESET,CslFrame::OnCommandEvent)
     EVT_CHAR(CslFrame::OnKeyDown)
     EVT_SHOW(CslFrame::OnShow)
     EVT_CLOSE(CslFrame::OnClose)
 END_EVENT_TABLE()
-
-CslMenu *g_cslMenu;
 
 
 class CslIDMapping
@@ -251,7 +247,7 @@ CslFrame::CslFrame(wxWindow* parent, int id, const wxString& title,const wxPoint
             }
         }
 
-        g_cslMenu->EnableMenuItem(MENU_MASTER_ADD);
+        CslMenu::EnableMenuItem(MENU_MASTER_ADD);
 
         list_ctrl_master->ListUpdate(m_engine->GetCurrentGame()->GetServers());
         list_ctrl_favourites->ListUpdate(m_engine->GetFavourites());
@@ -294,7 +290,7 @@ CslFrame::~CslFrame()
         delete m_engine;
     }
 
-    delete g_cslMenu;
+    delete m_menu;
 
     SaveSettings();
     delete g_cslSettings;
@@ -441,9 +437,12 @@ void CslFrame::do_layout()
     ToggleFilter();
     ToggleSplitterUpdate();
 
+// only set splitter positions here on wxMAC - it doesnt work under wxGTK
+// and EVT_SHOW is not send on wxMAC
+#ifdef __WXMAC__
     splitter_games_info->SetSashGravity(1.0f);
     splitter_lists->SetSashGravity(0.8f);
-
+#endif
     splitter_main->SetMinimumPaneSize(sizer_filter->GetMinSize().GetWidth()+4);
     splitter_games_info->SetMinimumPaneSize(20);
     splitter_lists->SetMinimumPaneSize(100);
@@ -491,7 +490,7 @@ void CslFrame::CreateMainMenu()
     SetMenuBar(m_menubar);
 
     m_menuMaster=menu_2;
-    g_cslMenu=new CslMenu(m_menubar);
+    m_menu=new CslMenu(m_menubar);
 }
 
 void CslFrame::OnPingStats(wxCommandEvent& event)
@@ -572,8 +571,8 @@ void CslFrame::OnTreeLeftClick(wxTreeEvent& event)
 
     if (!game)
     {
-        g_cslMenu->EnableMenuItem(MENU_MASTER_DEL);
-        g_cslMenu->EnableMenuItem(MENU_MASTER_UPDATE);
+        CslMenu::EnableMenuItem(MENU_MASTER_DEL);
+        CslMenu::EnableMenuItem(MENU_MASTER_UPDATE);
 
         servers=master->GetServers();
 
@@ -589,8 +588,8 @@ void CslFrame::OnTreeLeftClick(wxTreeEvent& event)
     }
     else
     {
-        g_cslMenu->EnableMenuItem(MENU_MASTER_DEL,false);
-        g_cslMenu->EnableMenuItem(MENU_MASTER_UPDATE,false);
+        CslMenu::EnableMenuItem(MENU_MASTER_DEL,false);
+        CslMenu::EnableMenuItem(MENU_MASTER_UPDATE,false);
         servers=game->GetServers();
     }
 
@@ -618,13 +617,13 @@ void CslFrame::OnTreeRightClick(wxTreeEvent& event)
 
     if (master)
     {
-        g_cslMenu->EnableMenuItem(MENU_MASTER_DEL);
-        g_cslMenu->EnableMenuItem(MENU_MASTER_UPDATE);
+        CslMenu::EnableMenuItem(MENU_MASTER_DEL);
+        CslMenu::EnableMenuItem(MENU_MASTER_UPDATE);
     }
     else
     {
-        g_cslMenu->EnableMenuItem(MENU_MASTER_DEL,false);
-        g_cslMenu->EnableMenuItem(MENU_MASTER_UPDATE,false);
+        CslMenu::EnableMenuItem(MENU_MASTER_DEL,false);
+        CslMenu::EnableMenuItem(MENU_MASTER_UPDATE,false);
     }
 
     PopupMenu(m_menuMaster);
@@ -678,7 +677,7 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
                 TreeAddMaster(NULL,master,true);
             else
             {
-                wxMessageBox(_("Master already exists!"),CSL_ERROR_STR,wxICON_ERROR,this);
+                wxMessageBox(_("Master already exists!"),_("Error"),wxICON_ERROR,this);
                 delete master;
             }
             break;
@@ -748,7 +747,7 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
 
         case CSL_BUTTON_SEARCH_CLOSE:
             g_cslSettings->m_showSearch=false;
-            g_cslMenu->CheckMenuItem(MENU_VIEW_SEARCH,false);
+            CslMenu::CheckMenuItem(MENU_VIEW_SEARCH,false);
             ToggleSearchBar();
             break;
 
@@ -873,8 +872,8 @@ void CslFrame::OnKeyDown(wxKeyEvent& event)
 
 void CslFrame::OnShow(wxShowEvent& event)
 {
-//    splitter_games_info->SetSashGravity(1.0f);
-//    splitter_lists->SetSashGravity(0.8f);
+    splitter_games_info->SetSashGravity(1.0f);
+    splitter_lists->SetSashGravity(0.8f);
     list_ctrl_master->ListAdjustSize(list_ctrl_master->GetClientSize(),true);
     list_ctrl_favourites->ListAdjustSize(list_ctrl_favourites->GetClientSize(),true);
 }
@@ -883,7 +882,7 @@ void CslFrame::OnClose(wxCloseEvent& event)
 {
     if (event.GetEventObject()==m_outputDlg)
     {
-        g_cslMenu->CheckMenuItem(MENU_VIEW_OUTPUT,false);
+        CslMenu::CheckMenuItem(MENU_VIEW_OUTPUT,false);
         return;
     }
 
@@ -1036,7 +1035,7 @@ void CslFrame::UpdateMaster()
     SetStatusText(_("Sending request to master: ")+master->GetAddress(),1);
     m_timer.Stop();
 
-    g_cslMenu->EnableMenuItem(MENU_MASTER_UPDATE,false);
+    CslMenu::EnableMenuItem(MENU_MASTER_UPDATE,false);
     tree_ctrl_games->Enable(false);
 
     wxInt32 num=m_engine->UpdateMaster();
@@ -1049,7 +1048,7 @@ void CslFrame::UpdateMaster()
         SetStatusText(wxString::Format(_("Got %d servers from master"),num),1);
     }
 
-    g_cslMenu->EnableMenuItem(MENU_MASTER_UPDATE);
+    CslMenu::EnableMenuItem(MENU_MASTER_UPDATE);
     tree_ctrl_games->Enable();
 
     m_timerInit=true;
@@ -1584,8 +1583,8 @@ bool CslApp::OnInit()
 {
     m_locale.Init(wxLANGUAGE_DEFAULT,wxLOCALE_CONV_ENCODING);
     m_locale.AddCatalogLookupPathPrefix(wxT(LOCALEDIR));
-#ifndef __WXMAC__
-    m_locale.AddCatalogLookupPathPrefix(::wxPathOnly(wxTheApp->argv[0]).BeforeLast(PATHDIVA)+wxT("/lang"));
+#ifdef __WXGTK__
+    m_locale.AddCatalogLookupPathPrefix(::wxPathOnly(wxTheApp->argv[0])+wxT("/lang"));
 #endif
     m_locale.AddCatalog(CSL_NAME_SHORT_STR);
 
@@ -1593,7 +1592,7 @@ bool CslApp::OnInit()
     wxSystemOptions::SetOption(wxT("mac.listctrl.always_use_generic"),1);
 #endif
 
-    wxString name=wxString::Format(wxT("%s-%s"),CSL_NAME_SHORT_STR,wxGetUserId().c_str());
+    wxString name=wxString::Format(wxT(".%s-%s.lock"),CSL_NAME_SHORT_STR,wxGetUserId().c_str());
     m_single=new wxSingleInstanceChecker(name);
 
     if (m_single->IsAnotherRunning())

@@ -40,6 +40,7 @@
 #include <wx/treectrl.h>
 #include <wx/listctrl.h>
 // end wxGlade
+#include "CslMenu.h"
 #include "CslStatusBar.h"
 #include "CslEngine.h"
 #include "CslDlgSettings.h"
@@ -60,6 +61,7 @@ class CslFrame: public wxFrame
     private:
         CslEngine *m_engine;
 
+        CslMenu *m_menu;
         wxMenu *m_menuMaster;
 
         wxTreeItemId m_treeGamesRoot;

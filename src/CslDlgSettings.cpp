@@ -128,7 +128,7 @@ CslDlgSettings::~CslDlgSettings()
 #ifndef __WXMAC__
     delete fpickSauer;
     delete fpickAssault;
-    delete fpickCube
+    delete fpickCube;
 #endif
     delete dpickSauer;
     delete dpickAssault;

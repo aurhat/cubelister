@@ -356,19 +356,19 @@ wxInt32 CslGame::ConnectPrepare(const CslServerInfo *info,const wxString& path,w
             if (!::wxFileExists(dst))
             {
                 src=A2U(DATADIR)+PATHDIV+map;
+#ifdef __WXGTK__
                 if (!::wxFileExists(src))
                 {
-#ifdef __WXMAC__
-                    src=::wxPathOnly(wxTheApp->argv[0]).BeforeLast(PATHDIVA)+PATHDIV+wxT("Resources")+PATHDIV+map;
-#else
-                    src=::wxPathOnly(wxTheApp->argv[0])+PATHDIV+wxT("data")+PATHDIV+map;
+                    src=::wxPathOnly(wxTheApp->argv[0])+("/data/")+map;
 #endif
                     if (!::wxFileExists(src))
                     {
                         *out=wxString::Format(_("Couldn't find \"%s\""),map.c_str());
                         return CSL_ERROR_FILE_DONT_EXIST;
                     }
+#ifdef __WXGTK__
                 }
+#endif
                 if (!::wxCopyFile(src,dst))
                     return CSL_ERROR_FILE_OPERATION;
             }

@@ -23,7 +23,7 @@
 #define CSLMENU_H
 
 /**
- @author Glen Masgai <mimosius@flexo>
+ @author Glen Masgai <mimosius@gmx.de>
 */
 
 #include "wx/wxprec.h"
@@ -90,44 +90,17 @@ enum
 class CslMenu
 {
     public:
-        CslMenu(wxMenuBar *menuBar) : m_menuBar(menuBar)
-        {
-            EnableMenuItem(MENU_MASTER_ADD,false);
-            EnableMenuItem(MENU_MASTER_DEL,false);
-            EnableMenuItem(MENU_MASTER_UPDATE,false);
+        CslMenu(wxMenuBar *menuBar);
 
-            CheckMenuItem(MENU_VIEW_FILTER,g_cslSettings->m_showFilter);
-            CheckMenuItem(MENU_VIEW_SEARCH,g_cslSettings->m_showSearch);
-            CheckMenuItem(MENU_VIEW_AUTO_FIT,g_cslSettings->m_autoFitColumns);
-            CheckMenuItem(MENU_VIEW_AUTO_SORT,g_cslSettings->m_autoSortColumns);
-            CheckMenuItem(MENU_VIEW_SPLITTER_LIVE,g_cslSettings->m_splitterLive);
-        }
-
-        void EnableMenuItem(wxInt32 id,bool enable=true)
-        {
-            m_menuBar->Enable(id,enable);
-        }
-        void CheckMenuItem(wxInt32 id,bool check=true)
-        {
-            m_menuBar->Check(id,check);
-        }
-
+        static void EnableMenuItem(wxInt32 id,bool enable=true);
+        static void CheckMenuItem(wxInt32 id,bool check=true);
         static void AddItemToMenu(wxMenu *menu,const wxInt32 id,
                                   const wxString& text,const wxArtID& art,
                                   const wxItemKind kind=wxITEM_NORMAL,
-                                  const wxString help=wxEmptyString)
-        {
-            wxMenuItem *item=new wxMenuItem(menu,id,text,help,kind);
-            wxOperatingSystemId os=wxPlatformInfo().GetOperatingSystemId();
-            if (id>wxID_HIGHEST || (os&wxOS_WINDOWS) || (os&wxOS_MAC))
-                item->SetBitmap(GET_ART_MENU(art));
-            menu->Append(item);
-        }
-
+                                  const wxString help=wxEmptyString);
     protected:
-        wxMenuBar *m_menuBar;
+        static wxMenuBar *m_menuBar;
 };
 
-extern CslMenu *g_cslMenu;
 
 #endif // CSLMENU_H

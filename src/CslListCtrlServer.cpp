@@ -51,13 +51,6 @@ enum
     SORT_MAPS, SORT_TIME, SORT_PLAY, SORT_MM, SORT_UNKNOWN
 };
 
-#define CSL_WARNING_STR            _("Warning!")
-#define CSL_ERROR_STR              _("Error!")
-#define CSL_DELETE_YESNOCANCEL_STR _("\nChoose Yes to keep these servers, " \
-                                     "No to delete them or\nCancel the operation.")
-#define MENU_SERVER_EXTENDED_STR   _("Extended information")
-
-
 BEGIN_DECLARE_EVENT_TYPES()
 DECLARE_EVENT_TYPE(wxCSL_EVT_PROCESS,wxID_ANY)
 END_DECLARE_EVENT_TYPES()
@@ -117,7 +110,7 @@ class CslProcess : public wxProcess
             // Cube returns with 1 - weird
             if (code!=0 && m_info->m_type!=CSL_GAME_CB)
                 wxMessageBox(m_cmd+wxString::Format(_(" returned with code: %d"),code),
-                             CSL_ERROR_STR,wxICON_ERROR,m_parent);
+                             _("Error"),wxICON_ERROR,m_parent);
 
             ProcessInputStream();
 
@@ -329,7 +322,7 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
     {
         CslMenu::AddItemToMenu(&menu,MENU_SERVER_CONNECT,MENU_SERVER_CONN_STR,wxART_CONNECT);
 #ifdef CSL_EXT_SERVER_INFO
-        CslMenu::AddItemToMenu(&menu,MENU_SERVER_EXTENDED,MENU_SERVER_EXTENDED_STR,wxART_ABOUT);
+        CslMenu::AddItemToMenu(&menu,MENU_SERVER_EXTENDED,_("Extended information"),wxART_ABOUT);
 #endif
         menu.AppendSeparator();
 
@@ -408,6 +401,9 @@ void CslListCtrlServer::ListRemoveServers()
     }
 }
 
+#define CSL_DELETE_YESNOCANCEL_STR _("\nChoose Yes to keep these servers, " \
+                                     "No to delete them or\nCancel the operation.")
+
 void CslListCtrlServer::ListDeleteServers()
 {
     wxInt32 c,i;
@@ -425,7 +421,7 @@ void CslListCtrlServer::ListDeleteServers()
         {
             msg=_("You are about to delete servers which are also favourites!\n");
             msg+=CSL_DELETE_YESNOCANCEL_STR;
-            skipFav=wxMessageBox(msg,CSL_WARNING_STR,wxYES_NO|wxCANCEL|wxICON_WARNING,this);
+            skipFav=wxMessageBox(msg,_("Warning"),wxYES_NO|wxCANCEL|wxICON_WARNING,this);
             if (skipFav==wxCANCEL)
                 return;
             if (skipFav!=wxNO)
@@ -435,7 +431,7 @@ void CslListCtrlServer::ListDeleteServers()
         {
             msg=_("You are about to delete servers which have statistics!\n");
             msg+=CSL_DELETE_YESNOCANCEL_STR;
-            skipStats=wxMessageBox(msg,CSL_WARNING_STR,wxYES_NO|wxCANCEL|wxICON_WARNING,this);
+            skipStats=wxMessageBox(msg,_("Warning"),wxYES_NO|wxCANCEL|wxICON_WARNING,this);
             if (skipStats==wxCANCEL)
                 return;
             if (skipStats!=wxNO)
@@ -457,7 +453,7 @@ void CslListCtrlServer::ListDeleteServers()
             l=s.Len();
             msg=wxString::Format(_("Server \"%s\" is currently locked,\nso deletion is not possible!"),
                                  A2U(StripColours(U2A(s),&l,2)).c_str());
-            wxMessageBox(msg,CSL_ERROR_STR,wxICON_ERROR,this);
+            wxMessageBox(msg,_("Error"),wxICON_ERROR,this);
             continue;
         }
 #ifdef CSL_EXT_SERVER_INFO
@@ -467,7 +463,7 @@ void CslListCtrlServer::ListDeleteServers()
             l=s.Len();
             msg=wxString::Format(_("Player statistics are shown for Server \"%s\",\nso deletion is not possible!"),
                                  A2U(StripColours(U2A(s),&l,2)).c_str());
-            wxMessageBox(msg,CSL_ERROR_STR,wxICON_ERROR,this);
+            wxMessageBox(msg,_("Error"),wxICON_ERROR,this);
             continue;
         }
 #endif
@@ -488,6 +484,7 @@ void CslListCtrlServer::ListDeleteServers()
         m_engine->DeleteServer(info);
     }
 }
+#undef CSL_DELETE_YESNOCANCEL_STR
 
 void CslListCtrlServer::OnMenu(wxCommandEvent& event)
 {
@@ -1155,7 +1152,7 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info)
     if (CslConnectionState::IsPlaying())
     {
         wxMessageBox(_("You are currently playing, so quit the game and try again."),
-                     CSL_WARNING_STR,wxOK|wxICON_INFORMATION,this);
+                     _("Warning"),wxOK|wxICON_INFORMATION,this);
         return;
     }
 
@@ -1194,13 +1191,13 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info)
     {
         wxMessageBox(wxString::Format(_("There was no executable for game %s specified yet!" \
                                         "\nPlease check your settings."),GetGameStr(info->m_type)),
-                     CSL_ERROR_STR,wxICON_ERROR,this);
+                     _("Error"),wxICON_ERROR,this);
         return;
     }
     if (path.IsEmpty() || !::wxDirExists(path))
     {
         wxMessageBox(_("Invalid game path was specified!\nPlease check your settings."),
-                     CSL_ERROR_STR,wxICON_ERROR,this);
+                     _("Error"),wxICON_ERROR,this);
         return;
     }
 
@@ -1292,7 +1289,7 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info)
     if (!(::wxExecute(cmd,wxEXEC_ASYNC,process)>0))
     {
         wxMessageBox(_("Failed to start: ")+cmd
-                     ,CSL_ERROR_STR,wxICON_ERROR,this);
+                     ,_("Error"),wxICON_ERROR,this);
         info->Lock(false);
         return;
     }
