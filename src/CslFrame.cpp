@@ -74,7 +74,7 @@ BEGIN_EVENT_TABLE(CslFrame, wxFrame)
     EVT_TREE_SEL_CHANGED(wxID_ANY,CslFrame::OnTreeLeftClick)
     EVT_TREE_ITEM_RIGHT_CLICK(wxID_ANY,CslFrame::OnTreeRightClick)
     EVT_MENU(wxID_ANY,CslFrame::OnCommandEvent)
-    EVT_TEXT(wxID_ANY,CslFrame::OnCommandEvent)
+    EVT_TEXT(CSL_TEXT_SEARCH,CslFrame::OnCommandEvent)
     EVT_CHECKBOX(wxID_ANY,CslFrame::OnCommandEvent)
     // dont use wxID_ANY for EVT_BUTTON, because on wxMAC
     // wxID_CANCEL is sent when pressing ESC

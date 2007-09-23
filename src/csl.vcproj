@@ -227,6 +227,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CslMenu.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CslStatusBar.cpp"
 				>
 			</File>

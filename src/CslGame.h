@@ -188,11 +188,11 @@ class CslServerInfo
             switch (m_type)
             {
                 case CSL_GAME_SB:
-                    return GetVersionStrSB(m_protocol);
+                    return wxString(GetVersionStrSB(m_protocol));
                 case CSL_GAME_AC:
-                    return GetVersionStrAC(m_protocol);
+                    return wxString(GetVersionStrAC(m_protocol));
                 case CSL_GAME_CB:
-                    return GetVersionStrCB(m_protocol);
+                    return wxString(GetVersionStrCB(m_protocol));
                 default:
                     break;
             }

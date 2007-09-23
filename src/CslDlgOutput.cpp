@@ -183,7 +183,7 @@ void CslDlgOutput::OnCommandEvent(wxCommandEvent& event)
                 break;
 
             wxUint32 size=file.Length();
-            char *buf=(char*)malloc(size);
+            char *buf=(char*)malloc(size+1);
             buf[size]=0;
 
             if (file.Read((void*)buf,size)!=(wxInt32)size)

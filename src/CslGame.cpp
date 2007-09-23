@@ -31,7 +31,7 @@ const wxChar* GetVersionStrSB(int n)
         wxT("Physics"), wxT("Mp"), wxT(""), wxT("Agc"), wxT("Quakecon"),
         wxT("Independence")
     };
-    size_t v=CSL_LAST_PROTOCOL_SB-n;
+    wxUint32 v=CSL_LAST_PROTOCOL_SB-n;
     return (v>=0 && v<sizeof(sb_versions)/sizeof(sb_versions[0])) ?
            sb_versions[v] : wxString::Format(wxT("%d"),n).c_str();
 }
@@ -42,7 +42,7 @@ const wxChar* GetVersionStrAC(int n)
     {
         wxT("0.93.x"), wxT("0.92"), wxT("0.91.x"), wxT("0.90")
     };
-    size_t v=CSL_LAST_PROTOCOL_AC-n;
+    wxUint32 v=CSL_LAST_PROTOCOL_AC-n;
     return (v>=0 && v<sizeof(ac_versions)/sizeof(ac_versions[0])) ?
            ac_versions[v] : wxString::Format(wxT("%d"),n).c_str();
 }
@@ -53,7 +53,7 @@ const wxChar* GetVersionStrCB(int n)
     {
         wxT("122")
     };
-    size_t v=CSL_LAST_PROTOCOL_CB-n;
+    wxUint32 v=CSL_LAST_PROTOCOL_CB-n;
     return (v>=0 && v<sizeof(cb_versions)/sizeof(cb_versions[0])) ?
            cb_versions[v] : wxString::Format(wxT("%d"),n).c_str();
 }
