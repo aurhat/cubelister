@@ -290,10 +290,10 @@ CslFrame::~CslFrame()
         delete m_engine;
     }
 
-    delete m_menu;
-
     SaveSettings();
     delete g_cslSettings;
+
+	delete m_menu;
 }
 
 void CslFrame::set_properties()

@@ -218,7 +218,7 @@ class CslServerInfo
             return 0;
         }
 
-        wxString& GetBestDescription()
+        wxString GetBestDescription()
         {
             if (m_desc.IsEmpty()) return m_host;
             return m_desc;
