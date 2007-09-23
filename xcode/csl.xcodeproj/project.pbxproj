@@ -10,6 +10,7 @@
 		9E015A240CA544C50029BEEF /* libwx_mac_static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E015A1F0CA544BA0029BEEF /* libwx_mac_static.a */; };
 		9E015AE10CA569950029BEEF /* csl_mac.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9E015AE00CA569950029BEEF /* csl_mac.icns */; };
 		9E3F16110CA1693800C3C8C9 /* GeoIP.c in Sources */ = {isa = PBXBuildFile; fileRef = 9E3F160F0CA1693800C3C8C9 /* GeoIP.c */; };
+		9E73FA100CA6EED200CA71BC /* CslMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E73FA0F0CA6EED200CA71BC /* CslMenu.cpp */; };
 		9ECC2F7C0CA1724E00578B5E /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9ECC2F7B0CA1724E00578B5E /* Carbon.framework */; };
 		9ECC2F7E0CA1726200578B5E /* System.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9ECC2F7D0CA1726200578B5E /* System.framework */; };
 		9ECC2F810CA172A500578B5E /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9ECC2F800CA172A500578B5E /* AppKit.framework */; };
@@ -58,6 +59,7 @@
 		9E015AE00CA569950029BEEF /* csl_mac.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = csl_mac.icns; path = ../src/img/csl_mac.icns; sourceTree = SOURCE_ROOT; };
 		9E3F160F0CA1693800C3C8C9 /* GeoIP.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = GeoIP.c; path = ../src/libGeoIP/GeoIP.c; sourceTree = SOURCE_ROOT; };
 		9E3F16100CA1693800C3C8C9 /* GeoIP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GeoIP.h; path = ../src/libGeoIP/GeoIP.h; sourceTree = SOURCE_ROOT; };
+		9E73FA0F0CA6EED200CA71BC /* CslMenu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslMenu.cpp; path = ../src/CslMenu.cpp; sourceTree = SOURCE_ROOT; };
 		9ECC2F7B0CA1724E00578B5E /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		9ECC2F7D0CA1726200578B5E /* System.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = System.framework; path = /System/Library/Frameworks/System.framework; sourceTree = "<absolute>"; };
 		9ECC2F800CA172A500578B5E /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
@@ -138,6 +140,7 @@
 		9ECC30FD0CA1A8F500578B5E /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				9E73FA0F0CA6EED200CA71BC /* CslMenu.cpp */,
 				9E3F160F0CA1693800C3C8C9 /* GeoIP.c */,
 				9E3F16100CA1693800C3C8C9 /* GeoIP.h */,
 				9ED9D4520CA1622F00B0FC71 /* CslArt.cpp */,
@@ -317,6 +320,7 @@
 				9ED9D4820CA1622F00B0FC71 /* CslStatusBar.cpp in Sources */,
 				9ED9D4830CA1622F00B0FC71 /* CslTools.cpp in Sources */,
 				9ED9D4840CA1622F00B0FC71 /* CslUDP.cpp in Sources */,
+				9E73FA100CA6EED200CA71BC /* CslMenu.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
