@@ -76,6 +76,8 @@ class CslDlgSettings: public wxDialog
         wxPanel* notebook_pane_sauer;
         wxTextCtrl* text_ctrl_assault_options;
         wxPanel* notebook_pane_assault;
+        wxTextCtrl* text_ctrl_frontier_options;
+        wxPanel* notebook_pane_frontier;
         wxTextCtrl* text_ctrl_cube_options;
         wxPanel* notebook_pane_cube;
         wxListbook* notebook_games;
@@ -100,9 +102,9 @@ class CslDlgSettings: public wxDialog
         // end wxGlade
 
 #ifndef __WXMAC__
-        wxFilePickerCtrl *fpickSauer,*fpickAssault,*fpickCube;
+        wxFilePickerCtrl *fpickSauer,*fpickAssault,*fpickFrontier,*fpickCube;
 #endif
-        wxDirPickerCtrl *dpickSauer,*dpickAssault,*dpickCube;
+        wxDirPickerCtrl *dpickSauer,*dpickAssault,*dpickFrontier,*dpickCube;
 
         void SetButtonColour(wxBitmapButton *button,wxButton *refButton,wxColour& colour);
         bool Validate();

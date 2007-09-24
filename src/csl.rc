@@ -17,11 +17,13 @@ ICON_CLOSE_PRESS_14     ICON                    "img\\close_press_14.ico"
 
 ICON_TREE_SB_24         ICON                    "img\\sb_24.ico"
 ICON_TREE_AC_24         ICON                    "img\\ac_24.ico"
+ICON_TREE_BF_24         ICON                    "img\\bf_24.ico"
 ICON_TREE_CB_24         ICON                    "img\\cb_24.ico"
 ICON_TREE_MASTER_24     ICON                    "img\\master_24.ico"
 
 ICON_LIST_SB_16         ICON                    "img\\sb_16.ico"
 ICON_LIST_AC_16         ICON                    "img\\ac_16.ico"
+ICON_LIST_BF_16         ICON                    "img\\bf_16.ico"
 ICON_LIST_CB_16         ICON                    "img\\cb_16.ico"
 
 ICON_MENU_CONNECT       ICON                    "img\\connect_16.ico"

@@ -527,12 +527,15 @@ int CslEngine::UpdateMaster()
 
     size_t size=data->GetSize();
 
-    // somehow set a limit
-    if (!(size>0) || size>65536)
+    if (!size)
     {
         num=-4;
         goto finish;
     }
+    // soee server do not report the size of the content
+    // somehow set a limit
+    if (size>32767)
+        size=32767;
 
     buf=(uchar*)calloc(1,size+1);
     if (!buf)
@@ -622,6 +625,7 @@ void CslEngine::UpdateServerInfo(CslServerInfo *info,ucharbuf *buf,wxUint32 now)
     switch (info->m_type)
     {
         case CSL_GAME_SB:
+        case CSL_GAME_BF:
         {
             info->m_players=getint(*buf);
             int numattr=getint(*buf);
@@ -704,6 +708,7 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
         switch (info->m_type)
         {
             case CSL_GAME_SB:
+            case CSL_GAME_BF:
             {
                 if (extended)
                 {

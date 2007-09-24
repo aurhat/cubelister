@@ -47,6 +47,17 @@ const wxChar* GetVersionStrAC(int n)
            ac_versions[v] : wxString::Format(wxT("%d"),n).c_str();
 }
 
+const wxChar* GetVersionStrBF(int n)
+{
+    static const wxChar* bf_versions[] =
+    {
+        wxT("Alpha1")
+    };
+    wxUint32 v=CSL_LAST_PROTOCOL_BF-n;
+    return (v>=0 && v<sizeof(bf_versions)/sizeof(bf_versions[0])) ?
+           bf_versions[v] : wxString::Format(wxT("%d"),n).c_str();
+}
+
 const wxChar* GetVersionStrCB(int n)
 {
     static const wxChar* cb_versions[] =
@@ -86,7 +97,8 @@ const wxChar* GetGameStr(int n)
 {
     static const wxChar *game_names[] =
     {
-        wxT("Sauerbraten"), wxT("AssaultCube"), wxT("Cube")
+        CSL_DEFAULT_NAME_SB, CSL_DEFAULT_NAME_AC,
+        CSL_DEFAULT_NAME_BF, CSL_DEFAULT_NAME_CB
     };
     return (n>CSL_GAME_START && n<=CSL_GAME_END &&
             (size_t)(n-1)<sizeof(game_names)/sizeof(game_names[0])) ? game_names[n-1] : wxT("none");
@@ -102,6 +114,9 @@ CslGame::CslGame(CSL_GAMETYPE type) : m_type(type), m_masterID(0)
             break;
         case CSL_GAME_AC:
             m_name=CSL_DEFAULT_NAME_AC;
+            break;
+        case CSL_GAME_BF:
+            m_name=CSL_DEFAULT_NAME_BF;
             break;
         case CSL_GAME_CB:
             m_name=CSL_DEFAULT_NAME_CB;
@@ -316,6 +331,7 @@ wxInt32 CslGame::ConnectWriteConfig(const CSL_GAMETYPE type,const wxString& cfg,
     switch (type)
     {
         case CSL_GAME_SB:
+        case CSL_GAME_BF:
             file.Open(cfg,wxFile::write);
             break;
 
@@ -348,6 +364,7 @@ wxInt32 CslGame::ConnectPrepare(const CslServerInfo *info,const wxString& path,w
     switch (info->m_type)
     {
         case CSL_GAME_SB:
+        case CSL_GAME_BF:
         {
             wxString map=wxString(CSL_DEFAULT_INJECT_FIL_SB)+wxString(wxT(".ogz"));
             wxString dst=path+CSL_DEFAULT_INJECT_DIR_SB+map;

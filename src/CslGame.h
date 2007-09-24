@@ -46,11 +46,14 @@
 #define CSL_DEFAULT_INJECT_FIL_SB     wxT("csl_start_sb")
 #define CSL_DEFAULT_INJECT_DIR_AC     wxT("config/")
 #define CSL_DEFAULT_INJECT_FIL_AC     wxT("autoexec.cfg")
+#define CSL_DEFAULT_INJECT_DIR_BF     CSL_DEFAULT_INJECT_DIR_SB
+#define CSL_DEFAULT_INJECT_FIL_BF     CSL_DEFAULT_INJECT_FIL_SB
 #define CSL_DEFAULT_INJECT_DIR_CB     wxT("packages/base/")
 #define CSL_DEFAULT_INJECT_FIL_CB     wxT("metl3.cfg")
 
 #define CSL_DEFAULT_NAME_SB           wxT("Sauerbraten")
 #define CSL_DEFAULT_NAME_AC           wxT("AssaultCube")
+#define CSL_DEFAULT_NAME_BF           wxT("Blood Frontier")
 #define CSL_DEFAULT_NAME_CB           wxT("Cube")
 
 #define CSL_DEFAULT_MASTER_SB         wxT("sauerbraten.org")
@@ -59,15 +62,20 @@
 #define CSL_DEFAULT_MASTER_AC         wxT("masterserver.cubers.net")
 #define CSL_DEFAULT_MASTER_PATH_AC    wxT("/cgi-bin/actioncube.pl/retrieve.do?item=list")
 
+#define CSL_DEFAULT_MASTER_BF         wxT("acord.woop.us")
+#define CSL_DEFAULT_MASTER_PATH_BF    wxT("/retrieve.do?item=list")
+
 #define CSL_DEFAULT_MASTER_CB         wxT("wouter.fov120.com")
 #define CSL_DEFAULT_MASTER_PATH_CB    wxT("/cube/masterserver/retrieve.do?item=list")
 
 #define CSL_DEFAULT_INFO_PORT_SB      28786
 #define CSL_DEFAULT_INFO_PORT_AC      28764
+#define CSL_DEFAULT_INFO_PORT_BF      28796
 #define CSL_DEFAULT_INFO_PORT_CB      28766
 
 #define CSL_LAST_PROTOCOL_SB   254
 #define CSL_LAST_PROTOCOL_AC  1125
+#define CSL_LAST_PROTOCOL_BF   254
 #define CSL_LAST_PROTOCOL_CB   122
 
 #define CSL_DEFAULT_SERVER_ADDR_SB1  wxT("81.169.170.173")   // TC1
@@ -85,13 +93,14 @@ enum { MM_OPEN = 0, MM_VETO, MM_LOCKED, MM_PRIVATE };
 typedef enum
 {
     CSL_GAME_START = 0,
-    CSL_GAME_SB, CSL_GAME_AC, CSL_GAME_CB,
+    CSL_GAME_SB, CSL_GAME_AC, CSL_GAME_BF, CSL_GAME_CB,
     CSL_GAME_END
 } CSL_GAMETYPE;
 
 
 extern const wxChar* GetVersionStrSB(int n);
 extern const wxChar* GetVersionStrAC(int n);
+extern const wxChar* GetVersionStrBF(int n);
 extern const wxChar* GetVersionStrCB(int n);
 extern const wxChar* GetModeStrSB(int n);
 extern const wxChar* GetModeStrAC(int n);
@@ -191,6 +200,8 @@ class CslServerInfo
                     return wxString(GetVersionStrSB(m_protocol));
                 case CSL_GAME_AC:
                     return wxString(GetVersionStrAC(m_protocol));
+                case CSL_GAME_BF:
+                    return wxString(GetVersionStrBF(m_protocol));
                 case CSL_GAME_CB:
                     return wxString(GetVersionStrCB(m_protocol));
                 default:
@@ -208,6 +219,9 @@ class CslServerInfo
                     break;
                 case CSL_GAME_AC:
                     return CSL_DEFAULT_INFO_PORT_AC;
+                    break;
+                case CSL_GAME_BF:
+                    return CSL_DEFAULT_INFO_PORT_BF;
                     break;
                 case CSL_GAME_CB:
                     return CSL_DEFAULT_INFO_PORT_CB;

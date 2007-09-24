@@ -32,6 +32,7 @@
 #ifndef _MSC_VER
 #include "img/csl_32.xpm"
 #include "img/sb_24.xpm"
+#include "img/bf_24.xpm"
 #include "img/ac_24.xpm"
 #include "img/cb_24.xpm"
 #include "img/master_24.xpm"
@@ -64,6 +65,7 @@ enum
     IMG_LIST_TREE_MASTER = 0,
     IMG_LIST_TREE_SB,
     IMG_LIST_TREE_AC,
+    IMG_LIST_TREE_BF,
     IMG_LIST_TREE_CB
 };
 
@@ -137,11 +139,13 @@ CslFrame::CslFrame(wxWindow* parent, int id, const wxString& title,const wxPoint
     m_imgListTree.Add(wxBitmap(master_24_xpm));
     m_imgListTree.Add(wxBitmap(sb_24_xpm));
     m_imgListTree.Add(wxBitmap(ac_24_xpm));
+    m_imgListTree.Add(wxBitmap(bf_24_xpm));
     m_imgListTree.Add(wxBitmap(cb_24_xpm));
 #else
     m_imgListTree.Add(wxIcon(wxT("ICON_TREE_MASTER_24"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imgListTree.Add(wxIcon(wxT("ICON_TREE_SB_24"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imgListTree.Add(wxIcon(wxT("ICON_TREE_AC_24"),wxBITMAP_TYPE_ICO_RESOURCE));
+    m_imgListTree.Add(wxIcon(wxT("ICON_TREE_BF_24"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imgListTree.Add(wxIcon(wxT("ICON_TREE_CB_24"),wxBITMAP_TYPE_ICO_RESOURCE));
 #endif
 
@@ -225,6 +229,10 @@ CslFrame::CslFrame(wxWindow* parent, int id, const wxString& title,const wxPoint
             game=m_engine->AddMaster(master);
             TreeAddGame(game);
 
+            master=new CslMaster(CSL_GAME_BF,CSL_DEFAULT_MASTER_BF,CSL_DEFAULT_MASTER_PATH_BF,true);
+            game=m_engine->AddMaster(master);
+            TreeAddGame(game);
+
             master=new CslMaster(CSL_GAME_CB,CSL_DEFAULT_MASTER_CB,CSL_DEFAULT_MASTER_PATH_CB,true);
             game=m_engine->AddMaster(master);
             TreeAddGame(game);
@@ -293,7 +301,7 @@ CslFrame::~CslFrame()
     SaveSettings();
     delete g_cslSettings;
 
-	delete m_menu;
+    delete m_menu;
 }
 
 void CslFrame::set_properties()
@@ -1142,6 +1150,9 @@ void CslFrame::TreeAddGame(CslGame *game,bool activate)
             case CSL_GAME_AC:
                 img=IMG_LIST_TREE_AC;
                 break;
+            case CSL_GAME_BF:
+                img=IMG_LIST_TREE_BF;
+                break;
             case CSL_GAME_CB:
                 img=IMG_LIST_TREE_CB;
                 break;
@@ -1258,10 +1269,13 @@ void CslFrame::LoadSettings()
     if (config->Read(wxT("BinaryAC"),&s)) g_cslSettings->m_clientBinAC=s;
     if (config->Read(wxT("OptionsAC"),&s)) g_cslSettings->m_clientOptsAC=s;
     if (config->Read(wxT("PathAC"),&s)) g_cslSettings->m_configPathAC=s;
-    if (config->Read(wxT("MinPlaytime"),&val))
-        if (config->Read(wxT("BinaryCB"),&s)) g_cslSettings->m_clientBinCB=s;
+    if (config->Read(wxT("BinaryBF"),&s)) g_cslSettings->m_clientBinBF=s;
+    if (config->Read(wxT("OptionsBF"),&s)) g_cslSettings->m_clientOptsBF=s;
+    if (config->Read(wxT("PathBF"),&s)) g_cslSettings->m_configPathBF=s;
+    if (config->Read(wxT("BinaryCB"),&s)) g_cslSettings->m_clientBinCB=s;
     if (config->Read(wxT("OptionsCB"),&s)) g_cslSettings->m_clientOptsCB=s;
     if (config->Read(wxT("PathCB"),&s)) g_cslSettings->m_configPathCB=s;
+    if (config->Read(wxT("MinPlaytime"),&val))
     {
         if (val<CSL_MIN_PLAYTIME_MIN || val>CSL_MIN_PLAYTIME_MAX)
             val=CSL_MIN_PLAYTIME_STD;
@@ -1345,6 +1359,9 @@ void CslFrame::SaveSettings()
     config->Write(wxT("BinaryAC"),g_cslSettings->m_clientBinAC);
     config->Write(wxT("OptionsAC"),g_cslSettings->m_clientOptsAC);
     config->Write(wxT("PathAC"),g_cslSettings->m_configPathAC);
+    config->Write(wxT("BinaryBF"),g_cslSettings->m_clientBinBF);
+    config->Write(wxT("OptionsBF"),g_cslSettings->m_clientOptsBF);
+    config->Write(wxT("PathBF"),g_cslSettings->m_configPathBF);
     config->Write(wxT("BinaryCB"),g_cslSettings->m_clientBinCB);
     config->Write(wxT("OptionsCB"),g_cslSettings->m_clientOptsCB);
     config->Write(wxT("PathCB"),g_cslSettings->m_configPathCB);

@@ -77,6 +77,7 @@ void CslDlgAddMaster::set_properties()
     choice_type->Clear();
     choice_type->Append(CSL_DEFAULT_NAME_SB,(void*)CSL_GAME_SB);
     choice_type->Append(CSL_DEFAULT_NAME_AC,(void*)CSL_GAME_AC);
+    choice_type->Append(CSL_DEFAULT_NAME_BF,(void*)CSL_GAME_BF);
     choice_type->Append(CSL_DEFAULT_NAME_CB,(void*)CSL_GAME_CB);
     choice_type->SetSelection(m_master->GetType()==CSL_GAME_START ? CSL_GAME_SB : m_master->GetType()-1);
 }
@@ -154,6 +155,10 @@ void CslDlgAddMaster::OnCommandEvent(wxCommandEvent& event)
                 case CSL_GAME_AC:
                     addr=CSL_DEFAULT_MASTER_AC;
                     path=CSL_DEFAULT_MASTER_PATH_AC;
+                    break;
+                case CSL_GAME_BF:
+                    addr=CSL_DEFAULT_MASTER_BF;
+                    path=CSL_DEFAULT_MASTER_PATH_BF;
                     break;
                 case CSL_GAME_CB:
                     addr=CSL_DEFAULT_MASTER_CB;

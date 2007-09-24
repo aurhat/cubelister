@@ -41,6 +41,7 @@
 #include "img/grey_list_16.xpm"
 #include "img/sb_16.xpm"
 #include "img/ac_16.xpm"
+#include "img/bf_16.xpm"
 #include "img/cb_16.xpm"
 #endif
 
@@ -177,7 +178,8 @@ CslListCtrlServer::CslListCtrlServer(wxWindow* parent,wxWindowID id,const wxPoin
 #define CSL_LIST_IMG_SORT_DSC_LIGHT   7
 #define CSL_LIST_IMG_SB               8
 #define CSL_LIST_IMG_AC               9
-#define CSL_LIST_IMG_CB              10
+#define CSL_LIST_IMG_BF              10
+#define CSL_LIST_IMG_CB              11
 
     m_imageList.Create(16,16,true);
 
@@ -192,6 +194,7 @@ CslListCtrlServer::CslListCtrlServer(wxWindow* parent,wxWindowID id,const wxPoin
     m_imageList.Add(wxBitmap(sortdsclight_16_xpm));
     m_imageList.Add(wxBitmap(sb_16_xpm));
     m_imageList.Add(wxBitmap(ac_16_xpm));
+    m_imageList.Add(wxBitmap(bf_16_xpm));
     m_imageList.Add(wxBitmap(cb_16_xpm));
 #else
     m_imageList.Add(wxIcon(wxT("ICON_LIST_GREEN"),wxBITMAP_TYPE_ICO_RESOURCE));
@@ -204,6 +207,7 @@ CslListCtrlServer::CslListCtrlServer(wxWindow* parent,wxWindowID id,const wxPoin
     m_imageList.Add(wxIcon(wxT("ICON_LIST_DSC_LIGHT"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imageList.Add(wxIcon(wxT("ICON_LIST_SB_16"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imageList.Add(wxIcon(wxT("ICON_LIST_AC_16"),wxBITMAP_TYPE_ICO_RESOURCE));
+    m_imageList.Add(wxIcon(wxT("ICON_LIST_BF_16"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imageList.Add(wxIcon(wxT("ICON_LIST_CB_16"),wxBITMAP_TYPE_ICO_RESOURCE));
 #endif
 
@@ -1001,6 +1005,9 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
             case CSL_GAME_AC:
                 i=CSL_LIST_IMG_AC;
                 break;
+            case CSL_GAME_BF:
+                i=CSL_LIST_IMG_BF;
+                break;
             case CSL_GAME_CB:
                 i=CSL_LIST_IMG_CB;
                 break;
@@ -1178,6 +1185,11 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info)
             path=g_cslSettings->m_configPathAC;
             opts=g_cslSettings->m_clientOptsAC;
             break;
+        case CSL_GAME_BF:
+            cmd=g_cslSettings->m_clientBinBF;
+            path=g_cslSettings->m_configPathBF;
+            opts=g_cslSettings->m_clientOptsBF;
+            break;
         case CSL_GAME_CB:
             cmd=g_cslSettings->m_clientBinCB;
             path=g_cslSettings->m_configPathCB;
@@ -1204,6 +1216,7 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info)
     switch (info->m_type)
     {
         case CSL_GAME_SB:
+        case CSL_GAME_BF:
         {
             if (info->m_mm==MM_PRIVATE)
             {

@@ -105,9 +105,13 @@ class CslSettings
                 m_clientBinAC(wxEmptyString),
                 m_clientOptsAC(wxEmptyString),
                 m_configPathAC(wxEmptyString),
+                m_clientBinBF(wxEmptyString),
+                m_clientOptsBF(wxEmptyString),
+                m_configPathBF(wxEmptyString),
                 m_clientBinCB(wxEmptyString),
                 m_clientOptsCB(wxEmptyString),
                 m_configPathCB(wxEmptyString),
+
                 m_minPlaytime(CSL_MIN_PLAYTIME_STD)
         {}
 
@@ -144,6 +148,9 @@ class CslSettings
         wxString m_clientBinAC;
         wxString m_clientOptsAC;
         wxString m_configPathAC;
+        wxString m_clientBinBF;
+        wxString m_clientOptsBF;
+        wxString m_configPathBF;
         wxString m_clientBinCB;
         wxString m_clientOptsCB;
         wxString m_configPathCB;

@@ -28,10 +28,10 @@
 #define CSL_NAME_STR          _("Cube Server Lister (CSL)")
 #define CSL_NAME_SHORT_STR    wxT("csl")
 
-#define CSL_VERSION_STR       wxT("0.6")
+#define CSL_VERSION_STR       wxT("0.6.1")
 #define CSL_VERSION_ADD_STR   wxT("")
 
-#define CSL_DESCRIPTION_STR   _("Tool to ... Sauerbraten based servers.")
+#define CSL_DESCRIPTION_STR   _("Tool to monitor cubeengine-based servers.")
 #define CSL_COPYRIGHT_STR     wxT("(C)2007 by WahnFred <wahnfred@the-conquerors.net>")
 
 #define CSL_VERSION_LONG_STR  wxString(CSL_VERSION_STR wxT(" ") CSL_VERSION_ADD_STR)
