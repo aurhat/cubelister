@@ -110,7 +110,7 @@ class CslProcess : public wxProcess
 
             // Cube returns with 1 - weird
             if (code!=0 && m_info->m_type!=CSL_GAME_CB)
-                wxMessageBox(m_cmd+wxString::Format(_(" returned with code: %d"),code),
+                wxMessageBox(wxString::Format(_("%s returned with code: %d"),m_cmd.c_str(),code),
                              _("Error"),wxICON_ERROR,m_parent);
 
             ProcessInputStream();

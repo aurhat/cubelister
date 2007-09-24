@@ -26,6 +26,7 @@ src/CslGame.h
 src/CslSettings.h
 src/CslArt.h
 src/CslUDP.h
+src/CslMenu.cpp
 src/CslMenu.h
 src/CslListCtrlInfo.h
 src/libGeoIP/GeoIP.h

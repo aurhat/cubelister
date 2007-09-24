@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CSL\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-09-24 14:40+0200\n"
-"PO-Revision-Date: 2007-09-18 21:02+0100\n"
+"POT-Creation-Date: 2007-09-24 16:00+0200\n"
+"PO-Revision-Date: 2007-09-24 16:01+0100\n"
 "Last-Translator: Glen Masgai <mimosius@gmx.de>\n"
 "Language-Team: Glen Masgai <mimosius@gmx.de>\n"
 "MIME-Version: 1.0\n"
@@ -66,7 +66,8 @@ msgstr "Kritischer Fehler!"
 msgid "Cube Server Lister"
 msgstr "Cube Server Lister"
 
-#: ../src/CslFrame.cpp:397 ../src/CslDlgOutput.cpp:97
+#: ../src/CslFrame.cpp:397
+#: ../src/CslDlgOutput.cpp:97
 msgid "Search:"
 msgstr "Suchen:"
 
@@ -138,14 +139,22 @@ msgstr "&Hilfe"
 msgid "Master already exists!"
 msgstr "Master existiert bereits!"
 
-#: ../src/CslFrame.cpp:688 ../src/CslDlgSettings.cpp:625
-#: ../src/CslDlgSettings.cpp:634 ../src/CslDlgSettings.cpp:646
-#: ../src/CslDlgSettings.cpp:653 ../src/CslDlgSettings.cpp:665
-#: ../src/CslDlgSettings.cpp:674 ../src/CslDlgSettings.cpp:686
-#: ../src/CslDlgSettings.cpp:693 ../src/CslDlgSettings.cpp:701
-#: ../src/CslListCtrlServer.cpp:114 ../src/CslListCtrlServer.cpp:460
-#: ../src/CslListCtrlServer.cpp:470 ../src/CslListCtrlServer.cpp:1206
-#: ../src/CslListCtrlServer.cpp:1212 ../src/CslListCtrlServer.cpp:1288
+#: ../src/CslFrame.cpp:688
+#: ../src/CslDlgSettings.cpp:625
+#: ../src/CslDlgSettings.cpp:634
+#: ../src/CslDlgSettings.cpp:646
+#: ../src/CslDlgSettings.cpp:653
+#: ../src/CslDlgSettings.cpp:665
+#: ../src/CslDlgSettings.cpp:674
+#: ../src/CslDlgSettings.cpp:686
+#: ../src/CslDlgSettings.cpp:693
+#: ../src/CslDlgSettings.cpp:701
+#: ../src/CslListCtrlServer.cpp:114
+#: ../src/CslListCtrlServer.cpp:460
+#: ../src/CslListCtrlServer.cpp:470
+#: ../src/CslListCtrlServer.cpp:1206
+#: ../src/CslListCtrlServer.cpp:1212
+#: ../src/CslListCtrlServer.cpp:1288
 #: ../src/CslListCtrlServer.cpp:1305
 msgid "Error"
 msgstr "Fehler!"
@@ -195,12 +204,15 @@ msgstr "Ping Schwellwerte"
 msgid "Don't update when playing"
 msgstr "Nicht aktualisieren beim Spielen"
 
-#: ../src/CslDlgSettings.cpp:108 ../src/CslDlgConnectWait.cpp:36
+#: ../src/CslDlgSettings.cpp:108
+#: ../src/CslDlgConnectWait.cpp:36
 msgid "&Ok"
 msgstr "&Ok"
 
-#: ../src/CslDlgSettings.cpp:109 ../src/CslDlgAddMaster.cpp:59
-#: ../src/CslDlgConnectWait.cpp:37 ../src/CslDlgAddServer.cpp:42
+#: ../src/CslDlgSettings.cpp:109
+#: ../src/CslDlgAddMaster.cpp:59
+#: ../src/CslDlgConnectWait.cpp:37
+#: ../src/CslDlgAddServer.cpp:42
 msgid "&Cancel"
 msgstr "&Abbrechen"
 
@@ -222,9 +234,8 @@ msgid "Select AssaultCube executable"
 msgstr "AssaultCube Programmdatei wählen"
 
 #: ../src/CslDlgSettings.cpp:211
-#, fuzzy
 msgid "Select Blood Frontier executable"
-msgstr "Cube Programmdatei wählen"
+msgstr "Blood Frontier Programmdatei wählen"
 
 #: ../src/CslDlgSettings.cpp:215
 msgid "Select Cube executable"
@@ -239,26 +250,31 @@ msgid "Select AssaultCube game path"
 msgstr "Wähle AssaultCube Spielverzeichnis"
 
 #: ../src/CslDlgSettings.cpp:228
-#, fuzzy
 msgid "Select Blood Frontier game path"
-msgstr "Wähle Cube Spielverzeichnis"
+msgstr "Wähle Blood Frontier Spielverzeichnis"
 
 #: ../src/CslDlgSettings.cpp:232
 msgid "Select Cube game path"
 msgstr "Wähle Cube Spielverzeichnis"
 
-#: ../src/CslDlgSettings.cpp:271 ../src/CslDlgSettings.cpp:280
-#: ../src/CslDlgSettings.cpp:289 ../src/CslDlgSettings.cpp:298
+#: ../src/CslDlgSettings.cpp:271
+#: ../src/CslDlgSettings.cpp:280
+#: ../src/CslDlgSettings.cpp:289
+#: ../src/CslDlgSettings.cpp:298
 msgid "Game executable:"
 msgstr "Programmdatei:"
 
-#: ../src/CslDlgSettings.cpp:273 ../src/CslDlgSettings.cpp:282
-#: ../src/CslDlgSettings.cpp:291 ../src/CslDlgSettings.cpp:300
+#: ../src/CslDlgSettings.cpp:273
+#: ../src/CslDlgSettings.cpp:282
+#: ../src/CslDlgSettings.cpp:291
+#: ../src/CslDlgSettings.cpp:300
 msgid "Game directory:"
 msgstr "Spielverzeichnis:"
 
-#: ../src/CslDlgSettings.cpp:275 ../src/CslDlgSettings.cpp:284
-#: ../src/CslDlgSettings.cpp:293 ../src/CslDlgSettings.cpp:302
+#: ../src/CslDlgSettings.cpp:275
+#: ../src/CslDlgSettings.cpp:284
+#: ../src/CslDlgSettings.cpp:293
+#: ../src/CslDlgSettings.cpp:302
 msgid "Game paramters:"
 msgstr "Spielparameter:"
 
@@ -272,7 +288,7 @@ msgstr "AssaultCube"
 
 #: ../src/CslDlgSettings.cpp:309
 msgid "Blood Frontier"
-msgstr ""
+msgstr "Blood Frontier"
 
 #: ../src/CslDlgSettings.cpp:310
 msgid "Cube"
@@ -355,8 +371,8 @@ msgstr ""
 
 #: ../src/CslListCtrlServer.cpp:113
 #, c-format
-msgid " returned with code: %d"
-msgstr " beendet mit Code: %d"
+msgid "%s returned with code: %d"
+msgstr "%s beendet mit Code: %d"
 
 #: ../src/CslListCtrlServer.cpp:329
 msgid "Extended information"
@@ -369,16 +385,16 @@ msgid ""
 "Cancel the operation."
 msgstr ""
 "\n"
-"Wähle Ja um diese Server zu behalten, Nein um sie zu löschen oder\n"
-"Abbrechen, um den Vorgang zu beenden."
+"Wähle Ja um diese Server zu behalten, Nein um sie zu löschen\n"
+"oder Abbrechen, um den Vorgang zu beenden."
 
 #: ../src/CslListCtrlServer.cpp:426
 msgid "You are about to delete servers which are also favourites!\n"
 msgstr "Es sollen Server gelöscht werden, die als Favoriten markiert sind!\n"
 
-#: ../src/CslListCtrlServer.cpp:428 ../src/CslListCtrlServer.cpp:438
+#: ../src/CslListCtrlServer.cpp:428
+#: ../src/CslListCtrlServer.cpp:438
 #: ../src/CslListCtrlServer.cpp:1162
-#, fuzzy
 msgid "Warning"
 msgstr "Warnung!"
 
@@ -404,12 +420,8 @@ msgstr ""
 
 #: ../src/CslListCtrlServer.cpp:669
 #, c-format
-msgid ""
-"Waiting %d seconds for a free slot on \"%s\" (press ESC to abort or join "
-"another server)"
-msgstr ""
-"Warte %d Sekunden auf einen freien Slot auf \"%s\" (ESC drücken um "
-"abzubrechen oder einen anderen Server wählen)"
+msgid "Waiting %d seconds for a free slot on \"%s\" (press ESC to abort or join another server)"
+msgstr "Warte %d Sekunden auf einen freien Slot auf \"%s\" (ESC drücken um abzubrechen oder einen anderen Server wählen)"
 
 #: ../src/CslListCtrlServer.cpp:704
 msgid "Host"
@@ -501,7 +513,8 @@ msgstr ""
 msgid "Failed to start: "
 msgstr "Fehler beim Starten:"
 
-#: ../src/CslDlgOutput.cpp:51 ../src/CslDlgOutput.cpp:318
+#: ../src/CslDlgOutput.cpp:51
+#: ../src/CslDlgOutput.cpp:318
 #, c-format
 msgid "%d matches"
 msgstr "%d Treffer"
@@ -535,7 +548,8 @@ msgid "&Close"
 msgstr "&Schliessen"
 
 #. begin wxGlade: CslDlgOutput::set_properties
-#: ../src/CslDlgOutput.cpp:77 ../src/CslDlgOutput.cpp:440
+#: ../src/CslDlgOutput.cpp:77
+#: ../src/CslDlgOutput.cpp:440
 msgid "CSL - Game output"
 msgstr "CSL - Spielausgabe"
 
@@ -555,7 +569,8 @@ msgstr "Logdatei öffnen"
 msgid "Save log file"
 msgstr "Logdatei speichern"
 
-#: ../src/CslDlgAddMaster.cpp:51 ../src/CslDlgAddServer.cpp:37
+#: ../src/CslDlgAddMaster.cpp:51
+#: ../src/CslDlgAddServer.cpp:37
 msgid "default"
 msgstr "Standard"
 
@@ -567,7 +582,8 @@ msgstr "Benutzerdefiniert"
 msgid "Add default master"
 msgstr "Standard Master"
 
-#: ../src/CslDlgAddMaster.cpp:58 ../src/CslDlgAddServer.cpp:41
+#: ../src/CslDlgAddMaster.cpp:58
+#: ../src/CslDlgAddServer.cpp:41
 msgid "&Add"
 msgstr "&Hinzufügen"
 
@@ -576,11 +592,13 @@ msgstr "&Hinzufügen"
 msgid "CSL - Add new Master"
 msgstr "CSL - Master hinzufügen"
 
-#: ../src/CslDlgAddMaster.cpp:94 ../src/CslDlgAddServer.cpp:77
+#: ../src/CslDlgAddMaster.cpp:94
+#: ../src/CslDlgAddServer.cpp:77
 msgid "Game:"
 msgstr "Spiel:"
 
-#: ../src/CslDlgAddMaster.cpp:97 ../src/CslDlgAddServer.cpp:80
+#: ../src/CslDlgAddMaster.cpp:97
+#: ../src/CslDlgAddServer.cpp:80
 msgid "Address:"
 msgstr "Adresse:"
 
@@ -588,7 +606,9 @@ msgstr "Adresse:"
 msgid "Path:"
 msgstr "Pfad:"
 
-#: ../src/CslGame.cpp:81 ../src/CslGame.cpp:93 ../src/CslListCtrlInfo.cpp:196
+#: ../src/CslGame.cpp:81
+#: ../src/CslGame.cpp:93
+#: ../src/CslListCtrlInfo.cpp:196
 msgid "unknown"
 msgstr "unbekannt"
 
@@ -679,9 +699,8 @@ msgid "Cube Server Lister (CSL)"
 msgstr "Cube Server Lister (CSL)"
 
 #: ../src/CslVersion.h:34
-#, fuzzy
 msgid "Tool to monitor cubeengine-based servers."
-msgstr "Programm um Sauerbraten basierte Server zu ..."
+msgstr "Programm um Cubeengine basierte Server zu beobachten."
 
 #: ../src/CslMenu.h:40
 msgid "&Connect to server"
@@ -721,22 +740,18 @@ msgstr "Server &löschen"
 #, fuzzy
 #~ msgid "Server \""
 #~ msgstr "Server voll"
-
 #~ msgid "File"
 #~ msgstr "Datei"
-
 #~ msgid ""
 #~ "For connect method \"Config\" you have to specify the game path "
 #~ "(Installation path)."
 #~ msgstr ""
 #~ "Verbindungsmethode \"Config\" benötigt das Spielverzeichnis "
 #~ "(Installationsverzeichnis)"
-
 #~ msgid "Config (csl-connect.cfg)"
 #~ msgstr "Config (csl-connect.cfg)"
-
 #~ msgid "Connect method:"
 #~ msgstr "Verbindungsmethode:"
-
 #~ msgid "Could not open %s%s for writing."
 #~ msgstr "Konnte %s%s nicht zum Schreiben öffnen."
+

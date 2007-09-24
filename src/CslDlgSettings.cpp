@@ -164,7 +164,7 @@ void CslDlgSettings::set_properties()
 
     text_ctrl_sauer_options->SetValue(m_settings.m_clientOptsSB);
     text_ctrl_assault_options->SetValue(m_settings.m_clientOptsAC);
-    text_ctrl_frontier_options->SetValue(m_settings.m_clientOptsAC);
+    text_ctrl_frontier_options->SetValue(m_settings.m_clientOptsBF);
     text_ctrl_cube_options->SetValue(m_settings.m_clientOptsCB);
 
     checkbox_play_update->SetValue(m_settings.m_dontUpdatePlaying);
@@ -224,7 +224,7 @@ void CslDlgSettings::do_layout()
                                      _("Select AssaultCube game path"),
                                      wxDefaultPosition,sizePicker,
                                      wxDIRP_DEFAULT_STYLE|wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST);
-    dpickFrontier=new wxDirPickerCtrl(notebook_pane_frontier,DIR_PICKER_BF,m_settings.m_configPathAC,
+    dpickFrontier=new wxDirPickerCtrl(notebook_pane_frontier,DIR_PICKER_BF,m_settings.m_configPathBF,
                                       _("Select Blood Frontier game path"),
                                       wxDefaultPosition,sizePicker,
                                       wxDIRP_DEFAULT_STYLE|wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST);
