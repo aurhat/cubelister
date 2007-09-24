@@ -21,7 +21,7 @@
   <kdevautoproject>
     <general>
       <activetarget>src/csl</activetarget>
-      <useconfiguration>debug</useconfiguration>
+      <useconfiguration>optimized-unicode</useconfiguration>
     </general>
     <run>
       <mainprogram>/home/mimosius/Documents/Development/csl</mainprogram>
@@ -259,9 +259,7 @@
       <synchronize>true</synchronize>
       <orientation>Vertical</orientation>
     </splitheadersource>
-    <references>
-      <pcs>wxGTK-2.8.5</pcs>
-    </references>
+    <references/>
   </kdevcppsupport>
   <cppsupportpart>
     <filetemplates>

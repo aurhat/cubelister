@@ -211,7 +211,7 @@ void CslDlgOutput::OnCommandEvent(wxCommandEvent& event)
 
             wxFileDialog dlg(this,_("Save log file"),wxEmptyString,s,
                              ext,wxSAVE|wxOVERWRITE_PROMPT);
-            // FIXME wxGTK: hmm, doesn't work in the dtor?!
+            // wxGTK: hmm, doesn't work in the ctor?!
             if (wxDirExists(g_cslSettings->m_outputPath))
                 dlg.SetPath(g_cslSettings->m_outputPath+wxT("/")+s);
             if (dlg.ShowModal()!=wxID_OK)
@@ -407,21 +407,15 @@ void CslDlgOutput::HandleOutput(char *text,wxUint32 size)
 {
     wxInt32 start=0,end=0;
 
-    if (text && size)
-    {
-        start=m_text.Len();
-        end=start+size;
-        m_text.Alloc(start+size+sizeof(wxChar));
-        m_text+=A2U(text);
-        text_ctrl_output->AppendText(checkbox_conv_filter->GetValue() ?
-                                     Filter(start,end) : m_text.Mid(start,size));
-    }
-    else
-    {
-        end=m_text.Len();
-        text_ctrl_output->AppendText(checkbox_conv_filter->GetValue() ?
-                                     Filter(start,end) : m_text);
-    }
+    if (!text || !size)
+        return;
+
+    start=m_text.Len();
+    end=start+size;
+    m_text.Alloc(start+size+sizeof(wxChar));
+    m_text+=A2U(text);
+    text_ctrl_output->AppendText(checkbox_conv_filter->GetValue() ?
+                                 Filter(start,end) : m_text.Mid(start,size));
 
     text_ctrl_output->ShowPosition(0);
 

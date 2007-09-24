@@ -84,9 +84,6 @@ class CslDlgOutput: public wxDialog
         void SetSearchbarColour(wxInt32 count);
         wxInt32 Search(const wxString& needle);
         wxString Filter(wxUint32 start,wxUint32 end);
-        void ClearTextCtrl();
-
-
 }; // wxGlade: end class
 
 
