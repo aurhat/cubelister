@@ -69,7 +69,7 @@
 		9ECC32980CA1AA3400578B5E /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		9ECC329A0CA1AA6800578B5E /* csl_start_sb.ogz */ = {isa = PBXFileReference; lastKnownFileType = file; name = csl_start_sb.ogz; path = ../data/csl_start_sb.ogz; sourceTree = SOURCE_ROOT; };
 		9ECC329B0CA1AA6800578B5E /* GeoIP.dat */ = {isa = PBXFileReference; lastKnownFileType = file; name = GeoIP.dat; path = ../data/GeoIP.dat; sourceTree = SOURCE_ROOT; };
-		9ED9D44A0CA161E000B0FC71 /* csl.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = csl.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9ED9D44A0CA161E000B0FC71 /* csl.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = csl.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9ED9D44D0CA161E000B0FC71 /* csl-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "csl-Info.plist"; sourceTree = "<group>"; };
 		9ED9D4520CA1622F00B0FC71 /* CslArt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslArt.cpp; path = ../src/CslArt.cpp; sourceTree = SOURCE_ROOT; };
 		9ED9D4530CA1622F00B0FC71 /* CslArt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslArt.h; path = ../src/CslArt.h; sourceTree = SOURCE_ROOT; };
@@ -164,6 +164,7 @@
 				9ED9D4640CA1622F00B0FC71 /* CslFrame.cpp */,
 				9ED9D4650CA1622F00B0FC71 /* CslFrame.h */,
 				9ED9D4660CA1622F00B0FC71 /* CslGame.cpp */,
+				9ED9D4670CA1622F00B0FC71 /* CslGame.h */,
 				9ED9D4680CA1622F00B0FC71 /* CslListCtrlInfo.cpp */,
 				9ED9D4690CA1622F00B0FC71 /* CslListCtrlInfo.h */,
 				9ED9D46A0CA1622F00B0FC71 /* CslListCtrlServer.cpp */,
@@ -178,7 +179,6 @@
 				9ED9D4730CA1622F00B0FC71 /* CslUDP.h */,
 				9ED9D4740CA1622F00B0FC71 /* CslVersion.h */,
 				9ED9D4750CA1622F00B0FC71 /* cube_tools.h */,
-				9ED9D4670CA1622F00B0FC71 /* CslGame.h */,
 			);
 			name = Sources;
 			sourceTree = "<group>";
@@ -205,7 +205,6 @@
 				9ECC31360CA1A96D00578B5E /* External Frameworks and Libraries */,
 				9ECC30FD0CA1A8F500578B5E /* Sources */,
 				9ED9D44B0CA161E000B0FC71 /* Products */,
-				9ED9D44D0CA161E000B0FC71 /* csl-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -223,6 +222,7 @@
 				9E015AE00CA569950029BEEF /* csl_mac.icns */,
 				9ECC329A0CA1AA6800578B5E /* csl_start_sb.ogz */,
 				9ECC329B0CA1AA6800578B5E /* GeoIP.dat */,
+				9ED9D44D0CA161E000B0FC71 /* csl-Info.plist */,
 			);
 			name = Resources;
 			sourceTree = "<group>";

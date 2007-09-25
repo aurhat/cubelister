@@ -478,8 +478,8 @@ void CslDlgSettings::OnPicker(wxFileDirPickerEvent& event)
         case DIR_PICKER_BF:
             m_settings.m_configPathBF=path;
 #ifdef __WXMAC__
-            m_settings.m_configPathBF+=wxT("/bloodfrontier");
-            m_settings.m_clientBinAC=path+wxT("/bloodfrontier/bloodfrontier.app/Contents/MacOS/bloodfrontier");
+            m_settings.m_configPathBF+=wxT("");
+            m_settings.m_clientBinBF=path+wxT("/sauerbraten.app/Contents/MacOS/sauerbraten");
 #endif
             break;
         case DIR_PICKER_CB:
