@@ -445,8 +445,8 @@ void CslFrame::do_layout()
     ToggleFilter();
     ToggleSplitterUpdate();
 
-// only set splitter positions here on wxMAC - it doesnt work under wxGTK
-// and EVT_SHOW is not send on wxMAC
+// only set splitter gravity on wxMAC here - it doesn't
+// work under wxGTK and EVT_SHOW is not send on wxMAC
 #ifdef __WXMAC__
     splitter_games_info->SetSashGravity(1.0f);
     splitter_lists->SetSashGravity(0.8f);
