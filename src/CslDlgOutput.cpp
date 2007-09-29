@@ -277,9 +277,10 @@ wxInt32 CslDlgOutput::Search(const wxString& needle)
     wxInt32 hlen=haystack.Len();
     wxInt32 nlen=needle.Len();
 
-    wxWindowUpdateLocker locler(text_ctrl_output);
-
 #ifdef __WXMAC__
+    // TODO: check if the locker is necessary under wxMAC
+    // causes flickering on wxGTK
+    wxWindowUpdateLocker locker(text_ctrl_output);
     attr.SetFlags(wxTEXT_ATTR_TEXT_COLOUR);
     attr.SetTextColour(SYSCOLOUR(wxSYS_COLOUR_WINDOWTEXT));
 #else
