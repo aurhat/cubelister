@@ -1,5 +1,5 @@
 /* XPM */
-static char * gg_xpm[] = {
+static const char * gg_xpm[] = {
 "23 12 95 2",
 "  	c None",
 ". 	c #CDCDCD",

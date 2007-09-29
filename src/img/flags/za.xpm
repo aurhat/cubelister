@@ -1,5 +1,5 @@
 /* XPM */
-static char * za_xpm[] = {
+static const char * za_xpm[] = {
 "18 12 118 2",
 "  	c None",
 ". 	c #009000",

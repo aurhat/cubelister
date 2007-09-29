@@ -1,5 +1,5 @@
 /* XPM */
-static char * kn_xpm[] = {
+static const char * kn_xpm[] = {
 "18 12 102 2",
 "  	c None",
 ". 	c #006200",

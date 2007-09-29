@@ -1,5 +1,5 @@
 /* XPM */
-static char * tv_xpm[] = {
+static const char * tv_xpm[] = {
 "18 12 151 2",
 "  	c None",
 ". 	c #CC4F45",

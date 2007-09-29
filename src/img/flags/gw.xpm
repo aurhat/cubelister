@@ -1,5 +1,5 @@
 /* XPM */
-static char * gw_xpm[] = {
+static const char * gw_xpm[] = {
 "18 12 69 1",
 " 	c None",
 ".	c #9E0000",

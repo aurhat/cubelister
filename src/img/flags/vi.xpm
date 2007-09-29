@@ -1,5 +1,5 @@
 /* XPM */
-static char * vi_xpm[] = {
+static const char * vi_xpm[] = {
 "18 12 126 2",
 "  	c None",
 ". 	c #CCCCCC",

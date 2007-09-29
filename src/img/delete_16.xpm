@@ -1,5 +1,5 @@
 /* XPM */
-static char * delete_16_xpm[] = {
+static const char * delete_16_xpm[] = {
 "16 16 86 1",
 " 	c None",
 ".	c #900000",

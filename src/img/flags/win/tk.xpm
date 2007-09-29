@@ -1,5 +1,5 @@
 /* XPM */
-static char * tk_xpm[] = {
+static const char * tk_xpm[] = {
 "23 12 112 2",
 "  	c None",
 ". 	c #CC4F45",

@@ -1,5 +1,5 @@
 /* XPM */
-static char * pw_xpm[] = {
+static const char * pw_xpm[] = {
 "23 12 82 1",
 " 	c None",
 ".	c #057CCC",

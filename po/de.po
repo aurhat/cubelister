@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CSL\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-09-24 16:00+0200\n"
-"PO-Revision-Date: 2007-09-24 16:01+0100\n"
+"POT-Creation-Date: 2007-09-25 16:51+0200\n"
+"PO-Revision-Date: 2007-09-25 16:53+0100\n"
 "Last-Translator: Glen Masgai <mimosius@gmx.de>\n"
 "Language-Team: Glen Masgai <mimosius@gmx.de>\n"
 "MIME-Version: 1.0\n"
@@ -61,7 +61,6 @@ msgstr ""
 msgid "Fatal error!"
 msgstr "Kritischer Fehler!"
 
-#. begin wxGlade: CslFrame::set_properties
 #: ../src/CslFrame.cpp:310
 msgid "Cube Server Lister"
 msgstr "Cube Server Lister"
@@ -216,7 +215,6 @@ msgstr "&Ok"
 msgid "&Cancel"
 msgstr "&Abbrechen"
 
-#. begin wxGlade: CslDlgSettings::set_properties
 #: ../src/CslDlgSettings.cpp:152
 msgid "Cube Server Lister - Settings"
 msgstr "Cube Server Lister - Einstellungen"
@@ -547,7 +545,6 @@ msgstr "&Speichern"
 msgid "&Close"
 msgstr "&Schliessen"
 
-#. begin wxGlade: CslDlgOutput::set_properties
 #: ../src/CslDlgOutput.cpp:77
 #: ../src/CslDlgOutput.cpp:440
 msgid "CSL - Game output"
@@ -587,7 +584,6 @@ msgstr "Standard Master"
 msgid "&Add"
 msgstr "&Hinzufügen"
 
-#. begin wxGlade: CslDlgAddMaster::set_properties
 #: ../src/CslDlgAddMaster.cpp:69
 msgid "CSL - Add new Master"
 msgstr "CSL - Master hinzufügen"
@@ -669,7 +665,6 @@ msgstr "Erweiterte Informationen nicht unterstützt"
 msgid "Set as default waiting time."
 msgstr "Setze als standard Wartezeit."
 
-#. begin wxGlade: CslDlgConnectWait::set_properties
 #: ../src/CslDlgConnectWait.cpp:48
 msgid "CSL - Server full"
 msgstr "CSL - Server voll"
@@ -686,14 +681,10 @@ msgstr ""
 msgid "Time to wait (sec):"
 msgstr "Wartezeit (sek):"
 
-#. begin wxGlade: CslDlgAddServer::set_properties
 #: ../src/CslDlgAddServer.cpp:53
 msgid "CSL - Add new server"
 msgstr "CSL - Server hinzufügen"
 
-#. *
-#. @author Glen Masgai <mimosius@gmx.de>
-#.
 #: ../src/CslVersion.h:28
 msgid "Cube Server Lister (CSL)"
 msgstr "Cube Server Lister (CSL)"
@@ -733,25 +724,4 @@ msgstr "Server &löschen"
 #: ../src/CslMenu.h:47
 msgid "&Delete servers"
 msgstr "Server &löschen"
-
-#~ msgid "Error!"
-#~ msgstr "Fehler!"
-
-#, fuzzy
-#~ msgid "Server \""
-#~ msgstr "Server voll"
-#~ msgid "File"
-#~ msgstr "Datei"
-#~ msgid ""
-#~ "For connect method \"Config\" you have to specify the game path "
-#~ "(Installation path)."
-#~ msgstr ""
-#~ "Verbindungsmethode \"Config\" benötigt das Spielverzeichnis "
-#~ "(Installationsverzeichnis)"
-#~ msgid "Config (csl-connect.cfg)"
-#~ msgstr "Config (csl-connect.cfg)"
-#~ msgid "Connect method:"
-#~ msgstr "Verbindungsmethode:"
-#~ msgid "Could not open %s%s for writing."
-#~ msgstr "Konnte %s%s nicht zum Schreiben öffnen."
 

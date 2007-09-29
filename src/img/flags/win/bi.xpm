@@ -1,5 +1,5 @@
 /* XPM */
-static char * bi_xpm[] = {
+static const char * bi_xpm[] = {
 "23 12 100 2",
 "  	c None",
 ". 	c #CCCACC",

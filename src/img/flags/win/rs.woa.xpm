@@ -1,5 +1,5 @@
 /* XPM */
-static char * rs_woa_xpm[] = {
+static const char * rs_woa_xpm[] = {
 "23 12 51 1",
 " 	c None",
 ".	c #CD0000",

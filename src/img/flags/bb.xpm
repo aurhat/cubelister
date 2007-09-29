@@ -1,5 +1,5 @@
 /* XPM */
-static char * bb_xpm[] = {
+static const char * bb_xpm[] = {
 "18 12 115 2",
 "  	c None",
 ". 	c #062771",

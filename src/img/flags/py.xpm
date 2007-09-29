@@ -1,5 +1,5 @@
 /* XPM */
-static char * py_xpm[] = {
+static const char * py_xpm[] = {
 "18 12 71 1",
 " 	c None",
 ".	c #9E0000",

@@ -1,5 +1,5 @@
 /* XPM */
-static char * sortasc_16_xpm[] = {
+static const char * sortasc_16_xpm[] = {
 "16 16 2 1",
 " 	c None",
 ".	c #787878",

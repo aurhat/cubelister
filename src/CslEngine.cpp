@@ -442,7 +442,8 @@ bool CslEngine::PingStats(CslServerInfo *info)
 
     ucharbuf p(ping, sizeof(ping));
     putint(p,0);
-//    putstring("stats",p);
+    putstring("stats",p);
+    putint(p,-1);
 
     packet=new CslUDPPacket();
     packet->Set(info->m_addr,ping,p.length());
@@ -515,6 +516,7 @@ int CslEngine::UpdateMaster()
     agent+=wxT("(")+os+wxT(")");
 
     wxHTTP http;
+    http.SetTimeout(10);
     if (!http.Connect(m_currentMaster->GetAddress(),80))
         return -2;
     http.SetHeader(wxT("User-Agent"),agent);
@@ -740,6 +742,8 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
 #ifdef __WXDEBUG__
                         dbg_type=wxT("stats");
 #endif
+                        wxInt32 rid=getint(p); // resent id or -1
+
                         if (getint(p)!=-1)
                             break;
 

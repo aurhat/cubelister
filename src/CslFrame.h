@@ -88,7 +88,7 @@ class CslFrame: public wxFrame
         void OnTreeLeftClick(wxTreeEvent& event);
         void OnTreeRightClick(wxTreeEvent& event);
         void OnCommandEvent(wxCommandEvent& event);
-        void OnKeyDown(wxKeyEvent& event);
+        void OnKeypress(wxKeyEvent& event);
         void OnShow(wxShowEvent& event);
         void OnClose(wxCloseEvent& event);
         void OnMouseEnter(wxMouseEvent& event);

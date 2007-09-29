@@ -1,5 +1,5 @@
 /* XPM */
-static char * reload_16_xpm[] = {
+static const char * reload_16_xpm[] = {
 "16 16 80 1",
 " 	c None",
 ".	c #3F6989",

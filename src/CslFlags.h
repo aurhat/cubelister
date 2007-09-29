@@ -248,7 +248,7 @@
 #include "zm.xpm"
 #include "zw.xpm"
 
-static char **flags[] =
+static const char **flags[] =
 {
     ad_xpm,ae_xpm,af_xpm,ag_xpm,ai_xpm,al_xpm,am_xpm,an_xpm,ao_xpm,aq_xpm,ar_xpm,
     as_xpm,at_xpm,au_xpm,aw_xpm,ax_xpm,az_xpm,ba_xpm,bb_xpm,bd_xpm,be_xpm,bf_xpm,
@@ -275,7 +275,7 @@ static char **flags[] =
     ws_xpm,ye_xpm,yt_xpm,yu_xpm,za_xpm,zm_xpm,zw_xpm
 };
 
-static char *codes[] =
+static const char *codes[] =
 {
     "ad","ae","af","ag","ai","al","am","an","ao","aq","ar",
     "as","at","au","aw","ax","az","ba","bb","bd","be","bf",

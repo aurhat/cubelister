@@ -1,5 +1,5 @@
 /* XPM */
-static char * red_16_xpm[] = {
+static const char * red_16_xpm[] = {
 "16 16 60 1",
 " 	c None",
 ".	c #FA3232",

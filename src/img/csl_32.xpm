@@ -1,5 +1,5 @@
 /* XPM */
-static char * csl_32_xpm[] = {
+static const char * csl_32_xpm[] = {
 "32 32 385 2",
 "  	c None",
 ". 	c #BA8464",

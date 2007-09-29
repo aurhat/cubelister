@@ -199,7 +199,7 @@ void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
     wxString s;
     wxInt32 i,ic=0;
     const char *country;
-    char **flag=NULL;
+    const char **flag=NULL;
     char *host=strdup(U2A(info->m_addr.IPAddress().c_str()));
 
     s=info->m_host;

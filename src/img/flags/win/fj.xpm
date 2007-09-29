@@ -1,5 +1,5 @@
 /* XPM */
-static char * fj_xpm[] = {
+static const char * fj_xpm[] = {
 "23 12 152 2",
 "  	c None",
 ". 	c #CC4F45",

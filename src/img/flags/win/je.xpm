@@ -1,5 +1,5 @@
 /* XPM */
-static char * je_xpm[] = {
+static const char * je_xpm[] = {
 "23 12 116 2",
 "  	c None",
 ". 	c #CC0C0C",

@@ -1,5 +1,5 @@
 /* XPM */
-static char * sj_xpm[] = {
+static const char * sj_xpm[] = {
 "18 12 127 2",
 "  	c None",
 ". 	c #BE2020",

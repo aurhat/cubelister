@@ -1,5 +1,5 @@
 /* XPM */
-static char * close_high_14_xpm[] = {
+static const char * close_high_14_xpm[] = {
 "14 14 139 2",
 "  	c None",
 ". 	c #E9B8B2",

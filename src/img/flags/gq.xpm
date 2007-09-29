@@ -1,5 +1,5 @@
 /* XPM */
-static char * gq_xpm[] = {
+static const char * gq_xpm[] = {
 "18 12 104 2",
 "  	c None",
 ". 	c #033E52",
