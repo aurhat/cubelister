@@ -117,7 +117,7 @@ class CslEngine : public wxEvtHandler
 
         bool Ping(CslServerInfo *info,bool force=false);
         bool PingUptime(CslServerInfo *info);
-        bool PingStats(CslServerInfo *info);
+        bool PingStats(CslServerInfo *info,wxUint32 playerid=-1);
         wxUint32 PingServers();
 
         int UpdateMaster();

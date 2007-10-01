@@ -230,11 +230,11 @@ void CslEngine::DeInitEngine()
 
 CslGame* CslEngine::AddMaster(CslMaster *master)
 {
+    wxASSERT(master);
+
     if (!master)
-    {
-        wxASSERT(master);
         return NULL;
-    }
+
     CslGame *game=FindOrCreateGame(master->GetType());
     if (game->AddMaster(master)>=0)
         return game;
@@ -244,11 +244,11 @@ CslGame* CslEngine::AddMaster(CslMaster *master)
 
 void CslEngine::DeleteMaster(CslMaster *master)
 {
+    wxASSERT(master);
+
     if (!master)
-    {
-        wxASSERT(master);
         return;
-    }
+
     master->GetGame()->DeleteMaster(master);
 }
 
@@ -432,7 +432,7 @@ bool CslEngine::PingUptime(CslServerInfo *info)
     return true;
 }
 
-bool CslEngine::PingStats(CslServerInfo *info)
+bool CslEngine::PingStats(CslServerInfo *info,wxUint32 playerid)
 {
     if (!info->m_extended)
         return false;
@@ -443,7 +443,7 @@ bool CslEngine::PingStats(CslServerInfo *info)
     ucharbuf p(ping, sizeof(ping));
     putint(p,0);
     putstring("stats",p);
-    putint(p,-1);
+    putint(p,playerid);
 
     packet=new CslUDPPacket();
     packet->Set(info->m_addr,ping,p.length());
@@ -722,7 +722,7 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
                         dbg_type=wxT("uptime");
 #endif
                         v=p.length();
-                        if (getint(p)!=-1)
+                        if (getint(p)!=-1)  // ack
                         {
                             p.len=v;
                             UpdateServerInfo(info,&p,now);
@@ -739,55 +739,91 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
                     }
                     else if (strcmp(text,"stats")==0)
                     {
+                        wxInt32 vi;
 #ifdef __WXDEBUG__
                         dbg_type=wxT("stats");
 #endif
-                        wxInt32 rid=getint(p); // resent id or -1
+                        wxInt32 rid=getint(p);       // resent id or -1
 
-                        if (getint(p)!=-1)
+                        if (getint(p)!=-1)  // check for ack
+                        {
+                            LOG_DEBUG("stats (%s) ERROR: missing ACK\n",
+                                      U2A(info->GetBestDescription()));
+                            return;
+                        }
+
+                        vi=getint(p);
+                        if (vi!=101)         // check for protocol
+                        {
+                            LOG_DEBUG("stats (%s) ERROR: prot=%d\n",
+                                      U2A(info->GetBestDescription()),vi);
+                            return;
+                        }
+
+                        vi=getint(p);
+                        if (vi>0)    // check for error
+                        {
+                            LOG_DEBUG("stats (%s) ERROR: received\n",U2A(info->GetBestDescription()));
+                            return;
+                        }
+
+                        CslPlayerStats *stats=&info->m_playerStats;
+
+                        vi=getint(p);
+                        if (vi==-10) // check for following ids
+                        {
+                            while (!p.overread())
+                            {
+                                vi=getint(p);
+                                if (p.overread())
+                                    break;
+                                if (rid==-1 && !stats->AddId(vi))
+                                {
+                                    stats->Reset();
+                                    LOG_DEBUG("stats (%s) ERROR: AddId(%d)\n",
+                                              U2A(info->GetBestDescription()),vi);
+                                    return;
+                                }
+                            }
+                            stats->SetWaitForStats();
+
+                            LOG_DEBUG("stats (%s) ids=%d\n",U2A(info->GetBestDescription()),
+                                      stats->m_ids.length());
                             break;
-
-                        wxUint32 extProt=getint(p);
-                        if (extProt<101)
+                        }
+                        else if (vi!=-11) // check for following stats
                             return;
 
-                        LOG_DEBUG("stats (%s) prot:%d\n",U2A(info->GetBestDescription()),extProt);
+                        CslPlayerStatsData *data=stats->GetNewStatsPtr();
 
-                        CslPlayerStats *stats=NULL;
-                        loopv(info->m_playerStats)
-                        {
-                            if (info->m_playerStats[i]->m_ok)
-                                continue;
-                            stats=info->m_playerStats.at(i);
-                        }
-
-                        if (!stats)
-                        {
-                            stats=new CslPlayerStats;
-                            info->m_playerStats.add(stats);
-                        }
-
-                        stats->m_id=getint(p);
+                        data->m_id=getint(p);
                         getstring(text,p,sizeof(text));
-                        stats->m_player=A2U(text);
+                        data->m_player=A2U(text);
                         getstring(text,p,sizeof(text));
-                        stats->m_team=A2U(text);
-                        stats->m_frags=getint(p);
-                        stats->m_deaths=getint(p);
-                        stats->m_teamkills=getint(p);
+                        data->m_team=A2U(text);
+                        data->m_frags=getint(p);
+                        data->m_deaths=getint(p);
+                        data->m_teamkills=getint(p);
 
                         if (p.overread())
                         {
                             LOG_DEBUG("stats(%s) OVERREAD!\n",U2A(info->GetBestDescription()));
+                            return;
+                        }
+
+                        if (!stats->AddStats(data))
+                        {
+                            stats->RemoveStats(data);
+                            stats->Reset();
+                            LOG_DEBUG("stats (%s) ERROR: AddStats()\n",
+                                      U2A(info->GetBestDescription()));
                             break;
                         }
 
-                        stats->m_ok=true;
-
-                        LOG_DEBUG("stats (%s): player:%s, team:%s, frags:%d, deaths:%d, tk:%d,\n",
+                        /*LOG_DEBUG("stats (%s): player:%s, team:%s, frags:%d, deaths:%d, tk:%d,\n",
                                   U2A(info->GetBestDescription()),
-                                  U2A(stats->m_player),U2A(stats->m_team),
-                                  stats->m_frags,stats->m_deaths,stats->m_teamkills);
+                                  U2A(data->m_player),U2A(data->m_team),
+                                  data->m_frags,data->m_deaths,data->m_teamkills);*/
 
                         wxCommandEvent evt(wxCSL_EVT_PING_STATS);
                         evt.SetClientData((void*)info);

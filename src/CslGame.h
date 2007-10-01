@@ -110,10 +110,10 @@ extern const wxChar* GetGameStr(int n);
 class CslGame;
 class CslMaster;
 
-class CslPlayerStats
+class CslPlayerStatsData
 {
     public:
-        CslPlayerStats() :
+        CslPlayerStatsData() :
                 m_rank(-1),m_frags(-1),m_deaths(-1),m_teamkills(-1),
                 m_id(-1),m_ok(false) {}
 
@@ -121,6 +121,116 @@ class CslPlayerStats
         wxInt32 m_rank,m_frags,m_deaths,m_teamkills;
         wxInt32 m_id;
         bool m_ok;
+};
+
+class CslPlayerStats
+{
+    public:
+        enum { CSL_STATS_NEED_IDS=0, CSL_STATS_NEED_STATS};
+
+        CslPlayerStats() : m_status(CSL_STATS_NEED_IDS),
+                m_lastRefresh(0),m_lastResponse(0) { m_mutex=new wxMutex(); }
+
+        CslPlayerStatsData* GetNewStatsPtr()
+        {
+            wxMutexLocker lock(*m_mutex);
+
+            CslPlayerStatsData *data=NULL;
+            loopv(m_stats)
+            {
+                if (m_stats[i]->m_ok)
+                    continue;
+                return m_stats[i];
+                break;
+            }
+
+            if (!data)
+                data=new CslPlayerStatsData;
+
+            return data;
+        }
+
+        bool AddStats(CslPlayerStatsData *data)
+        {
+            wxMutexLocker lock(*m_mutex);
+
+            if (m_status!=CSL_STATS_NEED_STATS)
+                return false;
+
+            loopv(m_ids)
+            {
+                if (m_ids[i]==data->m_id)
+                {
+                    m_ids.remove(i);
+                    data->m_ok=true;
+                    if (m_ids.length()==0)
+                        m_status=CSL_STATS_NEED_IDS;
+                    loopv(m_stats) if (m_stats[i]==data) return true;
+                    m_stats.add(data);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        void RemoveStats(CslPlayerStatsData *data)
+        {
+            wxMutexLocker lock(*m_mutex);
+
+            loopv(m_stats)
+            {
+                if (m_stats[i]==data)
+                {
+                    m_stats[i]->m_ok=false;
+                    return;
+                }
+                delete data;
+            }
+        }
+
+        void DeleteStats()
+        {
+            wxMutexLocker lock(*m_mutex);
+
+            m_status=CSL_STATS_NEED_IDS;
+            loopvrev(m_stats) delete m_stats[i];
+            m_stats.setsize(0);
+        }
+
+        void Reset()
+        {
+            wxMutexLocker lock(*m_mutex);
+
+            m_status=CSL_STATS_NEED_IDS;
+            loopv(m_stats) m_stats[i]->m_ok=false;
+            loopv(m_ids) m_ids.remove(0);
+        }
+
+        bool AddId(wxInt32 id)
+        {
+            wxMutexLocker lock(*m_mutex);
+
+            if (m_status!=CSL_STATS_NEED_IDS)
+                return false;
+            loopv(m_ids) if (m_ids[i]==id)
+                return false;
+            m_ids.add(id);
+            return true;
+        }
+
+        void SetWaitForStats()
+        {
+            if (m_ids.length())
+                m_status=CSL_STATS_NEED_STATS;
+            else
+                m_status=CSL_STATS_NEED_IDS;
+        }
+
+        wxUint32 m_status;
+        wxUint32 m_lastRefresh,m_lastResponse;
+        vector<wxInt32> m_ids;
+        vector<CslPlayerStatsData*> m_stats;
+        wxMutex *m_mutex;
 };
 
 class CslServerInfo
@@ -165,14 +275,6 @@ class CslServerInfo
         {
             return (m_type==info.m_type && m_host==info.m_host);
         }
-
-        void DeleteStats()
-        {
-            loopvrev(m_playerStats) delete m_playerStats.at(i);
-            m_playerStats.setsize(0);
-        }
-
-        void InvalidateStats() { loopv(m_playerStats) m_playerStats.at(i)->m_ok=false; }
 
         void CreateFavourite(const wxString& host=wxT("localhost"),
                              CSL_GAMETYPE type=CSL_GAME_START)
@@ -269,7 +371,7 @@ class CslServerInfo
         wxInt32 m_lock;
         bool m_waiting;
         bool m_extended;
-        vector<CslPlayerStats*> m_playerStats;
+        CslPlayerStats m_playerStats;
 
     protected:
         void AddMaster(const wxInt32 id)

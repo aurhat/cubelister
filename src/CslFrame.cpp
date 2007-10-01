@@ -82,14 +82,14 @@ BEGIN_EVENT_TABLE(CslFrame, wxFrame)
     // wxID_CANCEL is sent when pressing ESC
     EVT_BUTTON(CSL_BUTTON_SEARCH_CLOSE,CslFrame::OnCommandEvent)
     EVT_BUTTON(CSL_BUTTON_FILTER_RESET,CslFrame::OnCommandEvent)
-    // on wxMSW neither EVT_CHAR nor EVT_KEY_xxx 
+    // on wxMSW neither EVT_CHAR nor EVT_KEY_xxx
     // events are send, so connect them in the ctor()
-#ifdef __WXMAC__
+    #ifdef __WXMAC__
     EVT_CHAR(CslFrame::OnKeypress)
-#else
+    #else
     // on wxGTK EVT_CHAR gets not send since version >= 2.8.5
     EVT_KEY_UP(CslFrame::OnKeypress)
-#endif
+    #endif
     EVT_SHOW(CslFrame::OnShow)
     EVT_CLOSE(CslFrame::OnClose)
 END_EVENT_TABLE()
@@ -570,6 +570,8 @@ void CslFrame::OnTimer(wxTimerEvent& event)
         else
             m_lightCount++;
     }
+
+    wxPostEvent(m_extendedDlg,event);
 }
 
 void CslFrame::OnTreeLeftClick(wxTreeEvent& event)

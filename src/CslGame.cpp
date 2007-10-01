@@ -132,7 +132,8 @@ CslGame::~CslGame()
     DeleteMaster();
     loopv(m_servers)
     {
-        m_servers[i]->DeleteStats();
+        m_servers[i]->m_playerStats.DeleteStats();
+        delete m_servers[i]->m_playerStats.m_mutex; //FIXME better cleanup
         delete m_servers[i];
     }
 }
@@ -271,7 +272,7 @@ bool CslGame::DeleteServer(CslServerInfo *info)
         if (m_servers[i]==info)
         {
             m_servers.remove(i);
-            info->DeleteStats();
+            info->m_playerStats.DeleteStats();
             delete info;
             return true;
         }

@@ -55,8 +55,6 @@ class CslDlgExtended: public wxDialog
         void do_layout();
         // end wxGlade
 
-        wxTimer m_timer;
-
         CslEngine *m_engine;
         CslServerInfo *m_info;
 
@@ -80,7 +78,7 @@ class CslDlgExtended: public wxDialog
         wxButton* button_close;
         // end wxGlade
 
-        void QueryInfo();
+        void QueryInfo(wxInt32 playerid=-1);
         void ListAdjustSize(wxSize size);
         void ListSort(wxInt32 column);
         void ToggleSortArrow();
