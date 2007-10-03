@@ -111,9 +111,22 @@ extern const wxChar* GetGameStr(int n);
 class CslGame;
 class CslMaster;
 
-#define CSL_PLAYER_STATUS_SPECTATOR  0x1
-#define CSL_PLAYER_STATUS_MASTER     0x2
-#define CSL_PLAYER_STATUS_ADMIN      0x4
+enum
+{
+    CSL_PLAYER_STATE_SB_ALIVE = 0,
+    CSL_PLAYER_STATE_SB_DEAD,
+    CSL_PLAYER_STATE_SB_SPAWNING,
+    CSL_PLAYER_STATE_SB_LAGGED,
+    CSL_PLAYER_STATE_SB_EDITING,
+    CSL_PLAYER_STATE_SB_SPECTATOR
+};
+
+enum
+{
+    CSL_PLAYER_PRIV_SB_NONE = 0,
+    CSL_PLAYER_PRIV_SB_MASTER,
+    CSL_PLAYER_PRIV_SB_ADMIN
+};
 
 class CslPlayerStatsData
 {
@@ -121,14 +134,14 @@ class CslPlayerStatsData
         CslPlayerStatsData() :
                 m_frags(-1),m_deaths(-1),m_teamkills(-1),
                 m_health(-1),m_armour(-1),m_weapon(-1),
-                m_id(-1),m_status(0),
+                m_id(-1),m_priv(0),m_state(0),
                 m_ok(false) {}
 
         wxString m_player,m_team;
         wxInt32 m_frags,m_deaths,m_teamkills;
         wxInt32 m_health,m_armour,m_weapon;
         wxInt32 m_id;
-        wxUint32 m_status;
+        wxUint32 m_priv,m_state;
         bool m_ok;
 };
 

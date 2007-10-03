@@ -54,7 +54,7 @@ enum { SORT_PLAYER = 0, SORT_TEAM,
 
 enum { BUTTON_REFRESH = wxID_HIGHEST +1 };
 
-#define CSL_EXT_REFRESH_INTERVAL  10
+#define CSL_EXT_REFRESH_INTERVAL  5
 
 
 CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
@@ -231,7 +231,7 @@ void CslDlgExtended::OnPingStats(wxCommandEvent& event)
             s=data->m_player;
         list_ctrl_extended->SetItem(i,0,s);
 
-        if (data->m_status&CSL_PLAYER_STATUS_SPECTATOR)
+        if (data->m_state==CSL_PLAYER_STATE_SB_SPECTATOR)
             s=_("Spectator");
         else
             s=data->m_team;
@@ -255,10 +255,12 @@ void CslDlgExtended::OnPingStats(wxCommandEvent& event)
             s=wxString::Format(wxT("%d"),data->m_teamkills);
         list_ctrl_extended->SetItem(i,4,s);
 
-        if (data->m_health<=0)
+        if (data->m_state==CSL_PLAYER_STATE_SB_DEAD)
             s=_("dead");
+        else if (data->m_state==CSL_PLAYER_STATE_SB_EDITING)
+            s=_("editing");
         else
-            s=wxString::Format(wxT("%d"),data->m_health);
+            s=s=wxString::Format(wxT("%d"),data->m_health);
         list_ctrl_extended->SetItem(i,5,s);
 
         if (data->m_armour<0)
@@ -271,11 +273,11 @@ void CslDlgExtended::OnPingStats(wxCommandEvent& event)
         list_ctrl_extended->SetItem(i,7,s);
 
         wxColour colour=*wxBLACK;
-        if (data->m_status&CSL_PLAYER_STATUS_MASTER)
+        if (data->m_priv==CSL_PLAYER_PRIV_SB_MASTER)
             i=CSL_LIST_IMG_GREEN;
-        else if (data->m_status&CSL_PLAYER_STATUS_ADMIN)
+        else if (data->m_priv==CSL_PLAYER_PRIV_SB_ADMIN)
             i=CSL_LIST_IMG_ORANGE;
-        else if (data->m_status&CSL_PLAYER_STATUS_SPECTATOR)
+        else if (data->m_state==CSL_PLAYER_STATE_SB_SPECTATOR)
             i=CSL_LIST_IMG_GREY;
         else
             i=CSL_LIST_IMG_TRANS;

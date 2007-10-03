@@ -812,7 +812,8 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
                         data->m_health=getint(p);
                         data->m_armour=getint(p);
                         data->m_weapon=getint(p);
-                        data->m_status=getint(p);
+                        data->m_priv=getint(p);
+                        data->m_state=getint(p);
 
                         if (p.overread())
                         {
