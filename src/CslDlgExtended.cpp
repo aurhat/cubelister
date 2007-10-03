@@ -392,14 +392,14 @@ void CslDlgExtended::ListInit(CslEngine *engine)
     item.SetMask(wxLIST_MASK_TEXT);
     item.SetImage(-1);
 
-    item.SetAlign(wxLIST_FORMAT_LEFT);
+    //item.SetAlign(wxLIST_FORMAT_LEFT);
     item.SetText(_("Player"));
     list_ctrl_extended->InsertColumn(0,item);
 
     item.SetText(_("Team"));
     list_ctrl_extended->InsertColumn(1,item);
 
-    item.SetAlign(wxLIST_FORMAT_RIGHT);
+    //item.SetAlign(wxLIST_FORMAT_RIGHT);
     item.SetText(_("Frags"));
     list_ctrl_extended->InsertColumn(2,item);
 
@@ -415,7 +415,7 @@ void CslDlgExtended::ListInit(CslEngine *engine)
     item.SetText(_("Armour"));
     list_ctrl_extended->InsertColumn(6,item);
 
-    item.SetAlign(wxLIST_FORMAT_LEFT);
+    //item.SetAlign(wxLIST_FORMAT_LEFT);
     item.SetText(_("Weapon"));
     list_ctrl_extended->InsertColumn(7,item);
 
@@ -449,6 +449,7 @@ void CslDlgExtended::DoShow(CslServerInfo *info)
 
     SetTitle(wxString::Format(_("CSL - Extended info: %s"),
                               m_info->GetBestDescription().c_str()));
+	ListAdjustSize(GetClientSize());
     Show();
 }
 

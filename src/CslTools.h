@@ -25,9 +25,9 @@
     @author Glen Masgai <mimosius@gmx.de>
 */
 
-#ifdef __WXDEBUG__
+//#ifdef __WXDEBUG__
 #define CSL_EXT_SERVER_INFO
-#endif
+//#endif
 
 #ifndef DATADIR
 #undef LOCALEDIR

@@ -405,14 +405,19 @@ bool CslEngine::Ping(CslServerInfo *info,bool force)
     }
 #endif
 
-    // default ping packet
-    packet=new CslUDPPacket();
-    ucharbuf p(ping,sizeof(ping));
-    putint(p,info->m_pingSend);
-    packet->Set(info->m_addr,ping,p.length());
-    m_pingSock->SendPing(packet);
+	if (info->m_extended || info->m_type!=CSL_GAME_SB)
+	{
+        // default ping packet
+        packet=new CslUDPPacket();
+        ucharbuf p(ping,sizeof(ping));
+        putint(p,info->m_pingSend);
+        packet->Set(info->m_addr,ping,p.length());
+        m_pingSock->SendPing(packet);
+	}
+	else
+		PingUptime(info);
 
-    //LOG_DEBUG("Ping %s - %d\n",U2A(info->GetBestDescription()),ticks);
+    LOG_DEBUG("Ping %s - %d\n",U2A(info->GetBestDescription()),ticks);
 
     return true;
 }
@@ -534,7 +539,7 @@ int CslEngine::UpdateMaster()
         num=-4;
         goto finish;
     }
-    // soee server do not report the size of the content
+    // some server do not report the size of the content
     // somehow set a limit
     if (size>32767)
         size=32767;

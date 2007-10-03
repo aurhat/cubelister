@@ -218,10 +218,10 @@ CslListCtrlServer::CslListCtrlServer(wxWindow* parent,wxWindowID id,const wxPoin
     m_imageList.Add(wxIcon(wxT("ICON_LIST_GREEN"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imageList.Add(wxIcon(wxT("ICON_LIST_YELLOW"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imageList.Add(wxIcon(wxT("ICON_LIST_RED"),wxBITMAP_TYPE_ICO_RESOURCE));
+    m_imageList.Add(wxIcon(wxT("ICON_LIST_GREY"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imageList.Add(wxIcon(wxT("ICON_LIST_GREEN_EXT"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imageList.Add(wxIcon(wxT("ICON_LIST_YELLOW_EXT"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imageList.Add(wxIcon(wxT("ICON_LIST_RED_EXT"),wxBITMAP_TYPE_ICO_RESOURCE));
-    m_imageList.Add(wxIcon(wxT("ICON_LIST_GREY"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imageList.Add(wxIcon(wxT("ICON_LIST_ASC"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imageList.Add(wxIcon(wxT("ICON_LIST_DSC"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imageList.Add(wxIcon(wxT("ICON_LIST_ASC_LIGHT"),wxBITMAP_TYPE_ICO_RESOURCE));
