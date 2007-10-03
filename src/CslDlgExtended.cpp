@@ -19,9 +19,14 @@
  ***************************************************************************/
 
 #include "CslDlgExtended.h"
+#include "CslSettings.h"
 #ifndef _MSC_VER
 #include "img/sortasc_16.xpm"
 #include "img/sortdsc_16.xpm"
+#include "img/green_list_16.xpm"
+#include "img/orange_list_16.xpm"
+#include "img/grey_list_16.xpm"
+#include "img/trans_list_16.xpm"
 #endif
 
 BEGIN_EVENT_TABLE(CslDlgExtended, wxDialog)
@@ -34,10 +39,22 @@ BEGIN_EVENT_TABLE(CslDlgExtended, wxDialog)
 END_EVENT_TABLE()
 
 
-enum { CSL_LIST_IMG_SORT_ASC = 0, CSL_LIST_IMG_SORT_DSC };
-enum { SORT_RANK = 0,SORT_PLAYER, SORT_TEAM, SORT_FRAGS, SORT_DEATHS, SORT_TEAMKILLS };
+enum { CSL_LIST_IMG_SORT_ASC = 0,
+       CSL_LIST_IMG_SORT_DSC,
+       CSL_LIST_IMG_GREEN,
+       CSL_LIST_IMG_ORANGE,
+       CSL_LIST_IMG_GREY,
+       CSL_LIST_IMG_TRANS
+     };
+
+enum { SORT_PLAYER = 0, SORT_TEAM,
+       SORT_FRAGS, SORT_DEATHS, SORT_TEAMKILLS,
+       SORT_HEALTH, SORT_ARMOUR, SORT_WEAPON
+     };
 
 enum { BUTTON_REFRESH = wxID_HIGHEST +1 };
+
+#define CSL_EXT_REFRESH_INTERVAL  10
 
 
 CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
@@ -48,7 +65,8 @@ CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
     // begin wxGlade: CslDlgExtended::CslDlgExtended
     list_ctrl_extended = new wxListCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxSUNKEN_BORDER);
     label_status = new wxStaticText(this, wxID_ANY, _("Waiting for data..."));
-    button_refresh = new wxButton(this, BUTTON_REFRESH, _("&Refresh"));
+    checkbox_autoupdate = new wxCheckBox(this, wxID_ANY, _("Auto &update"));
+    button_update = new wxButton(this, BUTTON_REFRESH, _("&Update"));
     button_close = new wxButton(this, wxID_CLOSE, _("&Close"));
 
     set_properties();
@@ -59,9 +77,18 @@ CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
 #ifndef _MSC_VER
     m_imageList.Add(wxBitmap(sortasc_16_xpm));
     m_imageList.Add(wxBitmap(sortdsc_16_xpm));
+    m_imageList.Add(wxBitmap(green_list_16_xpm));
+    m_imageList.Add(wxBitmap(orange_list_16_xpm));
+    m_imageList.Add(wxBitmap(grey_list_16_xpm));
+    m_imageList.Add(wxBitmap(trans_list_16_xpm));
+
 #else
     m_imageList.Add(wxIcon(wxT("ICON_LIST_ASC"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imageList.Add(wxIcon(wxT("ICON_LIST_DSC"),wxBITMAP_TYPE_ICO_RESOURCE));
+    m_imageList.Add(wxIcon(wxT("ICON_LIST_GREEN"),wxBITMAP_TYPE_ICO_RESOURCE));
+    m_imageList.Add(wxIcon(wxT("ICON_LIST_ORANGE"),wxBITMAP_TYPE_ICO_RESOURCE));
+    m_imageList.Add(wxIcon(wxT("ICON_LIST_GREY"),wxBITMAP_TYPE_ICO_RESOURCE));
+    m_imageList.Add(wxIcon(wxT("ICON_LIST_TRANS"),wxBITMAP_TYPE_ICO_RESOURCE));
 #endif
 }
 
@@ -69,22 +96,24 @@ void CslDlgExtended::set_properties()
 {
     // begin wxGlade: CslDlgExtended::set_properties
     SetTitle(_("CSL - Extended info"));
-    list_ctrl_extended->SetMinSize(wxSize(450,300));
     button_close->SetDefault();
     // end wxGlade
+
+    SetMinSize(wxSize(600,400));
 }
 
 void CslDlgExtended::do_layout()
 {
     // begin wxGlade: CslDlgExtended::do_layout
     wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(2, 1, 0, 0);
-    wxFlexGridSizer* grid_sizer_button = new wxFlexGridSizer(1, 5, 0, 0);
+    wxFlexGridSizer* grid_sizer_button = new wxFlexGridSizer(1, 6, 0, 0);
     grid_sizer_main->Add(list_ctrl_extended, 1, wxALL|wxEXPAND, 4);
     wxStaticText* label_status_static = new wxStaticText(this, wxID_ANY, _("Status:"));
     grid_sizer_button->Add(label_status_static, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
     grid_sizer_button->Add(label_status, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_button->Add(button_refresh, 0, wxALL, 4);
-    grid_sizer_button->Add(8, 1, 0, wxADJUST_MINSIZE, 0);
+    grid_sizer_button->Add(checkbox_autoupdate, 0, wxRIGHT|wxALIGN_CENTER_VERTICAL, 8);
+    grid_sizer_button->Add(button_update, 0, wxALL, 4);
+    grid_sizer_button->Add(8, 1, 0, 0, 0);
     grid_sizer_button->Add(button_close, 0, wxALL, 4);
     grid_sizer_button->AddGrowableCol(1);
     grid_sizer_main->Add(grid_sizer_button, 1, wxEXPAND, 0);
@@ -95,8 +124,8 @@ void CslDlgExtended::do_layout()
     Layout();
     // end wxGlade
 
-    CentreOnParent();
     grid_sizer_main->SetSizeHints(this);
+    CentreOnParent();
 }
 
 void CslDlgExtended::OnClose(wxCloseEvent& event)
@@ -127,21 +156,32 @@ void CslDlgExtended::OnTimer(wxTimerEvent& event)
 
     wxUint32 now=wxDateTime::Now().GetTicks();
 
-    if (m_info->m_playerStats.m_ids.length() &&
-        (now-m_info->m_playerStats.m_lastResponse)*1000 > (wxUint32)(m_info->m_ping*m_info->m_playersMax)
-       )
+    CslPlayerStats *stats=m_info->m_playerStats;
+
+    if (stats->m_ids.length())
     {
-        loopv(m_info->m_playerStats.m_ids)
+        wxUint32 delay=m_info->m_ping*m_info->m_playersMax;
+        if ((delay > CSL_EXT_REFRESH_INTERVAL*1000) ||
+            ((now-stats->m_lastResponse)*1000 < delay))
+            return;
+
+        loopv(stats->m_ids)
         {
-            wxInt32 id=m_info->m_playerStats.m_ids[i];
+            wxInt32 id=stats->m_ids[i];
             QueryInfo(id);
             LOG_DEBUG("Resend %d\n",id);
         }
-        m_info->m_playerStats.m_lastResponse=now;
+        stats->m_lastResponse=now;
+        return;
     }
 
-    if (m_info->m_playerStats.m_lastRefresh+15<=now && !button_refresh->IsEnabled())
-        button_refresh->Enable();
+    if (m_info->m_players && stats->m_lastRefresh+CSL_EXT_REFRESH_INTERVAL<=now)
+    {
+        if (checkbox_autoupdate->GetValue())
+            QueryInfo();
+        else if (!button_update->IsEnabled())
+            button_update->Enable();
+    }
 }
 
 void CslDlgExtended::OnCommandEvent(wxCommandEvent& event)
@@ -170,7 +210,7 @@ void CslDlgExtended::OnPingStats(wxCommandEvent& event)
     wxListItem item;
     item.SetMask(wxLIST_MASK_TEXT|wxLIST_MASK_DATA);
     wxString s;
-    CslPlayerStats *stats=&info->m_playerStats;
+    CslPlayerStats *stats=info->m_playerStats;
     CslPlayerStatsData *data=NULL;
 
     loopv(stats->m_stats)
@@ -183,52 +223,90 @@ void CslDlgExtended::OnPingStats(wxCommandEvent& event)
 
         item.SetId(i);
         list_ctrl_extended->InsertItem(item);
-        list_ctrl_extended->SetItem(i,0,wxT(""));
-        list_ctrl_extended->SetItem(i,1,data->m_player);
-        list_ctrl_extended->SetItem(i,2,data->m_team);
+        list_ctrl_extended->SetItemData(i,(long)data);
+
+        if (data->m_player.IsEmpty())
+            s=_("- connecting -");
+        else
+            s=data->m_player;
+        list_ctrl_extended->SetItem(i,0,s);
+
+        if (data->m_status&CSL_PLAYER_STATUS_SPECTATOR)
+            s=_("Spectator");
+        else
+            s=data->m_team;
+        list_ctrl_extended->SetItem(i,1,s);
+
         if (data->m_frags<0)
-            s=_("no data");
+            s=wxT("0");
         else
             s=wxString::Format(wxT("%d"),data->m_frags);
-        list_ctrl_extended->SetItem(i,3,s);
+        list_ctrl_extended->SetItem(i,2,s);
 
         if (data->m_deaths<0)
-            s=_("no data");
+            s=wxT("0");
         else
             s=wxString::Format(wxT("%d"),data->m_deaths);
-        list_ctrl_extended->SetItem(i,4,s);
+        list_ctrl_extended->SetItem(i,3,s);
 
         if (data->m_teamkills<0)
-            s=_("no data");
+            s=wxT("0");
         else
             s=wxString::Format(wxT("%d"),data->m_teamkills);
+        list_ctrl_extended->SetItem(i,4,s);
+
+        if (data->m_health<=0)
+            s=_("dead");
+        else
+            s=wxString::Format(wxT("%d"),data->m_health);
         list_ctrl_extended->SetItem(i,5,s);
 
-        list_ctrl_extended->SetItemData(i,(long)data);
+        if (data->m_armour<0)
+            s=wxT("0");
+        else
+            s=wxString::Format(wxT("%d"),data->m_armour);
+        list_ctrl_extended->SetItem(i,6,s);
+
+        s=GetWeaponStrSB(data->m_weapon);
+        list_ctrl_extended->SetItem(i,7,s);
+
+        wxColour colour=*wxBLACK;
+        if (data->m_status&CSL_PLAYER_STATUS_MASTER)
+            i=CSL_LIST_IMG_GREEN;
+        else if (data->m_status&CSL_PLAYER_STATUS_ADMIN)
+            i=CSL_LIST_IMG_ORANGE;
+        else if (data->m_status&CSL_PLAYER_STATUS_SPECTATOR)
+            i=CSL_LIST_IMG_GREY;
+        else
+            i=CSL_LIST_IMG_TRANS;
+
+        list_ctrl_extended->SetItemImage(item,i);
     }
 
     stats->m_lastResponse=wxDateTime::Now().GetTicks();
 
-    label_status->SetLabel(wxString::Format(wxT("Got %d records (%d left)"),
+    label_status->SetLabel(wxString::Format(wxT("%d records (%d left)"),
                                             list_ctrl_extended->GetItemCount(),stats->m_ids.length()));
     ListSort(-1);
 }
 
 void CslDlgExtended::QueryInfo(wxInt32 playerid)
 {
+    if (m_info->m_players==0)
+        return;
+
     if (playerid==-1)
     {
         wxUint32 now=wxDateTime::Now().GetTicks();
 
-        if (m_info->m_playerStats.m_lastRefresh+15<=now)
+        if (m_info->m_playerStats->m_lastRefresh+CSL_EXT_REFRESH_INTERVAL<=now)
         {
             list_ctrl_extended->DeleteAllItems();
             label_status->SetLabel(_("Waiting for data..."));
-            button_refresh->Enable(false);
-            m_info->m_playerStats.Reset();
+            button_update->Enable(false);
+            m_info->m_playerStats->Reset();
             m_engine->PingStats(m_info);
-            m_info->m_playerStats.m_lastRefresh=now;
-            //m_timer.Start(15000,true);
+            m_info->m_playerStats->m_lastRefresh=now;
         }
     }
     else
@@ -242,12 +320,14 @@ void CslDlgExtended::ListAdjustSize(wxSize size)
 
     wxInt32 w=size.x-25;
 
-    list_ctrl_extended->SetColumnWidth(0,(wxInt32)(w*0.15f));
-    list_ctrl_extended->SetColumnWidth(1,(wxInt32)(w*0.25f));
-    list_ctrl_extended->SetColumnWidth(2,(wxInt32)(w*0.15f));
-    list_ctrl_extended->SetColumnWidth(3,(wxInt32)(w*0.15f));
-    list_ctrl_extended->SetColumnWidth(4,(wxInt32)(w*0.15f));
-    list_ctrl_extended->SetColumnWidth(5,(wxInt32)(w*0.15f));
+    list_ctrl_extended->SetColumnWidth(0,(wxInt32)(w*0.23f));
+    list_ctrl_extended->SetColumnWidth(1,(wxInt32)(w*0.11f));
+    list_ctrl_extended->SetColumnWidth(2,(wxInt32)(w*0.11f));
+    list_ctrl_extended->SetColumnWidth(3,(wxInt32)(w*0.11f));
+    list_ctrl_extended->SetColumnWidth(4,(wxInt32)(w*0.11f));
+    list_ctrl_extended->SetColumnWidth(5,(wxInt32)(w*0.11f));
+    list_ctrl_extended->SetColumnWidth(6,(wxInt32)(w*0.11f));
+    list_ctrl_extended->SetColumnWidth(7,(wxInt32)(w*0.11f));
 }
 
 void CslDlgExtended::ListSort(wxInt32 column)
@@ -312,31 +392,37 @@ void CslDlgExtended::ListInit(CslEngine *engine)
     item.SetMask(wxLIST_MASK_TEXT);
     item.SetImage(-1);
 
-    item.SetAlign(wxLIST_FORMAT_RIGHT);
-    item.SetText(_("Rank"));
-    list_ctrl_extended->InsertColumn(0,item);
-
     item.SetAlign(wxLIST_FORMAT_LEFT);
     item.SetText(_("Player"));
-    list_ctrl_extended->InsertColumn(1,item);
+    list_ctrl_extended->InsertColumn(0,item);
 
     item.SetText(_("Team"));
-    list_ctrl_extended->InsertColumn(2,item);
+    list_ctrl_extended->InsertColumn(1,item);
 
     item.SetAlign(wxLIST_FORMAT_RIGHT);
     item.SetText(_("Frags"));
-    list_ctrl_extended->InsertColumn(3,item);
+    list_ctrl_extended->InsertColumn(2,item);
 
     item.SetText(_("Deaths"));
-    list_ctrl_extended->InsertColumn(4,item);
+    list_ctrl_extended->InsertColumn(3,item);
 
     item.SetText(_("Teamkills"));
+    list_ctrl_extended->InsertColumn(4,item);
+
+    item.SetText(_("Health"));
     list_ctrl_extended->InsertColumn(5,item);
+
+    item.SetText(_("Armour"));
+    list_ctrl_extended->InsertColumn(6,item);
+
+    item.SetAlign(wxLIST_FORMAT_LEFT);
+    item.SetText(_("Weapon"));
+    list_ctrl_extended->InsertColumn(7,item);
 
     // assertion on __WXMAC__
     //ListAdjustSize(GetClientSize());
 
-    m_sortHelper.Init(CSL_SORT_ASC,SORT_RANK);
+    m_sortHelper.Init(CSL_SORT_DSC,SORT_FRAGS);
     ToggleSortArrow();
 }
 
@@ -348,17 +434,22 @@ void CslDlgExtended::DoShow(CslServerInfo *info)
         return;
     }
 
-//  if (m_info!=info && m_timer.IsRunning())
-//      m_timer.Stop();
-    //if (m_info!=info)
-    //    m_timerCount=15;
+    if (m_info!=info)
+    {
+        list_ctrl_extended->DeleteAllItems();
+        label_status->SetLabel(wxString::Format(wxT("%d records (%d left)"),0,0));
+    }
 
     m_info=info;
 
     QueryInfo();
 
-    if (!IsShown())
-        Show();
+    if (IsShown())
+        return;
+
+    SetTitle(wxString::Format(_("CSL - Extended info: %s"),
+                              m_info->GetBestDescription().c_str()));
+    Show();
 }
 
 int wxCALLBACK CslDlgExtended::ListSortCompareFunc(long item1,long item2,long data)
@@ -375,12 +466,6 @@ int wxCALLBACK CslDlgExtended::ListSortCompareFunc(long item1,long item2,long da
 
     switch (sortType)
     {
-        case SORT_RANK:
-            type=CSL_LIST_SORT_INT;
-            vi1=stats1->m_rank;
-            vi2=stats2->m_rank;
-            break;
-
         case SORT_PLAYER:
             type=CSL_LIST_SORT_STRING;
             vs1=stats1->m_player;
@@ -409,6 +494,24 @@ int wxCALLBACK CslDlgExtended::ListSortCompareFunc(long item1,long item2,long da
             type=CSL_LIST_SORT_INT;
             vi1=stats1->m_teamkills;
             vi2=stats2->m_teamkills;
+            break;
+
+        case SORT_HEALTH:
+            type=CSL_LIST_SORT_INT;
+            vi1=stats1->m_health;
+            vi2=stats2->m_health;
+            break;
+
+        case SORT_ARMOUR:
+            type=CSL_LIST_SORT_INT;
+            vi1=stats1->m_armour;
+            vi2=stats2->m_armour;
+            break;
+
+        case SORT_WEAPON:
+            type=CSL_LIST_SORT_INT;
+            vi1=stats1->m_weapon;
+            vi2=stats2->m_weapon;
             break;
 
         default:

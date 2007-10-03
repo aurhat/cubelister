@@ -98,11 +98,11 @@ void CslDlgOutput::do_layout()
     grid_sizer_search->Add(label_search, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_search->Add(text_ctrl_search, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_search->Add(label_matches, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_search->Add(30, 1, 0, wxADJUST_MINSIZE, 0);
+    grid_sizer_search->Add(30, 1, 0, 0, 0);
     grid_sizer_search->AddGrowableCol(1);
     grid_sizer_main->Add(grid_sizer_search, 1, wxEXPAND, 0);
     grid_sizer_conv_filter->Add(checkbox_conv_filter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_conv_filter->Add(1, 1, 0, wxADJUST_MINSIZE, 0);
+    grid_sizer_conv_filter->Add(1, 1, 0, 0, 0);
     wxStaticText* label_filter_level = new wxStaticText(this, wxID_ANY, _("Level:"));
     grid_sizer_conv_filter->Add(label_filter_level, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_conv_filter->Add(choice_conv_filter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
@@ -111,7 +111,7 @@ void CslDlgOutput::do_layout()
     grid_sizer_main->Add(static_line, 0, wxEXPAND, 0);
     grid_sizer_button->Add(button_load, 0, wxALL, 4);
     grid_sizer_button->Add(button_save, 0, wxALL, 4);
-    grid_sizer_button->Add(8, 1, 0, wxADJUST_MINSIZE, 0);
+    grid_sizer_button->Add(8, 1, 0, 0, 0);
     grid_sizer_button->Add(button_close_copy, 0, wxALL, 4);
     grid_sizer_main->Add(grid_sizer_button, 1, wxBOTTOM|wxALIGN_RIGHT, 4);
     SetSizer(grid_sizer_main);
@@ -367,7 +367,7 @@ wxString CslDlgOutput::Filter(wxUint32 start,wxUint32 end)
                 }
                 if (!skip && m_filterLevel>=2)
                 {
-                    if (cmp.CmpNoCase(wxT("NAME"))==0) // FIXME remove NoCase
+                    if (cmp=="NAME")
                         skip=true;
                     if (cmp==wxT("PLAYER"))
                         skip=true;
@@ -438,5 +438,5 @@ void CslDlgOutput::Reset(const wxString& title)
 
     m_self->text_ctrl_output->Clear();
     m_self->m_text.Clear();
-    m_self->SetTitle(wxString::Format(wxT("%s: "),_("CSL - Game output"))+title);
+    m_self->SetTitle(wxString::Format(_("CSL - Game output: %s"),title.c_str()));
 }

@@ -110,6 +110,8 @@ class CslListServer : public CslServerInfo
         CslListServer(CslServerInfo *info) :
                 CslServerInfo(), m_info(info),m_imgId(-1) {}
 
+        //~CslListServer() {}
+
         void Reset()
         {
             m_desc.Empty();

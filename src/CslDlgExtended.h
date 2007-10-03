@@ -74,7 +74,8 @@ class CslDlgExtended: public wxDialog
         // begin wxGlade: CslDlgExtended::attributes
         wxListCtrl* list_ctrl_extended;
         wxStaticText* label_status;
-        wxButton* button_refresh;
+        wxCheckBox* checkbox_autoupdate;
+        wxButton* button_update;
         wxButton* button_close;
         // end wxGlade
 

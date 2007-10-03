@@ -1,35 +1,7 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <!DOCTYPE KDevPrjSession>
 <KDevPrjSession>
- <DocsAndViews NumberOfDocuments="9" >
-  <Doc0 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslEngine.cpp" >
-   <View0 Encoding="" line="779" Type="Source" />
-  </Doc0>
-  <Doc1 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslGame.h" >
-   <View0 Encoding="" line="111" Type="Source" />
-  </Doc1>
-  <Doc2 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslDlgExtended.cpp" >
-   <View0 Encoding="" line="163" Type="Source" />
-  </Doc2>
-  <Doc3 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslGame.cpp" >
-   <View0 Encoding="" line="135" Type="Source" />
-  </Doc3>
-  <Doc4 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslEngine.h" >
-   <View0 Encoding="" line="119" Type="Source" />
-  </Doc4>
-  <Doc5 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslFrame.cpp" >
-   <View0 Encoding="" line="573" Type="Source" />
-  </Doc5>
-  <Doc6 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslDlgExtended.h" >
-   <View0 Encoding="" line="60" Type="Source" />
-  </Doc6>
-  <Doc7 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslListCtrlServer.cpp" >
-   <View0 Encoding="" line="410" Type="Source" />
-  </Doc7>
-  <Doc8 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslListCtrlServer.h" >
-   <View0 Encoding="" line="0" Type="Source" />
-  </Doc8>
- </DocsAndViews>
+ <DocsAndViews NumberOfDocuments="0" />
  <pluginList>
   <kdevdebugger>
    <breakpointList/>

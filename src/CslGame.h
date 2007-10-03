@@ -104,22 +104,31 @@ extern const wxChar* GetVersionStrBF(int n);
 extern const wxChar* GetVersionStrCB(int n);
 extern const wxChar* GetModeStrSB(int n);
 extern const wxChar* GetModeStrAC(int n);
+extern const wxChar* GetWeaponStrSB(int n);
 extern const wxChar* GetGameStr(int n);
 
 
 class CslGame;
 class CslMaster;
 
+#define CSL_PLAYER_STATUS_SPECTATOR  0x1
+#define CSL_PLAYER_STATUS_MASTER     0x2
+#define CSL_PLAYER_STATUS_ADMIN      0x4
+
 class CslPlayerStatsData
 {
     public:
         CslPlayerStatsData() :
-                m_rank(-1),m_frags(-1),m_deaths(-1),m_teamkills(-1),
-                m_id(-1),m_ok(false) {}
+                m_frags(-1),m_deaths(-1),m_teamkills(-1),
+                m_health(-1),m_armour(-1),m_weapon(-1),
+                m_id(-1),m_status(0),
+                m_ok(false) {}
 
         wxString m_player,m_team;
-        wxInt32 m_rank,m_frags,m_deaths,m_teamkills;
+        wxInt32 m_frags,m_deaths,m_teamkills;
+        wxInt32 m_health,m_armour,m_weapon;
         wxInt32 m_id;
+        wxUint32 m_status;
         bool m_ok;
 };
 
@@ -129,11 +138,13 @@ class CslPlayerStats
         enum { CSL_STATS_NEED_IDS=0, CSL_STATS_NEED_STATS};
 
         CslPlayerStats() : m_status(CSL_STATS_NEED_IDS),
-                m_lastRefresh(0),m_lastResponse(0) { m_mutex=new wxMutex(); }
+                m_lastRefresh(0),m_lastResponse(0) { m_critical=new wxCriticalSection(); }
+
+        ~CslPlayerStats() { DeleteStats(); delete m_critical; }
 
         CslPlayerStatsData* GetNewStatsPtr()
         {
-            wxMutexLocker lock(*m_mutex);
+            wxCriticalSectionLocker enter(*m_critical);
 
             CslPlayerStatsData *data=NULL;
             loopv(m_stats)
@@ -152,7 +163,7 @@ class CslPlayerStats
 
         bool AddStats(CslPlayerStatsData *data)
         {
-            wxMutexLocker lock(*m_mutex);
+            wxCriticalSectionLocker enter(*m_critical);
 
             if (m_status!=CSL_STATS_NEED_STATS)
                 return false;
@@ -175,7 +186,7 @@ class CslPlayerStats
 
         void RemoveStats(CslPlayerStatsData *data)
         {
-            wxMutexLocker lock(*m_mutex);
+            wxCriticalSectionLocker enter(*m_critical);
 
             loopv(m_stats)
             {
@@ -184,13 +195,13 @@ class CslPlayerStats
                     m_stats[i]->m_ok=false;
                     return;
                 }
-                delete data;
             }
+            delete data;
         }
 
         void DeleteStats()
         {
-            wxMutexLocker lock(*m_mutex);
+            wxCriticalSectionLocker enter(*m_critical);
 
             m_status=CSL_STATS_NEED_IDS;
             loopvrev(m_stats) delete m_stats[i];
@@ -199,7 +210,7 @@ class CslPlayerStats
 
         void Reset()
         {
-            wxMutexLocker lock(*m_mutex);
+            wxCriticalSectionLocker enter(*m_critical);
 
             m_status=CSL_STATS_NEED_IDS;
             loopv(m_stats) m_stats[i]->m_ok=false;
@@ -208,7 +219,7 @@ class CslPlayerStats
 
         bool AddId(wxInt32 id)
         {
-            wxMutexLocker lock(*m_mutex);
+            wxCriticalSectionLocker enter(*m_critical);
 
             if (m_status!=CSL_STATS_NEED_IDS)
                 return false;
@@ -230,7 +241,7 @@ class CslPlayerStats
         wxUint32 m_lastRefresh,m_lastResponse;
         vector<wxInt32> m_ids;
         vector<CslPlayerStatsData*> m_stats;
-        wxMutex *m_mutex;
+        wxCriticalSection *m_critical;
 };
 
 class CslServerInfo
@@ -269,7 +280,10 @@ class CslServerInfo
             m_lock=0;
             m_waiting=false;
             m_extended=false;
+            m_playerStats=NULL;
         }
+
+        //virtual ~CslServerInfo() { DeletePlayerStats(); }
 
         bool operator==(const CslServerInfo& info)
         {
@@ -353,6 +367,9 @@ class CslServerInfo
         bool IsDefault() { return (m_view&CSL_VIEW_DEFAULT)>0; }
         bool IsFavourite() { return (m_view&CSL_VIEW_FAVOURITE)>0; }
 
+        void CreatePlayerStats() { if (!m_playerStats) m_playerStats=new CslPlayerStats(); }
+        void DeletePlayerStats() { if (m_playerStats) { delete m_playerStats; m_playerStats=NULL; } }
+
         wxString m_host,m_domain;
         vector<wxInt32> m_masterIDs;
         wxString m_desc,m_gameMode,m_map;
@@ -371,7 +388,7 @@ class CslServerInfo
         wxInt32 m_lock;
         bool m_waiting;
         bool m_extended;
-        CslPlayerStats m_playerStats;
+        CslPlayerStats *m_playerStats;
 
     protected:
         void AddMaster(const wxInt32 id)

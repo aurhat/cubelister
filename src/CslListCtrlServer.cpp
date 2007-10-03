@@ -39,10 +39,16 @@
 #include "img/green_list_16.xpm"
 #include "img/yellow_list_16.xpm"
 #include "img/grey_list_16.xpm"
+#include "img/red_ext_list_16.xpm"
+#include "img/green_ext_list_16.xpm"
+#include "img/yellow_ext_list_16.xpm"
 #include "img/sb_16.xpm"
 #include "img/ac_16.xpm"
 #include "img/bf_16.xpm"
 #include "img/cb_16.xpm"
+#include "img/sb_ext_16.xpm"
+#include "img/ac_ext_16.xpm"
+#include "img/bf_ext_16.xpm"
 #endif
 
 enum
@@ -172,14 +178,20 @@ CslListCtrlServer::CslListCtrlServer(wxWindow* parent,wxWindowID id,const wxPoin
 #define CSL_LIST_IMG_YELLOW           1
 #define CSL_LIST_IMG_RED              2
 #define CSL_LIST_IMG_GREY             3
-#define CSL_LIST_IMG_SORT_ASC         4
-#define CSL_LIST_IMG_SORT_DSC         5
-#define CSL_LIST_IMG_SORT_ASC_LIGHT   6
-#define CSL_LIST_IMG_SORT_DSC_LIGHT   7
-#define CSL_LIST_IMG_SB               8
-#define CSL_LIST_IMG_AC               9
-#define CSL_LIST_IMG_BF              10
-#define CSL_LIST_IMG_CB              11
+#define CSL_LIST_IMG_GREEN_EXT        4
+#define CSL_LIST_IMG_YELLOW_EXT       5
+#define CSL_LIST_IMG_RED_EXT          6
+#define CSL_LIST_IMG_SORT_ASC         7
+#define CSL_LIST_IMG_SORT_DSC         8
+#define CSL_LIST_IMG_SORT_ASC_LIGHT   9
+#define CSL_LIST_IMG_SORT_DSC_LIGHT  10
+#define CSL_LIST_IMG_SB              11
+#define CSL_LIST_IMG_AC              12
+#define CSL_LIST_IMG_BF              13
+#define CSL_LIST_IMG_CB              14
+#define CSL_LIST_IMG_SB_EXT          15
+#define CSL_LIST_IMG_AC_EXT          16
+#define CSL_LIST_IMG_BF_EXT          17
 
     m_imageList.Create(16,16,true);
 
@@ -188,6 +200,9 @@ CslListCtrlServer::CslListCtrlServer(wxWindow* parent,wxWindowID id,const wxPoin
     m_imageList.Add(wxBitmap(yellow_list_16_xpm));
     m_imageList.Add(wxBitmap(red_list_16_xpm));
     m_imageList.Add(wxBitmap(grey_list_16_xpm));
+    m_imageList.Add(wxBitmap(green_ext_list_16_xpm));
+    m_imageList.Add(wxBitmap(yellow_ext_list_16_xpm));
+    m_imageList.Add(wxBitmap(red_ext_list_16_xpm));
     m_imageList.Add(wxBitmap(sortasc_16_xpm));
     m_imageList.Add(wxBitmap(sortdsc_16_xpm));
     m_imageList.Add(wxBitmap(sortasclight_16_xpm));
@@ -196,10 +211,16 @@ CslListCtrlServer::CslListCtrlServer(wxWindow* parent,wxWindowID id,const wxPoin
     m_imageList.Add(wxBitmap(ac_16_xpm));
     m_imageList.Add(wxBitmap(bf_16_xpm));
     m_imageList.Add(wxBitmap(cb_16_xpm));
+    m_imageList.Add(wxBitmap(sb_ext_16_xpm));
+    m_imageList.Add(wxBitmap(ac_ext_16_xpm));
+    m_imageList.Add(wxBitmap(bf_ext_16_xpm));
 #else
     m_imageList.Add(wxIcon(wxT("ICON_LIST_GREEN"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imageList.Add(wxIcon(wxT("ICON_LIST_YELLOW"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imageList.Add(wxIcon(wxT("ICON_LIST_RED"),wxBITMAP_TYPE_ICO_RESOURCE));
+    m_imageList.Add(wxIcon(wxT("ICON_LIST_GREEN_EXT"),wxBITMAP_TYPE_ICO_RESOURCE));
+    m_imageList.Add(wxIcon(wxT("ICON_LIST_YELLOW_EXT"),wxBITMAP_TYPE_ICO_RESOURCE));
+    m_imageList.Add(wxIcon(wxT("ICON_LIST_RED_EXT"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imageList.Add(wxIcon(wxT("ICON_LIST_GREY"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imageList.Add(wxIcon(wxT("ICON_LIST_ASC"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imageList.Add(wxIcon(wxT("ICON_LIST_DSC"),wxBITMAP_TYPE_ICO_RESOURCE));
@@ -209,6 +230,9 @@ CslListCtrlServer::CslListCtrlServer(wxWindow* parent,wxWindowID id,const wxPoin
     m_imageList.Add(wxIcon(wxT("ICON_LIST_AC_16"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imageList.Add(wxIcon(wxT("ICON_LIST_BF_16"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imageList.Add(wxIcon(wxT("ICON_LIST_CB_16"),wxBITMAP_TYPE_ICO_RESOURCE));
+    m_imageList.Add(wxIcon(wxT("ICON_LIST_SB_EXT_16"),wxBITMAP_TYPE_ICO_RESOURCE));
+    m_imageList.Add(wxIcon(wxT("ICON_LIST_AC_EXT_16"),wxBITMAP_TYPE_ICO_RESOURCE));
+    m_imageList.Add(wxIcon(wxT("ICON_LIST_BF_EXT_16"),wxBITMAP_TYPE_ICO_RESOURCE));
 #endif
 
     wxArtProvider::Push(new CslArt);
@@ -788,9 +812,9 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
     wxInt32 i,j;
     wxString s;
     wxListItem item;
-    CslListServer *infoCmp=NULL;
     bool found=false;
     bool pingOk=PingOk(info);
+    CslListServer *infoCmp=NULL;
 
     i=m_servers.GetCount();
     for (j=0;j<i;j++)
@@ -977,18 +1001,18 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
     SetItemBackgroundColour(item,found ? g_cslSettings->m_colServerHigh :
                             info->IsLocked() ? g_cslSettings->m_colServerPlay : m_stdColourListItem);
 
-
     item.SetMask(wxLIST_MASK_TEXT|wxLIST_MASK_IMAGE|wxLIST_MASK_DATA);
     if (m_id==CSL_LIST_MASTER)
     {
         if (!pingOk)
             i=CSL_LIST_IMG_GREY;
         else if (info->m_ping>(wxInt32)g_cslSettings->m_ping_bad)
-            i=CSL_LIST_IMG_RED;
+            i=info->m_extended ? CSL_LIST_IMG_RED_EXT : CSL_LIST_IMG_RED;
         else if (info->m_ping>(wxInt32)g_cslSettings->m_ping_good)
-            i=CSL_LIST_IMG_YELLOW;
+            i=info->m_extended ? CSL_LIST_IMG_YELLOW_EXT : CSL_LIST_IMG_YELLOW;
         else
-            i=CSL_LIST_IMG_GREEN;
+            i=info->m_extended ? CSL_LIST_IMG_GREEN_EXT : CSL_LIST_IMG_GREEN;
+
         if (infoCmp->ImgId()!=i)
         {
             SetItemImage(item,i);
@@ -1000,13 +1024,13 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
         switch (info->m_type)
         {
             case CSL_GAME_SB:
-                i=CSL_LIST_IMG_SB;
+                i=info->m_extended ? CSL_LIST_IMG_SB_EXT : CSL_LIST_IMG_SB;
                 break;
             case CSL_GAME_AC:
-                i=CSL_LIST_IMG_AC;
+                i=info->m_extended ? CSL_LIST_IMG_AC_EXT : CSL_LIST_IMG_AC;
                 break;
             case CSL_GAME_BF:
-                i=CSL_LIST_IMG_BF;
+                i=info->m_extended ? CSL_LIST_IMG_BF_EXT : CSL_LIST_IMG_BF;
                 break;
             case CSL_GAME_CB:
                 i=CSL_LIST_IMG_CB;
@@ -1021,7 +1045,8 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
         }
     }
 
-    static_cast<CslServerInfo&>(*infoCmp)=*info;
+    dynamic_cast<CslServerInfo&>(*infoCmp)=*info;
+
     return found;
 }
 
@@ -1367,8 +1392,32 @@ void CslListCtrlServer::ListSort(wxInt32 column)
         m_sortHelper.m_sortType=column;
     }
 
-    if (GetItemCount()>0)
-        SortItems(ListSortCompareFunc,(long)&m_sortHelper);
+    if (!GetItemCount())
+        return;
+
+// since WX > 2.8.4 the items get deselected when sorting !?
+#if wxVERSION_NUMBER > 2804
+    CslServerInfo **selected=new CslServerInfo*[GetItemCount()];
+    wxInt32 c=0,i,j;
+
+    for (i=0;i<GetItemCount();i++)
+        if (GetItemState(i,wxLIST_STATE_SELECTED) & wxLIST_STATE_SELECTED)
+            selected[c++]=(CslServerInfo*)((CslListServer*)GetItemData(i))->GetPtr();
+#endif
+
+    SortItems(ListSortCompareFunc,(long)&m_sortHelper);
+
+#if wxVERSION_NUMBER > 2804
+    for (i=0;i<c;i++)
+    {
+        j=ListFindItem(selected[i]);
+        if (j==wxNOT_FOUND)
+            continue;
+        SetItemState(j,wxLIST_STATE_SELECTED,wxLIST_STATE_SELECTED);
+    }
+
+    delete[] selected;
+#endif
 }
 
 int wxCALLBACK CslListCtrlServer::ListSortCompareFunc(long item1,long item2,long data)

@@ -93,6 +93,17 @@ const wxChar* GetModeStrAC(int n)
     return (n>=0 && (size_t)n<sizeof(ac_modenames)/sizeof(ac_modenames[0])) ? ac_modenames[n] : _("unknown");
 }
 
+const wxChar* GetWeaponStrSB(int n)
+{
+    static const wxChar* sb_weapons[] =
+    {
+        wxT("Fist"), wxT("Shotgun"), wxT("Chaingun"), wxT("Rocketlauncher"),
+        wxT("Rifle"), wxT("Grenadelauncher"), wxT("Pistol"), wxT("Fireball"),
+        wxT("Iceball"), wxT("Slimeball"), wxT("Bite")
+    };
+    return (n>=0 && (size_t)n<sizeof(sb_weapons)/sizeof(sb_weapons[0])) ? sb_weapons[n] : _("unknown");
+}
+
 const wxChar* GetGameStr(int n)
 {
     static const wxChar *game_names[] =
@@ -132,8 +143,7 @@ CslGame::~CslGame()
     DeleteMaster();
     loopv(m_servers)
     {
-        m_servers[i]->m_playerStats.DeleteStats();
-        delete m_servers[i]->m_playerStats.m_mutex; //FIXME better cleanup
+        m_servers[i]->DeletePlayerStats();
         delete m_servers[i];
     }
 }
@@ -272,7 +282,7 @@ bool CslGame::DeleteServer(CslServerInfo *info)
         if (m_servers[i]==info)
         {
             m_servers.remove(i);
-            info->m_playerStats.DeleteStats();
+            info->DeletePlayerStats();
             delete info;
             return true;
         }

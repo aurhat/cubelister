@@ -732,8 +732,8 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
                             Ping(info,true);
 
                         info->m_uptime=getint(p);
-                        if (info->m_uptime)
-                            info->m_extended=true;
+                        info->m_extended=true;
+                        info->CreatePlayerStats();
                         LOG_DEBUG("uptime (%s) %s\n",U2A(info->GetBestDescription()),
                                   U2A(FormatSeconds(info->m_uptime)));
                     }
@@ -767,7 +767,7 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
                             return;
                         }
 
-                        CslPlayerStats *stats=&info->m_playerStats;
+                        CslPlayerStats *stats=info->m_playerStats;
 
                         vi=getint(p);
                         if (vi==-10) // check for following ids
@@ -804,12 +804,18 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
                         data->m_frags=getint(p);
                         data->m_deaths=getint(p);
                         data->m_teamkills=getint(p);
+                        data->m_health=getint(p);
+                        data->m_armour=getint(p);
+                        data->m_weapon=getint(p);
+                        data->m_status=getint(p);
 
                         if (p.overread())
                         {
                             LOG_DEBUG("stats(%s) OVERREAD!\n",U2A(info->GetBestDescription()));
                             return;
                         }
+
+                        //LOG_DEBUG("add stats id=%d\n",data->m_id);
 
                         if (!stats->AddStats(data))
                         {
