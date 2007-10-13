@@ -67,7 +67,6 @@ static const char * grey_list_16_xpm[] = {
 "                ",
 "                ",
 "                ",
-"                ",
 "     .+@@#$     ",
 "    %&*=-;>,    ",
 "   .')!~%{]^/   ",
@@ -78,5 +77,6 @@ static const char * grey_list_16_xpm[] = {
 "   lmno]e|0pq   ",
 "    @r^^sgtu    ",
 "     crvwxq     ",
+"                ",
 "                ",
 "                "};

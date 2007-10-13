@@ -43,22 +43,16 @@ class CslStatusBar : public wxStatusBar
     public:
         CslStatusBar(wxWindow *parent);
 
-        static void InitBar(CslStatusBar *bar)
+        static void InitBar(CslStatusBar *bar) { m_self=bar; }
+        static void Light(wxInt32 light) { m_self->SetLight(light); };
+        static wxInt32 Light() { return m_self->GetLight(); };
+        static void SetText(wxUint32 id,const wxString& text)
         {
-            m_statusBar=bar;
-        }
-        static void SetText(wxString text,wxUint32 id);
-        static void Light(wxInt32 light)
-        {
-            m_statusBar->SetLight(light);
-        };
-        static wxInt32 Light()
-        {
-            return m_statusBar->GetLight();
+            m_self->SetStatusText(text,id);
         };
 
     private:
-        static CslStatusBar* m_statusBar;
+        static CslStatusBar* m_self;
 
         void OnSize(wxSizeEvent& event);
         DECLARE_EVENT_TABLE()
@@ -68,10 +62,7 @@ class CslStatusBar : public wxStatusBar
         wxInt32 m_light;
 
         void SetLight(wxInt32 light);
-        wxInt32 GetLight()
-        {
-            return m_light;
-        };
+        wxInt32 GetLight() { return m_light; };
 };
 
 #endif // CSLSTATUSBAR_H

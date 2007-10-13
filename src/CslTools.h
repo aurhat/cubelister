@@ -25,9 +25,13 @@
     @author Glen Masgai <mimosius@gmx.de>
 */
 
-//#ifdef __WXDEBUG__
-#define CSL_EXT_SERVER_INFO
-//#endif
+// since WX > 2.8.4 the listctrl items
+// get deselected when sorting (only wxGTK ?) !?
+#ifndef CSL_USE_WX_LIST_DESELECT_WORKAROUND
+#if wxVERSION_NUMBER > 2804
+#endif
+#define CSL_USE_WX_LIST_DESELECT_WORKAROUND
+#endif
 
 #ifndef DATADIR
 #undef LOCALEDIR
@@ -48,6 +52,13 @@
 
 #define SYSCOLOUR(x) wxSystemSettings::GetColour(x)
 
+#ifdef __WXMSW__
+#define PATHDIV wxT("\\")
+#define PATHDIVA wxT('\\')
+#else
+#define PATHDIV wxT("/")
+#define PATHDIVA wxT('/')
+#endif
 
 #ifdef __WXDEBUG__
 void Debug_Printf(const char *DbgFunc, const char *FmtStr,...);

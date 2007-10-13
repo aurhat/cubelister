@@ -121,8 +121,6 @@ class CslSettings
         wxInt32 m_splitterGamePos;
         wxInt32 m_splitterListPos;
         bool m_splitterLive;
-        wxUint32 m_toolbarPosition;
-        wxUint32 m_toolbarStyle;
         wxInt32 m_updateInterval;
         bool m_dontUpdatePlaying;
         bool m_showSearch,m_showFilter,m_filterFavourites;

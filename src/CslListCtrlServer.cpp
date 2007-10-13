@@ -23,6 +23,7 @@
 #include <wx/txtstrm.h>
 #include "CslDlgAddServer.h"
 #include "CslDlgConnectWait.h"
+#include <CslDlgConnectPass.h>
 #include "CslDlgOutput.h"
 #include "CslListCtrlServer.h"
 #include "CslStatusBar.h"
@@ -97,7 +98,7 @@ wxString           CslConnectionState::m_activeCfg=wxEmptyString;
 class CslProcess : public wxProcess
 {
     public:
-        CslProcess(CslListCtrlServer *parent,CslServerInfo *info,wxString cmd) :
+        CslProcess(CslListCtrlServer *parent,CslServerInfo *info,const wxString& cmd) :
                 wxProcess((CslListCtrlServer*)parent),
                 m_parent(parent),m_info(info),m_cmd(cmd)
         {
@@ -335,7 +336,7 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
     wxMenu menu;
     wxPoint point=event.GetPosition();
 
-//from keyboard
+    //from keyboard
     if (point.x==-1 && point.y==-1)
     {
         //TODO handle mouse pos if pointer is outside window
@@ -348,19 +349,24 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
     c=m_selected.GetCount();
     if (c==1)
     {
+        CslServerInfo *info=m_selected.Item(0);
+
         CslMenu::AddItemToMenu(&menu,MENU_SERVER_CONNECT,MENU_SERVER_CONN_STR,wxART_CONNECT);
-#ifdef CSL_EXT_SERVER_INFO
+        if (info->m_type==CSL_GAME_CB || info->m_type==CSL_GAME_AC)
+            CslMenu::AddItemToMenu(&menu,MENU_SERVER_CONNECT_PW,MENU_SERVER_CONN_PW_STR,wxART_CONNECT_PW);
         CslMenu::AddItemToMenu(&menu,MENU_SERVER_EXTENDED,_("Extended information"),wxART_ABOUT);
-#endif
+
         menu.AppendSeparator();
 
         if (CslConnectionState::IsPlaying())
+        {
             menu.Enable(MENU_SERVER_CONNECT,false);
-#ifdef CSL_EXT_SERVER_INFO
-        CslServerInfo *info=m_selected.Item(0);
-        if (!info->m_extended || !PingOk(info))
+            if (info->m_type==CSL_GAME_CB || info->m_type==CSL_GAME_AC)
+                menu.Enable(MENU_SERVER_CONNECT_PW,false);
+        }
+
+        if (info->m_exInfo!=CSL_EXINFO_OK || !PingOk(info))
             menu.Enable(MENU_SERVER_EXTENDED,false);
-#endif
     }
 
     switch (m_id)
@@ -484,7 +490,7 @@ void CslListCtrlServer::ListDeleteServers()
             wxMessageBox(msg,_("Error"),wxICON_ERROR,this);
             continue;
         }
-#ifdef CSL_EXT_SERVER_INFO
+
         if (m_extendedDlg->IsShown() && m_extendedDlg->GetInfo()==info)
         {
             s=info->GetBestDescription();
@@ -494,7 +500,6 @@ void CslListCtrlServer::ListDeleteServers()
             wxMessageBox(msg,_("Error"),wxICON_ERROR,this);
             continue;
         }
-#endif
 
         if (ls->IsFavourite() && skipFav!=wxNO)
             continue;
@@ -518,9 +523,9 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
 {
     CslServerInfo *info;
     wxListItem item;
+    wxString s;
     wxUint32 i=0;
     wxInt32 c=0;
-    wxString s;
 
     wxInt32 id=event.GetId();
 
@@ -529,6 +534,23 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
         case MENU_SERVER_CONNECT:
             ConnectToServer(m_selected.Item(0)->GetPtr());
             break;
+
+        case MENU_SERVER_CONNECT_PW:
+        {
+            info=m_selected.Item(0)->GetPtr();
+            CslConnectPassInfo *infoPass=new CslConnectPassInfo(info->m_type==CSL_GAME_AC,info->m_password);
+            CslDlgConnectPass *dlgPass=new CslDlgConnectPass(this,infoPass);
+            if (dlgPass->ShowModal()==wxID_OK)
+            {
+                if (infoPass->m_save)
+                    info->m_password=infoPass->m_password;
+                else
+                    info->m_password.Clear();
+                ConnectToServer(info,infoPass->m_password,infoPass->m_admin);
+            }
+            delete infoPass;
+            break;
+        }
 
         case MENU_SERVER_EXTENDED:
         {
@@ -646,7 +668,7 @@ void CslListCtrlServer::OnEndProcess(wxCommandEvent& event)
 {
     CslServerInfo *info=(CslServerInfo*)event.GetClientData();
 
-    CslGame::ConnectCleanup(info->m_type,CslConnectionState::GetConfig());
+    CslGame::ConnectCleanupConfig(info->m_type,CslConnectionState::GetConfig());
     CslConnectionState::Reset();
 
     if (!info)
@@ -669,7 +691,7 @@ void CslListCtrlServer::OnTimer(wxTimerEvent& event)
     {
         CslProcess::ProcessInputStream();
         if (m_timerCount==10)
-            CslGame::ConnectCleanup(info->m_type,CslConnectionState::GetConfig());
+            CslGame::ConnectCleanupConfig(info->m_type,CslConnectionState::GetConfig());
     }
     else if (CslConnectionState::IsWaiting())
     {
@@ -689,13 +711,13 @@ void CslListCtrlServer::OnTimer(wxTimerEvent& event)
                     s=A2U(StripColours(U2A(s),&l,2));
                 }
 
-                CslStatusBar::SetText(
-                    wxString::Format(_("Waiting %d seconds for a free slot on \"%s\" " \
-                                       "(press ESC to abort or join another server)"),
-                                     CslConnectionState::GetWaitTime(),s.c_str()),1);
+                CslStatusBar::SetText(1,
+                                      wxString::Format(_("Waiting %d seconds for a free slot on \"%s\" " \
+                                                         "(press ESC to abort or join another server)"),
+                                                       CslConnectionState::GetWaitTime(),s.c_str()));
             }
             else
-                CslStatusBar::SetText(wxT(""),1);
+                CslStatusBar::SetText(1,wxT(""));
         }
     }
     m_timerCount++;
@@ -801,6 +823,60 @@ wxInt32 CslListCtrlServer::ListFindItem(CslServerInfo *info)
     return wxNOT_FOUND;
 }
 
+bool CslListCtrlServer::ListSearchItemMatches(CslServerInfo *info)
+{
+    wxString s;
+
+    s=info->m_host.Lower();
+    if (s.Find(m_searchString)!=wxNOT_FOUND)
+        return true;
+    else
+    {
+        s=info->m_desc.Lower();
+        if (s.Find(m_searchString)!=wxNOT_FOUND)
+            return true;
+        else
+        {
+            s=info->GetVersionStr().Lower();
+            if (s.Find(m_searchString)!=wxNOT_FOUND)
+                return true;
+            else
+            {
+                s=info->m_gameMode.Lower();
+                if (s.Find(m_searchString)!=wxNOT_FOUND)
+                    return true;
+                else
+                {
+                    s=info->m_map.Lower();
+                    if (s.Find(m_searchString)!=wxNOT_FOUND)
+                        return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
+bool CslListCtrlServer::ListFilterItemMatches(CslServerInfo *info)
+{
+    if (m_filterFlags&CSL_FILTER_OFFLINE && !PingOk(info))
+        return true;
+    else if (m_filterFlags&CSL_FILTER_FULL && info->m_playersMax>0 &&
+             info->m_players==info->m_playersMax)
+        return true;
+    else if (m_filterFlags&CSL_FILTER_EMPTY && info->m_players==0)
+        return true;
+    else if (m_filterFlags&CSL_FILTER_NONEMPTY && info->m_players>0)
+        return true;
+    else if (m_filterFlags&CSL_FILTER_MM2 && info->m_mm==2)
+        return true;
+    else if (m_filterFlags&CSL_FILTER_MM3 && info->m_mm==3)
+        return true;
+
+    return false;
+}
+
 bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
 {
     if (!info)
@@ -835,28 +911,14 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
     item.SetId(i);
     item.SetMask(wxLIST_MASK_TEXT|wxLIST_MASK_DATA);
 
-    if (m_filterFlags)
+    // filter
+    found=m_filterFlags ? ListFilterItemMatches(info) : false;
+    if (found && j!=wxNOT_FOUND)
     {
-        if (m_filterFlags&CSL_FILTER_OFFLINE && !pingOk)
-            found=true;
-        else if (m_filterFlags&CSL_FILTER_FULL && info->m_playersMax>0 &&
-                 info->m_players==info->m_playersMax)
-            found=true;
-        else if (m_filterFlags&CSL_FILTER_EMPTY && info->m_players==0)
-            found=true;
-        else if (m_filterFlags&CSL_FILTER_NONEMPTY && info->m_players>0)
-            found=true;
-        else if (m_filterFlags&CSL_FILTER_MM2 && info->m_mm==2)
-            found=true;
-        else if (m_filterFlags&CSL_FILTER_MM3 && info->m_mm==3)
-            found=true;
-        if (found && j!=wxNOT_FOUND)
-        {
-            ListDeleteItem(&item);
-            wxInt32 pos=m_selected.Index(infoCmp);
-            if (pos!=wxNOT_FOUND)
-                m_selected.RemoveAt(pos);
-        }
+        ListDeleteItem(&item);
+        wxInt32 pos=m_selected.Index(infoCmp);
+        if (pos!=wxNOT_FOUND)
+            m_selected.RemoveAt(pos);
     }
 
     if (j==wxNOT_FOUND)
@@ -870,7 +932,11 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
             infoCmp->Reset();
 
         if (found)
+        {
+            if (!m_searchString.IsEmpty())
+                return ListSearchItemMatches(info);
             return true;
+        }
 
         item.SetData((long)infoCmp);
         InsertItem(item);
@@ -880,7 +946,11 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
     else
     {
         if (found)
+        {
+            if (!m_searchString.IsEmpty())
+                return ListSearchItemMatches(info);
             return true;
+        }
         infoCmp=(CslListServer*)GetItemData(item);
     }
 
@@ -892,7 +962,7 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
             if (info->m_type==CSL_GAME_AC)
             {
                 wxUint32 l=s.Len();
-                s=A2U(StripColours(U2A(info->m_desc),&l,2));
+                s=A2U(StripColours(U2A(s),&l,2));
             }
             SetItem(i,1,s);
         }
@@ -945,12 +1015,19 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
             }
         }
     }
-    /*else
+   else
     {
-        wxInt32 k;
-        for (k=1;k<GetColumnCount();k++)
-            SetItem(i,k,wxT(""));
-    }*/
+        if (info->m_desc.IsEmpty() && !info->m_descOld.IsEmpty())
+        {
+            s=info->m_descOld;
+            if (info->m_type==CSL_GAME_AC)
+            {
+                wxUint32 l=s.Len();
+                s=A2U(StripColours(U2A(s),&l,2));
+            }
+            SetItem(i,1,s);
+        }
+    }
 
     wxColour colour=m_stdColourListText;
     if (!pingOk)
@@ -967,37 +1044,8 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
         colour=g_cslSettings->m_colServerEmpty;
     SetItemTextColour(i,colour);
 
-    found=false;
-    if (!m_searchString.IsEmpty())
-    {
-        s=info->m_host.Lower();
-        if (s.Find(m_searchString)!=wxNOT_FOUND)
-            found=true;
-        else
-        {
-            s=info->m_desc.Lower();
-            if (s.Find(m_searchString)!=wxNOT_FOUND)
-                found=true;
-            else
-            {
-                s=info->GetVersionStr().Lower();
-                if (s.Find(m_searchString)!=wxNOT_FOUND)
-                    found=true;
-                else
-                {
-                    s=info->m_gameMode.Lower();
-                    if (s.Find(m_searchString)!=wxNOT_FOUND)
-                        found=true;
-                    else
-                    {
-                        s=info->m_map.Lower();
-                        if (s.Find(m_searchString)!=wxNOT_FOUND)
-                            found=true;
-                    }
-                }
-            }
-        }
-    }
+    // search
+    found=m_searchString.IsEmpty() ? false : ListSearchItemMatches(info);
     SetItemBackgroundColour(item,found ? g_cslSettings->m_colServerHigh :
                             info->IsLocked() ? g_cslSettings->m_colServerPlay : m_stdColourListItem);
 
@@ -1007,11 +1055,11 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
         if (!pingOk)
             i=CSL_LIST_IMG_GREY;
         else if (info->m_ping>(wxInt32)g_cslSettings->m_ping_bad)
-            i=info->m_extended ? CSL_LIST_IMG_RED_EXT : CSL_LIST_IMG_RED;
+            i=info->m_exInfo!=CSL_EXINFO_FALSE ? CSL_LIST_IMG_RED_EXT : CSL_LIST_IMG_RED;
         else if (info->m_ping>(wxInt32)g_cslSettings->m_ping_good)
-            i=info->m_extended ? CSL_LIST_IMG_YELLOW_EXT : CSL_LIST_IMG_YELLOW;
+            i=info->m_exInfo!=CSL_EXINFO_FALSE ? CSL_LIST_IMG_YELLOW_EXT : CSL_LIST_IMG_YELLOW;
         else
-            i=info->m_extended ? CSL_LIST_IMG_GREEN_EXT : CSL_LIST_IMG_GREEN;
+            i=info->m_exInfo!=CSL_EXINFO_FALSE ? CSL_LIST_IMG_GREEN_EXT : CSL_LIST_IMG_GREEN;
 
         if (infoCmp->ImgId()!=i)
         {
@@ -1024,13 +1072,13 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
         switch (info->m_type)
         {
             case CSL_GAME_SB:
-                i=info->m_extended ? CSL_LIST_IMG_SB_EXT : CSL_LIST_IMG_SB;
+                i=info->m_exInfo!=CSL_EXINFO_FALSE ? CSL_LIST_IMG_SB_EXT : CSL_LIST_IMG_SB;
                 break;
             case CSL_GAME_AC:
-                i=info->m_extended ? CSL_LIST_IMG_AC_EXT : CSL_LIST_IMG_AC;
+                i=info->m_exInfo!=CSL_EXINFO_FALSE ? CSL_LIST_IMG_AC_EXT : CSL_LIST_IMG_AC;
                 break;
             case CSL_GAME_BF:
-                i=info->m_extended ? CSL_LIST_IMG_BF_EXT : CSL_LIST_IMG_BF;
+                i=info->m_exInfo!=CSL_EXINFO_FALSE ? CSL_LIST_IMG_BF_EXT : CSL_LIST_IMG_BF;
                 break;
             case CSL_GAME_CB:
                 i=CSL_LIST_IMG_CB;
@@ -1137,7 +1185,7 @@ void CslListCtrlServer::ListClear()
     WX_CLEAR_ARRAY(m_servers);
 }
 
-wxUint32 CslListCtrlServer::ListSearch(wxString search)
+wxUint32 CslListCtrlServer::ListSearch(const wxString& search)
 {
     wxUint32 i,l,c=0;
 
@@ -1179,7 +1227,7 @@ wxUint32 CslListCtrlServer::ListFilter(wxUint32 filterFlags)
     return c;
 }
 
-void CslListCtrlServer::ConnectToServer(CslServerInfo *info)
+void CslListCtrlServer::ConnectToServer(CslServerInfo *info,const wxString& password,const bool admin)
 {
     if (CslConnectionState::IsPlaying())
     {
@@ -1298,7 +1346,7 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info)
 
     if (!sbUseParam)
     {
-        switch (CslGame::ConnectPrepare(info,path,&out))
+        switch (CslGame::ConnectPrepareConfig(out,info,path,password,admin))
         {
             case CSL_ERROR_NONE:
                 break;
@@ -1395,8 +1443,7 @@ void CslListCtrlServer::ListSort(wxInt32 column)
     if (!GetItemCount())
         return;
 
-// since WX > 2.8.4 the items get deselected when sorting !?
-#if wxVERSION_NUMBER > 2804
+#ifdef CSL_USE_WX_LIST_DESELECT_WORKAROUND
     CslServerInfo **selected=new CslServerInfo*[GetItemCount()];
     wxInt32 c=0,i,j;
 
@@ -1407,7 +1454,7 @@ void CslListCtrlServer::ListSort(wxInt32 column)
 
     SortItems(ListSortCompareFunc,(long)&m_sortHelper);
 
-#if wxVERSION_NUMBER > 2804
+#ifdef CSL_USE_WX_LIST_DESELECT_WORKAROUND
     for (i=0;i<c;i++)
     {
         j=ListFindItem(selected[i]);

@@ -29,10 +29,10 @@ BEGIN_EVENT_TABLE(CslStatusBar, wxStatusBar)
     EVT_SIZE(CslStatusBar::OnSize)
 END_EVENT_TABLE()
 
-enum { FIELD_LIGHT = 0, FIELD_MESSAGE, FIELD_END };
+enum { FIELD_LIGHT = 0, FIELD1, FIELD_END };
 
 
-CslStatusBar* CslStatusBar::m_statusBar=NULL;
+CslStatusBar* CslStatusBar::m_self=NULL;
 
 CslStatusBar::CslStatusBar(wxWindow *parent) : wxStatusBar(parent, wxID_ANY), m_bmp(NULL)
 {
@@ -63,11 +63,6 @@ void CslStatusBar::OnSize(wxSizeEvent& event)
     SetStatusWidths(FIELD_END,widths);
 
     event.Skip();
-}
-void CslStatusBar::SetText(wxString text,wxUint32 id)
-{
-    m_statusBar->SetStatusText(text,id);
-    //m_statusCount=m_timerCount>0 ? m_timerCount-1 : 0;
 }
 
 void CslStatusBar::SetLight(wxInt32 light)

@@ -51,8 +51,8 @@
 class CslFrame: public wxFrame
 {
     public:
-        // begin wxGlade: CslFrame::ids
-        // end wxGlade
+    // begin wxGlade: CslFrame::ids
+    // end wxGlade
 
         CslFrame(wxWindow* parent, int id, const wxString& title, const wxPoint& pos=wxDefaultPosition,
                  const wxSize& size=wxDefaultSize, long style=wxDEFAULT_FRAME_STYLE);
@@ -78,12 +78,12 @@ class CslFrame: public wxFrame
 
         CslDlgExtended *m_extendedDlg;
 
-        // begin wxGlade: CslFrame::methods
-        void set_properties();
-        void do_layout();
-        // end wxGlade
+    // begin wxGlade: CslFrame::methods
+    void set_properties();
+    void do_layout();
+    // end wxGlade
 
-        void OnPingStats(wxCommandEvent& event);
+        void OnPong(wxCommandEvent& event);
         void OnTimer(wxTimerEvent& event);
         void OnTreeLeftClick(wxTreeEvent& event);
         void OnTreeRightClick(wxTreeEvent& event);
@@ -100,34 +100,34 @@ class CslFrame: public wxFrame
         DECLARE_EVENT_TABLE()
 
     protected:
-        // begin wxGlade: CslFrame::attributes
-        wxStaticBox* sizer_filter_staticbox;
-        wxTreeCtrl* tree_ctrl_games;
-        wxPanel* pane_games;
-        CslListCtrlInfo* list_ctrl_info;
-        wxPanel* pane_info;
-        wxSplitterWindow* splitter_games_info;
-        wxCheckBox* checkbox_filter_full;
-        wxCheckBox* checkbox_filter_offline;
-        wxCheckBox* checkbox_filter_empty;
-        wxCheckBox* checkbox_filter_mm2;
-        wxCheckBox* checkbox_filter_nonempty;
-        wxCheckBox* checkbox_filter_mm3;
-        wxCheckBox* checkbox_filter_favourites;
-        wxButton* button_filter_reset;
-        wxPanel* pane_main_left;
-        CslListCtrlServer* list_ctrl_master;
-        wxTextCtrl* text_ctrl_search;
-        wxPanel* panel_search;
-        wxPanel* pane_master;
-        CslListCtrlServer* list_ctrl_favourites;
-        wxPanel* pane_favourites;
-        wxSplitterWindow* splitter_lists;
-        wxPanel* pane_main_right;
-        wxSplitterWindow* splitter_main;
-        wxPanel* panel_main;
-        wxPanel* panel_frame;
-        // end wxGlade
+    // begin wxGlade: CslFrame::attributes
+    wxStaticBox* sizer_filter_staticbox;
+    wxTreeCtrl* tree_ctrl_games;
+    wxPanel* pane_games;
+    CslListCtrlInfo* list_ctrl_info;
+    wxPanel* pane_info;
+    wxSplitterWindow* splitter_games_info;
+    wxCheckBox* checkbox_filter_full;
+    wxCheckBox* checkbox_filter_offline;
+    wxCheckBox* checkbox_filter_empty;
+    wxCheckBox* checkbox_filter_mm2;
+    wxCheckBox* checkbox_filter_nonempty;
+    wxCheckBox* checkbox_filter_mm3;
+    wxCheckBox* checkbox_filter_favourites;
+    wxButton* button_filter_reset;
+    wxPanel* pane_main_left;
+    CslListCtrlServer* list_ctrl_master;
+    wxTextCtrl* text_ctrl_search;
+    wxPanel* panel_search;
+    wxPanel* pane_master;
+    CslListCtrlServer* list_ctrl_favourites;
+    wxPanel* pane_favourites;
+    wxSplitterWindow* splitter_lists;
+    wxPanel* pane_main_right;
+    wxSplitterWindow* splitter_main;
+    wxPanel* panel_main;
+    wxPanel* panel_frame;
+    // end wxGlade
 
         wxBitmapButton* bitmap_button_search_clear;
         wxFlexGridSizer *m_sizerMaster,*m_sizerLeft,*m_sizerSearch;
@@ -147,6 +147,7 @@ class CslFrame: public wxFrame
         void TreeAddMaster(wxTreeItemId parent,CslMaster *master,bool activate);
         void TreeRemoveMaster();
         void TreeAddGame(CslGame *game,bool activate=false);
+        void TreeCalcTotalPlaytime(CslGame* game);
 
         void LoadSettings();
         void SaveSettings();

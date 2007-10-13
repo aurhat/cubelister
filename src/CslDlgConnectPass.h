@@ -18,60 +18,64 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef CSLDLGADDSERVER_H
-#define CSLDLGADDSERVER_H
+#ifndef CSLDLGCONNECTPASS_H
+#define CSLDLGCONNECTPASS_H
 
 /**
- @author Glen Masgai <mimosius@gmx.de>
+    @author Glen Masgai <mimosius@gmx.de>
 */
 
-#include "wx/wxprec.h"
-#ifdef __BORLANDC__
-#pragma hdrstop
-#endif
-#ifndef WX_PRECOMP
-#include "wx/wx.h"
-#endif
+#include <wx/wx.h>
 #include <wx/image.h>
-#include "CslGame.h"
-
 // begin wxGlade: ::dependencies
 // end wxGlade
 
 
-class CslDlgAddServer: public wxDialog
+class CslConnectPassInfo
 {
     public:
-    // begin wxGlade: CslDlgAddServer::ids
-    // end wxGlade
+        CslConnectPassInfo(const bool admin,const wxString& password)
+                : m_password(password),m_save(false),m_admin(admin) {}
 
-        CslDlgAddServer(wxWindow* parent, CslServerInfo *info,int id=wxID_ANY,const wxString& title=wxEmptyString,
-                        const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize,
-                        long style=wxDEFAULT_DIALOG_STYLE);
+        wxString m_password;
+        bool m_save;
+        bool m_admin;
+};
+
+
+class CslDlgConnectPass: public wxDialog
+{
+    public:
+    // begin wxGlade: CslDlgConnectPass::ids
+    // end wxGlade
+        CslDlgConnectPass(wxWindow* parent,CslConnectPassInfo *info,int id=wxID_ANY,
+                          const wxString& title=wxEmptyString,
+                          const wxPoint& pos=wxDefaultPosition,
+                          const wxSize& size=wxDefaultSize,
+                          long style=wxDEFAULT_DIALOG_STYLE);
 
     private:
-    // begin wxGlade: CslDlgAddServer::methods
+    // begin wxGlade: CslDlgConnectPass::methods
     void set_properties();
     void do_layout();
     // end wxGlade
 
-        void OnText(wxCommandEvent& WXUNUSED(event));
-        void OnButton(wxCommandEvent& event);
+        void OnCommandEvent(wxCommandEvent& event);
 
         DECLARE_EVENT_TABLE()
 
     protected:
-    // begin wxGlade: CslDlgAddServer::attributes
-    wxStaticBox* sizer_address_staticbox;
-    wxChoice* choice_type;
-    wxTextCtrl* text_ctrl_address;
-    wxButton* button_add;
+    // begin wxGlade: CslDlgConnectPass::attributes
+    wxStaticBox* sizer_ctrl_staticbox;
+    wxTextCtrl* text_ctrl_password;
+    wxCheckBox* checkbox_save;
+    wxCheckBox* checkbox_admin;
+    wxButton* button_ok;
     wxButton* button_cancel;
     // end wxGlade
 
-        CslServerInfo *m_info;
-
+        CslConnectPassInfo *m_info;
 }; // wxGlade: end class
 
 
-#endif // CSLDLGADDSERVER_H
+#endif // CSLDLGCONNECTPASS_H

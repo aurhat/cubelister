@@ -31,22 +31,15 @@ typedef unsigned int uint;
 #define loopk(m) loop(k,m)
 #define loopl(m) loop(l,m)
 
-#ifdef WIN32
-#define PATHDIV wxT("\\")
-#define PATHDIVA wxT('\\')
-#else
+#ifndef WIN32
 #define __cdecl
 #define _vsnprintf vsnprintf
-#define PATHDIV wxT("/")
-#define PATHDIVA wxT('/')
 #endif
 
 // easy safe strings
-
 #define _MAXDEFSTR 260
 typedef char string[_MAXDEFSTR];
 
-///inline void formatstring(char *d, const char *fmt, va_list v) { _vsnprintf(d, _MAXDEFSTR, fmt, v); d[_MAXDEFSTR-1] = 0; }
 inline char *s_strncpy(char *d, const char *s, size_t m)
 {
     strncpy(d,s,m);
@@ -398,6 +391,11 @@ template <class T> struct vector
         loopi(ulen/2) swapv(T, buf[i], buf[ulen-1-i]);
     }
 };
+
+extern void putint(ucharbuf &p, int n);
+extern int getint(ucharbuf &p);
+extern void putstring(const char *t, ucharbuf &p);
+extern void getstring(char *text, ucharbuf &p, int len);
 
 #endif // CUBE_TOOLS_H
 

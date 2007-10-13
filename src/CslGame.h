@@ -148,7 +148,7 @@ class CslPlayerStatsData
 class CslPlayerStats
 {
     public:
-        enum { CSL_STATS_NEED_IDS=0, CSL_STATS_NEED_STATS};
+        enum { CSL_STATS_NEED_IDS=0, CSL_STATS_NEED_STATS };
 
         CslPlayerStats() : m_status(CSL_STATS_NEED_IDS),
                 m_lastRefresh(0),m_lastResponse(0) { m_critical=new wxCriticalSection(); }
@@ -159,19 +159,12 @@ class CslPlayerStats
         {
             wxCriticalSectionLocker enter(*m_critical);
 
-            CslPlayerStatsData *data=NULL;
             loopv(m_stats)
             {
-                if (m_stats[i]->m_ok)
-                    continue;
+                if (m_stats[i]->m_ok) continue;
                 return m_stats[i];
-                break;
             }
-
-            if (!data)
-                data=new CslPlayerStatsData;
-
-            return data;
+            return new CslPlayerStatsData;
         }
 
         bool AddStats(CslPlayerStatsData *data)
@@ -183,16 +176,15 @@ class CslPlayerStats
 
             loopv(m_ids)
             {
-                if (m_ids[i]==data->m_id)
-                {
-                    m_ids.remove(i);
-                    data->m_ok=true;
-                    if (m_ids.length()==0)
-                        m_status=CSL_STATS_NEED_IDS;
-                    loopv(m_stats) if (m_stats[i]==data) return true;
-                    m_stats.add(data);
-                    return true;
-                }
+                if (m_ids[i]!=data->m_id)
+                    continue;
+                m_ids.remove(i);
+                data->m_ok=true;
+                if (m_ids.length()==0)
+                    m_status=CSL_STATS_NEED_IDS;
+                loopv(m_stats) if (m_stats[i]==data) return true;
+                m_stats.add(data);
+                return true;
             }
             return false;
         }
@@ -242,6 +234,22 @@ class CslPlayerStats
             return true;
         }
 
+        bool RemoveId(wxInt32 id)
+        {
+            wxCriticalSectionLocker enter(*m_critical);
+
+            loopv(m_ids)
+            {
+                if (m_ids[i]!=id)
+                    continue;
+                m_ids.remove(i);
+                if (m_ids.length()==0)
+                    m_status=CSL_STATS_NEED_IDS;
+                return true;
+            }
+            return false;
+        }
+
         void SetWaitForStats()
         {
             if (m_ids.length())
@@ -257,6 +265,72 @@ class CslPlayerStats
         wxCriticalSection *m_critical;
 };
 
+class CslTeamStatsData
+{
+    public:
+        CslTeamStatsData() : m_score(-1),m_ok(false) {}
+
+        wxString m_team;
+        wxInt32 m_score;
+        bool m_ok;
+};
+
+class CslTeamStats
+{
+    public:
+        CslTeamStats() :
+                m_teamplay(false),m_remain(-1),
+                m_lastRefresh(0),m_lastResponse(0)
+        {
+            m_critical=new wxCriticalSection();
+        }
+        ~CslTeamStats() { DeleteStats(); delete m_critical; }
+
+        CslTeamStatsData* GetNewStatsPtr()
+        {
+            wxCriticalSectionLocker enter(*m_critical);
+
+            loopv(m_stats)
+            {
+                if (m_stats[i]->m_ok) continue;
+                return m_stats[i];
+            }
+            return new CslTeamStatsData;
+        }
+
+        void AddStats(CslTeamStatsData *data)
+        {
+            wxCriticalSectionLocker enter(*m_critical);
+
+            data->m_ok=true;
+            loopv(m_stats) if (m_stats[i]==data) return;
+            m_stats.add(data);
+        }
+
+        void DeleteStats()
+        {
+            wxCriticalSectionLocker enter(*m_critical);
+
+            loopvrev(m_stats) delete m_stats[i];
+            m_stats.setsize(0);
+        }
+
+        void Reset()
+        {
+            wxCriticalSectionLocker enter(*m_critical);
+
+            loopv(m_stats) m_stats[i]->m_ok=false;
+        }
+
+        bool m_teamplay;
+        wxInt32 m_remain;
+        wxUint32 m_lastRefresh,m_lastResponse;
+        vector<CslTeamStatsData*> m_stats;
+        wxCriticalSection *m_critical;
+};
+
+enum { CSL_EXINFO_OK = 0, CSL_EXINFO_FALSE, CSL_EXINFO_ERROR };
+
 class CslServerInfo
 {
         friend class CslEngine;
@@ -268,7 +342,9 @@ class CslServerInfo
                       const CSL_GAMETYPE type=CSL_GAME_START,
                       const wxUint32 view=CSL_VIEW_DEFAULT,const wxUint32 lastSeen=0,
                       const wxUint32 playLast=0,const wxUint32 playTimeLastGame=0,
-                      const wxUint32 playTimeTotal=0,const wxUint32 connectedTimes=0)
+                      const wxUint32 playTimeTotal=0,const wxUint32 connectedTimes=0,
+                      const wxString& oldDescription=wxEmptyString,
+                      const wxString& password=wxEmptyString)
         {
             m_host=host;
             m_type=type;
@@ -288,12 +364,15 @@ class CslServerInfo
             m_playTimeLastGame=playTimeLastGame;
             m_playTimeTotal=playTimeTotal;
             m_connectedTimes=connectedTimes;
+            m_password=password;
+            m_descOld=oldDescription;
             m_uptime=0;
             m_uptimeRefresh=CSL_UPTIME_REFRESH_MULT;
             m_lock=0;
             m_waiting=false;
-            m_extended=false;
+            m_exInfo=CSL_EXINFO_FALSE;
             m_playerStats=NULL;
+            m_teamStats=NULL;
         }
 
         //virtual ~CslServerInfo() { DeletePlayerStats(); }
@@ -326,13 +405,13 @@ class CslServerInfo
             switch (m_type)
             {
                 case CSL_GAME_SB:
-                    return wxString(GetVersionStrSB(m_protocol));
+                    return GetVersionStrSB(m_protocol);
                 case CSL_GAME_AC:
-                    return wxString(GetVersionStrAC(m_protocol));
+                    return GetVersionStrAC(m_protocol);
                 case CSL_GAME_BF:
-                    return wxString(GetVersionStrBF(m_protocol));
+                    return GetVersionStrBF(m_protocol);
                 case CSL_GAME_CB:
-                    return wxString(GetVersionStrCB(m_protocol));
+                    return GetVersionStrCB(m_protocol);
                 default:
                     break;
             }
@@ -361,9 +440,20 @@ class CslServerInfo
             return 0;
         }
 
+        void SetDescription(const wxString& description)
+        {
+            m_desc=description;
+            m_descOld=description;
+        }
+
         wxString GetBestDescription()
         {
-            if (m_desc.IsEmpty()) return m_host;
+            if (m_desc.IsEmpty())
+            {
+                if (m_descOld.IsEmpty())
+                    return m_host;
+                else return m_descOld;
+            }
             return m_desc;
         }
 
@@ -382,10 +472,13 @@ class CslServerInfo
 
         void CreatePlayerStats() { if (!m_playerStats) m_playerStats=new CslPlayerStats(); }
         void DeletePlayerStats() { if (m_playerStats) { delete m_playerStats; m_playerStats=NULL; } }
+        void CreateTeamStats() { if (!m_teamStats) m_teamStats=new CslTeamStats(); }
+        void DeleteTeamStats() { if (m_teamStats) { delete m_teamStats; m_teamStats=NULL; } }
 
-        wxString m_host,m_domain;
+        wxString m_host,m_domain,m_password;
         vector<wxInt32> m_masterIDs;
-        wxString m_desc,m_gameMode,m_map;
+        wxString m_desc,m_descOld;
+        wxString m_gameMode,m_map;
         CSL_GAMETYPE m_type;
         wxInt32 m_protocol;
         wxInt32 m_ping,m_timeRemain;
@@ -400,8 +493,9 @@ class CslServerInfo
         wxUint32 m_uptimeRefresh;
         wxInt32 m_lock;
         bool m_waiting;
-        bool m_extended;
+        wxInt32 m_exInfo;
         CslPlayerStats *m_playerStats;
+        CslTeamStats *m_teamStats;
 
     protected:
         void AddMaster(const wxInt32 id)
@@ -514,11 +608,12 @@ class CslGame
         wxString GetName() { return m_name; }
         vector<CslMaster*>* GetMasters() { return &m_masters; }
         vector<CslServerInfo*>* GetServers() { return &m_servers; }
-        CslServerInfo* FindServerByAddr(const wxIPV4address addr);
+        CslServerInfo* FindServerByAddr(const wxIPV4address& addr);
 
-        static wxInt32 ConnectCleanup(const CSL_GAMETYPE type,const wxString& cfg);
-        static wxInt32 ConnectWriteConfig(const CSL_GAMETYPE type,const wxString& cfg,const wxString& str);
-        static wxInt32 ConnectPrepare(const CslServerInfo *info,const wxString& path,wxString *out);
+        static wxInt32 ConnectCleanupConfig(const CSL_GAMETYPE& type,const wxString& cfg);
+        static wxInt32 ConnectWriteConfig(const CSL_GAMETYPE& type,const wxString& cfg,const wxString& str);
+        static wxInt32 ConnectPrepareConfig(wxString& out,const CslServerInfo *info,const wxString& path,
+                                            const wxString& password=wxEmptyString,const bool admin=false);
 
     protected:
         CSL_GAMETYPE m_type;

@@ -3,6 +3,7 @@
 
 #ifndef _MSC_VER
 #include "img/connect_16.xpm"
+#include "img/connect_pw_16.xpm"
 #include "img/about_16.xpm"
 #if defined(__WXMSW__) || defined(__WXMAC__)
 #include "img/add_16.xpm"
@@ -23,6 +24,12 @@ wxBitmap CslArt::CreateBitmap(const wxArtID& id,const wxArtClient& client,const 
                 return wxBitmap(wxIcon(wxT("ICON_MENU_CONNECT"),wxBITMAP_TYPE_ICO_RESOURCE,16,16));
 #else
                 return wxBitmap(connect_16_xpm);
+#endif
+            else if (id==wxART_CONNECT_PW)
+#ifdef _MSC_VER
+                return wxBitmap(wxIcon(wxT("ICON_MENU_CONNECT_PW"),wxBITMAP_TYPE_ICO_RESOURCE,16,16));
+#else
+                return wxBitmap(connect_pw_16_xpm);
 #endif
             else if (id==wxART_ABOUT)
 #ifdef _MSC_VER

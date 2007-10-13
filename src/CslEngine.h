@@ -40,16 +40,34 @@
 #define CSL_UPDATE_INTERVAL_WAIT   2500
 
 BEGIN_DECLARE_EVENT_TYPES()
-DECLARE_EVENT_TYPE(wxCSL_EVT_PING_STATS,wxID_ANY)
+DECLARE_EVENT_TYPE(wxCSL_EVT_PONG,wxID_ANY)
 END_DECLARE_EVENT_TYPES()
 
-#define CSL_EVT_PING_STATS(id,fn) \
+#define CSL_EVT_PONG(id,fn) \
     DECLARE_EVENT_TABLE_ENTRY( \
-                               wxCSL_EVT_PING_STATS,id,wxID_ANY, \
+                               wxCSL_EVT_PONG,id,wxID_ANY, \
                                (wxObjectEventFunction)(wxEventFunction) \
                                wxStaticCastEvent(wxCommandEventFunction,&fn), \
                                (wxObject*)NULL \
                              ),
+
+
+// extended info commands
+#define CSL_EX_CMD_UPTIME      "ut"
+#define CSL_EX_CMD_PLAYERSTATS "ps"
+#define CSL_EX_CMD_TEAMSTATS   "ts"
+
+enum { CSL_PONG_TYPE_PING=0, CSL_PONG_TYPE_PLAYERSTATS, CSL_PONG_TYPE_TEAMSTATS };
+
+class CslPongPacket : public wxObject
+{
+    public:
+        CslPongPacket(CslServerInfo* info=NULL,wxInt32 type=-1) :
+                m_info(info),m_type(type) {}
+
+        CslServerInfo *m_info;
+        wxInt32 m_type;
+};
 
 class CslResolverPacket
 {
@@ -116,8 +134,9 @@ class CslEngine : public wxEvtHandler
         vector<CslServerInfo*>* GetFavourites() { return &m_favourites; }
 
         bool Ping(CslServerInfo *info,bool force=false);
-        bool PingUptime(CslServerInfo *info);
-        bool PingStats(CslServerInfo *info,wxUint32 playerid=-1);
+        bool PingExUptime(CslServerInfo *info);
+        bool PingExPlayerInfo(CslServerInfo *info,wxInt32 pid=-1);
+        bool PingExTeamInfo(CslServerInfo *info);
         wxUint32 PingServers();
 
         int UpdateMaster();

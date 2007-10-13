@@ -35,22 +35,26 @@ BEGIN_EVENT_TABLE(CslDlgExtended, wxDialog)
     EVT_LIST_COL_CLICK(wxID_ANY,CslDlgExtended::OnColumnLeftClick)
     EVT_TIMER(wxID_ANY,CslDlgExtended::OnTimer)
     EVT_BUTTON(wxID_ANY,CslDlgExtended::OnCommandEvent)
-    CSL_EVT_PING_STATS(wxID_ANY,CslDlgExtended::OnPingStats)
+    CSL_EVT_PONG(wxID_ANY,CslDlgExtended::OnPong)
 END_EVENT_TABLE()
 
 
-enum { CSL_LIST_IMG_SORT_ASC = 0,
-       CSL_LIST_IMG_SORT_DSC,
-       CSL_LIST_IMG_GREEN,
-       CSL_LIST_IMG_ORANGE,
-       CSL_LIST_IMG_GREY,
-       CSL_LIST_IMG_TRANS
-     };
+enum
+{
+    CSL_LIST_IMG_SORT_ASC = 0,
+    CSL_LIST_IMG_SORT_DSC,
+    CSL_LIST_IMG_GREEN,
+    CSL_LIST_IMG_ORANGE,
+    CSL_LIST_IMG_GREY,
+    CSL_LIST_IMG_TRANS
+};
 
-enum { SORT_PLAYER = 0, SORT_TEAM,
-       SORT_FRAGS, SORT_DEATHS, SORT_TEAMKILLS,
-       SORT_HEALTH, SORT_ARMOUR, SORT_WEAPON
-     };
+enum
+{
+    SORT_PLAYER = 0, SORT_TEAM,
+    SORT_FRAGS, SORT_DEATHS, SORT_TEAMKILLS,
+    SORT_HEALTH, SORT_ARMOUR, SORT_WEAPON
+};
 
 enum { BUTTON_REFRESH = wxID_HIGHEST +1 };
 
@@ -63,9 +67,15 @@ CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
         m_engine(NULL),m_info(NULL)
 {
     // begin wxGlade: CslDlgExtended::CslDlgExtended
+    sizer_team_score_staticbox = new wxStaticBox(this, -1, _("Team score"));
     list_ctrl_extended = new wxListCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxSUNKEN_BORDER);
+    label_team1 = new wxStaticText(this, wxID_ANY, _("label_team1"));
+    label_team2 = new wxStaticText(this, wxID_ANY, _("label_team2"));
+    label_team3 = new wxStaticText(this, wxID_ANY, _("label_team3"));
+    label_team4 = new wxStaticText(this, wxID_ANY, _("label_team4"));
     label_status = new wxStaticText(this, wxID_ANY, _("Waiting for data..."));
-    checkbox_autoupdate = new wxCheckBox(this, wxID_ANY, _("Auto &update"));
+    checkbox_update = new wxCheckBox(this, wxID_ANY, _("Auto &update"));
+    checkbox_update_end = new wxCheckBox(this, wxID_ANY, _("No update when map ends"));
     button_update = new wxButton(this, BUTTON_REFRESH, _("&Update"));
     button_close = new wxButton(this, wxID_CLOSE, _("&Close"));
 
@@ -90,6 +100,8 @@ CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
     m_imageList.Add(wxIcon(wxT("ICON_LIST_GREY"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imageList.Add(wxIcon(wxT("ICON_LIST_TRANS"),wxBITMAP_TYPE_ICO_RESOURCE));
 #endif
+
+    m_labelFont=label_team1->GetFont();
 }
 
 void CslDlgExtended::set_properties()
@@ -99,19 +111,37 @@ void CslDlgExtended::set_properties()
     button_close->SetDefault();
     // end wxGlade
 
-    SetMinSize(wxSize(600,400));
+    m_teamLabel.Add(label_team1);
+    m_teamLabel.Add(label_team2);
+    m_teamLabel.Add(label_team3);
+    m_teamLabel.Add(label_team4);
+
+    SetMinSize(wxSize(-1,440));
 }
 
 void CslDlgExtended::do_layout()
 {
     // begin wxGlade: CslDlgExtended::do_layout
-    wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(2, 1, 0, 0);
-    wxFlexGridSizer* grid_sizer_button = new wxFlexGridSizer(1, 6, 0, 0);
+    wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* grid_sizer_button = new wxFlexGridSizer(1, 7, 0, 0);
+    wxStaticBoxSizer* sizer_team_score = new wxStaticBoxSizer(sizer_team_score_staticbox, wxHORIZONTAL);
+    wxFlexGridSizer* grid_sizer_team_score = new wxFlexGridSizer(1, 4, 0, 0);
     grid_sizer_main->Add(list_ctrl_extended, 1, wxALL|wxEXPAND, 4);
+    grid_sizer_team_score->Add(label_team1, 0, wxALL, 4);
+    grid_sizer_team_score->Add(label_team2, 0, wxALL, 4);
+    grid_sizer_team_score->Add(label_team3, 0, wxALL, 4);
+    grid_sizer_team_score->Add(label_team4, 0, wxALL, 4);
+    grid_sizer_team_score->AddGrowableCol(0);
+    grid_sizer_team_score->AddGrowableCol(1);
+    grid_sizer_team_score->AddGrowableCol(2);
+    grid_sizer_team_score->AddGrowableCol(3);
+    sizer_team_score->Add(grid_sizer_team_score, 1, wxEXPAND, 0);
+    grid_sizer_main->Add(sizer_team_score, 1, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 4);
     wxStaticText* label_status_static = new wxStaticText(this, wxID_ANY, _("Status:"));
     grid_sizer_button->Add(label_status_static, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
     grid_sizer_button->Add(label_status, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_button->Add(checkbox_autoupdate, 0, wxRIGHT|wxALIGN_CENTER_VERTICAL, 8);
+    grid_sizer_button->Add(checkbox_update, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
+    grid_sizer_button->Add(checkbox_update_end, 0, wxRIGHT|wxALIGN_CENTER_VERTICAL, 8);
     grid_sizer_button->Add(button_update, 0, wxALL, 4);
     grid_sizer_button->Add(8, 1, 0, 0, 0);
     grid_sizer_button->Add(button_close, 0, wxALL, 4);
@@ -154,9 +184,17 @@ void CslDlgExtended::OnTimer(wxTimerEvent& event)
     if (!IsShown())
         return;
 
+    CslPlayerStats *stats=m_info->m_playerStats;
+
     wxUint32 now=wxDateTime::Now().GetTicks();
 
-    CslPlayerStats *stats=m_info->m_playerStats;
+    wxString label=_("Update");
+    if (!button_update->IsEnabled() && m_info->m_players>0)
+    {
+        wxInt32 diff=CSL_EXT_REFRESH_INTERVAL-(now-stats->m_lastRefresh);
+        if (diff>0)
+            label+=wxString::Format(wxT(" (%d)"),diff);
+    }
 
     if (stats->m_ids.length())
     {
@@ -175,9 +213,12 @@ void CslDlgExtended::OnTimer(wxTimerEvent& event)
         return;
     }
 
+    if (!button_update->IsEnabled() && m_info->m_players>0)
+        button_update->SetLabel(label);
+
     if (m_info->m_players && stats->m_lastRefresh+CSL_EXT_REFRESH_INTERVAL<=now)
     {
-        if (checkbox_autoupdate->GetValue())
+        if (checkbox_update->GetValue())
             QueryInfo();
         else if (!button_update->IsEnabled())
             button_update->Enable();
@@ -200,104 +241,202 @@ void CslDlgExtended::OnCommandEvent(wxCommandEvent& event)
     event.Skip();
 }
 
-void CslDlgExtended::OnPingStats(wxCommandEvent& event)
+void CslDlgExtended::OnPong(wxCommandEvent& event)
 {
-    CslServerInfo *info=(CslServerInfo*)event.GetClientData();
-
-    if (m_info!=info || !m_info || !info)
+    CslPongPacket *pp=(CslPongPacket*)event.GetClientData();
+    wxASSERT(pp);
+    if (!pp)
         return;
 
-    wxListItem item;
-    item.SetMask(wxLIST_MASK_TEXT|wxLIST_MASK_DATA);
+    CslServerInfo *info=pp->m_info;
+    if (m_info!=info || !m_info || !info)
+    {
+        delete pp;
+        return;
+    }
+
+    switch (pp->m_type)
+    {
+        case CSL_PONG_TYPE_PLAYERSTATS:
+        {
+            wxString s;
+            wxListItem item;
+            CslPlayerStats *stats=info->m_playerStats;
+            CslPlayerStatsData *data=NULL;
+
+            item.SetMask(wxLIST_MASK_TEXT|wxLIST_MASK_DATA);
+
+            loopv(stats->m_stats)
+            {
+                data=stats->m_stats[i];
+                if (!data->m_ok)
+                    break;
+                if (i<list_ctrl_extended->GetItemCount())
+                    continue;
+
+                item.SetId(i);
+                list_ctrl_extended->InsertItem(item);
+                list_ctrl_extended->SetItemData(i,(long)data);
+
+                if (data->m_player.IsEmpty())
+                    s=_("- connecting -");
+                else
+                    s=data->m_player;
+                list_ctrl_extended->SetItem(i,0,s);
+
+                if (data->m_state==CSL_PLAYER_STATE_SB_SPECTATOR)
+                    s=_("Spectator");
+                else
+                    s=data->m_team;
+                list_ctrl_extended->SetItem(i,1,s);
+
+                if (data->m_frags<0)
+                    s=wxT("0");
+                else
+                    s=wxString::Format(wxT("%d"),data->m_frags);
+                list_ctrl_extended->SetItem(i,2,s);
+
+                if (data->m_deaths<0)
+                    s=wxT("0");
+                else
+                    s=wxString::Format(wxT("%d"),data->m_deaths);
+                list_ctrl_extended->SetItem(i,3,s);
+
+                if (data->m_teamkills<0)
+                    s=wxT("0");
+                else
+                    s=wxString::Format(wxT("%d"),data->m_teamkills);
+                list_ctrl_extended->SetItem(i,4,s);
+
+                if (data->m_state==CSL_PLAYER_STATE_SB_DEAD)
+                    s=_("dead");
+                else if (data->m_state==CSL_PLAYER_STATE_SB_EDITING)
+                    s=_("editing");
+                else if (data->m_state)
+                    s=wxT("0");
+                else
+                    s=s=wxString::Format(wxT("%d"),data->m_health);
+                list_ctrl_extended->SetItem(i,5,s);
+
+                if (data->m_state || data->m_armour<0)
+                    s=wxT("0");
+                else
+                    s=wxString::Format(wxT("%d"),data->m_armour);
+                list_ctrl_extended->SetItem(i,6,s);
+
+                s=GetWeaponStrSB(data->m_weapon);
+                list_ctrl_extended->SetItem(i,7,s);
+
+                wxColour colour=*wxBLACK;
+                if (data->m_priv==CSL_PLAYER_PRIV_SB_MASTER)
+                    i=CSL_LIST_IMG_GREEN;
+                else if (data->m_priv==CSL_PLAYER_PRIV_SB_ADMIN)
+                    i=CSL_LIST_IMG_ORANGE;
+                else if (data->m_state==CSL_PLAYER_STATE_SB_SPECTATOR)
+                    i=CSL_LIST_IMG_GREY;
+                else
+                    i=CSL_LIST_IMG_TRANS;
+
+                list_ctrl_extended->SetItemImage(item,i);
+            }
+
+            stats->m_lastResponse=wxDateTime::Now().GetTicks();
+
+            label_status->SetLabel(wxString::Format(wxT("%d players (%d left)"),
+                                                    list_ctrl_extended->GetItemCount(),stats->m_ids.length()));
+            ListSort(-1);
+            break;
+        }
+
+        case CSL_PONG_TYPE_TEAMSTATS:
+            SetTeamScore();
+            break;
+
+        default:
+            break;
+    }
+
+    delete pp;
+}
+
+void CslDlgExtended::SetTeamScore()
+{
+    for (wxUint32 i=0;i<m_teamLabel.GetCount();i++)
+    {
+        m_teamLabel.Item(i)->SetLabel(wxT(""));
+        m_teamLabel.Item(i)->SetFont(m_labelFont);
+    }
+
+    if (!m_info || !m_info->m_teamStats)
+        return;
+
     wxString s;
-    CslPlayerStats *stats=info->m_playerStats;
-    CslPlayerStatsData *data=NULL;
+    wxInt32 h=-1;
+    wxInt32 hs=0;
+    wxInt32 c=m_teamLabel.GetCount();
+    bool end=false;
+    CslTeamStats *stats=m_info->m_teamStats;
+    CslTeamStatsData *data;
+
+    if (!stats->m_teamplay)
+    {
+        m_teamLabel.Item(0)->SetLabel("Not a team game.");
+        return;
+    }
+
+    wxFont font=m_labelFont;
+    font.SetWeight(wxFONTWEIGHT_BOLD);
 
     loopv(stats->m_stats)
     {
         data=stats->m_stats[i];
-        if (!data->m_ok)
+
+        // TODO i==c, dynamically add labels
+        if (!data->m_ok || i==c)
             break;
-        if (i<list_ctrl_extended->GetItemCount())
+
+        s=data->m_team;
+        s+=wxT(": ");
+
+        if (stats->m_remain==0 && data->m_score>hs)
+        {
+            h=i;
+            end=true;
+        }
+
+        if (data->m_score==10000)
+        {
+            h=i;
+            end=true;
             continue;
+        }
 
-        item.SetId(i);
-        list_ctrl_extended->InsertItem(item);
-        list_ctrl_extended->SetItemData(i,(long)data);
-
-        if (data->m_player.IsEmpty())
-            s=_("- connecting -");
-        else
-            s=data->m_player;
-        list_ctrl_extended->SetItem(i,0,s);
-
-        if (data->m_state==CSL_PLAYER_STATE_SB_SPECTATOR)
-            s=_("Spectator");
-        else
-            s=data->m_team;
-        list_ctrl_extended->SetItem(i,1,s);
-
-        if (data->m_frags<0)
-            s=wxT("0");
-        else
-            s=wxString::Format(wxT("%d"),data->m_frags);
-        list_ctrl_extended->SetItem(i,2,s);
-
-        if (data->m_deaths<0)
-            s=wxT("0");
-        else
-            s=wxString::Format(wxT("%d"),data->m_deaths);
-        list_ctrl_extended->SetItem(i,3,s);
-
-        if (data->m_teamkills<0)
-            s=wxT("0");
-        else
-            s=wxString::Format(wxT("%d"),data->m_teamkills);
-        list_ctrl_extended->SetItem(i,4,s);
-
-        if (data->m_state==CSL_PLAYER_STATE_SB_DEAD)
-            s=_("dead");
-        else if (data->m_state==CSL_PLAYER_STATE_SB_EDITING)
-            s=_("editing");
-        else
-            s=s=wxString::Format(wxT("%d"),data->m_health);
-        list_ctrl_extended->SetItem(i,5,s);
-
-        if (data->m_armour<0)
-            s=wxT("0");
-        else
-            s=wxString::Format(wxT("%d"),data->m_armour);
-        list_ctrl_extended->SetItem(i,6,s);
-
-        s=GetWeaponStrSB(data->m_weapon);
-        list_ctrl_extended->SetItem(i,7,s);
-
-        wxColour colour=*wxBLACK;
-        if (data->m_priv==CSL_PLAYER_PRIV_SB_MASTER)
-            i=CSL_LIST_IMG_GREEN;
-        else if (data->m_priv==CSL_PLAYER_PRIV_SB_ADMIN)
-            i=CSL_LIST_IMG_ORANGE;
-        else if (data->m_state==CSL_PLAYER_STATE_SB_SPECTATOR)
-            i=CSL_LIST_IMG_GREY;
-        else
-            i=CSL_LIST_IMG_TRANS;
-
-        list_ctrl_extended->SetItemImage(item,i);
+        s+=wxString::Format(wxT("%d"),data->m_score);
+        m_teamLabel.Item(i)->SetLabel(s);
     }
 
-    stats->m_lastResponse=wxDateTime::Now().GetTicks();
+    if (h>-1 && h<c)
+    {
+        s=data->m_team;
+        s+=wxT(": ");
+        if (data->m_score==10000)
+            s+=_("WINNER");
+        else
+            s+=wxString::Format(wxT("%d - "),data->m_score)+_("WINNER");
+        m_teamLabel.Item(h)->SetFont(font);
+        m_teamLabel.Item(h)->SetLabel(s);
+    }
 
-    label_status->SetLabel(wxString::Format(wxT("%d records (%d left)"),
-                                            list_ctrl_extended->GetItemCount(),stats->m_ids.length()));
-    ListSort(-1);
+    if (end && checkbox_update_end->IsChecked())
+        checkbox_update->SetValue(false);
 }
 
-void CslDlgExtended::QueryInfo(wxInt32 playerid)
+void CslDlgExtended::QueryInfo(wxInt32 pid)
 {
     if (m_info->m_players==0)
         return;
 
-    if (playerid==-1)
+    if (pid==-1)
     {
         wxUint32 now=wxDateTime::Now().GetTicks();
 
@@ -306,13 +445,13 @@ void CslDlgExtended::QueryInfo(wxInt32 playerid)
             list_ctrl_extended->DeleteAllItems();
             label_status->SetLabel(_("Waiting for data..."));
             button_update->Enable(false);
-            m_info->m_playerStats->Reset();
-            m_engine->PingStats(m_info);
+            m_engine->PingExPlayerInfo(m_info);
+            m_engine->PingExTeamInfo(m_info);
             m_info->m_playerStats->m_lastRefresh=now;
         }
     }
     else
-        m_engine->PingStats(m_info,playerid);
+        m_engine->PingExPlayerInfo(m_info,pid);
 }
 
 void CslDlgExtended::ListAdjustSize(wxSize size)
@@ -439,19 +578,22 @@ void CslDlgExtended::DoShow(CslServerInfo *info)
     if (m_info!=info)
     {
         list_ctrl_extended->DeleteAllItems();
-        label_status->SetLabel(wxString::Format(wxT("%d records (%d left)"),0,0));
+        label_status->SetLabel(wxString::Format(wxT("%d players (%d left)"),0,0));
     }
 
     m_info=info;
 
+    SetTeamScore();
+    button_update->SetLabel(_("Update"));
+    button_update->Enable(false);
+    SetTitle(wxString::Format(_("CSL - Extended info: %s"),
+                              m_info->GetBestDescription().c_str()));
     QueryInfo();
 
     if (IsShown())
         return;
 
-    SetTitle(wxString::Format(_("CSL - Extended info: %s"),
-                              m_info->GetBestDescription().c_str()));
-	ListAdjustSize(GetClientSize());
+    ListAdjustSize(GetClientSize());
     Show();
 }
 

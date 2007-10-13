@@ -27,6 +27,19 @@
 #endif
 #include <wx/regex.h>
 
+
+#ifdef __WXDEBUG__
+void Debug_Printf(const char *DbgFunc, const char *FmtStr,...)
+{
+    va_list ArgList;
+    va_start(ArgList,FmtStr);
+    fprintf(stdout,"%s(): ",DbgFunc);
+    vfprintf(stdout,FmtStr,ArgList);
+    fflush(stdout);
+    va_end(ArgList);
+}
+#endif
+
 char* StripColours(char *s,wxUint32 *l,wxUint32 count)
 {
     wxUint32 i;

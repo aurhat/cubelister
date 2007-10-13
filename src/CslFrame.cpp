@@ -71,7 +71,7 @@ enum
 
 
 BEGIN_EVENT_TABLE(CslFrame, wxFrame)
-    CSL_EVT_PING_STATS(wxID_ANY,CslFrame::OnPingStats)
+    CSL_EVT_PONG(wxID_ANY,CslFrame::OnPong)
     EVT_TIMER(wxID_ANY,CslFrame::OnTimer)
     EVT_TREE_SEL_CHANGED(wxID_ANY,CslFrame::OnTreeLeftClick)
     EVT_TREE_ITEM_RIGHT_CLICK(wxID_ANY,CslFrame::OnTreeRightClick)
@@ -168,10 +168,10 @@ CslFrame::CslFrame(wxWindow* parent, int id, const wxString& title,const wxPoint
 #endif
 
     m_engine=new CslEngine(this);
+
     m_outputDlg=new CslDlgOutput(this);
-#ifdef CSL_EXT_SERVER_INFO
     m_extendedDlg=new CslDlgExtended(this);
-#endif
+
     // begin wxGlade: CslFrame::CslFrame
     panel_frame = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL);
     panel_main = new wxPanel(panel_frame, wxID_ANY);
@@ -280,9 +280,7 @@ CslFrame::CslFrame(wxWindow* parent, int id, const wxString& title,const wxPoint
         m_engine=NULL;
     }
 
-#ifdef CSL_EXT_SERVER_INFO
     m_extendedDlg->ListInit(m_engine);
-#endif
 }
 
 CslFrame::~CslFrame()
@@ -294,7 +292,7 @@ CslFrame::~CslFrame()
     {
         CslServerInfo *info=CslConnectionState::GetInfo();
         if (info)
-            CslGame::ConnectCleanup(info->m_type,CslConnectionState::GetConfig());
+            CslGame::ConnectCleanupConfig(info->m_type,CslConnectionState::GetConfig());
     }
 
     tree_ctrl_games->DeleteAllItems();
@@ -334,7 +332,7 @@ void CslFrame::set_properties()
                                         wxMouseEventHandler(CslFrame::OnMouseLeftDown),NULL,this);
 
     // wxMAC: have to set minsize of the listctrl to prevent
-    //        hiding of the search panel while dragging
+    //        hiding of the search panel while dragging splitter
     list_ctrl_master->SetMinSize(wxSize(0,0));
 
     SetMinSize(wxSize(640,480));
@@ -508,7 +506,7 @@ void CslFrame::CreateMainMenu()
     m_menu=new CslMenu(m_menubar);
 }
 
-void CslFrame::OnPingStats(wxCommandEvent& event)
+void CslFrame::OnPong(wxCommandEvent& event)
 {
     wxPostEvent(m_extendedDlg,event);
 }
@@ -544,7 +542,7 @@ void CslFrame::OnTimer(wxTimerEvent& event)
 
     if (m_statusCount>-1 && m_statusCount==m_timerCount)
     {
-        CslStatusBar::SetText(wxT(""),1);
+        CslStatusBar::SetText(1,wxT(""));
         m_statusCount=-1;
     }
 
@@ -611,10 +609,10 @@ void CslFrame::OnTreeLeftClick(wxTreeEvent& event)
     }
 
     list_ctrl_master->ListClear();
+    TreeCalcTotalPlaytime(game);
 
     if (!m_engine->SetCurrentGame(game,master))
         return;
-
 
     list_ctrl_master->SetMasterSelected(master!=NULL);
     list_ctrl_master->ListUpdate(servers);
@@ -631,6 +629,7 @@ void CslFrame::OnTreeRightClick(wxTreeEvent& event)
     CslTreeItemData *data=(CslTreeItemData*)tree_ctrl_games->GetItemData(item);
 
     CslMaster *master=data->GetMaster();
+    TreeCalcTotalPlaytime(data->GetGame());
 
     if (master)
     {
@@ -733,14 +732,6 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
 
         case MENU_VIEW_AUTO_FIT:
             g_cslSettings->m_autoFitColumns=event.IsChecked();
-            break;
-
-        case MENU_VIEW_TOOLBAR_TEXT:
-            if (event.IsChecked())
-                g_cslSettings->m_toolbarStyle|=wxTB_TEXT;
-            else
-                g_cslSettings->m_toolbarStyle&=~wxTB_TEXT;
-            //RecreateToolbar();
             break;
 
         case MENU_VIEW_SPLITTER_LIVE:
@@ -1185,6 +1176,46 @@ void CslFrame::TreeAddGame(CslGame *game,bool activate)
     tree_ctrl_games->Expand(item);
 }
 
+void CslFrame::TreeCalcTotalPlaytime(CslGame* game)
+{
+    if (!game)
+        return;
+
+    wxString s;
+    wxUint32 playtime=0;
+    CslServerInfo *info=NULL;
+    vector<CslServerInfo*> *servers=game->GetServers();
+
+    loopv(*servers)
+    {
+        if (info)
+        {
+            if (info->m_playTimeTotal<servers->at(i)->m_playTimeTotal)
+                info=servers->at(i);
+        }
+        else
+            info=servers->at(i);
+
+        playtime+=servers->at(i)->m_playTimeTotal;
+    }
+
+    if (playtime)
+    {
+        s=wxString::Format(_("Total playtime for game %s: %s"),
+                           game->GetName().c_str(),
+                           FormatSeconds(playtime).c_str());
+        if (info)
+        {
+            s+=wxT("  -  ");
+            s+=wxString::Format(_("most played server: \'%s\' (total playtime: %s)"),
+                                info->GetBestDescription().c_str(),
+                                FormatSeconds(info->m_playTimeTotal).c_str());
+        }
+    }
+
+    CslStatusBar::SetText(1,s);
+}
+
 void CslFrame::LoadSettings()
 {
     long int val;
@@ -1211,8 +1242,6 @@ void CslFrame::LoadSettings()
     if (config->Read(wxT("SplitterGame"),&val)) g_cslSettings->m_splitterGamePos=val;
     if (config->Read(wxT("SplitterList"),&val)) g_cslSettings->m_splitterListPos=val;
     if (config->Read(wxT("SplitterLiveUpdate"),&val)) g_cslSettings->m_splitterLive=val>0;
-    if (config->Read(wxT("ToolbarPos"),&val)) g_cslSettings->m_toolbarPosition=val;
-    if (config->Read(wxT("ToolbarStyle"),&val)) g_cslSettings->m_toolbarStyle=val;
     if (config->Read(wxT("UpdateInterval"),&val))
     {
         if (val<CSL_UPDATE_INTERVAL_MIN || val>CSL_UPDATE_INTERVAL_MAX)
@@ -1324,8 +1353,6 @@ void CslFrame::SaveSettings()
     pos=splitter_lists->GetSashPosition();
     config->Write(wxT("SplitterList"),pos);
     config->Write(wxT("SplitterLiveUpdate"),(long int)g_cslSettings->m_splitterLive);
-    config->Write(wxT("ToolbarPos"),(long int)g_cslSettings->m_toolbarPosition);
-    config->Write(wxT("ToolbarStyle"),(long int)g_cslSettings->m_toolbarStyle);
     config->Write(wxT("UpdateInterval"),(long int)g_cslSettings->m_updateInterval);
     config->Write(wxT("NoUpdatePlaying"),g_cslSettings->m_dontUpdatePlaying);
     config->Write(wxT("ShowSearch"),g_cslSettings->m_showSearch);
@@ -1389,7 +1416,7 @@ bool CslFrame::LoadServers(wxUint32 *numm,wxUint32 *nums)
     vector<CslIDMapping*> mappings;
     vector<wxInt32> ids;
 
-    wxString addr,path;
+    wxString addr,path,password,description;
     wxUint32 view=0;
     wxUint32 lastSeen=0;
     wxUint32 playLast=0;
@@ -1449,10 +1476,14 @@ bool CslFrame::LoadServers(wxUint32 *numm,wxUint32 *nums)
             read_server=false;
             if (config->Read(wxT("Address"),&addr))
             {
+                config->Read(wxT("Password"),&password);
+                config->Read(wxT("Description"),&description);
+
                 while (config->Read(wxString::Format(wxT("Master%d"),id++),&val))
                     ids.add(val);
                 if (ids.length()==0)
                     ids.add(-1);
+
                 if (config->Read(wxT("View"),&val))
                 {
                     view=val;
@@ -1477,7 +1508,8 @@ bool CslFrame::LoadServers(wxUint32 *numm,wxUint32 *nums)
             {
                 CslServerInfo *info=new CslServerInfo(addr,(CSL_GAMETYPE)g,view,lastSeen,
                                                       playLast,playTimeLastGame,
-                                                      playTimeTotal,connectedTimes);
+                                                      playTimeTotal,connectedTimes,
+                                                      description,password);
 
                 if (ids[i]==-1)
                     id=-1;
@@ -1577,17 +1609,21 @@ void CslFrame::SaveServers()
         if (servers->length()==0)
             continue;
 
-        wxInt32 mid;
         sc=0;
         loopvk(*servers)
         {
             info=servers->at(k);
             config->SetPath(s+s.Format(wxT("/Server/%d"),sc++));
             config->Write(wxT("Address"),info->m_host);
+            config->Write(wxT("Password"),info->m_password);
+
+            wxUint32 len=info->m_descOld.Len();
+            wxString strip=A2U(StripColours(U2A(info->m_descOld),&len,2));
+            config->Write(wxT("Description"),strip);
+
             loopvj(info->m_masterIDs)
             {
-                mid=info->m_masterIDs[j];
-                config->Write(wxString::Format(wxT("Master%d"),j),mid);
+                config->Write(wxString::Format(wxT("Master%d"),j),info->m_masterIDs[j]);
             }
             config->Write(wxT("View"),(int)info->m_view);
             config->Write(wxT("LastSeen"),(int)info->m_lastSeen);

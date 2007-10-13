@@ -144,6 +144,7 @@ CslGame::~CslGame()
     loopv(m_servers)
     {
         m_servers[i]->DeletePlayerStats();
+        m_servers[i]->DeleteTeamStats();
         delete m_servers[i];
     }
 }
@@ -291,7 +292,7 @@ bool CslGame::DeleteServer(CslServerInfo *info)
     return false;
 }
 
-CslServerInfo* CslGame::FindServerByAddr(const wxIPV4address addr)
+CslServerInfo* CslGame::FindServerByAddr(const wxIPV4address& addr)
 {
     CslServerInfo *info;
 
@@ -306,7 +307,7 @@ CslServerInfo* CslGame::FindServerByAddr(const wxIPV4address addr)
     return NULL;
 }
 
-wxInt32 CslGame::ConnectCleanup(const CSL_GAMETYPE type,const wxString& cfg)
+wxInt32 CslGame::ConnectCleanupConfig(const CSL_GAMETYPE& type,const wxString& cfg)
 {
     if (cfg.IsEmpty())
         return CSL_ERROR_NONE;
@@ -314,6 +315,7 @@ wxInt32 CslGame::ConnectCleanup(const CSL_GAMETYPE type,const wxString& cfg)
     switch (type)
     {
         case CSL_GAME_SB:
+        case CSL_GAME_BF:
             return ConnectWriteConfig(type,cfg,wxT("\r\n"));
 
         case CSL_GAME_AC:
@@ -334,7 +336,7 @@ wxInt32 CslGame::ConnectCleanup(const CSL_GAMETYPE type,const wxString& cfg)
     return CSL_ERROR_NONE;
 }
 
-wxInt32 CslGame::ConnectWriteConfig(const CSL_GAMETYPE type,const wxString& cfg,const wxString& str)
+wxInt32 CslGame::ConnectWriteConfig(const CSL_GAMETYPE& type,const wxString& cfg,const wxString& str)
 {
     wxUint32 c,l;
     wxFile file;
@@ -366,11 +368,15 @@ wxInt32 CslGame::ConnectWriteConfig(const CSL_GAMETYPE type,const wxString& cfg,
     return 0;
 }
 
-wxInt32 CslGame::ConnectPrepare(const CslServerInfo *info,const wxString& path,wxString *out)
+wxInt32 CslGame::ConnectPrepareConfig(wxString& out,const CslServerInfo *info,const wxString& path,
+                                const wxString& password,const bool admin)
 {
     wxString s;
     wxString src;
     wxString cfg;
+    wxString connectpreCmd;
+    wxString connectPass=password;
+    wxString connectCmd(admin ? wxT("connectadmin") : wxT("connect"));
 
     switch (info->m_type)
     {
@@ -391,7 +397,7 @@ wxInt32 CslGame::ConnectPrepare(const CslServerInfo *info,const wxString& path,w
 #endif
                     if (!::wxFileExists(src))
                     {
-                        *out=wxString::Format(_("Couldn't find \"%s\""),map.c_str());
+                        out=wxString::Format(_("Couldn't find \"%s\""),map.c_str());
                         return CSL_ERROR_FILE_DONT_EXIST;
                     }
 #ifdef __WXGTK__
@@ -415,6 +421,11 @@ wxInt32 CslGame::ConnectPrepare(const CslServerInfo *info,const wxString& path,w
             if (::wxFileExists(cfg))
                 if (!::wxCopyFile(cfg,cfg+wxT(".csl")))
                     return CSL_ERROR_FILE_OPERATION;
+            if (!password.IsEmpty())
+            {
+                connectpreCmd=wxString::Format(wxT("/password %s"),connectPass.c_str());
+                connectPass.Clear();
+            }
             break;
 
         default:
@@ -422,7 +433,8 @@ wxInt32 CslGame::ConnectPrepare(const CslServerInfo *info,const wxString& path,w
             return CSL_ERROR_GAME_UNKNOWN;
     }
 
-    *out=cfg;
-    s=wxString::Format(wxT("\r\n/sleep 1000 [ connect %s ]\r\n"),info->m_host.c_str());
+    out=cfg;
+    s=wxString::Format(wxT("\r\n%s\r\n/sleep 1000 [ %s %s %s ]\r\n"),connectpreCmd.c_str(),
+                       connectCmd.c_str(),info->m_host.c_str(),connectPass.c_str());
     return ConnectWriteConfig(info->m_type,cfg,s);
 }

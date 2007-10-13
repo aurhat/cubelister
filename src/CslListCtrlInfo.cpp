@@ -144,9 +144,7 @@ CslListCtrlInfo::CslListCtrlInfo(wxWindow* parent,wxWindowID id,const wxPoint& p
     InsertItem(i++,_("Location"),0);
     InsertItem(i++,_("Game"),0);
     InsertItem(i++,_("Protocol version"),0);
-#ifdef CSL_EXT_SERVER_INFO
     InsertItem(i++,_("Uptime"),0);
-#endif
     InsertItem(i++,_("Last seen"),0);
     InsertItem(i++,_("Last played"),0);
     InsertItem(i++,_("Last playtime"),0);
@@ -234,7 +232,7 @@ void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
             s=wxEmptyString;
     }
     else
-        s=_("GeoIP database not found");
+        s=_("GeoIP database not found.");
 
     free(host);
 
@@ -265,13 +263,18 @@ void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
     else
         s=s.Format(wxT("%d"),info->m_protocol);
     SetItem(ic++,1,s);
-#ifdef CSL_EXT_SERVER_INFO
-    if (info->m_extended)
-        s=FormatSeconds(info->m_uptime);
+
+    if (info->m_exInfo!=CSL_EXINFO_FALSE)
+    {
+        if (info->m_exInfo==CSL_EXINFO_OK)
+            s=FormatSeconds(info->m_uptime);
+        else
+            s=_("This version of extended info is not supported.");
+    }
     else
-        s=_("Extended info not supported");
+        s=_("Extended info not supported.");
     SetItem(ic++,1,s);
-#endif
+
     if (info->m_lastSeen)
     {
         dt.Set((time_t)info->m_lastSeen);

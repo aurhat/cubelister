@@ -46,8 +46,7 @@ CslDlgAddMaster::CslDlgAddMaster(wxWindow* parent,CslMaster *master,int id,
 {
     // begin wxGlade: CslDlgAddMaster::CslDlgAddMaster
     sizer_address_staticbox = new wxStaticBox(this, -1, wxEmptyString);
-    const wxString choice_type_choices[] =
-    {
+    const wxString choice_type_choices[] = {
         _("default")
     };
     choice_type = new wxChoice(this, CHOICE_CTRL_TYPE, wxDefaultPosition, wxDefaultSize, 1, choice_type_choices, 0);

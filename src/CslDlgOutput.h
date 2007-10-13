@@ -34,11 +34,13 @@
 #include <wx/statline.h>
 // end wxGlade
 
+WX_DEFINE_ARRAY_INT(wxUint32, t_aUint);
+
 class CslDlgOutput: public wxDialog
 {
     public:
-        // begin wxGlade: CslDlgOutput::ids
-        // end wxGlade
+    // begin wxGlade: CslDlgOutput::ids
+    // end wxGlade
 
         CslDlgOutput(wxWindow* parent,int id=wxID_ANY,const wxString& title=wxEmptyString,
                      const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize,
@@ -50,12 +52,11 @@ class CslDlgOutput: public wxDialog
         static void Reset(const wxString& title);
 
     private:
-        // begin wxGlade: CslDlgOutput::methods
-        void set_properties();
-        void do_layout();
-        // end wxGlade
+    // begin wxGlade: CslDlgOutput::methods
+    void set_properties();
+    void do_layout();
+    // end wxGlade
 
-        wxString m_lastPath;
 
         void OnClose(wxCloseEvent& event);
         void OnCommandEvent(wxCommandEvent& event);
@@ -63,24 +64,33 @@ class CslDlgOutput: public wxDialog
         DECLARE_EVENT_TABLE()
 
     protected:
-        // begin wxGlade: CslDlgOutput::attributes
-        wxTextCtrl* text_ctrl_output;
-        wxTextCtrl* text_ctrl_search;
-        wxStaticText* label_matches;
-        wxCheckBox* checkbox_conv_filter;
-        wxChoice* choice_conv_filter;
-        wxStaticLine* static_line;
-        wxButton* button_load;
-        wxButton* button_save;
-        wxButton* button_close_copy;
-        // end wxGlade
+    // begin wxGlade: CslDlgOutput::attributes
+    wxTextCtrl* text_ctrl_output;
+    wxTextCtrl* text_ctrl_search;
+    wxStaticText* label_matches;
+    wxButton* button_search_prev;
+    wxButton* button_search_next;
+    wxCheckBox* checkbox_conv_filter;
+    wxChoice* choice_conv_filter;
+    wxStaticLine* static_line;
+    wxButton* button_load;
+    wxButton* button_save;
+    wxButton* button_close;
+    // end wxGlade
 
         static CslDlgOutput* m_self;
 
-        wxTextAttr m_textDefaultStyle;
+        wxString m_lastPath;
+
         wxString m_text;
         wxUint32 m_filterLevel;
 
+        t_aUint m_searchResults;
+        wxUint32 m_searchPos;
+
+        wxTextAttr m_textDefaultStyle;
+
+        void SetSearchTextColour(wxUint32 pos,wxUint32 posOld);
         void SetSearchbarColour(wxInt32 count);
         wxInt32 Search(const wxString& needle);
         wxString Filter(wxUint32 start,wxUint32 end);

@@ -35,11 +35,14 @@
 #include "CslEngine.h"
 #include "CslTools.h"
 
+
+WX_DEFINE_ARRAY_PTR(wxStaticText*,t_aLabel);
+
 class CslDlgExtended: public wxDialog
 {
     public:
-        // begin wxGlade: CslDlgExtended::ids
-        // end wxGlade
+    // begin wxGlade: CslDlgExtended::ids
+    // end wxGlade
 
         CslDlgExtended(wxWindow* parent,int id=wxID_ANY,const wxString& title=wxEmptyString,
                        const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize,
@@ -50,14 +53,17 @@ class CslDlgExtended: public wxDialog
         CslServerInfo* GetInfo() { return m_info; }
 
     private:
-        // begin wxGlade: CslDlgExtended::methods
-        void set_properties();
-        void do_layout();
-        // end wxGlade
+    // begin wxGlade: CslDlgExtended::methods
+    void set_properties();
+    void do_layout();
+    // end wxGlade
 
         CslEngine *m_engine;
         CslServerInfo *m_info;
 
+        wxFont m_labelFont;
+        t_aLabel m_teamLabel;
+                
         wxImageList m_imageList;
         CslListSortHelper m_sortHelper;
 
@@ -66,20 +72,27 @@ class CslDlgExtended: public wxDialog
         void OnColumnLeftClick(wxListEvent& event);
         void OnTimer(wxTimerEvent& event);
         void OnCommandEvent(wxCommandEvent& event);
-        void OnPingStats(wxCommandEvent& event);
+        void OnPong(wxCommandEvent& event);
 
         DECLARE_EVENT_TABLE()
 
     protected:
-        // begin wxGlade: CslDlgExtended::attributes
-        wxListCtrl* list_ctrl_extended;
-        wxStaticText* label_status;
-        wxCheckBox* checkbox_autoupdate;
-        wxButton* button_update;
-        wxButton* button_close;
-        // end wxGlade
+    // begin wxGlade: CslDlgExtended::attributes
+    wxStaticBox* sizer_team_score_staticbox;
+    wxListCtrl* list_ctrl_extended;
+    wxStaticText* label_team1;
+    wxStaticText* label_team2;
+    wxStaticText* label_team3;
+    wxStaticText* label_team4;
+    wxStaticText* label_status;
+    wxCheckBox* checkbox_update;
+    wxCheckBox* checkbox_update_end;
+    wxButton* button_update;
+    wxButton* button_close;
+    // end wxGlade
 
-        void QueryInfo(wxInt32 playerid=-1);
+        void SetTeamScore();
+        void QueryInfo(wxInt32 pid=-1);
         void ListAdjustSize(wxSize size);
         void ListSort(wxInt32 column);
         void ToggleSortArrow();

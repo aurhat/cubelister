@@ -19,8 +19,9 @@
  ***************************************************************************/
 
 #include <wx/colordlg.h>
-#include "CslDlgSettings.h"
 #include <wx/imaglist.h>
+#include "CslDlgSettings.h"
+#include "CslTools.h"
 #ifndef _MSC_VER
 #include "img/sb_24.xpm"
 #include "img/ac_24.xpm"
@@ -408,9 +409,9 @@ void CslDlgSettings::do_layout()
     grid_sizer_main->Fit(this);
 
     // what a crap
-    wxSize a=notebook_settings->GetBestSize();
-    wxSize d(a.x,a.y+48);
-    notebook_settings->SetMinSize(d);
+    //wxSize a=notebook_settings->GetBestSize();
+    //wxSize d(a.x,a.y+48);
+    //notebook_settings->SetMinSize(d);
 
     grid_sizer_main->SetSizeHints(this);
 }

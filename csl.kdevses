@@ -1,7 +1,23 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <!DOCTYPE KDevPrjSession>
 <KDevPrjSession>
- <DocsAndViews NumberOfDocuments="0" />
+ <DocsAndViews NumberOfDocuments="5" >
+  <Doc0 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslDlgExtended.cpp" >
+   <View0 Encoding="" line="413" Type="Source" />
+  </Doc0>
+  <Doc1 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslDlgExtended.h" >
+   <View0 Encoding="" line="63" Type="Source" />
+  </Doc1>
+  <Doc2 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslGame.h" >
+   <View0 Encoding="" line="162" Type="Source" />
+  </Doc2>
+  <Doc3 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslEngine.cpp" >
+   <View0 Encoding="" line="860" Type="Source" />
+  </Doc3>
+  <Doc4 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/wxWidgets/wxWidgets-2.8.5-HTML/docs/mshtml/wx/wx_wxfont.html#wxfontsetweight" >
+   <View0 Type="Documentation" />
+  </Doc4>
+ </DocsAndViews>
  <pluginList>
   <kdevdebugger>
    <breakpointList/>

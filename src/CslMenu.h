@@ -37,7 +37,8 @@
 #include "CslArt.h"
 #include "CslSettings.h"
 
-#define MENU_SERVER_CONN_STR      _("&Connect to server")
+#define MENU_SERVER_CONN_STR      _("&Connect")
+#define MENU_SERVER_CONN_PW_STR   _("Connect (&Password)")
 #define MENU_SERVER_COPY_STR      _("C&opy to clipboard")
 #define MENU_SERVER_MAS_ADD_STR   _("&Add to favourites")
 #define MENU_SERVER_MAS_REM_STR   _("&Remove from master")
@@ -56,7 +57,8 @@ enum
     MENU_SERVER_REM = wxID_REMOVE,
     MENU_SERVER_DEL = wxID_DELETE,
     MENU_SERVER_COPYTEXT = wxID_COPY,
-    MENU_SERVER_CONNECT = wxID_HIGHEST+1,
+    MENU_SERVER_CONNECT  = wxID_HIGHEST+1,
+    MENU_SERVER_CONNECT_PW,
     MENU_SERVER_EXTENDED,
 
     MENU_VIEW_HOST,
@@ -75,12 +77,6 @@ enum
     MENU_VIEW_AUTO_SORT,
     MENU_VIEW_AUTO_FIT,
     MENU_VIEW_SPLITTER_LIVE,
-    MENU_VIEW_TOOLBAR,
-    MENU_VIEW_TOOLBAR_TOP,
-    MENU_VIEW_TOOLBAR_BOTTOM,
-    MENU_VIEW_TOOLBAR_LEFT,
-    MENU_VIEW_TOOLBAR_RIGHT,
-    MENU_VIEW_TOOLBAR_TEXT,
 
     MENU_INFO_ABOUT,
 

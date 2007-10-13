@@ -58,7 +58,7 @@ class CslConnectionState
             m_activeList=NULL;
             m_activeInfo=NULL;
             m_activeCfg.Empty();
-            CslStatusBar::SetText(wxEmptyString,1);
+            CslStatusBar::SetText(1,wxEmptyString);
         }
 
         static void CreateWaitingState(CslServerInfo *info,CslListCtrlServer *list,
@@ -164,7 +164,7 @@ class CslListCtrlServer : public wxListCtrl
         wxUint32 ListUpdate(vector<CslServerInfo*> *servers);
         void ListClear();
         void ToggleSortArrow();
-        wxUint32 ListSearch(wxString search);
+        wxUint32 ListSearch(const wxString& search);
         wxUint32 ListFilter(wxUint32 filterFlags);
         void ListAdjustSize(wxSize size,bool init=false);
         void SetMasterSelected(bool selected) { m_masterSelected=selected; }
@@ -216,10 +216,14 @@ class CslListCtrlServer : public wxListCtrl
         static bool PingOk(CslServerInfo *info);
         wxInt32 ListFindItem(CslServerInfo *info);
         void ListDeleteItem(wxListItem *item);
+        bool ListSearchItemMatches(CslServerInfo *info);
+        bool ListFilterItemMatches(CslServerInfo *info);
         bool ListUpdateServer(CslServerInfo *info);
         void RemoveServer(CslListServer *server,CslServerInfo *info,wxInt32 id);
         void ListSort(wxInt32 column);
-        void ConnectToServer(CslServerInfo *info);
+        void ConnectToServer(CslServerInfo *info,
+                             const wxString& password=wxEmptyString,
+                             const bool admin=false);
         void ListRemoveServers();
         void ListDeleteServers();
 };

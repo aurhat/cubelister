@@ -87,7 +87,6 @@ static const char * red_list_16_xpm[] = {
 "                ",
 "                ",
 "                ",
-"                ",
 "     .+@#$%     ",
 "    &*=-;>,'    ",
 "   )!~{]^/(_:   ",
@@ -98,5 +97,6 @@ static const char * red_list_16_xpm[] = {
 "   yzABCD4EFG   ",
 "    HI_JKwLM    ",
 "     NOPQRG     ",
+"                ",
 "                ",
 "                "};

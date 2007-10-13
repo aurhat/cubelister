@@ -24,6 +24,8 @@
 #include "CslSettings.h"
 #include "CslTools.h"
 
+#define CSL_OUTPUT_EXTENSION  _("Text files (*.txt)|*.txt")
+
 BEGIN_EVENT_TABLE(CslDlgOutput,wxDialog)
     EVT_CLOSE(CslDlgOutput::OnClose)
     EVT_BUTTON(wxID_ANY,CslDlgOutput::OnCommandEvent)
@@ -39,6 +41,7 @@ enum
     CHOICE_CONV_FILTER
 };
 
+
 CslDlgOutput* CslDlgOutput::m_self=NULL;
 
 CslDlgOutput::CslDlgOutput(wxWindow* parent,int id,const wxString& title,
@@ -49,9 +52,10 @@ CslDlgOutput::CslDlgOutput(wxWindow* parent,int id,const wxString& title,
     text_ctrl_output = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxHSCROLL|wxTE_RICH|wxTE_RICH2|wxTE_AUTO_URL);
     text_ctrl_search = new wxTextCtrl(this, TEXT_SEARCH, wxEmptyString);
     label_matches = new wxStaticText(this, wxID_ANY, _("%d matches"));
-    checkbox_conv_filter = new wxCheckBox(this, CHECK_CONV_FILTER, _("Filter conversation (Beta)"));
-    const wxString choice_conv_filter_choices[] =
-    {
+    button_search_prev = new wxButton(this, wxID_UNDO, _("&Previous"));
+    button_search_next = new wxButton(this, wxID_REDO, _("&Next"));
+    checkbox_conv_filter = new wxCheckBox(this, CHECK_CONV_FILTER, _("&Filter conversation (Beta)"));
+    const wxString choice_conv_filter_choices[] = {
         _("0 (Low)"),
         _("1 (Default)"),
         _("2 (TC-Server)")
@@ -60,7 +64,7 @@ CslDlgOutput::CslDlgOutput(wxWindow* parent,int id,const wxString& title,
     static_line = new wxStaticLine(this, wxID_ANY);
     button_load = new wxButton(this, wxID_OPEN, _("&Load"));
     button_save = new wxButton(this, wxID_SAVE, _("&Save"));
-    button_close_copy = new wxButton(this, wxID_CLOSE, _("&Close"));
+    button_close = new wxButton(this, wxID_CLOSE, _("&Close"));
 
     set_properties();
     do_layout();
@@ -75,15 +79,18 @@ void CslDlgOutput::set_properties()
 {
     // begin wxGlade: CslDlgOutput::set_properties
     SetTitle(_("CSL - Game output"));
-    text_ctrl_output->SetMinSize(wxSize(550,300));
+    button_search_prev->Enable(false);
+    button_search_next->Enable(false);
     choice_conv_filter->SetSelection(0);
-    button_close_copy->SetDefault();
+    button_close->SetDefault();
     // end wxGlade
 
     label_matches->SetLabel(wxString::Format(label_matches->GetLabel(),0));
     choice_conv_filter->SetSelection(1);
     choice_conv_filter->Enable(false);
     m_filterLevel=1;
+
+    SetMinSize(wxSize(600,400));
 }
 
 void CslDlgOutput::do_layout()
@@ -92,14 +99,28 @@ void CslDlgOutput::do_layout()
     wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(5, 1, 0, 0);
     wxFlexGridSizer* grid_sizer_button = new wxFlexGridSizer(1, 4, 0, 0);
     wxFlexGridSizer* grid_sizer_conv_filter = new wxFlexGridSizer(1, 4, 0, 0);
-    wxFlexGridSizer* grid_sizer_search = new wxFlexGridSizer(1, 4, 0, 0);
+    wxFlexGridSizer* grid_sizer_search = new wxFlexGridSizer(1, 2, 0, 0);
+    wxBoxSizer* sizer_search_button = new wxBoxSizer(wxHORIZONTAL);
+    wxFlexGridSizer* grid_sizer_search_input = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* grid_sizer_search_text = new wxFlexGridSizer(1, 4, 0, 0);
     grid_sizer_main->Add(text_ctrl_output, 0, wxALL|wxEXPAND, 4);
+    grid_sizer_search_input->Add(1, 1, 0, 0, 0);
     wxStaticText* label_search = new wxStaticText(this, wxID_ANY, _("Search:"));
-    grid_sizer_search->Add(label_search, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_search->Add(text_ctrl_search, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_search->Add(label_matches, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_search->Add(30, 1, 0, 0, 0);
-    grid_sizer_search->AddGrowableCol(1);
+    grid_sizer_search_text->Add(label_search, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_search_text->Add(text_ctrl_search, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_search_text->Add(label_matches, 0, wxRIGHT|wxALIGN_CENTER_VERTICAL, 8);
+    grid_sizer_search_text->Add(30, 1, 0, 0, 0);
+    grid_sizer_search_text->AddGrowableCol(1);
+    grid_sizer_search_input->Add(grid_sizer_search_text, 1, wxEXPAND, 0);
+    grid_sizer_search_input->Add(1, 1, 0, 0, 0);
+    grid_sizer_search_input->AddGrowableRow(0);
+    grid_sizer_search_input->AddGrowableRow(2);
+    grid_sizer_search_input->AddGrowableCol(0);
+    grid_sizer_search->Add(grid_sizer_search_input, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 0);
+    sizer_search_button->Add(button_search_prev, 0, wxALL, 4);
+    sizer_search_button->Add(button_search_next, 0, wxALL, 4);
+    grid_sizer_search->Add(sizer_search_button, 1, wxEXPAND, 0);
+    grid_sizer_search->AddGrowableCol(0);
     grid_sizer_main->Add(grid_sizer_search, 1, wxEXPAND, 0);
     grid_sizer_conv_filter->Add(checkbox_conv_filter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_conv_filter->Add(1, 1, 0, 0, 0);
@@ -112,7 +133,7 @@ void CslDlgOutput::do_layout()
     grid_sizer_button->Add(button_load, 0, wxALL, 4);
     grid_sizer_button->Add(button_save, 0, wxALL, 4);
     grid_sizer_button->Add(8, 1, 0, 0, 0);
-    grid_sizer_button->Add(button_close_copy, 0, wxALL, 4);
+    grid_sizer_button->Add(button_close, 0, wxALL, 4);
     grid_sizer_main->Add(grid_sizer_button, 1, wxBOTTOM|wxALIGN_RIGHT, 4);
     SetSizer(grid_sizer_main);
     grid_sizer_main->Fit(this);
@@ -120,14 +141,14 @@ void CslDlgOutput::do_layout()
     grid_sizer_main->AddGrowableCol(0);
     Layout();
     // end wxGlade
-
-    CentreOnScreen();
+    
     grid_sizer_main->SetSizeHints(this);
+    CentreOnScreen();
 }
 
 void CslDlgOutput::OnClose(wxCloseEvent& event)
 {
-    if (event.CanVeto())
+    if (!event.CanVeto())
     {
         Hide();
         wxPostEvent(GetParent(),event);
@@ -141,12 +162,29 @@ void CslDlgOutput::OnCommandEvent(wxCommandEvent& event)
     event.Skip();
 
     wxString s;
-    wxString ext=_("Text files (*.txt)|*.txt");
 
     switch (event.GetId())
     {
         case TEXT_SEARCH:
             SetSearchbarColour(Search(event.GetString()));
+            break;
+
+        case wxID_UNDO:
+            text_ctrl_output->ShowPosition(m_searchResults.Item(--m_searchPos));
+            SetSearchTextColour(m_searchResults.Item(m_searchPos),
+                                m_searchResults.Item(m_searchPos+1));
+            if (m_searchPos==0)
+                button_search_prev->Enable(false);
+            button_search_next->Enable();
+            break;
+
+        case wxID_REDO:
+            text_ctrl_output->ShowPosition(m_searchResults.Item(++m_searchPos));
+            SetSearchTextColour(m_searchResults.Item(m_searchPos),
+                                m_searchResults.Item(m_searchPos-1));
+            if (m_searchPos>=m_searchResults.GetCount()-1)
+                button_search_next->Enable(false);
+            button_search_prev->Enable();
             break;
 
         case CHOICE_CONV_FILTER:
@@ -162,7 +200,7 @@ void CslDlgOutput::OnCommandEvent(wxCommandEvent& event)
             if (!s.IsEmpty())
                 SetSearchbarColour(Search(s));
 
-            text_ctrl_output->ShowPosition(0);
+            //text_ctrl_output->ShowPosition(0);
             break;
         }
 
@@ -171,7 +209,7 @@ void CslDlgOutput::OnCommandEvent(wxCommandEvent& event)
             if (wxDirExists(g_cslSettings->m_outputPath))
                 s=g_cslSettings->m_outputPath;
             wxFileDialog dlg(this,_("Open log file"),s,wxEmptyString,
-                             ext,wxOPEN|wxFILE_MUST_EXIST);
+                             CSL_OUTPUT_EXTENSION,wxOPEN|wxFILE_MUST_EXIST);
             if (dlg.ShowModal()!=wxID_OK)
                 break;
 
@@ -210,7 +248,7 @@ void CslDlgOutput::OnCommandEvent(wxCommandEvent& event)
             s+=wxT(".txt");
 
             wxFileDialog dlg(this,_("Save log file"),wxEmptyString,s,
-                             ext,wxSAVE|wxOVERWRITE_PROMPT);
+                             CSL_OUTPUT_EXTENSION,wxSAVE|wxOVERWRITE_PROMPT);
             // wxGTK: hmm, doesn't work in the ctor?!
             if (wxDirExists(g_cslSettings->m_outputPath))
                 dlg.SetPath(g_cslSettings->m_outputPath+wxT("/")+s);
@@ -238,6 +276,31 @@ void CslDlgOutput::OnCommandEvent(wxCommandEvent& event)
         default:
             break;
     }
+}
+
+void CslDlgOutput::SetSearchTextColour(wxUint32 pos,wxUint32 posOld)
+{
+    wxTextAttr attr;
+    wxTextAttr attrOld;
+
+#ifdef __WXMAC__
+    // TODO: check if the locker is necessary under wxMAC
+    // causes flickering on wxGTK
+    wxWindowUpdateLocker locker(text_ctrl_output);
+    attr.SetFlags(wxTEXT_ATTR_TEXT_COLOUR);
+    attr.SetTextColour(wxColour(255,64,64));
+    attrOld.SetFlags(wxTEXT_ATTR_TEXT_COLOUR);
+    attrOld.SetTextColour(*wxGREEN);
+#else
+    attr.SetFlags(wxTEXT_ATTR_BACKGROUND_COLOUR);
+    attr.SetBackgroundColour(wxColour(255,64,64));
+    attrOld.SetFlags(wxTEXT_ATTR_BACKGROUND_COLOUR);
+    attrOld.SetBackgroundColour(g_cslSettings->m_colServerHigh);
+#endif
+
+    wxUint32 len=text_ctrl_search->GetValue().Len();
+    text_ctrl_output->SetStyle(posOld,posOld+len,attrOld);
+    text_ctrl_output->SetStyle(pos,pos+len,attr);
 }
 
 void CslDlgOutput::SetSearchbarColour(wxInt32 count)
@@ -271,11 +334,16 @@ wxInt32 CslDlgOutput::Search(const wxString& needle)
 {
     wxTextAttr attr;
 
-    wxInt32 count=0;
-    wxInt32 pos=0;
-    wxString haystack=text_ctrl_output->GetValue();
+    const wxString& haystack=text_ctrl_output->GetValue();
     wxInt32 hlen=haystack.Len();
     wxInt32 nlen=needle.Len();
+    wxInt32 count=0;
+    wxInt32 pos=0;
+
+    button_search_prev->Enable(false);
+    button_search_next->Enable(false);
+    m_searchResults.Empty();
+    m_searchPos=0;
 
 #ifdef __WXMAC__
     // TODO: check if the locker is necessary under wxMAC
@@ -289,34 +357,45 @@ wxInt32 CslDlgOutput::Search(const wxString& needle)
 #endif
     text_ctrl_output->SetStyle(0,hlen,attr);
 
-    if (!nlen)
+    if (nlen && hlen)
     {
-        count=-1;
-        goto finish;
-    }
-
 #ifdef __WXMAC__
-    attr.SetTextColour(*wxGREEN);
+        attr.SetTextColour(*wxGREEN);
 #else
-    attr.SetBackgroundColour(g_cslSettings->m_colServerHigh);
+        attr.SetBackgroundColour(g_cslSettings->m_colServerHigh);
 #endif
-
-    while (pos<=hlen)
-    {
-        pos=haystack.find(needle,pos);
-        if (pos>=0)
+        while (pos<=hlen)
         {
-            text_ctrl_output->SetStyle(pos,pos+nlen,attr);
-            pos+=nlen;
-            count++;
+            pos=haystack.find(needle,pos);
+            if (pos>=0)
+            {
+                m_searchResults.Add(pos);
+                text_ctrl_output->SetStyle(pos,pos+nlen,attr);
+                pos+=nlen;
+                count++;
+            }
+            else
+                break;
         }
-        else
+    }
+    else
+        count=-1;
+
+    label_matches->SetLabel(wxString::Format(_("%d matches"),count<0 ? 0 : count));
+
+    switch (m_searchResults.GetCount())
+    {
+        case 0:
+            text_ctrl_output->ShowPosition(0);
+            return count;
+        case 1:
+            break;
+        default:
+            button_search_next->Enable();
             break;
     }
 
-finish:
-    wxInt32 c=count<0 ? 0:count;
-    label_matches->SetLabel(wxString::Format(_("%d matches"),c));
+    text_ctrl_output->ShowPosition(m_searchResults.Item(0));
 
     return count;
 }
@@ -367,7 +446,7 @@ wxString CslDlgOutput::Filter(wxUint32 start,wxUint32 end)
                 }
                 if (!skip && m_filterLevel>=2)
                 {
-                    if (cmp=="NAME")
+                    if (cmp==wxT("NAME"))
                         skip=true;
                     if (cmp==wxT("PLAYER"))
                         skip=true;
@@ -418,11 +497,7 @@ void CslDlgOutput::HandleOutput(char *text,wxUint32 size)
     text_ctrl_output->AppendText(checkbox_conv_filter->GetValue() ?
                                  Filter(start,end) : m_text.Mid(start,size));
 
-    text_ctrl_output->ShowPosition(0);
-
-    wxString s=text_ctrl_search->GetValue();
-    if (!s.IsEmpty())
-        SetSearchbarColour(Search(s));
+    SetSearchbarColour(Search(text_ctrl_search->GetValue()));
 }
 
 void CslDlgOutput::AddOutput(char *text,wxUint32 size)
@@ -436,6 +511,8 @@ void CslDlgOutput::Reset(const wxString& title)
     if (!m_self)
         return;
 
+    m_self->button_search_prev->Enable(false);
+    m_self->button_search_next->Enable(false);
     m_self->text_ctrl_output->Clear();
     m_self->m_text.Clear();
     m_self->SetTitle(wxString::Format(_("CSL - Game output: %s"),title.c_str()));

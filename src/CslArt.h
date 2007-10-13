@@ -14,6 +14,9 @@
 #ifndef wxART_CONNECT
 #define wxART_CONNECT    wxART_MAKE_ART_ID(wxART_CONNECT)
 #endif
+#ifndef wxART_CONNECT_PW
+#define wxART_CONNECT_PW wxART_MAKE_ART_ID(wxART_CONNECT_PW)
+#endif
 #ifndef wxART_RELOAD
 #define wxART_RELOAD     wxART_MAKE_ART_ID(wxART_RELOAD)
 #endif
