@@ -191,6 +191,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CslDlgConnectPass.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CslDlgConnectWait.cpp"
 				>
 			</File>
@@ -243,6 +247,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\cube_tools.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\libGeoIP\GeoIP.c"
 				>
 			</File>
@@ -266,6 +274,10 @@
 			</File>
 			<File
 				RelativePath=".\CslDlgAddServer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CslDlgConnectPass.h"
 				>
 			</File>
 			<File

@@ -345,10 +345,10 @@ wxInt32 CslDlgOutput::Search(const wxString& needle)
     m_searchResults.Empty();
     m_searchPos=0;
 
-#ifdef __WXMAC__
-    // TODO: check if the locker is necessary under wxMAC
+    // TODO: check if the locker is necessary
     // causes flickering on wxGTK
     wxWindowUpdateLocker locker(text_ctrl_output);
+#ifdef __WXMAC__
     attr.SetFlags(wxTEXT_ATTR_TEXT_COLOUR);
     attr.SetTextColour(SYSCOLOUR(wxSYS_COLOUR_WINDOWTEXT));
 #else

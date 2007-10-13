@@ -35,6 +35,7 @@ ICON_LIST_AC_EXT_16     ICON                    "img\\ac_ext_16.ico"
 ICON_LIST_BF_EXT_16     ICON                    "img\\bf_ext_16.ico"
 
 ICON_MENU_CONNECT       ICON                    "img\\connect_16.ico"
+ICON_MENU_CONNECT_PW    ICON                    "img\\connect_pw_16.ico"
 ICON_MENU_ADD           ICON                    "img\\add_16.ico"
 ICON_MENU_DEL           ICON                    "img\\delete_16.ico"
 ICON_MENU_RELOAD        ICON                    "img\\reload_16.ico"

@@ -1,8 +1,8 @@
 ; The name of the installer
-Name "CSL Installer Version 0.6"
+Name "CSL Installer Version 0.7"
 
 ; The file to write
-OutFile "CSL-Installer-v0.6.exe"
+OutFile "CSL-Installer-v0.7.exe"
 
 ; The default installation directory
 InstallDir "$PROGRAMFILES\CSL"
