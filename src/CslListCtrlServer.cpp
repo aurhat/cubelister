@@ -744,40 +744,49 @@ void CslListCtrlServer::ListInit(CslEngine *engine,
 
     wxListItem item;
 
-    item.SetMask(wxLIST_MASK_TEXT);
+    item.SetMask(wxLIST_MASK_TEXT|wxLIST_MASK_FORMAT);
     item.SetImage(-1);
 
+    item.SetAlign(wxLIST_FORMAT_LEFT);
     item.SetText(_("Host"));
     InsertColumn(0,item);
+    SetColumn(0,item);
 
     item.SetText(_("Description"));
     InsertColumn(1,item);
+    SetColumn(1,item);
 
     item.SetText(_("Version"));
     InsertColumn(2,item);
+    SetColumn(2,item);
 
     item.SetAlign(wxLIST_FORMAT_RIGHT);
     item.SetText(_("Ping"));
     InsertColumn(3,item);
+    SetColumn(3,item);
 
-    item.SetMask(wxLIST_MASK_TEXT);
     item.SetAlign(wxLIST_FORMAT_LEFT);
     item.SetText(_("Mode"));
     InsertColumn(4,item);
+    SetColumn(4,item);
 
     item.SetText(_("Map"));
     InsertColumn(5,item);
+    SetColumn(5,item);
 
     item.SetAlign(wxLIST_FORMAT_RIGHT);
     item.SetText(_("Time"));
     InsertColumn(6,item);
+    SetColumn(6,item);
 
     item.SetAlign(wxLIST_FORMAT_LEFT);
     item.SetText(_("Player"));
     InsertColumn(7,item);
+    SetColumn(7,item);
 
     item.SetText(_("MM"));
     InsertColumn(8,item);
+    SetColumn(8,item);
 
     m_sortHelper.Init(CSL_SORT_ASC,SORT_PING);
     ToggleSortArrow();

@@ -26,11 +26,13 @@
 */
 
 // since WX > 2.8.4 the listctrl items
-// get deselected when sorting (only wxGTK ?) !?
+// get deselected when sorting (only wxGTK ?)
+#ifdef __WXGTK__
 #ifndef CSL_USE_WX_LIST_DESELECT_WORKAROUND
 #if wxVERSION_NUMBER > 2804
-#endif
 #define CSL_USE_WX_LIST_DESELECT_WORKAROUND
+#endif
+#endif
 #endif
 
 #ifndef DATADIR

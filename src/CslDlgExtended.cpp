@@ -159,7 +159,7 @@ void CslDlgExtended::do_layout()
     // end wxGlade
 
     grid_sizer_main->SetSizeHints(this);
-    CentreOnParent();
+    CentreOnScreen();
 }
 
 void CslDlgExtended::OnClose(wxCloseEvent& event)
@@ -534,35 +534,41 @@ void CslDlgExtended::ListInit(CslEngine *engine)
 
     list_ctrl_extended->SetImageList(&m_imageList,wxIMAGE_LIST_SMALL);
 
-    item.SetMask(wxLIST_MASK_TEXT);
+    item.SetMask(wxLIST_MASK_TEXT|wxLIST_MASK_FORMAT);
     item.SetImage(-1);
 
-    //item.SetAlign(wxLIST_FORMAT_LEFT);
+    item.SetAlign(wxLIST_FORMAT_LEFT);
     item.SetText(_("Player"));
     list_ctrl_extended->InsertColumn(0,item);
+    list_ctrl_extended->SetColumn(0,item);
 
     item.SetText(_("Team"));
     list_ctrl_extended->InsertColumn(1,item);
+    list_ctrl_extended->SetColumn(1,item);
 
-    //item.SetAlign(wxLIST_FORMAT_RIGHT);
     item.SetText(_("Frags"));
     list_ctrl_extended->InsertColumn(2,item);
+    list_ctrl_extended->SetColumn(2,item);
 
     item.SetText(_("Deaths"));
     list_ctrl_extended->InsertColumn(3,item);
+    list_ctrl_extended->SetColumn(3,item);
 
     item.SetText(_("Teamkills"));
     list_ctrl_extended->InsertColumn(4,item);
+    list_ctrl_extended->SetColumn(4,item);
 
     item.SetText(_("Health"));
     list_ctrl_extended->InsertColumn(5,item);
+    list_ctrl_extended->SetColumn(5,item);
 
     item.SetText(_("Armour"));
     list_ctrl_extended->InsertColumn(6,item);
+    list_ctrl_extended->SetColumn(6,item);
 
-    //item.SetAlign(wxLIST_FORMAT_LEFT);
     item.SetText(_("Weapon"));
     list_ctrl_extended->InsertColumn(7,item);
+    list_ctrl_extended->SetColumn(7,item);
 
     // assertion on __WXMAC__
     //ListAdjustSize(GetClientSize());
