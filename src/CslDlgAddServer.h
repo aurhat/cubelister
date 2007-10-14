@@ -42,18 +42,18 @@
 class CslDlgAddServer: public wxDialog
 {
     public:
-    // begin wxGlade: CslDlgAddServer::ids
-    // end wxGlade
+        // begin wxGlade: CslDlgAddServer::ids
+        // end wxGlade
 
         CslDlgAddServer(wxWindow* parent, CslServerInfo *info,int id=wxID_ANY,const wxString& title=wxEmptyString,
                         const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize,
                         long style=wxDEFAULT_DIALOG_STYLE);
 
     private:
-    // begin wxGlade: CslDlgAddServer::methods
-    void set_properties();
-    void do_layout();
-    // end wxGlade
+        // begin wxGlade: CslDlgAddServer::methods
+        void set_properties();
+        void do_layout();
+        // end wxGlade
 
         void OnText(wxCommandEvent& WXUNUSED(event));
         void OnButton(wxCommandEvent& event);
@@ -61,13 +61,13 @@ class CslDlgAddServer: public wxDialog
         DECLARE_EVENT_TABLE()
 
     protected:
-    // begin wxGlade: CslDlgAddServer::attributes
-    wxStaticBox* sizer_address_staticbox;
-    wxChoice* choice_type;
-    wxTextCtrl* text_ctrl_address;
-    wxButton* button_add;
-    wxButton* button_cancel;
-    // end wxGlade
+        // begin wxGlade: CslDlgAddServer::attributes
+        wxStaticBox* sizer_address_staticbox;
+        wxChoice* choice_type;
+        wxTextCtrl* text_ctrl_address;
+        wxButton* button_add;
+        wxButton* button_cancel;
+        // end wxGlade
 
         CslServerInfo *m_info;
 

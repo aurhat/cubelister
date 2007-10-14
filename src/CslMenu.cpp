@@ -48,13 +48,15 @@ void CslMenu::CheckMenuItem(wxInt32 id,bool check)
     m_menuBar->Check(id,check);
 }
 
-void CslMenu::AddItemToMenu(wxMenu *menu,const wxInt32 id,
-                            const wxString& text,const wxArtID& art,
-                            const wxItemKind kind,const wxString help)
+wxMenuItem& CslMenu::AddItemToMenu(wxMenu *menu,const wxInt32 id,
+                                   const wxString& text,const wxArtID& art,
+                                   const wxItemKind kind,const wxString help)
 {
     wxMenuItem *item=new wxMenuItem(menu,id,text,help,kind);
     wxOperatingSystemId os=wxPlatformInfo().GetOperatingSystemId();
     if (id>wxID_HIGHEST || (os&wxOS_WINDOWS) || (os&wxOS_MAC))
         item->SetBitmap(GET_ART_MENU(art));
     menu->Append(item);
+
+    return *item;
 }

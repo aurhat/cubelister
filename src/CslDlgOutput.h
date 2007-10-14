@@ -39,8 +39,8 @@ WX_DEFINE_ARRAY_INT(wxUint32, t_aUint);
 class CslDlgOutput: public wxDialog
 {
     public:
-    // begin wxGlade: CslDlgOutput::ids
-    // end wxGlade
+        // begin wxGlade: CslDlgOutput::ids
+        // end wxGlade
 
         CslDlgOutput(wxWindow* parent,int id=wxID_ANY,const wxString& title=wxEmptyString,
                      const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize,
@@ -52,10 +52,10 @@ class CslDlgOutput: public wxDialog
         static void Reset(const wxString& title);
 
     private:
-    // begin wxGlade: CslDlgOutput::methods
-    void set_properties();
-    void do_layout();
-    // end wxGlade
+        // begin wxGlade: CslDlgOutput::methods
+        void set_properties();
+        void do_layout();
+        // end wxGlade
 
 
         void OnClose(wxCloseEvent& event);
@@ -64,19 +64,19 @@ class CslDlgOutput: public wxDialog
         DECLARE_EVENT_TABLE()
 
     protected:
-    // begin wxGlade: CslDlgOutput::attributes
-    wxTextCtrl* text_ctrl_output;
-    wxTextCtrl* text_ctrl_search;
-    wxStaticText* label_matches;
-    wxButton* button_search_prev;
-    wxButton* button_search_next;
-    wxCheckBox* checkbox_conv_filter;
-    wxChoice* choice_conv_filter;
-    wxStaticLine* static_line;
-    wxButton* button_load;
-    wxButton* button_save;
-    wxButton* button_close;
-    // end wxGlade
+        // begin wxGlade: CslDlgOutput::attributes
+        wxTextCtrl* text_ctrl_output;
+        wxTextCtrl* text_ctrl_search;
+        wxStaticText* label_matches;
+        wxButton* button_search_prev;
+        wxButton* button_search_next;
+        wxCheckBox* checkbox_conv_filter;
+        wxChoice* choice_conv_filter;
+        wxStaticLine* static_line;
+        wxButton* button_load;
+        wxButton* button_save;
+        wxButton* button_close;
+        // end wxGlade
 
         static CslDlgOutput* m_self;
 

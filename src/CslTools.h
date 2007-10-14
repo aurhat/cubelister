@@ -73,7 +73,7 @@ void Debug_Printf(const char *DbgFunc, const char *FmtStr,...);
 extern char* StripColours(char *s,wxUint32 *l,wxUint32 count);
 extern bool IsIP(const wxString& s);
 extern bool IP2Int(const wxString& s,wxUint32 *ip);
-extern wxString FormatSeconds(wxUint32 time);
+extern wxString FormatSeconds(wxUint32 time,bool space=false,bool full=false);
 
 
 enum { CSL_SORT_ASC = 0, CSL_SORT_DSC };

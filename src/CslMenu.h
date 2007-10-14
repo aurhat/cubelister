@@ -60,6 +60,7 @@ enum
     MENU_SERVER_CONNECT  = wxID_HIGHEST+1,
     MENU_SERVER_CONNECT_PW,
     MENU_SERVER_EXTENDED,
+    MENU_SERVER_FILTER_VER,
 
     MENU_VIEW_HOST,
     MENU_VIEW_DESC,
@@ -90,10 +91,10 @@ class CslMenu
 
         static void EnableMenuItem(wxInt32 id,bool enable=true);
         static void CheckMenuItem(wxInt32 id,bool check=true);
-        static void AddItemToMenu(wxMenu *menu,const wxInt32 id,
-                                  const wxString& text,const wxArtID& art,
-                                  const wxItemKind kind=wxITEM_NORMAL,
-                                  const wxString help=wxEmptyString);
+        static wxMenuItem& AddItemToMenu(wxMenu *menu,const wxInt32 id,
+                                         const wxString& text,const wxArtID& art,
+                                         const wxItemKind kind=wxITEM_NORMAL,
+                                         const wxString help=wxEmptyString);
     protected:
         static wxMenuBar *m_menuBar;
 };

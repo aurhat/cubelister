@@ -835,7 +835,9 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
                             return;
                         }
 
-                        stats->m_teamplay=!getint(p);
+                        stats->m_teamplay=!getint(p);  // error
+                        stats->m_remain=getint(p); // remaining time
+
                         if (!stats->m_teamplay)  // check error (no teammode)
                         {
                             stats->Reset();
@@ -846,8 +848,6 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
                                       dbg_type,U2A(info->GetBestDescription()));
                             return;
                         }
-
-                        stats->m_remain=getint(p); // map remaining
 
                         while (!p.overread())
                         {

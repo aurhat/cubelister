@@ -307,7 +307,7 @@ CslServerInfo* CslGame::FindServerByAddr(const wxIPV4address& addr)
     return NULL;
 }
 
-wxInt32 CslGame::ConnectCleanupConfig(const CSL_GAMETYPE& type,const wxString& cfg)
+wxInt32 CslGame::ConnectCleanupConfig(const CSL_GAMETYPE type,const wxString& cfg)
 {
     if (cfg.IsEmpty())
         return CSL_ERROR_NONE;
@@ -369,20 +369,17 @@ wxInt32 CslGame::ConnectWriteConfig(const CSL_GAMETYPE& type,const wxString& cfg
 }
 
 wxInt32 CslGame::ConnectPrepareConfig(wxString& out,const CslServerInfo *info,const wxString& path,
-                                const wxString& password,const bool admin)
+                                      const wxString& password,const bool admin)
 {
-    wxString s;
-    wxString src;
     wxString cfg;
-    wxString connectpreCmd;
-    wxString connectPass=password;
-    wxString connectCmd(admin ? wxT("connectadmin") : wxT("connect"));
+    wxString script;
 
     switch (info->m_type)
     {
         case CSL_GAME_SB:
         case CSL_GAME_BF:
         {
+            wxString src;
             wxString map=wxString(CSL_DEFAULT_INJECT_FIL_SB)+wxString(wxT(".ogz"));
             wxString dst=path+CSL_DEFAULT_INJECT_DIR_SB+map;
             cfg=path+CSL_DEFAULT_INJECT_DIR_SB+CSL_DEFAULT_INJECT_FIL_SB+wxT(".cfg");
@@ -406,35 +403,94 @@ wxInt32 CslGame::ConnectPrepareConfig(wxString& out,const CslServerInfo *info,co
                 if (!::wxCopyFile(src,dst))
                     return CSL_ERROR_FILE_OPERATION;
             }
+
+            script=wxString::Format(wxT("if (= $csl_connect 1) [ sleep 1000 [ connect %s ] ]\r\n%s\r\n"),
+                                    info->m_host.c_str(),wxT("csl_connect = 0"));
             break;
         }
 
         case CSL_GAME_AC:
+        {
             cfg=path+CSL_DEFAULT_INJECT_DIR_AC+CSL_DEFAULT_INJECT_FIL_AC;
             if (::wxFileExists(cfg))
                 if (!::wxCopyFile(cfg,cfg+wxT(".csl")))
                     return CSL_ERROR_FILE_OPERATION;
+
+            script=wxString::Format(wxT("sleep 1000 [ %s %s %s ]\r\n"),
+                                    admin ? wxT("connectadmin") : wxT("connect"),
+                                    info->m_host.c_str(),password.c_str());
             break;
+        }
 
         case CSL_GAME_CB:
+        {
+            char *buf;
+            wxFile file;
+            bool autoexec=true;
+            wxString s=path+wxT("autoexec.cfg");
+
+            // check autoexec.cfg
+            if (!::wxFileExists(s))
+            {
+                if (!file.Open(s,wxFile::write))
+                    return CSL_ERROR_FILE_OPERATION;
+                file.Close();
+            }
+            if (!file.Open(s,wxFile::read_write))
+                return CSL_ERROR_FILE_OPERATION;
+
+            wxUint32 size=file.Length();
+
+            if (size)
+            {
+                buf=new char[size+1];
+                buf[size]=0;
+
+                if (file.Read((void*)buf,size)!=(wxInt32)size)
+                {
+                    delete[] buf;
+                    file.Close();
+                    return CSL_ERROR_FILE_OPERATION;
+                }
+
+                if (strstr(buf,"alias csl_connect 1"))
+                    autoexec=false;
+
+                delete[] buf;
+            }
+
+            if (autoexec)
+            {
+                if (!file.Write(wxT("\r\nalias csl_connect 1\r\n")))
+                {
+                    file.Close();
+                    return CSL_ERROR_FILE_OPERATION;
+                }
+            }
+            file.Close();
+
+            // make a backup of the map config
             cfg=path+CSL_DEFAULT_INJECT_DIR_CB+CSL_DEFAULT_INJECT_FIL_CB;
             if (::wxFileExists(cfg))
+            {
                 if (!::wxCopyFile(cfg,cfg+wxT(".csl")))
                     return CSL_ERROR_FILE_OPERATION;
-            if (!password.IsEmpty())
-            {
-                connectpreCmd=wxString::Format(wxT("/password %s"),connectPass.c_str());
-                connectPass.Clear();
             }
+
+            if (!password.IsEmpty())
+                script=wxT("/password ")+password;
+            script+=wxString::Format(wxT("\r\nif (= $csl_connect 1) [ sleep 1000 [ connect %s ] ]\r\n%s\r\n"),
+                                     info->m_host.c_str(),wxT("alias csl_connect 0"));
             break;
+        }
 
         default:
+        {
             wxASSERT_MSG(false,wxT("unknown game"));
             return CSL_ERROR_GAME_UNKNOWN;
+        }
     }
 
     out=cfg;
-    s=wxString::Format(wxT("\r\n%s\r\n/sleep 1000 [ %s %s %s ]\r\n"),connectpreCmd.c_str(),
-                       connectCmd.c_str(),info->m_host.c_str(),connectPass.c_str());
-    return ConnectWriteConfig(info->m_type,cfg,s);
+    return ConnectWriteConfig(info->m_type,cfg,script);
 }

@@ -610,7 +610,7 @@ class CslGame
         vector<CslServerInfo*>* GetServers() { return &m_servers; }
         CslServerInfo* FindServerByAddr(const wxIPV4address& addr);
 
-        static wxInt32 ConnectCleanupConfig(const CSL_GAMETYPE& type,const wxString& cfg);
+        static wxInt32 ConnectCleanupConfig(const CSL_GAMETYPE type,const wxString& cfg);
         static wxInt32 ConnectWriteConfig(const CSL_GAMETYPE& type,const wxString& cfg,const wxString& str);
         static wxInt32 ConnectPrepareConfig(wxString& out,const CslServerInfo *info,const wxString& path,
                                             const wxString& password=wxEmptyString,const bool admin=false);

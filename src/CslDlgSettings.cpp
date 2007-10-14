@@ -309,7 +309,7 @@ void CslDlgSettings::do_layout()
     notebook_games->AddPage(notebook_pane_assault, _("AssaultCube"));
     notebook_games->AddPage(notebook_pane_frontier, _("Blood Frontier"));
     notebook_games->AddPage(notebook_pane_cube, _("Cube"));
-    sizer_games->Add(notebook_games, 1, wxALL|wxEXPAND, 4);
+    sizer_games->Add(notebook_games, 1, wxALL|wxEXPAND|wxFIXED_MINSIZE, 4);
     notebook_pane_games->SetSizer(sizer_games);
     wxStaticText* label_6 = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Server empty"));
     grid_sizer_colours->Add(label_6, 0, wxALL|wxALIGN_CENTER_VERTICAL, 6);
@@ -406,14 +406,14 @@ void CslDlgSettings::do_layout()
     grid_sizer_cube_path->Insert(dppos,dpickCube,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,4);
 
     Layout();
-    grid_sizer_main->Fit(this);
 
     // what a crap
-    //wxSize a=notebook_settings->GetBestSize();
-    //wxSize d(a.x,a.y+48);
-    //notebook_settings->SetMinSize(d);
+    wxSize a=GetBestSize();
+    wxSize d(a.x,a.y+24);
+    notebook_settings->SetMinSize(d);
 
     grid_sizer_main->SetSizeHints(this);
+    CentreOnParent();
 }
 
 void CslDlgSettings::OnPicker(wxFileDirPickerEvent& event)

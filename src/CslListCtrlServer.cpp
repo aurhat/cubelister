@@ -21,6 +21,7 @@
 #include <wx/clipbrd.h>
 #include <wx/file.h>
 #include <wx/txtstrm.h>
+#include <wx/wupdlock.h>
 #include "CslDlgAddServer.h"
 #include "CslDlgConnectWait.h"
 #include <CslDlgConnectPass.h>
@@ -309,7 +310,10 @@ void CslListCtrlServer::OnItemSelected(wxListEvent& event)
     if (m_dontUpdateInfo)
         return;
 
-    m_listInfo->UpdateInfo(m_selected.Last()->GetPtr());
+#ifdef CSL_USE_WX_LIST_DESELECT_WORKAROUND
+    if (FindFocus()==this)
+#endif
+        m_listInfo->UpdateInfo(m_selected.Last()->GetPtr());
 }
 
 void CslListCtrlServer::OnItemDeselected(wxListEvent& event)
@@ -334,6 +338,7 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
 {
     wxInt32 c;
     wxMenu menu;
+    CslServerInfo *info;
     wxPoint point=event.GetPosition();
 
     //from keyboard
@@ -347,14 +352,14 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
     }
 
     c=m_selected.GetCount();
+    if (c)
+        info=m_selected.Item(0);
+
     if (c==1)
     {
-        CslServerInfo *info=m_selected.Item(0);
-
         CslMenu::AddItemToMenu(&menu,MENU_SERVER_CONNECT,MENU_SERVER_CONN_STR,wxART_CONNECT);
         if (info->m_type==CSL_GAME_CB || info->m_type==CSL_GAME_AC)
             CslMenu::AddItemToMenu(&menu,MENU_SERVER_CONNECT_PW,MENU_SERVER_CONN_PW_STR,wxART_CONNECT_PW);
-        CslMenu::AddItemToMenu(&menu,MENU_SERVER_EXTENDED,_("Extended information"),wxART_ABOUT);
 
         menu.AppendSeparator();
 
@@ -364,9 +369,6 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
             if (info->m_type==CSL_GAME_CB || info->m_type==CSL_GAME_AC)
                 menu.Enable(MENU_SERVER_CONNECT_PW,false);
         }
-
-        if (info->m_exInfo!=CSL_EXINFO_OK || !PingOk(info))
-            menu.Enable(MENU_SERVER_EXTENDED,false);
     }
 
     switch (m_id)
@@ -377,7 +379,6 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
             CslMenu::AddItemToMenu(&menu,MENU_SERVER_ADD,MENU_SERVER_MAS_ADD_STR,wxART_ADD_BOOKMARK);
             if (m_masterSelected)
                 CslMenu::AddItemToMenu(&menu,MENU_SERVER_REM,MENU_SERVER_MAS_REM_STR,wxART_DEL_BOOKMARK);
-            menu.AppendSeparator();
             break;
 
         case CSL_LIST_FAVOURITE:
@@ -385,7 +386,6 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
             if (!c)
                 break;
             CslMenu::AddItemToMenu(&menu,MENU_SERVER_REM,MENU_SERVER_FAV_REM_STR,wxART_DEL_BOOKMARK);
-            menu.AppendSeparator();
             break;
         default:
             return;
@@ -393,10 +393,27 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
 
     if (c)
     {
-        CslMenu::AddItemToMenu(&menu,MENU_SERVER_COPYTEXT,MENU_SERVER_COPY_STR,wxART_COPY);
-        menu.AppendSeparator();
         CslMenu::AddItemToMenu(&menu,MENU_SERVER_DEL,
                                c>1 ? MENU_SERVER_DELM_STR : MENU_SERVER_DEL_STR,wxART_DELETE);
+        menu.AppendSeparator();
+
+        CslMenu::AddItemToMenu(&menu,MENU_SERVER_EXTENDED,_("Extended information"),wxART_ABOUT);
+        if (c==1)
+            if (info->m_exInfo!=CSL_EXINFO_OK || !PingOk(info))
+                menu.Enable(MENU_SERVER_EXTENDED,false);
+
+        CslMenu::AddItemToMenu(&menu,MENU_SERVER_COPYTEXT,MENU_SERVER_COPY_STR,wxART_COPY);
+
+        menu.AppendSeparator();
+    }
+
+    if (m_id==CSL_LIST_MASTER)
+    {
+        wxMenuItem &item=CslMenu::AddItemToMenu(&menu,MENU_SERVER_FILTER_VER,
+                                                _("Filter version"),
+                                                wxART_NONE,wxITEM_CHECK);
+        if (m_filterVersion>-1)
+            item.Check();
     }
 
     point=ScreenToClient(point);
@@ -659,6 +676,16 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
             break;
         }
 
+        case MENU_SERVER_FILTER_VER:
+        {
+            if (event.IsChecked() && m_selected.GetCount())
+                m_filterVersion=m_selected.Item(0)->GetPtr()->m_protocol;
+            else
+                m_filterVersion=-1;
+            ListFilter(m_filterFlags);
+            break;
+        }
+
         default:
             break;;
     }
@@ -690,8 +717,10 @@ void CslListCtrlServer::OnTimer(wxTimerEvent& event)
     if (CslConnectionState::IsPlaying())
     {
         CslProcess::ProcessInputStream();
-        if (m_timerCount==10)
+        /*
+        if (m_timerCount==10  && info->m_type==CSL_GAME_CB)
             CslGame::ConnectCleanupConfig(info->m_type,CslConnectionState::GetConfig());
+        */
     }
     else if (CslConnectionState::IsWaiting())
     {
@@ -736,6 +765,7 @@ void CslListCtrlServer::ListInit(CslEngine *engine,
     m_listFavourites=listFavourites;
     m_extendedDlg=extendedDlg;
     m_filterFlags=filterFlags;
+    m_filterVersion=-1;
 
     m_stdColourListText=GetTextColour();
     m_stdColourListItem=GetBackgroundColour();
@@ -792,7 +822,7 @@ void CslListCtrlServer::ListInit(CslEngine *engine,
     ToggleSortArrow();
 }
 
-void CslListCtrlServer::ListAdjustSize(wxSize size,bool init)
+void CslListCtrlServer::ListAdjustSize(const wxSize& size,const bool init)
 {
     if (!g_cslSettings->m_autoFitColumns && !init)
         return;
@@ -869,7 +899,9 @@ bool CslListCtrlServer::ListSearchItemMatches(CslServerInfo *info)
 
 bool CslListCtrlServer::ListFilterItemMatches(CslServerInfo *info)
 {
-    if (m_filterFlags&CSL_FILTER_OFFLINE && !PingOk(info))
+    if (m_filterVersion>-1 && info->m_protocol!=m_filterVersion)
+        return true;
+    else if (m_filterFlags&CSL_FILTER_OFFLINE && !PingOk(info))
         return true;
     else if (m_filterFlags&CSL_FILTER_FULL && info->m_playersMax>0 &&
              info->m_players==info->m_playersMax)
@@ -921,7 +953,7 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
     item.SetMask(wxLIST_MASK_TEXT|wxLIST_MASK_DATA);
 
     // filter
-    found=m_filterFlags ? ListFilterItemMatches(info) : false;
+    found=m_filterFlags||m_filterVersion>-1 ? ListFilterItemMatches(info) : false;
     if (found && j!=wxNOT_FOUND)
     {
         ListDeleteItem(&item);
@@ -1024,7 +1056,7 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
             }
         }
     }
-   else
+    else
     {
         if (info->m_desc.IsEmpty() && !info->m_descOld.IsEmpty())
         {
@@ -1215,12 +1247,13 @@ wxUint32 CslListCtrlServer::ListSearch(const wxString& search)
     return c;
 }
 
-wxUint32 CslListCtrlServer::ListFilter(wxUint32 filterFlags)
+wxUint32 CslListCtrlServer::ListFilter(const wxUint32 filterFlags)
 {
     wxUint32 i,l,c=0;
 
+    wxWindowUpdateLocker locker(this);
+
     m_filterFlags=filterFlags;
-    Freeze();
 
     l=m_servers.GetCount();
     for (i=0;i<l;i++)
@@ -1231,7 +1264,6 @@ wxUint32 CslListCtrlServer::ListFilter(wxUint32 filterFlags)
     }
 
     ListSort(-1);
-    Thaw();
 
     return c;
 }
@@ -1324,8 +1356,11 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info,const wxString& pass
 #endif
             }
             else
-                opts=opts+wxT(" -l")+CSL_DEFAULT_INJECT_FIL_SB;
-
+#ifdef __WXMSW__
+                opts=opts+wxT(" -x\"csl_connect = 1\" -l")+CSL_DEFAULT_INJECT_FIL_SB;
+#else
+                opts=opts+wxT(" -xcsl_connect\\ =\\ 1 -l")+CSL_DEFAULT_INJECT_FIL_SB;
+#endif
             break;
         }
 
@@ -1454,11 +1489,14 @@ void CslListCtrlServer::ListSort(wxInt32 column)
 
 #ifdef CSL_USE_WX_LIST_DESELECT_WORKAROUND
     CslServerInfo **selected=new CslServerInfo*[GetItemCount()];
-    wxInt32 c=0,i,j;
+    wxUint32 c=0,i;
+    wxInt32 j;
 
-    for (i=0;i<GetItemCount();i++)
+    /*for (i=0;i<GetItemCount();i++)
         if (GetItemState(i,wxLIST_STATE_SELECTED) & wxLIST_STATE_SELECTED)
-            selected[c++]=(CslServerInfo*)((CslListServer*)GetItemData(i))->GetPtr();
+            selected[c++]=(CslServerInfo*)((CslListServer*)GetItemData(i))->GetPtr();*/
+    for (i=0;i<m_selected.GetCount();i++)
+        selected[c++]=m_selected.Item(i)->GetPtr();
 #endif
 
     SortItems(ListSortCompareFunc,(long)&m_sortHelper);

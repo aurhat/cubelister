@@ -152,7 +152,6 @@ class CslListCtrlServer : public wxListCtrl
                           const wxSize& size=wxDefaultSize,long style=wxLC_ICON,
                           const wxValidator& validator=wxDefaultValidator,
                           const wxString& name=wxListCtrlNameStr);
-
         ~CslListCtrlServer();
 
         void ListInit(CslEngine *engine,
@@ -165,8 +164,8 @@ class CslListCtrlServer : public wxListCtrl
         void ListClear();
         void ToggleSortArrow();
         wxUint32 ListSearch(const wxString& search);
-        wxUint32 ListFilter(wxUint32 filterFlags);
-        void ListAdjustSize(wxSize size,bool init=false);
+        wxUint32 ListFilter(const wxUint32 filterFlags);
+        void ListAdjustSize(const wxSize& size,const bool init=false);
         void SetMasterSelected(bool selected) { m_masterSelected=selected; }
 
     private:
@@ -189,6 +188,7 @@ class CslListCtrlServer : public wxListCtrl
         t_aCslServerInfo m_servers;
         wxString m_searchString;
         wxUint32 m_filterFlags;
+        wxInt32 m_filterVersion;
 
         wxImageList m_imageList;
         wxColour m_stdColourListText;

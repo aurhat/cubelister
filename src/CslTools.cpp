@@ -99,7 +99,7 @@ bool IP2Int(const wxString& s,wxUint32 *ip)
     return true;
 }
 
-wxString FormatSeconds(wxUint32 time)
+wxString FormatSeconds(wxUint32 time,bool space=false,bool full=false)
 {
     wxUint32 rest=time;
     wxUint32 dy,hr,mn,sc;
@@ -117,7 +117,15 @@ wxString FormatSeconds(wxUint32 time)
     if (hr)
         s+=s.Format(wxT("%dh "),hr);
     if (mn)
-        s+=s.Format(wxT("%dmin "),mn);
+    {
+        s+=s.Format(wxT("%d"),mn);
+        if (space)
+            s+=wxT(" ");
+        if (full)
+            s+=_("minutes");
+        else
+            s+=_("min");
+    }
     if (sc)
         s+=s.Format(wxT("%dsec"),sc);
 

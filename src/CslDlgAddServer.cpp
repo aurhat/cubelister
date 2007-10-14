@@ -32,7 +32,8 @@ CslDlgAddServer::CslDlgAddServer(wxWindow* parent,CslServerInfo *info,int id,con
 {
     // begin wxGlade: CslDlgAddServer::CslDlgAddServer
     sizer_address_staticbox = new wxStaticBox(this, -1, wxEmptyString);
-    const wxString choice_type_choices[] = {
+    const wxString choice_type_choices[] =
+    {
         _("default")
     };
     choice_type = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 1, choice_type_choices, 0);

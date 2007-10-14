@@ -55,7 +55,8 @@ CslDlgOutput::CslDlgOutput(wxWindow* parent,int id,const wxString& title,
     button_search_prev = new wxButton(this, wxID_UNDO, _("&Previous"));
     button_search_next = new wxButton(this, wxID_REDO, _("&Next"));
     checkbox_conv_filter = new wxCheckBox(this, CHECK_CONV_FILTER, _("&Filter conversation (Beta)"));
-    const wxString choice_conv_filter_choices[] = {
+    const wxString choice_conv_filter_choices[] =
+    {
         _("0 (Low)"),
         _("1 (Default)"),
         _("2 (TC-Server)")
@@ -141,7 +142,7 @@ void CslDlgOutput::do_layout()
     grid_sizer_main->AddGrowableCol(0);
     Layout();
     // end wxGlade
-    
+
     grid_sizer_main->SetSizeHints(this);
     CentreOnScreen();
 }
@@ -197,10 +198,10 @@ void CslDlgOutput::OnCommandEvent(wxCommandEvent& event)
             choice_conv_filter->Enable(checked);
 
             s=text_ctrl_search->GetValue();
-            if (!s.IsEmpty())
+            if (s.IsEmpty())
+                text_ctrl_output->ShowPosition(0);
+            else
                 SetSearchbarColour(Search(s));
-
-            //text_ctrl_output->ShowPosition(0);
             break;
         }
 
@@ -227,6 +228,7 @@ void CslDlgOutput::OnCommandEvent(wxCommandEvent& event)
             if (file.Read((void*)buf,size)!=(wxInt32)size)
             {
                 free(buf);
+                file.Close();
                 break;
             }
             file.Close();
@@ -404,6 +406,7 @@ wxString CslDlgOutput::Filter(wxUint32 start,wxUint32 end)
 {
     bool colon=false;
     bool le=false;
+    bool lb=true;
     bool skip=false;
     wxUint32 i=start;
     wxUint32 b=start;
@@ -457,8 +460,18 @@ wxString CslDlgOutput::Filter(wxUint32 start,wxUint32 end)
                 break;
 
             case ' ':
-                if (!colon)
+                if (!colon&&!lb)
+                {
                     skip=true;
+                    if (m_filterLevel==2)
+                    {
+                        if (i<10)
+                            break;
+                        if (m_text.Mid(i-10,10)==wxT("(TEAMCHAT)"))
+                            skip=false;
+                    }
+
+                }
                 break;
 
             case '\r':
@@ -473,11 +486,13 @@ wxString CslDlgOutput::Filter(wxUint32 start,wxUint32 end)
                     b=i+1;
 
                     le=false;
+                    lb=true;
                     colon=false;
                     skip=false;
                     continue;
                 }
         }
+        lb=false;
     }
 
     return s;

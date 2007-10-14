@@ -35,6 +35,7 @@ BEGIN_EVENT_TABLE(CslDlgExtended, wxDialog)
     EVT_LIST_COL_CLICK(wxID_ANY,CslDlgExtended::OnColumnLeftClick)
     EVT_TIMER(wxID_ANY,CslDlgExtended::OnTimer)
     EVT_BUTTON(wxID_ANY,CslDlgExtended::OnCommandEvent)
+    EVT_CHECKBOX(wxID_ANY,CslDlgExtended::OnCommandEvent)
     CSL_EVT_PONG(wxID_ANY,CslDlgExtended::OnPong)
 END_EVENT_TABLE()
 
@@ -56,7 +57,7 @@ enum
     SORT_HEALTH, SORT_ARMOUR, SORT_WEAPON
 };
 
-enum { BUTTON_REFRESH = wxID_HIGHEST +1 };
+enum { BUTTON_REFRESH = wxID_HIGHEST +1, CHECK_UPDATE };
 
 #define CSL_EXT_REFRESH_INTERVAL  5
 
@@ -67,15 +68,20 @@ CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
         m_engine(NULL),m_info(NULL)
 {
     // begin wxGlade: CslDlgExtended::CslDlgExtended
+    sizer_info_staticbox = new wxStaticBox(this, -1, _("Info"));
     sizer_team_score_staticbox = new wxStaticBox(this, -1, _("Team score"));
     list_ctrl_extended = new wxListCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxSUNKEN_BORDER);
     label_team1 = new wxStaticText(this, wxID_ANY, _("label_team1"));
     label_team2 = new wxStaticText(this, wxID_ANY, _("label_team2"));
     label_team3 = new wxStaticText(this, wxID_ANY, _("label_team3"));
     label_team4 = new wxStaticText(this, wxID_ANY, _("label_team4"));
-    label_status = new wxStaticText(this, wxID_ANY, _("Waiting for data..."));
-    checkbox_update = new wxCheckBox(this, wxID_ANY, _("Auto &update"));
-    checkbox_update_end = new wxCheckBox(this, wxID_ANY, _("No update when map ends"));
+    label_team5 = new wxStaticText(this, wxID_ANY, _("label_team5"));
+    label_team6 = new wxStaticText(this, wxID_ANY, _("label_team6"));
+    label_map = new wxStaticText(this, wxID_ANY, _("label_12"));
+    label_remaining = new wxStaticText(this, wxID_ANY, _("label_13"));
+    label_records = new wxStaticText(this, wxID_ANY, _("label_14"));
+    checkbox_update = new wxCheckBox(this, CHECK_UPDATE, _("Auto &update"));
+    checkbox_update_end = new wxCheckBox(this, wxID_ANY, _("&Stop when map ends"));
     button_update = new wxButton(this, BUTTON_REFRESH, _("&Update"));
     button_close = new wxButton(this, wxID_CLOSE, _("&Close"));
 
@@ -108,6 +114,8 @@ void CslDlgExtended::set_properties()
 {
     // begin wxGlade: CslDlgExtended::set_properties
     SetTitle(_("CSL - Extended info"));
+    label_team1->SetMinSize(wxSize(100, -1));
+    checkbox_update_end->Enable(false);
     button_close->SetDefault();
     // end wxGlade
 
@@ -115,48 +123,66 @@ void CslDlgExtended::set_properties()
     m_teamLabel.Add(label_team2);
     m_teamLabel.Add(label_team3);
     m_teamLabel.Add(label_team4);
+    m_teamLabel.Add(label_team5);
+    m_teamLabel.Add(label_team6);
 
 #ifdef __WXMSW__
-    SetMinSize(wxSize(-1,420));
+    SetMinSize(wxSize(600,480));
 #else
-    SetMinSize(wxSize(-1,440));
+    SetMinSize(wxSize(600,500));
 #endif
 }
 
 void CslDlgExtended::do_layout()
 {
     // begin wxGlade: CslDlgExtended::do_layout
-    wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(3, 1, 0, 0);
-    wxFlexGridSizer* grid_sizer_button = new wxFlexGridSizer(1, 7, 0, 0);
+    wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(4, 1, 0, 0);
+    wxFlexGridSizer* grid_sizer_button = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* grid_sizer_info_team = new wxFlexGridSizer(1, 3, 0, 0);
+    wxFlexGridSizer* grid_sizer_update = new wxFlexGridSizer(3, 1, 0, 0);
+    wxStaticBoxSizer* sizer_info = new wxStaticBoxSizer(sizer_info_staticbox, wxHORIZONTAL);
+    wxFlexGridSizer* grid_sizer_info = new wxFlexGridSizer(3, 2, 0, 0);
     wxStaticBoxSizer* sizer_team_score = new wxStaticBoxSizer(sizer_team_score_staticbox, wxHORIZONTAL);
-    wxFlexGridSizer* grid_sizer_team_score = new wxFlexGridSizer(1, 4, 0, 0);
+    wxFlexGridSizer* grid_sizer_team_score = new wxFlexGridSizer(3, 2, 0, 0);
     grid_sizer_main->Add(list_ctrl_extended, 1, wxALL|wxEXPAND, 4);
     grid_sizer_team_score->Add(label_team1, 0, wxALL, 4);
     grid_sizer_team_score->Add(label_team2, 0, wxALL, 4);
     grid_sizer_team_score->Add(label_team3, 0, wxALL, 4);
     grid_sizer_team_score->Add(label_team4, 0, wxALL, 4);
-    grid_sizer_team_score->AddGrowableCol(0);
-    grid_sizer_team_score->AddGrowableCol(1);
-    grid_sizer_team_score->AddGrowableCol(2);
-    grid_sizer_team_score->AddGrowableCol(3);
+    grid_sizer_team_score->Add(label_team5, 0, wxALL, 4);
+    grid_sizer_team_score->Add(label_team6, 0, wxALL, 4);
     sizer_team_score->Add(grid_sizer_team_score, 1, wxEXPAND, 0);
-    grid_sizer_main->Add(sizer_team_score, 1, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 4);
-    wxStaticText* label_status_static = new wxStaticText(this, wxID_ANY, _("Status:"));
-    grid_sizer_button->Add(label_status_static, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
-    grid_sizer_button->Add(label_status, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_button->Add(checkbox_update, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
-    grid_sizer_button->Add(checkbox_update_end, 0, wxRIGHT|wxALIGN_CENTER_VERTICAL, 8);
-    grid_sizer_button->Add(button_update, 0, wxALL, 4);
-    grid_sizer_button->Add(8, 1, 0, 0, 0);
+    grid_sizer_info_team->Add(sizer_team_score, 1, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 4);
+    wxStaticText* label_map_static = new wxStaticText(this, wxID_ANY, _("Map:"));
+    grid_sizer_info->Add(label_map_static, 0, wxALL, 4);
+    grid_sizer_info->Add(label_map, 0, wxALL, 4);
+    wxStaticText* label_remaining_static = new wxStaticText(this, wxID_ANY, _("Time remaining:"));
+    grid_sizer_info->Add(label_remaining_static, 0, wxALL, 4);
+    grid_sizer_info->Add(label_remaining, 0, wxALL, 4);
+    wxStaticText* label_records_static = new wxStaticText(this, wxID_ANY, _("Player records:"));
+    grid_sizer_info->Add(label_records_static, 0, wxALL, 4);
+    grid_sizer_info->Add(label_records, 0, wxALL, 4);
+    sizer_info->Add(grid_sizer_info, 1, wxEXPAND, 0);
+    grid_sizer_info_team->Add(sizer_info, 1, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 4);
+    grid_sizer_update->Add(checkbox_update, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_update->Add(checkbox_update_end, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_update->Add(button_update, 0, wxALL|wxEXPAND, 4);
+    grid_sizer_update->AddGrowableRow(0);
+    grid_sizer_info_team->Add(grid_sizer_update, 1, wxEXPAND, 0);
+    grid_sizer_info_team->AddGrowableCol(1);
+    grid_sizer_main->Add(grid_sizer_info_team, 1, wxEXPAND, 0);
+    wxStaticLine* static_line = new wxStaticLine(this, wxID_ANY);
+    grid_sizer_main->Add(static_line, 0, wxLEFT|wxRIGHT|wxTOP|wxEXPAND, 4);
     grid_sizer_button->Add(button_close, 0, wxALL, 4);
-    grid_sizer_button->AddGrowableCol(1);
-    grid_sizer_main->Add(grid_sizer_button, 1, wxEXPAND, 0);
+    grid_sizer_main->Add(grid_sizer_button, 1, wxALIGN_RIGHT, 0);
     SetSizer(grid_sizer_main);
     grid_sizer_main->Fit(this);
     grid_sizer_main->AddGrowableRow(0);
     grid_sizer_main->AddGrowableCol(0);
     Layout();
     // end wxGlade
+
+    m_grid_sizer_info_team=grid_sizer_main;
 
     grid_sizer_main->SetSizeHints(this);
     CentreOnScreen();
@@ -235,6 +261,10 @@ void CslDlgExtended::OnCommandEvent(wxCommandEvent& event)
     {
         case wxID_CLOSE:
             Close();
+            break;
+
+        case CHECK_UPDATE:
+            checkbox_update_end->Enable(event.IsChecked());
             break;
 
         case BUTTON_REFRESH:
@@ -346,8 +376,8 @@ void CslDlgExtended::OnPong(wxCommandEvent& event)
 
             stats->m_lastResponse=wxDateTime::Now().GetTicks();
 
-            label_status->SetLabel(wxString::Format(wxT("%d players (%d left)"),
-                                                    list_ctrl_extended->GetItemCount(),stats->m_ids.length()));
+            label_records->SetLabel(wxString::Format(wxT("%d players (%d left)"),
+                                    list_ctrl_extended->GetItemCount(),stats->m_ids.length()));
             ListSort(-1);
             break;
         }
@@ -369,8 +399,10 @@ void CslDlgExtended::SetTeamScore()
     {
         m_teamLabel.Item(i)->SetLabel(wxT(""));
         m_teamLabel.Item(i)->SetFont(m_labelFont);
+        m_teamLabel.Item(i)->SetForegroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOWTEXT));
     }
 
+    wxASSERT(m_info && m_info->m_teamStats);
     if (!m_info || !m_info->m_teamStats)
         return;
 
@@ -381,58 +413,67 @@ void CslDlgExtended::SetTeamScore()
     bool end=false;
     CslTeamStats *stats=m_info->m_teamStats;
     CslTeamStatsData *data;
-
-    if (!stats->m_teamplay)
-    {
-        m_teamLabel.Item(0)->SetLabel("Not a team game.");
-        return;
-    }
-
     wxFont font=m_labelFont;
     font.SetWeight(wxFONTWEIGHT_BOLD);
 
-    loopv(stats->m_stats)
+    if (stats->m_teamplay)
     {
-        data=stats->m_stats[i];
-
-        // TODO i==c, dynamically add labels
-        if (!data->m_ok || i==c)
-            break;
-
-        s=data->m_team;
-        s+=wxT(": ");
-
-        if (stats->m_remain==0 && data->m_score>hs)
+        loopv(stats->m_stats)
         {
-            h=i;
-            end=true;
+            data=stats->m_stats[i];
+
+            // TODO i==c, dynamically add labels
+            if (!data->m_ok || i==c)
+                break;
+
+            if (data->m_score>hs || data->m_score==10000)
+            {
+                if (data->m_score==10000)
+                    end=true;
+                hs=data->m_score;
+                h=i;
+            }
+
+            s=data->m_team;
+            s+=wxT(": ");
+            s+=wxString::Format(wxT("%d"),data->m_score);
+            m_teamLabel.Item(i)->SetLabel(s);
         }
 
-        if (data->m_score==10000)
+        if (h>-1 && h<c)
         {
-            h=i;
-            end=true;
-            continue;
+            data=stats->m_stats[h];
+
+            m_teamLabel.Item(h)->SetFont(font);
+
+            if (end)
+            {
+                s=data->m_team;
+                s+=wxT(": ");
+                if (data->m_score==10000)
+                    s+=_("WINNER");
+                else
+                    s+=wxString::Format(wxT("%d - "),data->m_score)+_("WINNER");
+                m_teamLabel.Item(h)->SetLabel(s);
+                m_teamLabel.Item(h)->SetForegroundColour(*wxRED);
+            }
         }
-
-        s+=wxString::Format(wxT("%d"),data->m_score);
-        m_teamLabel.Item(i)->SetLabel(s);
     }
+    else
+        m_teamLabel.Item(0)->SetLabel("Not a team game.");
 
-    if (h>-1 && h<c)
-    {
-        s=data->m_team;
-        s+=wxT(": ");
-        if (data->m_score==10000)
-            s+=_("WINNER");
-        else
-            s+=wxString::Format(wxT("%d - "),data->m_score)+_("WINNER");
-        m_teamLabel.Item(h)->SetFont(font);
-        m_teamLabel.Item(h)->SetLabel(s);
-    }
 
-    if (end && checkbox_update_end->IsChecked())
+    if ((stats->m_remain==0 || end) && checkbox_update_end->IsChecked())
         checkbox_update->SetValue(false);
+
+    label_map->SetLabel(m_info->m_map);
+    s=FormatSeconds(m_info->m_timeRemain*60,true,true);
+    if (s.IsEmpty())
+        s+=_("Time is up");
+    label_remaining->SetLabel(s);
+
+    m_grid_sizer_info_team->Layout();
+    SetMinSize(GetBestSize());//m_grid_sizer_info_team->SetVirtualSizeHints(this);
 }
 
 void CslDlgExtended::QueryInfo(wxInt32 pid)
@@ -447,7 +488,7 @@ void CslDlgExtended::QueryInfo(wxInt32 pid)
         if (m_info->m_playerStats->m_lastRefresh+CSL_EXT_REFRESH_INTERVAL<=now)
         {
             list_ctrl_extended->DeleteAllItems();
-            label_status->SetLabel(_("Waiting for data..."));
+            label_records->SetLabel(_("Waiting for data..."));
             button_update->Enable(false);
             m_engine->PingExPlayerInfo(m_info);
             m_engine->PingExTeamInfo(m_info);
@@ -588,7 +629,7 @@ void CslDlgExtended::DoShow(CslServerInfo *info)
     if (m_info!=info)
     {
         list_ctrl_extended->DeleteAllItems();
-        label_status->SetLabel(wxString::Format(wxT("%d players (%d left)"),0,0));
+        label_records->SetLabel(wxString::Format(wxT("%d players (%d left)"),0,0));
     }
 
     m_info=info;
@@ -596,6 +637,8 @@ void CslDlgExtended::DoShow(CslServerInfo *info)
     SetTeamScore();
     button_update->SetLabel(_("Update"));
     button_update->Enable(false);
+    label_map->SetLabel(m_info->m_map);
+    label_remaining->SetLabel(FormatSeconds(m_info->m_timeRemain*60,true,true));
     SetTitle(wxString::Format(_("CSL - Extended info: %s"),
                               m_info->GetBestDescription().c_str()));
     QueryInfo();

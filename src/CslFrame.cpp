@@ -54,6 +54,8 @@ enum
     CSL_CHECK_FILTER_OFFLINE,
     CSL_CHECK_FILTER_MM2,
     CSL_CHECK_FILTER_MM3,
+    CSL_CHECK_FILTER_VERSION,
+    CSL_CHOICE_FILTER_VERSION,
     CSL_CHECK_FILTER_FAVOURITES,
     CSL_BUTTON_FILTER_RESET,
 
@@ -78,6 +80,7 @@ BEGIN_EVENT_TABLE(CslFrame, wxFrame)
     EVT_MENU(wxID_ANY,CslFrame::OnCommandEvent)
     EVT_TEXT(CSL_TEXT_SEARCH,CslFrame::OnCommandEvent)
     EVT_CHECKBOX(wxID_ANY,CslFrame::OnCommandEvent)
+    EVT_CHOICE(wxID_ANY,CslFrame::OnCommandEvent)
     // dont use wxID_ANY for EVT_BUTTON, because on wxMAC
     // wxID_CANCEL is sent when pressing ESC
     EVT_BUTTON(CSL_BUTTON_SEARCH_CLOSE,CslFrame::OnCommandEvent)
@@ -391,7 +394,7 @@ void CslFrame::do_layout()
     grid_sizer_filter->Add(checkbox_filter_mm3, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_filter->Add(checkbox_filter_favourites, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_filter->Add(1, 1, 0, wxEXPAND, 0);
-    grid_sizer_filter->Add(button_filter_reset, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
+    grid_sizer_filter->Add(button_filter_reset, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 4);
     grid_sizer_filter->AddGrowableCol(1);
     sizer_filter->Add(grid_sizer_filter, 1, wxEXPAND, 0);
     grid_sizer_main_left->Add(sizer_filter, 1, wxTOP|wxEXPAND, 4);
