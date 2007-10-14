@@ -127,7 +127,7 @@ void CslDlgExtended::set_properties()
     m_teamLabel.Add(label_team6);
 
 #ifdef __WXMSW__
-    SetMinSize(wxSize(600,480));
+    SetMinSize(wxSize(560,480));
 #else
     SetMinSize(wxSize(600,500));
 #endif
