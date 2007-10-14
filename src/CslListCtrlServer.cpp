@@ -361,7 +361,7 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
         if (info->m_type==CSL_GAME_CB || info->m_type==CSL_GAME_AC)
             CslMenu::AddItemToMenu(&menu,MENU_SERVER_CONNECT_PW,MENU_SERVER_CONN_PW_STR,wxART_CONNECT_PW);
 
-		CslMenu::AddItemToMenu(&menu,MENU_SERVER_EXTENDED,_("Extended information"),wxART_ABOUT);
+        CslMenu::AddItemToMenu(&menu,MENU_SERVER_EXTENDED,_("Extended information"),wxART_ABOUT);
         if (info->m_exInfo!=CSL_EXINFO_OK || !PingOk(info))
             menu.Enable(MENU_SERVER_EXTENDED,false);
 
@@ -406,16 +406,16 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
 
     if (m_id==CSL_LIST_MASTER)
     {
-		if (c || m_filterVersion>-1)
-		{
-			if (c)
-			    menu.AppendSeparator();
+        if (c || m_filterVersion>-1)
+        {
+            if (c)
+                menu.AppendSeparator();
             wxMenuItem &item=CslMenu::AddItemToMenu(&menu,MENU_SERVER_FILTER_VER,
-                                                _("Filter version"),
-                                                wxART_NONE,wxITEM_CHECK);
+                                                    _("Filter version"),
+                                                    wxART_NONE,wxITEM_CHECK);
             if (m_filterVersion>-1)
                 item.Check();
-		}
+        }
     }
 
     point=ScreenToClient(point);
@@ -1226,7 +1226,7 @@ void CslListCtrlServer::ListClear()
     DeleteAllItems();
     m_selected.Clear();
     WX_CLEAR_ARRAY(m_servers);
-	m_filterVersion=-1;
+    m_filterVersion=-1;
 }
 
 wxUint32 CslListCtrlServer::ListSearch(const wxString& search)

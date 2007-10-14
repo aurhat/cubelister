@@ -1204,13 +1204,13 @@ void CslFrame::TreeCalcTotalPlaytime(CslGame* game)
 
     if (playtime)
     {
-        s=wxString::Format(_("Total playtime for game %s: %s"),
+        s=wxString::Format(_("Total play time for game %s: %s"),
                            game->GetName().c_str(),
                            FormatSeconds(playtime).c_str());
         if (info)
         {
             s+=wxT("  -  ");
-            s+=wxString::Format(_("most played server: \'%s\' (total playtime: %s)"),
+            s+=wxString::Format(_("most played server: \'%s\' (total play time: %s)"),
                                 info->GetBestDescription().c_str(),
                                 FormatSeconds(info->m_playTimeTotal).c_str());
         }

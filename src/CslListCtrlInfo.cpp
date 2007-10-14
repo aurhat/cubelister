@@ -147,8 +147,8 @@ CslListCtrlInfo::CslListCtrlInfo(wxWindow* parent,wxWindowID id,const wxPoint& p
     InsertItem(i++,_("Uptime"),0);
     InsertItem(i++,_("Last seen"),0);
     InsertItem(i++,_("Last played"),0);
-    InsertItem(i++,_("Last playtime"),0);
-    InsertItem(i++,_("Total playtime"),0);
+    InsertItem(i++,_("Last play time"),0);
+    InsertItem(i++,_("Total play time"),0);
     InsertItem(i,_("Connects"),0);
 
     for (;i>=0;i-=2)
