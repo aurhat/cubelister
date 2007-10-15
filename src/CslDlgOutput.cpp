@@ -52,9 +52,9 @@ CslDlgOutput::CslDlgOutput(wxWindow* parent,int id,const wxString& title,
     text_ctrl_output = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxHSCROLL|wxTE_RICH|wxTE_RICH2|wxTE_AUTO_URL);
     text_ctrl_search = new wxTextCtrl(this, TEXT_SEARCH, wxEmptyString);
     label_matches = new wxStaticText(this, wxID_ANY, _("%d matches"));
-    button_search_prev = new wxButton(this, wxID_UNDO, _("&Previous"));
+    button_search_prev = new wxButton(this, wxID_UNDO, _("Previ&ous"));
     button_search_next = new wxButton(this, wxID_REDO, _("&Next"));
-    checkbox_conv_filter = new wxCheckBox(this, CHECK_CONV_FILTER, _("&Filter conversation (Beta)"));
+    checkbox_conv_filter = new wxCheckBox(this, CHECK_CONV_FILTER, _("&Filter chat"));
     const wxString choice_conv_filter_choices[] =
     {
         _("0 (Low)"),
@@ -109,7 +109,7 @@ void CslDlgOutput::do_layout()
     wxStaticText* label_search = new wxStaticText(this, wxID_ANY, _("Search:"));
     grid_sizer_search_text->Add(label_search, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_search_text->Add(text_ctrl_search, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_search_text->Add(label_matches, 0, wxRIGHT|wxALIGN_CENTER_VERTICAL, 8);
+    grid_sizer_search_text->Add(label_matches, 0, wxLEFT|wxRIGHT|wxALIGN_CENTER_VERTICAL, 6);
     grid_sizer_search_text->Add(30, 1, 0, 0, 0);
     grid_sizer_search_text->AddGrowableCol(1);
     grid_sizer_search_input->Add(grid_sizer_search_text, 1, wxEXPAND, 0);

@@ -726,6 +726,7 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
                         {
                             LOG_DEBUG("%s (%s) ERROR: prot=%d\n",dbg_type,
                                       U2A(info->GetBestDescription()),vi);
+                            info->m_exInfo=CSL_EXINFO_ERROR;
                             return;
                         }
 
@@ -832,11 +833,12 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
                         {
                             LOG_DEBUG("%s (%s) ERROR: prot=%d\n",dbg_type,
                                       U2A(info->GetBestDescription()),vi);
+                            info->m_exInfo=CSL_EXINFO_ERROR;
                             return;
                         }
 
                         stats->m_teamplay=!getint(p);  // error
-                        stats->m_remain=getint(p); // remaining time
+                        stats->m_remain=getint(p);  // remaining time
 
                         if (!stats->m_teamplay)  // check error (no teammode)
                         {

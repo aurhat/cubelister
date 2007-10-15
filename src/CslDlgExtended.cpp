@@ -68,20 +68,20 @@ CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
         m_engine(NULL),m_info(NULL)
 {
     // begin wxGlade: CslDlgExtended::CslDlgExtended
-    sizer_info_staticbox = new wxStaticBox(this, -1, _("Info"));
+    sizer_info_staticbox = new wxStaticBox(this, -1, _("Game info"));
     sizer_team_score_staticbox = new wxStaticBox(this, -1, _("Team score"));
     list_ctrl_extended = new wxListCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxSUNKEN_BORDER);
-    label_team1 = new wxStaticText(this, wxID_ANY, _("label_team1"));
-    label_team2 = new wxStaticText(this, wxID_ANY, _("label_team2"));
-    label_team3 = new wxStaticText(this, wxID_ANY, _("label_team3"));
-    label_team4 = new wxStaticText(this, wxID_ANY, _("label_team4"));
-    label_team5 = new wxStaticText(this, wxID_ANY, _("label_team5"));
-    label_team6 = new wxStaticText(this, wxID_ANY, _("label_team6"));
-    label_map = new wxStaticText(this, wxID_ANY, _("label_12"));
-    label_remaining = new wxStaticText(this, wxID_ANY, _("label_13"));
-    label_records = new wxStaticText(this, wxID_ANY, _("label_14"));
-    checkbox_update = new wxCheckBox(this, CHECK_UPDATE, _("Auto &update"));
-    checkbox_update_end = new wxCheckBox(this, wxID_ANY, _("&Stop when map ends"));
+    label_team1 = new wxStaticText(this, wxID_ANY, wxEmptyString);
+    label_team2 = new wxStaticText(this, wxID_ANY, wxEmptyString);
+    label_team3 = new wxStaticText(this, wxID_ANY, wxEmptyString);
+    label_team4 = new wxStaticText(this, wxID_ANY, wxEmptyString);
+    label_team5 = new wxStaticText(this, wxID_ANY, wxEmptyString);
+    label_team6 = new wxStaticText(this, wxID_ANY, wxEmptyString);
+    label_map = new wxStaticText(this, wxID_ANY, wxEmptyString);
+    label_remaining = new wxStaticText(this, wxID_ANY, wxEmptyString);
+    label_records = new wxStaticText(this, wxID_ANY, wxEmptyString);
+    checkbox_update = new wxCheckBox(this, CHECK_UPDATE, _("&Auto update"));
+    checkbox_update_end = new wxCheckBox(this, wxID_ANY, _("Stop when game &ends"));
     button_update = new wxButton(this, BUTTON_REFRESH, _("&Update"));
     button_close = new wxButton(this, wxID_CLOSE, _("&Close"));
 
@@ -114,7 +114,9 @@ void CslDlgExtended::set_properties()
 {
     // begin wxGlade: CslDlgExtended::set_properties
     SetTitle(_("CSL - Extended info"));
-    label_team1->SetMinSize(wxSize(100, -1));
+    label_team1->SetMinSize(wxSize(60, -1));
+    label_team2->SetMinSize(wxSize(60, -1));
+    label_map->SetMinSize(wxSize(100, -1));
     checkbox_update_end->Enable(false);
     button_close->SetDefault();
     // end wxGlade
@@ -182,7 +184,7 @@ void CslDlgExtended::do_layout()
     Layout();
     // end wxGlade
 
-    m_grid_sizer_info_team=grid_sizer_main;
+    m_grid_sizer_info_team=grid_sizer_info_team;
 
     grid_sizer_main->SetSizeHints(this);
     CentreOnScreen();
@@ -218,7 +220,7 @@ void CslDlgExtended::OnTimer(wxTimerEvent& event)
 
     wxUint32 now=wxDateTime::Now().GetTicks();
 
-    wxString label=_("Update");
+    wxString label=_("&Update");
     if (!button_update->IsEnabled() && m_info->m_players>0)
     {
         wxInt32 diff=CSL_EXT_REFRESH_INTERVAL-(now-stats->m_lastRefresh);
@@ -253,6 +255,8 @@ void CslDlgExtended::OnTimer(wxTimerEvent& event)
         else if (!button_update->IsEnabled())
             button_update->Enable();
     }
+    else if (!m_info->m_players && list_ctrl_extended->GetItemCount())
+        list_ctrl_extended->DeleteAllItems();
 }
 
 void CslDlgExtended::OnCommandEvent(wxCommandEvent& event)
@@ -376,7 +380,7 @@ void CslDlgExtended::OnPong(wxCommandEvent& event)
 
             stats->m_lastResponse=wxDateTime::Now().GetTicks();
 
-            label_records->SetLabel(wxString::Format(wxT("%d players (%d left)"),
+            label_records->SetLabel(wxString::Format(_("%d players (%d left)"),
                                     list_ctrl_extended->GetItemCount(),stats->m_ids.length()));
             ListSort(-1);
             break;
@@ -410,11 +414,9 @@ void CslDlgExtended::SetTeamScore()
     wxInt32 h=-1;
     wxInt32 hs=0;
     wxInt32 c=m_teamLabel.GetCount();
-    bool end=false;
     CslTeamStats *stats=m_info->m_teamStats;
     CslTeamStatsData *data;
-    wxFont font=m_labelFont;
-    font.SetWeight(wxFONTWEIGHT_BOLD);
+    wxSize size;
 
     if (stats->m_teamplay)
     {
@@ -426,10 +428,8 @@ void CslDlgExtended::SetTeamScore()
             if (!data->m_ok || i==c)
                 break;
 
-            if (data->m_score>hs || data->m_score==10000)
+            if (data->m_score>hs)
             {
-                if (data->m_score==10000)
-                    end=true;
                 hs=data->m_score;
                 h=i;
             }
@@ -438,15 +438,23 @@ void CslDlgExtended::SetTeamScore()
             s+=wxT(": ");
             s+=wxString::Format(wxT("%d"),data->m_score);
             m_teamLabel.Item(i)->SetLabel(s);
+
+            size=m_teamLabel.Item(i)->GetBestSize();
+            if (i%2==0)
+                size.x+=40;
+            m_teamLabel.Item(i)->SetMinSize(size);
         }
 
+        // TODO h<c, dynamically add labels
         if (h>-1 && h<c)
         {
             data=stats->m_stats[h];
 
+            wxFont font=m_labelFont;
+            font.SetWeight(wxFONTWEIGHT_BOLD);
             m_teamLabel.Item(h)->SetFont(font);
 
-            if (end)
+            if (data->m_score==10000 || stats->m_remain==0)
             {
                 s=data->m_team;
                 s+=wxT(": ");
@@ -454,26 +462,30 @@ void CslDlgExtended::SetTeamScore()
                     s+=_("WINNER");
                 else
                     s+=wxString::Format(wxT("%d - "),data->m_score)+_("WINNER");
+
                 m_teamLabel.Item(h)->SetLabel(s);
                 m_teamLabel.Item(h)->SetForegroundColour(*wxRED);
+                m_teamLabel.Item(h)->SetMinSize(m_teamLabel.Item(h)->GetBestSize());
+
+                if (checkbox_update_end->IsChecked())
+                    checkbox_update->SetValue(false);
             }
         }
     }
     else
-        m_teamLabel.Item(0)->SetLabel("Not a team game.");
-
-
-    if ((stats->m_remain==0 || end) && checkbox_update_end->IsChecked())
-        checkbox_update->SetValue(false);
+    {
+        label_team1->SetLabel(_("Not a team game."));
+        label_team1->SetMinSize(label_team1->GetBestSize());
+    }
 
     label_map->SetLabel(m_info->m_map);
-    s=FormatSeconds(m_info->m_timeRemain*60,true,true);
+    s=FormatSeconds(stats->m_remain>-1 ? stats->m_remain*60 : 0,true,true);
     if (s.IsEmpty())
-        s+=_("Time is up");
+        s=_("Time is up");
     label_remaining->SetLabel(s);
 
     m_grid_sizer_info_team->Layout();
-    SetMinSize(GetBestSize());//m_grid_sizer_info_team->SetVirtualSizeHints(this);
+    SetMinSize(GetBestSize());
 }
 
 void CslDlgExtended::QueryInfo(wxInt32 pid)
@@ -620,6 +632,8 @@ void CslDlgExtended::ListInit(CslEngine *engine)
 
 void CslDlgExtended::DoShow(CslServerInfo *info)
 {
+    wxString s;
+
     if (!info || !m_engine)
     {
         wxASSERT(info && m_engine);
@@ -629,18 +643,25 @@ void CslDlgExtended::DoShow(CslServerInfo *info)
     if (m_info!=info)
     {
         list_ctrl_extended->DeleteAllItems();
-        label_records->SetLabel(wxString::Format(wxT("%d players (%d left)"),0,0));
+        label_records->SetLabel(wxString::Format(_("%d players (%d left)"),0,0));
     }
 
     m_info=info;
 
     SetTeamScore();
-    button_update->SetLabel(_("Update"));
+    button_update->SetLabel(_("&Update"));
     button_update->Enable(false);
     label_map->SetLabel(m_info->m_map);
-    label_remaining->SetLabel(FormatSeconds(m_info->m_timeRemain*60,true,true));
-    SetTitle(wxString::Format(_("CSL - Extended info: %s"),
-                              m_info->GetBestDescription().c_str()));
+
+    s=FormatSeconds(m_info->m_timeRemain>-1 ? m_info->m_timeRemain*60 : 0,true,true);
+    if (s.IsEmpty())
+        s=_("Time is up");
+    label_remaining->SetLabel(s);
+
+    s=_("CSL - Extended info"); s+=wxT(":");
+    s+=m_info->GetBestDescription();
+    SetTitle(s);
+
     QueryInfo();
 
     if (IsShown())

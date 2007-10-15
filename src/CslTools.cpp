@@ -113,21 +113,68 @@ wxString FormatSeconds(wxUint32 time,bool space=false,bool full=false)
     sc=rest%60;
 
     if (dy)
-        s+=s.Format(wxT("%dd "),dy);
+    {
+        s+=s.Format(wxT("%d"),dy);
+        if (space)
+            s+=wxT(" ");
+        if (full)
+        {
+            if (dy==1)
+                s+=_("day");
+            else
+                s+=_("days");
+        }
+        else
+            s+=_("d");
+        s+=wxT(" ");
+    }
     if (hr)
-        s+=s.Format(wxT("%dh "),hr);
+    {
+        s+=s.Format(wxT("%d"),hr);
+        if (space)
+            s+=wxT(" ");
+        if (full)
+        {
+            if (hr==1)
+                s+=_("hour");
+            else
+                s+=_("hours");
+        }
+        else
+            s+=_("h");
+        s+=wxT(" ");
+    }
     if (mn)
     {
         s+=s.Format(wxT("%d"),mn);
         if (space)
             s+=wxT(" ");
         if (full)
-            s+=_("minutes");
+        {
+            if (mn==1)
+                s+=_("minute");
+            else
+                s+=_("minutes");
+        }
         else
             s+=_("min");
+        s+=wxT(" ");
     }
     if (sc)
-        s+=s.Format(wxT("%dsec"),sc);
+    {
+        s+=s.Format(wxT("%d"),sc);
+        if (space)
+            s+=wxT(" ");
+        if (full)
+        {
+            if (sc==1)
+                s+=_("second");
+            else
+                s+=_("seconds");
+        }
+        else
+            s+=_("sec");
+    }
 
     return s;
 }

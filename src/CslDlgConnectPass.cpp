@@ -37,7 +37,7 @@ CslDlgConnectPass::CslDlgConnectPass(wxWindow* parent,CslConnectPassInfo *info,i
     sizer_ctrl_staticbox = new wxStaticBox(this, -1, wxEmptyString);
     text_ctrl_password = new wxTextCtrl(this, TEXT_PASSWORD, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
     checkbox_save = new wxCheckBox(this, wxID_ANY, _("&Save password"));
-    checkbox_admin = new wxCheckBox(this, wxID_ANY, _("&Admin connect"));
+    checkbox_admin = new wxCheckBox(this, wxID_ANY, _("Ad&min connect"));
     button_ok = new wxButton(this, wxID_OK, _("&Ok"));
     button_cancel = new wxButton(this, wxID_CANCEL, _("&Cancel"));
 
