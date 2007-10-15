@@ -543,11 +543,11 @@ void CslFrame::OnTimer(wxTimerEvent& event)
             m_timerCount++;
     }
 
-    if (m_statusCount>-1 && m_statusCount==m_timerCount)
+    /*if (m_statusCount>-1 && m_statusCount==m_timerCount)
     {
         CslStatusBar::SetText(1,wxT(""));
         m_statusCount=-1;
-    }
+    }*/
 
     if (CslConnectionState::IsWaiting())
     {

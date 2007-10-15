@@ -451,6 +451,8 @@ void CslDlgExtended::SetTeamScore()
             size=m_teamLabel.Item(i)->GetBestSize();
             if (i%2==0)
                 size.x+=40;
+			else
+				size.x+=6;
             m_teamLabel.Item(i)->SetMinSize(size);
         }
 
@@ -495,7 +497,7 @@ void CslDlgExtended::SetTeamScore()
 
     m_grid_sizer_info_team->Layout();
     size=GetBestSize();
-#ifdef __WXMAC__
+#ifndef __WXGTK__
     if (GetSize().x<size.x)
         SetSize(size.x,-1);
 #endif
