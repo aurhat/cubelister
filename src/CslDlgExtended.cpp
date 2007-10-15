@@ -173,7 +173,6 @@ void CslDlgExtended::do_layout()
     grid_sizer_update->Add(checkbox_update, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_update->Add(checkbox_update_end, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_update->Add(button_update, 0, wxALL|wxEXPAND, 4);
-    grid_sizer_update->AddGrowableRow(0);
     grid_sizer_info_team->Add(grid_sizer_update, 1, wxEXPAND, 0);
     grid_sizer_info_team->AddGrowableCol(1);
     grid_sizer_main->Add(grid_sizer_info_team, 1, wxEXPAND, 0);
