@@ -35,6 +35,8 @@
 		9ED9D4820CA1622F00B0FC71 /* CslStatusBar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED9D46E0CA1622F00B0FC71 /* CslStatusBar.cpp */; };
 		9ED9D4830CA1622F00B0FC71 /* CslTools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED9D4700CA1622F00B0FC71 /* CslTools.cpp */; };
 		9ED9D4840CA1622F00B0FC71 /* CslUDP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED9D4720CA1622F00B0FC71 /* CslUDP.cpp */; };
+		9EF4F1F40CC386910044881A /* CslDlgConnectPass.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EF4F1F10CC386910044881A /* CslDlgConnectPass.cpp */; };
+		9EF4F1F50CC386910044881A /* cube_tools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EF4F1F30CC386910044881A /* cube_tools.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -107,6 +109,9 @@
 		9ED9D4730CA1622F00B0FC71 /* CslUDP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslUDP.h; path = ../src/CslUDP.h; sourceTree = SOURCE_ROOT; };
 		9ED9D4740CA1622F00B0FC71 /* CslVersion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslVersion.h; path = ../src/CslVersion.h; sourceTree = SOURCE_ROOT; };
 		9ED9D4750CA1622F00B0FC71 /* cube_tools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cube_tools.h; path = ../src/cube_tools.h; sourceTree = SOURCE_ROOT; };
+		9EF4F1F10CC386910044881A /* CslDlgConnectPass.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslDlgConnectPass.cpp; path = ../src/CslDlgConnectPass.cpp; sourceTree = SOURCE_ROOT; };
+		9EF4F1F20CC386910044881A /* CslDlgConnectPass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslDlgConnectPass.h; path = ../src/CslDlgConnectPass.h; sourceTree = SOURCE_ROOT; };
+		9EF4F1F30CC386910044881A /* cube_tools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cube_tools.cpp; path = ../src/cube_tools.cpp; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -140,7 +145,6 @@
 		9ECC30FD0CA1A8F500578B5E /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				9E73FA0F0CA6EED200CA71BC /* CslMenu.cpp */,
 				9E3F160F0CA1693800C3C8C9 /* GeoIP.c */,
 				9E3F16100CA1693800C3C8C9 /* GeoIP.h */,
 				9ED9D4520CA1622F00B0FC71 /* CslArt.cpp */,
@@ -149,6 +153,8 @@
 				9ED9D4550CA1622F00B0FC71 /* CslDlgAddMaster.h */,
 				9ED9D4560CA1622F00B0FC71 /* CslDlgAddServer.cpp */,
 				9ED9D4570CA1622F00B0FC71 /* CslDlgAddServer.h */,
+				9EF4F1F10CC386910044881A /* CslDlgConnectPass.cpp */,
+				9EF4F1F20CC386910044881A /* CslDlgConnectPass.h */,
 				9ED9D4580CA1622F00B0FC71 /* CslDlgConnectWait.cpp */,
 				9ED9D4590CA1622F00B0FC71 /* CslDlgConnectWait.h */,
 				9ED9D45A0CA1622F00B0FC71 /* CslDlgExtended.cpp */,
@@ -169,6 +175,7 @@
 				9ED9D4690CA1622F00B0FC71 /* CslListCtrlInfo.h */,
 				9ED9D46A0CA1622F00B0FC71 /* CslListCtrlServer.cpp */,
 				9ED9D46B0CA1622F00B0FC71 /* CslListCtrlServer.h */,
+				9E73FA0F0CA6EED200CA71BC /* CslMenu.cpp */,
 				9ED9D46C0CA1622F00B0FC71 /* CslMenu.h */,
 				9ED9D46D0CA1622F00B0FC71 /* CslSettings.h */,
 				9ED9D46E0CA1622F00B0FC71 /* CslStatusBar.cpp */,
@@ -178,6 +185,7 @@
 				9ED9D4720CA1622F00B0FC71 /* CslUDP.cpp */,
 				9ED9D4730CA1622F00B0FC71 /* CslUDP.h */,
 				9ED9D4740CA1622F00B0FC71 /* CslVersion.h */,
+				9EF4F1F30CC386910044881A /* cube_tools.cpp */,
 				9ED9D4750CA1622F00B0FC71 /* cube_tools.h */,
 			);
 			name = Sources;
@@ -321,6 +329,8 @@
 				9ED9D4830CA1622F00B0FC71 /* CslTools.cpp in Sources */,
 				9ED9D4840CA1622F00B0FC71 /* CslUDP.cpp in Sources */,
 				9E73FA100CA6EED200CA71BC /* CslMenu.cpp in Sources */,
+				9EF4F1F40CC386910044881A /* CslDlgConnectPass.cpp in Sources */,
+				9EF4F1F50CC386910044881A /* cube_tools.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

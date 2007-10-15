@@ -128,6 +128,10 @@ void CslDlgExtended::set_properties()
     m_teamLabel.Add(label_team5);
     m_teamLabel.Add(label_team6);
 
+    // wxMAC: have to set minsize of the listctrl to prevent
+    //        hiding of the search panel while dragging splitter
+    list_ctrl_extended->SetMinSize(wxSize(0,60));
+    
 #ifdef __WXMSW__
     SetMinSize(wxSize(560,480));
 #else

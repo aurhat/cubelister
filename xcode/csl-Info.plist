@@ -5,9 +5,9 @@
     <key>CFBundleName</key>
     <string>CSL</string>
     <key>CFBundleShortVersionString</key>
-    <string>0.6.1.1"</string>
+    <string>0.7"</string>
     <key>CFBundleGetInfoString</key>
-    <string>Cube Server Lister 0.6.1.1"</string>
+    <string>Cube Server Lister 0.7"</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
