@@ -315,7 +315,7 @@ void CslDlgOutput::SetSearchTextColour(wxUint32 pos,wxUint32 posOld)
 
 void CslDlgOutput::SetSearchbarColour(wxInt32 count)
 {
-    if (count)
+    if (count>0 || text_ctrl_search->IsEmpty())
     {
 #ifdef __WXMAC__
         // very ugly - setting back to black doesnt work, so add 1
@@ -388,8 +388,10 @@ wxInt32 CslDlgOutput::Search(const wxString& needle)
                 break;
         }
     }
+    else
+        count=-1;
 
-    label_matches->SetLabel(wxString::Format(_("%d matches"),count));
+    label_matches->SetLabel(wxString::Format(_("%d matches"),count<0 ? 0:count));
 
     switch (m_searchResults.GetCount())
     {
