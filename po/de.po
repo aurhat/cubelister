@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: CSL\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-10-15 09:57+0200\n"
-"PO-Revision-Date: 2007-10-15 13:21+0100\n"
+"PO-Revision-Date: 2007-10-15 18:09+0100\n"
 "Last-Translator: Glen Masgai <mimosius@gmx.de>\n"
 "Language-Team: Glen Masgai <mimosius@gmx.de>\n"
 "MIME-Version: 1.0\n"
@@ -629,7 +629,7 @@ msgstr "%d Server vom Master erhalten"
 #: ../src/CslFrame.cpp:1207
 #, c-format
 msgid "Total play time for game %s: %s"
-msgstr "Gesamtspielzeit für das Spiel %s: %s"
+msgstr "Gesamtspielzeit für %s: %s"
 
 #: ../src/CslFrame.cpp:1213
 #, c-format
