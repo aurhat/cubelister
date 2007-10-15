@@ -145,7 +145,7 @@ void CslDlgExtended::do_layout()
     wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(4, 1, 0, 0);
     wxFlexGridSizer* grid_sizer_button = new wxFlexGridSizer(1, 1, 0, 0);
     wxFlexGridSizer* grid_sizer_info_team = new wxFlexGridSizer(1, 3, 0, 0);
-    wxFlexGridSizer* grid_sizer_update = new wxFlexGridSizer(4, 1, 0, 0);
+    wxFlexGridSizer* grid_sizer_update = new wxFlexGridSizer(3, 1, 0, 0);
     wxStaticBoxSizer* sizer_info = new wxStaticBoxSizer(sizer_info_staticbox, wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_info = new wxFlexGridSizer(3, 2, 0, 0);
     wxStaticBoxSizer* sizer_team_score = new wxStaticBoxSizer(sizer_team_score_staticbox, wxHORIZONTAL);
@@ -170,11 +170,11 @@ void CslDlgExtended::do_layout()
     grid_sizer_info->Add(label_records, 0, wxALL, 4);
     sizer_info->Add(grid_sizer_info, 1, wxEXPAND, 0);
     grid_sizer_info_team->Add(sizer_info, 1, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 4);
-    grid_sizer_update->Add(1, 1, 0, 0, 0);
     grid_sizer_update->Add(checkbox_update, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_update->Add(checkbox_update_end, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_update->Add(button_update, 0, wxALL|wxEXPAND, 4);
     grid_sizer_update->AddGrowableRow(0);
+    grid_sizer_update->AddGrowableRow(1);
     grid_sizer_info_team->Add(grid_sizer_update, 1, wxEXPAND, 0);
     grid_sizer_info_team->AddGrowableCol(1);
     grid_sizer_main->Add(grid_sizer_info_team, 1, wxEXPAND, 0);
