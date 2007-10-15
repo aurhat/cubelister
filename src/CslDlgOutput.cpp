@@ -143,6 +143,14 @@ void CslDlgOutput::do_layout()
     Layout();
     // end wxGlade
 
+// TODO workaround possible?
+#ifdef __WXMAC__
+    button_search_prev->Hide();
+    button_search_next->Hide();
+    sizer_search_button->Detach(button_search_prev);
+    sizer_search_button->Detach(button_search_next);
+#endif
+
     grid_sizer_main->SetSizeHints(this);
     CentreOnScreen();
 }
@@ -380,10 +388,8 @@ wxInt32 CslDlgOutput::Search(const wxString& needle)
                 break;
         }
     }
-    else
-        count=-1;
 
-    label_matches->SetLabel(wxString::Format(_("%d matches"),count<0 ? 0 : count));
+    label_matches->SetLabel(wxString::Format(_("%d matches"),count));
 
     switch (m_searchResults.GetCount())
     {

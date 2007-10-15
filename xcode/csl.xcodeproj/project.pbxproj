@@ -194,11 +194,11 @@
 		9ECC31360CA1A96D00578B5E /* External Frameworks and Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				9ECC2F800CA172A500578B5E /* AppKit.framework */,
 				9ECC32980CA1AA3400578B5E /* OpenGL.framework */,
 				9ECC32960CA1A9EC00578B5E /* AGL.framework */,
 				9ECC2F7B0CA1724E00578B5E /* Carbon.framework */,
 				9ECC2F7D0CA1726200578B5E /* System.framework */,
-				9ECC2F800CA172A500578B5E /* AppKit.framework */,
 				9ECC2F860CA172E500578B5E /* WebKit.framework */,
 				9ECC2F830CA172BC00578B5E /* IOKit.framework */,
 			);

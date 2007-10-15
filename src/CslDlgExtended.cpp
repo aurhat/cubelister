@@ -134,8 +134,12 @@ void CslDlgExtended::set_properties()
 
 #ifdef __WXMSW__
     SetMinSize(wxSize(560,480));
-#else
+#endif
+#ifdef __WXGTK__
     SetMinSize(wxSize(600,500));
+#endif
+#ifdef __WXMAC__
+    SetMinSize(wxSize(600,530));
 #endif
 }
 
@@ -189,7 +193,7 @@ void CslDlgExtended::do_layout()
     Layout();
     // end wxGlade
 
-    m_grid_sizer_info_team=grid_sizer_info_team;
+    m_grid_sizer_info_team=grid_sizer_main;
 
     grid_sizer_main->SetSizeHints(this);
     CentreOnScreen();
@@ -490,7 +494,12 @@ void CslDlgExtended::SetTeamScore()
     label_remaining->SetLabel(s);
 
     m_grid_sizer_info_team->Layout();
-    SetMinSize(GetBestSize());
+    size=GetBestSize();
+#ifdef __WXMAC__
+    if (GetSize().x<size.x)
+        SetSize(size.x,-1);
+#endif
+    SetMinSize(size);
 }
 
 void CslDlgExtended::QueryInfo(wxInt32 pid)

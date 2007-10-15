@@ -338,7 +338,7 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
 {
     wxInt32 c;
     wxMenu menu;
-    CslServerInfo *info;
+    CslServerInfo *info=NULL;
     wxPoint point=event.GetPosition();
 
     //from keyboard
