@@ -131,7 +131,7 @@ void CslDlgExtended::set_properties()
     // wxMAC: have to set minsize of the listctrl to prevent
     //        hiding of the search panel while dragging splitter
     list_ctrl_extended->SetMinSize(wxSize(0,60));
-    
+
 #ifdef __WXMSW__
     SetMinSize(wxSize(560,480));
 #else
@@ -180,7 +180,7 @@ void CslDlgExtended::do_layout()
     wxStaticLine* static_line = new wxStaticLine(this, wxID_ANY);
     grid_sizer_main->Add(static_line, 0, wxLEFT|wxRIGHT|wxTOP|wxEXPAND, 4);
     grid_sizer_button->Add(button_close, 0, wxALL, 4);
-    grid_sizer_main->Add(grid_sizer_button, 1, wxALIGN_RIGHT, 0);
+    grid_sizer_main->Add(grid_sizer_button, 1, wxBOTTOM|wxALIGN_RIGHT, 4);
     SetSizer(grid_sizer_main);
     grid_sizer_main->Fit(this);
     grid_sizer_main->AddGrowableRow(0);
