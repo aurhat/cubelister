@@ -361,12 +361,15 @@
 				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "GEOIPDATADIR=\"\\\"data\\\"\"";
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_USE_GCC3_PFE_SUPPORT = NO;
+				GCC_VERSION_i386 = 4.0;
+				GCC_VERSION_ppc = 3.3;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GENERATE_PKGINFO_FILE = YES;
 				HEADER_SEARCH_PATHS = ../src/img/flags;
 				INSTALL_PATH = "$(HOME)/Applications";
 				MACH_O_TYPE = mh_execute;
-				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				MACOSX_DEPLOYMENT_TARGET_i386 = 10.4;
+				MACOSX_DEPLOYMENT_TARGET_ppc = 10.3;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-liconv",
@@ -382,36 +385,26 @@
 		9ED9D43F0CA161B500B0FC71 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = i386;
-				COPY_PHASE_STRIP = YES;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "../../wxMac-2.8.4/include/wx/wxprec.h";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					NO_GCC_PRAGMA,
-					__WXMAC__,
-					"wxUSE_BASE=1",
-					"_FILE_OFFSET_BITS=64",
-					_LARGE_FILES,
-					"__WXMAC_XCODE__=1",
-					"WX_PRECOMP=1",
-					MACOS_CLASSIC,
-					"__WXDEBUG__=1",
+				ARCHS = (
+					ppc,
+					i386,
 				);
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_OPTIMIZATION_LEVEL = s;
 				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "GEOIPDATADIR=\"\\\"data\\\"\"";
-				GCC_USE_GCC3_PFE_SUPPORT = NO;
-				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
-				GENERATE_PKGINFO_FILE = YES;
+				GCC_VERSION_i386 = 4.0;
+				GCC_VERSION_ppc = 3.3;
 				HEADER_SEARCH_PATHS = ../src/img/flags;
-				INSTALL_PATH = "$(HOME)/Applications";
-				MACH_O_TYPE = mh_execute;
-				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				INFOPLIST_FILE = Info.plist;
+				MACOSX_DEPLOYMENT_TARGET_i386 = 10.4;
+				MACOSX_DEPLOYMENT_TARGET_ppc = 10.3;
 				OTHER_LDFLAGS = (
 					"-liconv",
 					"-lz",
 				);
 				PRODUCT_NAME = csl;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
-				WRAPPER_EXTENSION = app;
 			};
 			name = Deployment;
 		};
