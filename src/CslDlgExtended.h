@@ -107,7 +107,7 @@ class CslPanelMap : public wxPanel
         t_aBaseInfo m_bases;
 
         void OnPaint(wxPaintEvent& event);
-		void OnErase(wxEraseEvent& event) {}
+        void OnErase(wxEraseEvent& event) {}
 
         DECLARE_EVENT_TABLE();
 
@@ -200,6 +200,7 @@ class CslDlgExtended: public wxDialog
         // end wxGlade
 
         void UpdateMap();
+        void ClearTeamScoreLabel(const wxUint32 start,const wxUint32 end);
         void SetTeamScore();
         void QueryInfo(wxInt32 pid=-1);
         void RecalcMinWidth(const bool forcemin=false);

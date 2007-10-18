@@ -363,6 +363,7 @@ class CslServerInfo
             m_players=-1;
             m_playersMax=-1;
             m_mm=-1;
+            m_hasBases=false;
             m_view=view;
             m_addr.Hostname(host);
             m_addr.Service(GetDefaultPort(type));
@@ -493,6 +494,7 @@ class CslServerInfo
         wxInt32 m_ping,m_timeRemain;
         wxInt32 m_players,m_playersMax;
         wxInt32 m_mm;
+        bool m_hasBases;
         wxUint32 m_view;
         wxIPV4address m_addr;
         wxUint32 m_lastSeen,m_pingSend,m_pingResp;

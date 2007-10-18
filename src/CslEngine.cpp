@@ -586,7 +586,10 @@ void CslEngine::UpdateServerInfo(CslServerInfo *info,ucharbuf *buf,wxUint32 now)
             if (numattr>=1)
                 info->m_protocol=attr[0];
             if (numattr>=2)
+            {
                 info->m_gameMode=GetModeStrSB(attr[1]);
+                info->m_hasBases=attr[1]>11 && attr[1]<14;
+            }
             if (numattr>=3)
             {
                 info->m_timeRemain=attr[2];

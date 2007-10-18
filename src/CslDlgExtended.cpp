@@ -33,7 +33,7 @@
 
 BEGIN_EVENT_TABLE(CslPanelMap, wxPanel)
     EVT_PAINT(CslPanelMap::OnPaint)
-	EVT_ERASE_BACKGROUND(CslPanelMap::OnErase)
+    EVT_ERASE_BACKGROUND(CslPanelMap::OnErase)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(CslDlgExtended, wxDialog)
@@ -210,8 +210,8 @@ CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
                                const wxPoint& pos, const wxSize& size, long style):
         wxDialog(parent, id, title, pos, size, style)
 {
-	m_engine=NULL;
-	m_info=NULL;
+    m_engine=NULL;
+    m_info=NULL;
     m_gridSizerMain=m_gridSizerList=m_gridSizerInfo=NULL;
     m_sizerMap=m_sizerMapLabel=NULL;
 
@@ -426,7 +426,7 @@ void CslDlgExtended::OnSize(wxSizeEvent& event)
 {
     //ListAdjustSize(event.GetSize());
     ListAdjustSize(list_ctrl_extended->GetClientSize());
-	if (m_sizerMapLabel)
+    if (m_sizerMapLabel)
         m_sizerMapLabel->SetMinSize(m_sizerMap->GetSize().x,-1);
 
     event.Skip();
@@ -628,14 +628,32 @@ void CslDlgExtended::OnPong(wxCommandEvent& event)
 
 void CslDlgExtended::UpdateMap()
 {
+    if (m_info->m_map.IsEmpty())
+    {
+        panel_map->SetOk(false);
+        ShowPanelMap(false,false);
+
+        label_map->SetLabel(_("no map"));
+        label_author->SetLabel(wxEmptyString);
+        label_author_prefix->SetLabel(wxEmptyString);
+
+        return;
+    }
+
     if (m_mapInfo.m_mapName!=m_info->m_map)
     {
-        if (!m_info->m_map.IsEmpty() &&
-            m_mapInfo.LoadMapData(m_info->m_map,CslGame::GetGameName(m_info->m_type),m_info->m_protocol))
+        if (m_mapInfo.LoadMapData(m_info->m_map,CslGame::GetGameName(m_info->m_type),m_info->m_protocol))
         {
-            if (!m_mapInfo.m_mapNameFull.IsEmpty())
+            if (m_mapInfo.m_mapNameFull.IsEmpty())
+                label_map->SetLabel(m_mapInfo.m_mapName);
+            else
                 label_map->SetLabel(m_mapInfo.m_mapNameFull);
-            if (!m_mapInfo.m_author.IsEmpty())
+            if (m_mapInfo.m_author.IsEmpty())
+            {
+                label_author->SetLabel(wxEmptyString);
+                label_author_prefix->SetLabel(wxEmptyString);
+            }
+            else
             {
                 label_author_prefix->SetLabel(_("by"));
                 label_author->SetLabel(m_mapInfo.m_author);
@@ -648,12 +666,21 @@ void CslDlgExtended::UpdateMap()
         {
             panel_map->SetOk(false);
             ShowPanelMap(false,false);
+
+            label_map->SetLabel(m_mapInfo.m_mapName);
         }
     }
-    else if (m_mapInfo.m_mapName.IsEmpty())
+}
+
+void CslDlgExtended::ClearTeamScoreLabel(const wxUint32 start,const wxUint32 end)
+{
+    wxUint32 i=start;
+    wxUint32 j=end;
+
+    for (;i<j;i++)
     {
-        panel_map->SetOk(false);
-        ShowPanelMap(false,false);
+        m_teamLabel.Item(i)->SetLabel(wxT(""));
+        m_teamLabel.Item(i)->SetFont(m_labelFont);
     }
 }
 
@@ -663,26 +690,15 @@ void CslDlgExtended::SetTeamScore()
     CslTeamStatsData *data;
     wxSize size;
     wxString s;
-    bool hasBases=false;
     wxInt32 h=-1;
     wxInt32 hs=0;
-    wxInt32 c=m_teamLabel.GetCount();
+    wxInt32 lc=m_teamLabel.GetCount();
 
     wxASSERT(m_info && m_info->m_teamStats);
     if (!m_info || !m_info->m_teamStats)
         return;
 
     stats=m_info->m_teamStats;
-
-    for (wxInt32 ic=0;ic<c;ic++)
-    {
-        m_teamLabel.Item(ic)->SetLabel(wxT(""));
-        m_teamLabel.Item(ic)->SetFont(m_labelFont);
-    }
-
-    label_map->SetLabel(m_info->m_map.IsEmpty() ? wxString(_("no map")) : m_info->m_map);
-    label_author->SetLabel(wxEmptyString);
-    label_author_prefix->SetLabel(wxEmptyString);
 
     UpdateMap();
     m_mapInfo.ResetBasesColour();
@@ -694,7 +710,7 @@ void CslDlgExtended::SetTeamScore()
             data=stats->m_stats[i];
 
             // TODO i==c, dynamically add labels
-            if (!data->m_ok || i==c)
+            if (!data->m_ok || i==lc)
                 break;
 
             if (data->m_score>hs)
@@ -703,9 +719,9 @@ void CslDlgExtended::SetTeamScore()
                 h=i;
             }
 
-            if (m_mapInfo.m_basesOk && data->IsCapture())
+            // colour bases
+            if (m_mapInfo.m_basesOk && m_info->m_hasBases)
             {
-                hasBases=true;
                 wxInt32 baseId;
                 wxInt32 baseCount=m_mapInfo.m_bases.GetCount();
                 loopvj(data->m_bases)
@@ -733,7 +749,7 @@ void CslDlgExtended::SetTeamScore()
         }
 
         // TODO h<c, dynamically add labels
-        if (h>-1 && h<c)
+        if (h>-1 && h<lc)
         {
             data=stats->m_stats[h];
 
@@ -764,7 +780,8 @@ void CslDlgExtended::SetTeamScore()
         label_team1->SetMinSize(label_team1->GetBestSize());
     }
 
-    panel_map->UpdateBases(m_mapInfo.m_bases,hasBases);
+    panel_map->UpdateBases(m_mapInfo.m_bases,m_info->m_hasBases);
+    ClearTeamScoreLabel(stats->m_teamplay ? stats->m_stats.length() : 1,lc);
 
     s=FormatSeconds(stats->m_remain>-1 ? stats->m_remain*60 : 0,true,true);
     if (s.IsEmpty())
