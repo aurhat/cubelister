@@ -68,6 +68,13 @@ enum { BUTTON_REFRESH = wxID_HIGHEST +1, CHECK_UPDATE, CHECK_MAP };
 
 #define CSL_EXT_REFRESH_INTERVAL  g_cslSettings->m_updateInterval/1000
 
+static const wxColour team_colours[] =
+{
+    wxColour(0,0,255),wxColour(255,0,0),wxColour(64,160,64),wxColour(192,128,0),
+    wxColour(190,60,75),wxColour(60,190,75),wxColour(225,225,60),wxColour(120,50,140)
+};
+
+
 
 bool CslMapInfo::LoadMapData(const wxString& mapName,const wxString& gameName,
                              const wxUint32 protVersion)
@@ -218,6 +225,9 @@ CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
     label_team4 = new wxStaticText(this, wxID_ANY, wxEmptyString);
     label_team5 = new wxStaticText(this, wxID_ANY, wxEmptyString);
     label_team6 = new wxStaticText(this, wxID_ANY, wxEmptyString);
+    label_team7 = new wxStaticText(this, wxID_ANY, wxEmptyString);
+    label_team8 = new wxStaticText(this, wxID_ANY, wxEmptyString);
+    label_server = new wxStaticText(this, wxID_ANY, wxEmptyString);
     label_mode = new wxStaticText(this, wxID_ANY, wxEmptyString);
     label_remaining = new wxStaticText(this, wxID_ANY, wxEmptyString);
     label_records = new wxStaticText(this, wxID_ANY, wxEmptyString);
@@ -270,7 +280,6 @@ void CslDlgExtended::set_properties()
     SetTitle(_("CSL - Extended info"));
     label_team1->SetMinSize(wxSize(60, -1));
     label_team2->SetMinSize(wxSize(60, -1));
-    label_mode->SetMinSize(wxSize(100, -1));
     checkbox_update_end->Enable(false);
     label_map->SetFont(wxFont(20, wxDECORATIVE, wxNORMAL, wxBOLD, 0, wxT("")));
     label_author->SetFont(wxFont(11, wxDECORATIVE, wxITALIC, wxBOLD, 0, wxT("")));
@@ -283,6 +292,8 @@ void CslDlgExtended::set_properties()
     m_teamLabel.Add(label_team4);
     m_teamLabel.Add(label_team5);
     m_teamLabel.Add(label_team6);
+    m_teamLabel.Add(label_team7);
+    m_teamLabel.Add(label_team8);
 
     // wxMAC: have to set minsize of the listctrl to prevent
     //        hiding of the search panel while dragging splitter
@@ -309,13 +320,12 @@ void CslDlgExtended::do_layout()
     wxStaticBoxSizer* sizer_map_label = new wxStaticBoxSizer(sizer_map_label_staticbox, wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_map_label = new wxFlexGridSizer(4, 1, 0, 0);
     wxFlexGridSizer* grid_sizer_author = new wxFlexGridSizer(1, 2, 0, 0);
-    wxFlexGridSizer* grid_sizer_update = new wxFlexGridSizer(1, 1, 0, 0);
     wxStaticBoxSizer* sizer_check = new wxStaticBoxSizer(sizer_check_staticbox, wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_check = new wxFlexGridSizer(3, 1, 0, 0);
     wxStaticBoxSizer* sizer_info = new wxStaticBoxSizer(sizer_info_staticbox, wxHORIZONTAL);
-    wxFlexGridSizer* grid_sizer_info = new wxFlexGridSizer(3, 2, 0, 0);
+    wxFlexGridSizer* grid_sizer_info = new wxFlexGridSizer(4, 2, 0, 0);
     wxStaticBoxSizer* sizer_team_score = new wxStaticBoxSizer(sizer_team_score_staticbox, wxHORIZONTAL);
-    wxFlexGridSizer* grid_sizer_team_score = new wxFlexGridSizer(3, 2, 0, 0);
+    wxFlexGridSizer* grid_sizer_team_score = new wxFlexGridSizer(4, 2, 0, 0);
     wxFlexGridSizer* grid_sizer_list_map = new wxFlexGridSizer(1, 2, 0, 0);
     wxStaticBoxSizer* sizer_map = new wxStaticBoxSizer(sizer_map_staticbox, wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_map = new wxFlexGridSizer(3, 1, 0, 0);
@@ -337,8 +347,13 @@ void CslDlgExtended::do_layout()
     grid_sizer_team_score->Add(label_team4, 0, wxALL, 4);
     grid_sizer_team_score->Add(label_team5, 0, wxALL, 4);
     grid_sizer_team_score->Add(label_team6, 0, wxALL, 4);
+    grid_sizer_team_score->Add(label_team7, 0, wxALL, 4);
+    grid_sizer_team_score->Add(label_team8, 0, wxALL, 4);
     sizer_team_score->Add(grid_sizer_team_score, 1, wxEXPAND, 0);
     grid_sizer_info_team->Add(sizer_team_score, 1, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 4);
+    wxStaticText* label_server_static = new wxStaticText(this, wxID_ANY, _("Server:"));
+    grid_sizer_info->Add(label_server_static, 0, wxALL, 4);
+    grid_sizer_info->Add(label_server, 0, wxALL, 4);
     wxStaticText* label_mode_static = new wxStaticText(this, wxID_ANY, _("Mode:"));
     grid_sizer_info->Add(label_mode_static, 0, wxALL, 4);
     grid_sizer_info->Add(label_mode, 0, wxALL, 4);
@@ -350,14 +365,14 @@ void CslDlgExtended::do_layout()
     grid_sizer_info->Add(label_records, 0, wxALL, 4);
     sizer_info->Add(grid_sizer_info, 1, wxEXPAND, 0);
     grid_sizer_info_team->Add(sizer_info, 1, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 4);
-    grid_sizer_check->Add(checkbox_update, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_check->Add(checkbox_update, 0, wxALL|wxALIGN_BOTTOM, 4);
     grid_sizer_check->Add(checkbox_update_end, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_check->Add(checkbox_map, 0, wxALL, 4);
+    grid_sizer_check->AddGrowableRow(0);
+    grid_sizer_check->AddGrowableRow(1);
+    grid_sizer_check->AddGrowableRow(2);
     sizer_check->Add(grid_sizer_check, 1, wxEXPAND, 0);
-    grid_sizer_update->Add(sizer_check, 1, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 4);
-    grid_sizer_update->AddGrowableRow(0);
-    grid_sizer_update->AddGrowableRow(1);
-    grid_sizer_info_team->Add(grid_sizer_update, 1, wxEXPAND, 0);
+    grid_sizer_info_team->Add(sizer_check, 1, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 4);
     grid_sizer_map_label->Add(1, 1, 0, 0, 0);
     grid_sizer_map_label->Add(label_map, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
     grid_sizer_author->Add(label_author_prefix, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
@@ -605,11 +620,6 @@ void CslDlgExtended::OnPong(wxCommandEvent& event)
 
     delete pp;
 }
-
-static const wxColour team_colours[] =
-{
-    *wxBLUE,*wxRED,wxColour(64,160,64),wxColour(192,128,0),wxColour(0,0,0),wxColour(255,255,255)
-};
 
 void CslDlgExtended::UpdateMap()
 {
@@ -968,6 +978,7 @@ void CslDlgExtended::DoShow(CslServerInfo *info)
     SetTeamScore();
     button_update->SetLabel(_("&Update"));
     button_update->Enable(false);
+    label_server->SetLabel(m_info->GetBestDescription());
     label_mode->SetLabel(m_info->m_gameMode);
 
     s=FormatSeconds(m_info->m_timeRemain>-1 ? m_info->m_timeRemain*60 : 0,true,true);

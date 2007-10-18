@@ -183,6 +183,9 @@ class CslDlgExtended: public wxDialog
         wxStaticText* label_team4;
         wxStaticText* label_team5;
         wxStaticText* label_team6;
+        wxStaticText* label_team7;
+        wxStaticText* label_team8;
+        wxStaticText* label_server;
         wxStaticText* label_mode;
         wxStaticText* label_remaining;
         wxStaticText* label_records;
