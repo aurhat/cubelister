@@ -33,7 +33,7 @@
 
 BEGIN_EVENT_TABLE(CslPanelMap, wxPanel)
     EVT_PAINT(CslPanelMap::OnPaint)
-    EVT_SIZE(CslPanelMap::OnSize)
+	EVT_ERASE_BACKGROUND(CslPanelMap::OnErase)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(CslDlgExtended, wxDialog)
@@ -197,7 +197,7 @@ void CslPanelMap::UpdateBases(const t_aBaseInfo& bases,const bool hasBases)
     if (!IsShown())
         return;
 
-    Refresh();
+    Refresh(false);
     /*for (i=0;i<bases.GetCount();i++)
     {
         wxPoint point=bases.Item(i)->m_point;
@@ -208,9 +208,13 @@ void CslPanelMap::UpdateBases(const t_aBaseInfo& bases,const bool hasBases)
 
 CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
                                const wxPoint& pos, const wxSize& size, long style):
-        wxDialog(parent, id, title, pos, size, style),
-        m_engine(NULL),m_info(NULL)
+        wxDialog(parent, id, title, pos, size, style)
 {
+	m_engine=NULL;
+	m_info=NULL;
+    m_gridSizerMain=m_gridSizerList=m_gridSizerInfo=NULL;
+    m_sizerMap=m_sizerMapLabel=NULL;
+
     // begin wxGlade: CslDlgExtended::CslDlgExtended
     sizer_team_score_staticbox = new wxStaticBox(this, -1, _("Team score"));
     sizer_info_staticbox = new wxStaticBox(this, -1, _("Game info"));
@@ -422,7 +426,8 @@ void CslDlgExtended::OnSize(wxSizeEvent& event)
 {
     //ListAdjustSize(event.GetSize());
     ListAdjustSize(list_ctrl_extended->GetClientSize());
-    m_sizerMapLabel->SetMinSize(m_sizerMap->GetSize().x,-1);
+	if (m_sizerMapLabel)
+        m_sizerMapLabel->SetMinSize(m_sizerMap->GetSize().x,-1);
 
     event.Skip();
 }

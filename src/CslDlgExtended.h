@@ -93,7 +93,7 @@ class CslPanelMap : public wxPanel
             SetMinSize(wxSize(bitmap.GetWidth(),bitmap.GetHeight()));
 
             if (refresh)
-                Refresh();
+                Refresh(false);
         }
 
         void SetOk(const bool ok=true) { m_ok=ok; }
@@ -107,7 +107,7 @@ class CslPanelMap : public wxPanel
         t_aBaseInfo m_bases;
 
         void OnPaint(wxPaintEvent& event);
-        void OnSize(wxSizeEvent& event) { Refresh(); event.Skip(); }
+		void OnErase(wxEraseEvent& event) {}
 
         DECLARE_EVENT_TABLE();
 
