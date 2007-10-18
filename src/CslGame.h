@@ -270,8 +270,17 @@ class CslTeamStatsData
     public:
         CslTeamStatsData() : m_score(-1),m_ok(false) {}
 
+        void Reset()
+        {
+            m_ok=false;
+            m_bases.setsize(0);
+        }
+
+        bool IsCapture() { return m_bases.length()>0; }
+
         wxString m_team;
         wxInt32 m_score;
+        vector<wxInt32> m_bases;
         bool m_ok;
 };
 
@@ -319,7 +328,7 @@ class CslTeamStats
         {
             wxCriticalSectionLocker enter(*m_critical);
 
-            loopv(m_stats) m_stats[i]->m_ok=false;
+            loopv(m_stats) m_stats[i]->Reset();
         }
 
         bool m_teamplay;
@@ -610,6 +619,7 @@ class CslGame
         vector<CslServerInfo*>* GetServers() { return &m_servers; }
         CslServerInfo* FindServerByAddr(const wxIPV4address& addr);
 
+        static wxString GetGameName(const CSL_GAMETYPE type);
         static wxInt32 ConnectCleanupConfig(const CSL_GAMETYPE type,const wxString& cfg);
         static wxInt32 ConnectWriteConfig(const CSL_GAMETYPE& type,const wxString& cfg,const wxString& str);
         static wxInt32 ConnectPrepareConfig(wxString& out,const CslServerInfo *info,const wxString& path,

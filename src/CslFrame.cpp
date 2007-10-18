@@ -541,6 +541,8 @@ void CslFrame::OnTimer(wxTimerEvent& event)
         }
         else
             m_timerCount++;
+
+        wxPostEvent(m_extendedDlg,event);
     }
 
     /*if (m_statusCount>-1 && m_statusCount==m_timerCount)
@@ -571,8 +573,6 @@ void CslFrame::OnTimer(wxTimerEvent& event)
         else
             m_lightCount++;
     }
-
-    wxPostEvent(m_extendedDlg,event);
 }
 
 void CslFrame::OnTreeLeftClick(wxTreeEvent& event)
@@ -1619,10 +1619,7 @@ void CslFrame::SaveServers()
             config->SetPath(s+s.Format(wxT("/Server/%d"),sc++));
             config->Write(wxT("Address"),info->m_host);
             config->Write(wxT("Password"),info->m_password);
-
-            wxUint32 len=info->m_descOld.Len();
-            wxString strip=A2U(StripColours(U2A(info->m_descOld),&len,2));
-            config->Write(wxT("Description"),strip);
+            config->Write(wxT("Description"),info->m_descOld);
 
             loopvj(info->m_masterIDs)
             {
@@ -1679,7 +1676,7 @@ bool CslApp::OnInit()
         return false;
     }
 
-    //wxInitAllImageHandlers();
+    wxInitAllImageHandlers();
     CslFrame* frame_csl=new CslFrame(NULL,wxID_ANY,wxEmptyString);
     frame_csl->Show();
     SetTopWindow(frame_csl);

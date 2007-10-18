@@ -118,24 +118,7 @@ const wxChar* GetGameStr(int n)
 
 CslGame::CslGame(CSL_GAMETYPE type) : m_type(type), m_masterID(0)
 {
-    switch (m_type)
-    {
-        case CSL_GAME_SB:
-            m_name=CSL_DEFAULT_NAME_SB;
-            break;
-        case CSL_GAME_AC:
-            m_name=CSL_DEFAULT_NAME_AC;
-            break;
-        case CSL_GAME_BF:
-            m_name=CSL_DEFAULT_NAME_BF;
-            break;
-        case CSL_GAME_CB:
-            m_name=CSL_DEFAULT_NAME_CB;
-            break;
-        default:
-            wxASSERT_MSG(!m_type,wxT("unknown game"));
-            break;
-    }
+    m_name=GetGameName(type);
 }
 
 CslGame::~CslGame()
@@ -305,6 +288,26 @@ CslServerInfo* CslGame::FindServerByAddr(const wxIPV4address& addr)
     }
 
     return NULL;
+}
+
+wxString CslGame::GetGameName(const CSL_GAMETYPE type)
+{
+    switch (type)
+    {
+        case CSL_GAME_SB:
+            return CSL_DEFAULT_NAME_SB;
+        case CSL_GAME_AC:
+            return CSL_DEFAULT_NAME_AC;
+        case CSL_GAME_BF:
+            return CSL_DEFAULT_NAME_BF;
+        case CSL_GAME_CB:
+            return CSL_DEFAULT_NAME_CB;
+        default:
+            break;
+    }
+
+    wxASSERT_MSG(!type,wxT("unknown game"));
+    return wxEmptyString;
 }
 
 wxInt32 CslGame::ConnectCleanupConfig(const CSL_GAMETYPE type,const wxString& cfg)

@@ -564,7 +564,10 @@ void CslEngine::FuzzPingSends()
 
 void CslEngine::UpdateServerInfo(CslServerInfo *info,ucharbuf *buf,wxUint32 now)
 {
+    wxUint32 l;
+    wxUint32 ml=127;
     char text[128];
+    text[ml]=0;
 
     info->m_pingResp=GetTicks();
     info->m_ping=info->m_pingResp-info->m_pingSend;
@@ -595,9 +598,11 @@ void CslEngine::UpdateServerInfo(CslServerInfo *info,ucharbuf *buf,wxUint32 now)
             if (numattr>=5)
                 info->m_mm=attr[4];
 
-            getstring(text,*buf,sizeof(text));
+            getstring(text,*buf,ml);
             info->m_map=A2U(text);
-            getstring(text,*buf,sizeof(text));
+            getstring(text,*buf,ml);
+            l=strlen(text);
+            StripColours(text,&l,2);
             info->SetDescription(A2U(text));
             break;
         }
@@ -622,9 +627,11 @@ void CslEngine::UpdateServerInfo(CslServerInfo *info,ucharbuf *buf,wxUint32 now)
                              GetModeStrSB(getint(*buf));
             info->m_players=getint(*buf);
             info->m_timeRemain=getint(*buf);
-            getstring(text,*buf,sizeof(text));
+            getstring(text,*buf,ml);
             info->m_map=A2U(text);
-            getstring(text,*buf,sizeof(text));
+            getstring(text,*buf,ml);
+            l=strlen(text);
+            StripColours(text,&l,2);
             info->SetDescription(A2U(text));
             if (info->m_type==CSL_GAME_AC)
                 info->m_playersMax=getint(*buf);
@@ -639,8 +646,11 @@ void CslEngine::UpdateServerInfo(CslServerInfo *info,ucharbuf *buf,wxUint32 now)
 void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 now)
 {
     wxInt32 vi;
+    wxUint32 exVersion;
     wxUint32 vu=0;
+    wxUint32 ml=127;
     char text[128];
+    text[ml]=0;
     bool extended=false;
     ucharbuf p((uchar*)packet->Data(),packet->Size());
 
@@ -661,7 +671,7 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
             {
                 if (extended)
                 {
-                    getstring(text,p,sizeof(text));
+                    getstring(text,p,ml);
 
                     if (strcmp(text,CSL_EX_CMD_UPTIME)==0)
                     {
@@ -677,8 +687,9 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
                             break;
                         }
 
-                        vi=getint(p);
-                        if (vi!=101)  // check protocol
+                        exVersion=getint(p);
+                        // check protocol
+                        if (exVersion<CSL_EX_VERSION_MIN || exVersion>CSL_EX_VERSION_MAX)
                         {
                             LOG_DEBUG("%s (%s) ERROR: prot=%d\n",dbg_type,
                                       U2A(info->GetBestDescription()),vi);
@@ -721,8 +732,9 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
                             return;
                         }
 
-                        vi=getint(p);
-                        if (vi!=101)  // check protocol
+                        exVersion=getint(p);
+                        // check protocol
+                        if (exVersion<CSL_EX_VERSION_MIN || exVersion>CSL_EX_VERSION_MAX)
                         {
                             LOG_DEBUG("%s (%s) ERROR: prot=%d\n",dbg_type,
                                       U2A(info->GetBestDescription()),vi);
@@ -774,9 +786,9 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
                         CslPlayerStatsData *data=stats->GetNewStatsPtr();
 
                         data->m_id=getint(p);
-                        getstring(text,p,sizeof(text));
+                        getstring(text,p,ml);
                         data->m_player=A2U(text);
-                        getstring(text,p,sizeof(text));
+                        getstring(text,p,ml);
                         data->m_team=A2U(text);
                         data->m_frags=getint(p);
                         data->m_deaths=getint(p);
@@ -828,8 +840,9 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
                             return;
                         }
 
-                        vi=getint(p);
-                        if (vi!=101)  // check protocol
+                        exVersion=getint(p);
+                        // check protocol
+                        if (exVersion<CSL_EX_VERSION_MIN || exVersion>CSL_EX_VERSION_MAX)
                         {
                             LOG_DEBUG("%s (%s) ERROR: prot=%d\n",dbg_type,
                                       U2A(info->GetBestDescription()),vi);
@@ -853,17 +866,28 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
 
                         while (!p.overread())
                         {
-                            getstring(text,p,sizeof(text));
-                            vi=getint(p);
-                            if (p.overread())
-                                break;
                             CslTeamStatsData *data=stats->GetNewStatsPtr();
+
+                            getstring(text,p,ml);
                             data->m_team=A2U(text);
-                            data->m_score=vi;
+                            data->m_score=getint(p);
+                            if (exVersion>=102)
+                            {
+                                vi=getint(p);
+                                while (vi--)
+                                    data->m_bases.add(getint(p));
+                            }
+
                             stats->AddStats(data);
-                            LOG_DEBUG("%s (%s): team:%s, score:%d\n",
+
+                            if (p.overread())
+                            {
+                                data->Reset();
+                                break;
+                            }
+                            LOG_DEBUG("%s (%s): team:%s, score:%d, bases:%d, remain:%d\n",
                                       dbg_type,U2A(info->GetBestDescription()),
-                                      U2A(data->m_team),data->m_score);
+                                      U2A(data->m_team),data->m_score,data->m_bases.length(),stats->m_remain);
                         }
 
                         wxCommandEvent evt(wxCSL_EVT_PONG);

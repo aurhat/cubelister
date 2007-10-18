@@ -460,7 +460,6 @@ void CslListCtrlServer::ListRemoveServers()
 void CslListCtrlServer::ListDeleteServers()
 {
     wxInt32 c,i;
-    wxUint32 l;
     wxString msg,s;
     CslServerInfo *info;
     wxInt32 skipFav=wxCANCEL,skipStats=wxCANCEL;
@@ -502,20 +501,16 @@ void CslListCtrlServer::ListDeleteServers()
 
         if (ls->IsLocked())
         {
-            s=info->GetBestDescription();
-            l=s.Len();
             msg=wxString::Format(_("Server \"%s\" is currently locked,\nso deletion is not possible!"),
-                                 A2U(StripColours(U2A(s),&l,2)).c_str());
+                                 info->GetBestDescription().c_str());
             wxMessageBox(msg,_("Error"),wxICON_ERROR,this);
             continue;
         }
 
         if (m_extendedDlg->IsShown() && m_extendedDlg->GetInfo()==info)
         {
-            s=info->GetBestDescription();
-            l=s.Len();
             msg=wxString::Format(_("Player statistics are shown for Server \"%s\",\nso deletion is not possible!"),
-                                 A2U(StripColours(U2A(s),&l,2)).c_str());
+                                 info->GetBestDescription().c_str());
             wxMessageBox(msg,_("Error"),wxICON_ERROR,this);
             continue;
         }
@@ -734,19 +729,11 @@ void CslListCtrlServer::OnTimer(wxTimerEvent& event)
         else if (m_timerCount%2==0)
         {
             if (CslConnectionState::CountDown())
-            {
-                wxString s=info->GetBestDescription();
-                if (info->m_type==CSL_GAME_AC)
-                {
-                    wxUint32 l=s.Len();
-                    s=A2U(StripColours(U2A(s),&l,2));
-                }
-
                 CslStatusBar::SetText(1,
                                       wxString::Format(_("Waiting %d seconds for a free slot on \"%s\" " \
                                                          "(press ESC to abort or join another server)"),
-                                                       CslConnectionState::GetWaitTime(),s.c_str()));
-            }
+                                                       CslConnectionState::GetWaitTime(),
+                                                       info->GetBestDescription().c_str()));
             else
                 CslStatusBar::SetText(1,wxT(""));
         }
@@ -1000,15 +987,7 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
     if (pingOk || info->m_pingResp)
     {
         if (infoCmp->m_desc != info->m_desc)
-        {
-            s=info->m_desc;
-            if (info->m_type==CSL_GAME_AC)
-            {
-                wxUint32 l=s.Len();
-                s=A2U(StripColours(U2A(s),&l,2));
-            }
-            SetItem(i,1,s);
-        }
+            SetItem(i,1,info->m_desc);
 
         if (infoCmp->m_protocol != info->m_protocol)
             SetItem(i,2,info->GetVersionStr());
@@ -1061,15 +1040,7 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
     else
     {
         if (info->m_desc.IsEmpty() && !info->m_descOld.IsEmpty())
-        {
-            s=info->m_descOld;
-            if (info->m_type==CSL_GAME_AC)
-            {
-                wxUint32 l=s.Len();
-                s=A2U(StripColours(U2A(s),&l,2));
-            }
-            SetItem(i,1,s);
-        }
+            SetItem(i,1,info->m_descOld);
     }
 
     wxColour colour=m_stdColourListText;
@@ -1283,12 +1254,6 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info,const wxString& pass
     bool sbUseParam=false;
     wxString cmd,path,opts,out;
     wxString srvtitle=info->GetBestDescription();
-
-    if (info->m_type==CSL_GAME_AC)
-    {
-        wxUint32 l=srvtitle.Len();
-        srvtitle=A2U(StripColours(U2A(srvtitle),&l,2));
-    }
 
     switch (info->m_type)
     {

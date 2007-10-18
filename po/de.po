@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CSL\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-10-15 09:57+0200\n"
+"POT-Creation-Date: 2007-10-15 19:15+0200\n"
 "PO-Revision-Date: 2007-10-15 18:09+0100\n"
 "Last-Translator: Glen Masgai <mimosius@gmx.de>\n"
 "Language-Team: Glen Masgai <mimosius@gmx.de>\n"
@@ -13,8 +13,7 @@ msgstr ""
 "X-Poedit-Country: GERMANY\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
-#: ../src/CslDlgAddMaster.cpp:51
-#: ../src/CslDlgAddServer.cpp:37
+#: ../src/CslDlgAddMaster.cpp:51 ../src/CslDlgAddServer.cpp:37
 msgid "default"
 msgstr "Standard"
 
@@ -26,15 +25,12 @@ msgstr "Benutzerdefiniert"
 msgid "Add default master"
 msgstr "Standard Master"
 
-#: ../src/CslDlgAddMaster.cpp:58
-#: ../src/CslDlgAddServer.cpp:41
+#: ../src/CslDlgAddMaster.cpp:58 ../src/CslDlgAddServer.cpp:41
 msgid "&Add"
 msgstr "&Hinzufügen"
 
-#: ../src/CslDlgAddMaster.cpp:59
-#: ../src/CslDlgAddServer.cpp:42
-#: ../src/CslDlgConnectPass.cpp:42
-#: ../src/CslDlgConnectWait.cpp:37
+#: ../src/CslDlgAddMaster.cpp:59 ../src/CslDlgAddServer.cpp:42
+#: ../src/CslDlgConnectPass.cpp:42 ../src/CslDlgConnectWait.cpp:37
 #: ../src/CslDlgSettings.cpp:110
 msgid "&Cancel"
 msgstr "Abbre&chen"
@@ -44,13 +40,11 @@ msgstr "Abbre&chen"
 msgid "CSL - Add new Master"
 msgstr "CSL - Master hinzufügen"
 
-#: ../src/CslDlgAddMaster.cpp:94
-#: ../src/CslDlgAddServer.cpp:77
+#: ../src/CslDlgAddMaster.cpp:94 ../src/CslDlgAddServer.cpp:77
 msgid "Game:"
 msgstr "Spiel:"
 
-#: ../src/CslDlgAddMaster.cpp:97
-#: ../src/CslDlgAddServer.cpp:80
+#: ../src/CslDlgAddMaster.cpp:97 ../src/CslDlgAddServer.cpp:80
 msgid "Address:"
 msgstr "Adresse:"
 
@@ -71,8 +65,7 @@ msgstr "Passwort &speichern"
 msgid "Ad&min connect"
 msgstr "Als Ad&min verbinden"
 
-#: ../src/CslDlgConnectPass.cpp:41
-#: ../src/CslDlgConnectWait.cpp:36
+#: ../src/CslDlgConnectPass.cpp:41 ../src/CslDlgConnectWait.cpp:36
 #: ../src/CslDlgSettings.cpp:109
 msgid "&Ok"
 msgstr "&Ok"
@@ -124,105 +117,98 @@ msgstr "&Automatisch aktualisieren"
 msgid "Stop when game &ends"
 msgstr "Anhalten bei Spiel&ende"
 
-#: ../src/CslDlgExtended.cpp:85
-#: ../src/CslDlgExtended.cpp:223
-#: ../src/CslDlgExtended.cpp:652
+#: ../src/CslDlgExtended.cpp:85 ../src/CslDlgExtended.cpp:232
+#: ../src/CslDlgExtended.cpp:668
 msgid "&Update"
 msgstr "Akt&ualisieren"
 
-#: ../src/CslDlgExtended.cpp:86
-#: ../src/CslDlgOutput.cpp:68
+#: ../src/CslDlgExtended.cpp:86 ../src/CslDlgOutput.cpp:68
 msgid "&Close"
 msgstr "&Schliessen"
 
 #. begin wxGlade: CslDlgExtended::set_properties
-#: ../src/CslDlgExtended.cpp:116
-#: ../src/CslDlgExtended.cpp:661
+#: ../src/CslDlgExtended.cpp:116 ../src/CslDlgExtended.cpp:677
 msgid "CSL - Extended info"
 msgstr "CSL - Erweiterte Informationen"
 
-#: ../src/CslDlgExtended.cpp:158
+#: ../src/CslDlgExtended.cpp:166
 msgid "Map:"
 msgstr "Map:"
 
-#: ../src/CslDlgExtended.cpp:161
+#: ../src/CslDlgExtended.cpp:169
 msgid "Time remaining:"
 msgstr "Zeit verbleibend:"
 
-#: ../src/CslDlgExtended.cpp:164
+#: ../src/CslDlgExtended.cpp:172
 msgid "Player records:"
 msgstr "Spieler Datensätze:"
 
-#: ../src/CslDlgExtended.cpp:320
+#: ../src/CslDlgExtended.cpp:329
 msgid "- connecting -"
 msgstr "- verbinden -"
 
-#: ../src/CslDlgExtended.cpp:326
+#: ../src/CslDlgExtended.cpp:335
 msgid "Spectator"
 msgstr "Spectator"
 
-#: ../src/CslDlgExtended.cpp:350
+#: ../src/CslDlgExtended.cpp:359
 msgid "dead"
 msgstr "dead"
 
-#: ../src/CslDlgExtended.cpp:352
+#: ../src/CslDlgExtended.cpp:361
 msgid "editing"
 msgstr "editing"
 
-#: ../src/CslDlgExtended.cpp:383
-#: ../src/CslDlgExtended.cpp:646
+#: ../src/CslDlgExtended.cpp:392 ../src/CslDlgExtended.cpp:662
 #, c-format
 msgid "%d players (%d left)"
 msgstr "%d Spieler (%d verbleibend)"
 
-#: ../src/CslDlgExtended.cpp:462
-#: ../src/CslDlgExtended.cpp:464
+#: ../src/CslDlgExtended.cpp:473 ../src/CslDlgExtended.cpp:475
 msgid "WINNER"
 msgstr "GEWINNER"
 
-#: ../src/CslDlgExtended.cpp:477
+#: ../src/CslDlgExtended.cpp:488
 msgid "Not a team game."
 msgstr "Kein Teamspiel."
 
-#: ../src/CslDlgExtended.cpp:484
-#: ../src/CslDlgExtended.cpp:658
+#: ../src/CslDlgExtended.cpp:495 ../src/CslDlgExtended.cpp:674
 msgid "Time is up"
 msgstr "Zeit abgelaufen"
 
-#: ../src/CslDlgExtended.cpp:503
+#: ../src/CslDlgExtended.cpp:519
 msgid "Waiting for data..."
 msgstr "Warte auf Daten..."
 
-#: ../src/CslDlgExtended.cpp:594
-#: ../src/CslListCtrlServer.cpp:815
+#: ../src/CslDlgExtended.cpp:610 ../src/CslListCtrlServer.cpp:815
 msgid "Player"
 msgstr "Spieler"
 
-#: ../src/CslDlgExtended.cpp:598
+#: ../src/CslDlgExtended.cpp:614
 msgid "Team"
 msgstr "Team"
 
-#: ../src/CslDlgExtended.cpp:602
+#: ../src/CslDlgExtended.cpp:618
 msgid "Frags"
 msgstr "Frags"
 
-#: ../src/CslDlgExtended.cpp:606
+#: ../src/CslDlgExtended.cpp:622
 msgid "Deaths"
 msgstr "Deaths"
 
-#: ../src/CslDlgExtended.cpp:610
+#: ../src/CslDlgExtended.cpp:626
 msgid "Teamkills"
 msgstr "Teamkills"
 
-#: ../src/CslDlgExtended.cpp:614
+#: ../src/CslDlgExtended.cpp:630
 msgid "Health"
 msgstr "Health"
 
-#: ../src/CslDlgExtended.cpp:618
+#: ../src/CslDlgExtended.cpp:634
 msgid "Armour"
 msgstr "Rüstung"
 
-#: ../src/CslDlgExtended.cpp:622
+#: ../src/CslDlgExtended.cpp:638
 msgid "Weapon"
 msgstr "Waffe"
 
@@ -230,8 +216,7 @@ msgstr "Waffe"
 msgid "Text files (*.txt)|*.txt"
 msgstr "Textdateien (*.txt)|*.txt"
 
-#: ../src/CslDlgOutput.cpp:54
-#: ../src/CslDlgOutput.cpp:386
+#: ../src/CslDlgOutput.cpp:54 ../src/CslDlgOutput.cpp:394
 #, c-format
 msgid "%d matches"
 msgstr "%d Treffer"
@@ -273,8 +258,7 @@ msgstr "&Speichern"
 msgid "CSL - Game output"
 msgstr "CSL - Spielausgabe"
 
-#: ../src/CslDlgOutput.cpp:109
-#: ../src/CslFrame.cpp:405
+#: ../src/CslDlgOutput.cpp:109 ../src/CslFrame.cpp:405
 msgid "Search:"
 msgstr "Suchen:"
 
@@ -282,15 +266,15 @@ msgstr "Suchen:"
 msgid "Level:"
 msgstr "Level:"
 
-#: ../src/CslDlgOutput.cpp:212
+#: ../src/CslDlgOutput.cpp:220
 msgid "Open log file"
 msgstr "Logdatei öffnen"
 
-#: ../src/CslDlgOutput.cpp:252
+#: ../src/CslDlgOutput.cpp:260
 msgid "Save log file"
 msgstr "Logdatei speichern"
 
-#: ../src/CslDlgOutput.cpp:533
+#: ../src/CslDlgOutput.cpp:541
 #, c-format
 msgid "CSL - Game output: %s"
 msgstr "CSL - Spielausgabe: %s"
@@ -352,24 +336,18 @@ msgstr "Wähle Blood Frontier Spielverzeichnis"
 msgid "Select Cube game path"
 msgstr "Wähle Cube Spielverzeichnis"
 
-#: ../src/CslDlgSettings.cpp:272
-#: ../src/CslDlgSettings.cpp:281
-#: ../src/CslDlgSettings.cpp:290
-#: ../src/CslDlgSettings.cpp:299
+#: ../src/CslDlgSettings.cpp:272 ../src/CslDlgSettings.cpp:281
+#: ../src/CslDlgSettings.cpp:290 ../src/CslDlgSettings.cpp:299
 msgid "Game executable:"
 msgstr "Programmdatei:"
 
-#: ../src/CslDlgSettings.cpp:274
-#: ../src/CslDlgSettings.cpp:283
-#: ../src/CslDlgSettings.cpp:292
-#: ../src/CslDlgSettings.cpp:301
+#: ../src/CslDlgSettings.cpp:274 ../src/CslDlgSettings.cpp:283
+#: ../src/CslDlgSettings.cpp:292 ../src/CslDlgSettings.cpp:301
 msgid "Game directory:"
 msgstr "Spielverzeichnis:"
 
-#: ../src/CslDlgSettings.cpp:276
-#: ../src/CslDlgSettings.cpp:285
-#: ../src/CslDlgSettings.cpp:294
-#: ../src/CslDlgSettings.cpp:303
+#: ../src/CslDlgSettings.cpp:276 ../src/CslDlgSettings.cpp:285
+#: ../src/CslDlgSettings.cpp:294 ../src/CslDlgSettings.cpp:303
 msgid "Game paramters:"
 msgstr "Spielparameter:"
 
@@ -456,22 +434,14 @@ msgstr ""
 "Damit %s zu einem Server verbinden kann, muss der Ordner\n"
 " angegeben werden, in dem sich %s befindet."
 
-#: ../src/CslDlgSettings.cpp:626
-#: ../src/CslDlgSettings.cpp:635
-#: ../src/CslDlgSettings.cpp:647
-#: ../src/CslDlgSettings.cpp:654
-#: ../src/CslDlgSettings.cpp:666
-#: ../src/CslDlgSettings.cpp:675
-#: ../src/CslDlgSettings.cpp:687
-#: ../src/CslDlgSettings.cpp:694
-#: ../src/CslDlgSettings.cpp:702
-#: ../src/CslFrame.cpp:699
-#: ../src/CslListCtrlServer.cpp:122
-#: ../src/CslListCtrlServer.cpp:509
-#: ../src/CslListCtrlServer.cpp:519
-#: ../src/CslListCtrlServer.cpp:1323
-#: ../src/CslListCtrlServer.cpp:1329
-#: ../src/CslListCtrlServer.cpp:1408
+#: ../src/CslDlgSettings.cpp:626 ../src/CslDlgSettings.cpp:635
+#: ../src/CslDlgSettings.cpp:647 ../src/CslDlgSettings.cpp:654
+#: ../src/CslDlgSettings.cpp:666 ../src/CslDlgSettings.cpp:675
+#: ../src/CslDlgSettings.cpp:687 ../src/CslDlgSettings.cpp:694
+#: ../src/CslDlgSettings.cpp:702 ../src/CslFrame.cpp:699
+#: ../src/CslListCtrlServer.cpp:122 ../src/CslListCtrlServer.cpp:509
+#: ../src/CslListCtrlServer.cpp:519 ../src/CslListCtrlServer.cpp:1323
+#: ../src/CslListCtrlServer.cpp:1329 ../src/CslListCtrlServer.cpp:1408
 #: ../src/CslListCtrlServer.cpp:1425
 msgid "Error"
 msgstr "Fehler!"
@@ -644,9 +614,7 @@ msgstr "CSL läuft bereits"
 msgid "CSL is already running."
 msgstr "Eine Instanz von CSL läuft bereits."
 
-#: ../src/CslGame.cpp:81
-#: ../src/CslGame.cpp:93
-#: ../src/CslGame.cpp:104
+#: ../src/CslGame.cpp:81 ../src/CslGame.cpp:93 ../src/CslGame.cpp:104
 #: ../src/CslListCtrlInfo.cpp:194
 msgid "unknown"
 msgstr "unbekannt"
@@ -735,8 +703,7 @@ msgstr ""
 msgid "You are about to delete servers which are also favourites!\n"
 msgstr "Es sollen Server gelöscht werden, die als Favoriten markiert sind!\n"
 
-#: ../src/CslListCtrlServer.cpp:477
-#: ../src/CslListCtrlServer.cpp:487
+#: ../src/CslListCtrlServer.cpp:477 ../src/CslListCtrlServer.cpp:487
 #: ../src/CslListCtrlServer.cpp:1279
 msgid "Warning"
 msgstr "Warnung!"
@@ -763,8 +730,12 @@ msgstr ""
 
 #: ../src/CslListCtrlServer.cpp:746
 #, c-format
-msgid "Waiting %d seconds for a free slot on \"%s\" (press ESC to abort or join another server)"
-msgstr "Warte %d Sekunden auf einen freien Slot auf \"%s\" (ESC drücken um abzubrechen oder einen anderen Server wählen)"
+msgid ""
+"Waiting %d seconds for a free slot on \"%s\" (press ESC to abort or join "
+"another server)"
+msgstr ""
+"Warte %d Sekunden auf einen freien Slot auf \"%s\" (ESC drücken um "
+"abzubrechen oder einen anderen Server wählen)"
 
 #: ../src/CslListCtrlServer.cpp:783
 msgid "Host"
@@ -946,4 +917,3 @@ msgstr "Cube Server Lister (CSL)"
 #: ../src/CslVersion.h:34
 msgid "Tool to monitor cubeengine-based servers."
 msgstr "Programm um Cubeengine basierte Server zu beobachten."
-

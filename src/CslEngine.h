@@ -52,6 +52,9 @@ END_DECLARE_EVENT_TYPES()
                              ),
 
 
+
+#define CSL_EX_VERSION_MIN      101
+#define CSL_EX_VERSION_MAX      102
 // extended info commands
 #define CSL_EX_CMD_UPTIME      "ut"
 #define CSL_EX_CMD_PLAYERSTATS "ps"
