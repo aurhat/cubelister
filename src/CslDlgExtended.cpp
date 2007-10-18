@@ -369,9 +369,9 @@ void CslDlgExtended::do_layout()
     grid_sizer_info->Add(label_records, 0, wxALL, 4);
     sizer_info->Add(grid_sizer_info, 1, wxEXPAND, 0);
     grid_sizer_info_team->Add(sizer_info, 1, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 4);
-    grid_sizer_check->Add(checkbox_update, 0, wxALL|wxALIGN_BOTTOM, 4);
-    grid_sizer_check->Add(checkbox_update_end, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_check->Add(checkbox_map, 0, wxALL, 4);
+    grid_sizer_check->Add(checkbox_update, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_check->Add(checkbox_update_end, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_check->Add(checkbox_map, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_check->AddGrowableRow(0);
     grid_sizer_check->AddGrowableRow(1);
     grid_sizer_check->AddGrowableRow(2);
