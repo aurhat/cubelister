@@ -201,13 +201,16 @@ class CslDlgExtended: public wxDialog
 
         void UpdateMap();
         void ClearTeamScoreLabel(const wxUint32 start,const wxUint32 end);
-        void SetTeamScore();
+        void SetPlayerData();
+        void SetTeamData();
         void QueryInfo(wxInt32 pid=-1);
-        void RecalcMinWidth(const bool forcemin=false);
+        void RecalcMinSize(const bool forceWidth=false,
+                           const bool forceHeight=false,
+                           const bool reLayout=false);
         void ListAdjustSize(const wxSize& size);
         void ListSort(wxInt32 column);
         void ToggleSortArrow();
-        void ShowPanelMap(const bool show, const bool checkbox);
+        void ShowPanelMap(const bool show, const bool enable);
 
         static int wxCALLBACK ListSortCompareFunc(long item1,long item2,long data);
 }; // wxGlade: end class
