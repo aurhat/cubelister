@@ -411,7 +411,7 @@ void sendpongs()        // reply all server info requests
         int flag = getint(t);
         if (flag == 0) {  //check the flag
             string extcmd;
-            getstring(extcmd,t);  //get the command string which says what to do
+            getstring(extcmd,t,_MAXDEFSTR);  //get the command string which says what to do
 
             int position = 0;
             for(int i=0;i<MAX_EXTENDED_COMMANDS;i++) {

@@ -171,7 +171,7 @@ void CslPanelMap::OnPaint(wxPaintEvent& event)
             //dc.SetPen(wxPen(base->m_colour));
             dc.SetPen(wxPen(*wxWHITE));
             dc.SetBrush(wxBrush(base->m_colour));
-            dc.DrawCircle(origin.x+base->m_point.x,origin.y+base->m_point.y,5);
+            dc.DrawCircle(origin.x+base->m_point.x,origin.y+base->m_point.y,4);
         }
     }
 
@@ -256,7 +256,6 @@ CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
     m_imageList.Add(wxBitmap(orange_list_16_xpm));
     m_imageList.Add(wxBitmap(grey_list_16_xpm));
     m_imageList.Add(wxBitmap(trans_list_16_xpm));
-
 #else
     m_imageList.Add(wxIcon(wxT("ICON_LIST_ASC"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imageList.Add(wxIcon(wxT("ICON_LIST_DSC"),wxBITMAP_TYPE_ICO_RESOURCE));
@@ -796,7 +795,7 @@ void CslDlgExtended::SetTeamData()
     label_mode->SetLabel(m_info->m_gameMode);
 
     //m_gridSizerMain->Layout();
-    RecalcMinSize();
+    RecalcMinSize(false);
 }
 
 void CslDlgExtended::QueryInfo(wxInt32 pid)
@@ -824,27 +823,42 @@ void CslDlgExtended::QueryInfo(wxInt32 pid)
         m_engine->PingExPlayerInfo(m_info,pid);
 }
 
-void CslDlgExtended::RecalcMinSize(bool forceWidth,bool forceHeight,bool reLayout)
+void CslDlgExtended::RecalcMinSize(bool reLayout,wxInt32 decWidth)
 {
     bool height=false, width=false;
+
+    if (reLayout)
+        m_gridSizerMain->Layout();
 
     wxSize best=GetBestSize();
     wxSize size=GetSize();
 
-    if (best.x>size.x)
+    if (decWidth>-1)
+    {
         width=true;
+        size.x-=decWidth;
+    }
+
+    if (best.x>size.x)
+    {
+        width=true;
+        size.x=best.x;
+    }
     if (best.y>size.y)
+    {
         height=true;
+        size.y=best.y;
+    }
 
-    if (!(width || height) && !forceWidth)
-        return;
+    if (width || height)
+    {
+        SetMinSize(wxSize(width ? size.x : -1,height ? size.y : -1));
+        SetSize(width ? size.x : -1,height ? size.y : -1);
+        SetSizeHints(best);
+    }
 
-    m_gridSizerMain->Layout();
-
-    SetSize(width ? best.x : -1,height? best.y : -1);
-    SetSizeHints(best);
-
-    ListAdjustSize(list_ctrl_extended->GetClientSize());
+    if (reLayout)
+        ListAdjustSize(list_ctrl_extended->GetClientSize());
 
 #ifdef __WXMSW__
     checkbox_update->Refresh();
@@ -925,10 +939,10 @@ void CslDlgExtended::ShowPanelMap(const bool show, const bool enable)
 {
     checkbox_map->SetValue(show);
     checkbox_map->Enable(enable);
+    wxInt32 width=m_mapInfo.m_bitmap.GetWidth()+8;
 
     if (show)
     {
-        wxInt32 width=m_mapInfo.m_bitmap.GetWidth()+8;
         //if (m_sizerMapLabel->GetSize().x<width)
         m_sizerMapLabel->SetMinSize(width,-1);
     }
@@ -953,7 +967,7 @@ void CslDlgExtended::ShowPanelMap(const bool show, const bool enable)
         return;
 
     //m_gridSizerMain->Layout();
-    RecalcMinSize(true,true,true);
+    RecalcMinSize(true,show ? -1 : width);
     //ListAdjustSize(list_ctrl_extended->GetClientSize());
 }
 

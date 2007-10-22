@@ -204,9 +204,7 @@ class CslDlgExtended: public wxDialog
         void SetPlayerData();
         void SetTeamData();
         void QueryInfo(wxInt32 pid=-1);
-        void RecalcMinSize(const bool forceWidth=false,
-                           const bool forceHeight=false,
-                           const bool reLayout=false);
+        void RecalcMinSize(bool reLayout,wxInt32 decWidth=-1);
         void ListAdjustSize(const wxSize& size);
         void ListSort(wxInt32 column);
         void ToggleSortArrow();
