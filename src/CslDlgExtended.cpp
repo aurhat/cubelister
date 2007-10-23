@@ -95,10 +95,7 @@ bool CslMapInfo::LoadMapData(const wxString& mapName,const wxString& gameName,
     {
         wxFileInputStream stream(path+mapName+wxT(".cfg"));
         if (!stream.IsOk())
-        {
-            LOG_DEBUG("stream error\n");
             return false;
-        }
 
         wxFileConfig config(stream);
 
@@ -117,22 +114,13 @@ bool CslMapInfo::LoadMapData(const wxString& mapName,const wxString& gameName,
             if (::wxFileExists(path))
             {
                 if (!m_bitmap.LoadFile(path,wxBITMAP_TYPE_PNG))
-                {
                     return false;
-                    LOG_DEBUG("load bitmap failed\n");
-                }
             }
             else
-            {
-                LOG_DEBUG("bitmap does not exist\n");
                 return false;
-            }
         }
         else
-        {
-            LOG_DEBUG("config read error\n");
             return false;
-        }
 
         while (true)
         {
@@ -153,7 +141,6 @@ bool CslMapInfo::LoadMapData(const wxString& mapName,const wxString& gameName,
         return true;
     }
 
-    LOG_DEBUG("path error\n");
     return false;
 }
 
@@ -293,9 +280,9 @@ void CslDlgExtended::set_properties()
 
     m_labelFont=label_team1->GetFont();
 
-    wxInt32 size=m_labelFont.GetPointSize();
-    label_map->SetFont(wxFont(size+10,wxDECORATIVE,wxNORMAL,wxBOLD));
-    label_author->SetFont(wxFont(size+4,wxDECORATIVE,wxITALIC,wxBOLD));
+    wxInt32 pointSize=m_labelFont.GetPointSize();
+    label_map->SetFont(wxFont(pointSize+10,wxDECORATIVE,wxNORMAL,wxBOLD));
+    label_author->SetFont(wxFont(pointSize+4,wxDECORATIVE,wxITALIC,wxBOLD));
 
     m_teamLabel.Add(label_team1);
     m_teamLabel.Add(label_team2);
@@ -314,6 +301,7 @@ void CslDlgExtended::set_properties()
 #endif
 #ifdef __WXMAC__
     list_ctrl_players->SetMinSize(wxSize(580,350));
+    button_update->SetMinSize(wxSize(button_update->GetSize().x+20,-1));
 #endif
 }
 
