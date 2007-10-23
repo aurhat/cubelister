@@ -393,7 +393,7 @@ wxInt32 CslGame::ConnectPrepareConfig(wxString& out,const CslServerInfo *info,co
 #ifdef __WXGTK__
                 if (!::wxFileExists(src))
                 {
-                    src=::wxPathOnly(wxTheApp->argv[0])+wxT("/data/")+map;
+                    src=::g_basePath+wxT("/data/")+map;
 #endif
                     if (!::wxFileExists(src))
                     {

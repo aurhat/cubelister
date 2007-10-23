@@ -115,7 +115,7 @@ CslListCtrlInfo::CslListCtrlInfo(wxWindow* parent,wxWindowID id,const wxPoint& p
 #ifdef __WXGTK__
     if (!m_geoIP)
     {
-        path=::wxPathOnly(wxTheApp->argv[0])+wxT("/data/GeoIP.dat");
+        path=::g_basePath+wxT("/data/GeoIP.dat");
         m_geoIP=GeoIP_open(U2A(path),GEOIP_MEMORY_CACHE);
     }
 #endif

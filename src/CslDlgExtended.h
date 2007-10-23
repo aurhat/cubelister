@@ -97,6 +97,7 @@ class CslPanelMap : public wxPanel
         }
 
         void SetOk(const bool ok=true) { m_ok=ok; }
+        bool IsOk() { return m_ok; }
 
         void UpdateBases(const t_aBaseInfo& bases,const bool hasBases);
 
@@ -170,8 +171,8 @@ class CslDlgExtended: public wxDialog
 
     protected:
         // begin wxGlade: CslDlgExtended::attributes
-        wxStaticBox* sizer_map_label_staticbox;
         wxStaticBox* sizer_update_staticbox;
+        wxStaticBox* sizer_map_label_staticbox;
         wxStaticBox* sizer_info_staticbox;
         wxStaticBox* sizer_team_score_staticbox;
         wxStaticBox* sizer_map_staticbox;
@@ -189,14 +190,14 @@ class CslDlgExtended: public wxDialog
         wxStaticText* label_mode;
         wxStaticText* label_remaining;
         wxStaticText* label_records;
-        wxCheckBox* checkbox_update;
-        wxCheckBox* checkbox_update_end;
-        wxButton* button_update;
         wxStaticText* label_map;
         wxStaticText* label_author_prefix;
         wxStaticText* label_author;
+        wxButton* button_update;
+        wxCheckBox* checkbox_update;
+        wxCheckBox* checkbox_update_end;
         wxCheckBox* checkbox_map;
-        wxStaticLine* static_line_1;
+        wxStaticLine* static_line;
         wxButton* button_close;
         // end wxGlade
 
@@ -209,7 +210,7 @@ class CslDlgExtended: public wxDialog
         void ListAdjustSize(const wxSize& size);
         void ListSort(wxInt32 column);
         void ToggleSortArrow();
-        void ShowPanelMap(const bool show, const bool enable);
+        void ShowPanelMap(const bool show);
 
         static int wxCALLBACK ListSortCompareFunc(long item1,long item2,long data);
 }; // wxGlade: end class

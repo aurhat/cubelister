@@ -84,7 +84,7 @@ bool CslMapInfo::LoadMapData(const wxString& mapName,const wxString& gameName,
     wxUint32 version=protVersion;
 
     wxString path=wxString(wxT(DATADIR))+PATHDIV+wxT("maps")+PATHDIV+gameName+PATHDIV;
-#ifndef __WXGTK__
+#ifdef __WXGTK__
     if (!::wxDirExists(path))
         path=::g_basePath+wxT("/data/maps/")+gameName+PATHDIV;
 #endif
@@ -226,8 +226,8 @@ CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
     // begin wxGlade: CslDlgExtended::CslDlgExtended
     sizer_team_score_staticbox = new wxStaticBox(this, -1, _("Team score"));
     sizer_info_staticbox = new wxStaticBox(this, -1, _("Game info"));
-    sizer_update_staticbox = new wxStaticBox(this, -1, _("Update"));
     sizer_map_label_staticbox = new wxStaticBox(this, -1, _("Map info"));
+    sizer_update_staticbox = new wxStaticBox(this, -1, wxEmptyString);
     sizer_map_staticbox = new wxStaticBox(this, -1, _("Map"));
     list_ctrl_players = new wxListCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxSUNKEN_BORDER);
     panel_map = new CslPanelMap(this, wxID_ANY);
@@ -243,14 +243,14 @@ CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
     label_mode = new wxStaticText(this, wxID_ANY, wxEmptyString);
     label_remaining = new wxStaticText(this, wxID_ANY, wxEmptyString);
     label_records = new wxStaticText(this, wxID_ANY, wxEmptyString);
-    checkbox_update = new wxCheckBox(this, CHECK_UPDATE, _("&Auto update"));
-    checkbox_update_end = new wxCheckBox(this, wxID_ANY, _("Stop when game &ends"));
-    button_update = new wxButton(this, BUTTON_REFRESH, _("&Update"));
     label_map = new wxStaticText(this, wxID_ANY, _("label_map"));
     label_author_prefix = new wxStaticText(this, wxID_ANY, _("by"));
     label_author = new wxStaticText(this, wxID_ANY, _("label_author"));
-    checkbox_map = new wxCheckBox(this, CHECK_MAP, _("Show map"));
-    static_line_1 = new wxStaticLine(this, wxID_ANY);
+    button_update = new wxButton(this, BUTTON_REFRESH, _("&Update"));
+    checkbox_update = new wxCheckBox(this, CHECK_UPDATE, _("&Auto update"));
+    checkbox_update_end = new wxCheckBox(this, wxID_ANY, _("Stop auto update when map &ends"));
+    checkbox_map = new wxCheckBox(this, CHECK_MAP, _("&Show map if possible"));
+    static_line = new wxStaticLine(this, wxID_ANY);
     button_close = new wxButton(this, wxID_CLOSE, _("&Close"));
 
     set_properties();
@@ -288,16 +288,14 @@ void CslDlgExtended::set_properties()
     label_team1->SetMinSize(wxSize(60, -1));
     label_team2->SetMinSize(wxSize(60, -1));
     checkbox_update_end->Enable(false);
-    label_map->SetFont(wxFont(18, wxDECORATIVE, wxNORMAL, wxBOLD, 0, wxT("")));
-    label_author->SetFont(wxFont(11, wxDECORATIVE, wxITALIC, wxBOLD, 0, wxT("")));
     button_close->SetDefault();
     // end wxGlade
 
     m_labelFont=label_team1->GetFont();
-    
-    wxInt32 fsize=m_labelFont.GetPointSize();
-    label_map->SetFont(wxFont(fsize+10, wxDECORATIVE, wxNORMAL, wxBOLD, 0, wxT("")));
-    label_author->SetFont(wxFont(fsize+4, wxDECORATIVE, wxITALIC, wxBOLD, 0, wxT("")));
+
+    wxInt32 size=m_labelFont.GetPointSize();
+    label_map->SetFont(wxFont(size+10,wxDECORATIVE,wxNORMAL,wxBOLD));
+    label_author->SetFont(wxFont(size+4,wxDECORATIVE,wxITALIC,wxBOLD));
 
     m_teamLabel.Add(label_team1);
     m_teamLabel.Add(label_team2);
@@ -308,9 +306,8 @@ void CslDlgExtended::set_properties()
     m_teamLabel.Add(label_team7);
     m_teamLabel.Add(label_team8);
 
-
 #ifdef __WXMSW__
-    list_ctrl_players->SetMinSize(wxSize(520,350)); // x=520
+    list_ctrl_players->SetMinSize(wxSize(520,350));
 #endif
 #ifdef __WXGTK__
     list_ctrl_players->SetMinSize(wxSize(580,350));
@@ -318,21 +315,19 @@ void CslDlgExtended::set_properties()
 #ifdef __WXMAC__
     list_ctrl_players->SetMinSize(wxSize(580,350));
 #endif
-
-//    list_ctrl_players->SetMinSize(wxSize(-1,350));
 }
 
 void CslDlgExtended::do_layout()
 {
     // begin wxGlade: CslDlgExtended::do_layout
-    wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(4, 1, 0, 0);
+    wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(5, 1, 0, 0);
     wxFlexGridSizer* grid_sizer_button = new wxFlexGridSizer(1, 1, 0, 0);
-    wxFlexGridSizer* grid_sizer_info_team = new wxFlexGridSizer(1, 4, 0, 0);
-    wxStaticBoxSizer* sizer_map_label = new wxStaticBoxSizer(sizer_map_label_staticbox, wxHORIZONTAL);
-    wxFlexGridSizer* grid_sizer_map_label = new wxFlexGridSizer(3, 1, 0, 0);
-    wxFlexGridSizer* grid_sizer_author = new wxFlexGridSizer(1, 2, 0, 0);
     wxStaticBoxSizer* sizer_update = new wxStaticBoxSizer(sizer_update_staticbox, wxHORIZONTAL);
-    wxFlexGridSizer* grid_sizer_update = new wxFlexGridSizer(4, 1, 0, 0);
+    wxFlexGridSizer* grid_sizer_update = new wxFlexGridSizer(1, 5, 0, 0);
+    wxFlexGridSizer* grid_sizer_info_team = new wxFlexGridSizer(1, 3, 0, 0);
+    wxStaticBoxSizer* sizer_map_label = new wxStaticBoxSizer(sizer_map_label_staticbox, wxHORIZONTAL);
+    wxFlexGridSizer* grid_sizer_map_label = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* grid_sizer_author = new wxFlexGridSizer(1, 2, 0, 0);
     wxStaticBoxSizer* sizer_info = new wxStaticBoxSizer(sizer_info_staticbox, wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_info = new wxFlexGridSizer(4, 2, 0, 0);
     wxStaticBoxSizer* sizer_team_score = new wxStaticBoxSizer(sizer_team_score_staticbox, wxHORIZONTAL);
@@ -360,7 +355,7 @@ void CslDlgExtended::do_layout()
     grid_sizer_team_score->Add(label_team6, 0, wxALL, 4);
     grid_sizer_team_score->Add(label_team7, 0, wxALL, 4);
     grid_sizer_team_score->Add(label_team8, 0, wxALL, 4);
-    sizer_team_score->Add(grid_sizer_team_score, 1, wxEXPAND, 0);
+    sizer_team_score->Add(grid_sizer_team_score, 1, wxALIGN_CENTER_VERTICAL, 0);
     grid_sizer_info_team->Add(sizer_team_score, 1, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 4);
     wxStaticText* label_server_static = new wxStaticText(this, wxID_ANY, _("Server:"));
     grid_sizer_info->Add(label_server_static, 0, wxALL, 4);
@@ -374,29 +369,28 @@ void CslDlgExtended::do_layout()
     wxStaticText* label_records_static = new wxStaticText(this, wxID_ANY, _("Player records:"));
     grid_sizer_info->Add(label_records_static, 0, wxALL, 4);
     grid_sizer_info->Add(label_records, 0, wxALL, 4);
-    sizer_info->Add(grid_sizer_info, 1, wxEXPAND, 0);
+    sizer_info->Add(grid_sizer_info, 1, wxALIGN_CENTER_VERTICAL, 0);
     grid_sizer_info_team->Add(sizer_info, 1, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 4);
-    grid_sizer_update->Add(checkbox_update, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_update->Add(checkbox_update_end, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_update->Add(1, 2, 0, 0, 0);
-    grid_sizer_update->Add(button_update, 0, wxALL|wxEXPAND, 4);
-    grid_sizer_update->AddGrowableRow(0);
-    grid_sizer_update->AddGrowableRow(5);
-    sizer_update->Add(grid_sizer_update, 1, wxEXPAND, 4);
-    grid_sizer_info_team->Add(sizer_update, 1, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 4);
     grid_sizer_map_label->Add(label_map, 0, wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_author->Add(label_author_prefix, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_author->Add(label_author, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_map_label->Add(grid_sizer_author, 1, wxBOTTOM|wxALIGN_CENTER_HORIZONTAL, 2);
-    grid_sizer_map_label->Add(checkbox_map, 0, wxTOP|wxALIGN_CENTER_HORIZONTAL, 4);
+    grid_sizer_map_label->Add(grid_sizer_author, 1, wxALIGN_CENTER_HORIZONTAL, 2);
     grid_sizer_map_label->AddGrowableRow(2);
     grid_sizer_map_label->AddGrowableCol(0);
-    sizer_map_label->Add(grid_sizer_map_label, 1, wxEXPAND, 0);
+    sizer_map_label->Add(grid_sizer_map_label, 1, wxALIGN_CENTER_VERTICAL, 0);
     grid_sizer_info_team->Add(sizer_map_label, 1, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 4);
     grid_sizer_info_team->AddGrowableCol(1);
     grid_sizer_main->Add(grid_sizer_info_team, 1, wxEXPAND, 0);
-    grid_sizer_main->Add(static_line_1, 0, wxLEFT|wxRIGHT|wxTOP|wxEXPAND, 4);
-    grid_sizer_button->Add(button_close, 0, wxRIGHT|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_update->Add(button_update, 0, wxALL|wxEXPAND, 4);
+    grid_sizer_update->Add(checkbox_update, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_update->Add(checkbox_update_end, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_update->Add(1, 1, 0, 0, 0);
+    grid_sizer_update->Add(checkbox_map, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_update->AddGrowableCol(3);
+    sizer_update->Add(grid_sizer_update, 1, wxEXPAND, 4);
+    grid_sizer_main->Add(sizer_update, 1, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 4);
+    grid_sizer_main->Add(static_line, 0, wxLEFT|wxRIGHT|wxTOP|wxEXPAND, 4);
+    grid_sizer_button->Add(button_close, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_main->Add(grid_sizer_button, 1, wxTOP|wxBOTTOM|wxALIGN_RIGHT, 4);
     SetSizer(grid_sizer_main);
     grid_sizer_main->Fit(this);
@@ -501,7 +495,8 @@ void CslDlgExtended::OnCommandEvent(wxCommandEvent& event)
             break;
 
         case CHECK_MAP:
-            ShowPanelMap(event.IsChecked(),true);
+            if (panel_map->IsOk())
+                ShowPanelMap(event.IsChecked());
             break;
 
         case BUTTON_REFRESH:
@@ -548,7 +543,7 @@ void CslDlgExtended::UpdateMap()
     if (m_info->m_map.IsEmpty())
     {
         panel_map->SetOk(false);
-        ShowPanelMap(false,false);
+        ShowPanelMap(false);
 
         label_map->SetLabel(_("no map"));
         label_author->SetLabel(wxEmptyString);
@@ -577,12 +572,12 @@ void CslDlgExtended::UpdateMap()
             }
 
             panel_map->SetMap(m_mapInfo.m_bitmap,checkbox_map->IsChecked());
-            ShowPanelMap(checkbox_map->IsChecked(),true);
+            ShowPanelMap(checkbox_map->IsChecked());
         }
         else
         {
             panel_map->SetOk(false);
-            ShowPanelMap(false,false);
+            ShowPanelMap(false);
 
             label_map->SetLabel(m_info->m_map);
             label_author->SetLabel(wxEmptyString);
@@ -948,7 +943,7 @@ void CslDlgExtended::ToggleSortArrow()
     list_ctrl_players->SetColumn(m_sortHelper.m_sortType,item);
 }
 
-void CslDlgExtended::ShowPanelMap(const bool show, const bool enable)
+void CslDlgExtended::ShowPanelMap(const bool show)
 {
     wxInt32 width;
 
@@ -963,8 +958,6 @@ void CslDlgExtended::ShowPanelMap(const bool show, const bool enable)
     }
     else
         width=-1;
-
-    checkbox_map->Enable(enable);
 
     if (show)
     {

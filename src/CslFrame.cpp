@@ -1648,7 +1648,7 @@ bool CslApp::OnInit()
     m_locale.Init(wxLANGUAGE_DEFAULT,wxLOCALE_CONV_ENCODING);
     m_locale.AddCatalogLookupPathPrefix(wxT(LOCALEDIR));
 #ifdef __WXGTK__
-    m_locale.AddCatalogLookupPathPrefix(::wxPathOnly(wxTheApp->argv[0])+wxT("/lang"));
+    m_locale.AddCatalogLookupPathPrefix(g_basePath+wxT("/lang"));
 #endif
     m_locale.AddCatalog(CSL_NAME_SHORT_STR);
 
