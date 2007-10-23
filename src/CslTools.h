@@ -25,6 +25,8 @@
     @author Glen Masgai <mimosius@gmx.de>
 */
 
+extern wxString g_basePath;
+
 // since WX > 2.8.4 the listctrl items
 // get deselected when sorting (only wxGTK ?)
 #ifdef __WXGTK__
@@ -38,12 +40,11 @@
 #ifndef DATADIR
 #undef LOCALEDIR
 #ifdef __WXMAC__
-#define DATADIR wxString(wxT("csl.app/Contents/Resources"))
-#define LOCALEDIR DATADIR+wxT("/lang")
+#define DATADIR g_basePath+wxT("/../Resources")
 #else
-#define DATADIR ::wxPathOnly(wxTheApp->argv[0])+PATHDIV+wxT("data")
-#define LOCALEDIR ::wxPathOnly(wxTheApp->argv[0])+PATHDIV+wxT("lang")
+#define DATADIR g_basePath+wxT("/data")
 #endif //__WXMAC__
+#define LOCALEDIR DATADIR+wxT("/lang")
 #endif //DATADIR
 
 #define A2U(PSZA_CHART) wxString(wxConvertMB2WX(PSZA_CHART))
@@ -68,7 +69,6 @@ void Debug_Printf(const char *DbgFunc, const char *FmtStr,...);
 #else
 #define LOG_DEBUG(...)
 #endif
-
 
 extern char* StripColours(char *s,wxUint32 *l,wxUint32 count);
 extern bool IsIP(const wxString& s);

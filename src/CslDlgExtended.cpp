@@ -84,18 +84,21 @@ bool CslMapInfo::LoadMapData(const wxString& mapName,const wxString& gameName,
     wxUint32 version=protVersion;
 
     wxString path=wxString(wxT(DATADIR))+PATHDIV+wxT("maps")+PATHDIV+gameName+PATHDIV;
-#ifdef __WXGTK__
+#ifndef __WXGTK__
     if (!::wxDirExists(path))
-        path=::wxPathOnly(wxTheApp->argv[0])+wxT("/data/maps/")+gameName+PATHDIV;
+        path=::g_basePath+wxT("/data/maps/")+gameName+PATHDIV;
 #endif
-
+    LOG_DEBUG("%s\n",U2A(path));
     Reset(mapName);
 
     if (::wxFileExists(path+mapName+wxT(".cfg")))
     {
         wxFileInputStream stream(path+mapName+wxT(".cfg"));
         if (!stream.IsOk())
+        {
+            LOG_DEBUG("stream error\n");
             return false;
+        }
 
         wxFileConfig config(stream);
 
@@ -114,13 +117,22 @@ bool CslMapInfo::LoadMapData(const wxString& mapName,const wxString& gameName,
             if (::wxFileExists(path))
             {
                 if (!m_bitmap.LoadFile(path,wxBITMAP_TYPE_PNG))
+                {
                     return false;
+                    LOG_DEBUG("load bitmap failed\n");
+                }
             }
             else
+            {
+                LOG_DEBUG("bitmap does not exist\n");
                 return false;
+            }
         }
         else
+        {
+            LOG_DEBUG("config read error\n");
             return false;
+        }
 
         while (true)
         {
@@ -141,6 +153,7 @@ bool CslMapInfo::LoadMapData(const wxString& mapName,const wxString& gameName,
         return true;
     }
 
+    LOG_DEBUG("path error\n");
     return false;
 }
 
@@ -260,8 +273,6 @@ CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
     m_imageList.Add(wxIcon(wxT("ICON_LIST_GREY"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imageList.Add(wxIcon(wxT("ICON_LIST_TRANS"),wxBITMAP_TYPE_ICO_RESOURCE));
 #endif
-
-    m_labelFont=label_team1->GetFont();
 }
 
 CslDlgExtended::~CslDlgExtended()
@@ -281,6 +292,12 @@ void CslDlgExtended::set_properties()
     label_author->SetFont(wxFont(11, wxDECORATIVE, wxITALIC, wxBOLD, 0, wxT("")));
     button_close->SetDefault();
     // end wxGlade
+
+    m_labelFont=label_team1->GetFont();
+    
+    wxInt32 fsize=m_labelFont.GetPointSize();
+    label_map->SetFont(wxFont(fsize+10, wxDECORATIVE, wxNORMAL, wxBOLD, 0, wxT("")));
+    label_author->SetFont(wxFont(fsize+4, wxDECORATIVE, wxITALIC, wxBOLD, 0, wxT("")));
 
     m_teamLabel.Add(label_team1);
     m_teamLabel.Add(label_team2);
@@ -934,12 +951,20 @@ void CslDlgExtended::ToggleSortArrow()
 void CslDlgExtended::ShowPanelMap(const bool show, const bool enable)
 {
     wxInt32 width;
-    //checkbox_map->SetValue(show);
+
+    if (m_mapInfo.m_bitmap.IsOk())
+    {
+        width=m_mapInfo.m_bitmap.GetWidth();
+#ifdef __WXMAC__
+        width+=30;
+#else
+        width+=16;
+#endif
+    }
+    else
+        width=-1;
+
     checkbox_map->Enable(enable);
-
-    width=m_mapInfo.m_bitmap.IsOk() ? m_mapInfo.m_bitmap.GetWidth()+16 : -1;
-
-    //wxWindowUpdateLocker lock(this);
 
     if (show)
     {

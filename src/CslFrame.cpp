@@ -1643,6 +1643,8 @@ IMPLEMENT_APP(CslApp)
 
 bool CslApp::OnInit()
 {
+    g_basePath=::wxPathOnly(wxTheApp->argv[0]);
+
     m_locale.Init(wxLANGUAGE_DEFAULT,wxLOCALE_CONV_ENCODING);
     m_locale.AddCatalogLookupPathPrefix(wxT(LOCALEDIR));
 #ifdef __WXGTK__

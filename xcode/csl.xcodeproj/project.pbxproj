@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		9E015A240CA544C50029BEEF /* libwx_mac_static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E015A1F0CA544BA0029BEEF /* libwx_mac_static.a */; };
 		9E015AE10CA569950029BEEF /* csl_mac.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9E015AE00CA569950029BEEF /* csl_mac.icns */; };
+		9E3B1E520CCE2BA800E6D4A2 /* maps in Resources */ = {isa = PBXBuildFile; fileRef = 9E3B1E480CCE2BA800E6D4A2 /* maps */; };
 		9E3F16110CA1693800C3C8C9 /* GeoIP.c in Sources */ = {isa = PBXBuildFile; fileRef = 9E3F160F0CA1693800C3C8C9 /* GeoIP.c */; };
 		9E73FA100CA6EED200CA71BC /* CslMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E73FA0F0CA6EED200CA71BC /* CslMenu.cpp */; };
 		9ECC2F7C0CA1724E00578B5E /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9ECC2F7B0CA1724E00578B5E /* Carbon.framework */; };
@@ -59,6 +60,7 @@
 /* Begin PBXFileReference section */
 		9E015A150CA544BA0029BEEF /* wxWindows.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = wxWindows.xcodeproj; path = "../../../Toolkits/wxMac-2.8.4/src/wxWindows.xcodeproj"; sourceTree = SOURCE_ROOT; };
 		9E015AE00CA569950029BEEF /* csl_mac.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = csl_mac.icns; path = ../src/img/csl_mac.icns; sourceTree = SOURCE_ROOT; };
+		9E3B1E480CCE2BA800E6D4A2 /* maps */ = {isa = PBXFileReference; lastKnownFileType = folder; name = maps; path = ../data/maps; sourceTree = SOURCE_ROOT; };
 		9E3F160F0CA1693800C3C8C9 /* GeoIP.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = GeoIP.c; path = ../src/libGeoIP/GeoIP.c; sourceTree = SOURCE_ROOT; };
 		9E3F16100CA1693800C3C8C9 /* GeoIP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GeoIP.h; path = ../src/libGeoIP/GeoIP.h; sourceTree = SOURCE_ROOT; };
 		9E73FA0F0CA6EED200CA71BC /* CslMenu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslMenu.cpp; path = ../src/CslMenu.cpp; sourceTree = SOURCE_ROOT; };
@@ -227,6 +229,7 @@
 		9EDC68A90CA1C2A4002A4C4B /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				9E3B1E480CCE2BA800E6D4A2 /* maps */,
 				9E015AE00CA569950029BEEF /* csl_mac.icns */,
 				9ECC329A0CA1AA6800578B5E /* csl_start_sb.ogz */,
 				9ECC329B0CA1AA6800578B5E /* GeoIP.dat */,
@@ -302,6 +305,7 @@
 				9ECC329C0CA1AA6800578B5E /* csl_start_sb.ogz in Resources */,
 				9ECC329D0CA1AA6800578B5E /* GeoIP.dat in Resources */,
 				9E015AE10CA569950029BEEF /* csl_mac.icns in Resources */,
+				9E3B1E520CCE2BA800E6D4A2 /* maps in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

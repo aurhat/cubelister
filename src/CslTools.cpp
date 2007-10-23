@@ -27,6 +27,7 @@
 #endif
 #include <wx/regex.h>
 
+wxString g_basePath;
 
 #ifdef __WXDEBUG__
 void Debug_Printf(const char *DbgFunc, const char *FmtStr,...)
