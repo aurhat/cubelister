@@ -75,10 +75,12 @@ static const wxColour team_colours[] =
 };
 
 
-
 bool CslMapInfo::LoadMapData(const wxString& mapName,const wxString& gameName,
                              const wxUint32 protVersion)
 {
+    long int val;
+    wxInt32 x,y;
+    wxUint32 i=0;
     wxUint32 version=protVersion;
 
     wxString path=wxString(wxT(DATADIR))+PATHDIV+wxT("maps")+PATHDIV+gameName+PATHDIV;
@@ -94,11 +96,6 @@ bool CslMapInfo::LoadMapData(const wxString& mapName,const wxString& gameName,
         wxFileInputStream stream(path+mapName+wxT(".cfg"));
         if (!stream.IsOk())
             return false;
-
-        CslBaseInfo *base;
-        long int val;
-        wxInt32 x,y;
-        wxUint32 i=0;
 
         wxFileConfig config(stream);
 
@@ -127,7 +124,7 @@ bool CslMapInfo::LoadMapData(const wxString& mapName,const wxString& gameName,
 
         while (true)
         {
-            config.SetPath(wxString::Format(wxT("/%d/Base%d"),version,i));
+            config.SetPath(wxString::Format(wxT("/%d/Base%d"),version,i++));
             if (!config.Read(wxT("x"),&val))
                 break;
             x=val;
@@ -135,10 +132,7 @@ bool CslMapInfo::LoadMapData(const wxString& mapName,const wxString& gameName,
                 break;
             y=val;
 
-            base=new CslBaseInfo(x,y);
-            m_bases.Add(base);
-
-            i++;
+            m_bases.Add(new CslBaseInfo(x,y));
         }
 
         if (m_bases.GetCount())
@@ -198,6 +192,7 @@ void CslPanelMap::UpdateBases(const t_aBaseInfo& bases,const bool hasBases)
         return;
 
     Refresh(false);
+    //TODO optimise drawing?
     /*for (i=0;i<bases.GetCount();i++)
     {
         wxPoint point=bases.Item(i)->m_point;
@@ -218,10 +213,10 @@ CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
     // begin wxGlade: CslDlgExtended::CslDlgExtended
     sizer_team_score_staticbox = new wxStaticBox(this, -1, _("Team score"));
     sizer_info_staticbox = new wxStaticBox(this, -1, _("Game info"));
-    sizer_check_staticbox = new wxStaticBox(this, -1, wxEmptyString);
+    sizer_update_staticbox = new wxStaticBox(this, -1, _("Update"));
     sizer_map_label_staticbox = new wxStaticBox(this, -1, _("Map info"));
     sizer_map_staticbox = new wxStaticBox(this, -1, _("Map"));
-    list_ctrl_extended = new wxListCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxSUNKEN_BORDER);
+    list_ctrl_players = new wxListCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxSUNKEN_BORDER);
     panel_map = new CslPanelMap(this, wxID_ANY);
     label_team1 = new wxStaticText(this, wxID_ANY, wxEmptyString);
     label_team2 = new wxStaticText(this, wxID_ANY, wxEmptyString);
@@ -237,11 +232,12 @@ CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
     label_records = new wxStaticText(this, wxID_ANY, wxEmptyString);
     checkbox_update = new wxCheckBox(this, CHECK_UPDATE, _("&Auto update"));
     checkbox_update_end = new wxCheckBox(this, wxID_ANY, _("Stop when game &ends"));
-    checkbox_map = new wxCheckBox(this, CHECK_MAP, _("Show map"));
+    button_update = new wxButton(this, BUTTON_REFRESH, _("&Update"));
     label_map = new wxStaticText(this, wxID_ANY, _("label_map"));
     label_author_prefix = new wxStaticText(this, wxID_ANY, _("by"));
     label_author = new wxStaticText(this, wxID_ANY, _("label_author"));
-    button_update = new wxButton(this, BUTTON_REFRESH, _("&Update"));
+    checkbox_map = new wxCheckBox(this, CHECK_MAP, _("Show map"));
+    static_line_1 = new wxStaticLine(this, wxID_ANY);
     button_close = new wxButton(this, wxID_CLOSE, _("&Close"));
 
     set_properties();
@@ -271,10 +267,7 @@ CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
 CslDlgExtended::~CslDlgExtended()
 {
     if (!panel_map->IsShown())
-    {
         delete m_sizerMap;
-        //delete m_sizerMapLabel;
-    }
 }
 
 void CslDlgExtended::set_properties()
@@ -284,7 +277,7 @@ void CslDlgExtended::set_properties()
     label_team1->SetMinSize(wxSize(60, -1));
     label_team2->SetMinSize(wxSize(60, -1));
     checkbox_update_end->Enable(false);
-    label_map->SetFont(wxFont(20, wxDECORATIVE, wxNORMAL, wxBOLD, 0, wxT("")));
+    label_map->SetFont(wxFont(18, wxDECORATIVE, wxNORMAL, wxBOLD, 0, wxT("")));
     label_author->SetFont(wxFont(11, wxDECORATIVE, wxITALIC, wxBOLD, 0, wxT("")));
     button_close->SetDefault();
     // end wxGlade
@@ -298,33 +291,31 @@ void CslDlgExtended::set_properties()
     m_teamLabel.Add(label_team7);
     m_teamLabel.Add(label_team8);
 
-    // wxMAC: have to set minsize of the listctrl to prevent
-    //        hiding of the search panel while dragging splitter
-    //list_ctrl_extended->SetMinSize(wxSize(0,60));
 
 #ifdef __WXMSW__
-    list_ctrl_extended->SetMinSize(wxSize(-1,350)); // x=520
+    list_ctrl_players->SetMinSize(wxSize(520,350)); // x=520
 #endif
 #ifdef __WXGTK__
-    list_ctrl_extended->SetMinSize(wxSize(580,350));
+    list_ctrl_players->SetMinSize(wxSize(580,350));
 #endif
 #ifdef __WXMAC__
-    list_ctrl_extended->SetMinSize(wxSize(580,350));
+    list_ctrl_players->SetMinSize(wxSize(580,350));
 #endif
-//    list_ctrl_extended->SetMinSize(wxSize(-1,350));
+
+//    list_ctrl_players->SetMinSize(wxSize(-1,350));
 }
 
 void CslDlgExtended::do_layout()
 {
     // begin wxGlade: CslDlgExtended::do_layout
     wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(4, 1, 0, 0);
-    wxFlexGridSizer* grid_sizer_button = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* grid_sizer_button = new wxFlexGridSizer(1, 1, 0, 0);
     wxFlexGridSizer* grid_sizer_info_team = new wxFlexGridSizer(1, 4, 0, 0);
     wxStaticBoxSizer* sizer_map_label = new wxStaticBoxSizer(sizer_map_label_staticbox, wxHORIZONTAL);
-    wxFlexGridSizer* grid_sizer_map_label = new wxFlexGridSizer(4, 1, 0, 0);
+    wxFlexGridSizer* grid_sizer_map_label = new wxFlexGridSizer(3, 1, 0, 0);
     wxFlexGridSizer* grid_sizer_author = new wxFlexGridSizer(1, 2, 0, 0);
-    wxStaticBoxSizer* sizer_check = new wxStaticBoxSizer(sizer_check_staticbox, wxHORIZONTAL);
-    wxGridSizer* box_sizer_check = new wxGridSizer(3, 1, 0, 0);
+    wxStaticBoxSizer* sizer_update = new wxStaticBoxSizer(sizer_update_staticbox, wxHORIZONTAL);
+    wxFlexGridSizer* grid_sizer_update = new wxFlexGridSizer(4, 1, 0, 0);
     wxStaticBoxSizer* sizer_info = new wxStaticBoxSizer(sizer_info_staticbox, wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_info = new wxFlexGridSizer(4, 2, 0, 0);
     wxStaticBoxSizer* sizer_team_score = new wxStaticBoxSizer(sizer_team_score_staticbox, wxHORIZONTAL);
@@ -332,7 +323,7 @@ void CslDlgExtended::do_layout()
     wxFlexGridSizer* grid_sizer_list_map = new wxFlexGridSizer(1, 2, 0, 0);
     wxStaticBoxSizer* sizer_map = new wxStaticBoxSizer(sizer_map_staticbox, wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_map = new wxFlexGridSizer(3, 1, 0, 0);
-    grid_sizer_list_map->Add(list_ctrl_extended, 1, wxALL|wxEXPAND, 4);
+    grid_sizer_list_map->Add(list_ctrl_players, 1, wxALL|wxEXPAND, 4);
     grid_sizer_map->Add(1, 1, 0, 0, 0);
     grid_sizer_map->Add(panel_map, 1, wxEXPAND, 0);
     grid_sizer_map->Add(1, 1, 0, 0, 0);
@@ -368,29 +359,28 @@ void CslDlgExtended::do_layout()
     grid_sizer_info->Add(label_records, 0, wxALL, 4);
     sizer_info->Add(grid_sizer_info, 1, wxEXPAND, 0);
     grid_sizer_info_team->Add(sizer_info, 1, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 4);
-    box_sizer_check->Add(checkbox_update, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    box_sizer_check->Add(checkbox_update_end, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    box_sizer_check->Add(checkbox_map, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    sizer_check->Add(box_sizer_check, 1, wxEXPAND, 0);
-    grid_sizer_info_team->Add(sizer_check, 1, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 4);
-    grid_sizer_map_label->Add(1, 1, 0, 0, 0);
-    grid_sizer_map_label->Add(label_map, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
+    grid_sizer_update->Add(checkbox_update, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_update->Add(checkbox_update_end, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_update->Add(1, 2, 0, 0, 0);
+    grid_sizer_update->Add(button_update, 0, wxALL|wxEXPAND, 4);
+    grid_sizer_update->AddGrowableRow(0);
+    grid_sizer_update->AddGrowableRow(5);
+    sizer_update->Add(grid_sizer_update, 1, wxEXPAND, 4);
+    grid_sizer_info_team->Add(sizer_update, 1, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 4);
+    grid_sizer_map_label->Add(label_map, 0, wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_author->Add(label_author_prefix, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_author->Add(label_author, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_map_label->Add(grid_sizer_author, 1, wxALIGN_CENTER_HORIZONTAL, 0);
-    grid_sizer_map_label->Add(1, 1, 0, 0, 0);
-    grid_sizer_map_label->AddGrowableRow(0);
-    grid_sizer_map_label->AddGrowableRow(3);
+    grid_sizer_map_label->Add(grid_sizer_author, 1, wxBOTTOM|wxALIGN_CENTER_HORIZONTAL, 2);
+    grid_sizer_map_label->Add(checkbox_map, 0, wxTOP|wxALIGN_CENTER_HORIZONTAL, 4);
+    grid_sizer_map_label->AddGrowableRow(2);
     grid_sizer_map_label->AddGrowableCol(0);
     sizer_map_label->Add(grid_sizer_map_label, 1, wxEXPAND, 0);
     grid_sizer_info_team->Add(sizer_map_label, 1, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 4);
     grid_sizer_info_team->AddGrowableCol(1);
     grid_sizer_main->Add(grid_sizer_info_team, 1, wxEXPAND, 0);
-    wxStaticLine* static_line = new wxStaticLine(this, wxID_ANY);
-    grid_sizer_main->Add(static_line, 0, wxLEFT|wxRIGHT|wxTOP|wxEXPAND, 4);
-    grid_sizer_button->Add(button_update, 0, wxRIGHT|wxALIGN_CENTER_VERTICAL, 16);
-    grid_sizer_button->Add(button_close, 0, wxALL, 4);
-    grid_sizer_main->Add(grid_sizer_button, 1, wxBOTTOM|wxALIGN_RIGHT, 4);
+    grid_sizer_main->Add(static_line_1, 0, wxLEFT|wxRIGHT|wxTOP|wxEXPAND, 4);
+    grid_sizer_button->Add(button_close, 0, wxRIGHT|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_main->Add(grid_sizer_button, 1, wxTOP|wxBOTTOM|wxALIGN_RIGHT, 4);
     SetSizer(grid_sizer_main);
     grid_sizer_main->Fit(this);
     grid_sizer_main->AddGrowableRow(0);
@@ -422,7 +412,7 @@ void CslDlgExtended::OnClose(wxCloseEvent& event)
 void CslDlgExtended::OnSize(wxSizeEvent& event)
 {
     //ListAdjustSize(event.GetSize());
-    ListAdjustSize(list_ctrl_extended->GetClientSize());
+    ListAdjustSize(list_ctrl_players->GetClientSize());
     //if (m_sizerMapLabel)
     //    m_sizerMapLabel->SetMinSize(m_sizerMap->GetSize().x,-1);
 
@@ -477,8 +467,8 @@ void CslDlgExtended::OnTimer(wxTimerEvent& event)
         else if (!button_update->IsEnabled())
             button_update->Enable();
     }
-    else if (!m_info->m_players && list_ctrl_extended->GetItemCount())
-        list_ctrl_extended->DeleteAllItems();
+    else if (!m_info->m_players && list_ctrl_players->GetItemCount())
+        list_ctrl_players->DeleteAllItems();
 }
 
 void CslDlgExtended::OnCommandEvent(wxCommandEvent& event)
@@ -609,42 +599,42 @@ void CslDlgExtended::SetPlayerData()
         data=stats->m_stats[i];
         if (!data->m_ok)
             break;
-        if (i<list_ctrl_extended->GetItemCount())
+        if (i<list_ctrl_players->GetItemCount())
             continue;
 
         item.SetId(i);
-        list_ctrl_extended->InsertItem(item);
-        list_ctrl_extended->SetItemData(i,(long)data);
+        list_ctrl_players->InsertItem(item);
+        list_ctrl_players->SetItemData(i,(long)data);
 
         if (data->m_player.IsEmpty())
             s=_("- connecting -");
         else
             s=data->m_player;
-        list_ctrl_extended->SetItem(i,0,s);
+        list_ctrl_players->SetItem(i,0,s);
 
         if (data->m_state==CSL_PLAYER_STATE_SB_SPECTATOR)
             s=_("Spectator");
         else
             s=data->m_team;
-        list_ctrl_extended->SetItem(i,1,s);
+        list_ctrl_players->SetItem(i,1,s);
 
         if (data->m_frags<0)
             s=wxT("0");
         else
             s=wxString::Format(wxT("%d"),data->m_frags);
-        list_ctrl_extended->SetItem(i,2,s);
+        list_ctrl_players->SetItem(i,2,s);
 
         if (data->m_deaths<0)
             s=wxT("0");
         else
             s=wxString::Format(wxT("%d"),data->m_deaths);
-        list_ctrl_extended->SetItem(i,3,s);
+        list_ctrl_players->SetItem(i,3,s);
 
         if (data->m_teamkills<0)
             s=wxT("0");
         else
             s=wxString::Format(wxT("%d"),data->m_teamkills);
-        list_ctrl_extended->SetItem(i,4,s);
+        list_ctrl_players->SetItem(i,4,s);
 
         if (data->m_state==CSL_PLAYER_STATE_SB_DEAD)
             s=_("dead");
@@ -654,16 +644,16 @@ void CslDlgExtended::SetPlayerData()
             s=wxT("0");
         else
             s=s=wxString::Format(wxT("%d"),data->m_health);
-        list_ctrl_extended->SetItem(i,5,s);
+        list_ctrl_players->SetItem(i,5,s);
 
         if (data->m_state || data->m_armour<0)
             s=wxT("0");
         else
             s=wxString::Format(wxT("%d"),data->m_armour);
-        list_ctrl_extended->SetItem(i,6,s);
+        list_ctrl_players->SetItem(i,6,s);
 
         s=GetWeaponStrSB(data->m_weapon);
-        list_ctrl_extended->SetItem(i,7,s);
+        list_ctrl_players->SetItem(i,7,s);
 
         wxColour colour=*wxBLACK;
         if (data->m_priv==CSL_PLAYER_PRIV_SB_MASTER)
@@ -675,13 +665,13 @@ void CslDlgExtended::SetPlayerData()
         else
             i=CSL_LIST_IMG_TRANS;
 
-        list_ctrl_extended->SetItemImage(item,i);
+        list_ctrl_players->SetItemImage(item,i);
     }
 
     stats->m_lastResponse=wxDateTime::Now().GetTicks();
 
     label_records->SetLabel(wxString::Format(_("%d players (%d left)"),
-                            list_ctrl_extended->GetItemCount(),stats->m_ids.length()));
+                            list_ctrl_players->GetItemCount(),stats->m_ids.length()));
 
     ListSort(-1);
 }
@@ -740,6 +730,7 @@ void CslDlgExtended::SetTeamData()
             s=data->m_team;
             s+=wxT(": ");
             s+=wxString::Format(wxT("%d"),data->m_score);
+            m_teamLabel.Item(i)->SetFont(m_labelFont);
             m_teamLabel.Item(i)->SetLabel(s);
             m_teamLabel.Item(i)->SetForegroundColour(team_colours[i]);
 
@@ -781,7 +772,12 @@ void CslDlgExtended::SetTeamData()
     }
     else
     {
-        label_team1->SetLabel(_("Not a team game."));
+        label_team1->SetFont(m_labelFont);
+        label_team1->SetForegroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOWTEXT));
+        if (!m_info->m_players)
+            label_team1->SetLabel(_("No teams."));
+        else
+            label_team1->SetLabel(_("Not a team game."));
         label_team1->SetMinSize(label_team1->GetBestSize());
     }
 
@@ -795,7 +791,7 @@ void CslDlgExtended::SetTeamData()
     label_mode->SetLabel(m_info->m_gameMode);
 
     //m_gridSizerMain->Layout();
-    RecalcMinSize(false);
+    RecalcMinSize(true);
 }
 
 void CslDlgExtended::QueryInfo(wxInt32 pid)
@@ -809,7 +805,7 @@ void CslDlgExtended::QueryInfo(wxInt32 pid)
 
         if (m_info->m_playerStats->m_lastRefresh+CSL_EXT_REFRESH_INTERVAL<=now)
         {
-            list_ctrl_extended->DeleteAllItems();
+            list_ctrl_players->DeleteAllItems();
             label_records->SetLabel(_("Waiting for data..."));
             button_update->Enable(false);
 
@@ -833,10 +829,10 @@ void CslDlgExtended::RecalcMinSize(bool reLayout,wxInt32 decWidth)
     wxSize best=GetBestSize();
     wxSize size=GetSize();
 
-    if (decWidth>-1)
+    if (decWidth!=-1)
     {
         width=true;
-        size.x-=decWidth;
+        size.x+=decWidth;
     }
 
     if (best.x>size.x)
@@ -854,11 +850,11 @@ void CslDlgExtended::RecalcMinSize(bool reLayout,wxInt32 decWidth)
     {
         SetMinSize(wxSize(width ? size.x : -1,height ? size.y : -1));
         SetSize(width ? size.x : -1,height ? size.y : -1);
-        SetSizeHints(best);
     }
+    SetSizeHints(best);
 
     if (reLayout)
-        ListAdjustSize(list_ctrl_extended->GetClientSize());
+        ListAdjustSize(list_ctrl_players->GetClientSize());
 
 #ifdef __WXMSW__
     checkbox_update->Refresh();
@@ -869,19 +865,19 @@ void CslDlgExtended::RecalcMinSize(bool reLayout,wxInt32 decWidth)
 
 void CslDlgExtended::ListAdjustSize(const wxSize& size)
 {
-    if (list_ctrl_extended->GetColumnCount()<6)
+    if (list_ctrl_players->GetColumnCount()<6)
         return;
 
-    wxInt32 w=size.x-25;
+    wxInt32 w=size.x-8;
 
-    list_ctrl_extended->SetColumnWidth(0,(wxInt32)(w*0.23f));
-    list_ctrl_extended->SetColumnWidth(1,(wxInt32)(w*0.11f));
-    list_ctrl_extended->SetColumnWidth(2,(wxInt32)(w*0.11f));
-    list_ctrl_extended->SetColumnWidth(3,(wxInt32)(w*0.11f));
-    list_ctrl_extended->SetColumnWidth(4,(wxInt32)(w*0.11f));
-    list_ctrl_extended->SetColumnWidth(5,(wxInt32)(w*0.11f));
-    list_ctrl_extended->SetColumnWidth(6,(wxInt32)(w*0.11f));
-    list_ctrl_extended->SetColumnWidth(7,(wxInt32)(w*0.11f));
+    list_ctrl_players->SetColumnWidth(0,(wxInt32)(w*0.23f));
+    list_ctrl_players->SetColumnWidth(1,(wxInt32)(w*0.11f));
+    list_ctrl_players->SetColumnWidth(2,(wxInt32)(w*0.11f));
+    list_ctrl_players->SetColumnWidth(3,(wxInt32)(w*0.11f));
+    list_ctrl_players->SetColumnWidth(4,(wxInt32)(w*0.11f));
+    list_ctrl_players->SetColumnWidth(5,(wxInt32)(w*0.11f));
+    list_ctrl_players->SetColumnWidth(6,(wxInt32)(w*0.11f));
+    list_ctrl_players->SetColumnWidth(7,(wxInt32)(w*0.11f));
 }
 
 void CslDlgExtended::ListSort(wxInt32 column)
@@ -894,7 +890,7 @@ void CslDlgExtended::ListSort(wxInt32 column)
     else
     {
         item.SetMask(wxLIST_MASK_IMAGE);
-        list_ctrl_extended->GetColumn(column,item);
+        list_ctrl_players->GetColumn(column,item);
 
         if (item.GetImage()==-1 || item.GetImage()==CSL_LIST_IMG_SORT_DSC)
         {
@@ -909,16 +905,16 @@ void CslDlgExtended::ListSort(wxInt32 column)
 
         item.Clear();
         item.SetImage(-1);
-        list_ctrl_extended->SetColumn(m_sortHelper.m_sortType,item);
+        list_ctrl_players->SetColumn(m_sortHelper.m_sortType,item);
 
         item.SetImage(img);
-        list_ctrl_extended->SetColumn(column,item);
+        list_ctrl_players->SetColumn(column,item);
 
         m_sortHelper.m_sortType=column;
     }
 
-    if (list_ctrl_extended->GetItemCount()>0)
-        list_ctrl_extended->SortItems(ListSortCompareFunc,(long)&m_sortHelper);
+    if (list_ctrl_players->GetItemCount()>0)
+        list_ctrl_players->SortItems(ListSortCompareFunc,(long)&m_sortHelper);
 }
 
 void CslDlgExtended::ToggleSortArrow()
@@ -932,23 +928,29 @@ void CslDlgExtended::ToggleSortArrow()
         img=CSL_LIST_IMG_SORT_DSC;
 
     item.SetImage(img);
-    list_ctrl_extended->SetColumn(m_sortHelper.m_sortType,item);
+    list_ctrl_players->SetColumn(m_sortHelper.m_sortType,item);
 }
 
 void CslDlgExtended::ShowPanelMap(const bool show, const bool enable)
 {
-    checkbox_map->SetValue(show);
+    wxInt32 width;
+    //checkbox_map->SetValue(show);
     checkbox_map->Enable(enable);
-    wxInt32 width=m_mapInfo.m_bitmap.GetWidth()+8;
+
+    width=m_mapInfo.m_bitmap.IsOk() ? m_mapInfo.m_bitmap.GetWidth()+16 : -1;
+
+    //wxWindowUpdateLocker lock(this);
 
     if (show)
     {
         //if (m_sizerMapLabel->GetSize().x<width)
-        m_sizerMapLabel->SetMinSize(width,-1);
+        m_sizerMapLabel->SetMinSize(width-8,-1);
     }
 
     if (show && !m_gridSizerList->GetItem(m_sizerMap))
     {
+        Freeze();
+
         m_gridSizerList->Add(m_sizerMap,1,wxALL|wxEXPAND,3);
         //m_gridSizerInfo->Add(m_sizerMapLabel,1,wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND,4);
         m_gridSizerList->Show(m_sizerMap);
@@ -967,8 +969,11 @@ void CslDlgExtended::ShowPanelMap(const bool show, const bool enable)
         return;
 
     //m_gridSizerMain->Layout();
-    RecalcMinSize(true,show ? -1 : width);
-    //ListAdjustSize(list_ctrl_extended->GetClientSize());
+    RecalcMinSize(true,show ? width : width/-1);
+    //ListAdjustSize(list_ctrl_players->GetClientSize());
+
+    if (show)
+        Thaw();
 }
 
 void CslDlgExtended::ListInit(CslEngine *engine)
@@ -977,43 +982,43 @@ void CslDlgExtended::ListInit(CslEngine *engine)
 
     m_engine=engine;
 
-    list_ctrl_extended->SetImageList(&m_imageList,wxIMAGE_LIST_SMALL);
+    list_ctrl_players->SetImageList(&m_imageList,wxIMAGE_LIST_SMALL);
 
     item.SetMask(wxLIST_MASK_TEXT|wxLIST_MASK_FORMAT);
     item.SetImage(-1);
 
     item.SetAlign(wxLIST_FORMAT_LEFT);
     item.SetText(_("Player"));
-    list_ctrl_extended->InsertColumn(0,item);
-    list_ctrl_extended->SetColumn(0,item);
+    list_ctrl_players->InsertColumn(0,item);
+    list_ctrl_players->SetColumn(0,item);
 
     item.SetText(_("Team"));
-    list_ctrl_extended->InsertColumn(1,item);
-    list_ctrl_extended->SetColumn(1,item);
+    list_ctrl_players->InsertColumn(1,item);
+    list_ctrl_players->SetColumn(1,item);
 
     item.SetText(_("Frags"));
-    list_ctrl_extended->InsertColumn(2,item);
-    list_ctrl_extended->SetColumn(2,item);
+    list_ctrl_players->InsertColumn(2,item);
+    list_ctrl_players->SetColumn(2,item);
 
     item.SetText(_("Deaths"));
-    list_ctrl_extended->InsertColumn(3,item);
-    list_ctrl_extended->SetColumn(3,item);
+    list_ctrl_players->InsertColumn(3,item);
+    list_ctrl_players->SetColumn(3,item);
 
     item.SetText(_("Teamkills"));
-    list_ctrl_extended->InsertColumn(4,item);
-    list_ctrl_extended->SetColumn(4,item);
+    list_ctrl_players->InsertColumn(4,item);
+    list_ctrl_players->SetColumn(4,item);
 
     item.SetText(_("Health"));
-    list_ctrl_extended->InsertColumn(5,item);
-    list_ctrl_extended->SetColumn(5,item);
+    list_ctrl_players->InsertColumn(5,item);
+    list_ctrl_players->SetColumn(5,item);
 
     item.SetText(_("Armour"));
-    list_ctrl_extended->InsertColumn(6,item);
-    list_ctrl_extended->SetColumn(6,item);
+    list_ctrl_players->InsertColumn(6,item);
+    list_ctrl_players->SetColumn(6,item);
 
     item.SetText(_("Weapon"));
-    list_ctrl_extended->InsertColumn(7,item);
-    list_ctrl_extended->SetColumn(7,item);
+    list_ctrl_players->InsertColumn(7,item);
+    list_ctrl_players->SetColumn(7,item);
 
     // assertion on __WXMAC__
     //ListAdjustSize(GetClientSize());
@@ -1034,7 +1039,7 @@ void CslDlgExtended::DoShow(CslServerInfo *info)
 
     if (m_info!=info)
     {
-        list_ctrl_extended->DeleteAllItems();
+        list_ctrl_players->DeleteAllItems();
         label_records->SetLabel(wxString::Format(_("%d players (%d left)"),0,0));
     }
 
@@ -1061,7 +1066,7 @@ void CslDlgExtended::DoShow(CslServerInfo *info)
     if (IsShown())
         return;
 
-    //ListAdjustSize(list_ctrl_extended->GetClientSize());
+    //ListAdjustSize(list_ctrl_players->GetClientSize());
     Show();
 }
 

@@ -171,11 +171,11 @@ class CslDlgExtended: public wxDialog
     protected:
         // begin wxGlade: CslDlgExtended::attributes
         wxStaticBox* sizer_map_label_staticbox;
-        wxStaticBox* sizer_check_staticbox;
+        wxStaticBox* sizer_update_staticbox;
         wxStaticBox* sizer_info_staticbox;
         wxStaticBox* sizer_team_score_staticbox;
         wxStaticBox* sizer_map_staticbox;
-        wxListCtrl* list_ctrl_extended;
+        wxListCtrl* list_ctrl_players;
         CslPanelMap* panel_map;
         wxStaticText* label_team1;
         wxStaticText* label_team2;
@@ -191,11 +191,12 @@ class CslDlgExtended: public wxDialog
         wxStaticText* label_records;
         wxCheckBox* checkbox_update;
         wxCheckBox* checkbox_update_end;
-        wxCheckBox* checkbox_map;
+        wxButton* button_update;
         wxStaticText* label_map;
         wxStaticText* label_author_prefix;
         wxStaticText* label_author;
-        wxButton* button_update;
+        wxCheckBox* checkbox_map;
+        wxStaticLine* static_line_1;
         wxButton* button_close;
         // end wxGlade
 

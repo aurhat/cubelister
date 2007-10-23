@@ -565,9 +565,8 @@ void CslEngine::FuzzPingSends()
 void CslEngine::UpdateServerInfo(CslServerInfo *info,ucharbuf *buf,wxUint32 now)
 {
     wxUint32 l;
-    wxUint32 ml=127;
-    char text[128];
-    text[ml]=0;
+    const wxUint32 ml=128;
+    char text[ml];
 
     info->m_pingResp=GetTicks();
     info->m_ping=info->m_pingResp-info->m_pingSend;
@@ -651,9 +650,8 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
     wxInt32 vi;
     wxUint32 exVersion;
     wxUint32 vu=0;
-    wxUint32 ml=127;
-    char text[128];
-    text[ml]=0;
+    const wxUint32 ml=128;
+    char text[ml];
     bool extended=false;
     ucharbuf p((uchar*)packet->Data(),packet->Size());
 
@@ -874,11 +872,13 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
                             getstring(text,p,ml);
                             data->m_team=A2U(text);
                             data->m_score=getint(p);
+
                             if (exVersion>=102)
                             {
                                 vi=getint(p);
-                                while (vi--)
-                                    data->m_bases.add(getint(p));
+                                if (vi>0)
+                                    while (vi--)
+                                        data->m_bases.add(getint(p));
                             }
 
                             stats->AddStats(data);
