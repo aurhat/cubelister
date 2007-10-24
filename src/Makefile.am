@@ -11,11 +11,11 @@ csl_SOURCES = CslArt.cpp CslDlgAddMaster.cpp CslDlgAddServer.cpp \
 AM_CPPFLAGS =  $(LIBSDL_CFLAGS) $(all_includes)
 
 # the library search path.
-csl_LDFLAGS = $(all_libraries) $(LIBSDL_RPATH)
-csl_LDADD = $(LIBSDL_LIBS) $(top_builddir)/src/libGeoIP/libGeoIP.a ${WX_LIBS}
+csl_LDFLAGS = $(all_libraries)
+csl_LDADD = $(top_builddir)/src/libGeoIP/libGeoIP.a ${WX_LIBS}
 noinst_HEADERS = CslArt.h CslDlgAddMaster.h CslDlgAddServer.h \
 	CslDlgConnectPass.h CslDlgConnectWait.h CslDlgExtended.h CslDlgOutput.h CslDlgSettings.h \
-	CslFrame.h CslGame.h CslListCtrlInfo.h CslListCtrlServer.h CslMenu.h CslSettings.h \
-	CslStatusBar.h CslTools.h CslUDP.h cube_tools.h
-SUBDIRS = libGeoIP
+	CslExtendedInfo.h CslFrame.h CslGame.h CslListCtrlInfo.h CslListCtrlServer.h CslMenu.h \
+	CslSettings.h CslStatusBar.h CslTools.h CslUDP.h cube_tools.h
+SUBDIRS = cslmapcfgtool libGeoIP
 INCLUDES = -I$(top_srcdir)/src/libGeoIP -I$(top_srcdir)/$(CSL_FLAGS_INCLUDE)

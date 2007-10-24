@@ -1,34 +1,19 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <!DOCTYPE KDevPrjSession>
 <KDevPrjSession>
- <DocsAndViews NumberOfDocuments="9" >
-  <Doc0 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslDlgExtended.cpp" >
+ <DocsAndViews NumberOfDocuments="4" >
+  <Doc0 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/cslmapcfgtool/CslMapCfgTool.cpp" >
    <View0 Encoding="" Type="Source" />
   </Doc0>
-  <Doc1 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslEngine.cpp" >
+  <Doc1 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/cslmapcfgtool/CslMapCfgTool.h" >
    <View0 Encoding="" Type="Source" />
   </Doc1>
-  <Doc2 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslFrame.cpp" >
+  <Doc2 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslGame.h" >
    <View0 Encoding="" Type="Source" />
   </Doc2>
-  <Doc3 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslTools.h" >
-   <View0 Encoding="" Type="Source" />
+  <Doc3 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslEngine.cpp" >
+   <View0 Encoding="" line="690" Type="Source" />
   </Doc3>
-  <Doc4 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslTools.cpp" >
-   <View0 Encoding="" Type="Source" />
-  </Doc4>
-  <Doc5 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslVersion.h" >
-   <View0 Encoding="" Type="Source" />
-  </Doc5>
-  <Doc6 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/wxWidgets/wxWidgets-2.8.5-HTML/docs/mshtml/wx/wx_wxsize.html" >
-   <View0 Type="Documentation" />
-  </Doc6>
-  <Doc7 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslDlgExtended.h" >
-   <View0 Encoding="" Type="Source" />
-  </Doc7>
-  <Doc8 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/wxWidgets/wxWidgets-2.8.5-HTML/docs/mshtml/wx/wx_wxscrollbar.html#wxscrollbar" >
-   <View0 Type="Documentation" />
-  </Doc8>
  </DocsAndViews>
  <pluginList>
   <kdevdebugger>

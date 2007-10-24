@@ -410,10 +410,7 @@ void CslDlgExtended::OnClose(wxCloseEvent& event)
 
 void CslDlgExtended::OnSize(wxSizeEvent& event)
 {
-    //ListAdjustSize(event.GetSize());
     ListAdjustSize(list_ctrl_players->GetClientSize());
-    //if (m_sizerMapLabel)
-    //    m_sizerMapLabel->SetMinSize(m_sizerMap->GetSize().x,-1);
 
     event.Skip();
 }
@@ -790,7 +787,6 @@ void CslDlgExtended::SetTeamData()
     label_remaining->SetLabel(s);
     label_mode->SetLabel(m_info->m_gameMode);
 
-    //m_gridSizerMain->Layout();
     RecalcMinSize(true);
 }
 
@@ -948,35 +944,26 @@ void CslDlgExtended::ShowPanelMap(const bool show)
         width=-1;
 
     if (show)
-    {
-        //if (m_sizerMapLabel->GetSize().x<width)
         m_sizerMapLabel->SetMinSize(width-8,-1);
-    }
 
     if (show && !m_gridSizerList->GetItem(m_sizerMap))
     {
         Freeze();
 
         m_gridSizerList->Add(m_sizerMap,1,wxALL|wxEXPAND,3);
-        //m_gridSizerInfo->Add(m_sizerMapLabel,1,wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND,4);
         m_gridSizerList->Show(m_sizerMap);
-        //m_gridSizerInfo->Show(m_sizerMapLabel);
     }
     else if (!show && m_gridSizerList->GetItem(m_sizerMap))
     {
         m_gridSizerList->Hide(m_sizerMap);
-        //m_gridSizerInfo->Hide(m_sizerMapLabel);
         m_gridSizerList->Detach(m_sizerMap);
-        //m_gridSizerInfo->Detach(m_sizerMapLabel);
 
         m_sizerMapLabel->SetMinSize(-1,-1);
     }
     else
         return;
 
-    //m_gridSizerMain->Layout();
     RecalcMinSize(true,show ? width : width/-1);
-    //ListAdjustSize(list_ctrl_players->GetClientSize());
 
     if (show)
         Thaw();
@@ -1072,7 +1059,6 @@ void CslDlgExtended::DoShow(CslServerInfo *info)
     if (IsShown())
         return;
 
-    //ListAdjustSize(list_ctrl_players->GetClientSize());
     Show();
 }
 

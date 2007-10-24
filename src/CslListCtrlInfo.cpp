@@ -264,9 +264,9 @@ void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
         s=s.Format(wxT("%d"),info->m_protocol);
     SetItem(ic++,1,s);
 
-    if (info->m_exInfo!=CSL_EXINFO_FALSE)
+    if (info->m_exInfo!=CSL_EXT_STATUS_FALSE)
     {
-        if (info->m_exInfo==CSL_EXINFO_OK)
+        if (info->m_exInfo==CSL_EXT_STATUS_OK)
             s=FormatSeconds(info->m_uptime);
         else
             s=_("This version of extended info is not supported.");

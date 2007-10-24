@@ -28,12 +28,15 @@
       <terminal>true</terminal>
       <runarguments>
         <csl/>
+        <cslmapcfgtool/>
       </runarguments>
       <debugarguments>
         <csl/>
+        <cslmapcfgtool/>
       </debugarguments>
       <cwd>
         <csl>/home/mimosius/Documents/Development/csl/</csl>
+        <cslmapcfgtool>/home/mimosius/Documents/Development/csl/csl/debug/./src</cslmapcfgtool>
       </cwd>
       <programargs/>
       <globaldebugarguments/>

@@ -338,7 +338,13 @@ class CslTeamStats
         wxCriticalSection *m_critical;
 };
 
-enum { CSL_EXINFO_OK = 0, CSL_EXINFO_FALSE, CSL_EXINFO_ERROR };
+enum
+{
+    CSL_EXT_STATUS_ERROR    = -1,
+    CSL_EXT_STATUS_FALSE,
+    CSL_EXT_STATUS_OK,
+    CSL_EXT_STATUS_MISMATCH,
+};
 
 class CslServerInfo
 {
@@ -380,7 +386,7 @@ class CslServerInfo
             m_uptimeRefresh=CSL_UPTIME_REFRESH_MULT;
             m_lock=0;
             m_waiting=false;
-            m_exInfo=CSL_EXINFO_FALSE;
+            m_exInfo=CSL_EXT_STATUS_FALSE;
             m_playerStats=NULL;
             m_teamStats=NULL;
         }
