@@ -33,6 +33,7 @@ ICON_LIST_CB_16         ICON                    "img\\cb_16.ico"
 ICON_LIST_SB_EXT_16     ICON                    "img\\sb_ext_16.ico"
 ICON_LIST_AC_EXT_16     ICON                    "img\\ac_ext_16.ico"
 ICON_LIST_BF_EXT_16     ICON                    "img\\bf_ext_16.ico"
+ICON_LIST_CB_EXT_16     ICON                    "img\\cb_ext_16.ico"
 
 ICON_MENU_CONNECT       ICON                    "img\\connect_16.ico"
 ICON_MENU_CONNECT_PW    ICON                    "img\\connect_pw_16.ico"

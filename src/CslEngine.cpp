@@ -505,7 +505,7 @@ int CslEngine::UpdateMaster()
     else
     {
         vector <CslServerInfo*> *servers=m_currentMaster->GetServers();
-        loopv(*servers) RemoveServerFromMaster(servers->at(i));
+        loopvrev(*servers) RemoveServerFromMaster(servers->at(i));
 
         char *p=(char*)buf;
         char *pend;

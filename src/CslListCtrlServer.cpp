@@ -51,6 +51,7 @@
 #include "img/sb_ext_16.xpm"
 #include "img/ac_ext_16.xpm"
 #include "img/bf_ext_16.xpm"
+#include "img/cb_ext_16.xpm"
 #endif
 
 enum
@@ -194,6 +195,7 @@ CslListCtrlServer::CslListCtrlServer(wxWindow* parent,wxWindowID id,const wxPoin
 #define CSL_LIST_IMG_SB_EXT          15
 #define CSL_LIST_IMG_AC_EXT          16
 #define CSL_LIST_IMG_BF_EXT          17
+#define CSL_LIST_IMG_CB_EXT          18
 
     m_imageList.Create(16,16,true);
 
@@ -216,6 +218,7 @@ CslListCtrlServer::CslListCtrlServer(wxWindow* parent,wxWindowID id,const wxPoin
     m_imageList.Add(wxBitmap(sb_ext_16_xpm));
     m_imageList.Add(wxBitmap(ac_ext_16_xpm));
     m_imageList.Add(wxBitmap(bf_ext_16_xpm));
+    m_imageList.Add(wxBitmap(cb_ext_16_xpm));
 #else
     m_imageList.Add(wxIcon(wxT("ICON_LIST_GREEN"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imageList.Add(wxIcon(wxT("ICON_LIST_YELLOW"),wxBITMAP_TYPE_ICO_RESOURCE));
@@ -235,6 +238,7 @@ CslListCtrlServer::CslListCtrlServer(wxWindow* parent,wxWindowID id,const wxPoin
     m_imageList.Add(wxIcon(wxT("ICON_LIST_SB_EXT_16"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imageList.Add(wxIcon(wxT("ICON_LIST_AC_EXT_16"),wxBITMAP_TYPE_ICO_RESOURCE));
     m_imageList.Add(wxIcon(wxT("ICON_LIST_BF_EXT_16"),wxBITMAP_TYPE_ICO_RESOURCE));
+    m_imageList.Add(wxIcon(wxT("ICON_LIST_CB_EXT_16"),wxBITMAP_TYPE_ICO_RESOURCE));
 #endif
 
     wxArtProvider::Push(new CslArt);
@@ -1095,7 +1099,7 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
                 i=info->m_extInfoStatus!=CSL_EXT_STATUS_FALSE ? CSL_LIST_IMG_BF_EXT : CSL_LIST_IMG_BF;
                 break;
             case CSL_GAME_CB:
-                i=CSL_LIST_IMG_CB;
+                i=info->m_extInfoStatus!=CSL_EXT_STATUS_FALSE ? CSL_LIST_IMG_CB_EXT : CSL_LIST_IMG_CB;
                 break;
             default:
                 i=-1;

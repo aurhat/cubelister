@@ -161,8 +161,8 @@ void CslPanelMap::OnPaint(wxPaintEvent& event)
         for (i=0;i<m_bases.GetCount();i++)
         {
             CslBaseInfo *base=m_bases.Item(i);
-            //dc.SetPen(wxPen(base->m_colour));
-            dc.SetPen(wxPen(*wxWHITE));
+            dc.SetPen(wxPen(base->m_colour));
+            //dc.SetPen(wxPen(*wxWHITE));
             dc.SetBrush(wxBrush(base->m_colour));
             dc.DrawCircle(origin.x+base->m_point.x,origin.y+base->m_point.y,4);
         }
@@ -615,19 +615,19 @@ void CslDlgExtended::SetPlayerData()
         list_ctrl_players->SetItem(i,1,s);
 
         if (data->m_frags<0)
-            s=wxT("0");
+            s=_("no data");
         else
             s=wxString::Format(wxT("%d"),data->m_frags);
         list_ctrl_players->SetItem(i,2,s);
 
         if (data->m_deaths<0)
-            s=wxT("0");
+            s=_("no data");
         else
             s=wxString::Format(wxT("%d"),data->m_deaths);
         list_ctrl_players->SetItem(i,3,s);
 
         if (data->m_teamkills<0)
-            s=wxT("0");
+            s=_("no data");
         else
             s=wxString::Format(wxT("%d"),data->m_teamkills);
         list_ctrl_players->SetItem(i,4,s);
@@ -648,7 +648,7 @@ void CslDlgExtended::SetPlayerData()
             s=wxString::Format(wxT("%d"),data->m_armour);
         list_ctrl_players->SetItem(i,6,s);
 
-        s=GetWeaponStrSB(data->m_weapon);
+		s=CslGame::GetWeaponName(m_info->m_type,data->m_weapon);
         list_ctrl_players->SetItem(i,7,s);
 
         wxColour colour=*wxBLACK;

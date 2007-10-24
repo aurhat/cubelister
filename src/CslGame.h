@@ -106,6 +106,8 @@ extern const wxChar* GetVersionStrCB(int n);
 extern const wxChar* GetModeStrSB(int n);
 extern const wxChar* GetModeStrAC(int n);
 extern const wxChar* GetWeaponStrSB(int n);
+extern const wxChar* GetWeaponStrAC(int n);
+extern const wxChar* GetWeaponStrCB(int n);
 extern const wxChar* GetGameStr(int n);
 
 
@@ -397,6 +399,8 @@ class CslGame
         CslServerInfo* FindServerByAddr(const wxIPV4address& addr);
 
         static wxString GetGameName(const CSL_GAMETYPE type);
+		static wxString GetWeaponName(const CSL_GAMETYPE type,const wxInt32 weapon);
+
         static wxInt32 ConnectCleanupConfig(const CSL_GAMETYPE type,const wxString& cfg);
         static wxInt32 ConnectWriteConfig(const CSL_GAMETYPE& type,const wxString& cfg,const wxString& str);
         static wxInt32 ConnectPrepareConfig(wxString& out,const CslServerInfo *info,const wxString& path,

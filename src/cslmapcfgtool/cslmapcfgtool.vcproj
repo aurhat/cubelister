@@ -2,10 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="csl"
-	ProjectGUID="{D5AE8284-7BC8-4FE3-89D3-2E737696DEAB}"
-	RootNamespace="csl"
-	Keyword="Win32Proj"
+	Name="cslmapcfgtool"
+	ProjectGUID="{E2D6E559-1BBC-49A9-81E0-F9C45B0F9185}"
+	RootNamespace="cslmapcfgtool"
 	>
 	<Platforms>
 		<Platform
@@ -40,12 +39,10 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;libGeoIP;img/flags/win"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
@@ -62,7 +59,6 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="wxbase28d.lib wxbase28d_net.lib wxmsw28d_adv.lib wxmsw28d_core.lib wxtiffd.lib wxjpegd.lib wxpngd.lib wxzlibd.lib wxregexd.lib wxexpatd.lib comctl32.lib rpcrt4.lib wsock32.lib"
-				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -117,10 +113,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=".;libGeoIP;img/flags/win"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE"
 				RuntimeLibrary="0"
-				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -137,7 +131,6 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="wxbase28.lib wxbase28_net.lib wxmsw28_adv.lib wxmsw28_core.lib wxtiff.lib wxjpeg.lib wxpng.lib wxzlib.lib wxregex.lib wxexpat.lib comctl32.lib rpcrt4.lib wsock32.lib"
-				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -179,87 +172,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\CslArt.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CslDlgAddMaster.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CslDlgAddServer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CslDlgConnectPass.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CslDlgConnectWait.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CslDlgExtended.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CslDlgOutput.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CslDlgSettings.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CslEngine.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CslExtendedInfo.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CslExtendedInfo.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CslFrame.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CslGame.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CslListCtrlInfo.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CslListCtrlServer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CslMenu.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CslStatusBar.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CslTools.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CslUDP.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\cube_tools.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\libGeoIP\GeoIP.c"
+				RelativePath=".\CslMapCfgTool.cpp"
 				>
 			</File>
 		</Filter>
@@ -269,93 +182,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\csl.rc"
+				RelativePath=".\CslMapCfgTool.h"
 				>
 			</File>
-			<File
-				RelativePath=".\CslArt.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CslDlgAddMaster.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CslDlgAddServer.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CslDlgConnectPass.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CslDlgExtended.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CslDlgGeneric.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CslDlgOutput.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CslDlgSettings.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CslEngine.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CslFlags.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CslFrame.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CslGame.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CslListCtrlInfo.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CslListCtrlServer.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CslMenu.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CslSettings.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CslStatusBar.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CslTools.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CslUDP.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CslVersion.h"
-				>
-			</File>
-			<File
-				RelativePath=".\cube_tools.h"
-				>
-			</File>
+		</Filter>
+		<Filter
+			Name="Ressourcendateien"
+			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
+			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
+			>
 		</Filter>
 	</Files>
 	<Globals>

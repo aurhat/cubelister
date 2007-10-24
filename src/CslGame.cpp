@@ -104,6 +104,26 @@ const wxChar* GetWeaponStrSB(int n)
     return (n>=0 && (size_t)n<sizeof(sb_weapons)/sizeof(sb_weapons[0])) ? sb_weapons[n] : _("unknown");
 }
 
+const wxChar* GetWeaponStrAC(int n)
+{
+    static const wxChar* ac_weapons[] =
+    {
+        wxT("nife"), wxT("Pistol"), wxT("Shotgun"), wxT("Subgun"),
+        wxT("Sniper"), wxT("Assault"), wxT("Grenade")
+    };
+    return (n>=0 && (size_t)n<sizeof(ac_weapons)/sizeof(ac_weapons[0])) ? ac_weapons[n] : _("unknown");
+}
+
+const wxChar* GetWeaponStrCB(int n)
+{
+    static const wxChar* cb_weapons[] =
+    {
+        wxT("Fist"), wxT("Shotgun"), wxT("Chaingun"), wxT("Rocketlauncher"),
+        wxT("Rifle"), wxT("Fireball"), wxT("Iceball"), wxT("Slimeball"), wxT("Bite")
+    };
+    return (n>=0 && (size_t)n<sizeof(cb_weapons)/sizeof(cb_weapons[0])) ? cb_weapons[n] : _("unknown");
+}
+
 const wxChar* GetGameStr(int n)
 {
     static const wxChar *game_names[] =
@@ -302,6 +322,27 @@ wxString CslGame::GetGameName(const CSL_GAMETYPE type)
             return CSL_DEFAULT_NAME_BF;
         case CSL_GAME_CB:
             return CSL_DEFAULT_NAME_CB;
+        default:
+            break;
+    }
+
+    wxASSERT_MSG(!type,wxT("unknown game"));
+    return wxEmptyString;
+}
+
+wxString CslGame::GetWeaponName(const CSL_GAMETYPE type,const wxInt32 weapon)
+{
+	switch (type)
+    {
+        case CSL_GAME_SB:
+            return GetWeaponStrSB(weapon);
+        case CSL_GAME_AC:
+            return GetWeaponStrAC(weapon);
+        case CSL_GAME_BF:
+			//TODO add weapons for BF
+            return wxEmptyString;
+        case CSL_GAME_CB:
+            return GetWeaponStrCB(weapon);
         default:
             break;
     }
