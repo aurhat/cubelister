@@ -4,8 +4,9 @@ AM_CXXFLAGS = -DLOCALEDIR=\"$(localedir)\" -DDATADIR=\"$(datadir)/csl\"
 bin_PROGRAMS = csl
 csl_SOURCES = CslArt.cpp CslDlgAddMaster.cpp CslDlgAddServer.cpp \
 	CslDlgConnectPass.cpp CslDlgConnectWait.cpp CslDlgExtended.cpp CslDlgOutput.cpp \
-	CslDlgSettings.cpp CslEngine.cpp CslFrame.cpp CslGame.cpp CslListCtrlInfo.cpp \
-	CslListCtrlServer.cpp CslMenu.cpp CslStatusBar.cpp CslTools.cpp CslUDP.cpp cube_tools.cpp
+	CslDlgSettings.cpp CslEngine.cpp CslExtendedInfo.cpp CslFrame.cpp CslGame.cpp \
+	CslListCtrlInfo.cpp CslListCtrlServer.cpp CslMenu.cpp CslStatusBar.cpp CslTools.cpp \
+	CslUDP.cpp cube_tools.cpp
 
 # set the include path found by configure
 AM_CPPFLAGS =  $(LIBSDL_CFLAGS) $(all_includes)

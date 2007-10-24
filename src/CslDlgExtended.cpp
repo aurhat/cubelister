@@ -88,7 +88,6 @@ bool CslMapInfo::LoadMapData(const wxString& mapName,const wxString& gameName,
     if (!::wxDirExists(path))
         path=::g_basePath+wxT("/data/maps/")+gameName+PATHDIV;
 #endif
-    LOG_DEBUG("%s\n",U2A(path));
     Reset(mapName);
 
     if (::wxFileExists(path+mapName+wxT(".cfg")))

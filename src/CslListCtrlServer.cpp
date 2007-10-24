@@ -362,7 +362,7 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
             CslMenu::AddItemToMenu(&menu,MENU_SERVER_CONNECT_PW,MENU_SERVER_CONN_PW_STR,wxART_CONNECT_PW);
 
         CslMenu::AddItemToMenu(&menu,MENU_SERVER_EXTENDED,_("Extended information"),wxART_ABOUT);
-        if (info->m_exInfo!=CSL_EXT_STATUS_OK || !PingOk(info))
+        if (info->m_extInfoStatus!=CSL_EXT_STATUS_OK || !PingOk(info))
             menu.Enable(MENU_SERVER_EXTENDED,false);
 
         menu.AppendSeparator();
@@ -1069,11 +1069,11 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
         if (!pingOk)
             i=CSL_LIST_IMG_GREY;
         else if (info->m_ping>(wxInt32)g_cslSettings->m_ping_bad)
-            i=info->m_exInfo!=CSL_EXT_STATUS_FALSE ? CSL_LIST_IMG_RED_EXT : CSL_LIST_IMG_RED;
+            i=info->m_extInfoStatus!=CSL_EXT_STATUS_FALSE ? CSL_LIST_IMG_RED_EXT : CSL_LIST_IMG_RED;
         else if (info->m_ping>(wxInt32)g_cslSettings->m_ping_good)
-            i=info->m_exInfo!=CSL_EXT_STATUS_FALSE ? CSL_LIST_IMG_YELLOW_EXT : CSL_LIST_IMG_YELLOW;
+            i=info->m_extInfoStatus!=CSL_EXT_STATUS_FALSE ? CSL_LIST_IMG_YELLOW_EXT : CSL_LIST_IMG_YELLOW;
         else
-            i=info->m_exInfo!=CSL_EXT_STATUS_FALSE ? CSL_LIST_IMG_GREEN_EXT : CSL_LIST_IMG_GREEN;
+            i=info->m_extInfoStatus!=CSL_EXT_STATUS_FALSE ? CSL_LIST_IMG_GREEN_EXT : CSL_LIST_IMG_GREEN;
 
         if (infoCmp->ImgId()!=i)
         {
@@ -1086,13 +1086,13 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
         switch (info->m_type)
         {
             case CSL_GAME_SB:
-                i=info->m_exInfo!=CSL_EXT_STATUS_FALSE ? CSL_LIST_IMG_SB_EXT : CSL_LIST_IMG_SB;
+                i=info->m_extInfoStatus!=CSL_EXT_STATUS_FALSE ? CSL_LIST_IMG_SB_EXT : CSL_LIST_IMG_SB;
                 break;
             case CSL_GAME_AC:
-                i=info->m_exInfo!=CSL_EXT_STATUS_FALSE ? CSL_LIST_IMG_AC_EXT : CSL_LIST_IMG_AC;
+                i=info->m_extInfoStatus!=CSL_EXT_STATUS_FALSE ? CSL_LIST_IMG_AC_EXT : CSL_LIST_IMG_AC;
                 break;
             case CSL_GAME_BF:
-                i=info->m_exInfo!=CSL_EXT_STATUS_FALSE ? CSL_LIST_IMG_BF_EXT : CSL_LIST_IMG_BF;
+                i=info->m_extInfoStatus!=CSL_EXT_STATUS_FALSE ? CSL_LIST_IMG_BF_EXT : CSL_LIST_IMG_BF;
                 break;
             case CSL_GAME_CB:
                 i=CSL_LIST_IMG_CB;

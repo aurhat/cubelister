@@ -33,6 +33,7 @@
 #include "wx/wx.h"
 #endif
 #include <wx/sckaddr.h>
+#include "CslExtendedInfo.h"
 #include "cube_tools.h"
 
 
@@ -111,240 +112,6 @@ extern const wxChar* GetGameStr(int n);
 class CslGame;
 class CslMaster;
 
-enum
-{
-    CSL_PLAYER_STATE_SB_ALIVE = 0,
-    CSL_PLAYER_STATE_SB_DEAD,
-    CSL_PLAYER_STATE_SB_SPAWNING,
-    CSL_PLAYER_STATE_SB_LAGGED,
-    CSL_PLAYER_STATE_SB_EDITING,
-    CSL_PLAYER_STATE_SB_SPECTATOR
-};
-
-enum
-{
-    CSL_PLAYER_PRIV_SB_NONE = 0,
-    CSL_PLAYER_PRIV_SB_MASTER,
-    CSL_PLAYER_PRIV_SB_ADMIN
-};
-
-class CslPlayerStatsData
-{
-    public:
-        CslPlayerStatsData() :
-                m_frags(-1),m_deaths(-1),m_teamkills(-1),
-                m_health(-1),m_armour(-1),m_weapon(-1),
-                m_id(-1),m_priv(0),m_state(0),
-                m_ok(false) {}
-
-        wxString m_player,m_team;
-        wxInt32 m_frags,m_deaths,m_teamkills;
-        wxInt32 m_health,m_armour,m_weapon;
-        wxInt32 m_id;
-        wxUint32 m_priv,m_state;
-        bool m_ok;
-};
-
-class CslPlayerStats
-{
-    public:
-        enum { CSL_STATS_NEED_IDS=0, CSL_STATS_NEED_STATS };
-
-        CslPlayerStats() : m_status(CSL_STATS_NEED_IDS),
-                m_lastRefresh(0),m_lastResponse(0) { m_critical=new wxCriticalSection(); }
-
-        ~CslPlayerStats() { DeleteStats(); delete m_critical; }
-
-        CslPlayerStatsData* GetNewStatsPtr()
-        {
-            wxCriticalSectionLocker enter(*m_critical);
-
-            loopv(m_stats)
-            {
-                if (m_stats[i]->m_ok) continue;
-                return m_stats[i];
-            }
-            return new CslPlayerStatsData;
-        }
-
-        bool AddStats(CslPlayerStatsData *data)
-        {
-            wxCriticalSectionLocker enter(*m_critical);
-
-            if (m_status!=CSL_STATS_NEED_STATS)
-                return false;
-
-            loopv(m_ids)
-            {
-                if (m_ids[i]!=data->m_id)
-                    continue;
-                m_ids.remove(i);
-                data->m_ok=true;
-                if (m_ids.length()==0)
-                    m_status=CSL_STATS_NEED_IDS;
-                loopv(m_stats) if (m_stats[i]==data) return true;
-                m_stats.add(data);
-                return true;
-            }
-            return false;
-        }
-
-        void RemoveStats(CslPlayerStatsData *data)
-        {
-            wxCriticalSectionLocker enter(*m_critical);
-
-            loopv(m_stats)
-            {
-                if (m_stats[i]==data)
-                {
-                    m_stats[i]->m_ok=false;
-                    return;
-                }
-            }
-            delete data;
-        }
-
-        void DeleteStats()
-        {
-            wxCriticalSectionLocker enter(*m_critical);
-
-            m_status=CSL_STATS_NEED_IDS;
-            loopvrev(m_stats) delete m_stats[i];
-            m_stats.setsize(0);
-        }
-
-        void Reset()
-        {
-            wxCriticalSectionLocker enter(*m_critical);
-
-            m_status=CSL_STATS_NEED_IDS;
-            loopv(m_stats) m_stats[i]->m_ok=false;
-            loopv(m_ids) m_ids.remove(0);
-        }
-
-        bool AddId(wxInt32 id)
-        {
-            wxCriticalSectionLocker enter(*m_critical);
-
-            if (m_status!=CSL_STATS_NEED_IDS)
-                return false;
-            loopv(m_ids) if (m_ids[i]==id)
-                return false;
-            m_ids.add(id);
-            return true;
-        }
-
-        bool RemoveId(wxInt32 id)
-        {
-            wxCriticalSectionLocker enter(*m_critical);
-
-            loopv(m_ids)
-            {
-                if (m_ids[i]!=id)
-                    continue;
-                m_ids.remove(i);
-                if (m_ids.length()==0)
-                    m_status=CSL_STATS_NEED_IDS;
-                return true;
-            }
-            return false;
-        }
-
-        void SetWaitForStats()
-        {
-            if (m_ids.length())
-                m_status=CSL_STATS_NEED_STATS;
-            else
-                m_status=CSL_STATS_NEED_IDS;
-        }
-
-        wxUint32 m_status;
-        wxUint32 m_lastRefresh,m_lastResponse;
-        vector<wxInt32> m_ids;
-        vector<CslPlayerStatsData*> m_stats;
-        wxCriticalSection *m_critical;
-};
-
-class CslTeamStatsData
-{
-    public:
-        CslTeamStatsData() : m_score(-1),m_ok(false) {}
-
-        void Reset()
-        {
-            m_ok=false;
-            m_bases.setsize(0);
-        }
-
-        bool IsCapture() { return m_bases.length()>0; }
-
-        wxString m_team;
-        wxInt32 m_score;
-        vector<wxInt32> m_bases;
-        bool m_ok;
-};
-
-class CslTeamStats
-{
-    public:
-        CslTeamStats() :
-                m_teamplay(false),m_remain(-1),
-                m_lastRefresh(0),m_lastResponse(0)
-        {
-            m_critical=new wxCriticalSection();
-        }
-        ~CslTeamStats() { DeleteStats(); delete m_critical; }
-
-        CslTeamStatsData* GetNewStatsPtr()
-        {
-            wxCriticalSectionLocker enter(*m_critical);
-
-            loopv(m_stats)
-            {
-                if (m_stats[i]->m_ok) continue;
-                return m_stats[i];
-            }
-            return new CslTeamStatsData;
-        }
-
-        void AddStats(CslTeamStatsData *data)
-        {
-            wxCriticalSectionLocker enter(*m_critical);
-
-            data->m_ok=true;
-            loopv(m_stats) if (m_stats[i]==data) return;
-            m_stats.add(data);
-        }
-
-        void DeleteStats()
-        {
-            wxCriticalSectionLocker enter(*m_critical);
-
-            loopvrev(m_stats) delete m_stats[i];
-            m_stats.setsize(0);
-        }
-
-        void Reset()
-        {
-            wxCriticalSectionLocker enter(*m_critical);
-
-            loopv(m_stats) m_stats[i]->Reset();
-        }
-
-        bool m_teamplay;
-        wxInt32 m_remain;
-        wxUint32 m_lastRefresh,m_lastResponse;
-        vector<CslTeamStatsData*> m_stats;
-        wxCriticalSection *m_critical;
-};
-
-enum
-{
-    CSL_EXT_STATUS_ERROR    = -1,
-    CSL_EXT_STATUS_FALSE,
-    CSL_EXT_STATUS_OK,
-    CSL_EXT_STATUS_MISMATCH,
-};
 
 class CslServerInfo
 {
@@ -386,7 +153,8 @@ class CslServerInfo
             m_uptimeRefresh=CSL_UPTIME_REFRESH_MULT;
             m_lock=0;
             m_waiting=false;
-            m_exInfo=CSL_EXT_STATUS_FALSE;
+            m_extInfoStatus=CSL_EXT_STATUS_FALSE;
+            m_extInfoVersion=0;
             m_playerStats=NULL;
             m_teamStats=NULL;
         }
@@ -510,7 +278,8 @@ class CslServerInfo
         wxUint32 m_uptimeRefresh;
         wxInt32 m_lock;
         bool m_waiting;
-        wxInt32 m_exInfo;
+        wxInt32 m_extInfoStatus;
+        wxInt32 m_extInfoVersion;
         CslPlayerStats *m_playerStats;
         CslTeamStats *m_teamStats;
 

@@ -52,14 +52,6 @@ END_DECLARE_EVENT_TYPES()
                              ),
 
 
-
-#define CSL_EX_VERSION_MIN      101
-#define CSL_EX_VERSION_MAX      102
-// extended info commands
-#define CSL_EX_PING_UPTIME      0
-#define CSL_EX_PING_PLAYERSTATS 1
-#define CSL_EX_PING_TEAMSTATS   2
-
 enum { CSL_PONG_TYPE_PING=0, CSL_PONG_TYPE_PLAYERSTATS, CSL_PONG_TYPE_TEAMSTATS };
 
 class CslPongPacket : public wxObject

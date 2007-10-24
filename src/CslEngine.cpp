@@ -317,14 +317,13 @@ bool CslEngine::Ping(CslServerInfo *info,bool force)
 
     info->m_pingSend=ticks;
 
-    if ((info->m_type==CSL_GAME_SB) &&
-        (info->m_ping<0 || info->m_exInfo==CSL_EXT_STATUS_OK) &&
+    if ((info->m_ping<0 || info->m_extInfoStatus==CSL_EXT_STATUS_OK) &&
         (info->CanPingUptime()))
     {
         return PingExUptime(info);
     }
 
-    if (info->m_exInfo!=CSL_EXT_STATUS_FALSE || info->m_type!=CSL_GAME_SB)
+    if (info->m_extInfoStatus!=CSL_EXT_STATUS_FALSE)
     {
         // default ping packet
         packet=new CslUDPPacket();
@@ -359,7 +358,7 @@ bool CslEngine::PingExUptime(CslServerInfo *info)
 
 bool CslEngine::PingExPlayerInfo(CslServerInfo *info,wxInt32 pid)
 {
-    if (info->m_exInfo!=CSL_EXT_STATUS_OK)
+    if (info->m_extInfoStatus!=CSL_EXT_STATUS_OK)
         return false;
 
     CslUDPPacket *packet;
@@ -370,8 +369,10 @@ bool CslEngine::PingExPlayerInfo(CslServerInfo *info,wxInt32 pid)
 
     ucharbuf p(ping,sizeof(ping));
     putint(p,0);
-    putint(p,CSL_EX_PING_PLAYERSTATS);
-    //putstring(CSL_EX_CMD_PLAYERSTATS,p);
+    if (info->m_extInfoVersion==101)
+        putstring(CSL_EX_PING_PLAYERSTATS_STR,p);
+    else
+        putint(p,CSL_EX_PING_PLAYERSTATS);
     putint(p,pid);
 
     packet=new CslUDPPacket();
@@ -381,7 +382,7 @@ bool CslEngine::PingExPlayerInfo(CslServerInfo *info,wxInt32 pid)
 
 bool CslEngine::PingExTeamInfo(CslServerInfo *info)
 {
-    if (info->m_exInfo!=CSL_EXT_STATUS_OK)
+    if (info->m_extInfoStatus!=CSL_EXT_STATUS_OK)
         return false;
 
     CslUDPPacket *packet;
@@ -391,8 +392,10 @@ bool CslEngine::PingExTeamInfo(CslServerInfo *info)
 
     ucharbuf p(ping,sizeof(ping));
     putint(p,0);
-    putint(p,CSL_EX_PING_TEAMSTATS);
-    //putstring(CSL_EX_CMD_TEAMSTATS,p);
+    if (info->m_extInfoVersion==101)
+        putstring(CSL_EX_PING_TEAMSTATS_STR,p);
+    else
+        putint(p,CSL_EX_PING_TEAMSTATS);
 
     packet=new CslUDPPacket();
     packet->Set(info->m_addr,ping,p.length());
@@ -652,6 +655,7 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
 {
     wxInt32 vi;
     wxUint32 exVersion;
+    wxUint32 cmd;
     wxUint32 vu=0;
     const wxUint32 ml=128;
     char text[ml];
@@ -677,11 +681,21 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
             {
                 if (extended)
                 {
-                    //getstring(text,p,ml);
-
-                    switch (getint(p))
+                    if (info->m_extInfoVersion==101)
                     {
-                            //if (strcmp(text,CSL_EX_CMD_UPTIME)==0)
+                        getstring(text,p,ml);
+                        if (text[0]==0)
+                            cmd=CSL_EX_PING_UPTIME;
+                        else if (strcmp(text,CSL_EX_PING_PLAYERSTATS_STR)==0)
+                            cmd=CSL_EX_PING_PLAYERSTATS;
+                        else if (strcmp(text,CSL_EX_PING_TEAMSTATS_STR)==0)
+                            cmd=CSL_EX_PING_TEAMSTATS;
+                    }
+                    else
+                        cmd=getint(p);
+
+                    switch (cmd)
+                    {
                         case CSL_EX_PING_UPTIME:
                         {
 #ifdef __WXDEBUG__
@@ -690,19 +704,20 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
                             vu=p.length();
                             if (getint(p)!=-1)  // check ack
                             {
-                                info->m_exInfo=CSL_EXT_STATUS_FALSE;
+                                info->m_extInfoStatus=CSL_EXT_STATUS_FALSE;
                                 p.len=vu;
                                 UpdateServerInfo(info,&p,now);
                                 break;
                             }
 
                             exVersion=getint(p);
+                            info->m_extInfoVersion=exVersion;
                             // check protocol
                             if (exVersion<CSL_EX_VERSION_MIN || exVersion>CSL_EX_VERSION_MAX)
                             {
                                 LOG_DEBUG("%s (%s) ERROR: prot=%d\n",dbg_type,
                                           U2A(info->GetBestDescription()),vi);
-                                info->m_exInfo=CSL_EXT_STATUS_ERROR;
+                                info->m_extInfoStatus=CSL_EXT_STATUS_ERROR;
                                 Ping(info,true);
                                 return;
                             }
@@ -712,12 +727,12 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
                             if (p.overread())
                             {
                                 LOG_DEBUG("%s (%s) OVERREAD!\n",dbg_type,U2A(info->GetBestDescription()));
-                                info->m_exInfo=CSL_EXT_STATUS_ERROR;
+                                info->m_extInfoStatus=CSL_EXT_STATUS_ERROR;
                                 Ping(info,true);
                                 return;
                             }
 
-                            info->m_exInfo=CSL_EXT_STATUS_OK;
+                            info->m_extInfoStatus=CSL_EXT_STATUS_OK;
                             info->CreatePlayerStats();
                             info->CreateTeamStats();
                             LOG_DEBUG("%s (%s) %s\n",dbg_type,U2A(info->GetBestDescription()),
@@ -728,7 +743,6 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
                             break;
                         }
 
-                        //else if (strcmp(text,CSL_EX_CMD_PLAYERSTATS)==0)
                         case CSL_EX_PING_PLAYERSTATS:
                         {
                             CslPlayerStats *stats=info->m_playerStats;
@@ -741,7 +755,7 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
                             {
                                 LOG_DEBUG("%s (%s) ERROR: missing ACK\n",dbg_type,
                                           U2A(info->GetBestDescription()));
-                                info->m_exInfo=CSL_EXT_STATUS_FALSE;
+                                info->m_extInfoStatus=CSL_EXT_STATUS_FALSE;
                                 return;
                             }
 
@@ -751,7 +765,7 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
                             {
                                 LOG_DEBUG("%s (%s) ERROR: prot=%d\n",dbg_type,
                                           U2A(info->GetBestDescription()),vi);
-                                info->m_exInfo=CSL_EXT_STATUS_ERROR;
+                                info->m_extInfoStatus=CSL_EXT_STATUS_ERROR;
                                 return;
                             }
 
@@ -842,7 +856,6 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
                             break;
                         }
 
-                        //else if (strcmp(text,CSL_EX_CMD_TEAMSTATS)==0)
                         case CSL_EX_PING_TEAMSTATS:
                         {
                             CslTeamStats *stats=info->m_teamStats;
@@ -853,7 +866,7 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
                             {
                                 LOG_DEBUG("%s(%s) ERROR: missing ACK\n",dbg_type,
                                           U2A(info->GetBestDescription()));
-                                info->m_exInfo=CSL_EXT_STATUS_FALSE;
+                                info->m_extInfoStatus=CSL_EXT_STATUS_FALSE;
                                 return;
                             }
 
@@ -863,7 +876,7 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
                             {
                                 LOG_DEBUG("%s (%s) ERROR: prot=%d\n",dbg_type,
                                           U2A(info->GetBestDescription()),vi);
-                                info->m_exInfo=CSL_EXT_STATUS_ERROR;
+                                info->m_extInfoStatus=CSL_EXT_STATUS_ERROR;
                                 return;
                             }
 
@@ -919,8 +932,9 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
                         default:
                         {
 #ifdef __WXDEBUG__
-                            dbg_type=wxT("unknown");
+                            dbg_type=wxT("unknown command");
 #endif
+                            LOG_DEBUG("%s: ERROR: unknown command: %d\n",U2A(info->GetBestDescription()),cmd);
                             break;
                         }
                     }
