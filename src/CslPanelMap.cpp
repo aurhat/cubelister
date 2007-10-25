@@ -154,7 +154,7 @@ void CslPanelMap::UpdateBases(const t_aBaseInfo& bases,const bool hasBases)
     if (!IsShown())
         return;
 
-    Refresh(false);
+    Refresh(m_background);
     //TODO optimise drawing?
     /*for (i=0;i<bases.GetCount();i++)
     {

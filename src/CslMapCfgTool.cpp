@@ -96,7 +96,6 @@ void CslMapToolPanelMap::OnPaint(wxPaintEvent& event)
     wxPostEvent(this,evt);
 }
 
-
 void CslMapToolPanelMap::OnMouseMove(wxMouseEvent &event)
 {
     event.Skip();
@@ -203,6 +202,7 @@ CslMapCfgTool::CslMapCfgTool(wxWindow* parent,int id,const wxString& title,
     choice_version = new wxChoice(this, COMBO_VERSION, wxDefaultPosition, wxDefaultSize, 1, choice_version_choices, 0);
     button_version_add = new wxButton(this, wxID_ADD, _("Add"));
     button_version_del = new wxButton(this, wxID_REMOVE, _("Remove"));
+    static_line_4 = new wxStaticLine(this, wxID_ANY);
     const wxString choice_base_choices[] =
     {
         _("0")
@@ -241,6 +241,8 @@ void CslMapCfgTool::set_properties()
     // end wxGlade
 
     panel_bitmap->Init(panel_zoom,&m_mapInfo.m_bases);
+    panel_bitmap->SetEraseBackGround();
+    panel_zoom->SetEraseBackGround();
 
     choice_version->Clear();
     Reset();
@@ -252,7 +254,7 @@ void CslMapCfgTool::do_layout()
     wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(2, 1, 0, 0);
     wxFlexGridSizer* grid_sizer_top = new wxFlexGridSizer(1, 2, 0, 0);
     wxStaticBoxSizer* sizer_control = new wxStaticBoxSizer(sizer_control_staticbox, wxHORIZONTAL);
-    wxFlexGridSizer* grid_sizer_control = new wxFlexGridSizer(9, 1, 0, 0);
+    wxFlexGridSizer* grid_sizer_control = new wxFlexGridSizer(10, 1, 0, 0);
     wxFlexGridSizer* grid_sizer_file = new wxFlexGridSizer(1, 3, 0, 0);
     wxFlexGridSizer* grid_sizer_desc = new wxFlexGridSizer(2, 2, 0, 0);
     wxFlexGridSizer* grid_sizer_base = new wxFlexGridSizer(1, 4, 0, 0);
@@ -261,14 +263,15 @@ void CslMapCfgTool::do_layout()
     sizer_map->Add(panel_bitmap, 1, wxALL|wxEXPAND, 4);
     grid_sizer_top->Add(sizer_map, 1, wxRIGHT|wxEXPAND, 2);
     wxStaticText* label_version_static = new wxStaticText(this, wxID_ANY, _("Version:"));
-    label_version_static->SetMinSize(wxSize(60, -1));
+    label_version_static->SetMinSize(wxSize(50, -1));
     grid_sizer_version->Add(label_version_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_version->Add(choice_version, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_version->Add(button_version_add, 0, wxALL, 4);
     grid_sizer_version->Add(button_version_del, 0, wxALL, 4);
     grid_sizer_control->Add(grid_sizer_version, 1, wxEXPAND, 0);
+    grid_sizer_control->Add(static_line_4, 0, wxEXPAND, 0);
     wxStaticText* label_bases_static = new wxStaticText(this, wxID_ANY, _("Bases:"));
-    label_bases_static->SetMinSize(wxSize(60, -1));
+    label_bases_static->SetMinSize(wxSize(50, -1));
     grid_sizer_base->Add(label_bases_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_base->Add(choice_base, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_base->Add(button_base_add, 0, wxALL, 4);

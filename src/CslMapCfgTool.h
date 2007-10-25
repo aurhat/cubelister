@@ -113,6 +113,7 @@ class CslMapCfgTool: public wxDialog
         wxChoice* choice_version;
         wxButton* button_version_add;
         wxButton* button_version_del;
+        wxStaticLine* static_line_4;
         wxChoice* choice_base;
         wxButton* button_base_add;
         wxButton* button_base_del;

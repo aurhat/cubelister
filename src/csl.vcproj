@@ -243,6 +243,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CslPanelMap.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CslStatusBar.cpp"
 				>
 			</File>
@@ -330,6 +334,10 @@
 			</File>
 			<File
 				RelativePath=".\CslMenu.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CslPanelMap.h"
 				>
 			</File>
 			<File

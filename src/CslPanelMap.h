@@ -105,7 +105,8 @@ class CslMapInfo
 class CslPanelMap : public wxPanel
 {
     public:
-        CslPanelMap(wxWindow *parent,wxInt32 id) : wxPanel(parent,id), m_ok(false) {}
+        CslPanelMap(wxWindow *parent,wxInt32 id) : wxPanel(parent,id),
+                m_ok(false),m_background(false) {}
         ~CslPanelMap() { Reset(); }
 
         void SetMap(const wxBitmap& bitmap,const bool refresh=true)
@@ -116,14 +117,15 @@ class CslPanelMap : public wxPanel
             SetMinSize(wxSize(bitmap.GetWidth(),bitmap.GetHeight()));
 
             if (refresh)
-                Refresh(false);
+                Refresh(m_background);
         }
 
+        void SetEraseBackGround(bool erase=true) { m_background=erase; }
         void SetOk(const bool ok=true,const bool refresh=false)
         {
             m_ok=ok;
             if (refresh)
-                Refresh(false);
+                Refresh(m_background);
         }
         bool IsOk() { return m_ok; }
 
@@ -137,10 +139,11 @@ class CslPanelMap : public wxPanel
 
     private:
         bool m_ok;
+        bool m_background;
         wxMemoryDC m_memDC;
 
         void OnPaint(wxPaintEvent& event);
-        void OnErase(wxEraseEvent& event) {}
+        void OnErase(wxEraseEvent& event) { if (m_background) event.Skip(); }
 
         DECLARE_EVENT_TABLE();
 

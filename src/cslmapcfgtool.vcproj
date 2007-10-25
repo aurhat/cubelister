@@ -175,6 +175,14 @@
 				RelativePath=".\CslMapCfgTool.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\CslPanelMap.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CslTools.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Headerdateien"
@@ -183,6 +191,14 @@
 			>
 			<File
 				RelativePath=".\CslMapCfgTool.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CslPanelMap.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CslTools.h"
 				>
 			</File>
 		</Filter>
