@@ -52,8 +52,8 @@ CslDlgOutput::CslDlgOutput(wxWindow* parent,int id,const wxString& title,
     text_ctrl_output = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxHSCROLL|wxTE_RICH|wxTE_RICH2|wxTE_AUTO_URL);
     text_ctrl_search = new wxTextCtrl(this, TEXT_SEARCH, wxEmptyString);
     label_matches = new wxStaticText(this, wxID_ANY, _("%d matches"));
-    button_search_prev = new wxButton(this, wxID_UNDO, _("Previ&ous"));
-    button_search_next = new wxButton(this, wxID_REDO, _("&Next"));
+    button_search_prev = new wxButton(this, wxID_BACKWARD, _("&Back"));
+    button_search_next = new wxButton(this, wxID_FORWARD, _("&Forward"));
     checkbox_conv_filter = new wxCheckBox(this, CHECK_CONV_FILTER, _("&Filter chat"));
     const wxString choice_conv_filter_choices[] =
     {
@@ -63,7 +63,7 @@ CslDlgOutput::CslDlgOutput(wxWindow* parent,int id,const wxString& title,
     };
     choice_conv_filter = new wxChoice(this, CHOICE_CONV_FILTER, wxDefaultPosition, wxDefaultSize, 3, choice_conv_filter_choices, 0);
     static_line = new wxStaticLine(this, wxID_ANY);
-    button_load = new wxButton(this, wxID_OPEN, _("&Load"));
+    button_load = new wxButton(this, wxID_OPEN, _("&Open"));
     button_save = new wxButton(this, wxID_SAVE, _("&Save"));
     button_close = new wxButton(this, wxID_CLOSE, _("&Close"));
 
@@ -178,7 +178,7 @@ void CslDlgOutput::OnCommandEvent(wxCommandEvent& event)
             SetSearchbarColour(Search(event.GetString()));
             break;
 
-        case wxID_UNDO:
+        case wxID_BACKWARD:
             text_ctrl_output->ShowPosition(m_searchResults.Item(--m_searchPos));
             SetSearchTextColour(m_searchResults.Item(m_searchPos),
                                 m_searchResults.Item(m_searchPos+1));
@@ -187,7 +187,7 @@ void CslDlgOutput::OnCommandEvent(wxCommandEvent& event)
             button_search_next->Enable();
             break;
 
-        case wxID_REDO:
+        case wxID_FORWARD:
             text_ctrl_output->ShowPosition(m_searchResults.Item(++m_searchPos));
             SetSearchTextColour(m_searchResults.Item(m_searchPos),
                                 m_searchResults.Item(m_searchPos-1));

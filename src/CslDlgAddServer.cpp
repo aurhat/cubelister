@@ -22,7 +22,7 @@
 
 BEGIN_EVENT_TABLE(CslDlgAddServer,wxDialog)
     EVT_TEXT(wxID_ANY,CslDlgAddServer::OnText)
-    EVT_BUTTON(wxID_OK,CslDlgAddServer::OnButton)
+    EVT_BUTTON(wxID_ADD,CslDlgAddServer::OnButton)
     EVT_TEXT_ENTER(wxID_ANY,CslDlgAddServer::OnButton)
 END_EVENT_TABLE()
 
@@ -38,7 +38,7 @@ CslDlgAddServer::CslDlgAddServer(wxWindow* parent,CslServerInfo *info,int id,con
     };
     choice_type = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 1, choice_type_choices, 0);
     text_ctrl_address = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
-    button_add = new wxButton(this, wxID_OK, _("&Add"));
+    button_add = new wxButton(this, wxID_ADD, _("Add"));
     button_cancel = new wxButton(this, wxID_CANCEL, _("&Cancel"));
 
     set_properties();
@@ -84,8 +84,8 @@ void CslDlgAddServer::do_layout()
     sizer_address->Add(grid_sizer_address, 1, wxEXPAND, 0);
     grid_sizer_main->Add(sizer_address, 1, wxALL|wxEXPAND, 4);
     grid_sizer_button->Add(1, 1, 0, 0, 0);
-    grid_sizer_button->Add(button_add, 0, wxALL, 4);
-    grid_sizer_button->Add(button_cancel, 0, wxALL, 4);
+    grid_sizer_button->Add(button_add, 0, wxALL|wxEXPAND, 4);
+    grid_sizer_button->Add(button_cancel, 0, wxALL|wxEXPAND, 4);
     grid_sizer_button->AddGrowableCol(0);
     grid_sizer_main->Add(grid_sizer_button, 1, wxBOTTOM|wxEXPAND, 4);
     SetSizer(grid_sizer_main);
@@ -106,7 +106,7 @@ void CslDlgAddServer::OnButton(wxCommandEvent& event)
 {
     wxString host=text_ctrl_address->GetValue();
 
-    // check again fore empty host - since setting a default button on wxMAC
+    // check again for empty host - since setting a default button on wxMAC
     // and hitting enter reaches this position, also if the the button was disabled
     if (host.IsEmpty())
         return;

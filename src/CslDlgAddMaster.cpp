@@ -24,7 +24,7 @@ BEGIN_EVENT_TABLE(CslDlgAddMaster,wxDialog)
     EVT_TEXT(wxID_ANY,CslDlgAddMaster::OnText)
     EVT_TEXT_ENTER(wxID_ANY,CslDlgAddMaster::OnCommandEvent)
     EVT_CHOICE(wxID_ANY,CslDlgAddMaster::OnCommandEvent)
-    EVT_BUTTON(wxID_OK,CslDlgAddMaster::OnCommandEvent)
+    EVT_BUTTON(wxID_ADD,CslDlgAddMaster::OnCommandEvent)
     EVT_RADIOBUTTON(wxID_ANY,CslDlgAddMaster::OnCommandEvent)
 END_EVENT_TABLE()
 
@@ -53,9 +53,9 @@ CslDlgAddMaster::CslDlgAddMaster(wxWindow* parent,CslMaster *master,int id,
     choice_type = new wxChoice(this, CHOICE_CTRL_TYPE, wxDefaultPosition, wxDefaultSize, 1, choice_type_choices, 0);
     text_ctrl_address = new wxTextCtrl(this, TEXT_CTRL_ADDRESS, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
     text_ctrl_path = new wxTextCtrl(this, TEXT_CTRL_PATH, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
-    radio_btn_custom = new wxRadioButton(this, RADIO_CTRL_CUSTOM, _("Custom"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
-    radio_btn_default = new wxRadioButton(this, RADIO_CTRL_DEFAULT, _("Add default master"));
-    button_add = new wxButton(this, wxID_OK, _("&Add"));
+    radio_btn_custom = new wxRadioButton(this, RADIO_CTRL_CUSTOM, _("C&ustom"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+    radio_btn_default = new wxRadioButton(this, RADIO_CTRL_DEFAULT, _("Add default &master"));
+    button_add = new wxButton(this, wxID_ADD, _("Add"));
     button_cancel = new wxButton(this, wxID_CANCEL, _("&Cancel"));
 
     set_properties();
@@ -111,8 +111,8 @@ void CslDlgAddMaster::do_layout()
     sizer_address->Add(grid_sizer_address, 1, wxEXPAND, 0);
     grid_sizer_main->Add(sizer_address, 1, wxALL|wxEXPAND, 4);
     grid_sizer_button->Add(1, 1, 0, 0, 0);
-    grid_sizer_button->Add(button_add, 0, wxALL, 4);
-    grid_sizer_button->Add(button_cancel, 0, wxALL, 4);
+    grid_sizer_button->Add(button_add, 0, wxALL|wxEXPAND, 4);
+    grid_sizer_button->Add(button_cancel, 0, wxALL|wxEXPAND, 4);
     grid_sizer_button->AddGrowableCol(0);
     grid_sizer_main->Add(grid_sizer_button, 1, wxBOTTOM|wxEXPAND, 4);
     SetSizer(grid_sizer_main);
@@ -181,7 +181,7 @@ void CslDlgAddMaster::OnCommandEvent(wxCommandEvent& event)
 
         case TEXT_CTRL_ADDRESS:
         case TEXT_CTRL_PATH:
-        case wxID_OK:
+        case wxID_ADD:
         {
             // check again fore empty host - since setting a default button on wxMAC
             // and hitting enter reaches this position, also if the the button was disabled

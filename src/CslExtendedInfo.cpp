@@ -23,13 +23,13 @@
 CslPlayerStats::CslPlayerStats() : m_status(CSL_STATS_NEED_IDS),
         m_lastRefresh(0),m_lastResponse(0)
 {
-     m_critical=new wxCriticalSection();
+    m_critical=new wxCriticalSection();
 }
 
 CslPlayerStats::~CslPlayerStats()
 {
-     DeleteStats();
-     delete m_critical;
+    DeleteStats();
+    delete m_critical;
 }
 
 CslPlayerStatsData* CslPlayerStats::GetNewStatsPtr()
@@ -146,8 +146,8 @@ CslTeamStats::CslTeamStats() :
 
 CslTeamStats::~CslTeamStats()
 {
-     DeleteStats();
-     delete m_critical;
+    DeleteStats();
+    delete m_critical;
 }
 
 CslTeamStatsData* CslTeamStats::GetNewStatsPtr()

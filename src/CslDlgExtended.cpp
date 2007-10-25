@@ -18,8 +18,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <wx/wfstream.h>
-#include <wx/fileconf.h>
 #include "CslDlgExtended.h"
 #include "CslSettings.h"
 #ifndef _MSC_VER
@@ -31,10 +29,6 @@
 #include "img/trans_list_16.xpm"
 #endif
 
-BEGIN_EVENT_TABLE(CslPanelMap, wxPanel)
-    EVT_PAINT(CslPanelMap::OnPaint)
-    EVT_ERASE_BACKGROUND(CslPanelMap::OnErase)
-END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(CslDlgExtended, wxDialog)
     EVT_CLOSE(CslDlgExtended::OnClose)
@@ -74,131 +68,6 @@ static const wxColour team_colours[] =
     wxColour(190,60,75),wxColour(60,190,75),wxColour(225,225,60),wxColour(120,50,140)
 };
 
-
-bool CslMapInfo::LoadMapData(const wxString& mapName,const wxString& gameName,
-                             const wxUint32 protVersion)
-{
-    long int val;
-    wxInt32 x,y;
-    wxUint32 i=0;
-    wxUint32 version=protVersion;
-
-    wxString path=wxString(wxT(DATADIR))+PATHDIV+wxT("maps")+PATHDIV+gameName+PATHDIV;
-#ifdef __WXGTK__
-    if (!::wxDirExists(path))
-        path=::g_basePath+wxT("/data/maps/")+gameName+PATHDIV;
-#endif
-    Reset(mapName);
-
-    if (::wxFileExists(path+mapName+wxT(".cfg")))
-    {
-        wxFileInputStream stream(path+mapName+wxT(".cfg"));
-        if (!stream.IsOk())
-            return false;
-
-        wxFileConfig config(stream);
-
-        config.SetPath(wxT("/LastVersion"));
-        if (config.Read(wxT("LastVersion"),&val))
-        {
-            if (val!=(long int)version)
-                version=val;
-
-            config.SetPath(wxString::Format(wxT("/%d/Mapname"),version));
-            config.Read(wxT("Mapname"),&m_mapNameFull);
-            config.SetPath(wxString::Format(wxT("/%d/Author"),version));
-            config.Read(wxT("Author"),&m_author);
-
-            path+=wxString::Format(wxT("%d/"),version)+mapName+wxT(".png");
-            if (::wxFileExists(path))
-            {
-                if (!m_bitmap.LoadFile(path,wxBITMAP_TYPE_PNG))
-                    return false;
-            }
-            else
-                return false;
-        }
-        else
-            return false;
-
-        while (true)
-        {
-            config.SetPath(wxString::Format(wxT("/%d/Base%d"),version,i++));
-            if (!config.Read(wxT("x"),&val))
-                break;
-            x=val;
-            if (!config.Read(wxT("y"),&val))
-                break;
-            y=val;
-
-            m_bases.Add(new CslBaseInfo(x,y));
-        }
-
-        if (m_bases.GetCount())
-            m_basesOk=true;
-
-        return true;
-    }
-
-    return false;
-}
-
-
-void CslPanelMap::OnPaint(wxPaintEvent& event)
-{
-    wxUint32 i;
-
-    wxPaintDC dc(this);
-    PrepareDC(dc);
-
-    if (m_ok)
-    {
-        wxPoint origin=GetBitmapOrigin();
-
-        m_memDC.SelectObject(m_bitmap);
-        dc.Blit(origin.x,origin.y,m_bitmap.GetWidth(),m_bitmap.GetHeight(),&m_memDC,0,0);
-
-        for (i=0;i<m_bases.GetCount();i++)
-        {
-            CslBaseInfo *base=m_bases.Item(i);
-            dc.SetPen(wxPen(base->m_colour));
-            //dc.SetPen(wxPen(*wxWHITE));
-            dc.SetBrush(wxBrush(base->m_colour));
-            dc.DrawCircle(origin.x+base->m_point.x,origin.y+base->m_point.y,4);
-        }
-    }
-
-    event.Skip();
-}
-
-void CslPanelMap::UpdateBases(const t_aBaseInfo& bases,const bool hasBases)
-{
-    wxUint32 i;
-    wxRect rect;
-    wxPoint point;
-    CslBaseInfo *base;
-
-    WX_CLEAR_ARRAY(m_bases);
-
-    if (hasBases)
-        for (i=0;i<bases.GetCount();i++)
-        {
-            base=new CslBaseInfo(*bases.Item(i));
-            m_bases.Add(base);
-        }
-
-    if (!IsShown())
-        return;
-
-    Refresh(false);
-    //TODO optimise drawing?
-    /*for (i=0;i<bases.GetCount();i++)
-    {
-        wxPoint point=bases.Item(i)->m_point;
-        wxRect rect(point.x-5,point.y-5,10,10);
-        RefreshRect(rect);
-    }*/
-}
 
 CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
                                const wxPoint& pos, const wxSize& size, long style):
@@ -648,7 +517,7 @@ void CslDlgExtended::SetPlayerData()
             s=wxString::Format(wxT("%d"),data->m_armour);
         list_ctrl_players->SetItem(i,6,s);
 
-		s=CslGame::GetWeaponName(m_info->m_type,data->m_weapon);
+        s=CslGame::GetWeaponName(m_info->m_type,data->m_weapon);
         list_ctrl_players->SetItem(i,7,s);
 
         wxColour colour=*wxBLACK;

@@ -21,6 +21,10 @@
 #ifndef CSLDLGEXTENDED_H
 #define CSLDLGEXTENDED_H
 
+/**
+ @author Glen Masgai <mimosius@gmx.de>
+*/
+
 #include <wx/wxprec.h>
 #ifdef __BORLANDC__
 #pragma hdrstop
@@ -34,94 +38,8 @@
 #include <wx/statline.h>
 // end wxGlade
 #include "CslEngine.h"
+#include "CslPanelMap.h"
 #include "CslTools.h"
-
-
-class CslBaseInfo
-{
-    public:
-        CslBaseInfo(const wxInt32 x,const wxInt32 y) :
-                m_point(wxPoint(x,y)),m_colour(*wxWHITE) {}
-
-        wxPoint m_point;
-        wxColour m_colour;
-};
-
-WX_DEFINE_ARRAY_PTR(CslBaseInfo*,t_aBaseInfo);
-
-class CslMapInfo
-{
-    public:
-        CslMapInfo() { Reset(); }
-        ~CslMapInfo() { Reset(); }
-
-        bool LoadMapData(const wxString& mapName,const wxString& gameName,
-                         const wxUint32 protVersion);
-        void Reset(const wxString& mapName=wxEmptyString)
-        {
-            m_mapName=mapName;
-            m_mapNameFull.Empty();
-            m_author.Empty();
-            m_basesOk=false;
-            WX_CLEAR_ARRAY(m_bases);
-        }
-
-        void ResetBasesColour()
-        {
-            for (wxUint32 i=0;i<m_bases.GetCount();i++)
-                m_bases.Item(i)->m_colour=*wxWHITE;
-        }
-
-        wxString m_mapName,m_mapNameFull,m_author;
-        wxBitmap m_bitmap;
-        t_aBaseInfo m_bases;
-        bool m_basesOk;
-};
-
-
-class CslPanelMap : public wxPanel
-{
-    public:
-        CslPanelMap(wxWindow *parent,wxInt32 id) : wxPanel(parent,id), m_ok(false) {}
-        ~CslPanelMap() { WX_CLEAR_ARRAY(m_bases); }
-
-        void SetMap(const wxBitmap& bitmap,const bool refresh)
-        {
-            m_bitmap=bitmap;
-            m_ok=true;
-
-            SetMinSize(wxSize(bitmap.GetWidth(),bitmap.GetHeight()));
-
-            if (refresh)
-                Refresh(false);
-        }
-
-        void SetOk(const bool ok=true) { m_ok=ok; }
-        bool IsOk() { return m_ok; }
-
-        void UpdateBases(const t_aBaseInfo& bases,const bool hasBases);
-
-    private:
-        wxMemoryDC m_memDC;
-        wxBitmap m_bitmap;
-
-        t_aBaseInfo m_bases;
-
-        void OnPaint(wxPaintEvent& event);
-        void OnErase(wxEraseEvent& event) {}
-
-        DECLARE_EVENT_TABLE();
-
-    protected:
-        bool m_ok;
-
-        wxPoint GetBitmapOrigin()
-        {
-            wxSize cSize=GetClientSize();
-            wxSize bSize(m_bitmap.GetWidth(),m_bitmap.GetHeight());
-            return wxPoint(cSize.x/2-bSize.x/2,cSize.y/2-bSize.y/2);
-        }
-};
 
 
 WX_DEFINE_ARRAY_PTR(wxStaticText*,t_aLabel);

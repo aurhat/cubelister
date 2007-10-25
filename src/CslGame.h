@@ -399,7 +399,7 @@ class CslGame
         CslServerInfo* FindServerByAddr(const wxIPV4address& addr);
 
         static wxString GetGameName(const CSL_GAMETYPE type);
-		static wxString GetWeaponName(const CSL_GAMETYPE type,const wxInt32 weapon);
+        static wxString GetWeaponName(const CSL_GAMETYPE type,const wxInt32 weapon);
 
         static wxInt32 ConnectCleanupConfig(const CSL_GAMETYPE type,const wxString& cfg);
         static wxInt32 ConnectWriteConfig(const CSL_GAMETYPE& type,const wxString& cfg,const wxString& str);

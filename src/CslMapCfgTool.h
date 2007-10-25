@@ -30,10 +30,50 @@
 // begin wxGlade: ::dependencies
 #include <wx/statline.h>
 // end wxGlade
+#include "CslPanelMap.h"
 
 // begin wxGlade: ::extracode
 
 // end wxGlade
+
+
+class CslMapToolPanelMap : public CslPanelMap
+{
+    public:
+        CslMapToolPanelMap(wxWindow *parent,wxInt32 id) :
+                CslPanelMap(parent,id),
+                m_id(id),m_panelZoom(NULL),m_basesPtr(NULL),m_activeBase(-1),
+                m_centre(wxPoint(-1,-1)),m_mouseLeftDown(false) {}
+
+        void Init(CslMapToolPanelMap *panel,t_aBaseInfo *basesPtr)
+        {
+            m_panelZoom=panel;
+            m_basesPtr=basesPtr;
+        }
+        void SetCentre(const wxPoint& centre) { m_centre=centre; }
+        void SetActiveBase(const wxInt32 id) { m_activeBase=id; }
+
+    private:
+        wxInt32 m_id;
+
+        CslMapToolPanelMap *m_panelZoom;
+        t_aBaseInfo *m_basesPtr;
+        wxInt32 m_activeBase;
+
+        wxPoint m_centre;
+        bool m_mouseLeftDown;
+
+        void OnPaintOverlay(wxCommandEvent& event);
+        void OnPaint(wxPaintEvent& event);
+        void OnMouseMove(wxMouseEvent& event);
+        void OnMouseLeftDown(wxMouseEvent& event);
+        void OnMouseLeftUp(wxMouseEvent& event);
+
+        DECLARE_EVENT_TABLE()
+
+    protected:
+        void SetBasePosition(const wxPoint& point);
+};
 
 
 class CslMapCfgTool: public wxDialog
@@ -46,6 +86,7 @@ class CslMapCfgTool: public wxDialog
                       const wxPoint& pos=wxDefaultPosition,
                       const wxSize& size=wxDefaultSize,
                       long style=wxDEFAULT_DIALOG_STYLE);
+        ~CslMapCfgTool() { Reset(); }
 
     private:
         // begin wxGlade: CslMapCfgTool::methods
@@ -53,11 +94,25 @@ class CslMapCfgTool: public wxDialog
         void do_layout();
         // end wxGlade
 
+        wxString m_fileName;
+        wxString m_pngPath,m_cfgPath;
+
+        wxInt32 m_lastInfo;
+        CslMapInfo m_mapInfo;
+
+        void OnClose(wxCloseEvent& event);
+        void OnCommandEvent(wxCommandEvent& event);
+
+        DECLARE_EVENT_TABLE()
+
     protected:
         // begin wxGlade: CslMapCfgTool::attributes
         wxStaticBox* sizer_control_staticbox;
         wxStaticBox* sizer_map_staticbox;
-        wxPanel* panel_bitmap;
+        CslMapToolPanelMap* panel_bitmap;
+        wxChoice* choice_version;
+        wxButton* button_version_add;
+        wxButton* button_version_del;
         wxChoice* choice_base;
         wxButton* button_base_add;
         wxButton* button_base_del;
@@ -65,11 +120,26 @@ class CslMapCfgTool: public wxDialog
         wxTextCtrl* text_ctrl_map_name;
         wxTextCtrl* text_ctrl_author;
         wxStaticLine* static_line_2;
+        CslMapToolPanelMap* panel_zoom;
+        wxStaticLine* static_line_3;
         wxButton* button_load_image;
-        wxButton* button_reset;
+        wxButton* button_load;
         wxButton* button_save;
+        wxButton* button_clear;
         wxButton* button_close;
         // end wxGlade
+
+        bool LoadImage();
+        void LoadConfig();
+        void SaveConfig();
+        void AddVersion();
+        void DelVersion();
+        void AddBase();
+        void DelBase();
+        void SetCurrentBase(const wxInt32 Id);
+        void ChoiceSetVersion(const wxInt32 id);
+        void ChoiceFillBases();
+        void Reset(const bool resetMap=true);
 }; // wxGlade: end class
 
 

@@ -332,14 +332,14 @@ wxString CslGame::GetGameName(const CSL_GAMETYPE type)
 
 wxString CslGame::GetWeaponName(const CSL_GAMETYPE type,const wxInt32 weapon)
 {
-	switch (type)
+    switch (type)
     {
         case CSL_GAME_SB:
             return GetWeaponStrSB(weapon);
         case CSL_GAME_AC:
             return GetWeaponStrAC(weapon);
         case CSL_GAME_BF:
-			//TODO add weapons for BF
+            //TODO add weapons for BF
             return wxEmptyString;
         case CSL_GAME_CB:
             return GetWeaponStrCB(weapon);
