@@ -140,7 +140,6 @@ class CslPanelMap : public wxPanel
     private:
         bool m_ok;
         bool m_background;
-        wxMemoryDC m_memDC;
 
         void OnPaint(wxPaintEvent& event);
         void OnErase(wxEraseEvent& event) { if (m_background) event.Skip(); }

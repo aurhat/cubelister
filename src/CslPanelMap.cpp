@@ -166,27 +166,27 @@ void CslPanelMap::UpdateBases(const t_aBaseInfo& bases,const bool hasBases)
 
 void CslPanelMap::OnPaint(wxPaintEvent& event)
 {
+	event.Skip();
+
+    if (!m_ok)
+		return;
+
     wxUint32 i;
+	wxMemoryDC memDC;
+	wxPoint origin=GetBitmapOrigin();
 
     wxPaintDC dc(this);
     PrepareDC(dc);
 
-    if (m_ok)
-    {
-        wxPoint origin=GetBitmapOrigin();
+	memDC.SelectObject(m_bitmap);
+	dc.Blit(origin.x,origin.y,m_bitmap.GetWidth(),m_bitmap.GetHeight(),&memDC,0,0);
 
-        m_memDC.SelectObject(m_bitmap);
-        dc.Blit(origin.x,origin.y,m_bitmap.GetWidth(),m_bitmap.GetHeight(),&m_memDC,0,0);
-
-        for (i=0;i<m_bases.GetCount();i++)
-        {
-            CslBaseInfo *base=m_bases.Item(i);
-            dc.SetPen(wxPen(base->m_colour));
-            //dc.SetPen(wxPen(*wxWHITE));
-            dc.SetBrush(wxBrush(base->m_colour));
-            dc.DrawCircle(origin.x+base->m_point.x,origin.y+base->m_point.y,4);
-        }
-    }
-
-    event.Skip();
+	for (i=0;i<m_bases.GetCount();i++)
+	{
+		CslBaseInfo *base=m_bases.Item(i);
+		dc.SetPen(wxPen(base->m_colour));
+		//dc.SetPen(wxPen(*wxWHITE));
+		dc.SetBrush(wxBrush(base->m_colour));
+		dc.DrawCircle(origin.x+base->m_point.x,origin.y+base->m_point.y,4);
+	}
 }

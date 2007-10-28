@@ -394,6 +394,7 @@ bool CslMapCfgTool::LoadImage()
         button_base_add->Enable(choice_version->GetCount()>0);
 
         sizer_map_staticbox->SetLabel(_("Map")+wxString(wxT(" (")+m_fileName+wxT(")")));
+		panel_zoom->SetEraseBackGround(false);
 
         return true;
     }
@@ -661,8 +662,9 @@ void CslMapCfgTool::Reset(const bool resetMap)
         return;
     m_mapInfo.Reset();
     panel_bitmap->Reset();
-    panel_zoom->Reset();
+	panel_zoom->SetEraseBackGround();
     panel_zoom->SetCentre(wxPoint(-1,-1));
+    panel_zoom->Reset();
 }
 
 
