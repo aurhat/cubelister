@@ -118,7 +118,7 @@ class CslPlayerStats
 class CslTeamStatsData
 {
     public:
-        CslTeamStatsData() : m_score(-1),m_ok(false) {}
+        CslTeamStatsData() : m_score(-1),m_score2(-1),m_ok(false) {}
 
         void Reset()
         {
@@ -129,7 +129,7 @@ class CslTeamStatsData
         bool IsCapture() { return m_bases.length()>0; }
 
         wxString m_team;
-        wxInt32 m_score;
+        wxInt32 m_score,m_score2;
         vector<wxInt32> m_bases;
         bool m_ok;
 };

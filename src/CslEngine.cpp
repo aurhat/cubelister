@@ -901,7 +901,8 @@ void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 n
                                 getstring(text,p,ml);
                                 data->m_team=A2U(text);
                                 data->m_score=getint(p);
-
+                                if (info->m_type==CSL_GAME_AC)
+                                    data->m_score2=getint(p);
                                 if (exVersion>=102)
                                 {
                                     vi=getint(p);

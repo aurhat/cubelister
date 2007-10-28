@@ -43,18 +43,20 @@ void Debug_Printf(const char *DbgFunc, const char *FmtStr,...)
 
 char* StripColours(char *s,wxUint32 *l,wxUint32 count)
 {
-    wxUint32 i;
+    wxUint32 i=0;
 
     if (!*l)
         return NULL;
 
-    for (i=0;i<*l;i++)
+    while (i<*l)
     {
         if (s[i]==0xc)
         {
             *l-=count;
             memmove((void*)&s[i],(void*)&s[i+count],*l-i);
         }
+        else
+            i++;
     }
 
     s[*l]=0;
