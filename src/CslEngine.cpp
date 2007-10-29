@@ -593,7 +593,7 @@ void CslEngine::UpdateServerInfo(CslServerInfo *info,ucharbuf *buf,wxUint32 now)
             if (numattr>=2)
             {
                 info->m_gameMode=GetModeStrSB(attr[1]);
-                info->m_hasBases=attr[1]>11 && attr[1]<14;
+                info->m_isCapture=attr[1]>11 && attr[1]<14;
             }
             if (numattr>=3)
             {
@@ -630,9 +630,14 @@ void CslEngine::UpdateServerInfo(CslServerInfo *info,ucharbuf *buf,wxUint32 now)
             if (info->m_type==CSL_GAME_CB && prot!=CSL_LAST_PROTOCOL_CB)
                 return;
             info->m_protocol=prot;
-            info->m_gameMode=info->m_type==CSL_GAME_AC ?
-                             GetModeStrAC(getint(*buf)):
-                             GetModeStrSB(getint(*buf));
+            wxInt32 mode=getint(*buf);
+            if (info->m_type==CSL_GAME_AC)
+            {
+                info->m_gameMode=GetModeStrAC(mode);
+                info->m_isCapture=mode==5;
+            }
+            else
+                info->m_gameMode=GetModeStrSB(mode);
             info->m_players=getint(*buf);
             info->m_timeRemain=getint(*buf);
             getstring(text,*buf,ml);

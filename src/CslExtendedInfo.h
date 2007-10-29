@@ -126,8 +126,6 @@ class CslTeamStatsData
             m_bases.setsize(0);
         }
 
-        bool IsCapture() { return m_bases.length()>0; }
-
         wxString m_team;
         wxInt32 m_score,m_score2;
         vector<wxInt32> m_bases;

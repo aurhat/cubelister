@@ -547,10 +547,9 @@ void CslDlgExtended::SetTeamData()
     CslTeamStatsData *data;
     wxSize size;
     wxString s;
-    wxInt32 h=-1;
-    wxInt32 hs=0;
-    wxInt32 lc=m_teamLabel.GetCount();
-    wxInt32 lu=0;
+    bool captureAC,captureSB;
+    wxInt32 h=-1,hs=0;
+    wxInt32 lu=0,lc=m_teamLabel.GetCount();
 
     wxASSERT(m_info && m_info->m_teamStats);
     if (!m_info || !m_info->m_teamStats)
@@ -560,6 +559,9 @@ void CslDlgExtended::SetTeamData()
 
     UpdateMap();
     m_mapInfo.ResetBasesColour();
+
+    captureAC=m_info->m_type==CSL_GAME_AC && m_info->m_isCapture;
+    captureSB=m_info->m_type==CSL_GAME_SB && m_info->m_isCapture;
 
     if (stats->m_teamplay)
     {
@@ -578,7 +580,7 @@ void CslDlgExtended::SetTeamData()
             }
 
             // colour bases
-            if (m_mapInfo.m_basesOk && m_info->m_hasBases)
+            if (captureSB && m_mapInfo.m_basesOk)
             {
                 wxInt32 baseId;
                 wxInt32 baseCount=m_mapInfo.m_bases.GetCount();
@@ -595,6 +597,18 @@ void CslDlgExtended::SetTeamData()
             s=data->m_team;
             s+=wxT(": ");
             s+=wxString::Format(wxT("%d"),data->m_score);
+
+            if (captureAC)
+            {
+                wxInt32 flagscore=data->m_score2;
+                if (flagscore<0)
+                    flagscore=0;
+                s+=wxString::Format(wxT(" - %d"),flagscore);
+                sizer_team_score_staticbox->SetLabel(_("Team score")+wxString(wxT(" - "))+_("Flag score"));
+            }
+            else
+                sizer_team_score_staticbox->SetLabel(_("Team score"));
+
             m_teamLabel.Item(i)->SetFont(m_labelFont);
             m_teamLabel.Item(i)->SetLabel(s);
             m_teamLabel.Item(i)->SetForegroundColour(team_colours[i]);
@@ -646,7 +660,7 @@ void CslDlgExtended::SetTeamData()
         label_team1->SetMinSize(label_team1->GetBestSize());
     }
 
-    panel_map->UpdateBases(m_mapInfo.m_bases,m_info->m_hasBases);
+    panel_map->UpdateBases(m_mapInfo.m_bases,captureSB);
     ClearTeamScoreLabel(lu ? lu : 1,lc);
 
     s=FormatSeconds(stats->m_remain>-1 ? stats->m_remain*60 : 0,true,true);

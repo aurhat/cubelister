@@ -869,7 +869,7 @@ bool CslListCtrlServer::ListSearchItemMatches(CslServerInfo *info)
             return true;
         else
         {
-            s=info->GetVersionStr().Lower();
+            s=wxString(info->GetVersionStr()).Lower();
             if (s.Find(m_searchString)!=wxNOT_FOUND)
                 return true;
             else

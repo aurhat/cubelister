@@ -108,7 +108,7 @@ const wxChar* GetWeaponStrAC(int n)
 {
     static const wxChar* ac_weapons[] =
     {
-        wxT("nife"), wxT("Pistol"), wxT("Shotgun"), wxT("Subgun"),
+        wxT("Knife"), wxT("Pistol"), wxT("Shotgun"), wxT("Subgun"),
         wxT("Sniper"), wxT("Assault"), wxT("Grenade")
     };
     return (n>=0 && (size_t)n<sizeof(ac_weapons)/sizeof(ac_weapons[0])) ? ac_weapons[n] : _("unknown");
