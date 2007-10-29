@@ -154,7 +154,7 @@ class CslEngine : public wxEvtHandler
         vector<CslServerInfo*> m_favourites;
 
         void UpdateServerInfo(CslServerInfo *info,ucharbuf *buf,wxUint32 now);
-        void ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 now);
+        void ParsePong(CslServerInfo *info,CslUDPPacket *packet,wxUint32 now);
 
         void OnPong(wxCommandEvent& event);
         void OnResolve(wxCommandEvent& event);

@@ -616,13 +616,6 @@ void CslEngine::UpdateServerInfo(CslServerInfo *info,ucharbuf *buf,wxUint32 now)
         }
 
         case CSL_GAME_CB:
-        {
-            // this sucks!
-            wxInt32 i;
-            for (i=0;i<buf->maxlength();i++)
-                *buf->at(i)^=0x61;
-            // dont break, nearly same as AC
-        }
         case CSL_GAME_AC:
         {
 
@@ -656,24 +649,30 @@ void CslEngine::UpdateServerInfo(CslServerInfo *info,ucharbuf *buf,wxUint32 now)
     }
 }
 
-void CslEngine::ParsePongCmd(CslServerInfo *info,CslUDPPacket *packet,wxUint32 now)
+void CslEngine::ParsePong(CslServerInfo *info,CslUDPPacket *packet,wxUint32 now)
 {
     wxInt32 vi;
     wxUint32 exVersion;
     wxUint32 cmd;
     wxUint32 vu=0;
+    bool extended;
     const wxUint32 ml=128;
     char text[ml];
-    bool extended=false;
     ucharbuf p((uchar*)packet->Data(),packet->Size());
 
 #ifdef __WXDEBUG__
     wxString dbg_type=wxT("unknown");
 #endif
 
+    if (info->m_type==CSL_GAME_CB && *p.at(0))
+    {
+        // this sucks!
+        for (vi=0;vi<p.maxlength();vi++)
+            *p.at(vi)^=0x61;
+    }
+
     vu=getint(p);
-    if (!vu)
-        extended=true;
+    extended=vu==0;
 
     while (packet->Size() > (wxUint32)p.length())
     {
@@ -985,7 +984,7 @@ void CslEngine::OnPong(wxCommandEvent& event)
     if ((info=m_currentGame->FindServerByAddr(packet->Address()))!=NULL)
     {
         skip=true;
-        ParsePongCmd(info,packet,ticks);
+        ParsePong(info,packet,ticks);
     }
 
     if (!skip)
@@ -997,7 +996,7 @@ void CslEngine::OnPong(wxCommandEvent& event)
                 info->m_addr.Service()==packet->Address().Service())
             {
                 skip=true;
-                ParsePongCmd(info,packet,ticks);
+                ParsePong(info,packet,ticks);
                 break;
             }
         }
