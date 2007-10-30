@@ -276,12 +276,10 @@ class CslServerInfo
         wxUint32 m_lastSeen,m_pingSend,m_pingResp;
         wxUint32 m_playLast,m_playTimeLastGame,m_playTimeTotal;
         wxUint32 m_connectedTimes;
-        wxUint32 m_uptime;
-        wxUint32 m_uptimeRefresh;
+        wxUint32 m_uptime,m_uptimeRefresh;
         wxInt32 m_lock;
         bool m_waiting;
-        wxInt32 m_extInfoStatus;
-        wxInt32 m_extInfoVersion;
+        wxInt32 m_extInfoStatus,m_extInfoVersion;
         CslPlayerStats *m_playerStats;
         CslTeamStats *m_teamStats;
 

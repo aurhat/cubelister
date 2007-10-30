@@ -24,6 +24,7 @@
 #include <wx/artprov.h>
 #include <wx/sysopt.h>
 #include "CslFrame.h"
+#include "CslDlgAbout.h"
 #include "CslDlgAddMaster.h"
 #include "CslDlgGeneric.h"
 #include "CslTools.h"
@@ -744,15 +745,8 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
 
         case wxID_ABOUT:
         {
-            wxAboutDialogInfo info;
-            info.SetName(CSL_NAME_STR);
-            info.SetVersion(CSL_VERSION_LONG_STR);
-#ifdef __WXGTK__
-            info.SetDescription(CSL_DESCRIPTION_STR);
-#endif
-            info.SetCopyright(CSL_COPYRIGHT_STR);
-            wxAboutBox(info);
-
+            CslDlgAbout *dlg=new CslDlgAbout(this);
+            dlg->Show();
             break;
         }
 

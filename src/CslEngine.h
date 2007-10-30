@@ -64,6 +64,7 @@ class CslPongPacket : public wxObject
         wxInt32 m_type;
 };
 
+
 class CslResolverPacket
 {
     public:
@@ -99,6 +100,7 @@ class CslResolverThread : public wxThread
         vector<CslResolverPacket*> m_packets;
         wxIPV4address m_addr;
 };
+
 
 class CslEngine : public wxEvtHandler
 {

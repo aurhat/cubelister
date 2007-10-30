@@ -317,33 +317,34 @@ bool CslEngine::Ping(CslServerInfo *info,bool force)
 
     info->m_pingSend=ticks;
 
-    if ((info->m_ping<0 || info->m_extInfoStatus==CSL_EXT_STATUS_OK) &&
-        (info->CanPingUptime()))
+    if ((info->m_type!=CSL_GAME_CB) &&
+        (info->CanPingUptime()) &&
+        (info->m_ping<0 || info->m_extInfoStatus==CSL_EXT_STATUS_OK))
     {
         return PingExUptime(info);
     }
 
-    if (info->m_extInfoStatus!=CSL_EXT_STATUS_FALSE)
+    if (info->m_type==CSL_GAME_CB || info->m_extInfoStatus!=CSL_EXT_STATUS_FALSE)
     {
+        //LOG_DEBUG("Ping %s - %d\n",U2A(info->GetBestDescription()),ticks);
         // default ping packet
         packet=new CslUDPPacket();
         ucharbuf p(ping,sizeof(ping));
         putint(p,info->m_pingSend);
         packet->Set(info->m_addr,ping,p.length());
-        m_pingSock->SendPing(packet);
+        return m_pingSock->SendPing(packet);
     }
     else
-        PingExUptime(info);
+        return PingExUptime(info);
 
-    //LOG_DEBUG("Ping %s - %d\n",U2A(info->GetBestDescription()),ticks);
-
-    return true;
+    return false;
 }
 
 bool CslEngine::PingExUptime(CslServerInfo *info)
 {
-    //LOG_DEBUG("uptime %s - %d\n",U2A(info->GetBestDescription()),GetTicks());
     uchar ping[16];
+
+    //LOG_DEBUG("uptime %s - %d\n",U2A(info->GetBestDescription()),GetTicks());
 
     CslUDPPacket *packet=new CslUDPPacket();
     ucharbuf p(ping,sizeof(ping));
@@ -351,9 +352,7 @@ bool CslEngine::PingExUptime(CslServerInfo *info)
     putint(p,CSL_EX_PING_UPTIME);
     //putstring(CSL_EX_CMD_UPTIME,p);
     packet->Set(info->m_addr,ping,p.length());
-    m_pingSock->SendPing(packet);
-
-    return true;
+    return m_pingSock->SendPing(packet);
 }
 
 bool CslEngine::PingExPlayerInfo(CslServerInfo *info,wxInt32 pid)
@@ -570,9 +569,9 @@ void CslEngine::FuzzPingSends()
 
 void CslEngine::UpdateServerInfo(CslServerInfo *info,ucharbuf *buf,wxUint32 now)
 {
-    wxUint32 l;
-    const wxUint32 ml=128;
-    char text[ml];
+    wxUint32 u;
+    wxInt32 i;
+    char text[_MAXDEFSTR];
 
     info->m_pingResp=GetTicks();
     info->m_ping=info->m_pingResp-info->m_pingSend;
@@ -606,16 +605,22 @@ void CslEngine::UpdateServerInfo(CslServerInfo *info,ucharbuf *buf,wxUint32 now)
             if (numattr>=5)
                 info->m_mm=attr[4];
 
-            getstring(text,*buf,ml);
+            getstring(text,*buf);
             info->m_map=A2U(text);
-            getstring(text,*buf,ml);
-            l=strlen(text);
-            StripColours(text,&l,2);
+            getstring(text,*buf);
+            u=strlen(text);
+            StripColours(text,&u,2);
             info->SetDescription(A2U(text));
             break;
         }
 
         case CSL_GAME_CB:
+        {
+            // this sucks
+            for (i=0;i<buf->maxlength();i++)
+                *buf->at(i)^=0x61;
+        }
+
         case CSL_GAME_AC:
         {
 
@@ -632,12 +637,12 @@ void CslEngine::UpdateServerInfo(CslServerInfo *info,ucharbuf *buf,wxUint32 now)
             else
                 info->m_gameMode=GetModeStrSB(mode);
             info->m_players=getint(*buf);
-            info->m_timeRemain=getint(*buf);
-            getstring(text,*buf,ml);
+            info->m_timeRemain=getint(*buf)+1;
+            getstring(text,*buf);
             info->m_map=A2U(text);
-            getstring(text,*buf,ml);
-            l=strlen(text);
-            StripColours(text,&l,2);
+            getstring(text,*buf);
+            u=strlen(text);
+            StripColours(text,&u,2);
             info->SetDescription(A2U(text));
             if (info->m_type==CSL_GAME_AC)
                 info->m_playersMax=getint(*buf);
@@ -652,27 +657,17 @@ void CslEngine::UpdateServerInfo(CslServerInfo *info,ucharbuf *buf,wxUint32 now)
 void CslEngine::ParsePong(CslServerInfo *info,CslUDPPacket *packet,wxUint32 now)
 {
     wxInt32 vi;
+    wxUint32 vu;
     wxUint32 exVersion;
     wxUint32 cmd;
-    wxUint32 vu=0;
-    bool extended;
-    const wxUint32 ml=128;
-    char text[ml];
+    char text[_MAXDEFSTR];
     ucharbuf p((uchar*)packet->Data(),packet->Size());
 
 #ifdef __WXDEBUG__
     wxString dbg_type=wxT("unknown");
 #endif
 
-    if (info->m_type==CSL_GAME_CB && *p.at(0))
-    {
-        // this sucks!
-        for (vi=0;vi<p.maxlength();vi++)
-            *p.at(vi)^=0x61;
-    }
-
     vu=getint(p);
-    extended=vu==0;
 
     while (packet->Size() > (wxUint32)p.length())
     {
@@ -681,13 +676,12 @@ void CslEngine::ParsePong(CslServerInfo *info,CslUDPPacket *packet,wxUint32 now)
             case CSL_GAME_SB:
             case CSL_GAME_BF:
             case CSL_GAME_AC:
-            case CSL_GAME_CB:
             {
-                if (extended)
+                if (vu==0) // extended info
                 {
                     if (info->m_extInfoVersion==101)
                     {
-                        getstring(text,p,ml);
+                        getstring(text,p);
                         if (text[0]==0)
                             cmd=CSL_EX_PING_UPTIME;
                         else if (strcmp(text,CSL_EX_PING_PLAYERSTATS_STR)==0)
@@ -817,9 +811,9 @@ void CslEngine::ParsePong(CslServerInfo *info,CslUDPPacket *packet,wxUint32 now)
                             CslPlayerStatsData *data=stats->GetNewStatsPtr();
 
                             data->m_id=getint(p);
-                            getstring(text,p,ml);
+                            getstring(text,p);
                             data->m_player=A2U(text);
-                            getstring(text,p,ml);
+                            getstring(text,p);
                             data->m_team=A2U(text);
                             data->m_frags=getint(p);
                             data->m_deaths=getint(p);
@@ -902,7 +896,7 @@ void CslEngine::ParsePong(CslServerInfo *info,CslUDPPacket *packet,wxUint32 now)
                             {
                                 CslTeamStatsData *data=stats->GetNewStatsPtr();
 
-                                getstring(text,p,ml);
+                                getstring(text,p);
                                 data->m_team=A2U(text);
                                 data->m_score=getint(p);
                                 if (info->m_type==CSL_GAME_AC)
@@ -949,6 +943,10 @@ void CslEngine::ParsePong(CslServerInfo *info,CslUDPPacket *packet,wxUint32 now)
 
                 break;
             }
+
+            case CSL_GAME_CB:
+                UpdateServerInfo(info,&p,now);
+                break;
 
             default:
                 break;

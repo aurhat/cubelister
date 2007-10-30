@@ -57,19 +57,21 @@ enum
 
 enum
 {
-    CSL_PLAYER_STATE_SB_ALIVE = 0,
-    CSL_PLAYER_STATE_SB_DEAD,
-    CSL_PLAYER_STATE_SB_SPAWNING,
-    CSL_PLAYER_STATE_SB_LAGGED,
-    CSL_PLAYER_STATE_SB_EDITING,
-    CSL_PLAYER_STATE_SB_SPECTATOR
+    CSL_PLAYER_STATE_UNKNOWN = -1,
+    CSL_PLAYER_STATE_ALIVE,
+    CSL_PLAYER_STATE_DEAD,
+    CSL_PLAYER_STATE_SPAWNING,
+    CSL_PLAYER_STATE_LAGGED,
+    CSL_PLAYER_STATE_EDITING,
+    CSL_PLAYER_STATE_SPECTATOR
 };
 
 enum
 {
-    CSL_PLAYER_PRIV_SB_NONE = 0,
-    CSL_PLAYER_PRIV_SB_MASTER,
-    CSL_PLAYER_PRIV_SB_ADMIN
+    CSL_PLAYER_PRIV_UNKNOWN = -1,
+    CSL_PLAYER_PRIV_NONE,
+    CSL_PLAYER_PRIV_MASTER,
+    CSL_PLAYER_PRIV_ADMIN
 };
 
 
@@ -78,15 +80,15 @@ class CslPlayerStatsData
     public:
         CslPlayerStatsData() :
                 m_frags(-1),m_deaths(-1),m_teamkills(-1),
-                m_health(-1),m_armour(-1),m_weapon(-1),
-                m_id(-1),m_priv(0),m_state(0),
+                m_health(-1),m_armour(-1),m_weapon(-1),m_id(-1),
+                m_priv(CSL_PLAYER_STATE_UNKNOWN),m_state(CSL_PLAYER_PRIV_UNKNOWN),
                 m_ok(false) {}
 
         wxString m_player,m_team;
         wxInt32 m_frags,m_deaths,m_teamkills;
         wxInt32 m_health,m_armour,m_weapon;
         wxInt32 m_id;
-        wxUint32 m_priv,m_state;
+        wxInt32 m_priv,m_state;
         bool m_ok;
 };
 

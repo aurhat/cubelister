@@ -33,43 +33,9 @@ typedef unsigned int uint;
 
 #ifndef WIN32
 #define __cdecl
-#define _vsnprintf vsnprintf
 #endif
 
-// easy safe strings
 #define _MAXDEFSTR 260
-typedef char string[_MAXDEFSTR];
-
-inline char *s_strncpy(char *d, const char *s, size_t m)
-{
-    strncpy(d,s,m);
-    d[m-1] = 0;
-    return d;
-}
-inline char *s_strcpy(char *d, const char *s)
-{
-    return s_strncpy(d,s,_MAXDEFSTR);
-}
-inline char *s_strcat(char *d, const char *s)
-{
-    size_t n = strlen(d);
-    return s_strncpy(d+n,s,_MAXDEFSTR-n);
-}
-
-
-#define s_sprintf(d) s_sprintf_f((char *)d)
-#define s_sprintfd(d) string d; s_sprintf(d)
-#define s_sprintfdlv(d,last,fmt) string d; { va_list ap; va_start(ap, last); formatstring(d, fmt, ap); va_end(ap); }
-#define s_sprintfdv(d,fmt) s_sprintfdlv(d,fmt,fmt)
-
-
-template <class T> void _swapv(T &a, T &b)
-{
-    T t = a;
-    a = b;
-    b = t;
-}
-
 
 #define loopv(v)    if(false) {} else for(int i = 0; i<(v).length(); i++)
 #define loopvj(v)   if(false) {} else for(int j = 0; j<(v).length(); j++)
@@ -395,7 +361,7 @@ template <class T> struct vector
 extern void putint(ucharbuf &p, int n);
 extern int getint(ucharbuf &p);
 extern void putstring(const char *t, ucharbuf &p);
-extern void getstring(char *text, ucharbuf &p, int len);
+extern void getstring(char *text, ucharbuf &p, int len=_MAXDEFSTR);
 
 #endif // CUBE_TOOLS_H
 

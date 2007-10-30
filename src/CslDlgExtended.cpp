@@ -477,7 +477,7 @@ void CslDlgExtended::SetPlayerData()
             s=data->m_player;
         list_ctrl_players->SetItem(i,0,s);
 
-        if (data->m_state==CSL_PLAYER_STATE_SB_SPECTATOR)
+        if (data->m_state==CSL_PLAYER_STATE_SPECTATOR)
             s=_("Spectator");
         else
             s=data->m_team;
@@ -501,17 +501,21 @@ void CslDlgExtended::SetPlayerData()
             s=wxString::Format(wxT("%d"),data->m_teamkills);
         list_ctrl_players->SetItem(i,4,s);
 
-        if (data->m_state==CSL_PLAYER_STATE_SB_DEAD)
+        if (data->m_state==CSL_PLAYER_STATE_UNKNOWN)
+            s=_("no data");
+        else if (data->m_state==CSL_PLAYER_STATE_DEAD)
             s=_("dead");
-        else if (data->m_state==CSL_PLAYER_STATE_SB_EDITING)
+        else if (data->m_state==CSL_PLAYER_STATE_EDITING)
             s=_("editing");
         else if (data->m_state)
             s=wxT("0");
         else
-            s=s=wxString::Format(wxT("%d"),data->m_health);
+            s=wxString::Format(wxT("%d"),data->m_health);
         list_ctrl_players->SetItem(i,5,s);
 
-        if (data->m_state || data->m_armour<0)
+        if (data->m_state==CSL_PLAYER_STATE_UNKNOWN)
+            s=_("no data");
+        else if (data->m_state || data->m_armour<0)
             s=wxT("0");
         else
             s=wxString::Format(wxT("%d"),data->m_armour);
@@ -521,11 +525,11 @@ void CslDlgExtended::SetPlayerData()
         list_ctrl_players->SetItem(i,7,s);
 
         wxColour colour=*wxBLACK;
-        if (data->m_priv==CSL_PLAYER_PRIV_SB_MASTER)
+        if (data->m_priv==CSL_PLAYER_PRIV_MASTER)
             i=CSL_LIST_IMG_GREEN;
-        else if (data->m_priv==CSL_PLAYER_PRIV_SB_ADMIN)
+        else if (data->m_priv==CSL_PLAYER_PRIV_ADMIN)
             i=CSL_LIST_IMG_ORANGE;
-        else if (data->m_state==CSL_PLAYER_STATE_SB_SPECTATOR)
+        else if (data->m_state==CSL_PLAYER_STATE_SPECTATOR)
             i=CSL_LIST_IMG_GREY;
         else
             i=CSL_LIST_IMG_TRANS;
@@ -634,15 +638,18 @@ void CslDlgExtended::SetTeamData()
 
             if (data->m_score==10000 || stats->m_remain==0)
             {
-                s=data->m_team;
-                s+=wxT(": ");
-                if (data->m_score==10000)
-                    s+=_("WINNER");
-                else
-                    s+=wxString::Format(wxT("%d - "),data->m_score)+_("WINNER");
+                if (!captureAC)
+                {
+                    s=data->m_team;
+                    s+=wxT(": ");
+                    if (data->m_score==10000)
+                        s+=_("WINNER");
+                    else
+                        s+=wxString::Format(wxT("%d - "),data->m_score)+_("WINNER");
 
-                m_teamLabel.Item(h)->SetLabel(s);
-                m_teamLabel.Item(h)->SetMinSize(m_teamLabel.Item(h)->GetBestSize());
+                    m_teamLabel.Item(h)->SetLabel(s);
+                    m_teamLabel.Item(h)->SetMinSize(m_teamLabel.Item(h)->GetBestSize());
+                }
 
                 if (checkbox_update_end->IsChecked())
                     checkbox_update->SetValue(false);
