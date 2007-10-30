@@ -13,6 +13,19 @@
 
 // end wxGlade
 
+class CslPanelAboutImage : public wxPanel
+{
+    public:
+        CslPanelAboutImage(wxWindow *parent,wxInt32 id);
+
+    private:
+        void OnPaint(wxPaintEvent& event);
+        DECLARE_EVENT_TABLE();
+
+    protected:
+        wxBitmap m_bitmap;
+};
+
 
 class CslDlgAbout: public wxDialog
 {
@@ -35,7 +48,7 @@ class CslDlgAbout: public wxDialog
 
     protected:
         // begin wxGlade: CslDlgAbout::attributes
-        wxStaticBitmap* bitmap_logo;
+        CslPanelAboutImage* panel_bitmap;
         wxStaticText* label_name;
         wxStaticText* label_version;
         wxStaticText* label_desc;

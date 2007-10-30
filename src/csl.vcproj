@@ -183,6 +183,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CslDlgAbout.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CslDlgAddMaster.cpp"
 				>
 			</File>
@@ -281,6 +285,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CslDlgAbout.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CslDlgAddMaster.h"
 				>
 			</File>
@@ -322,6 +330,10 @@
 			</File>
 			<File
 				RelativePath=".\CslGame.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CslLicense.h"
 				>
 			</File>
 			<File

@@ -2,13 +2,15 @@
 #include "CslDlgAbout.h"
 #include "CslVersion.h"
 #include "CslLicense.h"
-#ifndef _MSC_VER
-#include "img/csl_64.xpm"
-#endif
+#include "img/csl_128.xpm"
 
 // begin wxGlade: ::extracode
 
 // end wxGlade
+
+BEGIN_EVENT_TABLE(CslPanelAboutImage, wxPanel)
+    EVT_PAINT(CslPanelAboutImage::OnPaint)
+END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(CslDlgAbout, wxDialog)
     EVT_BUTTON(wxID_ANY,CslDlgAbout::OnCommandEvent)
@@ -33,6 +35,27 @@ const wxChar *csl_license_pre = wxT(\
                                     "modify it under the terms of the GNU General Public License version 2\n"
                                     "as published by the Free Software Foundation.\n\n\n");
 
+
+CslPanelAboutImage::CslPanelAboutImage(wxWindow *parent,wxInt32 id) :
+        wxPanel(parent,id)
+{
+    m_bitmap=wxBitmap(csl_128_xpm);
+}
+
+void CslPanelAboutImage::OnPaint(wxPaintEvent& event)
+{
+    wxMemoryDC memDC;
+
+    wxPaintDC dc(this);
+    PrepareDC(dc);
+
+    memDC.SelectObject(m_bitmap);
+    dc.Blit(0,0,m_bitmap.GetWidth(),m_bitmap.GetHeight(),&memDC,0,0,wxCOPY,true);
+
+    event.Skip();
+}
+
+
 CslDlgAbout::CslDlgAbout(wxWindow* parent,int id,const wxString& title,
                          const wxPoint& pos, const wxSize& size,long style):
         wxDialog(parent,id,title,pos,size,style)
@@ -41,10 +64,10 @@ CslDlgAbout::CslDlgAbout(wxWindow* parent,int id,const wxString& title,
     notebook = new wxNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0);
     notebook_pane_license = new wxPanel(notebook, wxID_ANY);
     notebook_pane_credits = new wxPanel(notebook, wxID_ANY);
-    bitmap_logo = new wxStaticBitmap(this, wxID_ANY, wxNullBitmap);
+    panel_bitmap = new CslPanelAboutImage(this, wxID_ANY);
     label_name = new wxStaticText(this, wxID_ANY, wxEmptyString);
     label_version = new wxStaticText(this, wxID_ANY, wxEmptyString);
-    label_desc = new wxStaticText(this, wxID_ANY, wxEmptyString);
+    label_desc = new wxStaticText(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
     label_copyright = new wxStaticText(this, wxID_ANY, wxEmptyString);
     text_ctrl_credits = new wxTextCtrl(notebook_pane_credits, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxHSCROLL);
     text_ctrl_license = new wxTextCtrl(notebook_pane_license, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxHSCROLL);
@@ -59,19 +82,19 @@ CslDlgAbout::CslDlgAbout(wxWindow* parent,int id,const wxString& title,
 void CslDlgAbout::set_properties()
 {
     // begin wxGlade: CslDlgAbout::set_properties
+    panel_bitmap->SetMinSize(wxSize(128,128));
     label_name->SetFont(wxFont(16, wxDECORATIVE, wxNORMAL, wxBOLD, 0, wxT("")));
     label_version->SetFont(wxFont(12, wxDEFAULT, wxNORMAL, wxBOLD, 0, wxT("")));
     button_close->SetDefault();
     // end wxGlade
 
-    SetTitle(wxT("About Cube Server Lister (CSL)"));
+    SetTitle(_("About Cube Server Lister (CSL)"));
 
     wxFont font=label_copyright->GetFont();
-    font.SetPointSize(font.GetPointSize()-1);
+    //font.SetPointSize(font.GetPointSize()-1);
     font.SetStyle(wxFONTSTYLE_ITALIC);
     label_copyright->SetFont(font);
 
-    bitmap_logo->SetBitmap(wxICON(csl_64));
     label_name->SetLabel(CSL_NAME_STR);
     label_version->SetLabel(CSL_VERSION_LONG_STR);
     label_desc->SetLabel(CSL_DESCRIPTION_STR);
@@ -91,7 +114,7 @@ void CslDlgAbout::do_layout()
     wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(7, 1, 0, 0);
     wxGridSizer* sizer_license = new wxGridSizer(1, 1, 0, 0);
     wxGridSizer* sizer_credits = new wxGridSizer(1, 1, 0, 0);
-    grid_sizer_main->Add(bitmap_logo, 0, wxALIGN_CENTER_HORIZONTAL, 0);
+    grid_sizer_main->Add(panel_bitmap, 1, wxALIGN_CENTER_HORIZONTAL, 0);
     grid_sizer_main->Add(label_name, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
     grid_sizer_main->Add(label_version, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
     grid_sizer_main->Add(label_desc, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);

@@ -340,14 +340,7 @@ void CslFrame::set_properties()
     list_ctrl_master->SetMinSize(wxSize(0,0));
 
     SetMinSize(wxSize(640,480));
-
-#ifdef _MSC_VER
-    wxIcon icon(wxT("ICON_APPLICATION"),wxBITMAP_TYPE_ICO_RESOURCE);
-#else
-    wxIcon icon;
-    icon.CopyFromBitmap(wxBitmap(csl_32_xpm));
-#endif
-    SetIcon(icon);
+    SetIcon(wxICON(csl_32));
 }
 
 void CslFrame::do_layout()

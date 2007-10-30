@@ -162,7 +162,7 @@ void CslDlgExtended::set_properties()
     m_teamLabel.Add(label_team8);
 
 #ifdef __WXMSW__
-    list_ctrl_players->SetMinSize(wxSize(520,350));
+    list_ctrl_players->SetMinSize(wxSize(520,300));
 #endif
 #ifdef __WXGTK__
     list_ctrl_players->SetMinSize(wxSize(580,350));
@@ -395,6 +395,7 @@ void CslDlgExtended::UpdateMap()
 {
     if (m_info->m_map.IsEmpty())
     {
+        m_mapInfo.Reset();
         panel_map->SetOk(false);
         ShowPanelMap(false);
 
@@ -607,8 +608,8 @@ void CslDlgExtended::SetTeamData()
                 wxInt32 flagscore=data->m_score2;
                 if (flagscore<0)
                     flagscore=0;
-                s+=wxString::Format(wxT(" - %d"),flagscore);
-                sizer_team_score_staticbox->SetLabel(_("Team score")+wxString(wxT(" - "))+_("Flag score"));
+                s+=wxString::Format(wxT(" / %d"),flagscore);
+                sizer_team_score_staticbox->SetLabel(_("Team score")+wxString(wxT(" / "))+_("Flag score"));
             }
             else
                 sizer_team_score_staticbox->SetLabel(_("Team score"));
@@ -632,9 +633,12 @@ void CslDlgExtended::SetTeamData()
         {
             data=stats->m_stats[h];
 
-            wxFont font=m_labelFont;
-            font.SetWeight(wxFONTWEIGHT_BOLD);
-            m_teamLabel.Item(h)->SetFont(font);
+            if (!captureAC)
+            {
+                wxFont font=m_labelFont;
+                font.SetWeight(wxFONTWEIGHT_BOLD);
+                m_teamLabel.Item(h)->SetFont(font);
+            }
 
             if (data->m_score==10000 || stats->m_remain==0)
             {

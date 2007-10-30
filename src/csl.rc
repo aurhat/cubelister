@@ -1,6 +1,6 @@
 //#include "wx/msw/wx.rc"
 
-ICON_APPLICATION        ICON                    "img\\csl_32.ico"
+CSL_32                  ICON                    "img\\csl_32.ico"
 
 ICON_LIST_GREEN         ICON                    "img\\green_list_16.ico"
 ICON_LIST_YELLOW        ICON                    "img\\yellow_list_16.ico"
