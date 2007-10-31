@@ -168,6 +168,8 @@ class CslServerInfo
             return (m_type==info.m_type && m_host==info.m_host);
         }
 
+        void Destroy() { DeletePlayerStats(); DeleteTeamStats(); delete this; }
+
         void CreateFavourite(const wxString& host=wxT("localhost"),
                              CSL_GAMETYPE type=CSL_GAME_START)
         {
@@ -256,11 +258,6 @@ class CslServerInfo
         bool IsDefault() { return (m_view&CSL_VIEW_DEFAULT)>0; }
         bool IsFavourite() { return (m_view&CSL_VIEW_FAVOURITE)>0; }
 
-        void CreatePlayerStats() { if (!m_playerStats) m_playerStats=new CslPlayerStats(); }
-        void DeletePlayerStats() { if (m_playerStats) { delete m_playerStats; m_playerStats=NULL; } }
-        void CreateTeamStats() { if (!m_teamStats) m_teamStats=new CslTeamStats(); }
-        void DeleteTeamStats() { if (m_teamStats) { delete m_teamStats; m_teamStats=NULL; } }
-
         wxString m_host,m_domain,m_password;
         vector<wxInt32> m_masterIDs;
         wxString m_desc,m_descOld;
@@ -300,6 +297,12 @@ class CslServerInfo
         void SetFavourite() { m_view|=CSL_VIEW_FAVOURITE; }
         void RemoveDefault() { m_view&=~CSL_VIEW_DEFAULT; }
         void RemoveFavourite() { m_view&=~CSL_VIEW_FAVOURITE; }
+
+        void CreatePlayerStats() { if (!m_playerStats) m_playerStats=new CslPlayerStats(); }
+        void DeletePlayerStats() { if (m_playerStats) { delete m_playerStats; m_playerStats=NULL; } }
+        void CreateTeamStats() { if (!m_teamStats) m_teamStats=new CslTeamStats(); }
+        void DeleteTeamStats() { if (m_teamStats) { delete m_teamStats; m_teamStats=NULL; } }
+
 };
 
 

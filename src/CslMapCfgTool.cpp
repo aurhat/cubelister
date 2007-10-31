@@ -424,7 +424,7 @@ void CslMapCfgTool::LoadConfig()
 
     Reset(false);
 
-    t_aInt versions;
+    t_aInt32 versions;
     m_mapInfo.GetMapConfigVersions(config,versions);
 
     for (wxUint32 i=0;i<versions.GetCount();i++)

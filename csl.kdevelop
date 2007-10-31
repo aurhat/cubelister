@@ -20,7 +20,7 @@
   </general>
   <kdevautoproject>
     <general>
-      <activetarget>src/csl</activetarget>
+      <activetarget>src/cslmapcfgtool</activetarget>
       <useconfiguration>debug</useconfiguration>
     </general>
     <run>

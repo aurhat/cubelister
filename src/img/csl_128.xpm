@@ -1,5 +1,5 @@
 /* XPM */
-static char * csl_128_xpm[] = {
+static const char * csl_128_xpm[] = {
 "128 128 2508 2",
 "  	c None",
 ". 	c #00E900",

@@ -28,7 +28,7 @@ BEGIN_EVENT_TABLE(CslPanelMap, wxPanel)
 END_EVENT_TABLE()
 
 
-bool CslMapInfo::GetMapConfigVersions(wxFileConfig& config,t_aInt& array)
+bool CslMapInfo::GetMapConfigVersions(wxFileConfig& config,t_aInt32& array)
 {
     wxUint32 i;
     long int index,val;
@@ -103,7 +103,7 @@ bool CslMapInfo::LoadMapData(const wxString& mapName,const wxString& gameName,
         wxFileConfig config(stream);
 
         wxInt32 version;
-        t_aInt versions;
+        t_aInt32 versions;
 
         if (!GetMapConfigVersions(config,versions))
             return false;

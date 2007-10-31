@@ -47,8 +47,8 @@ class CslBaseInfo
 };
 
 WX_DEFINE_ARRAY_PTR(CslBaseInfo*,t_aBaseInfo);
-WX_DEFINE_ARRAY_INT(long int, t_aInt);
-#include "CslTools.h"
+WX_DEFINE_ARRAY_INT(wxInt32, t_aInt32);
+
 class CslMapInfo
 {
     public:
@@ -74,7 +74,7 @@ class CslMapInfo
             return *this;
         }
 
-        bool GetMapConfigVersions(wxFileConfig& config,t_aInt& array);
+        bool GetMapConfigVersions(wxFileConfig& config,t_aInt32& array);
         bool LoadMapConfig(wxFileConfig& config,const wxInt32 protVersion);
         bool LoadMapData(const wxString& mapName,const wxString& gameName,
                          const wxInt32 protVersion);

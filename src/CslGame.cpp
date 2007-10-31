@@ -146,9 +146,7 @@ CslGame::~CslGame()
     DeleteMaster();
     loopv(m_servers)
     {
-        m_servers[i]->DeletePlayerStats();
-        m_servers[i]->DeleteTeamStats();
-        delete m_servers[i];
+        m_servers[i]->Destroy();
     }
 }
 
@@ -286,8 +284,7 @@ bool CslGame::DeleteServer(CslServerInfo *info)
         if (m_servers[i]==info)
         {
             m_servers.remove(i);
-            info->DeletePlayerStats();
-            delete info;
+            info->Destroy();
             return true;
         }
     }
