@@ -64,12 +64,12 @@ else
 	AC_MSG_ERROR([wxWidgets 2.8.0 or newer is required])
 fi
 
-if test "$host_os" = "mingw32" -o "$host_os" = "cygwin"; then
- CSL_FLAGS_INCLUDE="src/img/flags/win"
-else
- CSL_FLAGS_INCLUDE="src/img/flags"
-fi
-AC_SUBST(CSL_FLAGS_INCLUDE)
+dnl if test "$host_os" = "mingw32" -o "$host_os" = "cygwin"; then
+dnl  CSL_FLAGS_INCLUDE="src/img/flags/win"
+dnl else
+dnl  CSL_FLAGS_INCLUDE="src/img/flags"
+dnl fi
+dnl AC_SUBST(CSL_FLAGS_INCLUDE)
 
 CXXFLAGS="$CXXFLAGS $WX_CXXFLAGS"
 AC_SUBST(WX_LIBS)

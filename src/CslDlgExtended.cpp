@@ -116,7 +116,7 @@ CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
     for (i=0;i<c;i++)
         m_imageList.Add(AdjustIconSize(flags[i],wxNullIcon,wxSize(20,14),wxPoint(0,2)));
 #else
-    m_imageList.Create(20,12,true);
+    m_imageList.Create(18,12,true);
     m_imageList.Add(wxICON(sortasc_18_12));
     m_imageList.Add(wxICON(sortdsc_18_12));
     m_imageList.Add(wxIcon(unknown_xpm));

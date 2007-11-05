@@ -20,6 +20,6 @@ noinst_HEADERS = CslArt.h CslDlgAbout.h CslDlgAddMaster.h CslDlgAddServer.h \
 	CslListCtrlServer.h CslMapCfgTool.h CslMenu.h CslPanelMap.h CslSettings.h CslStatusBar.h \
 	CslTools.h CslUDP.h cube_tools.h
 SUBDIRS = libGeoIP
-INCLUDES = -I$(top_srcdir)/src/libGeoIP -I$(top_srcdir)/$(CSL_FLAGS_INCLUDE)
+INCLUDES = -I$(top_srcdir)/src/libGeoIP -I$(top_srcdir)/src/img/flags
 cslmapcfgtool_SOURCES = CslMapCfgTool.cpp CslPanelMap.cpp CslTools.cpp
 cslmapcfgtool_LDADD = ${WX_LIBS}
