@@ -7,5 +7,5 @@ Type=Application
 Exec=csl
 StartupNotify=true
 Terminal=false
-Icon=csl_128
+Icon=csl.png
 Categories=Games

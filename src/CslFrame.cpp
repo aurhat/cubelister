@@ -31,7 +31,7 @@
 #include "CslTools.h"
 #include "CslVersion.h"
 
-#ifndef _MSC_VER
+#ifndef __WXMSW__
 #include "img/csl_32.xpm"
 #include "img/sb_24.xpm"
 #include "img/bf_24.xpm"
@@ -327,7 +327,12 @@ void CslFrame::set_properties()
     list_ctrl_master->SetMinSize(wxSize(0,0));
 
     SetMinSize(wxSize(640,480));
+
+#ifdef __WXMSW__
+    SetIcon(wxICON(aa_csl_32));
+#else
     SetIcon(wxICON(csl_32));
+#endif
 }
 
 void CslFrame::do_layout()

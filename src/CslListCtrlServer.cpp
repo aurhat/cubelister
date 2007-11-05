@@ -32,7 +32,7 @@
 #include "CslMenu.h"
 #include "CslSettings.h"
 
-#ifndef _MSC_VER
+#ifndef __WXMSW__
 #include "img/sortasc_16.xpm"
 #include "img/sortdsc_16.xpm"
 #include "img/sortasclight_16.xpm"

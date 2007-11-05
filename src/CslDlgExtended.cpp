@@ -21,7 +21,7 @@
 #include "CslDlgExtended.h"
 #include "CslSettings.h"
 #include "CslFlags.h"
-#ifndef _MSC_VER
+#ifndef __WXMSW__
 #include "img/sortasc_18_12.xpm"
 #include "img/sortdsc_18_12.xpm"
 #endif

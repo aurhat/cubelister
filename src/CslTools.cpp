@@ -186,7 +186,7 @@ wxString FormatSeconds(wxUint32 time,bool space,bool full)
 
 #define CSL_USE_WIN32_TICK
 
-#ifdef _MSC_VER
+#ifdef __WXMSW__
 #ifndef CSL_USE_WIN32_TICK
 #include <time.h>
 #if !defined(_WINSOCK2API_) && !defined(_WINSOCKAPI_)
@@ -212,7 +212,7 @@ int gettimeofday(struct timeval* tv,void *dummy)
 #endif //USE_WIN32_TICK
 #else
 #include <sys/time.h>
-#endif //_MSC_VER
+#endif //__WXMSW__
 
 wxUint32 GetTicks()
 {

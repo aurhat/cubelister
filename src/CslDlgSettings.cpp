@@ -22,7 +22,7 @@
 #include <wx/imaglist.h>
 #include "CslDlgSettings.h"
 #include "CslTools.h"
-#ifndef _MSC_VER
+#ifndef __WXMSW__
 #include "img/sb_24.xpm"
 #include "img/ac_24.xpm"
 #include "img/bf_24.xpm"
@@ -114,17 +114,10 @@ CslDlgSettings::CslDlgSettings(wxWindow* parent,int id,const wxString& title,
     // end wxGlade
 
     wxImageList *imgList=new wxImageList(24,24,true);
-#ifndef _MSC_VER
-    imgList->Add(wxBitmap(sb_24_xpm));
-    imgList->Add(wxBitmap(ac_24_xpm));
-    imgList->Add(wxBitmap(bf_24_xpm));
-    imgList->Add(wxBitmap(cb_24_xpm));
-#else
-    imgList->Add(wxIcon(wxT("ICON_TREE_SB_24"),wxBITMAP_TYPE_ICO_RESOURCE));
-    imgList->Add(wxIcon(wxT("ICON_TREE_AC_24"),wxBITMAP_TYPE_ICO_RESOURCE));
-    imgList->Add(wxIcon(wxT("ICON_TREE_BF_24"),wxBITMAP_TYPE_ICO_RESOURCE));
-    imgList->Add(wxIcon(wxT("ICON_TREE_CB_24"),wxBITMAP_TYPE_ICO_RESOURCE));
-#endif
+    imgList->Add(wxICON(sb_24));
+    imgList->Add(wxICON(ac_24));
+    imgList->Add(wxICON(bf_24));
+    imgList->Add(wxICON(cb_24));
 
     notebook_games->AssignImageList(imgList);
     notebook_games->SetPageImage(0,IMG_LIST_GAMES_SB);

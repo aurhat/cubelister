@@ -1,8 +1,7 @@
-//#include "wx/msw/wx.rc"
+//#include <wx/msw/wx.rc>
 
-CSL_32                  ICON                    "img\\csl_32.ico"
+AA_CSL_32               ICON                    "img\\csl_32.ico"
 
-//LIST
 GREEN_LIST_16           ICON                    "img\\green_list_16.ico"
 YELLOW_LIST_16          ICON                    "img\\yellow_list_16.ico"
 RED_LIST_16             ICON                    "img\\red_list_16.ico"
@@ -21,14 +20,12 @@ CLOSE_14                ICON                    "img\\close_14.ico"
 CLOSE_HIGH_14           ICON                    "img\\close_high_14.ico"
 CLOSE_PRESS_14          ICON                    "img\\close_press_14.ico"
 
-//TREE
 SB_24                   ICON                    "img\\sb_24.ico"
 AC_24                   ICON                    "img\\ac_24.ico"
 BF_24                   ICON                    "img\\bf_24.ico"
 CB_24                   ICON                    "img\\cb_24.ico"
 MASTER_24               ICON                    "img\\master_24.ico"
 
-//LIST
 SB_16                   ICON                    "img\\sb_16.ico"
 AC_16                   ICON                    "img\\ac_16.ico"
 BF_16                   ICON                    "img\\bf_16.ico"
@@ -38,7 +35,6 @@ AC_EXT_16               ICON                    "img\\ac_ext_16.ico"
 BF_EXT_16               ICON                    "img\\bf_ext_16.ico"
 CB_EXT_16               ICON                    "img\\cb_ext_16.ico"
 
-//MENU
 CONNECT_16              ICON                    "img\\connect_16.ico"
 CONNECT_PW_16           ICON                    "img\\connect_pw_16.ico"
 ADD_16                  ICON                    "img\\add_16.ico"
