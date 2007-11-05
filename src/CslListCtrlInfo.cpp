@@ -23,18 +23,11 @@
 #include "CslFlags.h"
 #include "CslTools.h"
 #include "CslGeoIP.h"
-#ifndef _MSC_VER
 #include "img/info_18_12.xpm"
-#endif
 
 BEGIN_EVENT_TABLE(CslListCtrlInfo, wxListCtrl)
     EVT_SIZE(CslListCtrlInfo::OnSize)
 END_EVENT_TABLE()
-
-#ifdef _MSC_VER
-#define strcasecmp _stricmp
-#else
-#endif
 
 
 CslListCtrlInfo::CslListCtrlInfo(wxWindow* parent,wxWindowID id,const wxPoint& pos,
@@ -44,37 +37,38 @@ CslListCtrlInfo::CslListCtrlInfo(wxWindow* parent,wxWindowID id,const wxPoint& p
 {
 #ifdef __WXMSW__
     m_imgList.Create(23,12,true);
-    m_imgList.Add(AdjustFlagSize(wxICON(info_23_12),wxSize(23,12),wxPoint(5,0));
+    m_imgList.Add(AdjustIconSize(info_18_12_xpm,wxNullIcon,wxSize(23,12),wxPoint(2,0)));
+    m_imgList.Add(AdjustIconSize(unknown_xpm,wxNullIcon,wxSize(23,12),wxPoint(5,0)));
 #else
     m_imgList.Create(18,12,true);
     m_imgList.Add(wxBitmap(info_18_12_xpm));
+    m_imgList.Add(wxBitmap(unknown_xpm));
 #endif
 
-                  m_imgList.Add(wxBitmap(unknown_xpm));
-                  SetImageList(&m_imgList,wxIMAGE_LIST_SMALL);
+    SetImageList(&m_imgList,wxIMAGE_LIST_SMALL);
 
-                  wxListItem item;
-                  item.SetMask(wxLIST_MASK_TEXT);
+    wxListItem item;
+    item.SetMask(wxLIST_MASK_TEXT);
 
-                  item.SetText(wxT(""));
-                  InsertColumn(0,item);
-                  InsertColumn(1,item);
+    item.SetText(wxT(""));
+    InsertColumn(0,item);
+    InsertColumn(1,item);
 
-                  wxInt32 i=0;
-                  InsertItem(i++,_("Address"),0);
-                  InsertItem(i++,_("Location"),0);
-                  InsertItem(i++,_("Game"),0);
-                  InsertItem(i++,_("Protocol version"),0);
-                  InsertItem(i++,_("Uptime"),0);
-                  InsertItem(i++,_("Last seen"),0);
-                  InsertItem(i++,_("Last played"),0);
-                  InsertItem(i++,_("Last play time"),0);
-                  InsertItem(i++,_("Total play time"),0);
-                  InsertItem(i,_("Connects"),0);
+    wxInt32 i=0;
+    InsertItem(i++,_("Address"),0);
+    InsertItem(i++,_("Location"),0);
+    InsertItem(i++,_("Game"),0);
+    InsertItem(i++,_("Protocol version"),0);
+    InsertItem(i++,_("Uptime"),0);
+    InsertItem(i++,_("Last seen"),0);
+    InsertItem(i++,_("Last played"),0);
+    InsertItem(i++,_("Last play time"),0);
+    InsertItem(i++,_("Total play time"),0);
+    InsertItem(i,_("Connects"),0);
 
-                  for (;i>=0;i-=2)
-{
-    item.SetId(i);
+    for (;i>=0;i-=2)
+    {
+        item.SetId(i);
         SetItemBackgroundColour(item,g_cslSettings->m_colInfoStripe);
     }
 
@@ -154,7 +148,7 @@ void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
     if (!flag)
         flag=unknown_xpm;
 #ifdef __WXMSW__
-    m_imgList.Replace(1,AdjustFlagSize(flag),wxSize(23,12),wxPoint(5,0));
+    m_imgList.Replace(1,AdjustIconSize(flag,wxNullIcon,wxSize(23,12),wxPoint(5,0)));
 #else
     m_imgList.Replace(1,wxBitmap(flag));
 #endif

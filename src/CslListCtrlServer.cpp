@@ -199,47 +199,25 @@ CslListCtrlServer::CslListCtrlServer(wxWindow* parent,wxWindowID id,const wxPoin
 
     m_imageList.Create(16,16,true);
 
-#ifndef _MSC_VER
-    m_imageList.Add(wxBitmap(green_list_16_xpm));
-    m_imageList.Add(wxBitmap(yellow_list_16_xpm));
-    m_imageList.Add(wxBitmap(red_list_16_xpm));
-    m_imageList.Add(wxBitmap(grey_list_16_xpm));
-    m_imageList.Add(wxBitmap(green_ext_list_16_xpm));
-    m_imageList.Add(wxBitmap(yellow_ext_list_16_xpm));
-    m_imageList.Add(wxBitmap(red_ext_list_16_xpm));
-    m_imageList.Add(wxBitmap(sortasc_16_xpm));
-    m_imageList.Add(wxBitmap(sortdsc_16_xpm));
-    m_imageList.Add(wxBitmap(sortasclight_16_xpm));
-    m_imageList.Add(wxBitmap(sortdsclight_16_xpm));
-    m_imageList.Add(wxBitmap(sb_16_xpm));
-    m_imageList.Add(wxBitmap(ac_16_xpm));
-    m_imageList.Add(wxBitmap(bf_16_xpm));
-    m_imageList.Add(wxBitmap(cb_16_xpm));
-    m_imageList.Add(wxBitmap(sb_ext_16_xpm));
-    m_imageList.Add(wxBitmap(ac_ext_16_xpm));
-    m_imageList.Add(wxBitmap(bf_ext_16_xpm));
-    m_imageList.Add(wxBitmap(cb_ext_16_xpm));
-#else
-    m_imageList.Add(wxIcon(wxT("ICON_LIST_GREEN"),wxBITMAP_TYPE_ICO_RESOURCE));
-    m_imageList.Add(wxIcon(wxT("ICON_LIST_YELLOW"),wxBITMAP_TYPE_ICO_RESOURCE));
-    m_imageList.Add(wxIcon(wxT("ICON_LIST_RED"),wxBITMAP_TYPE_ICO_RESOURCE));
-    m_imageList.Add(wxIcon(wxT("ICON_LIST_GREY"),wxBITMAP_TYPE_ICO_RESOURCE));
-    m_imageList.Add(wxIcon(wxT("ICON_LIST_GREEN_EXT"),wxBITMAP_TYPE_ICO_RESOURCE));
-    m_imageList.Add(wxIcon(wxT("ICON_LIST_YELLOW_EXT"),wxBITMAP_TYPE_ICO_RESOURCE));
-    m_imageList.Add(wxIcon(wxT("ICON_LIST_RED_EXT"),wxBITMAP_TYPE_ICO_RESOURCE));
-    m_imageList.Add(wxIcon(wxT("ICON_LIST_ASC"),wxBITMAP_TYPE_ICO_RESOURCE));
-    m_imageList.Add(wxIcon(wxT("ICON_LIST_DSC"),wxBITMAP_TYPE_ICO_RESOURCE));
-    m_imageList.Add(wxIcon(wxT("ICON_LIST_ASC_LIGHT"),wxBITMAP_TYPE_ICO_RESOURCE));
-    m_imageList.Add(wxIcon(wxT("ICON_LIST_DSC_LIGHT"),wxBITMAP_TYPE_ICO_RESOURCE));
-    m_imageList.Add(wxIcon(wxT("ICON_LIST_SB_16"),wxBITMAP_TYPE_ICO_RESOURCE));
-    m_imageList.Add(wxIcon(wxT("ICON_LIST_AC_16"),wxBITMAP_TYPE_ICO_RESOURCE));
-    m_imageList.Add(wxIcon(wxT("ICON_LIST_BF_16"),wxBITMAP_TYPE_ICO_RESOURCE));
-    m_imageList.Add(wxIcon(wxT("ICON_LIST_CB_16"),wxBITMAP_TYPE_ICO_RESOURCE));
-    m_imageList.Add(wxIcon(wxT("ICON_LIST_SB_EXT_16"),wxBITMAP_TYPE_ICO_RESOURCE));
-    m_imageList.Add(wxIcon(wxT("ICON_LIST_AC_EXT_16"),wxBITMAP_TYPE_ICO_RESOURCE));
-    m_imageList.Add(wxIcon(wxT("ICON_LIST_BF_EXT_16"),wxBITMAP_TYPE_ICO_RESOURCE));
-    m_imageList.Add(wxIcon(wxT("ICON_LIST_CB_EXT_16"),wxBITMAP_TYPE_ICO_RESOURCE));
-#endif
+    m_imageList.Add(wxICON(green_list_16));
+    m_imageList.Add(wxICON(yellow_list_16));
+    m_imageList.Add(wxICON(red_list_16));
+    m_imageList.Add(wxICON(grey_list_16));
+    m_imageList.Add(wxICON(green_ext_list_16));
+    m_imageList.Add(wxICON(yellow_ext_list_16));
+    m_imageList.Add(wxICON(red_ext_list_16));
+    m_imageList.Add(wxICON(sortasc_16));
+    m_imageList.Add(wxICON(sortdsc_16));
+    m_imageList.Add(wxICON(sortasclight_16));
+    m_imageList.Add(wxICON(sortdsclight_16));
+    m_imageList.Add(wxICON(sb_16));
+    m_imageList.Add(wxICON(ac_16));
+    m_imageList.Add(wxICON(bf_16));
+    m_imageList.Add(wxICON(cb_16));
+    m_imageList.Add(wxICON(sb_ext_16));
+    m_imageList.Add(wxICON(ac_ext_16));
+    m_imageList.Add(wxICON(bf_ext_16));
+    m_imageList.Add(wxICON(cb_ext_16));
 
     wxArtProvider::Push(new CslArt);
 }

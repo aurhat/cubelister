@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;libGeoIP;img/flags/win"
+				AdditionalIncludeDirectories=".;libGeoIP;img/flags"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -117,7 +117,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=".;libGeoIP;img/flags/win"
+				AdditionalIncludeDirectories=".;libGeoIP;img/flags"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
@@ -223,15 +223,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CslExtendedInfo.h"
-				>
-			</File>
-			<File
 				RelativePath=".\CslFrame.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\CslGame.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CslGeoIP.cpp"
 				>
 			</File>
 			<File
@@ -321,6 +321,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CslExtendedInfo.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CslFlags.h"
 				>
 			</File>
@@ -330,6 +334,10 @@
 			</File>
 			<File
 				RelativePath=".\CslGame.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CslGeoIP.h"
 				>
 			</File>
 			<File

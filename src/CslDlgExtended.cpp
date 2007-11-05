@@ -106,7 +106,17 @@ CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
     do_layout();
     // end wxGlade
 
-    m_imageList.Create(18,12,true);
+#ifdef __WXMSW__
+    m_imageList.Create(20,14,true);
+    m_imageList.Add(AdjustIconSize(NULL,wxICON(sortasc_18_12),wxSize(20,14),wxPoint(0,0)));
+    m_imageList.Add(AdjustIconSize(NULL,wxICON(sortdsc_18_12),wxSize(20,14),wxPoint(0,0)));
+    m_imageList.Add(AdjustIconSize(unknown_xpm,wxNullIcon,wxSize(20,14),wxPoint(0,2)));
+
+    wxInt32 i,c=sizeof(codes)/sizeof(codes[0])-1;
+    for (i=0;i<c;i++)
+        m_imageList.Add(AdjustIconSize(flags[i],wxNullIcon,wxSize(20,14),wxPoint(0,2)));
+#else
+    m_imageList.Create(20,12,true);
     m_imageList.Add(wxICON(sortasc_18_12));
     m_imageList.Add(wxICON(sortdsc_18_12));
     m_imageList.Add(wxIcon(unknown_xpm));
@@ -114,6 +124,7 @@ CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
     wxInt32 i,c=sizeof(codes)/sizeof(codes[0])-1;
     for (i=0;i<c;i++)
         m_imageList.Add(wxBitmap(flags[i]));
+#endif
 }
 
 CslDlgExtended::~CslDlgExtended()

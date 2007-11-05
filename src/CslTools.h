@@ -35,6 +35,11 @@
 #endif
 #endif
 
+#ifdef _MSC_VER
+#define strcasecmp _stricmp
+#else
+#endif
+
 #ifndef DATADIR
 #undef LOCALEDIR
 #ifdef __WXMAC__
@@ -79,7 +84,8 @@ extern wxString FormatSeconds(wxUint32 time,bool space=false,bool full=false);
 extern wxUint32 GetTicks();
 
 #ifdef __WXMSW__
-wxBitmap AdjustFlagSize(const char **flag,const wxSize& size,const wxPoint& origin);
+wxBitmap AdjustIconSize(const char **data,const wxIcon& icon,
+                        const wxSize& size,const wxPoint& origin);
 #endif
 
 enum { CSL_SORT_ASC = 0, CSL_SORT_DSC };

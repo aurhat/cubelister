@@ -147,30 +147,16 @@ CslFrame::CslFrame(wxWindow* parent, int id, const wxString& title,const wxPoint
     LoadSettings();
 
     m_imgListTree.Create(24,24,true);
-#ifndef _MSC_VER
-    m_imgListTree.Add(wxBitmap(master_24_xpm));
-    m_imgListTree.Add(wxBitmap(sb_24_xpm));
-    m_imgListTree.Add(wxBitmap(ac_24_xpm));
-    m_imgListTree.Add(wxBitmap(bf_24_xpm));
-    m_imgListTree.Add(wxBitmap(cb_24_xpm));
-#else
-    m_imgListTree.Add(wxIcon(wxT("ICON_TREE_MASTER_24"),wxBITMAP_TYPE_ICO_RESOURCE));
-    m_imgListTree.Add(wxIcon(wxT("ICON_TREE_SB_24"),wxBITMAP_TYPE_ICO_RESOURCE));
-    m_imgListTree.Add(wxIcon(wxT("ICON_TREE_AC_24"),wxBITMAP_TYPE_ICO_RESOURCE));
-    m_imgListTree.Add(wxIcon(wxT("ICON_TREE_BF_24"),wxBITMAP_TYPE_ICO_RESOURCE));
-    m_imgListTree.Add(wxIcon(wxT("ICON_TREE_CB_24"),wxBITMAP_TYPE_ICO_RESOURCE));
-#endif
+    m_imgListTree.Add(wxICON(master_24));
+    m_imgListTree.Add(wxICON(sb_24));
+    m_imgListTree.Add(wxICON(ac_24));
+    m_imgListTree.Add(wxICON(bf_24));
+    m_imgListTree.Add(wxICON(cb_24));
 
     m_imgListButton.Create(14,14,true);
-#ifndef _MSC_VER
-    m_imgListButton.Add(wxBitmap(close_14_xpm));
-    m_imgListButton.Add(wxBitmap(close_high_14_xpm));
-    m_imgListButton.Add(wxBitmap(close_press_14_xpm));
-#else
-    m_imgListButton.Add(wxIcon(wxT("ICON_CLOSE_14"),wxBITMAP_TYPE_ICO_RESOURCE));
-    m_imgListButton.Add(wxIcon(wxT("ICON_CLOSE_HIGH_14"),wxBITMAP_TYPE_ICO_RESOURCE));
-    m_imgListButton.Add(wxIcon(wxT("ICON_CLOSE_PRESS_14"),wxBITMAP_TYPE_ICO_RESOURCE));
-#endif
+    m_imgListButton.Add(wxICON(close_14));
+    m_imgListButton.Add(wxICON(close_high_14));
+    m_imgListButton.Add(wxICON(close_press_14));
 
     m_engine=new CslEngine(this);
 

@@ -27,7 +27,7 @@
 
 const wxChar *csl_license = wxT(\
                                 "            GNU GENERAL PUBLIC LICENSE\n"
-                                "               Version 2, June 1991\n"
+                                "                    Version 2, June 1991\n"
                                 "\n"
                                 " Copyright (C) 1989, 1991 Free Software Foundation, Inc.\n"
                                 "                       59 Temple Place, Suite 330, Boston, MA  02111-1307  USA\n"

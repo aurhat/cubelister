@@ -236,9 +236,14 @@ wxUint32 GetTicks()
 }
 
 #ifdef __WXMSW__
-wxBitmap AdjustFlagSize(const char **flag,const wxSize& size,const wxPoint& origin)
+wxBitmap AdjustIconSize(const char **data,const wxIcon& icon,
+                        const wxSize& size,const wxPoint& origin)
 {
-    wxBitmap bitmap(flag);
+    wxBitmap bitmap;
+    if (data)
+        bitmap=wxBitmap(data);
+    else
+        bitmap=wxBitmap(icon);
     wxImage image=bitmap.ConvertToImage();
     image.Resize(size,origin);
     return wxBitmap(image);

@@ -28,9 +28,8 @@ bool CslGeoIP::Init()
         path=::g_basePath+wxT("/data/GeoIP.dat");
         s_geoIP=GeoIP_open(U2A(path),GEOIP_MEMORY_CACHE);
     }
-
-    return s_geoIP!=NULL;
 #endif
+    return s_geoIP!=NULL;
 }
 
 void CslGeoIP::Destroy()
