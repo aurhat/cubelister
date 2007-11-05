@@ -100,26 +100,11 @@ struct databuf
         return read;
     }
 
-    int length() const
-    {
-        return len;
-    }
-    int maxlength() const
-    {
-        return maxlen;
-    }
-    int remaining() const
-    {
-        return maxlen-len;
-    }
-    bool overread() const
-    {
-        return flags&OVERREAD;
-    }
-    bool overwrote() const
-    {
-        return flags&OVERWROTE;
-    }
+    int length() const { return len; }
+    int maxlength() const { return maxlen; }
+    int remaining() const { return maxlen-len; }
+    bool overread() const { return flags&OVERREAD; }
+    bool overwrote() const { return flags&OVERWROTE; }
 
     void forceoverread()
     {
@@ -360,6 +345,8 @@ template <class T> struct vector
 
 extern void putint(ucharbuf &p, int n);
 extern int getint(ucharbuf &p);
+extern int getuint(ucharbuf &p);
+
 extern void putstring(const char *t, ucharbuf &p);
 extern void getstring(char *text, ucharbuf &p, int len=_MAXDEFSTR);
 

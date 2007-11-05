@@ -34,7 +34,6 @@
 #endif
 #include <wx/listctrl.h>
 #include <wx/imaglist.h>
-#include <GeoIP.h>
 #include "CslGame.h"
 
 
@@ -46,13 +45,9 @@ class CslListCtrlInfo : public wxListCtrl
                         const wxValidator& validator=wxDefaultValidator,
                         const wxString& name=wxListCtrlNameStr);
 
-        ~CslListCtrlInfo();
-
         void UpdateInfo(CslServerInfo *info);
 
     private:
-        GeoIP *m_geoIP;
-
         wxImageList m_imgList;
 
         void OnSize(wxSizeEvent& event);

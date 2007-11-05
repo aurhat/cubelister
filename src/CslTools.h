@@ -25,8 +25,6 @@
     @author Glen Masgai <mimosius@gmx.de>
 */
 
-extern wxString g_basePath;
-
 // since WX > 2.8.4 the listctrl items
 // get deselected when sorting (only wxGTK ?)
 #ifdef __WXGTK__
@@ -70,11 +68,19 @@ void Debug_Printf(const char *DbgFunc, const char *FmtStr,...);
 #define LOG_DEBUG(...)
 #endif
 
+extern wxString g_basePath;
+
 extern char* StripColours(char *s,wxUint32 *l,wxUint32 count);
+
 extern bool IsIP(const wxString& s);
 extern bool IP2Int(const wxString& s,wxUint32 *ip);
-extern wxString FormatSeconds(wxUint32 time,bool space=false,bool full=false);
 
+extern wxString FormatSeconds(wxUint32 time,bool space=false,bool full=false);
+extern wxUint32 GetTicks();
+
+#ifdef __WXMSW__
+wxBitmap AdjustFlagSize(const char **flag,const wxSize& size,const wxPoint& origin);
+#endif
 
 enum { CSL_SORT_ASC = 0, CSL_SORT_DSC };
 enum { CSL_LIST_SORT_INT = 0, CSL_LIST_SORT_UINT, CSL_LIST_SORT_STRING };
@@ -91,8 +97,5 @@ class CslListSortHelper
         wxInt32 m_sortMode;
         wxInt32 m_sortType;
 };
-
-extern wxUint32 GetTicks();
-
 
 #endif // CSLTOOLS_H

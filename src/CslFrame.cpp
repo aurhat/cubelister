@@ -27,6 +27,7 @@
 #include "CslDlgAbout.h"
 #include "CslDlgAddMaster.h"
 #include "CslDlgGeneric.h"
+#include "CslGeoIP.h"
 #include "CslTools.h"
 #include "CslVersion.h"
 
@@ -1665,6 +1666,8 @@ bool CslApp::OnInit()
         return false;
     }
 
+    CslGeoIP::Init();
+
     wxInitAllImageHandlers();
     CslFrame* frame_csl=new CslFrame(NULL,wxID_ANY,wxEmptyString);
     frame_csl->Show();
@@ -1675,6 +1678,7 @@ bool CslApp::OnInit()
 
 int CslApp::OnExit()
 {
+    CslGeoIP::Destroy();
     delete m_single;
     return 0;
 }

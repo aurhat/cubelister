@@ -1,6 +1,8 @@
 [encoding: UTF-8]
 src/CslArt.cpp
 src/CslArt.h
+src/CslDlgAbout.cpp
+src/CslDlgAbout.h
 src/CslDlgAddMaster.cpp
 src/CslDlgAddMaster.h
 src/CslDlgAddServer.cpp

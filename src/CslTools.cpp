@@ -26,6 +26,7 @@
 #include <wx/wx.h>
 #endif
 #include <wx/regex.h>
+#include "CslTools.h"
 
 wxString g_basePath;
 
@@ -102,7 +103,7 @@ bool IP2Int(const wxString& s,wxUint32 *ip)
     return true;
 }
 
-wxString FormatSeconds(wxUint32 time,bool space=false,bool full=false)
+wxString FormatSeconds(wxUint32 time,bool space,bool full)
 {
     wxUint32 rest=time;
     wxUint32 dy,hr,mn,sc;
@@ -233,3 +234,13 @@ wxUint32 GetTicks()
     }
     return ticks;
 }
+
+#ifdef __WXMSW__
+wxBitmap AdjustFlagSize(const char **flag,const wxSize& size,const wxPoint& origin)
+{
+    wxBitmap bitmap(flag);
+    wxImage image=bitmap.ConvertToImage();
+    image.Resize(size,origin);
+    return wxBitmap(image);
+}
+#endif

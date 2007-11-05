@@ -41,6 +41,19 @@ int getint(ucharbuf &p)
     else return c;
 }
 
+int getuint(ucharbuf &p)
+{
+    int n = p.get();
+    if (n & 0x80)
+    {
+        n += (p.get() << 7) - 0x80;
+        if (n & (1<<14)) n += (p.get() << 14) - (1<<14);
+        if (n & (1<<21)) n += (p.get() << 21) - (1<<21);
+        if (n & (1<<28)) n |= 0xF0000000;
+    }
+    return n;
+}
+
 void putstring(const char *t, ucharbuf &p)
 {
     while (*t) putint(p,*t++);

@@ -32,6 +32,7 @@
 #ifndef WX_PRECOMP
 #include "wx/wx.h"
 #endif
+#include "CslGeoIP.h"
 #include "cube_tools.h"
 
 #define CSL_EX_VERSION_MIN      101
@@ -82,13 +83,14 @@ class CslPlayerStatsData
                 m_frags(-1),m_deaths(-1),m_teamkills(-1),
                 m_health(-1),m_armour(-1),m_weapon(-1),m_id(-1),
                 m_priv(CSL_PLAYER_STATE_UNKNOWN),m_state(CSL_PLAYER_PRIV_UNKNOWN),
-                m_ok(false) {}
+                m_ip(0),m_ok(false) {}
 
         wxString m_player,m_team;
         wxInt32 m_frags,m_deaths,m_teamkills;
         wxInt32 m_health,m_armour,m_weapon;
         wxInt32 m_id;
         wxInt32 m_priv,m_state;
+        wxUint32 m_ip;
         bool m_ok;
 };
 

@@ -637,7 +637,9 @@ void CslEngine::UpdateServerInfo(CslServerInfo *info,ucharbuf *buf,wxUint32 now)
             else
                 info->m_gameMode=GetModeStrSB(mode);
             info->m_players=getint(*buf);
-            info->m_timeRemain=getint(*buf)+1;
+            info->m_timeRemain=getint(*buf);
+            if (info->m_type==CSL_GAME_AC && info->m_protocol<1126) // <=0.93
+                info->m_timeRemain++;
             getstring(text,*buf);
             info->m_map=A2U(text);
             getstring(text,*buf);
@@ -823,6 +825,11 @@ void CslEngine::ParsePong(CslServerInfo *info,CslUDPPacket *packet,wxUint32 now)
                             data->m_weapon=getint(p);
                             data->m_priv=getint(p);
                             data->m_state=getint(p);
+                            if (exVersion>=102)
+                            {
+                                p.get((unsigned char*)&data->m_ip,3);
+                                data->m_ip<<=8;
+                            }
 
                             if (p.overread())
                             {
@@ -842,10 +849,11 @@ void CslEngine::ParsePong(CslServerInfo *info,CslUDPPacket *packet,wxUint32 now)
                                 break;
                             }
 
-                            /*LOG_DEBUG("%s (%s): player:%s, team:%s, frags:%d, deaths:%d, tk:%d,\n",
+                            LOG_DEBUG("%s (%s): player:%s, team:%s, frags:%d, deaths:%d, tk:%d, IP:%d.%d.%d.%d (%u)\n",
                                       dbg_type.c_str(),U2A(info->GetBestDescription()),
                                       U2A(data->m_player),U2A(data->m_team),
-                                      data->m_frags,data->m_deaths,data->m_teamkills);*/
+                                      data->m_frags,data->m_deaths,data->m_teamkills,
+                                      data->m_ip>>24,data->m_ip>>16&0xff,data->m_ip>>8&0xff,data->m_ip&0xff,data->m_ip);
 
                             wxCommandEvent evt(wxCSL_EVT_PONG);
                             evt.SetClientData((void*)new CslPongPacket(info,CSL_PONG_TYPE_PLAYERSTATS));

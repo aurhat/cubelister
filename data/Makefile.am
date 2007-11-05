@@ -1,5 +1,10 @@
-csldatadir =	$(datadir)/csl
-csldata_DATA = GeoIP.dat csl_start_sb.ogz
+datadir =	$(datadir)/csl
+data_DATA = GeoIP.dat csl_logo.png csl_start_sb.ogz
+EXTRA_DIST = $(data_DATA)
 
-EXTRA_DIST = $(csldata_DATA)
+appsdir = $(datadir)/applications
+apps_in_files = csl.desktop.in
+apps_DATA = $(apps_in_files:.desktop.in=.desktop)
+@INTLTOOL_DESKTOP_RULE@
+
 SUBDIRS = maps

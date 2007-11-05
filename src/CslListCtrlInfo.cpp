@@ -20,11 +20,10 @@
 
 #include "CslListCtrlInfo.h"
 #include "CslSettings.h"
-#include "CslTools.h"
 #include "CslFlags.h"
-#ifdef __WXMSW__
-#include "img/info_23_12.xpm"
-#else
+#include "CslTools.h"
+#include "CslGeoIP.h"
+#ifndef _MSC_VER
 #include "img/info_18_12.xpm"
 #endif
 
@@ -37,133 +36,49 @@ END_EVENT_TABLE()
 #else
 #endif
 
-#if 0
-void ShiftrFlags(int offset)
-{
-    int j=sizeof(flags)/sizeof(flags[0])-1;
-
-    for (;j>=0;j--)
-    {
-        char **xpm=flags[j];
-        int bs=strlen(xpm[0]);
-        int w=0,h=0,c=0,a=0;
-        int sc=0;
-        int i=0,k;
-        char b;
-        char *buf;
-        char cc[5]={0};
-
-        while (i<bs)
-        {
-            b=xpm[0][i];
-            i++;
-            if (sc==4) { break; }
-            if (b==' ') { sc++; continue; }
-            if (sc==0) { w=w*10+(b-'0'); }
-            if (sc==1) { h=h*10+(b-'0'); }
-            if (sc==2) { c=c*10+(b-'0'); }
-            if (sc==3) { a=a*10+(b-'0'); }
-        }
-
-        for (i=1;i<=c;i++)
-        {
-            if (!strstr(xpm[i],"None"))
-                continue;
-
-            k=0;
-            bs=strlen(xpm[i]);
-            while (k<bs)
-            {
-                b=xpm[i][k];
-                cc[k]=b;
-                if (b==' ') break;
-                k++;
-            }
-            break;
-        }
-        if (k==0 && k<a)
-            memset(cc+1,cc[0],3);
-
-        buf=(char*)malloc(bs+1);
-        sprintf(buf,"%d %d %d %d",w+offset,h,c,a);
-        xpm[0]=buf;
-
-        for (i=1;i<=h;i++)
-        {
-            buf=(char*)malloc((w+offset)*a);
-            memcpy(buf+offset*a,xpm[c+i],w*a);
-            if (a==1) memset(buf,cc[0],offset);
-            else
-            {
-                for (k=0;k<offset;k++)
-                    memcpy(buf+a*k,cc,a);
-            }
-            xpm[c+i]=buf;
-            //printf("%s\n",xpm[c+i]);
-        }
-    }
-}
-#endif
 
 CslListCtrlInfo::CslListCtrlInfo(wxWindow* parent,wxWindowID id,const wxPoint& pos,
                                  const wxSize& size,long style,
                                  const wxValidator& validator, const wxString& name)
         : wxListCtrl(parent,id,pos,size,style,validator,name)
 {
-    wxString path=wxT(DATADIR)+wxString(wxT("/GeoIP.dat"));
-    m_geoIP=GeoIP_open(U2A(path),GEOIP_MEMORY_CACHE);
-#ifdef __WXGTK__
-    if (!m_geoIP)
-    {
-        path=::g_basePath+wxT("/data/GeoIP.dat");
-        m_geoIP=GeoIP_open(U2A(path),GEOIP_MEMORY_CACHE);
-    }
-#endif
-
 #ifdef __WXMSW__
     m_imgList.Create(23,12,true);
-    m_imgList.Add(wxBitmap(info_23_12_xpm));
-    //ShiftrFlags(5);
+    m_imgList.Add(AdjustFlagSize(wxICON(info_23_12),wxSize(23,12),wxPoint(5,0));
 #else
     m_imgList.Create(18,12,true);
     m_imgList.Add(wxBitmap(info_18_12_xpm));
 #endif
 
-    m_imgList.Add(wxBitmap(unknown_xpm));
-    SetImageList(&m_imgList,wxIMAGE_LIST_SMALL);
+                  m_imgList.Add(wxBitmap(unknown_xpm));
+                  SetImageList(&m_imgList,wxIMAGE_LIST_SMALL);
 
-    wxListItem item;
-    item.SetMask(wxLIST_MASK_TEXT);
+                  wxListItem item;
+                  item.SetMask(wxLIST_MASK_TEXT);
 
-    item.SetText(wxT(""));
-    InsertColumn(0,item);
-    InsertColumn(1,item);
+                  item.SetText(wxT(""));
+                  InsertColumn(0,item);
+                  InsertColumn(1,item);
 
-    wxInt32 i=0;
-    InsertItem(i++,_("Address"),0);
-    InsertItem(i++,_("Location"),0);
-    InsertItem(i++,_("Game"),0);
-    InsertItem(i++,_("Protocol version"),0);
-    InsertItem(i++,_("Uptime"),0);
-    InsertItem(i++,_("Last seen"),0);
-    InsertItem(i++,_("Last played"),0);
-    InsertItem(i++,_("Last play time"),0);
-    InsertItem(i++,_("Total play time"),0);
-    InsertItem(i,_("Connects"),0);
+                  wxInt32 i=0;
+                  InsertItem(i++,_("Address"),0);
+                  InsertItem(i++,_("Location"),0);
+                  InsertItem(i++,_("Game"),0);
+                  InsertItem(i++,_("Protocol version"),0);
+                  InsertItem(i++,_("Uptime"),0);
+                  InsertItem(i++,_("Last seen"),0);
+                  InsertItem(i++,_("Last played"),0);
+                  InsertItem(i++,_("Last play time"),0);
+                  InsertItem(i++,_("Total play time"),0);
+                  InsertItem(i,_("Connects"),0);
 
-    for (;i>=0;i-=2)
-    {
-        item.SetId(i);
+                  for (;i>=0;i-=2)
+{
+    item.SetId(i);
         SetItemBackgroundColour(item,g_cslSettings->m_colInfoStripe);
     }
 
     AdjustSize(GetClientSize());
-}
-
-CslListCtrlInfo::~CslListCtrlInfo()
-{
-    if (m_geoIP)
-        GeoIP_delete(m_geoIP);
 }
 
 void CslListCtrlInfo::OnSize(wxSizeEvent& event)
@@ -209,9 +124,9 @@ void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
     }
     SetItem(ic++,1,s);
 
-    if (m_geoIP)
+    if (CslGeoIP::IsOk())
     {
-        country=GeoIP_country_code_by_addr(m_geoIP,host);
+        country=CslGeoIP::GetCountryCodeByAddr(host);
         if (country)
         {
             i=sizeof(codes)/sizeof(codes[0])-1;
@@ -224,7 +139,7 @@ void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
                 }
             }
             s=A2U(country);
-            country=GeoIP_country_name_by_addr(m_geoIP,host);
+            country=CslGeoIP::GetCountryNameByAddr(host);
             if (country)
                 s+=wxT(" (")+A2U(country)+wxT(")");
         }
@@ -236,10 +151,13 @@ void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
 
     free(host);
 
-    if (flag)
-        m_imgList.Replace(1,wxBitmap(flag));
-    else
-        m_imgList.Replace(1,wxBitmap(unknown_xpm));
+    if (!flag)
+        flag=unknown_xpm;
+#ifdef __WXMSW__
+    m_imgList.Replace(1,AdjustFlagSize(flag),wxSize(23,12),wxPoint(5,0));
+#else
+    m_imgList.Replace(1,wxBitmap(flag));
+#endif
     SetItem(ic++,1,s,1);
 
     switch (info->m_type)

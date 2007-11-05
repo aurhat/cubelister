@@ -185,7 +185,6 @@ void CslPanelMap::OnPaint(wxPaintEvent& event)
     {
         CslBaseInfo *base=m_bases.Item(i);
         dc.SetPen(wxPen(base->m_colour));
-        //dc.SetPen(wxPen(*wxWHITE));
         dc.SetBrush(wxBrush(base->m_colour));
         dc.DrawCircle(origin.x+base->m_point.x,origin.y+base->m_point.y,4);
     }

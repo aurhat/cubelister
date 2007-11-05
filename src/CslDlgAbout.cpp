@@ -19,9 +19,9 @@
  ***************************************************************************/
 
 #include "CslDlgAbout.h"
+#include "CslTools.h"
 #include "CslVersion.h"
 #include "CslLicense.h"
-#include "img/csl_128.xpm"
 
 // begin wxGlade: ::extracode
 
@@ -58,11 +58,23 @@ const wxChar *csl_license_pre = wxT(\
 CslPanelAboutImage::CslPanelAboutImage(wxWindow *parent,wxInt32 id) :
         wxPanel(parent,id)
 {
-    m_bitmap=wxBitmap(csl_128_xpm);
+    wxString path=wxString(wxT(DATADIR));
+#ifdef __WXGTK__
+    if (!::wxDirExists(path))
+        path=::g_basePath+wxT("/data");
+#endif
+    path+=+wxT("/csl_logo.png");
+    if (::wxFileExists(path))
+        m_bitmap.LoadFile(path,wxBITMAP_TYPE_PNG);
 }
 
 void CslPanelAboutImage::OnPaint(wxPaintEvent& event)
 {
+    event.Skip();
+
+    if (!m_bitmap.IsOk())
+        return;
+
     wxMemoryDC memDC;
 
     wxPaintDC dc(this);
@@ -70,8 +82,6 @@ void CslPanelAboutImage::OnPaint(wxPaintEvent& event)
 
     memDC.SelectObject(m_bitmap);
     dc.Blit(0,0,m_bitmap.GetWidth(),m_bitmap.GetHeight(),&memDC,0,0,wxCOPY,true);
-
-    event.Skip();
 }
 
 
@@ -101,7 +111,7 @@ CslDlgAbout::CslDlgAbout(wxWindow* parent,int id,const wxString& title,
 void CslDlgAbout::set_properties()
 {
     // begin wxGlade: CslDlgAbout::set_properties
-    panel_bitmap->SetMinSize(wxSize(128,128));
+    panel_bitmap->SetMinSize(wxSize(256,256));
     label_name->SetFont(wxFont(16, wxDECORATIVE, wxNORMAL, wxBOLD, 0, wxT("")));
     label_version->SetFont(wxFont(12, wxDEFAULT, wxNORMAL, wxBOLD, 0, wxT("")));
     button_close->SetDefault();

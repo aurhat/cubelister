@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Cube Server Lister
+GenericName=Cube Server Lister
+Comment=Monitor Cubeengine based gameservers
+Type=Application
+Exec=csl
+StartupNotify=true
+Terminal=false
+Icon=csl_128
+Categories=Games

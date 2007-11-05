@@ -20,13 +20,10 @@
 
 #include "CslDlgExtended.h"
 #include "CslSettings.h"
+#include "CslFlags.h"
 #ifndef _MSC_VER
-#include "img/sortasc_16.xpm"
-#include "img/sortdsc_16.xpm"
-#include "img/green_list_16.xpm"
-#include "img/orange_list_16.xpm"
-#include "img/grey_list_16.xpm"
-#include "img/trans_list_16.xpm"
+#include "img/sortasc_18_12.xpm"
+#include "img/sortdsc_18_12.xpm"
 #endif
 
 
@@ -45,10 +42,7 @@ enum
 {
     CSL_LIST_IMG_SORT_ASC = 0,
     CSL_LIST_IMG_SORT_DSC,
-    CSL_LIST_IMG_GREEN,
-    CSL_LIST_IMG_ORANGE,
-    CSL_LIST_IMG_GREY,
-    CSL_LIST_IMG_TRANS
+    CSL_LIST_IMG_UNKNOWN
 };
 
 enum
@@ -112,22 +106,14 @@ CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
     do_layout();
     // end wxGlade
 
-    m_imageList.Create(16,16,true);
-#ifndef _MSC_VER
-    m_imageList.Add(wxBitmap(sortasc_16_xpm));
-    m_imageList.Add(wxBitmap(sortdsc_16_xpm));
-    m_imageList.Add(wxBitmap(green_list_16_xpm));
-    m_imageList.Add(wxBitmap(orange_list_16_xpm));
-    m_imageList.Add(wxBitmap(grey_list_16_xpm));
-    m_imageList.Add(wxBitmap(trans_list_16_xpm));
-#else
-    m_imageList.Add(wxIcon(wxT("ICON_LIST_ASC"),wxBITMAP_TYPE_ICO_RESOURCE));
-    m_imageList.Add(wxIcon(wxT("ICON_LIST_DSC"),wxBITMAP_TYPE_ICO_RESOURCE));
-    m_imageList.Add(wxIcon(wxT("ICON_LIST_GREEN"),wxBITMAP_TYPE_ICO_RESOURCE));
-    m_imageList.Add(wxIcon(wxT("ICON_LIST_ORANGE"),wxBITMAP_TYPE_ICO_RESOURCE));
-    m_imageList.Add(wxIcon(wxT("ICON_LIST_GREY"),wxBITMAP_TYPE_ICO_RESOURCE));
-    m_imageList.Add(wxIcon(wxT("ICON_LIST_TRANS"),wxBITMAP_TYPE_ICO_RESOURCE));
-#endif
+    m_imageList.Create(18,12,true);
+    m_imageList.Add(wxICON(sortasc_18_12));
+    m_imageList.Add(wxICON(sortdsc_18_12));
+    m_imageList.Add(wxIcon(unknown_xpm));
+
+    wxInt32 i,c=sizeof(codes)/sizeof(codes[0])-1;
+    for (i=0;i<c;i++)
+        m_imageList.Add(wxBitmap(flags[i]));
 }
 
 CslDlgExtended::~CslDlgExtended()
@@ -453,6 +439,7 @@ void CslDlgExtended::ClearTeamScoreLabel(const wxUint32 start,const wxUint32 end
 }
 void CslDlgExtended::SetPlayerData()
 {
+    wxInt32 c;
     wxString s;
     wxListItem item;
     CslPlayerStats *stats=m_info->m_playerStats;
@@ -527,16 +514,42 @@ void CslDlgExtended::SetPlayerData()
 
         wxColour colour=*wxBLACK;
         if (data->m_priv==CSL_PLAYER_PRIV_MASTER)
+            list_ctrl_players->SetItemBackgroundColour(item,wxColour(64,255,128));
+        else if (data->m_priv==CSL_PLAYER_PRIV_ADMIN)
+            list_ctrl_players->SetItemBackgroundColour(item,wxColour(255,128,0));
+        else if (data->m_state==CSL_PLAYER_STATE_SPECTATOR)
+            list_ctrl_players->SetItemBackgroundColour(item,wxColour(192,192,192));
+        /*if (data->m_priv==CSL_PLAYER_PRIV_MASTER)
             i=CSL_LIST_IMG_GREEN;
         else if (data->m_priv==CSL_PLAYER_PRIV_ADMIN)
             i=CSL_LIST_IMG_ORANGE;
         else if (data->m_state==CSL_PLAYER_STATE_SPECTATOR)
             i=CSL_LIST_IMG_GREY;
         else
-            i=CSL_LIST_IMG_TRANS;
+            i=CSL_LIST_IMG_TRANS;*/
 
-        list_ctrl_players->SetItemImage(item,i);
+        const char *country;
+        wxInt32 flag=CSL_LIST_IMG_UNKNOWN;
+
+        if (data->m_ip && CslGeoIP::IsOk())
+        {
+            country=CslGeoIP::GetCountryCodeByIPnum(data->m_ip);
+            if (country)
+            {
+                for (c=sizeof(codes)/sizeof(codes[0])-1;c>=0;c--)
+                {
+                    if (!strcasecmp(country,codes[c]))
+                    {
+                        flag+=++c;
+                        break;
+                    }
+                }
+            }
+        }
+
+        list_ctrl_players->SetItemImage(item,flag);
     }
+
 
     stats->m_lastResponse=wxDateTime::Now().GetTicks();
 
