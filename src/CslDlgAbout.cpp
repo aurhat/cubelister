@@ -70,7 +70,13 @@ CslPanelAboutImage::CslPanelAboutImage(wxWindow *parent,wxInt32 id) :
             m_bitmap.LoadFile(path,wxBITMAP_TYPE_PNG);
     */
     wxMemoryInputStream stream(csl_logo_png,sizeof csl_logo_png);
+    // see wx_wxbitmap.html
+#ifdef __WXMSW__
     m_bitmap=new wxBitmap(stream,wxBITMAP_TYPE_PNG);
+#else
+    wxImage image(stream,wxBITMAP_TYPE_PNG);
+    m_bitmap=new wxBitmap(image);
+#endif
 }
 
 CslPanelAboutImage::~CslPanelAboutImage()
