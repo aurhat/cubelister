@@ -40,13 +40,14 @@ class CslPanelAboutImage : public wxPanel
 {
     public:
         CslPanelAboutImage(wxWindow *parent,wxInt32 id);
+        ~CslPanelAboutImage();
 
     private:
         void OnPaint(wxPaintEvent& event);
         DECLARE_EVENT_TABLE();
 
     protected:
-        wxBitmap m_bitmap;
+        wxBitmap *m_bitmap;
 };
 
 

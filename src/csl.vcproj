@@ -281,6 +281,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\csl_logo_png.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CslArt.h"
 				>
 			</File>

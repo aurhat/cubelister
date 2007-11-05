@@ -108,8 +108,10 @@ CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
 
 #ifdef __WXMSW__
     m_imageList.Create(20,14,true);
-    m_imageList.Add(AdjustIconSize(NULL,wxICON(sortasc_18_12),wxSize(20,14),wxPoint(0,0)));
-    m_imageList.Add(AdjustIconSize(NULL,wxICON(sortdsc_18_12),wxSize(20,14),wxPoint(0,0)));
+    m_imageList.Add(AdjustIconSize(NULL,wxIcon(wxT("sortasc_18_12"),wxBITMAP_TYPE_ICO_RESOURCE,18,12),
+                                   wxSize(20,14),wxPoint(0,0)));
+    m_imageList.Add(AdjustIconSize(NULL,wxIcon(wxT("sortdsc_18_12"),wxBITMAP_TYPE_ICO_RESOURCE,18,12),
+                                   wxSize(20,14),wxPoint(0,0)));
     m_imageList.Add(AdjustIconSize(unknown_xpm,wxNullIcon,wxSize(20,14),wxPoint(0,2)));
 
     wxInt32 i,c=sizeof(codes)/sizeof(codes[0])-1;

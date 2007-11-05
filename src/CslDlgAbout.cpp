@@ -17,11 +17,12 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-
+#include <wx/mstream.h>
 #include "CslDlgAbout.h"
 #include "CslTools.h"
 #include "CslVersion.h"
 #include "CslLicense.h"
+#include "csl_logo_png.h"
 
 // begin wxGlade: ::extracode
 
@@ -58,21 +59,30 @@ const wxChar *csl_license_pre = wxT(\
 CslPanelAboutImage::CslPanelAboutImage(wxWindow *parent,wxInt32 id) :
         wxPanel(parent,id)
 {
-    wxString path=wxString(wxT(DATADIR));
-#ifdef __WXGTK__
-    if (!::wxDirExists(path))
-        path=::g_basePath+wxT("/data");
-#endif
-    path+=+wxT("/csl_logo.png");
-    if (::wxFileExists(path))
-        m_bitmap.LoadFile(path,wxBITMAP_TYPE_PNG);
+    /*
+        wxString path=wxString(wxT(DATADIR));
+    #ifdef __WXGTK__
+        if (!::wxDirExists(path))
+            path=::g_basePath+wxT("/data");
+    #endif
+        path+=+wxT("/csl_logo.png");
+        if (::wxFileExists(path))
+            m_bitmap.LoadFile(path,wxBITMAP_TYPE_PNG);
+    */
+    wxMemoryInputStream stream(csl_logo_png,sizeof csl_logo_png);
+    m_bitmap=new wxBitmap(stream,wxBITMAP_TYPE_PNG);
+}
+
+CslPanelAboutImage::~CslPanelAboutImage()
+{
+    delete m_bitmap;
 }
 
 void CslPanelAboutImage::OnPaint(wxPaintEvent& event)
 {
     event.Skip();
 
-    if (!m_bitmap.IsOk())
+    if (!m_bitmap->IsOk())
         return;
 
     wxMemoryDC memDC;
@@ -80,8 +90,8 @@ void CslPanelAboutImage::OnPaint(wxPaintEvent& event)
     wxPaintDC dc(this);
     PrepareDC(dc);
 
-    memDC.SelectObject(m_bitmap);
-    dc.Blit(0,0,m_bitmap.GetWidth(),m_bitmap.GetHeight(),&memDC,0,0,wxCOPY,true);
+    memDC.SelectObject(*m_bitmap);
+    dc.Blit(0,0,m_bitmap->GetWidth(),m_bitmap->GetHeight(),&memDC,0,0,wxCOPY,true);
 }
 
 
