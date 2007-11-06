@@ -91,6 +91,7 @@ CslDlgSettings::CslDlgSettings(wxWindow* parent,int id,const wxString& title,
     sizer_ping_threshold_staticbox = new wxStaticBox(notebook_pane_other, -1, _("Ping thresholds"));
     notebook_pane_sauer = new wxPanel(notebook_games, wxID_ANY);
     text_ctrl_sauer_options = new wxTextCtrl(notebook_pane_sauer, wxID_ANY, wxEmptyString);
+    checkbox_sauer_priv_config = new wxCheckBox(notebook_pane_sauer, wxID_ANY, _("Use private config files"));
     text_ctrl_assault_options = new wxTextCtrl(notebook_pane_assault, wxID_ANY, wxEmptyString);
     text_ctrl_frontier_options = new wxTextCtrl(notebook_pane_frontier, wxID_ANY, wxEmptyString);
     text_ctrl_cube_options = new wxTextCtrl(notebook_pane_cube, wxID_ANY, wxEmptyString);
@@ -114,11 +115,17 @@ CslDlgSettings::CslDlgSettings(wxWindow* parent,int id,const wxString& title,
     // end wxGlade
 
     wxImageList *imgList=new wxImageList(24,24,true);
+#ifdef __WXMSW__
     imgList->Add(wxICON(sb_24));
     imgList->Add(wxICON(ac_24));
     imgList->Add(wxICON(bf_24));
     imgList->Add(wxICON(cb_24));
-
+#else
+    imgList->Add(wxBitmap(sb_24_xpm));
+    imgList->Add(wxBitmap(ac_24_xpm));
+    imgList->Add(wxBitmap(bf_24_xpm));
+    imgList->Add(wxBitmap(cb_24_xpm));
+#endif
     notebook_games->AssignImageList(imgList);
     notebook_games->SetPageImage(0,IMG_LIST_GAMES_SB);
     notebook_games->SetPageImage(1,IMG_LIST_GAMES_AC);
@@ -160,6 +167,7 @@ void CslDlgSettings::set_properties()
     text_ctrl_assault_options->SetValue(m_settings.m_clientOptsAC);
     text_ctrl_frontier_options->SetValue(m_settings.m_clientOptsBF);
     text_ctrl_cube_options->SetValue(m_settings.m_clientOptsCB);
+    checkbox_sauer_priv_config->SetValue(m_settings.m_privConfSB);
 
     checkbox_play_update->SetValue(m_settings.m_dontUpdatePlaying);
     spin_ctrl_update->SetRange(CSL_UPDATE_INTERVAL_MIN/1000,CSL_UPDATE_INTERVAL_MAX/1000);
@@ -210,19 +218,19 @@ void CslDlgSettings::do_layout()
                                    wxDefaultPosition,sizePicker,
                                    wxFLP_DEFAULT_STYLE|wxFLP_USE_TEXTCTRL|wxFLP_FILE_MUST_EXIST);
 #endif
-    dpickSauer=new wxDirPickerCtrl(notebook_pane_sauer,DIR_PICKER_SB,m_settings.m_configPathSB,
+    dpickSauer=new wxDirPickerCtrl(notebook_pane_sauer,DIR_PICKER_SB,m_settings.m_gamePathSB,
                                    _("Select Sauerbraten game path"),
                                    wxDefaultPosition,sizePicker,
                                    wxDIRP_DEFAULT_STYLE|wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST);
-    dpickAssault=new wxDirPickerCtrl(notebook_pane_assault,DIR_PICKER_AC,m_settings.m_configPathAC,
+    dpickAssault=new wxDirPickerCtrl(notebook_pane_assault,DIR_PICKER_AC,m_settings.m_gamePathAC,
                                      _("Select AssaultCube game path"),
                                      wxDefaultPosition,sizePicker,
                                      wxDIRP_DEFAULT_STYLE|wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST);
-    dpickFrontier=new wxDirPickerCtrl(notebook_pane_frontier,DIR_PICKER_BF,m_settings.m_configPathBF,
+    dpickFrontier=new wxDirPickerCtrl(notebook_pane_frontier,DIR_PICKER_BF,m_settings.m_gamePathBF,
                                       _("Select Blood Frontier game path"),
                                       wxDefaultPosition,sizePicker,
                                       wxDIRP_DEFAULT_STYLE|wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST);
-    dpickCube=new wxDirPickerCtrl(notebook_pane_cube,DIR_PICKER_CB,m_settings.m_configPathCB,
+    dpickCube=new wxDirPickerCtrl(notebook_pane_cube,DIR_PICKER_CB,m_settings.m_gamePathCB,
                                   _("Select Cube game path"),
                                   wxDefaultPosition,sizePicker,
                                   wxDIRP_DEFAULT_STYLE|wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST);
@@ -237,14 +245,14 @@ void CslDlgSettings::do_layout()
     if (!m_settings.m_clientBinCB.IsEmpty())
         fpickCube->SetPath(m_settings.m_clientBinCB);
 #endif
-    if (!m_settings.m_configPathSB.IsEmpty())
-        dpickSauer->SetPath(m_settings.m_configPathSB);
-    if (!m_settings.m_configPathAC.IsEmpty())
-        dpickAssault->SetPath(m_settings.m_configPathAC);
-    if (!m_settings.m_configPathBF.IsEmpty())
-        dpickFrontier->SetPath(m_settings.m_configPathBF);
-    if (!m_settings.m_configPathCB.IsEmpty())
-        dpickCube->SetPath(m_settings.m_configPathCB);
+    if (!m_settings.m_gamePathSB.IsEmpty())
+        dpickSauer->SetPath(m_settings.m_gamePathSB);
+    if (!m_settings.m_gamePathAC.IsEmpty())
+        dpickAssault->SetPath(m_settings.m_gamePathAC);
+    if (!m_settings.m_gamePathBF.IsEmpty())
+        dpickFrontier->SetPath(m_settings.m_gamePathBF);
+    if (!m_settings.m_gamePathCB.IsEmpty())
+        dpickCube->SetPath(m_settings.m_gamePathCB);
 
     // begin wxGlade: CslDlgSettings::do_layout
     wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(2, 1, 0, 0);
@@ -261,7 +269,7 @@ void CslDlgSettings::do_layout()
     wxFlexGridSizer* grid_sizer_cube_path = new wxFlexGridSizer(3, 2, 0, 0);
     wxFlexGridSizer* grid_sizer_frontier_path = new wxFlexGridSizer(3, 2, 0, 0);
     wxFlexGridSizer* grid_sizer_assault_path = new wxFlexGridSizer(3, 2, 0, 0);
-    wxFlexGridSizer* grid_sizer_sauer_path = new wxFlexGridSizer(3, 2, 0, 0);
+    wxFlexGridSizer* grid_sizer_sauer_path = new wxFlexGridSizer(4, 2, 0, 0);
     wxStaticText* label_sauer_exe = new wxStaticText(notebook_pane_sauer, wxID_ANY, _("Game executable:"));
     grid_sizer_sauer_path->Add(label_sauer_exe, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
     wxStaticText* label_sauer_path = new wxStaticText(notebook_pane_sauer, wxID_ANY, _("Game directory:"));
@@ -269,6 +277,9 @@ void CslDlgSettings::do_layout()
     wxStaticText* label_sauer_options = new wxStaticText(notebook_pane_sauer, wxID_ANY, _("Game paramters:"));
     grid_sizer_sauer_path->Add(label_sauer_options, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
     grid_sizer_sauer_path->Add(text_ctrl_sauer_options, 0, wxALL|wxEXPAND, 4);
+    wxStaticText* label_sauer_priv_config = new wxStaticText(notebook_pane_sauer, wxID_ANY, _("Config files:"));
+    grid_sizer_sauer_path->Add(label_sauer_priv_config, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
+    grid_sizer_sauer_path->Add(checkbox_sauer_priv_config, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     notebook_pane_sauer->SetSizer(grid_sizer_sauer_path);
     grid_sizer_sauer_path->AddGrowableCol(1);
     wxStaticText* label_assault_exe = new wxStaticText(notebook_pane_assault, wxID_ANY, _("Game executable:"));
@@ -376,9 +387,9 @@ void CslDlgSettings::do_layout()
 
     CentreOnParent();
 
-    wxInt32 dppos=3;
 #ifdef __WXMAC__
-    dppos=1;
+    wxInt32 dppos=1;
+    wxInt32 border=-1;
     label_sauer_exe->Hide();
     label_assault_exe->Hide();
     label_frontier_exe->Hide();
@@ -388,15 +399,17 @@ void CslDlgSettings::do_layout()
     grid_sizer_frontier_path->Detach(label_frontier_exe);
     grid_sizer_cube_path->Detach(label_cube_exe);
 #else
+    wxInt32 dppos=3;
+    wxInt32 border=4;
     grid_sizer_sauer_path->Insert(1,fpickSauer,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,4);
     grid_sizer_assault_path->Insert(1,fpickAssault,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,4);
     grid_sizer_frontier_path->Insert(1,fpickFrontier,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,4);
     grid_sizer_cube_path->Insert(1,fpickCube,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,4);
 #endif
-    grid_sizer_sauer_path->Insert(dppos,dpickSauer,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,4);
-    grid_sizer_assault_path->Insert(dppos,dpickAssault,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,4);
-    grid_sizer_frontier_path->Insert(dppos,dpickFrontier,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,4);
-    grid_sizer_cube_path->Insert(dppos,dpickCube,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,4);
+    grid_sizer_sauer_path->Insert(dppos,dpickSauer,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,border);
+    grid_sizer_assault_path->Insert(dppos,dpickAssault,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,border);
+    grid_sizer_frontier_path->Insert(dppos,dpickFrontier,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,border);
+    grid_sizer_cube_path->Insert(dppos,dpickCube,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,border);
 
     Layout();
 
@@ -423,7 +436,7 @@ void CslDlgSettings::OnPicker(wxFileDirPickerEvent& event)
             {
                 gpath=path.BeforeLast(PATHDIVA);
                 dpickSauer->SetPath(gpath);
-                m_settings.m_configPathSB=gpath;
+                m_settings.m_gamePathSB=gpath;
             }
 
             break;
@@ -433,7 +446,7 @@ void CslDlgSettings::OnPicker(wxFileDirPickerEvent& event)
             {
                 gpath=path.BeforeLast(PATHDIVA);
                 dpickAssault->SetPath(gpath);
-                m_settings.m_configPathAC=gpath;
+                m_settings.m_gamePathAC=gpath;
             }
             break;
         case FILE_PICKER_BF:
@@ -442,7 +455,7 @@ void CslDlgSettings::OnPicker(wxFileDirPickerEvent& event)
             {
                 gpath=path.BeforeLast(PATHDIVA);
                 dpickFrontier->SetPath(gpath);
-                m_settings.m_configPathBF=gpath;
+                m_settings.m_gamePathBF=gpath;
             }
             break;
         case FILE_PICKER_CB:
@@ -451,35 +464,35 @@ void CslDlgSettings::OnPicker(wxFileDirPickerEvent& event)
             {
                 gpath=path.BeforeLast(PATHDIVA);
                 dpickCube->SetPath(gpath);
-                m_settings.m_configPathCB=gpath;
+                m_settings.m_gamePathCB=gpath;
             }
             break;
 #endif
         case DIR_PICKER_SB:
-            m_settings.m_configPathSB=path;
+            m_settings.m_gamePathSB=path;
 #ifdef __WXMAC__
-            m_settings.m_configPathSB+=wxT("/sauerbraten");
+            m_settings.m_gamePathSB+=wxT("/sauerbraten");
             m_settings.m_clientBinSB=path+wxT("/sauerbraten/sauerbraten.app/Contents/MacOS/sauerbraten");
 #endif
             break;
         case DIR_PICKER_AC:
-            m_settings.m_configPathAC=path;
+            m_settings.m_gamePathAC=path;
 #ifdef __WXMAC__
-            m_settings.m_configPathAC+=wxT("/assaultcube");
+            m_settings.m_gamePathAC+=wxT("/assaultcube");
             m_settings.m_clientBinAC=path+wxT("/assaultcube/actioncube.app/Contents/MacOS/actioncube");
 #endif
             break;
         case DIR_PICKER_BF:
-            m_settings.m_configPathBF=path;
+            m_settings.m_gamePathBF=path;
 #ifdef __WXMAC__
-            m_settings.m_configPathBF+=wxT("");
+            m_settings.m_gamePathBF+=wxT("");
             m_settings.m_clientBinBF=path+wxT("/sauerbraten.app/Contents/MacOS/sauerbraten");
 #endif
             break;
         case DIR_PICKER_CB:
-            m_settings.m_configPathCB=path;
+            m_settings.m_gamePathCB=path;
 #ifdef __WXMAC__
-            m_settings.m_configPathCB+=wxT("/cube");
+            m_settings.m_gamePathCB+=wxT("/cube");
             m_settings.m_clientBinCB=path+wxT("/cube/cube.app/Contents/MacOS/Cube");
 #endif
             break;
@@ -565,6 +578,7 @@ void CslDlgSettings::OnCommandEvent(wxCommandEvent& event)
             m_settings.m_clientOptsAC=text_ctrl_assault_options->GetValue();
             m_settings.m_clientOptsBF=text_ctrl_frontier_options->GetValue();
             m_settings.m_clientOptsCB=text_ctrl_cube_options->GetValue();
+            m_settings.m_privConfSB=checkbox_sauer_priv_config->GetValue();
             m_settings.m_updateInterval=spin_ctrl_update->GetValue()*1000;
             m_settings.m_waitServerFull=spin_ctrl_wait->GetValue();
             m_settings.m_dontUpdatePlaying=checkbox_play_update->IsChecked();
@@ -614,16 +628,16 @@ bool CslDlgSettings::Validate()
                          CSL_DEFAULT_INJECT_DIR_SB);
     if (!m_settings.m_clientBinSB.IsEmpty())
     {
-        if (m_settings.m_configPathSB.IsEmpty())
+        if (m_settings.m_gamePathSB.IsEmpty())
         {
             wxMessageBox(msg,_("Error"),wxICON_ERROR,this);
             return false;
         }
 
-        if (!m_settings.m_configPathSB.EndsWith(wxString(PATHDIV)))
-            m_settings.m_configPathSB+=PATHDIV;
+        if (!m_settings.m_gamePathSB.EndsWith(wxString(PATHDIV)))
+            m_settings.m_gamePathSB+=PATHDIV;
 
-        if (!::wxDirExists(m_settings.m_configPathSB+CSL_DEFAULT_INJECT_DIR_SB))
+        if (!::wxDirExists(m_settings.m_gamePathSB+CSL_DEFAULT_INJECT_DIR_SB))
         {
             wxMessageBox(msg,_("Error"),wxICON_ERROR,this);
             return false;
@@ -635,14 +649,14 @@ bool CslDlgSettings::Validate()
                          CSL_DEFAULT_INJECT_DIR_AC);
     if (!m_settings.m_clientBinAC.IsEmpty())
     {
-        if (m_settings.m_configPathAC.IsEmpty())
+        if (m_settings.m_gamePathAC.IsEmpty())
         {
             wxMessageBox(msg,_("Error"),wxICON_ERROR,this);
             return false;
         }
-        if (!m_settings.m_configPathAC.EndsWith(wxString(PATHDIV)))
-            m_settings.m_configPathAC+=PATHDIV;
-        if (!::wxDirExists(m_settings.m_configPathAC+CSL_DEFAULT_INJECT_DIR_AC))
+        if (!m_settings.m_gamePathAC.EndsWith(wxString(PATHDIV)))
+            m_settings.m_gamePathAC+=PATHDIV;
+        if (!::wxDirExists(m_settings.m_gamePathAC+CSL_DEFAULT_INJECT_DIR_AC))
         {
             wxMessageBox(msg,_("Error"),wxICON_ERROR,this);
             return false;
@@ -654,16 +668,16 @@ bool CslDlgSettings::Validate()
                          CSL_DEFAULT_INJECT_DIR_BF);
     if (!m_settings.m_clientBinBF.IsEmpty())
     {
-        if (m_settings.m_configPathBF.IsEmpty())
+        if (m_settings.m_gamePathBF.IsEmpty())
         {
             wxMessageBox(msg,_("Error"),wxICON_ERROR,this);
             return false;
         }
 
-        if (!m_settings.m_configPathBF.EndsWith(wxString(PATHDIV)))
-            m_settings.m_configPathBF+=PATHDIV;
+        if (!m_settings.m_gamePathBF.EndsWith(wxString(PATHDIV)))
+            m_settings.m_gamePathBF+=PATHDIV;
 
-        if (!::wxDirExists(m_settings.m_configPathBF+CSL_DEFAULT_INJECT_DIR_BF))
+        if (!::wxDirExists(m_settings.m_gamePathBF+CSL_DEFAULT_INJECT_DIR_BF))
         {
             wxMessageBox(msg,_("Error"),wxICON_ERROR,this);
             return false;
@@ -675,14 +689,14 @@ bool CslDlgSettings::Validate()
                          CSL_DEFAULT_INJECT_DIR_CB);
     if (!m_settings.m_clientBinCB.IsEmpty())
     {
-        if (m_settings.m_configPathCB.IsEmpty())
+        if (m_settings.m_gamePathCB.IsEmpty())
         {
             wxMessageBox(msg,_("Error"),wxICON_ERROR,this);
             return false;
         }
-        if (!m_settings.m_configPathCB.EndsWith(wxString(PATHDIV)))
-            m_settings.m_configPathCB+=PATHDIV;
-        if (!::wxDirExists(m_settings.m_configPathCB+CSL_DEFAULT_INJECT_DIR_CB))
+        if (!m_settings.m_gamePathCB.EndsWith(wxString(PATHDIV)))
+            m_settings.m_gamePathCB+=PATHDIV;
+        if (!::wxDirExists(m_settings.m_gamePathCB+CSL_DEFAULT_INJECT_DIR_CB))
         {
             wxMessageBox(msg,_("Error"),wxICON_ERROR,this);
             return false;

@@ -1234,29 +1234,31 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info,const wxString& pass
     }
 
     bool sbUseParam=false;
-    wxString cmd,path,opts,out;
+    wxString cmd,path,opts,out,privGameName;
     wxString srvtitle=info->GetBestDescription();
 
     switch (info->m_type)
     {
         case CSL_GAME_SB:
             cmd=g_cslSettings->m_clientBinSB;
-            path=g_cslSettings->m_configPathSB;
+            path=g_cslSettings->m_gamePathSB;
             opts=g_cslSettings->m_clientOptsSB;
+            if (g_cslSettings->m_privConfSB)
+                privGameName=wxT("sauerbraten");
             break;
         case CSL_GAME_AC:
             cmd=g_cslSettings->m_clientBinAC;
-            path=g_cslSettings->m_configPathAC;
+            path=g_cslSettings->m_gamePathAC;
             opts=g_cslSettings->m_clientOptsAC;
             break;
         case CSL_GAME_BF:
             cmd=g_cslSettings->m_clientBinBF;
-            path=g_cslSettings->m_configPathBF;
+            path=g_cslSettings->m_gamePathBF;
             opts=g_cslSettings->m_clientOptsBF;
             break;
         case CSL_GAME_CB:
             cmd=g_cslSettings->m_clientBinCB;
-            path=g_cslSettings->m_configPathCB;
+            path=g_cslSettings->m_gamePathCB;
             opts=g_cslSettings->m_clientOptsCB;
             break;
         default:
@@ -1277,7 +1279,28 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info,const wxString& pass
         return;
     }
 
-    switch (info->m_type)
+    if (!privGameName.IsEmpty())
+    {
+#ifdef __WXMAC__
+        wxString privConfPath=::wxGetHomeDir();
+        privConfPath+=wxT("/Library/Application\\ Support/sauerbraten");
+#else
+        privConfPath=wxStandardPaths::GetUserConfigDir();
+#ifdef __WXMSW__
+        privConfPath+=wxT("/csl");
+#else
+        privConfPath+=wxT("/.csl");
+#endif //__WXMSW__
+        privConfPath+=wxT("/config/sauerbraten");
+#endif //__WXMAC__
+#ifdef __WXMSW__
+        opts+=wxString(wxT(" -q\"")+privConfPath+wxString(wxT("\""));
+#else
+        opts+=wxString(wxT(" -q")+privConfPath);
+#endif //__WXMSW__
+                   }
+
+                   switch (info->m_type)
     {
         case CSL_GAME_SB:
         case CSL_GAME_BF:
@@ -1365,6 +1388,7 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info,const wxString& pass
     info->Lock();
     ::wxSetWorkingDirectory(path);
 
+    LOG_DEBUG("launch command: %s\n",cmd.c_str());
     CslProcess *process=new CslProcess(this,info,cmd);
     if (!(::wxExecute(cmd,wxEXEC_ASYNC,process)>0))
     {

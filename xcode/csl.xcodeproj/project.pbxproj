@@ -77,7 +77,7 @@
 		9ECC32980CA1AA3400578B5E /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		9ECC329A0CA1AA6800578B5E /* csl_start_sb.ogz */ = {isa = PBXFileReference; lastKnownFileType = file; name = csl_start_sb.ogz; path = ../data/csl_start_sb.ogz; sourceTree = SOURCE_ROOT; };
 		9ECC329B0CA1AA6800578B5E /* GeoIP.dat */ = {isa = PBXFileReference; lastKnownFileType = file; name = GeoIP.dat; path = ../data/GeoIP.dat; sourceTree = SOURCE_ROOT; };
-		9ED9D44A0CA161E000B0FC71 /* csl.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = csl.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9ED9D44A0CA161E000B0FC71 /* csl.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = csl.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9ED9D44D0CA161E000B0FC71 /* csl-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "csl-Info.plist"; sourceTree = "<group>"; };
 		9ED9D4520CA1622F00B0FC71 /* CslArt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslArt.cpp; path = ../src/CslArt.cpp; sourceTree = SOURCE_ROOT; };
 		9ED9D4530CA1622F00B0FC71 /* CslArt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslArt.h; path = ../src/CslArt.h; sourceTree = SOURCE_ROOT; };

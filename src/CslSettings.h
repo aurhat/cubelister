@@ -101,16 +101,26 @@ class CslSettings
                 /* Client */
                 m_clientBinSB(wxEmptyString),
                 m_clientOptsSB(wxEmptyString),
-                m_configPathSB(wxEmptyString),
+                m_gamePathSB(wxEmptyString),
+#ifdef __WXMAC__
+                m_privConfSB(true),
+#else
+                m_privConfSB(false),
+#endif
                 m_clientBinAC(wxEmptyString),
                 m_clientOptsAC(wxEmptyString),
-                m_configPathAC(wxEmptyString),
+                m_gamePathAC(wxEmptyString),
                 m_clientBinBF(wxEmptyString),
                 m_clientOptsBF(wxEmptyString),
-                m_configPathBF(wxEmptyString),
+                m_gamePathBF(wxEmptyString),
+#ifdef __WXMAC__
+                m_privConfBF(true),
+#else
+                m_privConfBF(false),
+#endif
                 m_clientBinCB(wxEmptyString),
                 m_clientOptsCB(wxEmptyString),
-                m_configPathCB(wxEmptyString),
+                m_gamePathCB(wxEmptyString),
 
                 m_minPlaytime(CSL_MIN_PLAYTIME_STD)
         {}
@@ -142,16 +152,18 @@ class CslSettings
         /* Client */
         wxString m_clientBinSB;
         wxString m_clientOptsSB;
-        wxString m_configPathSB;
+        wxString m_gamePathSB;
+        bool m_privConfSB;
         wxString m_clientBinAC;
         wxString m_clientOptsAC;
-        wxString m_configPathAC;
+        wxString m_gamePathAC;
         wxString m_clientBinBF;
         wxString m_clientOptsBF;
-        wxString m_configPathBF;
+        wxString m_gamePathBF;
+        bool m_privConfBF;
         wxString m_clientBinCB;
         wxString m_clientOptsCB;
-        wxString m_configPathCB;
+        wxString m_gamePathCB;
         wxUint32 m_minPlaytime;
 };
 

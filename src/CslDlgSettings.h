@@ -72,6 +72,7 @@ class CslDlgSettings: public wxDialog
         wxStaticBox* sizer_times_staticbox;
         wxStaticBox* sizer_colours_staticbox;
         wxTextCtrl* text_ctrl_sauer_options;
+        wxCheckBox* checkbox_sauer_priv_config;
         wxPanel* notebook_pane_sauer;
         wxTextCtrl* text_ctrl_assault_options;
         wxPanel* notebook_pane_assault;

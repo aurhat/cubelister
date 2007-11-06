@@ -146,19 +146,32 @@ CslFrame::CslFrame(wxWindow* parent, int id, const wxString& title,const wxPoint
 #define wxTR_DEFAULT_STYLE treectlStyle
 
     LoadSettings();
-
+#ifdef __WXMSW__
     m_imgListTree.Create(24,24,true);
     m_imgListTree.Add(wxICON(master_24));
     m_imgListTree.Add(wxICON(sb_24));
     m_imgListTree.Add(wxICON(ac_24));
     m_imgListTree.Add(wxICON(bf_24));
     m_imgListTree.Add(wxICON(cb_24));
+#else
+    m_imgListTree.Create(24,24,true);
+    m_imgListTree.Add(wxBitmap(master_24_xpm));
+    m_imgListTree.Add(wxBitmap(sb_24_xpm));
+    m_imgListTree.Add(wxBitmap(ac_24_xpm));
+    m_imgListTree.Add(wxBitmap(bf_24_xpm));
+    m_imgListTree.Add(wxBitmap(cb_24_xpm));
+#endif
 
     m_imgListButton.Create(14,14,true);
+#ifdef __WXMSW__
     m_imgListButton.Add(wxICON(close_14));
     m_imgListButton.Add(wxICON(close_high_14));
     m_imgListButton.Add(wxICON(close_press_14));
-
+#else
+    m_imgListButton.Add(wxBitmap(close_14_xpm));
+    m_imgListButton.Add(wxBitmap(close_high_14_xpm));
+    m_imgListButton.Add(wxBitmap(close_press_14_xpm));
+#endif
     m_engine=new CslEngine(this);
 
     m_outputDlg=new CslDlgOutput(this);
@@ -1292,16 +1305,18 @@ void CslFrame::LoadSettings()
     config->SetPath(wxT("/Clients"));
     if (config->Read(wxT("BinarySB"),&s)) g_cslSettings->m_clientBinSB=s;
     if (config->Read(wxT("OptionsSB"),&s)) g_cslSettings->m_clientOptsSB=s;
-    if (config->Read(wxT("PathSB"),&s)) g_cslSettings->m_configPathSB=s;
+    if (config->Read(wxT("PathSB"),&s)) g_cslSettings->m_gamePathSB=s;
+    if (config->Read(wxT("PrivateConfigSB"),&val)) g_cslSettings->m_privConfSB=val>0;
     if (config->Read(wxT("BinaryAC"),&s)) g_cslSettings->m_clientBinAC=s;
     if (config->Read(wxT("OptionsAC"),&s)) g_cslSettings->m_clientOptsAC=s;
-    if (config->Read(wxT("PathAC"),&s)) g_cslSettings->m_configPathAC=s;
+    if (config->Read(wxT("PathAC"),&s)) g_cslSettings->m_gamePathAC=s;
     if (config->Read(wxT("BinaryBF"),&s)) g_cslSettings->m_clientBinBF=s;
     if (config->Read(wxT("OptionsBF"),&s)) g_cslSettings->m_clientOptsBF=s;
-    if (config->Read(wxT("PathBF"),&s)) g_cslSettings->m_configPathBF=s;
+    if (config->Read(wxT("PrivateConfigBF"),&val)) g_cslSettings->m_privConfBF=val>0;
+    if (config->Read(wxT("PathBF"),&s)) g_cslSettings->m_gamePathBF=s;
     if (config->Read(wxT("BinaryCB"),&s)) g_cslSettings->m_clientBinCB=s;
     if (config->Read(wxT("OptionsCB"),&s)) g_cslSettings->m_clientOptsCB=s;
-    if (config->Read(wxT("PathCB"),&s)) g_cslSettings->m_configPathCB=s;
+    if (config->Read(wxT("PathCB"),&s)) g_cslSettings->m_gamePathCB=s;
     if (config->Read(wxT("MinPlaytime"),&val))
     {
         if (val<CSL_MIN_PLAYTIME_MIN || val>CSL_MIN_PLAYTIME_MAX)
@@ -1380,16 +1395,18 @@ void CslFrame::SaveSettings()
     config->SetPath(wxT("/Clients"));
     config->Write(wxT("BinarySB"),g_cslSettings->m_clientBinSB);
     config->Write(wxT("OptionsSB"),g_cslSettings->m_clientOptsSB);
-    config->Write(wxT("PathSB"),g_cslSettings->m_configPathSB);
+    config->Write(wxT("PathSB"),g_cslSettings->m_gamePathSB);
+    config->Write(wxT("PrivateConfigSB"),g_cslSettings->m_privConfSB);
     config->Write(wxT("BinaryAC"),g_cslSettings->m_clientBinAC);
     config->Write(wxT("OptionsAC"),g_cslSettings->m_clientOptsAC);
-    config->Write(wxT("PathAC"),g_cslSettings->m_configPathAC);
+    config->Write(wxT("PathAC"),g_cslSettings->m_gamePathAC);
     config->Write(wxT("BinaryBF"),g_cslSettings->m_clientBinBF);
     config->Write(wxT("OptionsBF"),g_cslSettings->m_clientOptsBF);
-    config->Write(wxT("PathBF"),g_cslSettings->m_configPathBF);
+    config->Write(wxT("PrivateConfigBF"),g_cslSettings->m_privConfBF);
+    config->Write(wxT("PathBF"),g_cslSettings->m_gamePathBF);
     config->Write(wxT("BinaryCB"),g_cslSettings->m_clientBinCB);
     config->Write(wxT("OptionsCB"),g_cslSettings->m_clientOptsCB);
-    config->Write(wxT("PathCB"),g_cslSettings->m_configPathCB);
+    config->Write(wxT("PathCB"),g_cslSettings->m_gamePathCB);
     config->Write(wxT("MinPlaytime"),(long int)g_cslSettings->m_minPlaytime);
 
     delete config;
