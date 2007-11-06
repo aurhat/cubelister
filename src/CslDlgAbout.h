@@ -67,6 +67,7 @@ class CslDlgAbout: public wxDialog
         // end wxGlade
 
         void OnCommandEvent(wxCommandEvent& event);
+        void OnMouseDown(wxMouseEvent& event);
 
         DECLARE_EVENT_TABLE();
 
@@ -76,6 +77,7 @@ class CslDlgAbout: public wxDialog
         wxStaticText* label_name;
         wxStaticText* label_version;
         wxStaticText* label_desc;
+        wxStaticText* label_web;
         wxStaticText* label_copyright;
         wxTextCtrl* text_ctrl_credits;
         wxPanel* notebook_pane_credits;

@@ -119,9 +119,9 @@ CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
         m_imageList.Add(AdjustIconSize(flags[i],wxNullIcon,wxSize(20,14),wxPoint(0,2)));
 #else
     m_imageList.Create(18,12,true);
-    m_imageList.Add(wxICON(sortasc_18_12));
-    m_imageList.Add(wxICON(sortdsc_18_12));
-    m_imageList.Add(wxIcon(unknown_xpm));
+    m_imageList.Add(wxBitmap(sortasc_18_12_xpm));
+    m_imageList.Add(wxBitmap(sortdsc_18_12_xpm));
+    m_imageList.Add(wxBitmap(unknown_xpm));
 
     wxInt32 i,c=sizeof(codes)/sizeof(codes[0])-1;
     for (i=0;i<c;i++)
@@ -167,7 +167,7 @@ void CslDlgExtended::set_properties()
     list_ctrl_players->SetMinSize(wxSize(580,350));
 #endif
 #ifdef __WXMAC__
-    list_ctrl_players->SetMinSize(wxSize(580,350));
+    list_ctrl_players->SetMinSize(wxSize(580,330));
     button_update->SetMinSize(wxSize(button_update->GetSize().x+20,-1));
 #endif
 }

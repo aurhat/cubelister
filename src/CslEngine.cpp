@@ -661,7 +661,7 @@ void CslEngine::ParsePong(CslServerInfo *info,CslUDPPacket *packet,wxUint32 now)
     wxInt32 vi;
     wxUint32 vu;
     wxUint32 exVersion;
-    wxUint32 cmd;
+    wxInt32 cmd=-1;
     char text[_MAXDEFSTR];
     ucharbuf p((uchar*)packet->Data(),packet->Size());
 

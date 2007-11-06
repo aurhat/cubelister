@@ -113,6 +113,7 @@ CslDlgAbout::CslDlgAbout(wxWindow* parent,int id,const wxString& title,
     label_name = new wxStaticText(this, wxID_ANY, wxEmptyString);
     label_version = new wxStaticText(this, wxID_ANY, wxEmptyString);
     label_desc = new wxStaticText(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+    label_web = new wxStaticText(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
     label_copyright = new wxStaticText(this, wxID_ANY, wxEmptyString);
     text_ctrl_credits = new wxTextCtrl(notebook_pane_credits, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxHSCROLL);
     text_ctrl_license = new wxTextCtrl(notebook_pane_license, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxHSCROLL);
@@ -127,22 +128,29 @@ CslDlgAbout::CslDlgAbout(wxWindow* parent,int id,const wxString& title,
 void CslDlgAbout::set_properties()
 {
     // begin wxGlade: CslDlgAbout::set_properties
-    panel_bitmap->SetMinSize(wxSize(256,256));
     label_name->SetFont(wxFont(16, wxDECORATIVE, wxNORMAL, wxBOLD, 0, wxT("")));
     label_version->SetFont(wxFont(12, wxDEFAULT, wxNORMAL, wxBOLD, 0, wxT("")));
+    label_web->SetForegroundColour(wxColour(50, 50, 204));
     button_close->SetDefault();
     // end wxGlade
 
     SetTitle(_("About Cube Server Lister (CSL)"));
 
+    label_web->Connect(wxEVT_LEFT_DOWN,wxMouseEventHandler(CslDlgAbout::OnMouseDown),NULL,this);
+    label_web->SetCursor(wxCursor(wxCURSOR_HAND));
+
     wxFont font=label_copyright->GetFont();
     //font.SetPointSize(font.GetPointSize()-1);
     font.SetStyle(wxFONTSTYLE_ITALIC);
     label_copyright->SetFont(font);
+    font.SetStyle(wxFONTSTYLE_NORMAL);
+    font.SetWeight(wxFONTWEIGHT_BOLD);
+    label_web->SetFont(font);
 
     label_name->SetLabel(CSL_NAME_STR);
     label_version->SetLabel(CSL_VERSION_LONG_STR);
     label_desc->SetLabel(CSL_DESCRIPTION_STR);
+    label_web->SetLabel(CSL_WEBADDR);
     label_copyright->SetLabel(CSL_COPYRIGHT_STR);
 
     text_ctrl_credits->SetValue(csl_credits);
@@ -150,19 +158,23 @@ void CslDlgAbout::set_properties()
     text_ctrl_license->AppendText(csl_license);
     text_ctrl_credits->ShowPosition(0);
     text_ctrl_license->ShowPosition(0);
+
+    panel_bitmap->SetMinSize(wxSize(256,256));
+    notebook->SetMinSize(wxSize(400,210));
 }
 
 
 void CslDlgAbout::do_layout()
 {
     // begin wxGlade: CslDlgAbout::do_layout
-    wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(7, 1, 0, 0);
+    wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(8, 1, 0, 0);
     wxGridSizer* sizer_license = new wxGridSizer(1, 1, 0, 0);
     wxGridSizer* sizer_credits = new wxGridSizer(1, 1, 0, 0);
     grid_sizer_main->Add(panel_bitmap, 1, wxALIGN_CENTER_HORIZONTAL, 0);
     grid_sizer_main->Add(label_name, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
     grid_sizer_main->Add(label_version, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
     grid_sizer_main->Add(label_desc, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
+    grid_sizer_main->Add(label_web, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
     grid_sizer_main->Add(label_copyright, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
     sizer_credits->Add(text_ctrl_credits, 0, wxALL|wxEXPAND, 4);
     notebook_pane_credits->SetSizer(sizer_credits);
@@ -171,10 +183,10 @@ void CslDlgAbout::do_layout()
     notebook->AddPage(notebook_pane_credits, _("Credits"));
     notebook->AddPage(notebook_pane_license, _("License"));
     grid_sizer_main->Add(notebook, 1, wxALL|wxEXPAND, 8);
-    grid_sizer_main->Add(button_close, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
+    grid_sizer_main->Add(button_close, 0, wxBOTTOM|wxALIGN_CENTER_HORIZONTAL, 8);
     SetSizer(grid_sizer_main);
     grid_sizer_main->Fit(this);
-    grid_sizer_main->AddGrowableRow(5);
+    grid_sizer_main->AddGrowableRow(6);
     grid_sizer_main->AddGrowableCol(0);
     Layout();
     // end wxGlade
@@ -188,4 +200,10 @@ void CslDlgAbout::do_layout()
 void CslDlgAbout::OnCommandEvent(wxCommandEvent& event)
 {
     this->Destroy();
+}
+
+void CslDlgAbout::OnMouseDown(wxMouseEvent& event)
+{
+    wxLaunchDefaultBrowser(CSL_WEBADDR);
+    event.Skip();
 }

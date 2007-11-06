@@ -33,6 +33,7 @@
 #define CSL_VERSION_LONG_STR  wxString(CSL_VERSION_STR wxT(" ") CSL_VERSION_ADD_STR)
 
 #define CSL_DESCRIPTION_STR   _("Tool to monitor cubeengine-based servers.")
+#define CSL_WEBADDR           wxT("http://cubelister.sourceforge.net")
 #define CSL_COPYRIGHT_STR     wxT("(C)2007 by WahnFred <wahnfred@the-conquerors.net>")
 
 

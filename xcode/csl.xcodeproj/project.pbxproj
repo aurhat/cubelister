@@ -36,6 +36,10 @@
 		9ED9D4820CA1622F00B0FC71 /* CslStatusBar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED9D46E0CA1622F00B0FC71 /* CslStatusBar.cpp */; };
 		9ED9D4830CA1622F00B0FC71 /* CslTools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED9D4700CA1622F00B0FC71 /* CslTools.cpp */; };
 		9ED9D4840CA1622F00B0FC71 /* CslUDP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED9D4720CA1622F00B0FC71 /* CslUDP.cpp */; };
+		9EF31B870CE0C99900156B63 /* CslDlgAbout.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EF31B7E0CE0C99900156B63 /* CslDlgAbout.cpp */; };
+		9EF31B880CE0C99900156B63 /* CslExtendedInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EF31B800CE0C99900156B63 /* CslExtendedInfo.cpp */; };
+		9EF31B890CE0C99900156B63 /* CslGeoIP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EF31B820CE0C99900156B63 /* CslGeoIP.cpp */; };
+		9EF31B8A0CE0C99900156B63 /* CslPanelMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EF31B850CE0C99900156B63 /* CslPanelMap.cpp */; };
 		9EF4F1F40CC386910044881A /* CslDlgConnectPass.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EF4F1F10CC386910044881A /* CslDlgConnectPass.cpp */; };
 		9EF4F1F50CC386910044881A /* cube_tools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EF4F1F30CC386910044881A /* cube_tools.cpp */; };
 /* End PBXBuildFile section */
@@ -73,7 +77,7 @@
 		9ECC32980CA1AA3400578B5E /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		9ECC329A0CA1AA6800578B5E /* csl_start_sb.ogz */ = {isa = PBXFileReference; lastKnownFileType = file; name = csl_start_sb.ogz; path = ../data/csl_start_sb.ogz; sourceTree = SOURCE_ROOT; };
 		9ECC329B0CA1AA6800578B5E /* GeoIP.dat */ = {isa = PBXFileReference; lastKnownFileType = file; name = GeoIP.dat; path = ../data/GeoIP.dat; sourceTree = SOURCE_ROOT; };
-		9ED9D44A0CA161E000B0FC71 /* csl.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = csl.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9ED9D44A0CA161E000B0FC71 /* csl.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = csl.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9ED9D44D0CA161E000B0FC71 /* csl-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "csl-Info.plist"; sourceTree = "<group>"; };
 		9ED9D4520CA1622F00B0FC71 /* CslArt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslArt.cpp; path = ../src/CslArt.cpp; sourceTree = SOURCE_ROOT; };
 		9ED9D4530CA1622F00B0FC71 /* CslArt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslArt.h; path = ../src/CslArt.h; sourceTree = SOURCE_ROOT; };
@@ -111,6 +115,17 @@
 		9ED9D4730CA1622F00B0FC71 /* CslUDP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslUDP.h; path = ../src/CslUDP.h; sourceTree = SOURCE_ROOT; };
 		9ED9D4740CA1622F00B0FC71 /* CslVersion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslVersion.h; path = ../src/CslVersion.h; sourceTree = SOURCE_ROOT; };
 		9ED9D4750CA1622F00B0FC71 /* cube_tools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cube_tools.h; path = ../src/cube_tools.h; sourceTree = SOURCE_ROOT; };
+		9EF31B7C0CE0C99900156B63 /* csl_icon_png.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = csl_icon_png.h; path = ../src/csl_icon_png.h; sourceTree = SOURCE_ROOT; };
+		9EF31B7D0CE0C99900156B63 /* csl_logo_png.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = csl_logo_png.h; path = ../src/csl_logo_png.h; sourceTree = SOURCE_ROOT; };
+		9EF31B7E0CE0C99900156B63 /* CslDlgAbout.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslDlgAbout.cpp; path = ../src/CslDlgAbout.cpp; sourceTree = SOURCE_ROOT; };
+		9EF31B7F0CE0C99900156B63 /* CslDlgAbout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslDlgAbout.h; path = ../src/CslDlgAbout.h; sourceTree = SOURCE_ROOT; };
+		9EF31B800CE0C99900156B63 /* CslExtendedInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslExtendedInfo.cpp; path = ../src/CslExtendedInfo.cpp; sourceTree = SOURCE_ROOT; };
+		9EF31B810CE0C99900156B63 /* CslExtendedInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslExtendedInfo.h; path = ../src/CslExtendedInfo.h; sourceTree = SOURCE_ROOT; };
+		9EF31B820CE0C99900156B63 /* CslGeoIP.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslGeoIP.cpp; path = ../src/CslGeoIP.cpp; sourceTree = SOURCE_ROOT; };
+		9EF31B830CE0C99900156B63 /* CslGeoIP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslGeoIP.h; path = ../src/CslGeoIP.h; sourceTree = SOURCE_ROOT; };
+		9EF31B840CE0C99900156B63 /* CslLicense.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslLicense.h; path = ../src/CslLicense.h; sourceTree = SOURCE_ROOT; };
+		9EF31B850CE0C99900156B63 /* CslPanelMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslPanelMap.cpp; path = ../src/CslPanelMap.cpp; sourceTree = SOURCE_ROOT; };
+		9EF31B860CE0C99900156B63 /* CslPanelMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslPanelMap.h; path = ../src/CslPanelMap.h; sourceTree = SOURCE_ROOT; };
 		9EF4F1F10CC386910044881A /* CslDlgConnectPass.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslDlgConnectPass.cpp; path = ../src/CslDlgConnectPass.cpp; sourceTree = SOURCE_ROOT; };
 		9EF4F1F20CC386910044881A /* CslDlgConnectPass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslDlgConnectPass.h; path = ../src/CslDlgConnectPass.h; sourceTree = SOURCE_ROOT; };
 		9EF4F1F30CC386910044881A /* cube_tools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cube_tools.cpp; path = ../src/cube_tools.cpp; sourceTree = SOURCE_ROOT; };
@@ -147,6 +162,17 @@
 		9ECC30FD0CA1A8F500578B5E /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				9EF31B7C0CE0C99900156B63 /* csl_icon_png.h */,
+				9EF31B7D0CE0C99900156B63 /* csl_logo_png.h */,
+				9EF31B7E0CE0C99900156B63 /* CslDlgAbout.cpp */,
+				9EF31B7F0CE0C99900156B63 /* CslDlgAbout.h */,
+				9EF31B800CE0C99900156B63 /* CslExtendedInfo.cpp */,
+				9EF31B810CE0C99900156B63 /* CslExtendedInfo.h */,
+				9EF31B820CE0C99900156B63 /* CslGeoIP.cpp */,
+				9EF31B830CE0C99900156B63 /* CslGeoIP.h */,
+				9EF31B840CE0C99900156B63 /* CslLicense.h */,
+				9EF31B850CE0C99900156B63 /* CslPanelMap.cpp */,
+				9EF31B860CE0C99900156B63 /* CslPanelMap.h */,
 				9E3F160F0CA1693800C3C8C9 /* GeoIP.c */,
 				9E3F16100CA1693800C3C8C9 /* GeoIP.h */,
 				9ED9D4520CA1622F00B0FC71 /* CslArt.cpp */,
@@ -335,6 +361,10 @@
 				9E73FA100CA6EED200CA71BC /* CslMenu.cpp in Sources */,
 				9EF4F1F40CC386910044881A /* CslDlgConnectPass.cpp in Sources */,
 				9EF4F1F50CC386910044881A /* cube_tools.cpp in Sources */,
+				9EF31B870CE0C99900156B63 /* CslDlgAbout.cpp in Sources */,
+				9EF31B880CE0C99900156B63 /* CslExtendedInfo.cpp in Sources */,
+				9EF31B890CE0C99900156B63 /* CslGeoIP.cpp in Sources */,
+				9EF31B8A0CE0C99900156B63 /* CslPanelMap.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
