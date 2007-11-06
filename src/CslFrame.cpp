@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <wx/mstream.h>
 #include <wx/fileconf.h>
 #include <wx/stdpaths.h>
 #include <wx/aboutdlg.h>
@@ -30,9 +31,9 @@
 #include "CslGeoIP.h"
 #include "CslTools.h"
 #include "CslVersion.h"
+#include "csl_icon_png.h"
 
 #ifndef __WXMSW__
-#include "img/csl_32.xpm"
 #include "img/sb_24.xpm"
 #include "img/bf_24.xpm"
 #include "img/ac_24.xpm"
@@ -328,10 +329,16 @@ void CslFrame::set_properties()
 
     SetMinSize(wxSize(640,480));
 
+    wxMemoryInputStream stream(csl_icon_png,sizeof(csl_icon_png));
+    // see wx_wxbitmap.html
 #ifdef __WXMSW__
     SetIcon(wxICON(aa_csl_32));
 #else
-    SetIcon(wxICON(csl_32));
+    wxIcon icon;
+    wxImage image(stream,wxBITMAP_TYPE_PNG);
+    wxBitmap bitmap(image);
+    icon.CopyFromBitmap(bitmap);
+    SetIcon(icon);
 #endif
 }
 

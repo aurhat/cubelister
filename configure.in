@@ -1,5 +1,5 @@
 AC_INIT(configure.in)
-AM_INIT_AUTOMAKE(csl, 0.6.1)
+AM_INIT_AUTOMAKE(csl, 0.7.5)
 
 DEFAULT_FLAGS="-fsigned-char -Wall -fno-strict-aliasing"
 CFLAGS="$CFLAGS $DEFAULT_FLAGS"
@@ -31,8 +31,8 @@ fi
 
 WXCONFIG=wx-config
 AC_ARG_WITH(wx-config,
-[[  --with-wx-config=FILE     Use the given path to wx-config when determining
-                            wxWidgets configuration; defaults to "wx-config"]],
+[[  --with-wx-config=FILE   Use the given path to wx-config when determining
+                          wxWidgets configuration; defaults to "wx-config"]],
 [
     if test "$withval" != "yes" -a "$withval" != ""; then
         WXCONFIG=$withval
@@ -64,6 +64,43 @@ else
 	AC_MSG_ERROR([wxWidgets 2.8.0 or newer is required])
 fi
 
+dnl GeoIP
+internal_geoip="yes"
+AC_CHECK_HEADERS(GeoIP.h,
+    AC_CHECK_LIB(GeoIP, GeoIP_new,[
+         internal_geoip="no"]))
+
+if test "x$internal_geoip" = "xyes"; then
+ GEOIP_LIBS="libGeoIP/libGeoIP.a"
+else
+ GEOIP_LIBS="-lGeoIP"
+fi
+AM_CONDITIONAL(with_internal_geoip,test "x$internal_geoip" = "xyes")
+
+
+GEOIPDATADIR=""
+internal_geoip_database="yes"
+AC_ARG_WITH(geoip-datadir,
+[[  --with-geoip-datadir=DIR   Use the given path for GeoIP database lookup]],
+[
+    if test "$withval" != "yes" -a "$withval" != ""; then
+        internal_geoip_database="no"
+        GEOIPDATADIR=$withval
+	AC_DEFINE(CSL_EXTERNAL_GEOIP_DATABASE)
+    fi
+])
+AM_CONDITIONAL(with_internal_geoipdatabase,test "x$internal_geoip_database" = "xyes")
+AC_SUBST(GEOIPDATADIR)
+
+
+dnl map config tool
+cslmapcfgtool=yes
+AC_ARG_WITH(cslmapcfgtool,
+[[  --with-cslmapcfgtool    build the map config tool (default=yes)]],
+ [cslmapcfgtool=$withval]
+)
+AM_CONDITIONAL(build_cslmapcfgtool,test "x$cslmapcfgtool" = "xyes")
+
 dnl if test "$host_os" = "mingw32" -o "$host_os" = "cygwin"; then
 dnl  CSL_FLAGS_INCLUDE="src/img/flags/win"
 dnl else
@@ -73,7 +110,22 @@ dnl AC_SUBST(CSL_FLAGS_INCLUDE)
 
 CXXFLAGS="$CXXFLAGS $WX_CXXFLAGS"
 AC_SUBST(WX_LIBS)
+AC_SUBST(GEOIP_LIBS)
 
 AC_OUTPUT(Makefile data/Makefile data/maps/Makefile \
 	data/maps/Sauerbraten/254/Makefile data/maps/Sauerbraten/Makefile po/Makefile.in src/Makefile \
 	src/libGeoIP/Makefile)
+
+echo
+echo --------------------------------------
+echo $PACKAGE $VERSION
+
+echo
+echo wxWidgets version............. : $wxversion
+echo
+echo Need internal libGeoIP........ : $internal_geoip
+echo Need internal GeoIP database.. : $internal_geoip_database
+echo
+echo Build map config tool......... : $cslmapcfgtool
+echo --------------------------------------
+echo
