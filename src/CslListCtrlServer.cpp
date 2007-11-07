@@ -1285,7 +1285,7 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info,const wxString& pass
         wxString privConfPath;
 #ifdef __WXMAC__
         privConfPath=::wxGetHomeDir();
-        privConfPath+=wxString(wxT("/Library/Application\\ Support/"))+privGameName";
+        privConfPath+=wxString(wxT("/Library/Application\\ Support/"))+privGameName;
 #else
         privConfPath=wxStandardPaths().GetUserConfigDir();
 #ifdef __WXMSW__
