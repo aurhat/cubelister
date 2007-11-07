@@ -642,6 +642,25 @@ bool CslDlgSettings::Validate()
             wxMessageBox(msg,_("Error"),wxICON_ERROR,this);
             return false;
         }
+
+#ifdef __WXMSW__
+		if (checkbox_sauer_priv_config->GetValue() &&
+			m_settings.m_clientBinSB.EndsWith(wxT(".bat")))
+		{
+			msg=wxString::Format(_("The batch file (.bat) was selected as game\n"
+								   "executeable for game %s.\n"
+								   "This does not work in combination with the\n"
+								   "private config file mode.\n"
+								   "Disable the private config file mode or choose\n"
+								   "the real game executeable (.exe).\n"
+								   "If not using the batch file (*.bat), it's a good\n"
+								   "idea to add -r to the game parameters."),
+								   GetGameStr(CSL_GAME_SB));
+			wxMessageBox(msg,_("Error"),wxICON_ERROR,this);
+
+			return false;
+		}
+#endif
     }
 
     msg=wxString::Format(CSL_ERROR_SETTINGS_CONNECT_FMT_STR,

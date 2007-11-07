@@ -345,7 +345,7 @@ void CslFrame::set_properties()
     wxMemoryInputStream stream(csl_icon_png,sizeof(csl_icon_png));
     // see wx_wxbitmap.html
 #ifdef __WXMSW__
-    SetIcon(wxICON(aa_csl_32));
+    SetIcon(wxICON(aa_csl_48));
 #else
     wxIcon icon;
     wxImage image(stream,wxBITMAP_TYPE_PNG);

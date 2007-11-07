@@ -1,6 +1,6 @@
 //#include <wx/msw/wx.rc>
 
-AA_CSL_32               ICON                    "img\\csl_32.ico"
+AA_CSL_48               ICON                    "img\\csl_48.ico"
 
 GREEN_LIST_16           ICON                    "img\\green_list_16.ico"
 YELLOW_LIST_16          ICON                    "img\\yellow_list_16.ico"
