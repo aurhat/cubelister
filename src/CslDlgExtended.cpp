@@ -407,7 +407,7 @@ void CslDlgExtended::UpdateMap()
 
     if (m_mapInfo.m_mapName!=m_info->m_map)
     {
-        if (m_mapInfo.LoadMapData(m_info->m_map,CslGame::GetGameName(m_info->m_type),m_info->m_protocol))
+        if (m_mapInfo.LoadMapData(m_info->m_map,GetGameStr(m_info->m_type),m_info->m_protocol))
         {
             if (m_mapInfo.m_mapNameFull.IsEmpty())
                 label_map->SetLabel(m_mapInfo.m_mapName);
@@ -877,7 +877,7 @@ void CslDlgExtended::ShowPanelMap(const bool show)
         m_gridSizerList->Hide(m_sizerMap);
         m_gridSizerList->Detach(m_sizerMap);
 
-        m_sizerMapLabel->SetMinSize(-1,-1);
+        m_sizerMapLabel->SetMinSize(m_sizerMapLabel->GetStaticBox()->GetBestSize());
     }
     else
         return;
@@ -969,8 +969,7 @@ void CslDlgExtended::DoShow(CslServerInfo *info)
         s=_("Time is up");
     label_remaining->SetLabel(s);
 
-    s=_("CSL - Extended info"); s+=wxT(": ");
-    s+=m_info->GetBestDescription();
+    s=wxString(_("CSL - Extended info"))+wxString(wxT(": "))+m_info->GetBestDescription();
     SetTitle(s);
 
     QueryInfo();

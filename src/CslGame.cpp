@@ -132,13 +132,13 @@ const wxChar* GetGameStr(int n)
         CSL_DEFAULT_NAME_BF, CSL_DEFAULT_NAME_CB
     };
     return (n>CSL_GAME_START && n<=CSL_GAME_END &&
-            (size_t)(n-1)<sizeof(game_names)/sizeof(game_names[0])) ? game_names[n-1] : wxT("none");
+            (size_t)(n-1)<sizeof(game_names)/sizeof(game_names[0])) ? game_names[n-1] : _("unknown");
 }
 
 
 CslGame::CslGame(CSL_GAMETYPE type) : m_type(type), m_masterID(0)
 {
-    m_name=GetGameName(type);
+    m_name=GetGameStr(type);
 }
 
 CslGame::~CslGame()
@@ -305,26 +305,6 @@ CslServerInfo* CslGame::FindServerByAddr(const wxIPV4address& addr)
     }
 
     return NULL;
-}
-
-wxString CslGame::GetGameName(const CSL_GAMETYPE type)
-{
-    switch (type)
-    {
-        case CSL_GAME_SB:
-            return CSL_DEFAULT_NAME_SB;
-        case CSL_GAME_AC:
-            return CSL_DEFAULT_NAME_AC;
-        case CSL_GAME_BF:
-            return CSL_DEFAULT_NAME_BF;
-        case CSL_GAME_CB:
-            return CSL_DEFAULT_NAME_CB;
-        default:
-            break;
-    }
-
-    wxASSERT_MSG(!type,wxT("unknown game"));
-    return wxEmptyString;
 }
 
 wxString CslGame::GetWeaponName(const CSL_GAMETYPE type,const wxInt32 weapon)

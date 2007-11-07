@@ -1294,7 +1294,7 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info,const wxString& pass
         privConfPath+=wxT("/.csl");
 #endif //__WXMSW__
         privConfPath+=wxString(PATHDIV)+wxString(wxT("gamecfg"));
-		privConfPath+=wxString(PATHDIV)+privGameName;
+        privConfPath+=wxString(PATHDIV)+privGameName;
 #endif //__WXMAC__
 #ifdef __WXMSW__
         opts+=wxString(wxT(" -q\""))+privConfPath+wxString(wxT("\""));

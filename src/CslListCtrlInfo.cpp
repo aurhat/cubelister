@@ -154,26 +154,16 @@ void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
 #endif
     SetItem(ic++,1,s,1);
 
-    switch (info->m_type)
-    {
-        case CSL_GAME_SB:
-            s=CSL_DEFAULT_NAME_SB;
-            break;
-        case CSL_GAME_AC:
-            s=CSL_DEFAULT_NAME_AC;
-            break;
-        case CSL_GAME_CB:
-            s=CSL_DEFAULT_NAME_CB;
-            break;
-        default:
-            s=CSL_UNKNOWN_STR;
-    }
-    SetItem(ic++,1,s);
+    SetItem(ic++,1,GetGameStr(info->m_type));
 
-    if (info->m_protocol<0)
-        s=CSL_UNKNOWN_STR;
-    else
+    if (info->m_protocol>=0)
+    {
         s=s.Format(wxT("%d"),info->m_protocol);
+        if (info->m_extInfoStatus!=CSL_EXT_STATUS_FALSE)
+            s+=wxString::Format(wxT(" / %d"),info->m_extInfoVersion);
+    }
+    else
+        s=CSL_UNKNOWN_STR;
     SetItem(ic++,1,s);
 
     if (info->m_extInfoStatus!=CSL_EXT_STATUS_FALSE)

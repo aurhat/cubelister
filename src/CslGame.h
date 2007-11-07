@@ -399,7 +399,6 @@ class CslGame
         vector<CslServerInfo*>* GetServers() { return &m_servers; }
         CslServerInfo* FindServerByAddr(const wxIPV4address& addr);
 
-        static wxString GetGameName(const CSL_GAMETYPE type);
         static wxString GetWeaponName(const CSL_GAMETYPE type,const wxInt32 weapon);
 
         static wxInt32 ConnectCleanupConfig(const CSL_GAMETYPE type,const wxString& cfg);
