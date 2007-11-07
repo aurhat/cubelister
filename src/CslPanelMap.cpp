@@ -87,16 +87,17 @@ bool CslMapInfo::LoadMapConfig(wxFileConfig& config,const wxInt32 protVersion)
 bool CslMapInfo::LoadMapData(const wxString& mapName,const wxString& gameName,
                              const wxInt32 protVersion)
 {
-    wxString path=wxString(wxT(DATADIR))+PATHDIV+wxT("maps")+PATHDIV+gameName+PATHDIV;
+    wxString path=DATAPATH+wxString(PATHDIV)+wxString(wxT("maps"))+
+		          wxString(PATHDIV)+gameName+wxString(PATHDIV);
 #ifdef __WXGTK__
     if (!::wxDirExists(path))
-        path=::g_basePath+wxT("/data/maps/")+gameName+PATHDIV;
+        path=g_basePath+wxT("/data/maps/")+gameName+PATHDIV;
 #endif
     Reset(mapName);
 
-    if (::wxFileExists(path+mapName+wxT(".cfg")))
+    if (::wxFileExists(path+mapName+wxString(wxT(".cfg"))))
     {
-        wxFileInputStream stream(path+mapName+wxT(".cfg"));
+        wxFileInputStream stream(path+mapName+wxString(wxT(".cfg")));
         if (!stream.IsOk())
             return false;
 
@@ -116,7 +117,7 @@ bool CslMapInfo::LoadMapData(const wxString& mapName,const wxString& gameName,
         if (!LoadMapConfig(config,version))
             return false;
 
-        path+=wxString::Format(wxT("%d/"),version)+mapName+wxT(".png");
+        path+=wxString::Format(wxT("%d/"),version)+mapName+wxString(wxT(".png"));
         if (::wxFileExists(path))
         {
             if (!m_bitmap.LoadFile(path,wxBITMAP_TYPE_PNG))

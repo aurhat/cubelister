@@ -161,10 +161,10 @@ void CslDlgExtended::set_properties()
     m_teamLabel.Add(label_team8);
 
 #ifdef __WXMSW__
-    list_ctrl_players->SetMinSize(wxSize(520,300));
+    list_ctrl_players->SetMinSize(wxSize(520,270));
 #endif
 #ifdef __WXGTK__
-    list_ctrl_players->SetMinSize(wxSize(580,350));
+    list_ctrl_players->SetMinSize(wxSize(580,320));
 #endif
 #ifdef __WXMAC__
     list_ctrl_players->SetMinSize(wxSize(580,330));

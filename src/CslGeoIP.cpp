@@ -41,7 +41,7 @@ bool CslGeoIP::Init()
 #ifdef CSL_EXTERNAL_GEOIP_DATABASE
     s_geoIP=GeoIP_open_type(GEOIP_COUNTRY_EDITION,GEOIP_MEMORY_CACHE);
 #else
-    wxString path=wxT(DATADIR)+wxString(wxT("/GeoIP.dat"));
+    wxString path=DATAPATH+wxString(wxT("/GeoIP.dat"));
     s_geoIP=GeoIP_open(U2A(path),GEOIP_MEMORY_CACHE);
 #ifdef __WXGTK__
     if (!s_geoIP)

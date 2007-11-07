@@ -402,12 +402,14 @@ wxInt32 CslGame::ConnectPrepareConfig(wxString& out,const CslServerInfo *info,co
         {
             wxString src;
             wxString map=wxString(CSL_DEFAULT_INJECT_FIL_SB)+wxString(wxT(".ogz"));
-            wxString dst=path+CSL_DEFAULT_INJECT_DIR_SB+map;
-            cfg=path+CSL_DEFAULT_INJECT_DIR_SB+CSL_DEFAULT_INJECT_FIL_SB+wxT(".cfg");
+            wxString dst=path+wxString(CSL_DEFAULT_INJECT_DIR_SB)+map;
+            cfg=path+wxString(CSL_DEFAULT_INJECT_DIR_SB)+
+				     wxString(CSL_DEFAULT_INJECT_FIL_SB)+
+					 wxString(wxT(".cfg"));
 
             if (!::wxFileExists(dst))
             {
-                src=A2U(DATADIR)+PATHDIV+map;
+                src=DATAPATH+wxString(PATHDIV)+map;
 #ifdef __WXGTK__
                 if (!::wxFileExists(src))
                 {
@@ -432,9 +434,9 @@ wxInt32 CslGame::ConnectPrepareConfig(wxString& out,const CslServerInfo *info,co
 
         case CSL_GAME_AC:
         {
-            cfg=path+CSL_DEFAULT_INJECT_DIR_AC+CSL_DEFAULT_INJECT_FIL_AC;
+            cfg=path+wxString(CSL_DEFAULT_INJECT_DIR_AC)+wxString(CSL_DEFAULT_INJECT_FIL_AC);
             if (::wxFileExists(cfg))
-                if (!::wxCopyFile(cfg,cfg+wxT(".csl")))
+                if (!::wxCopyFile(cfg,cfg+wxString(wxT(".csl"))))
                     return CSL_ERROR_FILE_OPERATION;
 
             script=wxString::Format(wxT("sleep 1000 [ %s %s %s ]\r\n"),
@@ -448,7 +450,7 @@ wxInt32 CslGame::ConnectPrepareConfig(wxString& out,const CslServerInfo *info,co
             char *buf;
             wxFile file;
             bool autoexec=true;
-            wxString s=path+wxT("autoexec.cfg");
+            wxString s=path+wxString(wxT("autoexec.cfg"));
 
             // check autoexec.cfg
             if (!::wxFileExists(s))
@@ -491,10 +493,10 @@ wxInt32 CslGame::ConnectPrepareConfig(wxString& out,const CslServerInfo *info,co
             file.Close();
 
             // make a backup of the map config
-            cfg=path+CSL_DEFAULT_INJECT_DIR_CB+CSL_DEFAULT_INJECT_FIL_CB;
+            cfg=path+wxString(CSL_DEFAULT_INJECT_DIR_CB)+wxString(CSL_DEFAULT_INJECT_FIL_CB);
             if (::wxFileExists(cfg))
             {
-                if (!::wxCopyFile(cfg,cfg+wxT(".csl")))
+                if (!::wxCopyFile(cfg,cfg+wxString(wxT(".csl"))))
                     return CSL_ERROR_FILE_OPERATION;
             }
 

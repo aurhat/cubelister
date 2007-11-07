@@ -128,13 +128,13 @@
     LangString DESC_Section2 ${LANG_ENGLISH} "Tool to create map config files necessary for map preview."
     LangString DESC_Section3 ${LANG_ENGLISH} "Images and config files for map preview."
     LangString DESC_Section4 ${LANG_ENGLISH} "Some translations."
-    LangString DESC_Section5 ${LANG_ENGLISH} "Program shortcuts."
+    LangString DESC_Section5 ${LANG_ENGLISH} "Program shortcuts for the startmenu and the desktop."
 
     LangString DESC_Section1 ${LANG_GERMAN} "Hauptprogramm."
     LangString DESC_Section2 ${LANG_GERMAN} "Ein Werkzeug, um die für die Mapvorschau benötigten Konfigurationsdateien zu erzeugen."
     LangString DESC_Section3 ${LANG_GERMAN} "Bilder und Konfigurationsdateien für die Mapvorschau."
     LangString DESC_Section4 ${LANG_GERMAN} "Einige Übersetzungen."
-    LangString DESC_Section5 ${LANG_GERMAN} "Programmverknüpfungen."
+    LangString DESC_Section5 ${LANG_GERMAN} "Verknüpfungen für das Startmenü und den Desktop."
 
     ;Assign descriptions to sections
     !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN

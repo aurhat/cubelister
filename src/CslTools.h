@@ -43,11 +43,18 @@
 #ifndef DATADIR
 #undef LOCALEDIR
 #ifdef __WXMAC__
-#define DATADIR g_basePath+wxT("/../Resources")
+#define DATAPATH g_basePath+wxString(wxString(wxT("/../Resources")))
 #else
-#define DATADIR g_basePath+wxT("/data")
+#define DATAPATH g_basePath+wxString(PATHDIV)+wxString(wxT("data"))
 #endif //__WXMAC__
-#define LOCALEDIR DATADIR+wxT("/lang")
+#ifdef __WXMSW__
+#define LOCALEPATH g_basePath+wxString(PATHDIV)+wxString(wxT("lang"))
+#else
+#define LOCALEPATH DATAPATH+wxString(PATHDIV)+wxString(wxT("lang"))
+#endif //__WXMSW__
+#else
+#define DATAPATH wxString(wxT(DATADIR))+wxString(PATHDIV)+wxString(wxT("data"))
+#define LOCALEPATH wxString(wxT(LOCALEDIR))+wxString(PATHDIV)+wxString(wxT("lang"))
 #endif //DATADIR
 
 #define A2U(PSZA_CHART) wxString(wxConvertMB2WX(PSZA_CHART))

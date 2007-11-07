@@ -1326,16 +1326,16 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info,const wxString& pass
             if (sbUseParam)
             {
 #ifdef __WXMSW__
-                opts+=wxT(" -x\"connect ")+info->m_host+wxT("\"");
+                opts+=wxString(wxT(" -x\"connect "))+info->m_host+wxString(wxT("\""));
 #else
-                opts+=wxT(" -xconnect\\ ")+info->m_host;
+                opts+=wxString(wxT(" -xconnect\\ "))+info->m_host;
 #endif
             }
             else
 #ifdef __WXMSW__
-                opts=opts+wxT(" -x\"csl_connect = 1\" -l")+CSL_DEFAULT_INJECT_FIL_SB;
+                opts+=wxString(wxT(" -x\"csl_connect = 1\" -l"))+wxString(CSL_DEFAULT_INJECT_FIL_SB);
 #else
-                opts=opts+wxT(" -xcsl_connect\\ =\\ 1 -l")+CSL_DEFAULT_INJECT_FIL_SB;
+                opts+=wxString(wxT(" -xcsl_connect\\ =\\ 1 -l"))+wxString(CSL_DEFAULT_INJECT_FIL_SB);
 #endif
             break;
         }
@@ -1348,7 +1348,7 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info,const wxString& pass
             break;
     }
 
-    cmd+=wxT(" ")+opts;
+    cmd+=wxString(wxT(" "))+opts;
 
     CslConnectionState::Reset();
 
