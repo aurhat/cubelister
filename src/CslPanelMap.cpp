@@ -88,7 +88,7 @@ bool CslMapInfo::LoadMapData(const wxString& mapName,const wxString& gameName,
                              const wxInt32 protVersion)
 {
     wxString path=DATAPATH+wxString(PATHDIV)+wxString(wxT("maps"))+
-		          wxString(PATHDIV)+gameName+wxString(PATHDIV);
+                  wxString(PATHDIV)+gameName+wxString(PATHDIV);
 #ifdef __WXGTK__
     if (!::wxDirExists(path))
         path=g_basePath+wxT("/data/maps/")+gameName+PATHDIV;

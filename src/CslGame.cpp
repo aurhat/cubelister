@@ -404,8 +404,8 @@ wxInt32 CslGame::ConnectPrepareConfig(wxString& out,const CslServerInfo *info,co
             wxString map=wxString(CSL_DEFAULT_INJECT_FIL_SB)+wxString(wxT(".ogz"));
             wxString dst=path+wxString(CSL_DEFAULT_INJECT_DIR_SB)+map;
             cfg=path+wxString(CSL_DEFAULT_INJECT_DIR_SB)+
-				     wxString(CSL_DEFAULT_INJECT_FIL_SB)+
-					 wxString(wxT(".cfg"));
+                wxString(CSL_DEFAULT_INJECT_FIL_SB)+
+                wxString(wxT(".cfg"));
 
             if (!::wxFileExists(dst))
             {

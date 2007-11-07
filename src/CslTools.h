@@ -53,8 +53,8 @@
 #define LOCALEPATH DATAPATH+wxString(PATHDIV)+wxString(wxT("lang"))
 #endif //__WXMSW__
 #else
-#define DATAPATH wxString(wxT(DATADIR))+wxString(PATHDIV)+wxString(wxT("data"))
-#define LOCALEPATH wxString(wxT(LOCALEDIR))+wxString(PATHDIV)+wxString(wxT("lang"))
+#define DATAPATH wxString(wxT(DATADIR))+wxString(PATHDIV)
+#define LOCALEPATH wxString(wxT(LOCALEDIR))+wxString(PATHDIV)
 #endif //DATADIR
 
 #define A2U(PSZA_CHART) wxString(wxConvertMB2WX(PSZA_CHART))
