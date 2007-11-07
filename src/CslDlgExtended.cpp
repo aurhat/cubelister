@@ -876,8 +876,11 @@ void CslDlgExtended::ShowPanelMap(const bool show)
     {
         m_gridSizerList->Hide(m_sizerMap);
         m_gridSizerList->Detach(m_sizerMap);
-
+#ifdef __WXMAC__
+        m_sizerMapLabel->SetMinSize(wxSize(-1,-1));
+#else
         m_sizerMapLabel->SetMinSize(m_sizerMapLabel->GetStaticBox()->GetBestSize());
+#endif
     }
     else
         return;
