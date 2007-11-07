@@ -1285,20 +1285,21 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info,const wxString& pass
         wxString privConfPath;
 #ifdef __WXMAC__
         privConfPath=::wxGetHomeDir();
-        privConfPath+=wxT("/Library/Application\\ Support/sauerbraten");
+        privConfPath+=wxString(wxT("/Library/Application\\ Support/"))+privGameName";
 #else
         privConfPath=wxStandardPaths().GetUserConfigDir();
 #ifdef __WXMSW__
-        privConfPath+=wxT("/csl");
+        privConfPath+=wxT("\\csl");
 #else
         privConfPath+=wxT("/.csl");
 #endif //__WXMSW__
-        privConfPath+=wxT("/gamecfg/sauerbraten");
+        privConfPath+=wxString(PATHDIV)+wxString(wxT("gamecfg"));
+		privConfPath+=wxString(PATHDIV)+privGameName;
 #endif //__WXMAC__
 #ifdef __WXMSW__
         opts+=wxString(wxT(" -q\""))+privConfPath+wxString(wxT("\""));
 #else
-        opts+=wxString(wxT(" -q")+privConfPath);
+        opts+=wxString(wxT(" -q"))+privConfPath;
 #endif //__WXMSW__
     }
 
