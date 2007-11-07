@@ -39,3 +39,4 @@ src/CslTools.h
 src/CslUDP.cpp
 src/CslUDP.h
 src/CslVersion.h
+data/csl.desktop.in

@@ -1,15 +1,17 @@
-datadir =	$(datadir)/csl
-data_DATA = GeoIP.dat csl_start_sb.ogz
-EXTRA_DIST = $(data_DATA)
+csldatadir = $(datadir)/csl
+csldata_DATA = csl_start_sb.ogz
+if with_internal_geoipdatabase
+csldata_DATA += GeoIP.dat
+endif
 
-appsdir = $(datadir)/applications
-apps_in_files = csl.desktop.in
-apps_DATA = $(apps_in_files:.desktop.in=.desktop)
+desktopdir = $(datadir)/applications
+desktop_in_files = csl.desktop.in
+desktop_DATA = $(desktop_in_files:.desktop.in=.desktop)
 @INTLTOOL_DESKTOP_RULE@
 
 pixmapsdir = $(datadir)/pixmaps
-pximaps_DATA = csl.png
+pixmaps_DATA = csl.png
 
-EXTRA_DIST = $(data_DATA) $(pixmaps_DATA)
+EXTRA_DIST = $(csldata_DATA) $(desktop_DATA) $(pixmaps_DATA)
 
 SUBDIRS = maps

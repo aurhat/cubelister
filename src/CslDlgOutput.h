@@ -31,7 +31,6 @@
 #include <wx/image.h>
 
 // begin wxGlade: ::dependencies
-#include <wx/statline.h>
 // end wxGlade
 
 WX_DEFINE_ARRAY_INT(wxUint32, t_aUint);
@@ -65,6 +64,8 @@ class CslDlgOutput: public wxDialog
 
     protected:
         // begin wxGlade: CslDlgOutput::attributes
+        wxStaticBox* sizer_conv_filter_staticbox;
+        wxStaticBox* sizer_search_staticbox;
         wxTextCtrl* text_ctrl_output;
         wxTextCtrl* text_ctrl_search;
         wxStaticText* label_matches;
@@ -72,7 +73,6 @@ class CslDlgOutput: public wxDialog
         wxButton* button_search_next;
         wxCheckBox* checkbox_conv_filter;
         wxChoice* choice_conv_filter;
-        wxStaticLine* static_line;
         wxButton* button_load;
         wxButton* button_save;
         wxButton* button_close;

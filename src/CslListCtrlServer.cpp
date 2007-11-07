@@ -21,6 +21,7 @@
 #include <wx/clipbrd.h>
 #include <wx/file.h>
 #include <wx/txtstrm.h>
+#include <wx/stdpaths.h>
 #include <wx/wupdlock.h>
 #include "CslDlgAddServer.h"
 #include "CslDlgConnectWait.h"
@@ -1281,26 +1282,27 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info,const wxString& pass
 
     if (!privGameName.IsEmpty())
     {
+        wxString privConfPath;
 #ifdef __WXMAC__
-        wxString privConfPath=::wxGetHomeDir();
+        privConfPath=::wxGetHomeDir();
         privConfPath+=wxT("/Library/Application\\ Support/sauerbraten");
 #else
-        privConfPath=wxStandardPaths::GetUserConfigDir();
+        privConfPath=wxStandardPaths().GetUserConfigDir();
 #ifdef __WXMSW__
         privConfPath+=wxT("/csl");
 #else
         privConfPath+=wxT("/.csl");
 #endif //__WXMSW__
-        privConfPath+=wxT("/config/sauerbraten");
+        privConfPath+=wxT("/gamecfg/sauerbraten");
 #endif //__WXMAC__
 #ifdef __WXMSW__
-        opts+=wxString(wxT(" -q\"")+privConfPath+wxString(wxT("\""));
+        opts+=wxString(wxT(" -q\""))+privConfPath+wxString(wxT("\""));
 #else
         opts+=wxString(wxT(" -q")+privConfPath);
 #endif //__WXMSW__
-                   }
+    }
 
-                   switch (info->m_type)
+    switch (info->m_type)
     {
         case CSL_GAME_SB:
         case CSL_GAME_BF:
@@ -1388,7 +1390,6 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info,const wxString& pass
     info->Lock();
     ::wxSetWorkingDirectory(path);
 
-    LOG_DEBUG("launch command: %s\n",cmd.c_str());
     CslProcess *process=new CslProcess(this,info,cmd);
     if (!(::wxExecute(cmd,wxEXEC_ASYNC,process)>0))
     {

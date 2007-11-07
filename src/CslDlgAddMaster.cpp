@@ -54,7 +54,7 @@ CslDlgAddMaster::CslDlgAddMaster(wxWindow* parent,CslMaster *master,int id,
     text_ctrl_address = new wxTextCtrl(this, TEXT_CTRL_ADDRESS, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
     text_ctrl_path = new wxTextCtrl(this, TEXT_CTRL_PATH, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
     radio_btn_custom = new wxRadioButton(this, RADIO_CTRL_CUSTOM, _("C&ustom"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
-    radio_btn_default = new wxRadioButton(this, RADIO_CTRL_DEFAULT, _("Add default &master"));
+    radio_btn_default = new wxRadioButton(this, RADIO_CTRL_DEFAULT, _("&Default master"));
     button_add = new wxButton(this, wxID_ADD, _("Add"));
     button_cancel = new wxButton(this, wxID_CANCEL, _("&Cancel"));
 

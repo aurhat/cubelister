@@ -49,6 +49,8 @@ CslDlgOutput::CslDlgOutput(wxWindow* parent,int id,const wxString& title,
         wxDialog(parent, id, title, pos, size, style)
 {
     // begin wxGlade: CslDlgOutput::CslDlgOutput
+    sizer_conv_filter_staticbox = new wxStaticBox(this, -1, _("Chat"));
+    sizer_search_staticbox = new wxStaticBox(this, -1, _("Search"));
     text_ctrl_output = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxHSCROLL|wxTE_RICH|wxTE_RICH2|wxTE_AUTO_URL);
     text_ctrl_search = new wxTextCtrl(this, TEXT_SEARCH, wxEmptyString);
     label_matches = new wxStaticText(this, wxID_ANY, _("%d matches"));
@@ -62,7 +64,6 @@ CslDlgOutput::CslDlgOutput(wxWindow* parent,int id,const wxString& title,
         _("2 (TC-Server)")
     };
     choice_conv_filter = new wxChoice(this, CHOICE_CONV_FILTER, wxDefaultPosition, wxDefaultSize, 3, choice_conv_filter_choices, 0);
-    static_line = new wxStaticLine(this, wxID_ANY);
     button_load = new wxButton(this, wxID_OPEN, _("&Open"));
     button_save = new wxButton(this, wxID_SAVE, _("&Save"));
     button_close = new wxButton(this, wxID_CLOSE, _("&Close"));
@@ -80,6 +81,7 @@ void CslDlgOutput::set_properties()
 {
     // begin wxGlade: CslDlgOutput::set_properties
     SetTitle(_("CSL - Game output"));
+    text_ctrl_search->SetMinSize(wxSize(120,-1));
     button_search_prev->Enable(false);
     button_search_next->Enable(false);
     choice_conv_filter->SetSelection(0);
@@ -97,21 +99,22 @@ void CslDlgOutput::set_properties()
 void CslDlgOutput::do_layout()
 {
     // begin wxGlade: CslDlgOutput::do_layout
-    wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(5, 1, 0, 0);
+    wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(3, 1, 0, 0);
     wxFlexGridSizer* grid_sizer_button = new wxFlexGridSizer(1, 4, 0, 0);
-    wxFlexGridSizer* grid_sizer_conv_filter = new wxFlexGridSizer(1, 4, 0, 0);
+    wxFlexGridSizer* grid_sizer_control = new wxFlexGridSizer(1, 2, 0, 0);
+    wxStaticBoxSizer* sizer_conv_filter = new wxStaticBoxSizer(sizer_conv_filter_staticbox, wxHORIZONTAL);
+    wxFlexGridSizer* grid_sizer_conv_filter = new wxFlexGridSizer(1, 3, 0, 0);
+    wxStaticBoxSizer* sizer_search = new wxStaticBoxSizer(sizer_search_staticbox, wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_search = new wxFlexGridSizer(1, 2, 0, 0);
     wxBoxSizer* sizer_search_button = new wxBoxSizer(wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_search_input = new wxFlexGridSizer(3, 1, 0, 0);
-    wxFlexGridSizer* grid_sizer_search_text = new wxFlexGridSizer(1, 4, 0, 0);
+    wxFlexGridSizer* grid_sizer_search_text = new wxFlexGridSizer(1, 3, 0, 0);
     grid_sizer_main->Add(text_ctrl_output, 0, wxALL|wxEXPAND, 4);
     grid_sizer_search_input->Add(1, 1, 0, 0, 0);
-    wxStaticText* label_search = new wxStaticText(this, wxID_ANY, _("Search:"));
-    grid_sizer_search_text->Add(label_search, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_search_text->Add(text_ctrl_search, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_search_text->Add(label_matches, 0, wxLEFT|wxRIGHT|wxALIGN_CENTER_VERTICAL, 6);
-    grid_sizer_search_text->Add(30, 1, 0, 0, 0);
-    grid_sizer_search_text->AddGrowableCol(1);
+    grid_sizer_search_text->Add(20, 1, 0, 0, 0);
+    grid_sizer_search_text->AddGrowableCol(0);
     grid_sizer_search_input->Add(grid_sizer_search_text, 1, wxEXPAND, 0);
     grid_sizer_search_input->Add(1, 1, 0, 0, 0);
     grid_sizer_search_input->AddGrowableRow(0);
@@ -122,15 +125,16 @@ void CslDlgOutput::do_layout()
     sizer_search_button->Add(button_search_next, 0, wxALL, 4);
     grid_sizer_search->Add(sizer_search_button, 1, wxEXPAND, 0);
     grid_sizer_search->AddGrowableCol(0);
-    grid_sizer_main->Add(grid_sizer_search, 1, wxEXPAND, 0);
+    sizer_search->Add(grid_sizer_search, 1, wxEXPAND, 0);
+    grid_sizer_control->Add(sizer_search, 1, wxALL|wxEXPAND, 4);
     grid_sizer_conv_filter->Add(checkbox_conv_filter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_conv_filter->Add(1, 1, 0, 0, 0);
     wxStaticText* label_filter_level = new wxStaticText(this, wxID_ANY, _("Level:"));
-    grid_sizer_conv_filter->Add(label_filter_level, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_conv_filter->Add(choice_conv_filter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_conv_filter->AddGrowableCol(1);
-    grid_sizer_main->Add(grid_sizer_conv_filter, 1, wxEXPAND, 0);
-    grid_sizer_main->Add(static_line, 0, wxEXPAND, 0);
+    grid_sizer_conv_filter->Add(label_filter_level, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
+    grid_sizer_conv_filter->Add(choice_conv_filter, 0, wxLEFT|wxRIGHT|wxALIGN_CENTER_VERTICAL, 4);
+    sizer_conv_filter->Add(grid_sizer_conv_filter, 1, wxALIGN_CENTER_VERTICAL, 0);
+    grid_sizer_control->Add(sizer_conv_filter, 1, wxALL|wxEXPAND, 4);
+    grid_sizer_control->AddGrowableCol(0);
+    grid_sizer_main->Add(grid_sizer_control, 1, wxEXPAND, 0);
     grid_sizer_button->Add(button_load, 0, wxALL, 4);
     grid_sizer_button->Add(button_save, 0, wxALL, 4);
     grid_sizer_button->Add(8, 1, 0, 0, 0);
@@ -157,13 +161,8 @@ void CslDlgOutput::do_layout()
 
 void CslDlgOutput::OnClose(wxCloseEvent& event)
 {
-    if (!event.CanVeto())
-    {
-        Hide();
-        wxPostEvent(GetParent(),event);
-        return;
-    }
-    event.Skip();
+    Hide();
+    wxPostEvent(GetParent(),event);
 }
 
 void CslDlgOutput::OnCommandEvent(wxCommandEvent& event)
@@ -241,7 +240,7 @@ void CslDlgOutput::OnCommandEvent(wxCommandEvent& event)
             }
             file.Close();
 
-            Reset(wxString::Format(wxT("%s "),wxT("File"))+s);
+            Reset(wxString::Format(wxT("%s "),_("File"))+s);
             HandleOutput(buf,size);
             free(buf);
             break;
@@ -534,9 +533,15 @@ void CslDlgOutput::Reset(const wxString& title)
     if (!m_self)
         return;
 
+    wxString s;
+
     m_self->button_search_prev->Enable(false);
     m_self->button_search_next->Enable(false);
     m_self->text_ctrl_output->Clear();
     m_self->m_text.Clear();
-    m_self->SetTitle(wxString::Format(_("CSL - Game output: %s"),title.c_str()));
+
+    s=_("CSL - Game output");
+    if (!title.IsEmpty())
+        s+=wxT(": ")+title;
+    m_self->SetTitle(s);
 }

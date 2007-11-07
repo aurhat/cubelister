@@ -34,7 +34,7 @@
 
 #define CSL_DESCRIPTION_STR   _("Tool to monitor cubeengine-based servers.")
 #define CSL_WEBADDR           wxT("http://cubelister.sourceforge.net")
-#define CSL_COPYRIGHT_STR     wxT("(C)2007 by WahnFred <wahnfred@the-conquerors.net>")
+#define CSL_COPYRIGHT_STR     wxT("(C)2007, WahnFred <wahnfred@the-conquerors.net>")
 
 
 #endif // CSL_VERSION_H

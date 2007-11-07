@@ -74,8 +74,8 @@ CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
 
     // begin wxGlade: CslDlgExtended::CslDlgExtended
     sizer_team_score_staticbox = new wxStaticBox(this, -1, _("Team score"));
-    sizer_info_staticbox = new wxStaticBox(this, -1, _("Game info"));
-    sizer_map_label_staticbox = new wxStaticBox(this, -1, _("Map info"));
+    sizer_info_staticbox = new wxStaticBox(this, -1, _("Game information"));
+    sizer_map_label_staticbox = new wxStaticBox(this, -1, _("Map information"));
     sizer_update_staticbox = new wxStaticBox(this, -1, wxEmptyString);
     sizer_map_staticbox = new wxStaticBox(this, -1, _("Map"));
     list_ctrl_players = new wxListCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxSUNKEN_BORDER);
@@ -92,9 +92,9 @@ CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
     label_mode = new wxStaticText(this, wxID_ANY, wxEmptyString);
     label_remaining = new wxStaticText(this, wxID_ANY, wxEmptyString);
     label_records = new wxStaticText(this, wxID_ANY, wxEmptyString);
-    label_map = new wxStaticText(this, wxID_ANY, _("label_map"));
+    label_map = new wxStaticText(this, wxID_ANY, wxEmptyString);
     label_author_prefix = new wxStaticText(this, wxID_ANY, _("by"));
-    label_author = new wxStaticText(this, wxID_ANY, _("label_author"));
+    label_author = new wxStaticText(this, wxID_ANY, wxEmptyString);
     button_update = new wxButton(this, BUTTON_REFRESH, _("&Update"));
     checkbox_update = new wxCheckBox(this, CHECK_UPDATE, _("&Auto update"));
     checkbox_update_end = new wxCheckBox(this, wxID_ANY, _("Stop auto update when map &ends"));

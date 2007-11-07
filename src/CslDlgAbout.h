@@ -25,9 +25,15 @@
     @author Glen Masgai <mimosius@gmx.de>
 */
 
-#include <wx/wx.h>
+#include "wx/wxprec.h"
+#ifdef __BORLANDC__
+#pragma hdrstop
+#endif
+#ifndef WX_PRECOMP
+#include "wx/wx.h"
+#endif
 #include <wx/image.h>
-
+#include <wx/hyperlink.h>
 // begin wxGlade: ::dependencies
 #include <wx/notebook.h>
 // end wxGlade
@@ -67,7 +73,6 @@ class CslDlgAbout: public wxDialog
         // end wxGlade
 
         void OnCommandEvent(wxCommandEvent& event);
-        void OnMouseDown(wxMouseEvent& event);
 
         DECLARE_EVENT_TABLE();
 
@@ -77,7 +82,7 @@ class CslDlgAbout: public wxDialog
         wxStaticText* label_name;
         wxStaticText* label_version;
         wxStaticText* label_desc;
-        wxStaticText* label_web;
+        wxHyperlinkCtrl* hyperlink_web;
         wxStaticText* label_copyright;
         wxTextCtrl* text_ctrl_credits;
         wxPanel* notebook_pane_credits;
