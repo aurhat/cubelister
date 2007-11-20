@@ -88,8 +88,10 @@ void CslResolverThread::AddPacket(CslResolverPacket *packet)
     m_packetSection.Enter();
     m_packets.add(packet);
     m_packetSection.Leave();
-    //wxMutexLocker lock(m_mutex);
+    if (m_mutex.TryLock()!=wxMUTEX_NO_ERROR)
+        return;
     m_condition->Signal();
+    m_mutex.Unlock();
 }
 
 void CslResolverThread::Terminate()
@@ -849,11 +851,11 @@ void CslEngine::ParsePong(CslServerInfo *info,CslUDPPacket *packet,wxUint32 now)
                                 break;
                             }
 
-                            LOG_DEBUG("%s (%s): player:%s, team:%s, frags:%d, deaths:%d, tk:%d, IP:%d.%d.%d.%d (%u)\n",
+                            /*LOG_DEBUG("%s (%s): player:%s, team:%s, frags:%d, deaths:%d, tk:%d, IP:%d.%d.%d.%d (%u)\n",
                                       dbg_type.c_str(),U2A(info->GetBestDescription()),
                                       U2A(data->m_player),U2A(data->m_team),
                                       data->m_frags,data->m_deaths,data->m_teamkills,
-                                      data->m_ip>>24,data->m_ip>>16&0xff,data->m_ip>>8&0xff,data->m_ip&0xff,data->m_ip);
+                                      data->m_ip>>24,data->m_ip>>16&0xff,data->m_ip>>8&0xff,data->m_ip&0xff,data->m_ip);*/
 
                             wxCommandEvent evt(wxCSL_EVT_PONG);
                             evt.SetClientData((void*)new CslPongPacket(info,CSL_PONG_TYPE_PLAYERSTATS));

@@ -699,7 +699,7 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
                 break;
             }
             if (m_engine->AddMaster(master))
-                TreeAddMaster(NULL,master,true);
+                TreeAddMaster(wxTreeItemId(),master,true);
             else
             {
                 wxMessageBox(_("Master already exists!"),_("Error"),wxICON_ERROR,this);
