@@ -72,16 +72,16 @@ void CslStatusBar::SetLight(wxInt32 light)
     switch (light)
     {
         case LIGHT_GREEN:
-            m_bmp->SetIcon(wxIcon(green_16_xpm));
+            m_bmp->SetBitmap(wxBitmap(green_16_xpm));
             break;
         case LIGHT_GREY:
-            m_bmp->SetIcon(wxIcon(grey_16_xpm));
+            m_bmp->SetBitmap(wxBitmap(grey_16_xpm));
             break;
         case LIGHT_RED:
-            m_bmp->SetIcon(wxIcon(red_16_xpm));
+            m_bmp->SetBitmap(wxBitmap(red_16_xpm));
             break;
         case LIGHT_YELLOW:
-            m_bmp->SetIcon(wxIcon(yellow_16_xpm));
+            m_bmp->SetBitmap(wxBitmap(yellow_16_xpm));
             break;
     }
 }
