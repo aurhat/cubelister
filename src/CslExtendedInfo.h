@@ -36,7 +36,7 @@
 #include "cube_tools.h"
 
 #define CSL_EX_VERSION_MIN      101
-#define CSL_EX_VERSION_MAX      102
+#define CSL_EX_VERSION_MAX      103
 // commands
 // version 101
 #define CSL_EX_PING_UPTIME_STR      "ut"

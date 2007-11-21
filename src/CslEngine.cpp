@@ -827,7 +827,14 @@ void CslEngine::ParsePong(CslServerInfo *info,CslUDPPacket *packet,wxUint32 now)
                             data->m_weapon=getint(p);
                             data->m_priv=getint(p);
                             data->m_state=getint(p);
-                            if (exVersion>=102)
+                            if (exVersion>102)
+                            {
+                                p.get((unsigned char*)&data->m_ip,3);
+#if wxBYTE_ORDER == wxLITTLE_ENDIAN
+                                data->m_ip=wxUINT32_SWAP_ALWAYS(data->m_ip);
+#endif
+                            }
+                            else if (exVersion==102)
                             {
                                 p.get((unsigned char*)&data->m_ip,3);
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
