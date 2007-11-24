@@ -1,3 +1,8 @@
+Version 0.8-SVN
+    * feature: auto save of game output
+    * feature: added online version check
+    * fixed:   menubar on OS X
+
 Version 0.7.5
     * feature: support for extended info version 102
     * feature: new private config file mode
@@ -16,7 +21,7 @@ Version 0.7
     * fixed:   header of lists are now properly aligned (Windows)
 
 Version 0.6.1.1 (OS X only)
-    * fixed: game path for Blood Frontier
+    * fixed:   game path for Blood Frontier
 
 Version 0.6.1
     * feature: added Blood Frontier to the games list
