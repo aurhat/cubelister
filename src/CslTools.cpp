@@ -25,7 +25,9 @@
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
 #endif
+#include <wx/platinfo.h>
 #include <wx/regex.h>
+#include "CslVersion.h"
 #include "CslTools.h"
 
 wxString g_basePath;
@@ -249,3 +251,13 @@ wxBitmap AdjustIconSize(const char **data,const wxIcon& icon,
     return wxBitmap(image);
 }
 #endif
+
+wxString GetHttpAgent()
+{
+    wxPlatformInfo pinfo;
+    wxOperatingSystemId id=pinfo.GetOperatingSystemId();
+    wxString agent=wxT("Csl/");
+    agent+=CSL_VERSION_LONG_STR;
+    agent+=wxT("(")+pinfo.GetOperatingSystemFamilyName(id)+wxT(")");
+    return agent;
+}

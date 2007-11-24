@@ -19,7 +19,6 @@
  ***************************************************************************/
 
 #include <wx/protocol/http.h>
-#include <wx/platinfo.h>
 #include "CslEngine.h"
 #include "CslVersion.h"
 #include "CslTools.h"
@@ -461,18 +460,11 @@ int CslEngine::UpdateMaster()
     if (m_currentMaster==NULL)
         return -1;
 
-    wxPlatformInfo pinfo;
-    wxOperatingSystemId id=pinfo.GetOperatingSystemId();
-    wxString os=pinfo.GetOperatingSystemFamilyName(id);
-    wxString agent=wxT("Csl/");
-    agent+=CSL_VERSION_LONG_STR;
-    agent+=wxT("(")+os+wxT(")");
-
     wxHTTP http;
     http.SetTimeout(10);
     if (!http.Connect(m_currentMaster->GetAddress(),80))
         return -2;
-    http.SetHeader(wxT("User-Agent"),agent);
+    http.SetHeader(wxT("User-Agent"),GetHttpAgent());
     wxInputStream *data=http.GetInputStream(m_currentMaster->GetPath());
 
     wxUint32 code=http.GetResponse();

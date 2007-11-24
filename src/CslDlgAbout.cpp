@@ -104,7 +104,7 @@ CslDlgAbout::CslDlgAbout(wxWindow* parent,int id,const wxString& title,
     label_name = new wxStaticText(this, wxID_ANY, wxEmptyString);
     label_version = new wxStaticText(this, wxID_ANY, wxEmptyString);
     label_desc = new wxStaticText(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
-    hyperlink_web = new wxHyperlinkCtrl(this, wxID_ANY, CSL_WEBADDR, CSL_WEBADDR);
+    hyperlink_web = new wxHyperlinkCtrl(this, wxID_ANY, CSL_WEBADDRFULL_STR, CSL_WEBADDRFULL_STR);
     label_copyright = new wxStaticText(this, wxID_ANY, wxEmptyString);
     text_ctrl_credits = new wxTextCtrl(notebook_pane_credits, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxHSCROLL);
     text_ctrl_license = new wxTextCtrl(notebook_pane_license, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxHSCROLL);

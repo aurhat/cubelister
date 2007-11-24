@@ -90,6 +90,8 @@ extern bool IP2Int(const wxString& s,wxUint32 *ip);
 extern wxString FormatSeconds(wxUint32 time,bool space=false,bool full=false);
 extern wxUint32 GetTicks();
 
+extern wxString GetHttpAgent();
+
 #ifdef __WXMSW__
 wxBitmap AdjustIconSize(const char **data,const wxIcon& icon,
                         const wxSize& size,const wxPoint& origin);

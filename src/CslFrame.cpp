@@ -24,6 +24,7 @@
 #include <wx/aboutdlg.h>
 #include <wx/artprov.h>
 #include <wx/sysopt.h>
+#include <wx/protocol/http.h>
 #include "CslFrame.h"
 #include "CslDlgAbout.h"
 #include "CslDlgAddMaster.h"
@@ -45,6 +46,21 @@
 #endif
 
 #define CSL_TIMER_SHOT 500
+
+BEGIN_DECLARE_EVENT_TYPES()
+DECLARE_EVENT_TYPE(wxCSL_EVT_VERSIONCHECK,wxID_ANY)
+END_DECLARE_EVENT_TYPES()
+
+#define CSL_EVT_VERSIONCHECK(id,fn) \
+    DECLARE_EVENT_TABLE_ENTRY( \
+                               wxCSL_EVT_VERSIONCHECK,id,wxID_ANY, \
+                               (wxObjectEventFunction)(wxEventFunction) \
+                               wxStaticCastEvent(wxCommandEventFunction,&fn), \
+                               (wxObject*)NULL \
+                             ),
+
+DEFINE_EVENT_TYPE(wxCSL_EVT_VERSIONCHECK)
+
 
 enum
 {
@@ -98,6 +114,7 @@ BEGIN_EVENT_TABLE(CslFrame, wxFrame)
     #endif
     EVT_SHOW(CslFrame::OnShow)
     EVT_CLOSE(CslFrame::OnClose)
+    CSL_EVT_VERSIONCHECK(wxID_ANY,CslFrame::OnVersionCheck)
 END_EVENT_TABLE()
 
 
@@ -124,6 +141,54 @@ class CslTreeItemData : public wxTreeItemData
         CslGame *m_game;
         CslMaster *m_master;
 };
+
+
+void *CslVersionCheckThread::Entry()
+{
+    wxString *version=NULL;
+
+    wxHTTP http;
+    http.SetTimeout(10);
+
+    if (http.Connect(CSL_WEBADDR_STR,80))
+    {
+        http.SetHeader(wxT("User-Agent"),GetHttpAgent());
+        wxInputStream *data=http.GetInputStream(wxT("/latest.txt"));
+        wxUint32 code=http.GetResponse();
+
+        if (data)
+        {
+            if (code==200)
+            {
+                size_t size=min(data->GetSize(),15);
+                if (size)
+                {
+                    char buf[16]={0};
+                    data->Read((void*)buf,size);
+
+                    if (!(strstr(buf,"<html>") ||
+                          strstr(buf,"<HTML>")))
+                    {
+                        char *pend=strpbrk(buf," \t\r\n");
+                        if (pend)
+                            *pend='\0';
+                        version=new wxString(A2U(buf));
+                        LOG_DEBUG("version check: %s\n",buf);
+                    }
+                }
+            }
+            delete data;
+        }
+    }
+
+    wxCommandEvent evt(wxCSL_EVT_VERSIONCHECK);
+    evt.SetClientData(version);
+    wxPostEvent(m_evtHandler,evt);
+
+    LOG_DEBUG("version check: thread exit\n");
+
+    return NULL;
+}
 
 
 CslFrame::CslFrame(wxWindow* parent, int id, const wxString& title,const wxPoint& pos,
@@ -279,13 +344,17 @@ CslFrame::CslFrame(wxWindow* parent, int id, const wxString& title,const wxPoint
     }
     else
     {
-        wxMessageBox(_("Failed to initialise internal engine!\nPlease restart the application."),
+        wxMessageBox(_("Failed to initialise internal engine!\n"\
+                       "Please restart the application."),
                      _("Fatal error!"),wxICON_ERROR,this);
         delete m_engine;
         m_engine=NULL;
     }
 
     m_extendedDlg->ListInit(m_engine);
+
+    m_versionCheckThread=new CslVersionCheckThread(this);
+    m_versionCheckThread->Run();
 }
 
 CslFrame::~CslFrame()
@@ -312,6 +381,12 @@ CslFrame::~CslFrame()
     delete g_cslSettings;
 
     delete m_menu;
+
+    if (m_versionCheckThread)
+    {
+        m_versionCheckThread->Delete();
+        delete m_versionCheckThread;
+    }
 }
 
 void CslFrame::set_properties()
@@ -905,10 +980,9 @@ void CslFrame::OnClose(wxCloseEvent& event)
         return;
     }
 
-    CslDlgGeneric *dlg=new CslDlgGeneric(this,_("CSL terminating"),
+    CslDlgGeneric *dlg=new CslDlgGeneric(this,CSL_DLG_GENERIC_DEFAULT,_("CSL terminating"),
                                          _("Waiting for engine to terminate ..."),
-                                         wxArtProvider::GetBitmap(wxART_INFORMATION,wxART_CMN_DIALOG),
-                                         wxDefaultPosition);
+                                         wxArtProvider::GetBitmap(wxART_INFORMATION,wxART_CMN_DIALOG));
     dlg->Show();
     wxYield();
 
@@ -965,6 +1039,35 @@ void CslFrame::OnMouseLeftDown(wxMouseEvent& event)
         default:
             break;
     }
+}
+
+void CslFrame::OnVersionCheck(wxCommandEvent& event)
+{
+    wxString *version=(wxString*)event.GetClientData();
+
+    if (version)
+    {
+        if (version->Cmp(CSL_VERSION_STR)>0)
+        {
+            CslDlgGeneric *dlg=new CslDlgGeneric(this,CSL_DLG_GENERIC_URL|CSL_DLG_GENERIC_CLOSE,
+                                                 wxString::Format(_("New version %s"),version->c_str()),
+                                                 wxString::Format(_("There is a new version (%s)\n"\
+                                                                    "of Cube Server Lister available.\n"),
+                                                                  version->c_str()),
+                                                 wxArtProvider::GetBitmap(wxART_INFORMATION,wxART_CMN_DIALOG),
+                                                 CSL_WEBADDRFULL_STR);
+            dlg->Show();
+        }
+
+        delete version;
+    }
+
+    if (!m_versionCheckThread)
+        return;
+
+    m_versionCheckThread->Delete();
+    delete m_versionCheckThread;
+    m_versionCheckThread=NULL;
 }
 
 void CslFrame::ToggleSearchBar()
@@ -1674,10 +1777,10 @@ bool CslApp::OnInit()
 
     if (m_single->IsAnotherRunning())
     {
-        CslDlgGeneric *dlg=new CslDlgGeneric(NULL,_("CSL already running"),
+        CslDlgGeneric *dlg=new CslDlgGeneric(NULL,CSL_DLG_GENERIC_DEFAULT,
+                                             _("CSL already running"),
                                              _("CSL is already running."),
-                                             wxArtProvider::GetBitmap(wxART_INFORMATION,wxART_CMN_DIALOG),
-                                             wxDefaultPosition);
+                                             wxArtProvider::GetBitmap(wxART_INFORMATION,wxART_CMN_DIALOG));
         dlg->Show();
         dlg->Update();
         SetTopWindow(dlg);

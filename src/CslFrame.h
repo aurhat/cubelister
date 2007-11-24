@@ -48,6 +48,23 @@
 #include "CslListCtrlInfo.h"
 #include "CslDlgOutput.h"
 
+
+class CslVersionCheckThread : public wxThread
+{
+    public:
+        CslVersionCheckThread(wxEvtHandler *evtHandler) :
+                wxThread(wxTHREAD_JOINABLE),m_evtHandler(evtHandler)
+        {
+            Create();
+        }
+
+        virtual void *Entry();
+
+    private:
+        wxEvtHandler *m_evtHandler;
+};
+
+
 class CslFrame: public wxFrame
 {
     public:
@@ -75,8 +92,9 @@ class CslFrame: public wxFrame
         wxTimer m_timer;
 
         CslDlgOutput *m_outputDlg;
-
         CslDlgExtended *m_extendedDlg;
+
+        CslVersionCheckThread *m_versionCheckThread;
 
         // begin wxGlade: CslFrame::methods
         void set_properties();
@@ -94,9 +112,8 @@ class CslFrame: public wxFrame
         void OnMouseEnter(wxMouseEvent& event);
         void OnMouseLeave(wxMouseEvent& event);
         void OnMouseLeftDown(wxMouseEvent& event);
-#ifdef __WXMAC__
-        void OnSplitter(wxSplitterEvent &event);
-#endif
+        void OnVersionCheck(wxCommandEvent& event);
+
         DECLARE_EVENT_TABLE()
 
     protected:
