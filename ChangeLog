@@ -1,0 +1,33 @@
+Version 0.7.5
+    * feature: support for extended info version 102
+    * feature: new private config file mode
+    * feature: new map config tool, to generate the required config files
+               for the map preview. 
+    * changed: new application icon and a reworked about dialog. 
+    * fixed:   PPC part of the OS X build (used wrong compiler version)
+ 
+Version 0.7
+    * feature: extended information like players, health, frags...
+    * feature: password based connect (AssaultCube, Cube 1).
+    * feature: show some stats in the statusbar when selecting a game
+    * feature: jump beetween search results in the output dialog (not on OSX)
+    * feature: filter server version
+    * changed: improved connect methods
+    * fixed:   header of lists are now properly aligned (Windows)
+
+Version 0.6.1.1 (OS X only)
+    * fixed: game path for Blood Frontier
+
+Version 0.6.1
+    * feature: added Blood Frontier to the games list
+    * changed: pressing ESC in the main window now clears the search bar 
+               instead of hiding it
+    * fixed:   a possible crash in the output dialog
+    * fixed:   text in the output dialog could be added twice
+    * fixed:   "min playtime" not loaded correctly in some cases
+
+Version 0.6
+    * feature: get rid of "connect methods"
+    * feature: added Cube (only support for latest official precompiled version)
+    * feature: added logging of game output and chat-filtering (beta)
+    * feature: added menu icons

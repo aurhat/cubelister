@@ -279,7 +279,7 @@ CslFrame::CslFrame(wxWindow* parent, int id, const wxString& title,const wxPoint
     }
     else
     {
-        wxMessageBox(_("Failed to initialize!\nPlease restart the application"),
+        wxMessageBox(_("Failed to initialise internal engine!\nPlease restart the application."),
                      _("Fatal error!"),wxICON_ERROR,this);
         delete m_engine;
         m_engine=NULL;
@@ -484,8 +484,8 @@ void CslFrame::CreateMainMenu()
 #ifndef __WXMAC__
     menu=new wxMenu();
     m_menubar->Append(menu,_("&File"));
-    CslMenu::AddItemToMenu(menu_1,wxID_PREFERENCES,_("&Settings"),wxART_SETTINGS);
-    CslMenu::AddItemToMenu(menu_1,wxID_EXIT,_("&Exit"),wxART_QUIT);
+    CslMenu::AddItemToMenu(menu,wxID_PREFERENCES,_("&Settings"),wxART_SETTINGS);
+    CslMenu::AddItemToMenu(menu,wxID_EXIT,_("&Exit"),wxART_QUIT);
 #endif
 
     menu=new wxMenu();
