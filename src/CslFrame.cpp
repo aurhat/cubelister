@@ -475,43 +475,52 @@ void CslFrame::do_layout()
 
 void CslFrame::CreateMainMenu()
 {
+    wxMenu *menu;
+
     m_menubar=new wxMenuBar();
-    wxMenu* menu_1=new wxMenu();
+    // Do not add the File menu on __wxMAC__, since Preferences and Exit getting moved
+    // to the "Mac menu" so the File menu is empty then.
+    // Add Prefernces and Exit to any other menu.
+#ifndef __WXMAC__
+    menu=new wxMenu();
+    m_menubar->Append(menu,_("&File"));
     CslMenu::AddItemToMenu(menu_1,wxID_PREFERENCES,_("&Settings"),wxART_SETTINGS);
     CslMenu::AddItemToMenu(menu_1,wxID_EXIT,_("&Exit"),wxART_QUIT);
-    m_menubar->Append(menu_1,_("&File"));
-    wxMenu* menu_2=new wxMenu();
-    CslMenu::AddItemToMenu(menu_2,MENU_MASTER_UPDATE,_("&Update from master\tF5"),wxART_RELOAD);
-    menu_2->AppendSeparator();
-    CslMenu::AddItemToMenu(menu_2,MENU_MASTER_ADD,_("Add a &new master ..."),wxART_ADD_BOOKMARK);
-    CslMenu::AddItemToMenu(menu_2,MENU_MASTER_DEL,_("&Remove master"),wxART_DEL_BOOKMARK);
-    m_menubar->Append(menu_2,_("&Master"));
-    wxMenu* menu_3=new wxMenu();
-    CslMenu::AddItemToMenu(menu_3,MENU_VIEW_SEARCH,_("Show &search bar\tCTRL+S"),
-                           wxART_NONE,wxITEM_CHECK);
-    CslMenu::AddItemToMenu(menu_3,MENU_VIEW_FILTER,_("Show &filter\tCTRL+F"),
-                           wxART_NONE,wxITEM_CHECK);
-    CslMenu::AddItemToMenu(menu_3,MENU_VIEW_OUTPUT,_("Show &game output\tCTRL+O"),
-                           wxART_NONE,wxITEM_CHECK);
-    menu_3->AppendSeparator();
-    CslMenu::AddItemToMenu(menu_3,MENU_VIEW_AUTO_SORT,_("Sort &lists automatically\tCTRL+L"),
-                           wxART_NONE,wxITEM_CHECK);
-    CslMenu::AddItemToMenu(menu_3,MENU_VIEW_AUTO_FIT,_("Fit columns on window &resize"),
-                           wxART_NONE,wxITEM_CHECK);
-    CslMenu::AddItemToMenu(menu_3,MENU_VIEW_SPLITTER_LIVE,_("Redraw while dragging spli&tters"),
-                           wxART_NONE,wxITEM_CHECK);
-    m_menubar->Append(menu_3,_("&View"));
-    wxMenu* menu_4=new wxMenu();
-    CslMenu::AddItemToMenu(menu_4,wxID_ABOUT,_("A&bout"),wxART_ABOUT);
-#ifdef __WXMAC__
-    m_menubar->Append(menu_4,wxEmptyString);
-#else
-    m_menubar->Append(menu_4,_("&Help"));
 #endif
 
-    SetMenuBar(m_menubar);
+    menu=new wxMenu();
+    CslMenu::AddItemToMenu(menu,MENU_MASTER_UPDATE,_("&Update from master\tF5"),wxART_RELOAD);
+    menu->AppendSeparator();
+    CslMenu::AddItemToMenu(menu,MENU_MASTER_ADD,_("Add a &new master ..."),wxART_ADD_BOOKMARK);
+    CslMenu::AddItemToMenu(menu,MENU_MASTER_DEL,_("&Remove master"),wxART_DEL_BOOKMARK);
+    m_menubar->Append(menu,_("&Master"));
+    m_menuMaster=menu;
+#ifdef __WXMAC__
+    CslMenu::AddItemToMenu(menu,wxID_PREFERENCES,_("&Settings"),wxART_SETTINGS);
+    CslMenu::AddItemToMenu(menu,wxID_EXIT,_("&Exit"),wxART_QUIT);
+#endif
 
-    m_menuMaster=menu_2;
+    menu=new wxMenu();
+    CslMenu::AddItemToMenu(menu,MENU_VIEW_SEARCH,_("Show &search bar\tCTRL+S"),
+                           wxART_NONE,wxITEM_CHECK);
+    CslMenu::AddItemToMenu(menu,MENU_VIEW_FILTER,_("Show &filter\tCTRL+F"),
+                           wxART_NONE,wxITEM_CHECK);
+    CslMenu::AddItemToMenu(menu,MENU_VIEW_OUTPUT,_("Show &game output\tCTRL+O"),
+                           wxART_NONE,wxITEM_CHECK);
+    menu->AppendSeparator();
+    CslMenu::AddItemToMenu(menu,MENU_VIEW_AUTO_SORT,_("Sort &lists automatically\tCTRL+L"),
+                           wxART_NONE,wxITEM_CHECK);
+    CslMenu::AddItemToMenu(menu,MENU_VIEW_AUTO_FIT,_("Fit columns on window &resize"),
+                           wxART_NONE,wxITEM_CHECK);
+    CslMenu::AddItemToMenu(menu,MENU_VIEW_SPLITTER_LIVE,_("Redraw while dragging spli&tters"),
+                           wxART_NONE,wxITEM_CHECK);
+    m_menubar->Append(menu,_("&View"));
+
+    menu=new wxMenu();
+    CslMenu::AddItemToMenu(menu,wxID_ABOUT,_("A&bout"),wxART_ABOUT);
+    m_menubar->Append(menu,_("&Help"));
+
+    SetMenuBar(m_menubar);
     m_menu=new CslMenu(m_menubar);
 }
 
