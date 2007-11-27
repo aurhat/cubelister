@@ -290,6 +290,7 @@
 		9ED9D43C0CA161B500B0FC71 /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 9ED9D43D0CA161B500B0FC71 /* Build configuration list for PBXProject "csl" */;
+			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 0;
 			mainGroup = 9ED9D43A0CA161B500B0FC71;
 			productRefGroup = 9ED9D44B0CA161E000B0FC71 /* Products */;
@@ -300,6 +301,7 @@
 					ProjectRef = 9E015A150CA544BA0029BEEF /* wxWindows.xcodeproj */;
 				},
 			);
+			projectRoot = "";
 			targets = (
 				9ED9D4490CA161E000B0FC71 /* csl */,
 			);

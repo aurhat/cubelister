@@ -1296,10 +1296,11 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info,const wxString& pass
         privConfPath+=wxString(PATHDIV)+wxString(wxT("gamecfg"));
         privConfPath+=wxString(PATHDIV)+privGameName;
 #endif //__WXMAC__
+        // use Prepend() and do not use opts+= here, since -q<path> must be before -r
 #ifdef __WXMSW__
-        opts+=wxString(wxT(" -q\""))+privConfPath+wxString(wxT("\""));
+        opts.Prepend(wxString(wxT("-q\""))+privConfPath+wxString(wxT("\" ")));
 #else
-        opts+=wxString(wxT(" -q"))+privConfPath;
+        opts.Prepend(wxString(wxT("-q"))+privConfPath+wxString(wxT(" ")));
 #endif //__WXMSW__
     }
 
