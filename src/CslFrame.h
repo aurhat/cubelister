@@ -58,7 +58,7 @@ class CslVersionCheckThread : public wxThread
             Create();
         }
 
-        virtual void *Entry();
+        virtual ExitCode Entry();
 
     private:
         wxEvtHandler *m_evtHandler;

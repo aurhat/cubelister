@@ -28,12 +28,9 @@ BEGIN_EVENT_TABLE(CslUDP,wxEvtHandler)
 END_EVENT_TABLE()
 
 
-CslUDP::CslUDP(wxEvtHandler *handler) :
-        wxEvtHandler()
+CslUDP::CslUDP(wxEvtHandler *evtHandler) : wxEvtHandler(),
+        m_init(false),m_evtHandler(evtHandler)
 {
-    m_init=false;
-    m_evtHandler=handler;
-
     wxIPV4address address;
     address.AnyAddress();
     LOG_DEBUG("Listen port: %li\n",address.Service());

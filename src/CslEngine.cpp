@@ -45,7 +45,7 @@ BEGIN_EVENT_TABLE(CslEngine,wxEvtHandler)
 END_EVENT_TABLE()
 
 
-void *CslResolverThread::Entry()
+wxThread::ExitCode CslResolverThread::Entry()
 {
     m_mutex.Lock();
 
@@ -79,7 +79,7 @@ void *CslResolverThread::Entry()
     m_mutex.Unlock();
     LOG_DEBUG("exit\n");
 
-    return NULL;
+    return 0;
 }
 
 void CslResolverThread::AddPacket(CslResolverPacket *packet)

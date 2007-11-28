@@ -124,6 +124,7 @@ class CslProcess : public wxProcess
                              _("Error"),wxICON_ERROR,m_parent);
 
             ProcessInputStream();
+            ProcessErrorStream();
 
             wxCommandEvent evt(wxCSL_EVT_PROCESS);
             evt.SetClientData(m_info);
@@ -153,6 +154,28 @@ class CslProcess : public wxProcess
                     StripColours(buf,&last,1);
                 CslDlgOutput::AddOutput(buf,last);
                 //LOG_DEBUG("%s", buf);
+            }
+        }
+
+        static void ProcessErrorStream()
+        {
+            if (!m_self)
+                return;
+
+            wxInputStream *stream=m_self->GetErrorStream();
+            if (!stream)
+                return;
+
+            while (stream->CanRead())
+            {
+                char buf[1025];
+                stream->Read((void*)buf,1024);
+                wxUint32 last=stream->LastRead();
+                buf[last]=0;
+                if (m_self->m_info->m_type==CSL_GAME_CB)
+                    StripColours(buf,&last,1);
+                //CslDlgOutput::AddOutput(buf,last);
+                LOG_DEBUG("%s", buf);
             }
         }
 
@@ -697,6 +720,7 @@ void CslListCtrlServer::OnTimer(wxTimerEvent& event)
     if (CslConnectionState::IsPlaying())
     {
         CslProcess::ProcessInputStream();
+        CslProcess::ProcessErrorStream();
         /*
         if (m_timerCount==10  && info->m_type==CSL_GAME_CB)
             CslGame::ConnectCleanupConfig(info->m_type,CslConnectionState::GetConfig());

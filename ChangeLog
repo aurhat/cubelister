@@ -2,17 +2,19 @@ Version 0.8-SVN
     * feature: auto save of game output
     * feature: added online version check
     * fixed:   menubar on OS X
+    * fixed:   order of game parameters - in sauerbraten -q<cfgpath>
+               must be before -r to load init.cfg correctly
 
 Version 0.7.5
     * feature: support for extended info version 102
     * feature: new private config file mode
     * feature: new map config tool, to generate the required config files
-               for the map preview. 
+               for the map preview
     * changed: new application icon and a reworked about dialog. 
     * fixed:   PPC part of the OS X build (used wrong compiler version)
  
 Version 0.7
-    * feature: extended information like players, health, frags...
+    * feature: extended information like players, health, frags,...
     * feature: password based connect (AssaultCube, Cube 1).
     * feature: show some stats in the statusbar when selecting a game
     * feature: jump beetween search results in the output dialog (not on OSX)

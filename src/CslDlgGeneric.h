@@ -25,9 +25,6 @@
  @author Glen Masgai <mimosius@gmx.de>
 */
 
-#include <wx/wx.h>
-#include <wx/image.h>
-
 #define CSL_DLG_GENERIC_DEFAULT  0x0
 #define CSL_DLG_GENERIC_URL      0x1
 #define CSL_DLG_GENERIC_CLOSE    0x2
@@ -61,6 +58,7 @@ class CslDlgGeneric: public wxDialog
             if (type&CSL_DLG_GENERIC_URL)
                 grid_sizer_right->Add(new wxHyperlinkCtrl(this,wxID_ANY,url,url),
                                       0,wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL,4);
+
             if (type&CSL_DLG_GENERIC_CLOSE)
             {
                 wxButton *button=new wxButton(this,wxID_CLOSE, _("&Close"));

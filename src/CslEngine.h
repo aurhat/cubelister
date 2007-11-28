@@ -86,7 +86,7 @@ class CslResolverThread : public wxThread
         }
         ~CslResolverThread() { delete m_condition; }
 
-        virtual void *Entry();
+        virtual ExitCode Entry();
         void AddPacket(CslResolverPacket *packet);
         void Terminate();
 

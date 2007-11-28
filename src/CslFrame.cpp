@@ -143,7 +143,7 @@ class CslTreeItemData : public wxTreeItemData
 };
 
 
-void *CslVersionCheckThread::Entry()
+wxThread::ExitCode CslVersionCheckThread::Entry()
 {
     wxString *version=NULL;
 
@@ -187,7 +187,7 @@ void *CslVersionCheckThread::Entry()
 
     LOG_DEBUG("version check: thread exit\n");
 
-    return NULL;
+    return 0;
 }
 
 

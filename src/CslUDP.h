@@ -104,7 +104,7 @@ class CslUDPPacket
 class CslUDP : public wxEvtHandler
 {
     public:
-        CslUDP(wxEvtHandler *handler);
+        CslUDP(wxEvtHandler *evtHandler);
         ~CslUDP();
 
         bool IsInit() { return m_init; }
@@ -114,7 +114,6 @@ class CslUDP : public wxEvtHandler
         bool m_init;
         wxEvtHandler *m_evtHandler;
         wxDatagramSocket *m_socket;
-        wxUint32 m_initTicks;
 
         void OnSocketEvent(wxSocketEvent& event);
 
