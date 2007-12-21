@@ -586,7 +586,7 @@ void CslEngine::UpdateServerInfo(CslServerInfo *info,ucharbuf *buf,wxUint32 now)
             if (numattr>=2)
             {
                 info->m_gameMode=GetModeStrSB(attr[1]);
-                info->m_isCapture=attr[1]>11 && attr[1]<14;
+                info->m_isCapture=attr[1]>11 && attr[1]<15;
             }
             if (numattr>=3)
             {

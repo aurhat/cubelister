@@ -71,8 +71,10 @@ class CslFrame: public wxFrame
         // begin wxGlade: CslFrame::ids
         // end wxGlade
 
-        CslFrame(wxWindow* parent, int id, const wxString& title, const wxPoint& pos=wxDefaultPosition,
-                 const wxSize& size=wxDefaultSize, long style=wxDEFAULT_FRAME_STYLE);
+        CslFrame(wxWindow* parent,int id,const wxString& title,
+                 const wxPoint& pos=wxDefaultPosition,
+                 const wxSize& size=wxDefaultSize,
+                 long style=wxDEFAULT_FRAME_STYLE);
         ~CslFrame();
 
     private:

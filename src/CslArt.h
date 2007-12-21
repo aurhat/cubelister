@@ -33,7 +33,8 @@ class CslArt : public wxArtProvider
         static wxBitmap GetMenuBitmap(const wxArtID& id);
 
     protected:
-        wxBitmap CreateBitmap(const wxArtID& id,const wxArtClient& client,
+        wxBitmap CreateBitmap(const wxArtID& id,
+                              const wxArtClient& client,
                               const wxSize& size);
 };
 

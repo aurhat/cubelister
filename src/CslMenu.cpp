@@ -50,7 +50,7 @@ void CslMenu::CheckMenuItem(wxInt32 id,bool check)
 
 wxMenuItem& CslMenu::AddItemToMenu(wxMenu *menu,const wxInt32 id,
                                    const wxString& text,const wxArtID& art,
-                                   const wxItemKind kind,const wxString help)
+                                   const wxItemKind kind,const wxString& help)
 {
     wxMenuItem *item=new wxMenuItem(menu,id,text,help,kind);
     wxOperatingSystemId os=wxPlatformInfo().GetOperatingSystemId();

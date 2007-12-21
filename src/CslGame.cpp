@@ -26,10 +26,10 @@ const wxChar* GetVersionStrSB(int n)
 {
     static const wxChar* sb_versions[] =
     {
-        wxT("Summer"), wxT("Spring"), wxT("Gui"), wxT("Water"),
-        wxT("Normalmap"), wxT("Sp"), wxT("Occlusion"), wxT("Shader"),
-        wxT("Physics"), wxT("Mp"), wxT(""), wxT("Agc"), wxT("Quakecon"),
-        wxT("Independence")
+        wxT("Winter"), wxT("Summer"), wxT("Spring"), wxT("Gui"),
+        wxT("Water"), wxT("Normalmap"), wxT("Sp"), wxT("Occlusion"),
+        wxT("Shader"), wxT("Physics"), wxT("Mp"), wxT(""), wxT("Agc"),
+        wxT("Quakecon"), wxT("Independence")
     };
     wxUint32 v=CSL_LAST_PROTOCOL_SB-n;
     return (v>=0 && v<sizeof(sb_versions)/sizeof(sb_versions[0])) ?
@@ -76,7 +76,8 @@ const wxChar* GetModeStrSB(int n)
         wxT("ffa/default"), wxT("coopedit"), wxT("ffa/duel"), wxT("teamplay"),
         wxT("instagib"), wxT("instagib team"), wxT("efficiency"), wxT("efficiency team"),
         wxT("insta arena"), wxT("insta clan arena"), wxT("tactics arena"), wxT("tactics clan arena"),
-        wxT("capture"), wxT("insta capture")
+        wxT("capture"), wxT("insta capture"), wxT("regen capture"), wxT("assassin"),
+        wxT("insta assassin")
     };
     return (n>=0 && (size_t)n<sizeof(sb_modenames)/sizeof(sb_modenames[0])) ? sb_modenames[n] : _("unknown");
 }
@@ -162,7 +163,9 @@ wxInt32 CslGame::AddMaster(CslMaster *master)
     }
 
     wxInt32 id=0;
-    loopv(m_masterIDs)    // find a free id
+
+    // find a free id
+    loopv(m_masterIDs)
     {
         if (m_masterIDs[i]>i)
         {
@@ -216,11 +219,13 @@ CslServerInfo* CslGame::AddServer(CslServerInfo *info,wxInt32 id)
         loopv(m_masters)
         {
             master=m_masters[i];
-            if (id!=master->m_id) // find master with this id
+            // find master with this id
+            if (id!=master->m_id)
                 continue;
 
             servers=master->GetServers();
-            loopvj(*servers)     // check if server was already added
+            // check if server was already added
+            loopvj(*servers)
             {
                 il=servers->at(j);
                 if (*il==*info)

@@ -94,7 +94,7 @@ class CslMenu
         static wxMenuItem& AddItemToMenu(wxMenu *menu,const wxInt32 id,
                                          const wxString& text,const wxArtID& art,
                                          const wxItemKind kind=wxITEM_NORMAL,
-                                         const wxString help=wxEmptyString);
+                                         const wxString& help=wxEmptyString);
     protected:
         static wxMenuBar *m_menuBar;
 };

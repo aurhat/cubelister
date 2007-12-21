@@ -74,7 +74,7 @@
 #define CSL_DEFAULT_INFO_PORT_BF      28796
 #define CSL_DEFAULT_INFO_PORT_CB      28766
 
-#define CSL_LAST_PROTOCOL_SB   254
+#define CSL_LAST_PROTOCOL_SB   255
 #define CSL_LAST_PROTOCOL_AC  1125
 #define CSL_LAST_PROTOCOL_BF   254
 #define CSL_LAST_PROTOCOL_CB   122
@@ -163,7 +163,7 @@ class CslServerInfo
 
         //virtual ~CslServerInfo() { DeletePlayerStats(); }
 
-        bool operator==(const CslServerInfo& info)
+        bool operator==(const CslServerInfo& info) const
         {
             return (m_type==info.m_type && m_host==info.m_host);
         }
@@ -188,7 +188,7 @@ class CslServerInfo
 
         void SetWaiting(bool wait=true) { m_waiting=wait; }
 
-        const wxChar* GetVersionStr()
+        const wxChar* GetVersionStr() const
         {
             switch (m_type)
             {
@@ -206,7 +206,7 @@ class CslServerInfo
             return wxEmptyString;
         }
 
-        wxUint32 GetDefaultPort(const CSL_GAMETYPE type)
+        wxUint32 GetDefaultPort(const CSL_GAMETYPE type) const
         {
             switch (type)
             {
@@ -234,7 +234,7 @@ class CslServerInfo
             m_descOld=description;
         }
 
-        wxString GetBestDescription()
+        wxString GetBestDescription() const
         {
             if (m_desc.IsEmpty())
             {
@@ -253,10 +253,10 @@ class CslServerInfo
 
         bool CanPingUptime() { return m_uptimeRefresh++%CSL_UPTIME_REFRESH_MULT==0; }
 
-        bool IsLocked() { return m_lock>0; }
-        bool IsUnused() { return m_view==0; }
-        bool IsDefault() { return (m_view&CSL_VIEW_DEFAULT)>0; }
-        bool IsFavourite() { return (m_view&CSL_VIEW_FAVOURITE)>0; }
+        bool IsLocked() const { return m_lock>0; }
+        bool IsUnused() const { return m_view==0; }
+        bool IsDefault() const { return (m_view&CSL_VIEW_DEFAULT)>0; }
+        bool IsFavourite() const { return (m_view&CSL_VIEW_FAVOURITE)>0; }
 
         wxString m_host,m_domain,m_password;
         vector<wxInt32> m_masterIDs;
@@ -320,7 +320,7 @@ class CslMaster
 
         ~CslMaster() { RemoveServers(); }
 
-        bool operator==(const CslMaster& m2)
+        bool operator==(const CslMaster& m2) const
         {
             return m_address==m2.m_address && m_path==m2.m_path;
         }
@@ -362,11 +362,11 @@ class CslMaster
             RemoveServer(m_servers[i]);
         }
 
-        CslGame* GetGame() { return m_game; }
-        wxString GetAddress() { return m_address; }
-        wxString GetPath() { return m_path; }
-        CSL_GAMETYPE GetType() { return m_type; }
-        wxInt32 GetID() { return m_id; }
+        CslGame* GetGame() const { return m_game; }
+        wxString GetAddress() const { return m_address; }
+        wxString GetPath() const { return m_path; }
+        CSL_GAMETYPE GetType() const { return m_type; }
+        wxInt32 GetID() const { return m_id; }
         vector<CslServerInfo*>* GetServers() { return &m_servers; }
 
     protected:
@@ -393,8 +393,8 @@ class CslGame
         CslGame(CSL_GAMETYPE type);
         ~CslGame();
 
-        CSL_GAMETYPE GetType() { return m_type; }
-        wxString GetName() { return m_name; }
+        CSL_GAMETYPE GetType() const { return m_type; }
+        wxString GetName() const { return m_name; }
         vector<CslMaster*>* GetMasters() { return &m_masters; }
         vector<CslServerInfo*>* GetServers() { return &m_servers; }
         CslServerInfo* FindServerByAddr(const wxIPV4address& addr);

@@ -262,7 +262,9 @@
       <synchronize>true</synchronize>
       <orientation>Vertical</orientation>
     </splitheadersource>
-    <references/>
+    <references>
+      <pcs>wxGTK-2.8.7</pcs>
+    </references>
   </kdevcppsupport>
   <cppsupportpart>
     <filetemplates>

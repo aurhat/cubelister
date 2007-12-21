@@ -21,7 +21,6 @@
 #include <wx/mstream.h>
 #include <wx/fileconf.h>
 #include <wx/stdpaths.h>
-#include <wx/aboutdlg.h>
 #include <wx/artprov.h>
 #include <wx/sysopt.h>
 #include <wx/protocol/http.h>
@@ -191,8 +190,8 @@ wxThread::ExitCode CslVersionCheckThread::Entry()
 }
 
 
-CslFrame::CslFrame(wxWindow* parent, int id, const wxString& title,const wxPoint& pos,
-                   const wxSize& size, long style):
+CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
+                   const wxPoint& pos,const wxSize& size,long style):
         wxFrame(parent, id, title, pos, size, wxDEFAULT_FRAME_STYLE)
 {
     long listctlStyle=wxLC_REPORT;

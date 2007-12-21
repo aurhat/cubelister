@@ -1,4 +1,6 @@
 Version 0.8-SVN
+    * feature: support for extended info version 103
+    * feature: added new game modes of sauerbraten winter edition
     * feature: auto save of game output
     * feature: added online version check
     * fixed:   menubar on OS X
