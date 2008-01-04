@@ -114,12 +114,10 @@ void CslDlgConnectPass::OnCommandEvent(wxCommandEvent& event)
             break;
 
         case wxID_OK:
-        {
             EndModal(wxID_OK);
             m_info->m_password=text_ctrl_password->GetValue();
             m_info->m_save=checkbox_save->IsChecked();
             m_info->m_admin=checkbox_admin->IsChecked();
-        }
 
         default:
             break;

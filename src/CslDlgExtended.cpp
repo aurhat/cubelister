@@ -532,14 +532,6 @@ void CslDlgExtended::SetPlayerData()
             list_ctrl_players->SetItemBackgroundColour(item,wxColour(255,128,0));
         else if (data->m_state==CSL_PLAYER_STATE_SPECTATOR)
             list_ctrl_players->SetItemBackgroundColour(item,wxColour(192,192,192));
-        /*if (data->m_priv==CSL_PLAYER_PRIV_MASTER)
-            i=CSL_LIST_IMG_GREEN;
-        else if (data->m_priv==CSL_PLAYER_PRIV_ADMIN)
-            i=CSL_LIST_IMG_ORANGE;
-        else if (data->m_state==CSL_PLAYER_STATE_SPECTATOR)
-            i=CSL_LIST_IMG_GREY;
-        else
-            i=CSL_LIST_IMG_TRANS;*/
 
         const char *country;
         wxInt32 flag=CSL_LIST_IMG_UNKNOWN;

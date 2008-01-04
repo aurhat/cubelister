@@ -26,7 +26,7 @@ const wxChar* GetVersionStrSB(int n)
 {
     static const wxChar* sb_versions[] =
     {
-        wxT("Winter"), wxT("Summer"), wxT("Spring"), wxT("Gui"),
+        wxT("Assassin"), wxT("Summer"), wxT("Spring"), wxT("Gui"),
         wxT("Water"), wxT("Normalmap"), wxT("Sp"), wxT("Occlusion"),
         wxT("Shader"), wxT("Physics"), wxT("Mp"), wxT(""), wxT("Agc"),
         wxT("Quakecon"), wxT("Independence")

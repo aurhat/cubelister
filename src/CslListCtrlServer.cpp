@@ -736,11 +736,10 @@ void CslListCtrlServer::OnTimer(wxTimerEvent& event)
         else if (m_timerCount%2==0)
         {
             if (CslConnectionState::CountDown())
-                CslStatusBar::SetText(1,
-                                      wxString::Format(_("Waiting %d seconds for a free slot on \"%s\" " \
-                                                         "(press ESC to abort or join another server)"),
-                                                       CslConnectionState::GetWaitTime(),
-                                                       info->GetBestDescription().c_str()));
+                CslStatusBar::SetText(1,wxString::Format(_("Waiting %s for a free slot on \"%s\" " \
+                                      "(press ESC to abort or join another server)"),
+                                      FormatSeconds(CslConnectionState::GetWaitTime(),true,true).c_str(),
+                                      info->GetBestDescription().c_str()));
             else
                 CslStatusBar::SetText(1,wxT(""));
         }
@@ -1419,8 +1418,8 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info,const wxString& pass
     CslProcess *process=new CslProcess(this,info,cmd);
     if (!(::wxExecute(cmd,wxEXEC_ASYNC,process)>0))
     {
-        wxMessageBox(_("Failed to start: ")+cmd
-                     ,_("Error"),wxICON_ERROR,this);
+        wxMessageBox(_("Failed to start: ")+cmd,
+                     _("Error"),wxICON_ERROR,this);
         info->Lock(false);
         return;
     }
