@@ -305,7 +305,7 @@ void CslDlgExtended::OnTimer(wxTimerEvent& event)
 
     if (stats->m_ids.length())
     {
-        wxUint32 delay=m_info->m_ping*m_info->m_playersMax;
+        wxUint32 delay=m_info->m_ping; // *m_info->m_players; //FIXME m_players or m_playersMax?
         if ((delay > (wxUint32)CSL_EXT_REFRESH_INTERVAL*1000) ||
             ((now-stats->m_lastResponse)*1000 < delay))
             return;
@@ -979,10 +979,18 @@ int wxCALLBACK CslDlgExtended::ListSortCompareFunc(long item1,long item2,long da
 {
     CslPlayerStatsData *stats1=(CslPlayerStatsData*)item1;
     CslPlayerStatsData *stats2=(CslPlayerStatsData*)item2;
-
-    wxInt32 type;
     wxInt32 sortMode=((CslListSortHelper*)data)->m_sortMode;
     wxInt32 sortType=((CslListSortHelper*)data)->m_sortType;
+
+    if (sortType!=SORT_PLAYER)
+    {
+        if (stats1->m_state==CSL_PLAYER_STATE_SPECTATOR)
+            return 1;
+        if (stats2->m_state==CSL_PLAYER_STATE_SPECTATOR)
+            return -1;
+    }
+
+    wxInt32 type;
     wxInt32 vi1=0,vi2=0;
     wxUint32 vui1=0,vui2=0;
     wxString vs1=wxEmptyString,vs2=wxEmptyString;
