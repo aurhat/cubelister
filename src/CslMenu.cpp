@@ -32,18 +32,16 @@ CslMenu::CslMenu(wxMenuBar *menuBar)
     EnableMenuItem(MENU_MASTER_UPDATE,false);
 
     CheckMenuItem(MENU_VIEW_FILTER,g_cslSettings->m_showFilter);
-    CheckMenuItem(MENU_VIEW_SEARCH,g_cslSettings->m_showSearch);
     CheckMenuItem(MENU_VIEW_AUTO_FIT,g_cslSettings->m_autoFitColumns);
     CheckMenuItem(MENU_VIEW_AUTO_SORT,g_cslSettings->m_autoSortColumns);
-    CheckMenuItem(MENU_VIEW_SPLITTER_LIVE,g_cslSettings->m_splitterLive);
 }
 
-void CslMenu::EnableMenuItem(wxInt32 id,bool enable)
+void CslMenu::EnableMenuItem(const wxInt32 id,const bool enable)
 {
     m_menuBar->Enable(id,enable);
 }
 
-void CslMenu::CheckMenuItem(wxInt32 id,bool check)
+void CslMenu::CheckMenuItem(const wxInt32 id,const bool check)
 {
     m_menuBar->Check(id,check);
 }

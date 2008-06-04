@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28d.lib wxbase28d_net.lib wxmsw28d_adv.lib wxmsw28d_core.lib wxtiffd.lib wxjpegd.lib wxpngd.lib wxzlibd.lib wxregexd.lib wxexpatd.lib comctl32.lib rpcrt4.lib wsock32.lib"
+				AdditionalDependencies="wxbase28d.lib wxbase28d_net.lib wxmsw28d_adv.lib wxmsw28d_core.lib wxmsw28d_aui.lib wxtiffd.lib wxjpegd.lib wxpngd.lib wxzlibd.lib wxregexd.lib wxexpatd.lib comctl32.lib rpcrt4.lib wsock32.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -137,7 +137,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28.lib wxbase28_net.lib wxmsw28_adv.lib wxmsw28_core.lib wxtiff.lib wxjpeg.lib wxpng.lib wxzlib.lib wxregex.lib wxexpat.lib comctl32.lib rpcrt4.lib wsock32.lib"
+				AdditionalDependencies="wxbase28.lib wxbase28_net.lib wxmsw28_adv.lib wxmsw28_core.lib wxmsw28_aui.lib wxtiff.lib wxjpeg.lib wxpng.lib wxzlib.lib wxregex.lib wxexpat.lib comctl32.lib rpcrt4.lib wsock32.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -216,6 +216,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CslDlgTraffic.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CslEngine.cpp"
 				>
 			</File>
@@ -237,6 +241,10 @@
 			</File>
 			<File
 				RelativePath=".\CslListCtrlInfo.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CslListCtrlPlayer.cpp"
 				>
 			</File>
 			<File
@@ -322,6 +330,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CslDlgTraffic.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CslEngine.h"
 				>
 			</File>
@@ -351,6 +363,10 @@
 			</File>
 			<File
 				RelativePath=".\CslListCtrlInfo.h"
+				>
+			</File>
+			<File
+				RelativePath=".\csllistctrlplayer.h"
 				>
 			</File>
 			<File

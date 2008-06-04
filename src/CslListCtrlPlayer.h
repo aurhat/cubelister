@@ -18,60 +18,54 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef CSLDLGADDSERVER_H
-#define CSLDLGADDSERVER_H
+#ifndef CSLLISTCTRLPLAYER_H
+#define CSLLISTCTRLPLAYER_H
 
 /**
- @author Glen Masgai <mimosius@gmx.de>
+    @author Glen Masgai <mimosius@gmx.de>
 */
 
-#include "wx/wxprec.h"
+#include <wx/wxprec.h>
 #ifdef __BORLANDC__
 #pragma hdrstop
 #endif
 #ifndef WX_PRECOMP
-#include "wx/wx.h"
+#include <wx/wx.h>
 #endif
-#include <wx/image.h>
+#include <wx/listctrl.h>
+#include <wx/imaglist.h>
 #include "CslGame.h"
-
-// begin wxGlade: ::dependencies
-// end wxGlade
+#include "CslTools.h"
 
 
-class CslDlgAddServer: public wxDialog
+class CslListCtrlPlayer : public wxListCtrl
 {
     public:
-    // begin wxGlade: CslDlgAddServer::ids
-    // end wxGlade
+        CslListCtrlPlayer(wxWindow* parent,wxWindowID id,const wxPoint& pos=wxDefaultPosition,
+                          const wxSize& size=wxDefaultSize,long style=wxLC_ICON,
+                          const wxValidator& validator=wxDefaultValidator,
+                          const wxString& name=wxListCtrlNameStr);
 
-        CslDlgAddServer(wxWindow* parent, CslServerInfo *info,int id=wxID_ANY,const wxString& title=wxEmptyString,
-                        const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize,
-                        long style=wxDEFAULT_DIALOG_STYLE);
+        void ListInit(const bool smallview=false);
+        void ListAdjustSize();
+        void ListUpdatePlayerData(CslPlayerStats *stats,const CSL_GAMETYPE type);
 
     private:
-    // begin wxGlade: CslDlgAddServer::methods
-    void set_properties();
-    void do_layout();
-    // end wxGlade
+        bool m_small;
+        wxImageList m_imageList;
+        CslListSortHelper m_sortHelper;
 
-        void OnText(wxCommandEvent& WXUNUSED(event));
-        void OnButton(wxCommandEvent& event);
+        void OnSize(wxSizeEvent& event);
+        void OnColumnLeftClick(wxListEvent& event);
 
         DECLARE_EVENT_TABLE()
 
     protected:
-    // begin wxGlade: CslDlgAddServer::attributes
-    wxStaticBox* sizer_address_staticbox;
-    wxChoice* choice_type;
-    wxTextCtrl* text_ctrl_address;
-    wxButton* button_add;
-    wxButton* button_cancel;
-    // end wxGlade
+        void ListSort(const wxInt32 column);
+        void ToggleSortArrow();
+        void ShowPanelMap(const bool show);
 
-        CslServerInfo *m_info;
+        static int wxCALLBACK ListSortCompareFunc(long item1,long item2,long data);
+};
 
-}; // wxGlade: end class
-
-
-#endif // CSLDLGADDSERVER_H
+#endif

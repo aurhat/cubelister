@@ -34,17 +34,17 @@
 class CslDlgAddMaster: public wxDialog
 {
     public:
-        // begin wxGlade: CslDlgAddMaster::ids
-        // end wxGlade
+    // begin wxGlade: CslDlgAddMaster::ids
+    // end wxGlade
         CslDlgAddMaster(wxWindow* parent,CslMaster *master,int id=wxID_ANY,const wxString& title=wxEmptyString,
                         const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize,
                         long style=wxDEFAULT_DIALOG_STYLE);
 
     private:
-        // begin wxGlade: CslDlgAddMaster::methods
-        void set_properties();
-        void do_layout();
-        // end wxGlade
+    // begin wxGlade: CslDlgAddMaster::methods
+    void set_properties();
+    void do_layout();
+    // end wxGlade
 
         void OnText(wxCommandEvent& WXUNUSED(event));
         void OnCommandEvent(wxCommandEvent& event);
@@ -52,16 +52,18 @@ class CslDlgAddMaster: public wxDialog
         DECLARE_EVENT_TABLE()
 
     protected:
-        // begin wxGlade: CslDlgAddMaster::attributes
-        wxStaticBox* sizer_address_staticbox;
-        wxChoice* choice_type;
-        wxTextCtrl* text_ctrl_address;
-        wxTextCtrl* text_ctrl_path;
-        wxRadioButton* radio_btn_custom;
-        wxRadioButton* radio_btn_default;
-        wxButton* button_add;
-        wxButton* button_cancel;
-        // end wxGlade
+    // begin wxGlade: CslDlgAddMaster::attributes
+    wxStaticBox* sizer_address_staticbox;
+    wxRadioButton* radio_btn_custom_copy;
+    wxRadioButton* radio_btn_default_copy;
+    wxChoice* choice_type;
+    wxTextCtrl* text_ctrl_address;
+    wxTextCtrl* text_ctrl_path;
+    wxRadioButton* radio_btn_custom;
+    wxRadioButton* radio_btn_default;
+    wxButton* button_add;
+    wxButton* button_cancel;
+    // end wxGlade
 
         CslMaster *m_master;
 }; // wxGlade: end class

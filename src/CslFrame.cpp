@@ -66,15 +66,18 @@ enum
     CSL_BUTTON_SEARCH_CLOSE = MENU_END + 1,
     CSL_TEXT_SEARCH,
 
-    CSL_CHECK_FILTER_FULL,
-    CSL_CHECK_FILTER_EMPTY,
-    CSL_CHECK_FILTER_NONEMPTY,
-    CSL_CHECK_FILTER_OFFLINE,
-    CSL_CHECK_FILTER_MM2,
-    CSL_CHECK_FILTER_MM3,
-    CSL_CHECK_FILTER_VERSION,
-    CSL_CHOICE_FILTER_VERSION,
-    CSL_CHECK_FILTER_FAVOURITES,
+    CSL_CHECK_FILTER_OFFLINE_MASTER,
+    CSL_CHECK_FILTER_FULL_MASTER,
+    CSL_CHECK_FILTER_EMPTY_MASTER,
+    CSL_CHECK_FILTER_NONEMPTY_MASTER,
+    CSL_CHECK_FILTER_MM2_MASTER,
+    CSL_CHECK_FILTER_MM3_MASTER,
+    CSL_CHECK_FILTER_OFFLINE_FAVOURITES,
+    CSL_CHECK_FILTER_FULL_FAVOURITES,
+    CSL_CHECK_FILTER_EMPTY_FAVOURITES,
+    CSL_CHECK_FILTER_NONEMPTY_FAVOURITES,
+    CSL_CHECK_FILTER_MM2_FAVOURITES,
+    CSL_CHECK_FILTER_MM3_FAVOURITES,
     CSL_BUTTON_FILTER_RESET,
 
     CSL_SPLITTER_LISTS
@@ -91,8 +94,10 @@ enum
 
 
 BEGIN_EVENT_TABLE(CslFrame, wxFrame)
+    EVT_SIZE(CslFrame::OnSize)
     CSL_EVT_PONG(wxID_ANY,CslFrame::OnPong)
     EVT_TIMER(wxID_ANY,CslFrame::OnTimer)
+    EVT_LIST_ITEM_SELECTED(wxID_ANY,CslFrame::OnListItemSelected)
     EVT_TREE_SEL_CHANGED(wxID_ANY,CslFrame::OnTreeLeftClick)
     EVT_TREE_ITEM_RIGHT_CLICK(wxID_ANY,CslFrame::OnTreeRightClick)
     EVT_MENU(wxID_ANY,CslFrame::OnCommandEvent)
@@ -194,6 +199,10 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
                    const wxPoint& pos,const wxSize& size,long style):
         wxFrame(parent, id, title, pos, size, wxDEFAULT_FRAME_STYLE)
 {
+    m_AuiMgr.SetManagedWindow(this);
+
+    LoadSettings();
+
     long listctlStyle=wxLC_REPORT;
     long treectlStyle=wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE;
 
@@ -209,7 +218,6 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
 #define wxLC_REPORT listctlStyle
 #define wxTR_DEFAULT_STYLE treectlStyle
 
-    LoadSettings();
 #ifdef __WXMSW__
     m_imgListTree.Create(24,24,true);
     m_imgListTree.Add(wxICON(master_24));
@@ -240,34 +248,29 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
 
     m_outputDlg=new CslDlgOutput(this);
     m_extendedDlg=new CslDlgExtended(this);
+    m_trafficDlg=NULL;
 
-    // begin wxGlade: CslFrame::CslFrame
-    panel_frame = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL);
-    panel_main = new wxPanel(panel_frame, wxID_ANY);
-    splitter_main = new wxSplitterWindow(panel_main, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D|wxSP_BORDER);
-    pane_main_right = new wxPanel(splitter_main, wxID_ANY);
-    splitter_lists = new wxSplitterWindow(pane_main_right, CSL_SPLITTER_LISTS, wxDefaultPosition, wxDefaultSize, wxSP_3DSASH);
-    pane_favourites = new wxPanel(splitter_lists, wxID_ANY);
-    pane_master = new wxPanel(splitter_lists, wxID_ANY);
-    panel_search = new wxPanel(pane_master, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL);
-    pane_main_left = new wxPanel(splitter_main, wxID_ANY);
-    splitter_games_info = new wxSplitterWindow(pane_main_left, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3DSASH);
-    pane_info = new wxPanel(splitter_games_info, wxID_ANY);
-    sizer_filter_staticbox = new wxStaticBox(pane_main_left, -1, _("Filter out these servers"));
-    pane_games = new wxPanel(splitter_games_info, wxID_ANY);
-    tree_ctrl_games = new wxTreeCtrl(pane_games, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_HAS_BUTTONS|wxTR_NO_LINES|wxTR_LINES_AT_ROOT|wxTR_DEFAULT_STYLE);
-    list_ctrl_info = new CslListCtrlInfo(pane_info, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_NO_HEADER);
-    checkbox_filter_full = new wxCheckBox(pane_main_left, CSL_CHECK_FILTER_FULL, _("F&ull"));
-    checkbox_filter_offline = new wxCheckBox(pane_main_left, CSL_CHECK_FILTER_OFFLINE, _("&Offline"));
-    checkbox_filter_empty = new wxCheckBox(pane_main_left, CSL_CHECK_FILTER_EMPTY, _("&Empty"));
-    checkbox_filter_mm2 = new wxCheckBox(pane_main_left, CSL_CHECK_FILTER_MM2, _("Mastermode &2"));
-    checkbox_filter_nonempty = new wxCheckBox(pane_main_left, CSL_CHECK_FILTER_NONEMPTY, _("&Not empty"));
-    checkbox_filter_mm3 = new wxCheckBox(pane_main_left, CSL_CHECK_FILTER_MM3, _("Mastermode &3"));
-    checkbox_filter_favourites = new wxCheckBox(pane_main_left, CSL_CHECK_FILTER_FAVOURITES, _("Filter fa&vourites as well"));
-    button_filter_reset = new wxButton(pane_main_left, CSL_BUTTON_FILTER_RESET, _("&Reset"));
-    list_ctrl_master = new CslListCtrlServer(pane_master, CSL_LIST_MASTER, wxDefaultPosition, wxDefaultSize, wxLC_REPORT);
-    text_ctrl_search = new wxTextCtrl(panel_search, CSL_TEXT_SEARCH, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RICH|wxTE_RICH2);
-    list_ctrl_favourites = new CslListCtrlServer(pane_favourites, CSL_LIST_FAVOURITE, wxDefaultPosition, wxDefaultSize, wxLC_REPORT);
+    pane_favourites=new wxPanel(this, wxID_ANY);
+    pane_master=new wxPanel(this, wxID_ANY);
+    panel_search=new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL);
+    tree_ctrl_games=new wxTreeCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_HAS_BUTTONS|wxTR_NO_LINES|wxTR_LINES_AT_ROOT|wxTR_DEFAULT_STYLE);
+    list_ctrl_info=new CslListCtrlInfo(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_NO_HEADER);
+    list_ctrl_players=new CslListCtrlPlayer(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxSUNKEN_BORDER);
+    text_ctrl_search=new wxTextCtrl(panel_search, CSL_TEXT_SEARCH, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RICH|wxTE_RICH2);
+    list_ctrl_master=new CslListCtrlServer(pane_master, CSL_LIST_MASTER, wxDefaultPosition, wxDefaultSize, wxLC_REPORT);
+    checkbox_filter_offline_master=new wxCheckBox(pane_master, CSL_CHECK_FILTER_OFFLINE_MASTER, _("&Offline"));
+    checkbox_filter_full_master=new wxCheckBox(pane_master, CSL_CHECK_FILTER_FULL_MASTER, _("F&ull"));
+    checkbox_filter_empty_master=new wxCheckBox(pane_master, CSL_CHECK_FILTER_EMPTY_MASTER, _("&Empty"));
+    checkbox_filter_nonempty_master=new wxCheckBox(pane_master, CSL_CHECK_FILTER_NONEMPTY_MASTER, _("&Not empty"));
+    checkbox_filter_mm2_master=new wxCheckBox(pane_master, CSL_CHECK_FILTER_MM2_MASTER, _("Mastermode &2"));
+    checkbox_filter_mm3_master=new wxCheckBox(pane_master, CSL_CHECK_FILTER_MM3_MASTER, _("Mastermode &3"));
+    list_ctrl_favourites=new CslListCtrlServer(pane_favourites, CSL_LIST_FAVOURITE, wxDefaultPosition, wxDefaultSize, wxLC_REPORT);
+    checkbox_filter_offline_favourites=new wxCheckBox(pane_favourites, CSL_CHECK_FILTER_OFFLINE_FAVOURITES, _("&Offline"));
+    checkbox_filter_full_favourites=new wxCheckBox(pane_favourites, CSL_CHECK_FILTER_FULL_FAVOURITES, _("F&ull"));
+    checkbox_filter_empty_favourites=new wxCheckBox(pane_favourites, CSL_CHECK_FILTER_EMPTY_FAVOURITES, _("&Empty"));
+    checkbox_filter_nonempty_favourites=new wxCheckBox(pane_favourites, CSL_CHECK_FILTER_NONEMPTY_FAVOURITES, _("&Not empty"));
+    checkbox_filter_mm2_favourites=new wxCheckBox(pane_favourites, CSL_CHECK_FILTER_MM2_FAVOURITES, _("Mastermode &2"));
+    checkbox_filter_mm3_favourites=new wxCheckBox(pane_favourites, CSL_CHECK_FILTER_MM3_FAVOURITES, _("Mastermode &3"));
 
     set_properties();
     do_layout();
@@ -296,29 +299,29 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
 
         if (!LoadServers())
         {
-            master=new CslMaster(CSL_GAME_SB,CSL_DEFAULT_MASTER_SB,CSL_DEFAULT_MASTER_PATH_SB,true);
+            master=new CslMaster(CSL_GAME_SB,CslMasterConnection(CSL_DEFAULT_MASTER_SB,CSL_DEFAULT_MASTER_PATH_SB));
             game=m_engine->AddMaster(master);
             m_engine->SetCurrentGame(game,NULL);
             TreeAddGame(game,true);
 
-            master=new CslMaster(CSL_GAME_AC,CSL_DEFAULT_MASTER_AC,CSL_DEFAULT_MASTER_PATH_AC,true);
+            master=new CslMaster(CSL_GAME_AC,CslMasterConnection(CSL_DEFAULT_MASTER_AC,CSL_DEFAULT_MASTER_PATH_AC));
             game=m_engine->AddMaster(master);
             TreeAddGame(game);
 
-            master=new CslMaster(CSL_GAME_BF,CSL_DEFAULT_MASTER_BF,CSL_DEFAULT_MASTER_PATH_BF,true);
+            master=new CslMaster(CSL_GAME_BF,CslMasterConnection(CSL_DEFAULT_MASTER_BF,CSL_DEFAULT_MASTER_PORT_BF));
             game=m_engine->AddMaster(master);
             TreeAddGame(game);
 
-            master=new CslMaster(CSL_GAME_CB,CSL_DEFAULT_MASTER_CB,CSL_DEFAULT_MASTER_PATH_CB,true);
+            master=new CslMaster(CSL_GAME_CB,CslMasterConnection(CSL_DEFAULT_MASTER_CB,CSL_DEFAULT_MASTER_PATH_CB));
             game=m_engine->AddMaster(master);
             TreeAddGame(game);
 
             CslServerInfo *info;
             info=new CslServerInfo();
-            info->CreateFavourite(CSL_DEFAULT_SERVER_ADDR_SB1,CSL_GAME_SB);
+            info->CreateFavourite(CSL_GAME_SB,CSL_DEFAULT_SERVER_ADDR_SB1);
             m_engine->AddServer(info,-1);
             info=new CslServerInfo();
-            info->CreateFavourite(CSL_DEFAULT_SERVER_ADDR_SB2,CSL_GAME_SB);
+            info->CreateFavourite(CSL_GAME_SB,CSL_DEFAULT_SERVER_ADDR_SB2);
             m_engine->AddServer(info,-1);
         }
         else
@@ -337,20 +340,19 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
         list_ctrl_favourites->ListUpdate(m_engine->GetFavourites());
         //tree_ctrl_games->ExpandAll();
 
-
         m_timerInit=true;
         m_timer.Start(CSL_TIMER_SHOT);
     }
     else
     {
         wxMessageBox(_("Failed to initialise internal engine!\n"\
-                       "Please restart the application."),
+                       "Please try to restart the application."),
                      _("Fatal error!"),wxICON_ERROR,this);
         delete m_engine;
         m_engine=NULL;
     }
 
-    m_extendedDlg->ListInit(m_engine);
+    m_extendedDlg->SetEngine(m_engine);
 
     m_versionCheckThread=new CslVersionCheckThread(this);
     m_versionCheckThread->Run();
@@ -386,16 +388,15 @@ CslFrame::~CslFrame()
         m_versionCheckThread->Delete();
         delete m_versionCheckThread;
     }
+
+    m_AuiMgr.UnInit();
 }
 
 void CslFrame::set_properties()
 {
-    // begin wxGlade: CslFrame::set_properties
     SetTitle(_("Cube Server Lister"));
-    // end wxGlade
 
     CreateMainMenu();
-
     UpdateFilterCheckBoxes();
 
     bitmap_button_search_clear=new wxBitmapButton(panel_search,CSL_BUTTON_SEARCH_CLOSE,
@@ -410,11 +411,9 @@ void CslFrame::set_properties()
     bitmap_button_search_clear->Connect(wxEVT_LEFT_DOWN,
                                         wxMouseEventHandler(CslFrame::OnMouseLeftDown),NULL,this);
 
-    // wxMAC: have to set minsize of the listctrl to prevent
-    //        hiding of the search panel while dragging splitter
-    list_ctrl_master->SetMinSize(wxSize(0,0));
+    list_ctrl_players->ListInit(true);
 
-    SetMinSize(wxSize(640,480));
+    SetMinSize(wxSize(CSL_FRAME_MIN_WIDTH,CSL_FRAME_MIN_HEIGHT));
 
     wxMemoryInputStream stream(csl_icon_png,sizeof(csl_icon_png));
     // see wx_wxbitmap.html
@@ -431,81 +430,66 @@ void CslFrame::set_properties()
 
 void CslFrame::do_layout()
 {
+    wxInt32 i=0;
+
     CslStatusBar *statusBar=new CslStatusBar(this);
     SetStatusBar(statusBar);
     CslStatusBar::InitBar(statusBar);
 
     list_ctrl_master->ListInit(m_engine,list_ctrl_info,NULL,list_ctrl_favourites,
-                               m_extendedDlg,g_cslSettings->m_filterFlags);
-    list_ctrl_favourites->ListInit(m_engine,list_ctrl_info,list_ctrl_master,NULL,m_extendedDlg,
-                                   g_cslSettings->m_filterFavourites ? g_cslSettings->m_filterFlags : 0);
+                               m_extendedDlg,g_cslSettings->m_filterMaster);
+    list_ctrl_favourites->ListInit(m_engine,list_ctrl_info,list_ctrl_master,NULL,
+                                   m_extendedDlg,g_cslSettings->m_filterFavourites);
 
-    // begin wxGlade: CslFrame::do_layout
-    wxBoxSizer* sizer_frame = new wxBoxSizer(wxHORIZONTAL);
-    wxBoxSizer* sizer_panel_frame = new wxBoxSizer(wxHORIZONTAL);
-    wxBoxSizer* sizer_panel = new wxBoxSizer(wxHORIZONTAL);
-    wxBoxSizer* sizer_main_right = new wxBoxSizer(wxHORIZONTAL);
-    wxBoxSizer* sizer_list_favourites = new wxBoxSizer(wxHORIZONTAL);
-    wxFlexGridSizer* grid_sizer_master = new wxFlexGridSizer(2, 1, 0, 0);
-    wxFlexGridSizer* grid_sizer_search = new wxFlexGridSizer(1, 3, 0, 0);
-    wxFlexGridSizer* grid_sizer_main_left = new wxFlexGridSizer(2, 1, 0, 0);
-    wxStaticBoxSizer* sizer_filter = new wxStaticBoxSizer(sizer_filter_staticbox, wxHORIZONTAL);
-    wxFlexGridSizer* grid_sizer_filter = new wxFlexGridSizer(4, 3, 0, 0);
-    wxFlexGridSizer* grid_sizer_info = new wxFlexGridSizer(1, 1, 0, 0);
-    wxFlexGridSizer* grid_sizer_games_filter = new wxFlexGridSizer(1, 1, 0, 0);
-    grid_sizer_games_filter->Add(tree_ctrl_games, 1, wxEXPAND, 4);
-    pane_games->SetSizer(grid_sizer_games_filter);
-    grid_sizer_games_filter->AddGrowableRow(0);
-    grid_sizer_games_filter->AddGrowableCol(0);
-    grid_sizer_info->Add(list_ctrl_info, 1, wxEXPAND, 4);
-    pane_info->SetSizer(grid_sizer_info);
-    grid_sizer_info->AddGrowableRow(0);
-    grid_sizer_info->AddGrowableCol(0);
-    splitter_games_info->SplitHorizontally(pane_games, pane_info);
-    grid_sizer_main_left->Add(splitter_games_info, 1, wxEXPAND, 4);
-    grid_sizer_filter->Add(checkbox_filter_full, 0, wxLEFT|wxRIGHT|wxTOP|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_filter->Add(1, 1, 0, wxEXPAND, 0);
-    grid_sizer_filter->Add(checkbox_filter_offline, 0, wxLEFT|wxRIGHT|wxTOP|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_filter->Add(checkbox_filter_empty, 0, wxLEFT|wxRIGHT|wxTOP|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_filter->Add(1, 1, 0, wxEXPAND, 0);
-    grid_sizer_filter->Add(checkbox_filter_mm2, 0, wxLEFT|wxRIGHT|wxTOP|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_filter->Add(checkbox_filter_nonempty, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_filter->Add(1, 1, 0, wxEXPAND, 0);
-    grid_sizer_filter->Add(checkbox_filter_mm3, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_filter->Add(checkbox_filter_favourites, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_filter->Add(1, 1, 0, wxEXPAND, 0);
-    grid_sizer_filter->Add(button_filter_reset, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 4);
-    grid_sizer_filter->AddGrowableCol(1);
-    sizer_filter->Add(grid_sizer_filter, 1, wxEXPAND, 0);
-    grid_sizer_main_left->Add(sizer_filter, 1, wxTOP|wxEXPAND, 4);
-    pane_main_left->SetSizer(grid_sizer_main_left);
-    grid_sizer_main_left->AddGrowableRow(0);
-    grid_sizer_main_left->AddGrowableCol(0);
-    grid_sizer_master->Add(list_ctrl_master, 1, wxEXPAND, 5);
-    wxStaticText* label_search_static = new wxStaticText(panel_search, wxID_ANY, _("Search:"));
+    wxFlexGridSizer* grid_sizer_favourites=new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* grid_sizer_filter_favourites=new wxFlexGridSizer(1, 7, 0, 0);
+    wxFlexGridSizer* grid_sizer_master=new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* grid_sizer_filter_master=new wxFlexGridSizer(1, 7, 0, 0);
+    wxFlexGridSizer* grid_sizer_search=new wxFlexGridSizer(1, 3, 0, 0);
+    wxStaticText* label_search_static=new wxStaticText(panel_search, wxID_ANY, _("Search:"));
     grid_sizer_search->Add(label_search_static, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
-    grid_sizer_search->Add(text_ctrl_search, 0, wxLEFT|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_search->Add(text_ctrl_search, 0, wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
     panel_search->SetSizer(grid_sizer_search);
     grid_sizer_search->AddGrowableCol(2);
-    grid_sizer_master->Add(panel_search, 1, wxALL|wxEXPAND, 4);
+    grid_sizer_master->Add(list_ctrl_master, 1, wxEXPAND, 5);
+    wxStaticText* label_filter_main=new wxStaticText(pane_master, wxID_ANY, _("Filter out:"));
+    grid_sizer_filter_master->Add(label_filter_main, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_filter_master->Add(checkbox_filter_offline_master, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_filter_master->Add(checkbox_filter_full_master, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_filter_master->Add(checkbox_filter_empty_master, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_filter_master->Add(checkbox_filter_nonempty_master, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_filter_master->Add(checkbox_filter_mm2_master, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_filter_master->Add(checkbox_filter_mm3_master, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_filter_master->AddGrowableCol(1);
+    grid_sizer_filter_master->AddGrowableCol(2);
+    grid_sizer_filter_master->AddGrowableCol(3);
+    grid_sizer_filter_master->AddGrowableCol(4);
+    grid_sizer_filter_master->AddGrowableCol(5);
+    grid_sizer_filter_master->AddGrowableCol(6);
+    grid_sizer_master->Add(grid_sizer_filter_master, 1, wxEXPAND, 0);
     pane_master->SetSizer(grid_sizer_master);
     grid_sizer_master->AddGrowableRow(0);
     grid_sizer_master->AddGrowableCol(0);
-    sizer_list_favourites->Add(list_ctrl_favourites, 1, wxEXPAND, 3);
-    pane_favourites->SetSizer(sizer_list_favourites);
-    splitter_lists->SplitHorizontally(pane_master, pane_favourites);
-    sizer_main_right->Add(splitter_lists, 1, wxEXPAND, 4);
-    pane_main_right->SetSizer(sizer_main_right);
-    splitter_main->SplitVertically(pane_main_left, pane_main_right);
-    sizer_panel->Add(splitter_main, 1, wxEXPAND, 0);
-    panel_main->SetSizer(sizer_panel);
-    sizer_panel_frame->Add(panel_main, 1, wxALL|wxEXPAND, 4);
-    panel_frame->SetSizer(sizer_panel_frame);
-    sizer_frame->Add(panel_frame, 1, wxEXPAND, 0);
-    SetSizer(sizer_frame);
-    sizer_frame->Fit(this);
-    Layout();
-    // end wxGlade
+
+    grid_sizer_favourites->Add(list_ctrl_favourites, 1, wxEXPAND, 3);
+    wxStaticText* label_filter_favoruites=new wxStaticText(pane_favourites, wxID_ANY, _("Filter out:"));
+    grid_sizer_filter_favourites->Add(label_filter_favoruites, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_filter_favourites->Add(checkbox_filter_offline_favourites, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_filter_favourites->Add(checkbox_filter_full_favourites, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_filter_favourites->Add(checkbox_filter_empty_favourites, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_filter_favourites->Add(checkbox_filter_nonempty_favourites, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_filter_favourites->Add(checkbox_filter_mm2_favourites, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_filter_favourites->Add(checkbox_filter_mm3_favourites, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_filter_favourites->AddGrowableCol(1);
+    grid_sizer_filter_favourites->AddGrowableCol(2);
+    grid_sizer_filter_favourites->AddGrowableCol(3);
+    grid_sizer_filter_favourites->AddGrowableCol(4);
+    grid_sizer_filter_favourites->AddGrowableCol(5);
+    grid_sizer_filter_favourites->AddGrowableCol(6);
+    grid_sizer_favourites->Add(grid_sizer_filter_favourites, 1, wxTOP|wxEXPAND, 3);
+    pane_favourites->SetSizer(grid_sizer_favourites);
+    grid_sizer_favourites->AddGrowableRow(0);
+    grid_sizer_favourites->AddGrowableCol(0);
 
 #ifdef __WXMAC__
     wxSizerItem *sitem=grid_sizer_main_left->GetItem(sizer_filter);
@@ -513,38 +497,44 @@ void CslFrame::do_layout()
     sitem->SetBorder(4);
 #endif
 
-    wxInt32 bboffset=0;
 #ifdef __WXMSW__
-    bboffset=2;
+    i=2; //bitmap button offset
 #endif
     grid_sizer_search->Insert(0,bitmap_button_search_clear,0,
-                              wxRIGHT|wxLEFT|wxTOP|wxALIGN_CENTER_VERTICAL,
-                              bboffset);
+                              wxRIGHT|wxTOP|wxALIGN_CENTER_VERTICAL,i);
 
     m_sizerMaster=grid_sizer_master;
-    m_sizerLeft=grid_sizer_main_left;
+    m_sizerFavourites=grid_sizer_favourites;
     m_sizerSearch=grid_sizer_search;
-    m_sizerFilter=sizer_filter;
+    m_sizerFilterMaster=grid_sizer_filter_master;
+    m_sizerFilterFavourites=grid_sizer_filter_favourites;
+
+    wxSize size=m_sizerFilterMaster->GetMinSize();
+    size.y+=list_ctrl_master->GetBestSize().y;
+    //pane_master->SetMinSize(size);
+    //pane_favourites->SetMinSize(size);
+
+    m_AuiMgr.AddPane(pane_master,wxAuiPaneInfo().Caption(_("Master list servers")).Center().BestSize(size));
+    m_AuiMgr.AddPane(pane_favourites,wxAuiPaneInfo().Caption(_("Favourite servers")).Bottom().Row(2).BestSize(size).MinSize(size));
+    size=panel_search->GetBestSize();
+    m_AuiMgr.AddPane(panel_search,wxAuiPaneInfo().Caption(_("Search")).BestSize(size).MaxSize(-1,size.y).MinSize(-1,size.y).Bottom().Row(1));
+    m_AuiMgr.AddPane(tree_ctrl_games,wxAuiPaneInfo().Caption(_("Games")).Left().Layer(1).Position(0));
+    m_AuiMgr.AddPane(list_ctrl_info,wxAuiPaneInfo().Caption(_("Server Info")).Left().Layer(1).Position(1).MinSize(250,-1).BestSize(250,-1));
+    m_AuiMgr.AddPane(list_ctrl_players,wxAuiPaneInfo().Caption(_("Players")).Left().Layer(1).Position(2));
+    m_AuiMgr.Update();
 
     SetSize(g_cslSettings->m_frameSize);
     CentreOnScreen();
 
-    ToggleSearchBar();
     ToggleFilter();
-    ToggleSplitterUpdate();
 
 // only set splitter gravity on wxMAC here - it doesn't
 // work under wxGTK and EVT_SHOW is not send on wxMAC
 #ifdef __WXMAC__
-    splitter_games_info->SetSashGravity(1.0f);
     splitter_lists->SetSashGravity(0.8f);
 #endif
-    splitter_main->SetMinimumPaneSize(sizer_filter->GetMinSize().GetWidth()+4);
-    splitter_games_info->SetMinimumPaneSize(20);
-    splitter_lists->SetMinimumPaneSize(100);
-    splitter_main->SetSashPosition(g_cslSettings->m_splitterMainPos);
-    splitter_games_info->SetSashPosition(g_cslSettings->m_splitterGamePos);
-    splitter_lists->SetSashPosition(g_cslSettings->m_splitterListPos);
+    i=grid_sizer_filter_favourites->GetMinSize().GetWidth();
+    //pane_main_right->SetMinSize(wxSize(i,-1));
 }
 
 void CslFrame::CreateMainMenu()
@@ -575,8 +565,6 @@ void CslFrame::CreateMainMenu()
 #endif
 
     menu=new wxMenu();
-    CslMenu::AddItemToMenu(menu,MENU_VIEW_SEARCH,_("Show &search bar\tCTRL+S"),
-                           wxART_NONE,wxITEM_CHECK);
     CslMenu::AddItemToMenu(menu,MENU_VIEW_FILTER,_("Show &filter\tCTRL+F"),
                            wxART_NONE,wxITEM_CHECK);
     CslMenu::AddItemToMenu(menu,MENU_VIEW_OUTPUT,_("Show &game output\tCTRL+O"),
@@ -586,16 +574,38 @@ void CslFrame::CreateMainMenu()
                            wxART_NONE,wxITEM_CHECK);
     CslMenu::AddItemToMenu(menu,MENU_VIEW_AUTO_FIT,_("Fit columns on window &resize"),
                            wxART_NONE,wxITEM_CHECK);
-    CslMenu::AddItemToMenu(menu,MENU_VIEW_SPLITTER_LIVE,_("Redraw while dragging spli&tters"),
-                           wxART_NONE,wxITEM_CHECK);
     m_menubar->Append(menu,_("&View"));
 
     menu=new wxMenu();
+    CslMenu::AddItemToMenu(menu,MENU_INFO_TRAFFIC,_("&Traffic statistics"),wxART_NONE);
+#ifndef __WXMAC__
+    menu->AppendSeparator();
     CslMenu::AddItemToMenu(menu,wxID_ABOUT,_("A&bout"),wxART_ABOUT);
+#endif
     m_menubar->Append(menu,_("&Help"));
 
     SetMenuBar(m_menubar);
     m_menu=new CslMenu(m_menubar);
+}
+
+void CslFrame::OnSize(wxSizeEvent& event)
+{
+    wxObject *object=event.GetEventObject();
+
+    if (object==list_ctrl_master)
+    {
+        LOG_DEBUG("master\n");
+        return;
+    }
+    else if (object==list_ctrl_favourites)
+    {
+        LOG_DEBUG("favourites\n");
+        return;
+    }
+    else
+        LOG_DEBUG("other\n");
+
+    event.Skip();
 }
 
 void CslFrame::OnPong(wxCommandEvent& event)
@@ -632,6 +642,7 @@ void CslFrame::OnTimer(wxTimerEvent& event)
             m_timerCount++;
 
         wxPostEvent(m_extendedDlg,event);
+        if (m_trafficDlg) wxPostEvent(m_trafficDlg,event);
     }
 
     /*if (m_statusCount>-1 && m_statusCount==m_timerCount)
@@ -662,6 +673,21 @@ void CslFrame::OnTimer(wxTimerEvent& event)
         else
             m_lightCount++;
     }
+}
+
+void CslFrame::OnListItemSelected(wxListEvent& event)
+{
+    CslServerInfo *info=(CslServerInfo*)event.GetClientData();
+
+    if (!info)
+        return;
+
+#ifdef CSL_USE_WX_LIST_DESELECT_WORKAROUND
+    if (FindFocus()==event.GetEventObject())
+#endif
+        list_ctrl_info->UpdateInfo(info);
+
+    LOG_DEBUG("%s\n",info->GetBestDescription().c_str());
 }
 
 void CslFrame::OnTreeLeftClick(wxTreeEvent& event)
@@ -739,8 +765,13 @@ void CslFrame::OnTreeRightClick(wxTreeEvent& event)
 
 void CslFrame::OnCommandEvent(wxCommandEvent& event)
 {
-    wxUint32 u=0;
-    bool checked=false;
+    wxUint32 id=event.GetId();
+
+    if (id>=CSL_CHECK_FILTER_OFFLINE_MASTER && id<=CSL_CHECK_FILTER_MM3_FAVOURITES)
+    {
+        HandleFilterEvent(id,event.IsChecked());
+        return;
+    }
 
     switch (event.GetId())
     {
@@ -772,8 +803,7 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
                     type=data->GetGame()->GetType();
             }
 
-            CslMaster *master=new CslMaster;
-            master->Create(type);
+            CslMaster *master=new CslMaster(type);
 
             CslDlgAddMaster *dlg=new CslDlgAddMaster((wxWindow*)this,master);
             if (dlg->ShowModal()!=wxID_OK)
@@ -802,19 +832,19 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             UpdateMaster();
             break;
 
-        case MENU_VIEW_SEARCH:
-            g_cslSettings->m_showSearch=event.IsChecked();
-            ToggleSearchBar();
-            break;
-
         case MENU_VIEW_FILTER:
             g_cslSettings->m_showFilter=event.IsChecked();
             ToggleFilter();
             break;
 
         case MENU_VIEW_OUTPUT:
-            m_outputDlg->Show(!m_outputDlg->IsShown());
+        {
+            wxString bla;
+            bla=m_AuiMgr.SavePerspective();
+            LOG_DEBUG("%s\n",bla.c_str());
+            //m_outputDlg->Show(!m_outputDlg->IsShown());
             break;
+        }
 
         case MENU_VIEW_AUTO_SORT:
             g_cslSettings->m_autoSortColumns=event.IsChecked();
@@ -826,10 +856,12 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             g_cslSettings->m_autoFitColumns=event.IsChecked();
             break;
 
-        case MENU_VIEW_SPLITTER_LIVE:
-            g_cslSettings->m_splitterLive=event.IsChecked();
-            ToggleSplitterUpdate();
+        case MENU_INFO_TRAFFIC:
+        {
+            m_trafficDlg=new CslDlgTraffic(this);
+            m_trafficDlg->Show();
             break;
+        }
 
         case wxID_ABOUT:
         {
@@ -838,17 +870,13 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             break;
         }
 
-        case CSL_BUTTON_SEARCH_CLOSE:
-            g_cslSettings->m_showSearch=false;
-            CslMenu::CheckMenuItem(MENU_VIEW_SEARCH,false);
-            ToggleSearchBar();
-            break;
-
         case CSL_TEXT_SEARCH:
         {
             wxString s=event.GetString();
+            bool sr=list_ctrl_master->ListSearch(s)>0;
+            sr|=list_ctrl_favourites->ListSearch(s)>0;
 
-            if (list_ctrl_master->ListSearch(s)||s.IsEmpty())
+            if (sr || s.IsEmpty())
             {
 #ifdef __WXMAC__
                 // very ugly - setting back to black doesnt work, so add 1
@@ -874,64 +902,67 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             break;
         }
 
-        case CSL_CHECK_FILTER_OFFLINE:
-            u=CSL_FILTER_OFFLINE;
-            checked=event.IsChecked();
-        case CSL_CHECK_FILTER_FULL:
-            if (!u)
-            {
-                u=CSL_FILTER_FULL;
-                checked=event.IsChecked();
-            }
-        case CSL_CHECK_FILTER_EMPTY:
-            if (!u)
-            {
-                u=CSL_FILTER_EMPTY;
-                checked=event.IsChecked();
-            }
-        case CSL_CHECK_FILTER_NONEMPTY:
-            if (!u)
-            {
-                u=CSL_FILTER_NONEMPTY;
-                checked=event.IsChecked();
-            }
-        case CSL_CHECK_FILTER_MM2:
-            if (!u)
-            {
-                u=CSL_FILTER_MM2;
-                checked=event.IsChecked();
-            }
-        case CSL_CHECK_FILTER_MM3:
-            if (!u)
-            {
-                u=CSL_FILTER_MM3;
-                checked=event.IsChecked();
-            }
+        default:
+            break;
+    }
+}
+
+void CslFrame::HandleFilterEvent(const wxInt32 id,const bool checked)
+{
+    CslListCtrlServer *listctrl;
+    wxUint32 *filter;
+    wxUint32 f=0,sender=id;
+
+    if (id<CSL_CHECK_FILTER_OFFLINE_FAVOURITES)
+    {
+        // master filter
+        listctrl=list_ctrl_master;
+        filter=&g_cslSettings->m_filterMaster;
+    }
+    else
+    {
+        // favourites filter
+        listctrl=list_ctrl_favourites;
+        filter=&g_cslSettings->m_filterFavourites;
+        sender-=CSL_CHECK_FILTER_OFFLINE_FAVOURITES;
+        sender+=CSL_CHECK_FILTER_OFFLINE_MASTER;
+    }
+
+    switch (sender)
+    {
+        case CSL_CHECK_FILTER_OFFLINE_MASTER:
+            f=CSL_FILTER_OFFLINE;
+        case CSL_CHECK_FILTER_FULL_MASTER:
+            if (!f)
+                f=CSL_FILTER_FULL;
+        case CSL_CHECK_FILTER_EMPTY_MASTER:
+            if (!f)
+                f=CSL_FILTER_EMPTY;
+        case CSL_CHECK_FILTER_NONEMPTY_MASTER:
+            if (!f)
+                f=CSL_FILTER_NONEMPTY;
+        case CSL_CHECK_FILTER_MM2_MASTER:
+            if (!f)
+                f=CSL_FILTER_MM2;
+        case CSL_CHECK_FILTER_MM3_MASTER:
+            if (!f)
+                f=CSL_FILTER_MM3;
             if (checked)
-                g_cslSettings->m_filterFlags|=u;
+                *filter|=f;
             else
-                g_cslSettings->m_filterFlags&=~u;
+                *filter&=~f;
 
-            list_ctrl_master->ListFilter(g_cslSettings->m_filterFlags);
-            if (g_cslSettings->m_filterFavourites && checkbox_filter_favourites->IsChecked())
-                list_ctrl_favourites->ListFilter(g_cslSettings->m_filterFlags);
+            listctrl->ListFilter(*filter);
             break;
 
-        case CSL_CHECK_FILTER_FAVOURITES:
-            u=0;
-            g_cslSettings->m_filterFavourites=event.IsChecked();
-            if (g_cslSettings->m_filterFavourites)
-                u=g_cslSettings->m_filterFlags;
-            list_ctrl_favourites->ListFilter(u);
-            break;
-
-        case CSL_BUTTON_FILTER_RESET:
-            g_cslSettings->m_filterFlags=0;
-            UpdateFilterCheckBoxes();
-            list_ctrl_master->ListFilter(0);
-            if (checkbox_filter_favourites->IsChecked())
-                list_ctrl_favourites->ListFilter(0);
-            break;
+            //FIXME
+            /*case CSL_BUTTON_FILTER_RESET:
+                g_cslSettings->m_filter=0;
+                UpdateFilterCheckBoxes();
+                list_ctrl_master->ListFilter(0);
+                //if (checkbox_filter_favourites->IsChecked())
+                //    list_ctrl_favourites->ListFilter(0);
+                break;*/
 
         default:
             break;
@@ -953,7 +984,7 @@ void CslFrame::OnKeypress(wxKeyEvent& event)
     {
         if (CslConnectionState::IsWaiting())
             CslConnectionState::Reset();
-        else if (g_cslSettings->m_showSearch && FindFocus()==text_ctrl_search)
+        else if (FindFocus()==text_ctrl_search)
         {
             text_ctrl_search->Clear();
             wxCommandEvent evt(wxEVT_COMMAND_TEXT_UPDATED,CSL_TEXT_SEARCH);
@@ -965,17 +996,30 @@ void CslFrame::OnKeypress(wxKeyEvent& event)
 
 void CslFrame::OnShow(wxShowEvent& event)
 {
-    splitter_games_info->SetSashGravity(1.0f);
-    splitter_lists->SetSashGravity(0.8f);
+    //splitter_lists->SetSashGravity(0.8f);
     list_ctrl_master->ListAdjustSize(list_ctrl_master->GetClientSize(),true);
     list_ctrl_favourites->ListAdjustSize(list_ctrl_favourites->GetClientSize(),true);
 }
 
 void CslFrame::OnClose(wxCloseEvent& event)
 {
+    if (CslConnectionState::IsPlaying())
+    {
+        wxMessageBox(_("There is currently a game running.\n"
+                       "Quit the game first and try again."),
+                     _("Error"),wxOK|wxICON_ERROR,this);
+        return;
+    }
+
     if (event.GetEventObject()==m_outputDlg)
     {
         CslMenu::CheckMenuItem(MENU_VIEW_OUTPUT,false);
+        return;
+    }
+    if (event.GetEventObject()==m_trafficDlg)
+    {
+        m_trafficDlg->Destroy();
+        m_trafficDlg=NULL;
         return;
     }
 
@@ -1069,77 +1113,41 @@ void CslFrame::OnVersionCheck(wxCommandEvent& event)
     m_versionCheckThread=NULL;
 }
 
-void CslFrame::ToggleSearchBar()
-{
-    if (g_cslSettings->m_showSearch && !panel_search->IsShown())
-    {
-        m_sizerMaster->Insert(1,panel_search,1,wxEXPAND|wxALL,4);
-        panel_search->Show();
-        text_ctrl_search->SetFocus();
-    }
-    else if (!g_cslSettings->m_showSearch && panel_search->IsShown())
-    {
-        panel_search->Hide();
-        text_ctrl_search->Clear();
-        text_ctrl_search->SetBackgroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOW));
-        list_ctrl_master->ListSearch(wxEmptyString);
-        m_sizerMaster->Detach(panel_search);
-    }
-    else
-        return;
-
-    m_sizerMaster->Layout();
-}
-
 void CslFrame::ToggleFilter()
 {
-    if (g_cslSettings->m_showFilter && !m_sizerLeft->IsShown(m_sizerFilter))
+    if (g_cslSettings->m_showFilter && !m_sizerMaster->IsShown(m_sizerFilterMaster))
     {
-        //m_sizerLeft->Detach(m_sizerFilter);
-        m_sizerLeft->Show(m_sizerFilter);
+        m_sizerMaster->Show(m_sizerFilterMaster);
+        m_sizerFavourites->Show(m_sizerFilterFavourites);
     }
-    else if (!g_cslSettings->m_showFilter && m_sizerLeft->IsShown(m_sizerFilter))
+    else if (!g_cslSettings->m_showFilter && m_sizerMaster->IsShown(m_sizerFilterMaster))
     {
-        //m_sizerLeft->Insert(1,m_sizerFilter,1,wxEXPAND|wxALL,4);
-        m_sizerLeft->Hide(m_sizerFilter,true);
+        m_sizerMaster->Hide(m_sizerFilterMaster,true);
+        m_sizerFavourites->Hide(m_sizerFilterFavourites,true);
     }
-    m_sizerLeft->Layout();
-}
-
-void CslFrame::ToggleSplitterUpdate()
-{
-    wxUint32 styleMain=splitter_main->GetWindowStyle();
-    wxUint32 styleGame=splitter_games_info->GetWindowStyle();
-    wxUint32 styleList=splitter_lists->GetWindowStyle();
-
-    if (g_cslSettings->m_splitterLive)
-    {
-        styleMain|=wxSP_LIVE_UPDATE;
-        styleGame|=wxSP_LIVE_UPDATE;
-        styleList|=wxSP_LIVE_UPDATE;
-    }
-    else
-    {
-        styleMain&=~wxSP_LIVE_UPDATE;
-        styleGame&=~wxSP_LIVE_UPDATE;
-        styleList&=~wxSP_LIVE_UPDATE;
-    }
-
-    splitter_main->SetWindowStyle(styleMain);
-    splitter_games_info->SetWindowStyle(styleGame);
-    splitter_lists->SetWindowStyle(styleList);
+    m_sizerMaster->Layout();
+    m_sizerFavourites->Layout();
 }
 
 void CslFrame::UpdateFilterCheckBoxes()
 {
-    checkbox_filter_offline->SetValue((g_cslSettings->m_filterFlags&CSL_FILTER_OFFLINE)>0);
-    checkbox_filter_full->SetValue((g_cslSettings->m_filterFlags&CSL_FILTER_FULL)>0);
-    checkbox_filter_empty->SetValue((g_cslSettings->m_filterFlags&CSL_FILTER_EMPTY)>0);
-    checkbox_filter_nonempty->SetValue((g_cslSettings->m_filterFlags&CSL_FILTER_NONEMPTY)>0);
-    checkbox_filter_mm2->SetValue((g_cslSettings->m_filterFlags&CSL_FILTER_MM2)>0);
-    checkbox_filter_mm3->SetValue((g_cslSettings->m_filterFlags&CSL_FILTER_MM3)>0);
+    wxUint32 filter;
 
-    checkbox_filter_favourites->SetValue(g_cslSettings->m_filterFavourites);
+    filter=g_cslSettings->m_filterMaster;
+    checkbox_filter_offline_master->SetValue((filter&CSL_FILTER_OFFLINE)>0);
+    checkbox_filter_full_master->SetValue((filter&CSL_FILTER_FULL)>0);
+    checkbox_filter_empty_master->SetValue((filter&CSL_FILTER_EMPTY)>0);
+    checkbox_filter_nonempty_master->SetValue((filter&CSL_FILTER_NONEMPTY)>0);
+    checkbox_filter_mm2_master->SetValue((filter&CSL_FILTER_MM2)>0);
+    checkbox_filter_mm3_master->SetValue((filter&CSL_FILTER_MM3)>0);
+
+    filter=g_cslSettings->m_filterFavourites;
+    checkbox_filter_offline_favourites->SetValue((filter&CSL_FILTER_OFFLINE)>0);
+    checkbox_filter_full_favourites->SetValue((filter&CSL_FILTER_FULL)>0);
+    checkbox_filter_empty_favourites->SetValue((filter&CSL_FILTER_EMPTY)>0);
+    checkbox_filter_nonempty_favourites->SetValue((filter&CSL_FILTER_NONEMPTY)>0);
+    checkbox_filter_mm2_favourites->SetValue((filter&CSL_FILTER_MM2)>0);
+    checkbox_filter_mm3_favourites->SetValue((filter&CSL_FILTER_MM3)>0);
 }
 
 void CslFrame::UpdateMaster()
@@ -1153,7 +1161,7 @@ void CslFrame::UpdateMaster()
     if (!master)
         return;
 
-    SetStatusText(_("Sending request to master: ")+master->GetAddress(),1);
+    SetStatusText(_("Sending request to master: ")+master->GetConnection().GetAddress(),1);
     m_timer.Stop();
 
     CslMenu::EnableMenuItem(MENU_MASTER_UPDATE,false);
@@ -1161,7 +1169,7 @@ void CslFrame::UpdateMaster()
 
     wxInt32 num=m_engine->UpdateMaster();
     if (num<0)
-        SetStatusText(_("Error on update from master: ")+master->GetAddress(),1);
+        SetStatusText(_("Error on update from master: ")+master->GetConnection().GetAddress(),1);
     else
     {
         m_timerCount=0;
@@ -1189,11 +1197,12 @@ wxTreeItemId CslFrame::TreeFindItem(wxTreeItemId parent,CslGame *game,CslMaster 
         {
             data=(CslTreeItemData*)tree_ctrl_games->GetItemData(item);
             if (game)
+            {
                 if (data->GetGame()==game)
                     break;
-                else if (master)
-                    if (data->GetMaster()==master)
-                        break;
+                else if (master && data->GetMaster()==master)
+                    break;
+            }
             item=tree_ctrl_games->GetNextSibling(item);
         }
     }
@@ -1218,7 +1227,7 @@ void CslFrame::TreeAddMaster(wxTreeItemId parent,CslMaster *master,bool activate
 
     wxTreeItemId item;
     CslTreeItemData *data=new CslTreeItemData(master);
-    item=tree_ctrl_games->AppendItem(parent,master->GetAddress(),IMG_LIST_TREE_MASTER,-1,data);
+    item=tree_ctrl_games->AppendItem(parent,master->GetConnection().GetAddress(),IMG_LIST_TREE_MASTER,-1,data);
 
     if (activate)
         tree_ctrl_games->SelectItem(item);
@@ -1331,111 +1340,104 @@ void CslFrame::TreeCalcTotalPlaytime(CslGame* game)
 
 void CslFrame::LoadSettings()
 {
-    long int val;
-    double dval;
-    wxUint32 version=0;
-    wxString s=wxStandardPaths().GetUserDataDir();
-    wxString file=s+PATHDIV+wxT("settings.ini");
-
     g_cslSettings=new CslSettings;
+
+    wxString file=wxStandardPaths().GetUserDataDir()+PATHDIV+wxT("settings.ini");
 
     if (!::wxFileExists(file))
         return;
 
-    wxFileConfig *config=new wxFileConfig(wxEmptyString,wxEmptyString,file,
-                                          wxEmptyString,wxCONFIG_USE_LOCAL_FILE);
+    long int val;
+    double dval;
+    wxUint32 version;
+    wxString s;
 
-    config->SetPath(wxT("/Version"));
-    if (config->Read(wxT("Version"),&val)) version=val;
+    wxFileConfig config(wxEmptyString,wxEmptyString,file,wxEmptyString,wxCONFIG_USE_LOCAL_FILE);
 
-    config->SetPath(wxT("/Gui"));
-    if (config->Read(wxT("SizeX"),&val)) g_cslSettings->m_frameSize.SetWidth(val);
-    if (config->Read(wxT("SizeY"),&val)) g_cslSettings->m_frameSize.SetHeight(val);
-    if (config->Read(wxT("SplitterMain"),&val)) g_cslSettings->m_splitterMainPos=val;
-    if (config->Read(wxT("SplitterGame"),&val)) g_cslSettings->m_splitterGamePos=val;
-    if (config->Read(wxT("SplitterList"),&val)) g_cslSettings->m_splitterListPos=val;
-    if (config->Read(wxT("SplitterLiveUpdate"),&val)) g_cslSettings->m_splitterLive=val>0;
-    if (config->Read(wxT("UpdateInterval"),&val))
+    config.SetPath(wxT("/Version"));
+    config.Read(wxT("Version"),&val,0); version=val;
+
+    config.SetPath(wxT("/Gui"));
+    if (config.Read(wxT("SizeX"),&val)) g_cslSettings->m_frameSize.SetWidth(val);
+    if (config.Read(wxT("SizeY"),&val)) g_cslSettings->m_frameSize.SetHeight(val);
+    if (config.Read(wxT("UpdateInterval"),&val))
     {
         if (val<CSL_UPDATE_INTERVAL_MIN || val>CSL_UPDATE_INTERVAL_MAX)
             val=CSL_UPDATE_INTERVAL_MIN;
         g_cslSettings->m_updateInterval=val;
     }
-    if (config->Read(wxT("NoUpdatePlaying"),&val)) g_cslSettings->m_dontUpdatePlaying=val>0;
-    if (config->Read(wxT("ShowSearch"),&val)) g_cslSettings->m_showSearch=val>0;
-    if (config->Read(wxT("ShowFilter"),&val)) g_cslSettings->m_showFilter=val>0;
-    if (config->Read(wxT("FilterFavourites"),&val)) g_cslSettings->m_filterFavourites=val>0;
-    if (config->Read(wxT("Filter"),&val)) g_cslSettings->m_filterFlags=val;
-    if (config->Read(wxT("WaitOnFullServer"),&val))
+    if (config.Read(wxT("NoUpdatePlaying"),&val)) g_cslSettings->m_dontUpdatePlaying=val>0;
+    if (config.Read(wxT("ShowFilter"),&val)) g_cslSettings->m_showFilter=val>0;
+    if (config.Read(wxT("FilterMaster"),&val)) g_cslSettings->m_filterMaster=val;
+    if (config.Read(wxT("FilterFavourites"),&val)) g_cslSettings->m_filterFavourites=val;
+    if (config.Read(wxT("WaitOnFullServer"),&val))
     {
         if (val<CSL_WAIT_SERVER_FULL_MIN || val>CSL_WAIT_SERVER_FULL_MAX)
             val=CSL_WAIT_SERVER_FULL_STD;
         g_cslSettings->m_waitServerFull=val;
     }
-    if (config->Read(wxT("PingGood"),&val))
+    if (config.Read(wxT("PingGood"),&val))
     {
         g_cslSettings->m_ping_good=val;
         if (g_cslSettings->m_ping_good>9999)
             g_cslSettings->m_ping_good=CSL_PING_GOOD_STD;
     }
-    if (config->Read(wxT("PingBad"),&val))
+    if (config.Read(wxT("PingBad"),&val))
     {
         g_cslSettings->m_ping_bad=val;
         if (g_cslSettings->m_ping_bad<g_cslSettings->m_ping_good)
             g_cslSettings->m_ping_bad=g_cslSettings->m_ping_good;
     }
-    if (config->Read(wxT("LastOutputPath"),&s)) g_cslSettings->m_outputPath=s;
+    if (config.Read(wxT("LastOutputPath"),&s)) g_cslSettings->m_outputPath=s;
 
     /* ListCtrl */
-    config->SetPath(wxT("/List"));
-    if (config->Read(wxT("AutoFit"),&val)) g_cslSettings->m_autoFitColumns=val>0;
-    if (config->Read(wxT("AutoSort"),&val)) g_cslSettings->m_autoSortColumns=val>0;
+    config.SetPath(wxT("/List"));
+    if (config.Read(wxT("AutoFit"),&val)) g_cslSettings->m_autoFitColumns=val>0;
+    if (config.Read(wxT("AutoSort"),&val)) g_cslSettings->m_autoSortColumns=val>0;
     if (version)
     {
-        if (config->Read(wxT("ColMult1"),&dval)) g_cslSettings->m_colServerS1=(float)dval;
-        if (config->Read(wxT("ColMult2"),&dval)) g_cslSettings->m_colServerS2=(float)dval;
-        if (config->Read(wxT("ColMult3"),&dval)) g_cslSettings->m_colServerS3=(float)dval;
-        if (config->Read(wxT("ColMult4"),&dval)) g_cslSettings->m_colServerS4=(float)dval;
-        if (config->Read(wxT("ColMult5"),&dval)) g_cslSettings->m_colServerS5=(float)dval;
-        if (config->Read(wxT("ColMult6"),&dval)) g_cslSettings->m_colServerS6=(float)dval;
-        if (config->Read(wxT("ColMult7"),&dval)) g_cslSettings->m_colServerS7=(float)dval;
-        if (config->Read(wxT("ColMult8"),&dval)) g_cslSettings->m_colServerS8=(float)dval;
-        if (config->Read(wxT("ColMult9"),&dval)) g_cslSettings->m_colServerS9=(float)dval;
+        if (config.Read(wxT("ColMult1"),&dval)) g_cslSettings->m_colServerS1=(float)dval;
+        if (config.Read(wxT("ColMult2"),&dval)) g_cslSettings->m_colServerS2=(float)dval;
+        if (config.Read(wxT("ColMult3"),&dval)) g_cslSettings->m_colServerS3=(float)dval;
+        if (config.Read(wxT("ColMult4"),&dval)) g_cslSettings->m_colServerS4=(float)dval;
+        if (config.Read(wxT("ColMult5"),&dval)) g_cslSettings->m_colServerS5=(float)dval;
+        if (config.Read(wxT("ColMult6"),&dval)) g_cslSettings->m_colServerS6=(float)dval;
+        if (config.Read(wxT("ColMult7"),&dval)) g_cslSettings->m_colServerS7=(float)dval;
+        if (config.Read(wxT("ColMult8"),&dval)) g_cslSettings->m_colServerS8=(float)dval;
+        if (config.Read(wxT("ColMult9"),&dval)) g_cslSettings->m_colServerS9=(float)dval;
     }
-    if (config->Read(wxT("ColourEmpty"),&val)) g_cslSettings->m_colServerEmpty=INT2COLOUR(val);
-    if (config->Read(wxT("ColourOffline"),&val)) g_cslSettings->m_colServerOff=INT2COLOUR(val);
-    if (config->Read(wxT("ColourFull"),&val)) g_cslSettings->m_colServerFull=INT2COLOUR(val);
-    if (config->Read(wxT("ColourMM1"),&val)) g_cslSettings->m_colServerMM1=INT2COLOUR(val);
-    if (config->Read(wxT("ColourMM2"),&val)) g_cslSettings->m_colServerMM2=INT2COLOUR(val);
-    if (config->Read(wxT("ColourMM3"),&val)) g_cslSettings->m_colServerMM3=INT2COLOUR(val);
-    if (config->Read(wxT("ColourSearch"),&val)) g_cslSettings->m_colServerHigh=INT2COLOUR(val);
-    if (config->Read(wxT("ColourPlaying"),&val)) g_cslSettings->m_colServerPlay=INT2COLOUR(val);
-    if (config->Read(wxT("ColourStripes"),&val)) g_cslSettings->m_colInfoStripe=INT2COLOUR(val);
+    if (config.Read(wxT("ColourEmpty"),&val)) g_cslSettings->m_colServerEmpty=INT2COLOUR(val);
+    if (config.Read(wxT("ColourOffline"),&val)) g_cslSettings->m_colServerOff=INT2COLOUR(val);
+    if (config.Read(wxT("ColourFull"),&val)) g_cslSettings->m_colServerFull=INT2COLOUR(val);
+    if (config.Read(wxT("ColourMM1"),&val)) g_cslSettings->m_colServerMM1=INT2COLOUR(val);
+    if (config.Read(wxT("ColourMM2"),&val)) g_cslSettings->m_colServerMM2=INT2COLOUR(val);
+    if (config.Read(wxT("ColourMM3"),&val)) g_cslSettings->m_colServerMM3=INT2COLOUR(val);
+    if (config.Read(wxT("ColourSearch"),&val)) g_cslSettings->m_colServerHigh=INT2COLOUR(val);
+    if (config.Read(wxT("ColourPlaying"),&val)) g_cslSettings->m_colServerPlay=INT2COLOUR(val);
+    if (config.Read(wxT("ColourStripes"),&val)) g_cslSettings->m_colInfoStripe=INT2COLOUR(val);
 
     /* Client */
-    config->SetPath(wxT("/Clients"));
-    if (config->Read(wxT("BinarySB"),&s)) g_cslSettings->m_clientBinSB=s;
-    if (config->Read(wxT("OptionsSB"),&s)) g_cslSettings->m_clientOptsSB=s;
-    if (config->Read(wxT("PathSB"),&s)) g_cslSettings->m_gamePathSB=s;
-    if (config->Read(wxT("PrivateConfigSB"),&val)) g_cslSettings->m_privConfSB=val>0;
-    if (config->Read(wxT("BinaryAC"),&s)) g_cslSettings->m_clientBinAC=s;
-    if (config->Read(wxT("OptionsAC"),&s)) g_cslSettings->m_clientOptsAC=s;
-    if (config->Read(wxT("PathAC"),&s)) g_cslSettings->m_gamePathAC=s;
-    if (config->Read(wxT("BinaryBF"),&s)) g_cslSettings->m_clientBinBF=s;
-    if (config->Read(wxT("OptionsBF"),&s)) g_cslSettings->m_clientOptsBF=s;
-    if (config->Read(wxT("PrivateConfigBF"),&val)) g_cslSettings->m_privConfBF=val>0;
-    if (config->Read(wxT("PathBF"),&s)) g_cslSettings->m_gamePathBF=s;
-    if (config->Read(wxT("BinaryCB"),&s)) g_cslSettings->m_clientBinCB=s;
-    if (config->Read(wxT("OptionsCB"),&s)) g_cslSettings->m_clientOptsCB=s;
-    if (config->Read(wxT("PathCB"),&s)) g_cslSettings->m_gamePathCB=s;
-    if (config->Read(wxT("MinPlaytime"),&val))
+    config.SetPath(wxT("/Clients"));
+    if (config.Read(wxT("BinarySB"),&s)) g_cslSettings->m_clientBinSB=s;
+    if (config.Read(wxT("OptionsSB"),&s)) g_cslSettings->m_clientOptsSB=s;
+    if (config.Read(wxT("PathSB"),&s)) g_cslSettings->m_gamePathSB=s;
+    if (config.Read(wxT("PrivateConfigSB"),&val)) g_cslSettings->m_privConfSB=val>0;
+    if (config.Read(wxT("BinaryAC"),&s)) g_cslSettings->m_clientBinAC=s;
+    if (config.Read(wxT("OptionsAC"),&s)) g_cslSettings->m_clientOptsAC=s;
+    if (config.Read(wxT("PathAC"),&s)) g_cslSettings->m_gamePathAC=s;
+    if (config.Read(wxT("BinaryBF"),&s)) g_cslSettings->m_clientBinBF=s;
+    if (config.Read(wxT("OptionsBF"),&s)) g_cslSettings->m_clientOptsBF=s;
+    if (config.Read(wxT("PrivateConfigBF"),&val)) g_cslSettings->m_privConfBF=val>0;
+    if (config.Read(wxT("PathBF"),&s)) g_cslSettings->m_gamePathBF=s;
+    if (config.Read(wxT("BinaryCB"),&s)) g_cslSettings->m_clientBinCB=s;
+    if (config.Read(wxT("OptionsCB"),&s)) g_cslSettings->m_clientOptsCB=s;
+    if (config.Read(wxT("PathCB"),&s)) g_cslSettings->m_gamePathCB=s;
+    if (config.Read(wxT("MinPlaytime"),&val))
     {
         if (val<CSL_MIN_PLAYTIME_MIN || val>CSL_MIN_PLAYTIME_MAX)
             val=CSL_MIN_PLAYTIME_STD;
         g_cslSettings->m_minPlaytime=val;
     }
-
-    delete config;
 }
 
 void CslFrame::SaveSettings()
@@ -1445,139 +1447,137 @@ void CslFrame::SaveSettings()
     if (!::wxDirExists(dir))
         ::wxMkdir(dir,0700);
 
-    wxFileConfig *config=new wxFileConfig(wxEmptyString,wxEmptyString,
-                                          dir+PATHDIV+wxT("settings.ini"),
-                                          wxEmptyString,wxCONFIG_USE_LOCAL_FILE);
-    config->SetUmask(0077);
-    config->DeleteAll();
+    wxFileConfig config(wxEmptyString,wxEmptyString,dir+PATHDIV+wxT("settings.ini"),
+                        wxEmptyString,wxCONFIG_USE_LOCAL_FILE);
+    config.SetUmask(0077);
+    config.DeleteAll();
 
-    wxSize size=GetSize();
-    long int pos;
-
-    config->SetPath(wxT("/Version"));
-    config->Write(wxT("Version"),CSL_CONFIG_VERSION);
+    config.SetPath(wxT("/Version"));
+    config.Write(wxT("Version"),CSL_CONFIG_VERSION);
 
     /* GUI */
-    config->SetPath(wxT("/Gui"));
-    config->Write(wxT("SizeX"),(long int)size.GetWidth());
-    config->Write(wxT("SizeY"),(long int)size.GetHeight());
-    pos=splitter_main->GetSashPosition();
-    config->Write(wxT("SplitterMain"),pos);
-    pos=splitter_games_info->GetSashPosition();
-    config->Write(wxT("SplitterGame"),pos);
-    pos=splitter_lists->GetSashPosition();
-    config->Write(wxT("SplitterList"),pos);
-    config->Write(wxT("SplitterLiveUpdate"),(long int)g_cslSettings->m_splitterLive);
-    config->Write(wxT("UpdateInterval"),(long int)g_cslSettings->m_updateInterval);
-    config->Write(wxT("NoUpdatePlaying"),g_cslSettings->m_dontUpdatePlaying);
-    config->Write(wxT("ShowSearch"),g_cslSettings->m_showSearch);
-    config->Write(wxT("ShowFilter"),g_cslSettings->m_showFilter);
-    config->Write(wxT("FilterFavourites"),g_cslSettings->m_filterFavourites);
-    config->Write(wxT("Filter"),(long int)g_cslSettings->m_filterFlags);
-    config->Write(wxT("WaitOnFullServer"),(long int)g_cslSettings->m_waitServerFull);
-    config->Write(wxT("PingGood"),(long int)g_cslSettings->m_ping_good);
-    config->Write(wxT("PingBad"),(long int)g_cslSettings->m_ping_bad);
-    config->Write(wxT("LastOutputPath"),g_cslSettings->m_outputPath);
+    wxSize size=GetSize();
+    config.SetPath(wxT("/Gui"));
+    config.Write(wxT("SizeX"),(long int)size.GetWidth());
+    config.Write(wxT("SizeY"),(long int)size.GetHeight());
+    config.Write(wxT("UpdateInterval"),(long int)g_cslSettings->m_updateInterval);
+    config.Write(wxT("NoUpdatePlaying"),g_cslSettings->m_dontUpdatePlaying);
+    config.Write(wxT("ShowFilter"),g_cslSettings->m_showFilter);
+    config.Write(wxT("FilterMaster"),(long int)g_cslSettings->m_filterMaster);
+    config.Write(wxT("FilterFavourites"),(long int)g_cslSettings->m_filterFavourites);
+    config.Write(wxT("WaitOnFullServer"),(long int)g_cslSettings->m_waitServerFull);
+    config.Write(wxT("PingGood"),(long int)g_cslSettings->m_ping_good);
+    config.Write(wxT("PingBad"),(long int)g_cslSettings->m_ping_bad);
+    config.Write(wxT("LastOutputPath"),g_cslSettings->m_outputPath);
 
     /* ListCtrl */
-    config->SetPath(wxT("/List"));
-    config->Write(wxT("AutoFit"),g_cslSettings->m_autoFitColumns);
-    config->Write(wxT("AutoSort"),g_cslSettings->m_autoSortColumns);
-    config->Write(wxT("ColMult1"),g_cslSettings->m_colServerS1);
-    config->Write(wxT("ColMult2"),g_cslSettings->m_colServerS2);
-    config->Write(wxT("ColMult3"),g_cslSettings->m_colServerS3);
-    config->Write(wxT("ColMult4"),g_cslSettings->m_colServerS4);
-    config->Write(wxT("ColMult5"),g_cslSettings->m_colServerS5);
-    config->Write(wxT("ColMult6"),g_cslSettings->m_colServerS6);
-    config->Write(wxT("ColMult7"),g_cslSettings->m_colServerS7);
-    config->Write(wxT("ColMult8"),g_cslSettings->m_colServerS8);
-    config->Write(wxT("ColMult9"),g_cslSettings->m_colServerS9);
-    config->Write(wxT("ColourEmpty"),COLOUR2INT(g_cslSettings->m_colServerEmpty));
-    config->Write(wxT("ColourOffline"),COLOUR2INT(g_cslSettings->m_colServerOff));
-    config->Write(wxT("ColourFull"),COLOUR2INT(g_cslSettings->m_colServerFull));
-    config->Write(wxT("ColourMM1"),COLOUR2INT(g_cslSettings->m_colServerMM1));
-    config->Write(wxT("ColourMM2"),COLOUR2INT(g_cslSettings->m_colServerMM2));
-    config->Write(wxT("ColourMM3"),COLOUR2INT(g_cslSettings->m_colServerMM3));
-    config->Write(wxT("ColourSearch"),COLOUR2INT(g_cslSettings->m_colServerHigh));
-    config->Write(wxT("ColourPlaying"),COLOUR2INT(g_cslSettings->m_colServerPlay));
-    config->Write(wxT("ColourStripes"),COLOUR2INT(g_cslSettings->m_colInfoStripe));
+    config.SetPath(wxT("/List"));
+    config.Write(wxT("AutoFit"),g_cslSettings->m_autoFitColumns);
+    config.Write(wxT("AutoSort"),g_cslSettings->m_autoSortColumns);
+    config.Write(wxT("ColMult1"),g_cslSettings->m_colServerS1);
+    config.Write(wxT("ColMult2"),g_cslSettings->m_colServerS2);
+    config.Write(wxT("ColMult3"),g_cslSettings->m_colServerS3);
+    config.Write(wxT("ColMult4"),g_cslSettings->m_colServerS4);
+    config.Write(wxT("ColMult5"),g_cslSettings->m_colServerS5);
+    config.Write(wxT("ColMult6"),g_cslSettings->m_colServerS6);
+    config.Write(wxT("ColMult7"),g_cslSettings->m_colServerS7);
+    config.Write(wxT("ColMult8"),g_cslSettings->m_colServerS8);
+    config.Write(wxT("ColMult9"),g_cslSettings->m_colServerS9);
+    config.Write(wxT("ColourEmpty"),COLOUR2INT(g_cslSettings->m_colServerEmpty));
+    config.Write(wxT("ColourOffline"),COLOUR2INT(g_cslSettings->m_colServerOff));
+    config.Write(wxT("ColourFull"),COLOUR2INT(g_cslSettings->m_colServerFull));
+    config.Write(wxT("ColourMM1"),COLOUR2INT(g_cslSettings->m_colServerMM1));
+    config.Write(wxT("ColourMM2"),COLOUR2INT(g_cslSettings->m_colServerMM2));
+    config.Write(wxT("ColourMM3"),COLOUR2INT(g_cslSettings->m_colServerMM3));
+    config.Write(wxT("ColourSearch"),COLOUR2INT(g_cslSettings->m_colServerHigh));
+    config.Write(wxT("ColourPlaying"),COLOUR2INT(g_cslSettings->m_colServerPlay));
+    config.Write(wxT("ColourStripes"),COLOUR2INT(g_cslSettings->m_colInfoStripe));
 
     /* Client */
-    config->SetPath(wxT("/Clients"));
-    config->Write(wxT("BinarySB"),g_cslSettings->m_clientBinSB);
-    config->Write(wxT("OptionsSB"),g_cslSettings->m_clientOptsSB);
-    config->Write(wxT("PathSB"),g_cslSettings->m_gamePathSB);
-    config->Write(wxT("PrivateConfigSB"),g_cslSettings->m_privConfSB);
-    config->Write(wxT("BinaryAC"),g_cslSettings->m_clientBinAC);
-    config->Write(wxT("OptionsAC"),g_cslSettings->m_clientOptsAC);
-    config->Write(wxT("PathAC"),g_cslSettings->m_gamePathAC);
-    config->Write(wxT("BinaryBF"),g_cslSettings->m_clientBinBF);
-    config->Write(wxT("OptionsBF"),g_cslSettings->m_clientOptsBF);
-    config->Write(wxT("PrivateConfigBF"),g_cslSettings->m_privConfBF);
-    config->Write(wxT("PathBF"),g_cslSettings->m_gamePathBF);
-    config->Write(wxT("BinaryCB"),g_cslSettings->m_clientBinCB);
-    config->Write(wxT("OptionsCB"),g_cslSettings->m_clientOptsCB);
-    config->Write(wxT("PathCB"),g_cslSettings->m_gamePathCB);
-    config->Write(wxT("MinPlaytime"),(long int)g_cslSettings->m_minPlaytime);
-
-    delete config;
+    config.SetPath(wxT("/Clients"));
+    config.Write(wxT("BinarySB"),g_cslSettings->m_clientBinSB);
+    config.Write(wxT("OptionsSB"),g_cslSettings->m_clientOptsSB);
+    config.Write(wxT("PathSB"),g_cslSettings->m_gamePathSB);
+    config.Write(wxT("PrivateConfigSB"),g_cslSettings->m_privConfSB);
+    config.Write(wxT("BinaryAC"),g_cslSettings->m_clientBinAC);
+    config.Write(wxT("OptionsAC"),g_cslSettings->m_clientOptsAC);
+    config.Write(wxT("PathAC"),g_cslSettings->m_gamePathAC);
+    config.Write(wxT("BinaryBF"),g_cslSettings->m_clientBinBF);
+    config.Write(wxT("OptionsBF"),g_cslSettings->m_clientOptsBF);
+    config.Write(wxT("PrivateConfigBF"),g_cslSettings->m_privConfBF);
+    config.Write(wxT("PathBF"),g_cslSettings->m_gamePathBF);
+    config.Write(wxT("BinaryCB"),g_cslSettings->m_clientBinCB);
+    config.Write(wxT("OptionsCB"),g_cslSettings->m_clientOptsCB);
+    config.Write(wxT("PathCB"),g_cslSettings->m_gamePathCB);
+    config.Write(wxT("MinPlaytime"),(long int)g_cslSettings->m_minPlaytime);
 }
 
 bool CslFrame::LoadServers(wxUint32 *numm,wxUint32 *nums)
 {
+    wxString file=wxStandardPaths().GetUserDataDir()+PATHDIV+wxT("servers.ini");
+
+    if (!::wxFileExists(file))
+        return false;
+
     long int val;
-    bool read_master,read_server;
+    bool read_server;
     wxUint32 mc=0,sc=0,tmc=0,tsc=0;
-    wxFileConfig *config=NULL;
-    CslMaster *master=NULL;
+    CslMaster *master;
     vector<CslIDMapping*> mappings;
     vector<wxInt32> ids;
 
     wxString addr,path,password,description;
+    wxUint16 port=0;
     wxUint32 view=0;
     wxUint32 lastSeen=0;
     wxUint32 playLast=0;
     wxUint32 playTimeLastGame=0;
     wxUint32 playTimeTotal=0;
     wxUint32 connectedTimes=0;
+    wxUint32 gt;
 
-    wxString s=wxStandardPaths().GetUserDataDir();
-    wxString file=s+PATHDIV+wxT("servers.ini");
+    wxFileConfig config(wxEmptyString,wxEmptyString,file,wxEmptyString,wxCONFIG_USE_LOCAL_FILE);
 
-    if (!::wxFileExists(file))
-        goto finish;
-
-    config=new wxFileConfig(wxEmptyString,wxEmptyString,file,
-                            wxEmptyString,wxCONFIG_USE_LOCAL_FILE);
-
-    for (wxUint32 g=CSL_GAME_START+1;g<CSL_GAME_END;g++)
+    for (gt=CSL_GAME_START+1;gt<CSL_GAME_END;gt++)
     {
-        wxString s=wxT("/")+wxString(GetGameStr(g));
-        config->SetPath(s);
+        wxString s=wxT("/")+wxString(GetGameStr(gt));
+        config.SetPath(s);
 
         mc=0;
-        read_master=true;
-        while (read_master)
+        while (1)
         {
-            config->SetPath(s+wxString::Format(wxT("/Master/%d"),mc++));
+            long int id;
+            CslMasterConnection connection;
+            master=NULL;
 
-            read_master=false;
-            if (config->Read(wxT("address"),&addr))
+            config.SetPath(s+wxString::Format(wxT("/Master/%d"),mc++));
+
+            if (config.Read(wxT("Address"),&addr))
             {
-                if (config->Read(wxT("path"),&path))
-                    if (config->Read(wxT("ID"),&val))
-                        read_master=true;
+                if (config.Read(wxT("ID"),&id))
+                {
+                    val=0;
+                    config.Read(wxT("Port"),&val,0); port=val;
+                    config.Read(wxT("Type"),&val,CSL_MASTER_CONN_HTTP);
+                    if (val==CSL_MASTER_CONN_HTTP)
+                    {
+                        port=port ? port:CSL_DEFAULT_MASTER_WEB_PORT;
+                        if (config.Read(wxT("Path"),&path))
+                            master=new CslMaster((CSL_GAMETYPE)gt,CslMasterConnection(addr,path,port));
+                    }
+                    else if (port)
+                        master=new CslMaster((CSL_GAMETYPE)gt,CslMasterConnection(addr,port));
+                }
             }
-            if (!read_master)
+            if (!master)
                 break;
 
-            master=new CslMaster((CSL_GAMETYPE)g,addr,path);
             if (!m_engine->AddMaster(master))
             {
                 delete master;
                 continue;
             }
-            mappings.add(new CslIDMapping(val,master->GetID()));
+            mappings.add(new CslIDMapping(id,master->GetID()));
             tmc++;
         }
 
@@ -1588,31 +1588,32 @@ bool CslFrame::LoadServers(wxUint32 *numm,wxUint32 *nums)
             wxInt32 id=0;
             ids.setsize(0);
 
-            config->SetPath(s+wxString::Format(wxT("/Server/%d"),sc++));
+            config.SetPath(s+wxString::Format(wxT("/Server/%d"),sc++));
 
             read_server=false;
-            if (config->Read(wxT("Address"),&addr))
+            if (config.Read(wxT("Address"),&addr))
             {
-                config->Read(wxT("Password"),&password);
-                config->Read(wxT("Description"),&description);
+                config.Read(wxT("Port"),&val,GetDefaultPort((CSL_GAMETYPE)gt)); port=val;
+                config.Read(wxT("Password"),&password);
+                config.Read(wxT("Description"),&description);
 
-                while (config->Read(wxString::Format(wxT("Master%d"),id++),&val))
+                while (config.Read(wxString::Format(wxT("Master%d"),id++),&val))
                     ids.add(val);
                 if (ids.length()==0)
                     ids.add(-1);
 
-                if (config->Read(wxT("View"),&val))
+                if (config.Read(wxT("View"),&val))
                 {
                     view=val;
-                    if (config->Read(wxT("LastSeen"),&val))
+                    if (config.Read(wxT("LastSeen"),&val))
                         lastSeen=(wxUint32)val;
-                    if (config->Read(wxT("PlayLast"),&val))
+                    if (config.Read(wxT("PlayLast"),&val))
                         playLast=(wxUint32)val;
-                    if (config->Read(wxT("PlayTimeLastGame"),&val))
+                    if (config.Read(wxT("PlayTimeLastGame"),&val))
                         playTimeLastGame=(wxUint32)val;
-                    if (config->Read(wxT("PlayTimeTotal"),&val))
+                    if (config.Read(wxT("PlayTimeTotal"),&val))
                         playTimeTotal=(wxUint32)val;
-                    if (config->Read(wxT("ConnectedTimes"),&val))
+                    if (config.Read(wxT("ConnectedTimes"),&val))
                         connectedTimes=(wxUint32)val;
                     read_server=true;
                 }
@@ -1623,8 +1624,8 @@ bool CslFrame::LoadServers(wxUint32 *numm,wxUint32 *nums)
 
             loopv(ids)
             {
-                CslServerInfo *info=new CslServerInfo(addr,(CSL_GAMETYPE)g,view,lastSeen,
-                                                      playLast,playTimeLastGame,
+                CslServerInfo *info=new CslServerInfo((CSL_GAMETYPE)gt,addr,port,view,
+                                                      lastSeen,playLast,playTimeLastGame,
                                                       playTimeTotal,connectedTimes,
                                                       description,password);
 
@@ -1650,10 +1651,6 @@ bool CslFrame::LoadServers(wxUint32 *numm,wxUint32 *nums)
             }
         }
     }
-
-finish:
-    if (config)
-        delete config;
 
     loopv(mappings)
     delete mappings[i];
@@ -1681,11 +1678,10 @@ void CslFrame::SaveServers()
             return;
         }
 
-    wxFileConfig *config=new wxFileConfig(wxEmptyString,wxEmptyString,
-                                          s+PATHDIV+wxT("servers.ini"),
-                                          wxEmptyString,wxCONFIG_USE_LOCAL_FILE);
-    config->SetUmask(0077);
-    config->DeleteAll();
+    wxFileConfig config(wxEmptyString,wxEmptyString,s+PATHDIV+wxT("servers.ini"),
+                        wxEmptyString,wxCONFIG_USE_LOCAL_FILE);
+    config.SetUmask(0077);
+    config.DeleteAll();
 
     wxInt32 mc,sc;
     CslMaster *master;
@@ -1696,10 +1692,10 @@ void CslFrame::SaveServers()
     vector<CslGame*> *games=m_engine->GetGames();
 
     if (!games->length())
-        goto finish;
+        return;
 
-    config->SetPath(wxT("/Version"));
-    config->Write(wxT("Version"),CSL_SERVERCONFIG_VERSION);
+    config.SetPath(wxT("/Version"));
+    config.Write(wxT("Version"),CSL_SERVERCONFIG_VERSION);
 
     servers=m_engine->GetFavourites();
 
@@ -1707,7 +1703,7 @@ void CslFrame::SaveServers()
     {
         game=games->at(i);
         s=wxT("/")+game->GetName();
-        config->SetPath(s);
+        config.SetPath(s);
 
         masters=game->GetMasters();
 
@@ -1715,11 +1711,14 @@ void CslFrame::SaveServers()
         loopvj(*masters)
         {
             master=masters->at(j);
+            CslMasterConnection& connection=master->GetConnection();
 
-            config->SetPath(s+s.Format(wxT("/Master/%d"),mc++));
-            config->Write(wxT("Address"),master->GetAddress());
-            config->Write(wxT("Path"),master->GetPath());
-            config->Write(wxT("ID"),master->GetID());
+            config.SetPath(s+s.Format(wxT("/Master/%d"),mc++));
+            config.Write(wxT("Type"),connection.GetType());
+            config.Write(wxT("Address"),connection.GetAddress());
+            config.Write(wxT("Port"),connection.GetPort());
+            config.Write(wxT("Path"),connection.GetPath());
+            config.Write(wxT("ID"),master->GetID());
         }
 
         servers=game->GetServers();
@@ -1730,26 +1729,24 @@ void CslFrame::SaveServers()
         loopvk(*servers)
         {
             info=servers->at(k);
-            config->SetPath(s+s.Format(wxT("/Server/%d"),sc++));
-            config->Write(wxT("Address"),info->m_host);
-            config->Write(wxT("Password"),info->m_password);
-            config->Write(wxT("Description"),info->m_descOld);
+            config.SetPath(s+s.Format(wxT("/Server/%d"),sc++));
+            config.Write(wxT("Address"),info->m_host);
+            config.Write(wxT("Port"),info->m_port);
+            config.Write(wxT("Password"),info->m_password);
+            config.Write(wxT("Description"),info->m_descOld);
 
             loopvj(info->m_masterIDs)
             {
-                config->Write(wxString::Format(wxT("Master%d"),j),info->m_masterIDs[j]);
+                config.Write(wxString::Format(wxT("Master%d"),j),info->m_masterIDs[j]);
             }
-            config->Write(wxT("View"),(int)info->m_view);
-            config->Write(wxT("LastSeen"),(int)info->m_lastSeen);
-            config->Write(wxT("PlayLast"),(int)info->m_playLast);
-            config->Write(wxT("PlayTimeLastGame"),(int)info->m_playTimeLastGame);
-            config->Write(wxT("PlayTimeTotal"),(int)info->m_playTimeTotal);
-            config->Write(wxT("ConnectedTimes"),(int)info->m_connectedTimes);
+            config.Write(wxT("View"),(int)info->m_view);
+            config.Write(wxT("LastSeen"),(int)info->m_lastSeen);
+            config.Write(wxT("PlayLast"),(int)info->m_playLast);
+            config.Write(wxT("PlayTimeLastGame"),(int)info->m_playTimeLastGame);
+            config.Write(wxT("PlayTimeTotal"),(int)info->m_playTimeTotal);
+            config.Write(wxT("ConnectedTimes"),(int)info->m_connectedTimes);
         }
     }
-
-finish:
-    delete config;
 }
 
 
@@ -1769,6 +1766,7 @@ bool CslApp::OnInit()
 
 #ifdef __WXMAC__
     wxSystemOptions::SetOption(wxT("mac.listctrl.always_use_generic"),1);
+    //TODO wxApp::SetExitOnFrameDelete(false);
 #endif
 
     wxString name=wxString::Format(wxT(".%s-%s.lock"),CSL_NAME_SHORT_STR,wxGetUserId().c_str());

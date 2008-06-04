@@ -22,14 +22,54 @@
 #include "CslGame.h"
 #include "CslTools.h"
 
+const wxChar* GetVersionStr(const CSL_GAMETYPE type,const wxInt32 protocol)
+{
+    switch (type)
+    {
+        case CSL_GAME_SB:
+            return GetVersionStrSB(protocol);
+        case CSL_GAME_AC:
+            return GetVersionStrAC(protocol);
+        case CSL_GAME_BF:
+            return GetVersionStrBF(protocol);
+        case CSL_GAME_CB:
+            return GetVersionStrCB(protocol);
+        default:
+            break;
+    }
+    return wxEmptyString;
+}
+
+wxUint32 GetDefaultPort(const CSL_GAMETYPE type)
+{
+    switch (type)
+    {
+        case CSL_GAME_SB:
+            return CSL_DEFAULT_PORT_SB;
+            break;
+        case CSL_GAME_AC:
+            return CSL_DEFAULT_PORT_AC;
+            break;
+        case CSL_GAME_BF:
+            return CSL_DEFAULT_PORT_BF;
+            break;
+        case CSL_GAME_CB:
+            return CSL_DEFAULT_PORT_CB;
+            break;
+        default:
+            break;
+    }
+    return 0;
+}
+
 const wxChar* GetVersionStrSB(int n)
 {
     static const wxChar* sb_versions[] =
     {
-        wxT("Assassin"), wxT("Summer"), wxT("Spring"), wxT("Gui"),
-        wxT("Water"), wxT("Normalmap"), wxT("Sp"), wxT("Occlusion"),
-        wxT("Shader"), wxT("Physics"), wxT("Mp"), wxT(""), wxT("Agc"),
-        wxT("Quakecon"), wxT("Independence")
+        wxT("CVS"), wxT("Assassin"), wxT("Summer"), wxT("Spring"),
+        wxT("Gui"), wxT("Water"), wxT("Normalmap"), wxT("Sp"),
+        wxT("Occlusion"), wxT("Shader"), wxT("Physics"), wxT("Mp"),
+        wxT(""), wxT("Agc"), wxT("Quakecon"), wxT("Independence")
     };
     wxUint32 v=CSL_LAST_PROTOCOL_SB-n;
     return (v>=0 && v<sizeof(sb_versions)/sizeof(sb_versions[0])) ?
@@ -40,7 +80,7 @@ const wxChar* GetVersionStrAC(int n)
 {
     static const wxChar* ac_versions[] =
     {
-        wxT("0.93.x"), wxT("0.92"), wxT("0.91.x"), wxT("0.90")
+        wxT("1.0"), wxT("0.93.x"), wxT("0.92"), wxT("0.91.x"), wxT("0.90")
     };
     wxUint32 v=CSL_LAST_PROTOCOL_AC-n;
     return (v>=0 && v<sizeof(ac_versions)/sizeof(ac_versions[0])) ?
@@ -77,7 +117,7 @@ const wxChar* GetModeStrSB(int n)
         wxT("instagib"), wxT("instagib team"), wxT("efficiency"), wxT("efficiency team"),
         wxT("insta arena"), wxT("insta clan arena"), wxT("tactics arena"), wxT("tactics clan arena"),
         wxT("capture"), wxT("insta capture"), wxT("regen capture"), wxT("assassin"),
-        wxT("insta assassin")
+        wxT("insta assassin"), wxT("ctf"), wxT("insta ctf")
     };
     return (n>=0 && (size_t)n<sizeof(sb_modenames)/sizeof(sb_modenames[0])) ? sb_modenames[n] : _("unknown");
 }
@@ -110,7 +150,7 @@ const wxChar* GetWeaponStrAC(int n)
     static const wxChar* ac_weapons[] =
     {
         wxT("Knife"), wxT("Pistol"), wxT("Shotgun"), wxT("Subgun"),
-        wxT("Sniper"), wxT("Assault"), wxT("Grenade")
+        wxT("Sniper"), wxT("Assault"), wxT("Grenade"), wxT("Pistol (auto)")
     };
     return (n>=0 && (size_t)n<sizeof(ac_weapons)/sizeof(ac_weapons[0])) ? ac_weapons[n] : _("unknown");
 }
@@ -408,6 +448,8 @@ wxInt32 CslGame::ConnectPrepareConfig(wxString& out,const CslServerInfo *info,co
             wxString src;
             wxString map=wxString(CSL_DEFAULT_INJECT_FIL_SB)+wxString(wxT(".ogz"));
             wxString dst=path+wxString(CSL_DEFAULT_INJECT_DIR_SB)+map;
+            wxString port;
+
             cfg=path+wxString(CSL_DEFAULT_INJECT_DIR_SB)+
                 wxString(CSL_DEFAULT_INJECT_FIL_SB)+
                 wxString(wxT(".cfg"));
@@ -432,8 +474,11 @@ wxInt32 CslGame::ConnectPrepareConfig(wxString& out,const CslServerInfo *info,co
                     return CSL_ERROR_FILE_OPERATION;
             }
 
-            script=wxString::Format(wxT("if (= $csl_connect 1) [ sleep 1000 [ connect %s ] ]\r\n%s\r\n"),
-                                    info->m_host.c_str(),wxT("csl_connect = 0"));
+            if (GetDefaultPort(info->m_type)!=info->m_port)
+                port=wxString::Format(wxT(":%d"),info->m_port);
+
+            script=wxString::Format(wxT("if (= $csl_connect 1) [ sleep 1000 [ connect %s%s ] ]\r\n%s\r\n"),
+                                    info->m_host.c_str(),port.c_str(),wxT("csl_connect = 0"));
             break;
         }
 

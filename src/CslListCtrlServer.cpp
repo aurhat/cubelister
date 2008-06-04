@@ -257,6 +257,7 @@ CslListCtrlServer::~CslListCtrlServer()
 void CslListCtrlServer::OnSize(wxSizeEvent& event)
 {
     ListAdjustSize(event.GetSize());
+    //wxPostEvent(m_parent,event);
     event.Skip();
 }
 
@@ -305,9 +306,7 @@ void CslListCtrlServer::OnItemSelected(wxListEvent& event)
     event.Skip();
 
     wxListItem item;
-    wxInt32 i=event.GetIndex();
-
-    item.SetId(i);
+    item.SetId(event.GetIndex());
     GetItem(item);
 
     CslListServer *server=(CslListServer*)GetItemData(item);
@@ -316,10 +315,7 @@ void CslListCtrlServer::OnItemSelected(wxListEvent& event)
     if (m_dontUpdateInfo)
         return;
 
-#ifdef CSL_USE_WX_LIST_DESELECT_WORKAROUND
-    if (FindFocus()==this)
-#endif
-        m_listInfo->UpdateInfo(m_selected.Last()->GetPtr());
+    event.SetClientData((void*)server->GetPtr());
 }
 
 void CslListCtrlServer::OnItemDeselected(wxListEvent& event)
@@ -329,10 +325,8 @@ void CslListCtrlServer::OnItemDeselected(wxListEvent& event)
     if (m_dontRemoveOnDeselect)
         return;
 
-    wxInt32 i=event.GetIndex();
-
     wxListItem item;
-    item.SetId(i);
+    item.SetId(event.GetIndex());
     GetItem(item);
 
     CslListServer *server=(CslListServer*)GetItemData(item);
@@ -1349,10 +1343,13 @@ void CslListCtrlServer::ConnectToServer(CslServerInfo *info,const wxString& pass
 
             if (sbUseParam)
             {
+                wxString port;
+                if (GetDefaultPort(info->m_type)!=info->m_port)
+                    port=wxString::Format(wxT(":%d"),info->m_port);
 #ifdef __WXMSW__
-                opts+=wxString(wxT(" -x\"connect "))+info->m_host+wxString(wxT("\""));
+                opts+=wxString(wxT(" -x\"connect "))+info->m_host+port+wxString(wxT("\""));
 #else
-                opts+=wxString(wxT(" -xconnect\\ "))+info->m_host;
+                opts+=wxString(wxT(" -xconnect\\ "))+info->m_host+port;
 #endif
             }
             else

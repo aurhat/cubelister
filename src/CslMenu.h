@@ -62,24 +62,12 @@ enum
     MENU_SERVER_EXTENDED,
     MENU_SERVER_FILTER_VER,
 
-    MENU_VIEW_HOST,
-    MENU_VIEW_DESC,
-    MENU_VIEW_PING,
-    MENU_VIEW_VER,
-    MENU_VIEW_MODE,
-    MENU_VIEW_MAP,
-    MENU_VIEW_TIME,
-    MENU_VIEW_PLAY,
-    MENU_VIEW_MM,
-
-    MENU_VIEW_SEARCH,
     MENU_VIEW_FILTER,
     MENU_VIEW_OUTPUT,
     MENU_VIEW_AUTO_SORT,
     MENU_VIEW_AUTO_FIT,
-    MENU_VIEW_SPLITTER_LIVE,
 
-    MENU_INFO_ABOUT,
+    MENU_INFO_TRAFFIC,
 
     MENU_END
 };
@@ -89,8 +77,8 @@ class CslMenu
     public:
         CslMenu(wxMenuBar *menuBar);
 
-        static void EnableMenuItem(wxInt32 id,bool enable=true);
-        static void CheckMenuItem(wxInt32 id,bool check=true);
+        static void EnableMenuItem(const wxInt32 id,const bool enable=true);
+        static void CheckMenuItem(const wxInt32 id,const bool check=true);
         static wxMenuItem& AddItemToMenu(wxMenu *menu,const wxInt32 id,
                                          const wxString& text,const wxArtID& art,
                                          const wxItemKind kind=wxITEM_NORMAL,

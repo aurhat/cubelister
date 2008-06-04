@@ -35,14 +35,9 @@
 #include "CslGeoIP.h"
 #include "cube_tools.h"
 
-#define CSL_EX_VERSION_MIN      101
+#define CSL_EX_VERSION_MIN      102
 #define CSL_EX_VERSION_MAX      103
 // commands
-// version 101
-#define CSL_EX_PING_UPTIME_STR      "ut"
-#define CSL_EX_PING_PLAYERSTATS_STR "ps"
-#define CSL_EX_PING_TEAMSTATS_STR   "ts"
-// since version 102
 #define CSL_EX_PING_UPTIME      0
 #define CSL_EX_PING_PLAYERSTATS 1
 #define CSL_EX_PING_TEAMSTATS   2
@@ -80,13 +75,13 @@ class CslPlayerStatsData
 {
     public:
         CslPlayerStatsData() :
-                m_frags(-1),m_deaths(-1),m_teamkills(-1),
+                m_frags(0),m_deaths(0),m_teamkills(0),m_accuracy(0),
                 m_health(-1),m_armour(-1),m_weapon(-1),m_id(-1),
                 m_priv(CSL_PLAYER_STATE_UNKNOWN),m_state(CSL_PLAYER_PRIV_UNKNOWN),
                 m_ip(0),m_ok(false) {}
 
         wxString m_player,m_team;
-        wxInt32 m_frags,m_deaths,m_teamkills;
+        wxInt32 m_frags,m_deaths,m_teamkills,m_accuracy;
         wxInt32 m_health,m_armour,m_weapon;
         wxInt32 m_id;
         wxInt32 m_priv,m_state;
@@ -152,6 +147,28 @@ class CslTeamStats
         wxUint32 m_lastRefresh,m_lastResponse;
         vector<CslTeamStatsData*> m_stats;
         wxCriticalSection *m_critical;
+};
+
+
+#define CSL_UPTIME_REFRESH_MULT 4
+
+class CslExtendedInfo
+{
+    public:
+        CslExtendedInfo() : m_extInfoStatus(CSL_EXT_STATUS_FALSE),m_extInfoVersion(0),
+                m_uptime(0),m_uptimeRefresh(CSL_UPTIME_REFRESH_MULT),
+                m_playerStats(NULL),m_teamStats(NULL) {};
+
+        bool CanPingUptime() { return m_uptimeRefresh++%CSL_UPTIME_REFRESH_MULT==0; }
+        void CreatePlayerStats() { if (!m_playerStats) m_playerStats=new CslPlayerStats(); }
+        void DeletePlayerStats() { if (m_playerStats) { delete m_playerStats; m_playerStats=NULL; } }
+        void CreateTeamStats() { if (!m_teamStats) m_teamStats=new CslTeamStats(); }
+        void DeleteTeamStats() { if (m_teamStats) { delete m_teamStats; m_teamStats=NULL; } }
+
+        wxInt32 m_extInfoStatus,m_extInfoVersion;
+        wxUint32 m_uptime,m_uptimeRefresh;
+        CslPlayerStats *m_playerStats;
+        CslTeamStats *m_teamStats;
 };
 
 #endif // CSLEXTENDEDINFO_H

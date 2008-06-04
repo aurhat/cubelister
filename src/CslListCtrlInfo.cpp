@@ -25,7 +25,7 @@
 #include "CslGeoIP.h"
 #include "img/info_18_12.xpm"
 
-BEGIN_EVENT_TABLE(CslListCtrlInfo, wxListCtrl)
+BEGIN_EVENT_TABLE(CslListCtrlInfo,wxListCtrl)
     EVT_SIZE(CslListCtrlInfo::OnSize)
 END_EVENT_TABLE()
 

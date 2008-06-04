@@ -28,6 +28,10 @@ BEGIN_EVENT_TABLE(CslUDP,wxEvtHandler)
 END_EVENT_TABLE()
 
 
+wxUint32 CslUDP::m_bytesIn=0,CslUDP::m_bytesOut=0;
+wxUint32 CslUDP::m_packetsIn=0,CslUDP::m_packetsOut=0;
+
+
 CslUDP::CslUDP(wxEvtHandler *evtHandler) : wxEvtHandler(),
         m_init(false),m_evtHandler(evtHandler)
 {
@@ -62,6 +66,7 @@ void CslUDP::OnSocketEvent(wxSocketEvent& event)
         return;
 
     wxIPV4address addr;
+    wxUint32 size;
     CslUDPPacket *packet=new CslUDPPacket(CSL_MAX_PACKET_SIZE);
 
     m_socket->RecvFrom(addr,packet->Data(),CSL_MAX_PACKET_SIZE);
@@ -69,11 +74,14 @@ void CslUDP::OnSocketEvent(wxSocketEvent& event)
     if (m_socket->Error())
     {
         packet->FreeData();
-        LOG_DEBUG("Error read\n");
+        LOG_DEBUG("Error reading on UDP socket\n");
     }
 
+    size=m_socket->LastCount();
     packet->SetAddr(addr);
-    packet->SetSize(m_socket->LastCount());
+    packet->SetSize(size);
+    m_bytesIn+=size;
+    m_packetsIn++;
 
     wxCommandEvent evt(wxCSL_EVT_PING);
     evt.SetClientData(packet);
@@ -97,5 +105,41 @@ bool CslUDP::SendPing(CslUDPPacket *packet)
         return false;
     }
 
+    m_bytesOut+=size;
+    m_packetsOut++;
+
     return true;
+}
+
+wxUint32 CslUDP::GetPacketCount(wxUint32 type)
+{
+    switch (type)
+    {
+        case CSL_UDP_TRAFFIC_IN:
+            return m_packetsIn;
+        case CSL_UDP_TRAFFIC_OUT:
+            return m_packetsOut;
+    }
+    return 0;
+}
+
+wxUint32 CslUDP::GetTraffic(wxUint32 type,bool overhead)
+{
+    wxUint32 bytes,packets;
+
+    switch (type)
+    {
+        case CSL_UDP_TRAFFIC_IN:
+            bytes=m_bytesIn;
+            packets=m_packetsIn;
+            break;
+        case CSL_UDP_TRAFFIC_OUT:
+            bytes=m_bytesOut;
+            packets=m_packetsOut;
+            break;
+        default:
+            return 0;
+    }
+
+    return bytes+packets*(overhead ? CSL_UDP_OVERHEAD:0);
 }

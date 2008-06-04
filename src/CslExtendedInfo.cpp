@@ -38,7 +38,8 @@ CslPlayerStatsData* CslPlayerStats::GetNewStatsPtr()
 
     loopv(m_stats)
     {
-        if (m_stats[i]->m_ok) continue;
+        if (m_stats[i]->m_ok)
+            continue;
         return m_stats[i];
     }
     return new CslPlayerStatsData;
@@ -96,8 +97,7 @@ bool CslPlayerStats::AddId(wxInt32 id)
 
     if (m_status!=CSL_STATS_NEED_IDS)
         return false;
-    loopv(m_ids) if (m_ids[i]==id)
-        return false;
+    loopv(m_ids) if (m_ids[i]==id) return false;
     m_ids.add(id);
     return true;
 }
@@ -156,7 +156,8 @@ CslTeamStatsData* CslTeamStats::GetNewStatsPtr()
 
     loopv(m_stats)
     {
-        if (m_stats[i]->m_ok) continue;
+        if (m_stats[i]->m_ok)
+            continue;
         return m_stats[i];
     }
     return new CslTeamStatsData;

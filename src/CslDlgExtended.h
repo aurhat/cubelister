@@ -32,14 +32,13 @@
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
 #endif
-#include <wx/imaglist.h>
 // begin wxGlade: ::dependencies
 #include <wx/listctrl.h>
 #include <wx/statline.h>
 // end wxGlade
 #include "CslEngine.h"
 #include "CslPanelMap.h"
-#include "CslTools.h"
+#include "CslListCtrlPlayer.h"
 
 
 WX_DEFINE_ARRAY_PTR(wxStaticText*,t_aLabel);
@@ -47,23 +46,23 @@ WX_DEFINE_ARRAY_PTR(wxStaticText*,t_aLabel);
 class CslDlgExtended: public wxDialog
 {
     public:
-        // begin wxGlade: CslDlgExtended::ids
-        // end wxGlade
+    // begin wxGlade: CslDlgExtended::ids
+    // end wxGlade
 
         CslDlgExtended(wxWindow* parent,int id=wxID_ANY,const wxString& title=wxEmptyString,
                        const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize,
                        long style=wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
         ~CslDlgExtended();
 
-        void ListInit(CslEngine *engine);
+        void SetEngine(CslEngine *engine) { m_engine=engine; }
         void DoShow(CslServerInfo *info);
         CslServerInfo* GetInfo() { return m_info; }
 
     private:
-        // begin wxGlade: CslDlgExtended::methods
-        void set_properties();
-        void do_layout();
-        // end wxGlade
+    // begin wxGlade: CslDlgExtended::methods
+    void set_properties();
+    void do_layout();
+    // end wxGlade
 
         CslEngine *m_engine;
         CslServerInfo *m_info;
@@ -72,15 +71,11 @@ class CslDlgExtended: public wxDialog
         wxFont m_labelFont;
         t_aLabel m_teamLabel;
 
-        wxImageList m_imageList;
-        CslListSortHelper m_sortHelper;
-
         wxFlexGridSizer *m_gridSizerMain,*m_gridSizerList,*m_gridSizerInfo;
         wxStaticBoxSizer *m_sizerMap,*m_sizerMapLabel;
 
         void OnClose(wxCloseEvent& event);
         void OnSize(wxSizeEvent& event);
-        void OnColumnLeftClick(wxListEvent& event);
         void OnTimer(wxTimerEvent& event);
         void OnCommandEvent(wxCommandEvent& event);
         void OnPong(wxCommandEvent& event);
@@ -88,36 +83,36 @@ class CslDlgExtended: public wxDialog
         DECLARE_EVENT_TABLE()
 
     protected:
-        // begin wxGlade: CslDlgExtended::attributes
-        wxStaticBox* sizer_update_staticbox;
-        wxStaticBox* sizer_map_label_staticbox;
-        wxStaticBox* sizer_info_staticbox;
-        wxStaticBox* sizer_team_score_staticbox;
-        wxStaticBox* sizer_map_staticbox;
-        wxListCtrl* list_ctrl_players;
-        CslPanelMap* panel_map;
-        wxStaticText* label_team1;
-        wxStaticText* label_team2;
-        wxStaticText* label_team3;
-        wxStaticText* label_team4;
-        wxStaticText* label_team5;
-        wxStaticText* label_team6;
-        wxStaticText* label_team7;
-        wxStaticText* label_team8;
-        wxStaticText* label_server;
-        wxStaticText* label_mode;
-        wxStaticText* label_remaining;
-        wxStaticText* label_records;
-        wxStaticText* label_map;
-        wxStaticText* label_author_prefix;
-        wxStaticText* label_author;
-        wxButton* button_update;
-        wxCheckBox* checkbox_update;
-        wxCheckBox* checkbox_update_end;
-        wxCheckBox* checkbox_map;
-        wxStaticLine* static_line;
-        wxButton* button_close;
-        // end wxGlade
+    // begin wxGlade: CslDlgExtended::attributes
+    wxStaticBox* sizer_update_staticbox;
+    wxStaticBox* sizer_map_label_staticbox;
+    wxStaticBox* sizer_info_staticbox;
+    wxStaticBox* sizer_team_score_staticbox;
+    wxStaticBox* sizer_map_staticbox;
+    CslListCtrlPlayer* list_ctrl_players;
+    CslPanelMap* panel_map;
+    wxStaticText* label_team1;
+    wxStaticText* label_team2;
+    wxStaticText* label_team3;
+    wxStaticText* label_team4;
+    wxStaticText* label_team5;
+    wxStaticText* label_team6;
+    wxStaticText* label_team7;
+    wxStaticText* label_team8;
+    wxStaticText* label_server;
+    wxStaticText* label_mode;
+    wxStaticText* label_remaining;
+    wxStaticText* label_records;
+    wxStaticText* label_map;
+    wxStaticText* label_author_prefix;
+    wxStaticText* label_author;
+    wxButton* button_update;
+    wxCheckBox* checkbox_update;
+    wxCheckBox* checkbox_update_end;
+    wxCheckBox* checkbox_map;
+    wxStaticLine* static_line;
+    wxButton* button_close;
+    // end wxGlade
 
         void UpdateMap();
         void ClearTeamScoreLabel(const wxUint32 start,const wxUint32 end);
@@ -125,9 +120,6 @@ class CslDlgExtended: public wxDialog
         void SetTeamData();
         void QueryInfo(wxInt32 pid=-1);
         void RecalcMinSize(bool reLayout,wxInt32 decWidth=-1);
-        void ListAdjustSize(const wxSize& size);
-        void ListSort(wxInt32 column);
-        void ToggleSortArrow();
         void ShowPanelMap(const bool show);
 
         static int wxCALLBACK ListSortCompareFunc(long item1,long item2,long data);

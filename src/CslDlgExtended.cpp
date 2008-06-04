@@ -20,17 +20,10 @@
 
 #include "CslDlgExtended.h"
 #include "CslSettings.h"
-#include "CslFlags.h"
-#ifndef __WXMSW__
-#include "img/sortasc_18_12.xpm"
-#include "img/sortdsc_18_12.xpm"
-#endif
-
 
 BEGIN_EVENT_TABLE(CslDlgExtended, wxDialog)
     EVT_CLOSE(CslDlgExtended::OnClose)
     EVT_SIZE(CslDlgExtended::OnSize)
-    EVT_LIST_COL_CLICK(wxID_ANY,CslDlgExtended::OnColumnLeftClick)
     EVT_TIMER(wxID_ANY,CslDlgExtended::OnTimer)
     EVT_BUTTON(wxID_ANY,CslDlgExtended::OnCommandEvent)
     EVT_CHECKBOX(wxID_ANY,CslDlgExtended::OnCommandEvent)
@@ -78,7 +71,7 @@ CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
     sizer_map_label_staticbox = new wxStaticBox(this, -1, _("Map information"));
     sizer_update_staticbox = new wxStaticBox(this, -1, wxEmptyString);
     sizer_map_staticbox = new wxStaticBox(this, -1, _("Map"));
-    list_ctrl_players = new wxListCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxSUNKEN_BORDER);
+    list_ctrl_players = new CslListCtrlPlayer(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxSUNKEN_BORDER);
     panel_map = new CslPanelMap(this, wxID_ANY);
     label_team1 = new wxStaticText(this, wxID_ANY, wxEmptyString);
     label_team2 = new wxStaticText(this, wxID_ANY, wxEmptyString);
@@ -105,28 +98,6 @@ CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
     set_properties();
     do_layout();
     // end wxGlade
-
-#ifdef __WXMSW__
-    m_imageList.Create(20,14,true);
-    m_imageList.Add(AdjustIconSize(NULL,wxIcon(wxT("sortasc_18_12"),wxBITMAP_TYPE_ICO_RESOURCE,18,12),
-                                   wxSize(20,14),wxPoint(0,0)));
-    m_imageList.Add(AdjustIconSize(NULL,wxIcon(wxT("sortdsc_18_12"),wxBITMAP_TYPE_ICO_RESOURCE,18,12),
-                                   wxSize(20,14),wxPoint(0,0)));
-    m_imageList.Add(AdjustIconSize(unknown_xpm,wxNullIcon,wxSize(20,14),wxPoint(0,2)));
-
-    wxInt32 i,c=sizeof(codes)/sizeof(codes[0])-1;
-    for (i=0;i<c;i++)
-        m_imageList.Add(AdjustIconSize(flags[i],wxNullIcon,wxSize(20,14),wxPoint(0,2)));
-#else
-    m_imageList.Create(18,12,true);
-    m_imageList.Add(wxBitmap(sortasc_18_12_xpm));
-    m_imageList.Add(wxBitmap(sortdsc_18_12_xpm));
-    m_imageList.Add(wxBitmap(unknown_xpm));
-
-    wxInt32 i,c=sizeof(codes)/sizeof(codes[0])-1;
-    for (i=0;i<c;i++)
-        m_imageList.Add(wxBitmap(flags[i]));
-#endif
 }
 
 CslDlgExtended::~CslDlgExtended()
@@ -160,6 +131,7 @@ void CslDlgExtended::set_properties()
     m_teamLabel.Add(label_team7);
     m_teamLabel.Add(label_team8);
 
+    list_ctrl_players->ListInit();
 #ifdef __WXMSW__
     list_ctrl_players->SetMinSize(wxSize(520,270));
 #endif
@@ -260,7 +232,6 @@ void CslDlgExtended::do_layout()
     m_sizerMap=sizer_map;
     m_sizerMapLabel=sizer_map_label;
 
-    Layout();
     grid_sizer_main->SetSizeHints(this);
     CentreOnScreen();
 }
@@ -277,14 +248,8 @@ void CslDlgExtended::OnClose(wxCloseEvent& event)
 
 void CslDlgExtended::OnSize(wxSizeEvent& event)
 {
-    ListAdjustSize(list_ctrl_players->GetClientSize());
-
+    list_ctrl_players->ListAdjustSize();
     event.Skip();
-}
-
-void CslDlgExtended::OnColumnLeftClick(wxListEvent& event)
-{
-    ListSort(event.GetColumn());
 }
 
 void CslDlgExtended::OnTimer(wxTimerEvent& event)
@@ -452,116 +417,12 @@ void CslDlgExtended::ClearTeamScoreLabel(const wxUint32 start,const wxUint32 end
 }
 void CslDlgExtended::SetPlayerData()
 {
-    wxInt32 c;
-    wxString s;
-    wxListItem item;
     CslPlayerStats *stats=m_info->m_playerStats;
-    CslPlayerStatsData *data=NULL;
 
-    item.SetMask(wxLIST_MASK_TEXT|wxLIST_MASK_DATA);
-
-    loopv(stats->m_stats)
-    {
-        data=stats->m_stats[i];
-        if (!data->m_ok)
-            break;
-        if (i<list_ctrl_players->GetItemCount())
-            continue;
-
-        item.SetId(i);
-        list_ctrl_players->InsertItem(item);
-        list_ctrl_players->SetItemData(i,(long)data);
-
-        if (data->m_player.IsEmpty())
-            s=_("- connecting -");
-        else
-            s=data->m_player;
-        list_ctrl_players->SetItem(i,0,s);
-
-        if (data->m_state==CSL_PLAYER_STATE_SPECTATOR)
-            s=_("Spectator");
-        else
-            s=data->m_team;
-        list_ctrl_players->SetItem(i,1,s);
-
-        if (data->m_frags<0)
-            s=_("no data");
-        else
-            s=wxString::Format(wxT("%d"),data->m_frags);
-        list_ctrl_players->SetItem(i,2,s);
-
-        if (data->m_deaths<0)
-            s=_("no data");
-        else
-            s=wxString::Format(wxT("%d"),data->m_deaths);
-        list_ctrl_players->SetItem(i,3,s);
-
-        if (data->m_teamkills<0)
-            s=_("no data");
-        else
-            s=wxString::Format(wxT("%d"),data->m_teamkills);
-        list_ctrl_players->SetItem(i,4,s);
-
-        if (data->m_state==CSL_PLAYER_STATE_UNKNOWN)
-            s=_("no data");
-        else if (data->m_state==CSL_PLAYER_STATE_DEAD)
-            s=_("dead");
-        else if (data->m_state==CSL_PLAYER_STATE_EDITING)
-            s=_("editing");
-        else if (data->m_state)
-            s=wxT("0");
-        else
-            s=wxString::Format(wxT("%d"),data->m_health);
-        list_ctrl_players->SetItem(i,5,s);
-
-        if (data->m_state==CSL_PLAYER_STATE_UNKNOWN)
-            s=_("no data");
-        else if (data->m_state || data->m_armour<0)
-            s=wxT("0");
-        else
-            s=wxString::Format(wxT("%d"),data->m_armour);
-        list_ctrl_players->SetItem(i,6,s);
-
-        s=CslGame::GetWeaponName(m_info->m_type,data->m_weapon);
-        list_ctrl_players->SetItem(i,7,s);
-
-        wxColour colour=*wxBLACK;
-        if (data->m_priv==CSL_PLAYER_PRIV_MASTER)
-            list_ctrl_players->SetItemBackgroundColour(item,wxColour(64,255,128));
-        else if (data->m_priv==CSL_PLAYER_PRIV_ADMIN)
-            list_ctrl_players->SetItemBackgroundColour(item,wxColour(255,128,0));
-        else if (data->m_state==CSL_PLAYER_STATE_SPECTATOR)
-            list_ctrl_players->SetItemBackgroundColour(item,wxColour(192,192,192));
-
-        const char *country;
-        wxInt32 flag=CSL_LIST_IMG_UNKNOWN;
-
-        if (data->m_ip && CslGeoIP::IsOk())
-        {
-            country=CslGeoIP::GetCountryCodeByIPnum(data->m_ip);
-            if (country)
-            {
-                for (c=sizeof(codes)/sizeof(codes[0])-1;c>=0;c--)
-                {
-                    if (!strcasecmp(country,codes[c]))
-                    {
-                        flag+=++c;
-                        break;
-                    }
-                }
-            }
-        }
-
-        list_ctrl_players->SetItemImage(item,flag);
-    }
-
-
+    list_ctrl_players->ListUpdatePlayerData(stats,m_info->m_type);
     stats->m_lastResponse=wxDateTime::Now().GetTicks();
-
     label_records->SetLabel(wxString::Format(_("%d players (%d left)"),
                             list_ctrl_players->GetItemCount(),stats->m_ids.length()));
-
-    ListSort(-1);
 }
 
 void CslDlgExtended::SetTeamData()
@@ -703,8 +564,8 @@ void CslDlgExtended::SetTeamData()
 
 void CslDlgExtended::QueryInfo(wxInt32 pid)
 {
-    if (m_info->m_players==0)
-        return;
+    //if (m_info->m_players==0)
+    //    return;
 
     if (pid==-1)
     {
@@ -728,7 +589,7 @@ void CslDlgExtended::QueryInfo(wxInt32 pid)
 
 void CslDlgExtended::RecalcMinSize(bool reLayout,wxInt32 decWidth)
 {
-    bool height=false, width=false;
+    bool height=false,width=false;
 
     if (reLayout)
         m_gridSizerMain->Layout();
@@ -761,81 +622,13 @@ void CslDlgExtended::RecalcMinSize(bool reLayout,wxInt32 decWidth)
     SetSizeHints(best);
 
     if (reLayout)
-        ListAdjustSize(list_ctrl_players->GetClientSize());
+        list_ctrl_players->ListAdjustSize();
 
 #ifdef __WXMSW__
     checkbox_update->Refresh();
     checkbox_update_end->Refresh();
     checkbox_map->Refresh();
 #endif
-}
-
-void CslDlgExtended::ListAdjustSize(const wxSize& size)
-{
-    if (list_ctrl_players->GetColumnCount()<6)
-        return;
-
-    wxInt32 w=size.x-8;
-
-    list_ctrl_players->SetColumnWidth(0,(wxInt32)(w*0.23f));
-    list_ctrl_players->SetColumnWidth(1,(wxInt32)(w*0.11f));
-    list_ctrl_players->SetColumnWidth(2,(wxInt32)(w*0.11f));
-    list_ctrl_players->SetColumnWidth(3,(wxInt32)(w*0.11f));
-    list_ctrl_players->SetColumnWidth(4,(wxInt32)(w*0.11f));
-    list_ctrl_players->SetColumnWidth(5,(wxInt32)(w*0.11f));
-    list_ctrl_players->SetColumnWidth(6,(wxInt32)(w*0.11f));
-    list_ctrl_players->SetColumnWidth(7,(wxInt32)(w*0.11f));
-}
-
-void CslDlgExtended::ListSort(wxInt32 column)
-{
-    wxListItem item;
-    wxInt32 img;
-
-    if (column==-1)
-        column=m_sortHelper.m_sortType;
-    else
-    {
-        item.SetMask(wxLIST_MASK_IMAGE);
-        list_ctrl_players->GetColumn(column,item);
-
-        if (item.GetImage()==-1 || item.GetImage()==CSL_LIST_IMG_SORT_DSC)
-        {
-            img=CSL_LIST_IMG_SORT_ASC;
-            m_sortHelper.m_sortMode=CSL_SORT_ASC;
-        }
-        else
-        {
-            img=CSL_LIST_IMG_SORT_DSC;
-            m_sortHelper.m_sortMode=CSL_SORT_DSC;
-        }
-
-        item.Clear();
-        item.SetImage(-1);
-        list_ctrl_players->SetColumn(m_sortHelper.m_sortType,item);
-
-        item.SetImage(img);
-        list_ctrl_players->SetColumn(column,item);
-
-        m_sortHelper.m_sortType=column;
-    }
-
-    if (list_ctrl_players->GetItemCount()>0)
-        list_ctrl_players->SortItems(ListSortCompareFunc,(long)&m_sortHelper);
-}
-
-void CslDlgExtended::ToggleSortArrow()
-{
-    wxListItem item;
-    wxInt32 img=-1;
-
-    if (m_sortHelper.m_sortMode==CSL_SORT_ASC)
-        img=CSL_LIST_IMG_SORT_ASC;
-    else
-        img=CSL_LIST_IMG_SORT_DSC;
-
-    item.SetImage(img);
-    list_ctrl_players->SetColumn(m_sortHelper.m_sortType,item);
 }
 
 void CslDlgExtended::ShowPanelMap(const bool show)
@@ -883,57 +676,6 @@ void CslDlgExtended::ShowPanelMap(const bool show)
         Thaw();
 }
 
-void CslDlgExtended::ListInit(CslEngine *engine)
-{
-    wxListItem item;
-
-    m_engine=engine;
-
-    list_ctrl_players->SetImageList(&m_imageList,wxIMAGE_LIST_SMALL);
-
-    item.SetMask(wxLIST_MASK_TEXT|wxLIST_MASK_FORMAT);
-    item.SetImage(-1);
-
-    item.SetAlign(wxLIST_FORMAT_LEFT);
-    item.SetText(_("Player"));
-    list_ctrl_players->InsertColumn(0,item);
-    list_ctrl_players->SetColumn(0,item);
-
-    item.SetText(_("Team"));
-    list_ctrl_players->InsertColumn(1,item);
-    list_ctrl_players->SetColumn(1,item);
-
-    item.SetText(_("Frags"));
-    list_ctrl_players->InsertColumn(2,item);
-    list_ctrl_players->SetColumn(2,item);
-
-    item.SetText(_("Deaths"));
-    list_ctrl_players->InsertColumn(3,item);
-    list_ctrl_players->SetColumn(3,item);
-
-    item.SetText(_("Teamkills"));
-    list_ctrl_players->InsertColumn(4,item);
-    list_ctrl_players->SetColumn(4,item);
-
-    item.SetText(_("Health"));
-    list_ctrl_players->InsertColumn(5,item);
-    list_ctrl_players->SetColumn(5,item);
-
-    item.SetText(_("Armour"));
-    list_ctrl_players->InsertColumn(6,item);
-    list_ctrl_players->SetColumn(6,item);
-
-    item.SetText(_("Weapon"));
-    list_ctrl_players->InsertColumn(7,item);
-    list_ctrl_players->SetColumn(7,item);
-
-    // assertion on __WXMAC__
-    //ListAdjustSize(GetClientSize());
-
-    m_sortHelper.Init(CSL_SORT_DSC,SORT_FRAGS);
-    ToggleSortArrow();
-}
-
 void CslDlgExtended::DoShow(CslServerInfo *info)
 {
     wxString s;
@@ -973,109 +715,4 @@ void CslDlgExtended::DoShow(CslServerInfo *info)
         return;
 
     Show();
-}
-
-int wxCALLBACK CslDlgExtended::ListSortCompareFunc(long item1,long item2,long data)
-{
-    CslPlayerStatsData *stats1=(CslPlayerStatsData*)item1;
-    CslPlayerStatsData *stats2=(CslPlayerStatsData*)item2;
-    wxInt32 sortMode=((CslListSortHelper*)data)->m_sortMode;
-    wxInt32 sortType=((CslListSortHelper*)data)->m_sortType;
-
-    if (sortType!=SORT_PLAYER)
-    {
-        if (stats1->m_state==CSL_PLAYER_STATE_SPECTATOR)
-            return 1;
-        if (stats2->m_state==CSL_PLAYER_STATE_SPECTATOR)
-            return -1;
-    }
-
-    wxInt32 type;
-    wxInt32 vi1=0,vi2=0;
-    wxUint32 vui1=0,vui2=0;
-    wxString vs1=wxEmptyString,vs2=wxEmptyString;
-
-    switch (sortType)
-    {
-        case SORT_PLAYER:
-            type=CSL_LIST_SORT_STRING;
-            vs1=stats1->m_player;
-            vs2=stats2->m_player;
-            break;
-
-        case SORT_TEAM:
-            type=CSL_LIST_SORT_STRING;
-            vs1=stats1->m_team;
-            vs2=stats2->m_team;
-            break;
-
-        case SORT_FRAGS:
-            type=CSL_LIST_SORT_INT;
-            vi1=stats1->m_frags;
-            vi2=stats2->m_frags;
-            break;
-
-        case SORT_DEATHS:
-            type=CSL_LIST_SORT_INT;
-            vi1=stats1->m_deaths;
-            vi2=stats2->m_deaths;
-            break;
-
-        case SORT_TEAMKILLS:
-            type=CSL_LIST_SORT_INT;
-            vi1=stats1->m_teamkills;
-            vi2=stats2->m_teamkills;
-            break;
-
-        case SORT_HEALTH:
-            type=CSL_LIST_SORT_INT;
-            vi1=stats1->m_health;
-            vi2=stats2->m_health;
-            break;
-
-        case SORT_ARMOUR:
-            type=CSL_LIST_SORT_INT;
-            vi1=stats1->m_armour;
-            vi2=stats2->m_armour;
-            break;
-
-        case SORT_WEAPON:
-            type=CSL_LIST_SORT_INT;
-            vi1=stats1->m_weapon;
-            vi2=stats2->m_weapon;
-            break;
-
-        default:
-            return 0;
-    }
-
-    if (type==CSL_LIST_SORT_INT)
-    {
-        if (vi1==vi2)
-            return 0;
-        if (vi1<vi2)
-            return sortMode==CSL_SORT_ASC ? -1 : 1;
-        else
-            return sortMode==CSL_SORT_ASC ? 1 : -1;
-    }
-    else if (type==CSL_LIST_SORT_UINT)
-    {
-        if (vui1==vui2)
-            return 0;
-        if (vui1<vui2)
-            return sortMode==CSL_SORT_ASC ? -1 : 1;
-        else
-            return sortMode==CSL_SORT_ASC ? 1 : -1;
-    }
-    else if (type==CSL_LIST_SORT_STRING)
-    {
-        if (vs1==vs2)
-            return 0;
-        if (vs1.CmpNoCase(vs2)<0)
-            return sortMode==CSL_SORT_ASC ? -1 : 1;
-        else
-            return sortMode==CSL_SORT_ASC ? 1 : -1;
-    }
-
-    return 0;
 }

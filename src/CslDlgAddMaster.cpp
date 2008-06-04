@@ -46,8 +46,9 @@ CslDlgAddMaster::CslDlgAddMaster(wxWindow* parent,CslMaster *master,int id,
 {
     // begin wxGlade: CslDlgAddMaster::CslDlgAddMaster
     sizer_address_staticbox = new wxStaticBox(this, -1, wxEmptyString);
-    const wxString choice_type_choices[] =
-    {
+    radio_btn_custom_copy = new wxRadioButton(this, RADIO_CTRL_CUSTOM, _("C&ustom"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+    radio_btn_default_copy = new wxRadioButton(this, RADIO_CTRL_DEFAULT, _("&Default master"));
+    const wxString choice_type_choices[] = {
         _("default")
     };
     choice_type = new wxChoice(this, CHOICE_CTRL_TYPE, wxDefaultPosition, wxDefaultSize, 1, choice_type_choices, 0);
@@ -88,9 +89,15 @@ void CslDlgAddMaster::do_layout()
     wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(2, 1, 0, 0);
     wxFlexGridSizer* grid_sizer_button = new wxFlexGridSizer(1, 3, 0, 0);
     wxStaticBoxSizer* sizer_address = new wxStaticBoxSizer(sizer_address_staticbox, wxHORIZONTAL);
-    wxFlexGridSizer* grid_sizer_address = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* grid_sizer_address = new wxFlexGridSizer(3, 1, 0, 0);
     wxFlexGridSizer* grid_sizer_radio = new wxFlexGridSizer(1, 2, 0, 0);
     wxFlexGridSizer* grid_sizer_address_top = new wxFlexGridSizer(3, 2, 0, 0);
+    wxFlexGridSizer* grid_sizer_radio_copy = new wxFlexGridSizer(1, 2, 0, 0);
+    grid_sizer_radio_copy->Add(radio_btn_custom_copy, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_radio_copy->Add(radio_btn_default_copy, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_radio_copy->AddGrowableCol(0);
+    grid_sizer_radio_copy->AddGrowableCol(1);
+    grid_sizer_address->Add(grid_sizer_radio_copy, 1, wxEXPAND, 0);
     wxStaticText* label_game_static = new wxStaticText(this, wxID_ANY, _("Game:"));
     grid_sizer_address_top->Add(label_game_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_address_top->Add(choice_type, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
@@ -158,7 +165,7 @@ void CslDlgAddMaster::OnCommandEvent(wxCommandEvent& event)
                     break;
                 case CSL_GAME_BF:
                     addr=CSL_DEFAULT_MASTER_BF;
-                    path=CSL_DEFAULT_MASTER_PATH_BF;
+                    path=wxString::Format(wxT("%d"),CSL_DEFAULT_MASTER_PORT_BF);
                     break;
                 case CSL_GAME_CB:
                     addr=CSL_DEFAULT_MASTER_CB;
@@ -194,7 +201,7 @@ void CslDlgAddMaster::OnCommandEvent(wxCommandEvent& event)
             wxString path=text_ctrl_path->GetValue();
             if (!path.StartsWith(wxT("/")))
                 path=wxT("/")+path;
-            m_master->Create(type,addr,path);
+            m_master->Create(type,CslMasterConnection(addr,path));
             EndModal(wxID_OK);
         }
         default:

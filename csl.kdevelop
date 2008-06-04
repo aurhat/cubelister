@@ -17,6 +17,7 @@
     <absoluteprojectpath>false</absoluteprojectpath>
     <description/>
     <defaultencoding/>
+    <versioncontrol/>
   </general>
   <kdevautoproject>
     <general>
@@ -39,7 +40,7 @@
         <cslmapcfgtool>/home/mimosius/Documents/Development/csl/csl/debug/./src</cslmapcfgtool>
       </cwd>
       <programargs/>
-      <globaldebugarguments/>
+      <globaldebugarguments>--sync</globaldebugarguments>
       <globalcwd>/home/mimosius/Documents/Development/csl</globalcwd>
       <useglobalprogram>false</useglobalprogram>
       <autocompile>true</autocompile>
@@ -144,6 +145,12 @@
         <envvar value="1" name="WANT_AUTOCONF_2_5" />
         <envvar value="1" name="WANT_AUTOMAKE_1_6" />
       </envvars>
+      <abortonerror>true</abortonerror>
+      <runmultiplejobs>false</runmultiplejobs>
+      <numberofjobs>1</numberofjobs>
+      <dontact>false</dontact>
+      <makebin/>
+      <prio>0</prio>
     </make>
   </kdevautoproject>
   <kdevdoctreeview>
@@ -191,6 +198,7 @@
     </ignoredoxygen>
   </kdevdoctreeview>
   <kdevfilecreate>
+    <filetypes/>
     <useglobaltypes>
       <type ext="cpp" />
       <type ext="h" />
@@ -198,8 +206,9 @@
   </kdevfilecreate>
   <kdevdocumentation>
     <projectdoc>
-      <docsystem>Doxygen Documentation Collection</docsystem>
+      <docsystem>DevHelp-Dokumentationskollektion</docsystem>
       <docurl>csl.tag</docurl>
+      <usermanualurl/>
     </projectdoc>
   </kdevdocumentation>
   <substmap>
@@ -262,9 +271,7 @@
       <synchronize>true</synchronize>
       <orientation>Vertical</orientation>
     </splitheadersource>
-    <references>
-      <pcs>wxGTK-2.8.7</pcs>
-    </references>
+    <references/>
   </kdevcppsupport>
   <cppsupportpart>
     <filetemplates>

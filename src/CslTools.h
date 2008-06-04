@@ -87,6 +87,7 @@ extern char* StripColours(char *s,wxUint32 *l,wxUint32 count);
 extern bool IsIP(const wxString& s);
 extern bool IP2Int(const wxString& s,wxUint32 *ip);
 
+extern wxString FormatBytes(wxUint64 size);
 extern wxString FormatSeconds(wxUint32 time,bool space=false,bool full=false);
 extern wxUint32 GetTicks();
 

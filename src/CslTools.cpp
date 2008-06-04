@@ -58,6 +58,11 @@ char* StripColours(char *s,wxUint32 *l,wxUint32 count)
             *l-=count;
             memmove((void*)&s[i],(void*)&s[i+count],*l-i);
         }
+        else if (s[i]=='\r' || s[i]=='\n')
+        {
+            *l-=1;
+            memmove((void*)&s[i],(void*)&s[i+count],*l-i);
+        }
         else
             i++;
     }
@@ -105,11 +110,31 @@ bool IP2Int(const wxString& s,wxUint32 *ip)
     return true;
 }
 
+wxString FormatBytes(wxUint64 size)
+{
+    if (size>0x100000)
+    {
+#ifdef USE_FLOAT_PRECISION
+        float s=(float)size/0x100000;
+        return wxString::Format(wxT("%.2f MiB"),s);
+#else
+        wxUint64 m=size/0x100000;
+        wxUint64 k=(size%0x100000)*100/0x100000;
+        return wxString::Format(wxT("%lli.%-2.2lli MiB"),m,k);
+#endif
+
+    }
+    else if (size>0x400)
+        return wxString::Format(wxT("%lli KiB"),size/0x400);
+    else
+        return wxString::Format(wxT("%lli B"),size);
+}
+
 wxString FormatSeconds(wxUint32 time,bool space,bool full)
 {
-    wxUint32 rest=time;
-    wxUint32 dy,hr,mn,sc;
     wxString s;
+    wxUint32 dy,hr,mn,sc;
+    wxUint32 rest=time;
 
     dy=rest/86400;
     rest%=86400;

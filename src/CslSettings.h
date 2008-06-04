@@ -37,10 +37,13 @@
 #define  CSL_CONFIG_VERSION        1
 #define  CSL_SERVERCONFIG_VERSION  1
 
-#define CSL_FILTER_FULL        1<<0
-#define CSL_FILTER_EMPTY       1<<1
-#define CSL_FILTER_NONEMPTY    1<<2
-#define CSL_FILTER_OFFLINE     1<<3
+#define CSL_FRAME_MIN_WIDTH  800
+#define CSL_FRAME_MIN_HEIGHT 600
+
+#define CSL_FILTER_OFFLINE     1<<0
+#define CSL_FILTER_FULL        1<<1
+#define CSL_FILTER_EMPTY       1<<2
+#define CSL_FILTER_NONEMPTY    1<<3
 #define CSL_FILTER_MM2         1<<4
 #define CSL_FILTER_MM3         1<<5
 
@@ -61,17 +64,12 @@ class CslSettings
     public:
         CslSettings() :
                 /* GUI */
-                m_frameSize(wxSize(600,400)),
-                m_splitterMainPos(250),
-                m_splitterGamePos(150),
-                m_splitterListPos(280),
-                m_splitterLive(true),
+                m_frameSize(wxSize(CSL_FRAME_MIN_WIDTH,CSL_FRAME_MIN_HEIGHT)),
                 m_updateInterval(CSL_UPDATE_INTERVAL_MIN),
                 m_dontUpdatePlaying(true),
-                m_showSearch(true),
                 m_showFilter(true),
-                m_filterFavourites(false),
-                m_filterFlags(0),
+                m_filterMaster(0),
+                m_filterFavourites(0),
                 m_waitServerFull(CSL_WAIT_SERVER_FULL_STD),
                 m_ping_good(CSL_PING_GOOD_STD),
                 m_ping_bad(CSL_PING_BAD_STD),
@@ -127,14 +125,10 @@ class CslSettings
 
         /* GUI */
         wxSize m_frameSize;
-        wxInt32 m_splitterMainPos;
-        wxInt32 m_splitterGamePos;
-        wxInt32 m_splitterListPos;
-        bool m_splitterLive;
         wxInt32 m_updateInterval;
         bool m_dontUpdatePlaying;
-        bool m_showSearch,m_showFilter,m_filterFavourites;
-        wxUint32 m_filterFlags;
+        bool m_showFilter;
+        wxUint32 m_filterMaster,m_filterFavourites;
         wxInt32 m_waitServerFull;
         wxUint32 m_ping_good,m_ping_bad;
         wxString m_outputPath;

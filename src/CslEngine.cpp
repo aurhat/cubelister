@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <wx/protocol/http.h>
+#include <wx/sckstrm.h>
 #include "CslEngine.h"
 #include "CslVersion.h"
 #include "CslTools.h"
@@ -369,10 +370,7 @@ bool CslEngine::PingExPlayerInfo(CslServerInfo *info,wxInt32 pid)
 
     ucharbuf p(ping,sizeof(ping));
     putint(p,0);
-    if (info->m_extInfoVersion==101)
-        putstring(CSL_EX_PING_PLAYERSTATS_STR,p);
-    else
-        putint(p,CSL_EX_PING_PLAYERSTATS);
+    putint(p,CSL_EX_PING_PLAYERSTATS);
     putint(p,pid);
 
     packet=new CslUDPPacket();
@@ -392,10 +390,7 @@ bool CslEngine::PingExTeamInfo(CslServerInfo *info)
 
     ucharbuf p(ping,sizeof(ping));
     putint(p,0);
-    if (info->m_extInfoVersion==101)
-        putstring(CSL_EX_PING_TEAMSTATS_STR,p);
-    else
-        putint(p,CSL_EX_PING_TEAMSTATS);
+    putint(p,CSL_EX_PING_TEAMSTATS);
 
     packet=new CslUDPPacket();
     packet->Set(info->m_addr,ping,p.length());
@@ -454,47 +449,57 @@ wxUint32 CslEngine::PingServers()
 
 int CslEngine::UpdateMaster()
 {
-    int num=0;
-    uchar *buf=NULL;
-
     if (m_currentMaster==NULL)
         return -1;
 
-    wxHTTP http;
-    http.SetTimeout(10);
-    if (!http.Connect(m_currentMaster->GetAddress(),80))
-        return -2;
-    http.SetHeader(wxT("User-Agent"),GetHttpAgent());
-    wxInputStream *data=http.GetInputStream(m_currentMaster->GetPath());
+    wxInt32 num=0;
+    char buf[32768];
+    CslMasterConnection &connection=m_currentMaster->GetConnection();
 
-    wxUint32 code=http.GetResponse();
+    if (connection.GetType()==CSL_MASTER_CONN_HTTP)
+    {
+        wxHTTP http;
+        wxInputStream *stream;
+        http.SetTimeout(10);
 
-    if (!data||code!=200)
+        if (!http.Connect(connection.GetAddress(),connection.GetPort()))
+            return -2;
+        http.SetHeader(wxT("User-Agent"),GetHttpAgent());
+        if (!(stream=http.GetInputStream(connection.GetPath())))
+            return -3;
+
+        if (http.GetResponse()!=200)
+            return -3;
+
+        if (!stream->GetSize())
+            return -3;
+
+        stream->Read((void*)buf,32768);
+        buf[stream->LastRead()]=0;
+
+        delete stream;
+    }
+    else
+    {
+        wxSocketClient sock(wxSOCKET_BLOCK);
+        sock.SetTimeout(10);
+        wxIPV4address addr;
+        addr.Hostname(connection.GetAddress());
+        addr.Service(connection.GetPort());
+
+        if (!sock.Connect(addr,true))
+            return -2;
+
+        sock.Write((void*)"list",4);
+        if (sock.LastCount()!=4)
+            return -3;
+
+        sock.Read((void*)buf,32768);
+        buf[sock.LastCount()]=0;
+    }
+
+    if (strstr((char*)buf,"<html>") || strstr((char*)buf,"<HTML>"))
         return -3;
-
-    size_t size=data->GetSize();
-
-    if (!size)
-    {
-        num=-4;
-        goto finish;
-    }
-    // some server do not report the size of the content
-    // somehow set a limit
-    if (size>32767)
-        size=32767;
-
-    buf=(uchar*)calloc(1,size+1);
-    if (!buf)
-    {
-        num=-5;
-        goto finish;
-    }
-
-    data->Read((void*)buf,size);
-
-    if (strstr((char*)buf,"<html>")||strstr((char*)buf,"<HTML>"))
-        num=-4;
     else
     {
         vector <CslServerInfo*> *servers=m_currentMaster->GetServers();
@@ -518,7 +523,7 @@ int CslEngine::UpdateMaster()
             else
                 *pend=0;
 
-            info=new CslServerInfo(A2U(p),m_currentMaster->GetType());
+            info=new CslServerInfo(m_currentMaster->GetType(),A2U(p));
             ret=AddServer(info,m_currentMaster->GetID());
             if (!ret || ret!=info)
                 delete info;
@@ -530,10 +535,6 @@ int CslEngine::UpdateMaster()
             p=pend+1;
         }
     }
-
-finish:
-    if (buf) free(buf);
-    if (data) delete data;
 
     FuzzPingSends();
 
@@ -576,28 +577,31 @@ void CslEngine::UpdateServerInfo(CslServerInfo *info,ucharbuf *buf,wxUint32 now)
         case CSL_GAME_SB:
         case CSL_GAME_BF:
         {
-            info->m_players=getint(*buf);
-            int numattr=getint(*buf);
             vector<int>attr;
             attr.setsize(0);
+
+            info->m_players=getint(*buf);
+            int numattr=getint(*buf),i=0;
             loopj(numattr) attr.add(getint(*buf));
-            if (numattr>=1)
-                info->m_protocol=attr[0];
-            if (numattr>=2)
+            if (numattr>=++i)
+                info->m_protocol=attr[i-1];
+            if (numattr>=++i)
             {
-                info->m_gameMode=GetModeStrSB(attr[1]);
-                info->m_isCapture=attr[1]>11 && attr[1]<15;
+                info->m_gameMode=GetModeStrSB(attr[i-1]);
+                info->m_isCapture=attr[i-1]>11 && attr[i-1]<15;
+                if (info->m_type==CSL_GAME_BF)
+                    i++;
             }
-            if (numattr>=3)
+            if (numattr>=++i)
             {
-                info->m_timeRemain=attr[2];
+                info->m_timeRemain=attr[i-1];
                 if (info->m_protocol<254)
                     info->m_timeRemain++;
             }
-            if (numattr>=4)
-                info->m_playersMax=attr[3];
-            if (numattr>=5)
-                info->m_mm=attr[4];
+            if (numattr>=++i)
+                info->m_playersMax=attr[i-1];
+            if (numattr>=++i)
+                info->m_mm=attr[i-1];
 
             getstring(text,*buf);
             info->m_map=A2U(text);
@@ -675,18 +679,7 @@ void CslEngine::ParsePong(CslServerInfo *info,CslUDPPacket *packet,wxUint32 now)
             {
                 if (vu==0) // extended info
                 {
-                    if (info->m_extInfoVersion==101)
-                    {
-                        getstring(text,p);
-                        if (text[0]==0)
-                            cmd=CSL_EX_PING_UPTIME;
-                        else if (strcmp(text,CSL_EX_PING_PLAYERSTATS_STR)==0)
-                            cmd=CSL_EX_PING_PLAYERSTATS;
-                        else if (strcmp(text,CSL_EX_PING_TEAMSTATS_STR)==0)
-                            cmd=CSL_EX_PING_TEAMSTATS;
-                    }
-                    else
-                        cmd=getint(p);
+                    cmd=getint(p);
 
                     switch (cmd)
                     {
@@ -814,12 +807,14 @@ void CslEngine::ParsePong(CslServerInfo *info,CslUDPPacket *packet,wxUint32 now)
                             data->m_frags=getint(p);
                             data->m_deaths=getint(p);
                             data->m_teamkills=getint(p);
+                            if (info->m_extInfoVersion>=103)
+                                data->m_accuracy=getint(p);
                             data->m_health=getint(p);
                             data->m_armour=getint(p);
                             data->m_weapon=getint(p);
                             data->m_priv=getint(p);
                             data->m_state=getint(p);
-                            if (exVersion>102)
+                            if (exVersion>=103)
                             {
                                 p.get((unsigned char*)&data->m_ip,3);
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
@@ -855,11 +850,11 @@ void CslEngine::ParsePong(CslServerInfo *info,CslUDPPacket *packet,wxUint32 now)
                                 break;
                             }
 
-                            /*LOG_DEBUG("%s (%s): player:%s, team:%s, frags:%d, deaths:%d, tk:%d, IP:%d.%d.%d.%d (%u)\n",
+                            LOG_DEBUG("%s (%s): player:%s, team:%s, frags:%d, deaths:%d, tk:%d, IP:%d.%d.%d.%d (%u)\n",
                                       dbg_type.c_str(),U2A(info->GetBestDescription()),
                                       U2A(data->m_player),U2A(data->m_team),
                                       data->m_frags,data->m_deaths,data->m_teamkills,
-                                      data->m_ip>>24,data->m_ip>>16&0xff,data->m_ip>>8&0xff,data->m_ip&0xff,data->m_ip);*/
+                                      data->m_ip>>24,data->m_ip>>16&0xff,data->m_ip>>8&0xff,data->m_ip&0xff,data->m_ip);
 
                             wxCommandEvent evt(wxCSL_EVT_PONG);
                             evt.SetClientData((void*)new CslPongPacket(info,CSL_PONG_TYPE_PLAYERSTATS));
@@ -893,6 +888,8 @@ void CslEngine::ParsePong(CslServerInfo *info,CslUDPPacket *packet,wxUint32 now)
                             }
 
                             stats->m_teamplay=!getint(p);  // error
+                            if (exVersion>=103)
+                                getint(p); //FIXME dummy for gamemode
                             stats->m_remain=getint(p);  // remaining time
 
                             if (!stats->m_teamplay)  // check error (no teammode)
@@ -915,13 +912,10 @@ void CslEngine::ParsePong(CslServerInfo *info,CslUDPPacket *packet,wxUint32 now)
                                 data->m_score=getint(p);
                                 if (info->m_type==CSL_GAME_AC)
                                     data->m_score2=getint(p);
-                                if (exVersion>=102)
-                                {
-                                    vi=getint(p);
-                                    if (vi>0)
-                                        while (vi--)
-                                            data->m_bases.add(getint(p));
-                                }
+                                vi=getint(p);
+                                if (vi>0)
+                                    while (vi--)
+                                        data->m_bases.add(getint(p));
 
                                 stats->AddStats(data);
 
@@ -989,9 +983,7 @@ void CslEngine::OnPong(wxCommandEvent& event)
 
     bool skip=false;
     CslServerInfo *info=NULL;
-
-    wxDateTime now=wxDateTime::Now();
-    wxUint32 ticks=now.GetTicks();
+    wxUint32 ticks=wxDateTime::Now().GetTicks();
 
     if ((info=m_currentGame->FindServerByAddr(packet->Address()))!=NULL)
     {
@@ -1029,22 +1021,21 @@ void CslEngine::OnResolve(wxCommandEvent& event)
     CslGame *game=NULL;
     CslResolverPacket *packet=(CslResolverPacket*)event.GetClientData();
 
-    if (packet->m_domain.IsEmpty())
-        goto finish;
-
-    loopv(m_games)
+    if (!packet->m_domain.IsEmpty())
     {
-        game=m_games[i];
-        if (game->GetType()==packet->m_type)
+        loopv(m_games)
         {
-            wxMutexLocker lock(m_mutex);
+            game=m_games[i];
+            if (game->GetType()==packet->m_type)
+            {
+                wxMutexLocker lock(m_mutex);
 
-            if ((info=game->FindServerByAddr(packet->m_address))!=NULL)
-                info->m_domain=packet->m_domain;
-            break;
+                if ((info=game->FindServerByAddr(packet->m_address))!=NULL)
+                    info->m_domain=packet->m_domain;
+                break;
+            }
         }
     }
 
-finish:
     delete packet;
 }

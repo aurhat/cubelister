@@ -32,8 +32,7 @@ CslDlgAddServer::CslDlgAddServer(wxWindow* parent,CslServerInfo *info,int id,con
 {
     // begin wxGlade: CslDlgAddServer::CslDlgAddServer
     sizer_address_staticbox = new wxStaticBox(this, -1, wxEmptyString);
-    const wxString choice_type_choices[] =
-    {
+    const wxString choice_type_choices[] = {
         _("default")
     };
     choice_type = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 1, choice_type_choices, 0);
@@ -104,7 +103,15 @@ void CslDlgAddServer::OnText(wxCommandEvent& WXUNUSED(event))
 
 void CslDlgAddServer::OnButton(wxCommandEvent& event)
 {
+    unsigned long port=0;
     wxString host=text_ctrl_address->GetValue();
+    wxInt32 pos=host.Find(':');
+
+    if (pos!=wxNOT_FOUND)
+    {
+        host.Mid(pos+1).ToULong(&port);
+        host.Truncate(pos);
+    }
 
     // check again for empty host - since setting a default button on wxMAC
     // and hitting enter reaches this position, also if the the button was disabled
@@ -113,7 +120,7 @@ void CslDlgAddServer::OnButton(wxCommandEvent& event)
 
     CSL_GAMETYPE type=(CSL_GAMETYPE)(long)choice_type->GetClientData(choice_type->GetSelection());
 
-    m_info->CreateFavourite(host,type);
+    m_info->CreateFavourite(type,host,port);
 
     EndModal(wxID_OK);
 }

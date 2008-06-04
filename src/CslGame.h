@@ -57,34 +57,34 @@
 #define CSL_DEFAULT_NAME_BF           wxT("Blood Frontier")
 #define CSL_DEFAULT_NAME_CB           wxT("Cube")
 
+#define CSL_DEFAULT_MASTER_WEB_PORT   80
+
 #define CSL_DEFAULT_MASTER_SB         wxT("sauerbraten.org")
 #define CSL_DEFAULT_MASTER_PATH_SB    wxT("/masterserver/retrieve.do?item=list")
 
 #define CSL_DEFAULT_MASTER_AC         wxT("masterserver.cubers.net")
 #define CSL_DEFAULT_MASTER_PATH_AC    wxT("/cgi-bin/actioncube.pl/retrieve.do?item=list")
 
-#define CSL_DEFAULT_MASTER_BF         wxT("acord.woop.us")
-#define CSL_DEFAULT_MASTER_PATH_BF    wxT("/retrieve.do?item=list")
+#define CSL_DEFAULT_MASTER_BF         wxT("bloodfrontier.com")
+#define CSL_DEFAULT_MASTER_PORT_BF    28800
 
 #define CSL_DEFAULT_MASTER_CB         wxT("wouter.fov120.com")
 #define CSL_DEFAULT_MASTER_PATH_CB    wxT("/cube/masterserver/retrieve.do?item=list")
 
-#define CSL_DEFAULT_INFO_PORT_SB      28786
-#define CSL_DEFAULT_INFO_PORT_AC      28764
-#define CSL_DEFAULT_INFO_PORT_BF      28796
-#define CSL_DEFAULT_INFO_PORT_CB      28766
+#define CSL_DEFAULT_PORT_SB  28785
+#define CSL_DEFAULT_PORT_AC  28763
+#define CSL_DEFAULT_PORT_BF  28795
+#define CSL_DEFAULT_PORT_CB  28765
 
-#define CSL_LAST_PROTOCOL_SB   255
-#define CSL_LAST_PROTOCOL_AC  1125
-#define CSL_LAST_PROTOCOL_BF   254
+#define CSL_LAST_PROTOCOL_SB   256
+#define CSL_LAST_PROTOCOL_AC  1126
+#define CSL_LAST_PROTOCOL_BF     0
 #define CSL_LAST_PROTOCOL_CB   122
 
-#define CSL_DEFAULT_SERVER_ADDR_SB1  wxT("81.169.170.173")   // TC1
-#define CSL_DEFAULT_SERVER_ADDR_SB2  wxT("85.214.41.161")    // TC2
+#define CSL_DEFAULT_SERVER_ADDR_SB1  wxT("85.214.113.69")   // TC1
+#define CSL_DEFAULT_SERVER_ADDR_SB2  wxT("81.169.135.134")  // TC2
 #define CSL_DEFAULT_SERVER_DESC_SB1  wxT("The-Conquerors")
 #define CSL_DEFAULT_SERVER_DESC_SB2  wxT("The-Conquerors 2")
-
-#define CSL_UPTIME_REFRESH_MULT 4
 
 #define CSL_VIEW_DEFAULT      1
 #define CSL_VIEW_FAVOURITE    2
@@ -99,6 +99,8 @@ typedef enum
 } CSL_GAMETYPE;
 
 
+extern wxUint32 GetDefaultPort(const CSL_GAMETYPE type);
+extern const wxChar* GetVersionStr(const CSL_GAMETYPE type,const wxInt32 protocol);
 extern const wxChar* GetVersionStrSB(int n);
 extern const wxChar* GetVersionStrAC(int n);
 extern const wxChar* GetVersionStrBF(int n);
@@ -113,17 +115,18 @@ extern const wxChar* GetGameStr(int n);
 
 class CslGame;
 class CslMaster;
+class CslMasterConnection;
 
 
-class CslServerInfo
+class CslServerInfo : public CslExtendedInfo
 {
         friend class CslEngine;
         friend class CslGame;
         friend class CslMaster;
 
     public:
-        CslServerInfo(const wxString& host=wxT("localhost"),
-                      const CSL_GAMETYPE type=CSL_GAME_START,
+        CslServerInfo(const CSL_GAMETYPE type=CSL_GAME_START,
+                      const wxString& host=wxT("localhost"),wxUint16 port=0,
                       const wxUint32 view=CSL_VIEW_DEFAULT,const wxUint32 lastSeen=0,
                       const wxUint32 playLast=0,const wxUint32 playTimeLastGame=0,
                       const wxUint32 playTimeTotal=0,const wxUint32 connectedTimes=0,
@@ -131,6 +134,7 @@ class CslServerInfo
                       const wxString& password=wxEmptyString)
         {
             m_host=host;
+            m_port=port ? port:GetDefaultPort(type);
             m_type=type;
             m_protocol=-1;
             m_ping=-1;
@@ -141,7 +145,7 @@ class CslServerInfo
             m_isCapture=false;
             m_view=view;
             m_addr.Hostname(host);
-            m_addr.Service(GetDefaultPort(type));
+            m_addr.Service(port ? port+1:m_port+1);
             m_pingSend=0;
             m_pingResp=0;
             m_lastSeen=lastSeen;
@@ -151,82 +155,35 @@ class CslServerInfo
             m_connectedTimes=connectedTimes;
             m_password=password;
             m_descOld=oldDescription;
-            m_uptime=0;
-            m_uptimeRefresh=CSL_UPTIME_REFRESH_MULT;
             m_lock=0;
             m_waiting=false;
-            m_extInfoStatus=CSL_EXT_STATUS_FALSE;
-            m_extInfoVersion=0;
-            m_playerStats=NULL;
-            m_teamStats=NULL;
         }
-
-        //virtual ~CslServerInfo() { DeletePlayerStats(); }
 
         bool operator==(const CslServerInfo& info) const
         {
-            return (m_type==info.m_type && m_host==info.m_host);
+            return (m_type==info.m_type && m_host==info.m_host && m_port==info.m_port);
         }
 
         void Destroy() { DeletePlayerStats(); DeleteTeamStats(); delete this; }
 
-        void CreateFavourite(const wxString& host=wxT("localhost"),
-                             CSL_GAMETYPE type=CSL_GAME_START)
+        void CreateFavourite(const CSL_GAMETYPE type=CSL_GAME_START,
+                             const wxString& host=wxT("localhost"),const wxUint16 port=0)
         {
             m_host=host;
+            m_port=port ? port:GetDefaultPort(type);
             m_type=type;
             m_view=CSL_VIEW_FAVOURITE;
             m_addr.Hostname(host);
-            m_addr.Service(GetDefaultPort(type));
+            m_addr.Service(port ? port+1:m_port+1);
         }
 
-        void SetLastPlayTime(wxUint32 time)
+        void SetLastPlayTime(const wxUint32 time)
         {
             m_playTimeLastGame=time;
             m_playTimeTotal+=time;
         }
 
-        void SetWaiting(bool wait=true) { m_waiting=wait; }
-
-        const wxChar* GetVersionStr() const
-        {
-            switch (m_type)
-            {
-                case CSL_GAME_SB:
-                    return GetVersionStrSB(m_protocol);
-                case CSL_GAME_AC:
-                    return GetVersionStrAC(m_protocol);
-                case CSL_GAME_BF:
-                    return GetVersionStrBF(m_protocol);
-                case CSL_GAME_CB:
-                    return GetVersionStrCB(m_protocol);
-                default:
-                    break;
-            }
-            return wxEmptyString;
-        }
-
-        wxUint32 GetDefaultPort(const CSL_GAMETYPE type) const
-        {
-            switch (type)
-            {
-                case CSL_GAME_SB:
-                    return CSL_DEFAULT_INFO_PORT_SB;
-                    break;
-                case CSL_GAME_AC:
-                    return CSL_DEFAULT_INFO_PORT_AC;
-                    break;
-                case CSL_GAME_BF:
-                    return CSL_DEFAULT_INFO_PORT_BF;
-                    break;
-                case CSL_GAME_CB:
-                    return CSL_DEFAULT_INFO_PORT_CB;
-                    break;
-                default:
-                    break;
-            }
-            return 0;
-        }
+        void SetWaiting(const bool wait=true) { m_waiting=wait; }
 
         void SetDescription(const wxString& description)
         {
@@ -238,12 +195,13 @@ class CslServerInfo
         {
             if (m_desc.IsEmpty())
             {
-                if (m_descOld.IsEmpty())
-                    return m_host;
+                if (m_descOld.IsEmpty()) return m_host;
                 else return m_descOld;
             }
             return m_desc;
         }
+
+        const wxChar* GetVersionStr() const { return ::GetVersionStr(m_type,m_protocol); }
 
         void Lock(bool lock=true)
         {
@@ -251,14 +209,13 @@ class CslServerInfo
             else m_lock++;
         }
 
-        bool CanPingUptime() { return m_uptimeRefresh++%CSL_UPTIME_REFRESH_MULT==0; }
-
         bool IsLocked() const { return m_lock>0; }
         bool IsUnused() const { return m_view==0; }
         bool IsDefault() const { return (m_view&CSL_VIEW_DEFAULT)>0; }
         bool IsFavourite() const { return (m_view&CSL_VIEW_FAVOURITE)>0; }
 
         wxString m_host,m_domain,m_password;
+        wxUint16 m_port;
         vector<wxInt32> m_masterIDs;
         wxString m_desc,m_descOld;
         wxString m_gameMode,m_map;
@@ -273,12 +230,8 @@ class CslServerInfo
         wxUint32 m_lastSeen,m_pingSend,m_pingResp;
         wxUint32 m_playLast,m_playTimeLastGame,m_playTimeTotal;
         wxUint32 m_connectedTimes;
-        wxUint32 m_uptime,m_uptimeRefresh;
         wxInt32 m_lock;
         bool m_waiting;
-        wxInt32 m_extInfoStatus,m_extInfoVersion;
-        CslPlayerStats *m_playerStats;
-        CslTeamStats *m_teamStats;
 
     protected:
         void AddMaster(const wxInt32 id)
@@ -297,41 +250,65 @@ class CslServerInfo
         void SetFavourite() { m_view|=CSL_VIEW_FAVOURITE; }
         void RemoveDefault() { m_view&=~CSL_VIEW_DEFAULT; }
         void RemoveFavourite() { m_view&=~CSL_VIEW_FAVOURITE; }
-
-        void CreatePlayerStats() { if (!m_playerStats) m_playerStats=new CslPlayerStats(); }
-        void DeletePlayerStats() { if (m_playerStats) { delete m_playerStats; m_playerStats=NULL; } }
-        void CreateTeamStats() { if (!m_teamStats) m_teamStats=new CslTeamStats(); }
-        void DeleteTeamStats() { if (m_teamStats) { delete m_teamStats; m_teamStats=NULL; } }
-
 };
 
+
+enum { CSL_MASTER_CONN_HTTP, CSL_MASTER_CONN_OTHER };
+
+class CslMasterConnection
+{
+        friend class CslMaster;
+    public:
+        CslMasterConnection() {}
+
+        CslMasterConnection(const wxString& address,const wxString& path,
+                            const wxUint16 port=CSL_DEFAULT_MASTER_WEB_PORT) :
+                m_type(CSL_MASTER_CONN_HTTP),m_address(address),
+                m_path(path),m_port(port) {};
+
+        CslMasterConnection(const wxString& address,const wxUint16 port) :
+                m_type(CSL_MASTER_CONN_OTHER),m_address(address),
+                m_path(wxEmptyString),m_port(port) {};
+
+        bool operator==(const CslMasterConnection& m2) const
+        {
+            return m_address==m2.m_address && m_path==m2.m_path;
+        }
+
+        wxInt32 GetType() const { return m_type; }
+        wxString GetAddress() const { return m_address; }
+        wxString GetPath() const { return m_path; }
+        wxUint16 GetPort() const { return m_port; }
+
+    private:
+        wxInt32 m_type;
+        wxString m_address;
+        wxString m_path;
+        wxUint16 m_port;
+};
 
 class CslMaster
 {
         friend class CslGame;
 
     public:
-        CslMaster(const CSL_GAMETYPE type=CSL_GAME_START,
-                  const wxString& address=wxEmptyString,
-                  const wxString& path=wxEmptyString,
-                  const bool def=false) :
-                m_game(NULL),m_address(address),m_path(path),
-                m_type(type),m_id(0) {}
+        CslMaster(const CSL_GAMETYPE type) :
+                m_game(NULL),m_type(type),m_id(0) {}
+
+        CslMaster(const CSL_GAMETYPE type,const CslMasterConnection& connection):
+                m_game(NULL),m_type(type),m_id(0),m_connection(connection) {}
 
         ~CslMaster() { RemoveServers(); }
 
         bool operator==(const CslMaster& m2) const
         {
-            return m_address==m2.m_address && m_path==m2.m_path;
+            return m_connection==m2.m_connection;
         }
 
-        void Create(const CSL_GAMETYPE type,
-                    const wxString& address=wxEmptyString,
-                    const wxString& path=wxEmptyString)
+        void Create(const CSL_GAMETYPE type,const CslMasterConnection& connection)
         {
             m_type=type;
-            m_address=address;
-            m_path=path;
+            m_connection=connection;
         }
 
         void AddServer(CslServerInfo *info)
@@ -363,18 +340,16 @@ class CslMaster
         }
 
         CslGame* GetGame() const { return m_game; }
-        wxString GetAddress() const { return m_address; }
-        wxString GetPath() const { return m_path; }
         CSL_GAMETYPE GetType() const { return m_type; }
         wxInt32 GetID() const { return m_id; }
+        CslMasterConnection& GetConnection() { return m_connection; }
         vector<CslServerInfo*>* GetServers() { return &m_servers; }
 
     protected:
         CslGame *m_game;
-        wxString m_address;
-        wxString m_path;
         CSL_GAMETYPE m_type;
         wxInt32 m_id;
+        CslMasterConnection m_connection;
         vector<CslServerInfo*> m_servers;
 
         void Init(CslGame *game,wxUint32 id)

@@ -57,8 +57,7 @@ CslDlgOutput::CslDlgOutput(wxWindow* parent,int id,const wxString& title,
     button_search_prev = new wxButton(this, wxID_BACKWARD, _("&Back"));
     button_search_next = new wxButton(this, wxID_FORWARD, _("&Forward"));
     checkbox_conv_filter = new wxCheckBox(this, CHECK_CONV_FILTER, _("&Filter chat"));
-    const wxString choice_conv_filter_choices[] =
-    {
+    const wxString choice_conv_filter_choices[] = {
         _("0 (Low)"),
         _("1 (Default)"),
         _("2 (TC-Server)")

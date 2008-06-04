@@ -36,6 +36,7 @@
 #include <wx/sckaddr.h>
 
 #define CSL_MAX_PACKET_SIZE 5000
+#define CSL_UDP_OVERHEAD 42
 
 BEGIN_DECLARE_EVENT_TYPES()
 DECLARE_EVENT_TYPE(wxCSL_EVT_PING,wxID_ANY)
@@ -101,19 +102,25 @@ class CslUDPPacket
         wxIPV4address m_addr;
 };
 
+
+enum { CSL_UDP_TRAFFIC_IN, CSL_UDP_TRAFFIC_OUT };
+
 class CslUDP : public wxEvtHandler
 {
     public:
         CslUDP(wxEvtHandler *evtHandler);
         ~CslUDP();
 
-        bool IsInit() { return m_init; }
+        bool IsInit() const { return m_init; }
         bool SendPing(CslUDPPacket *packet);
+        static wxUint32 GetTraffic(wxUint32 type,bool overhead=false);
+        static wxUint32 GetPacketCount(wxUint32 type);
 
     private:
         bool m_init;
         wxEvtHandler *m_evtHandler;
         wxDatagramSocket *m_socket;
+        static wxUint32 m_bytesIn,m_bytesOut,m_packetsIn,m_packetsOut;
 
         void OnSocketEvent(wxSocketEvent& event);
 
