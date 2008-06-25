@@ -103,9 +103,9 @@ class CslListServerData
     public:
         CslListServerData(CslServerInfo *info) :
                 Info(info)
-                {
-                    Reset();
-                }
+        {
+            Reset();
+        }
 
         CslListServerData& operator=(const CslServerInfo& info)
         {

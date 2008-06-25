@@ -70,9 +70,9 @@ class CslResolverPacket
     public:
         CslResolverPacket(const wxString& host,wxUint16 port,wxInt32 id) :
                 Host(host),GameId(id)
-                {
-                    Address.Service(port);
-                }
+        {
+            Address.Service(port);
+        }
 
         wxString Host;
         wxString Domain;

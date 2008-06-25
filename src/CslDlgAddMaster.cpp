@@ -76,8 +76,9 @@ void CslDlgAddMaster::set_properties()
     SetTitle(_("CSL - Add new Master"));
     choice_gametype->SetSelection(0);
     choice_mastertype->SetSelection(0);
-    text_ctrl_address->SetMinSize(wxSize(220, -1));
+    text_ctrl_address->SetMinSize(wxSize(180, -1));
     text_ctrl_address->SetFocus();
+    spin_ctrl_port->SetMinSize(wxSize(60, -1));
     button_add->Enable(false);
     button_add->SetDefault();
     // end wxGlade
@@ -105,7 +106,7 @@ void CslDlgAddMaster::do_layout()
     grid_sizer_address_top->Add(grid_sizer_choice, 1, wxEXPAND, 0);
     wxStaticText* label_address_static = new wxStaticText(this, wxID_ANY, _("Address:"));
     grid_sizer_address_top->Add(label_address_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_address->Add(text_ctrl_address, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_address->Add(text_ctrl_address, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     wxStaticText* label_port_static = new wxStaticText(this, wxID_ANY, _("Port:"));
     grid_sizer_address->Add(label_port_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_address->Add(spin_ctrl_port, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);

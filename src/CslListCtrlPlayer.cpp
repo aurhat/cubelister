@@ -287,24 +287,24 @@ void CslListCtrlPlayer::ToggleSortArrow()
 
 void CslListCtrlPlayer::SetInfo(CslServerInfo *info)
 {
-     m_info=info;
-     DeleteAllItems();
+    m_info=info;
+    DeleteAllItems();
 
-     if (!info)
-         return;
+    if (!info)
+        return;
 
-     wxInt32 i;
-     wxListItem item;
-     vector<wxString> descriptions;
+    wxInt32 i;
+    wxListItem item;
+    vector<wxString> descriptions;
 
-     info->GetGame().GetPlayerstatsDescriptions(descriptions);
+    info->GetGame().GetPlayerstatsDescriptions(descriptions);
 
-     for (i=0;i<GetColumnCount() && i<descriptions.length();i++)
-     {
-         GetColumn(i,item);
-         item.SetText(descriptions[i]);
-         SetColumn(i,item);
-     }
+    for (i=0;i<GetColumnCount() && i<descriptions.length();i++)
+    {
+        GetColumn(i,item);
+        item.SetText(descriptions[i]);
+        SetColumn(i,item);
+    }
 }
 
 void CslListCtrlPlayer::ListInit(const wxUint32 view)
