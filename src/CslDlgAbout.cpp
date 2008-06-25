@@ -19,9 +19,9 @@
  ***************************************************************************/
 
 #include <wx/mstream.h>
+#include "engine/CslTools.h"
+#include "engine/CslVersion.h"
 #include "CslDlgAbout.h"
-#include "CslTools.h"
-#include "CslVersion.h"
 #include "CslLicense.h"
 #include "csl_logo_png.h"
 

@@ -20,7 +20,7 @@
 
 #include <wx/wfstream.h>
 #include "CslPanelMap.h"
-#include "CslTools.h"
+#include "engine/CslTools.h"
 
 BEGIN_EVENT_TABLE(CslPanelMap, wxPanel)
     EVT_PAINT(CslPanelMap::OnPaint)

@@ -34,26 +34,37 @@
 #endif
 #include <wx/listctrl.h>
 #include <wx/imaglist.h>
-#include "CslGame.h"
-#include "CslTools.h"
+#include "engine/CslGame.h"
+#include "engine/CslTools.h"
 
 
 class CslListCtrlPlayer : public wxListCtrl
 {
     public:
+        enum {CSL_LISTPLAYER_MICRO_SIZE, CSL_LISTPLAYER_MINI_SIZE, CSL_LIST_PLAYER_DEFAULT_SIZE };
+
         CslListCtrlPlayer(wxWindow* parent,wxWindowID id,const wxPoint& pos=wxDefaultPosition,
                           const wxSize& size=wxDefaultSize,long style=wxLC_ICON,
                           const wxValidator& validator=wxDefaultValidator,
                           const wxString& name=wxListCtrlNameStr);
 
-        void ListInit(const bool smallview=false);
+        void ListInit(const wxUint32 view);
         void ListAdjustSize();
-        void ListUpdatePlayerData(CslPlayerStats *stats,const CSL_GAMETYPE type);
+        void ListUpdatePlayerData(CslGame& game,CslPlayerStats& stats);
+
+        void SetInfo(CslServerInfo *info);
+        CslServerInfo* GetInfo() { return m_info; }
+        wxInt32 GetView() { return m_view; }
+
+        static wxSize BestSizeMicro;
+        static wxSize BestSizeMini;
 
     private:
-        bool m_small;
+        wxUint32 m_view;
         wxImageList m_imageList;
         CslListSortHelper m_sortHelper;
+
+        CslServerInfo *m_info;
 
         void OnSize(wxSizeEvent& event);
         void OnColumnLeftClick(wxListEvent& event);

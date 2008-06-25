@@ -1,40 +1,34 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <!DOCTYPE KDevPrjSession>
 <KDevPrjSession>
- <DocsAndViews NumberOfDocuments="11" >
-  <Doc0 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslFrame.cpp" >
-   <View0 Encoding="" line="204" Type="Source" />
+ <DocsAndViews NumberOfDocuments="9" >
+  <Doc0 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/engine/CslGame.cpp" >
+   <View0 Encoding="" line="273" Type="Source" />
   </Doc0>
-  <Doc1 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslEngine.cpp" >
-   <View0 Encoding="" line="609" Type="Source" />
+  <Doc1 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/engine/CslGame.h" >
+   <View0 Encoding="" line="158" Type="Source" />
   </Doc1>
-  <Doc2 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslEngine.h" >
-   <View0 Encoding="" line="89" Type="Source" />
+  <Doc2 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslDlgSettings.cpp" >
+   <View0 Encoding="" Type="Source" />
   </Doc2>
-  <Doc3 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslGame.h" >
-   <View0 Encoding="" line="365" Type="Source" />
+  <Doc3 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslDlgSettings.h" >
+   <View0 Encoding="" Type="Source" />
   </Doc3>
-  <Doc4 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslFrame.h" >
-   <View0 Encoding="" line="95" Type="Source" />
+  <Doc4 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/engine/CslGameSauerbraten.cpp" >
+   <View0 Encoding="" line="159" Type="Source" />
   </Doc4>
-  <Doc5 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslMenu.cpp" >
-   <View0 Encoding="" line="33" Type="Source" />
+  <Doc5 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/engine/CslGameSauerbraten.h" >
+   <View0 Encoding="" line="0" Type="Source" />
   </Doc5>
-  <Doc6 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslMenu.h" >
-   <View0 Encoding="" line="64" Type="Source" />
+  <Doc6 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/engine/CslEngine.cpp" >
+   <View0 Encoding="" line="455" Type="Source" />
   </Doc6>
-  <Doc7 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslSettings.h" >
-   <View0 Encoding="" line="69" Type="Source" />
+  <Doc7 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslFrame.cpp" >
+   <View0 Encoding="" line="1526" Type="Source" />
   </Doc7>
-  <Doc8 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslTools.cpp" >
-   <View0 Encoding="" line="35" Type="Source" />
+  <Doc8 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/engine/CslEngine.h" >
+   <View0 Encoding="" line="0" Type="Source" />
   </Doc8>
-  <Doc9 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslListCtrlServer.cpp" >
-   <View0 Encoding="" line="153" Type="Source" />
-  </Doc9>
-  <Doc10 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslGame.cpp" >
-   <View0 Encoding="" line="93" Type="Source" />
-  </Doc10>
  </DocsAndViews>
  <pluginList>
   <kdevdebugger>
@@ -50,7 +44,7 @@
   </kdevbookmarks>
   <kdevvalgrind>
    <executable path="" params="" />
-   <valgrind path="" params="" />
+   <valgrind path="/usr/bin/valgrind" params=" --tool=memcheck --leak-check=yes" />
    <calltree path="" params="" />
    <kcachegrind path="" />
   </kdevvalgrind>

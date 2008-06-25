@@ -33,42 +33,47 @@
 #include "wx/wx.h"
 #endif
 #include <wx/image.h>
-#include "CslGame.h"
-
+#include "engine/CslEngine.h"
 // begin wxGlade: ::dependencies
+#include <wx/spinctrl.h>
 // end wxGlade
 
 
 class CslDlgAddServer: public wxDialog
 {
     public:
-    // begin wxGlade: CslDlgAddServer::ids
-    // end wxGlade
+        // begin wxGlade: CslDlgAddServer::ids
+        // end wxGlade
 
-        CslDlgAddServer(wxWindow* parent, CslServerInfo *info,int id=wxID_ANY,const wxString& title=wxEmptyString,
+        CslDlgAddServer(wxWindow* parent,const wxInt32 id=wxID_ANY,const wxString& title=wxEmptyString,
                         const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize,
                         long style=wxDEFAULT_DIALOG_STYLE);
 
-    private:
-    // begin wxGlade: CslDlgAddServer::methods
-    void set_properties();
-    void do_layout();
-    // end wxGlade
+        void InitDlg(CslEngine *engine,CslServerInfo *info);
 
-        void OnText(wxCommandEvent& WXUNUSED(event));
-        void OnButton(wxCommandEvent& event);
+    private:
+        // begin wxGlade: CslDlgAddServer::methods
+        void set_properties();
+        void do_layout();
+        // end wxGlade
+
+        void UpdatePort();
+
+        void OnCommandEvent(wxCommandEvent& event);
 
         DECLARE_EVENT_TABLE()
 
     protected:
-    // begin wxGlade: CslDlgAddServer::attributes
-    wxStaticBox* sizer_address_staticbox;
-    wxChoice* choice_type;
-    wxTextCtrl* text_ctrl_address;
-    wxButton* button_add;
-    wxButton* button_cancel;
-    // end wxGlade
+        // begin wxGlade: CslDlgAddServer::attributes
+        wxStaticBox* sizer_address_staticbox;
+        wxChoice* choice_gametype;
+        wxTextCtrl* text_ctrl_address;
+        wxSpinCtrl* spin_ctrl_port;
+        wxButton* button_add;
+        wxButton* button_cancel;
+        // end wxGlade
 
+        CslEngine *m_engine;
         CslServerInfo *m_info;
 
 }; // wxGlade: end class

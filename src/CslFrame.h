@@ -36,18 +36,18 @@
 #include <wx/snglinst.h>
 #include <wx/image.h>
 #include <wx/imaglist.h>
-#include <wx/splitter.h>
 #include <wx/treectrl.h>
 #include <wx/listctrl.h>
+#include "engine/CslEngine.h"
 #include "CslMenu.h"
+#include "CslDlgExtended.h"
 #include "CslStatusBar.h"
-#include "CslEngine.h"
 #include "CslDlgSettings.h"
 #include "CslListCtrlServer.h"
 #include "CslListCtrlInfo.h"
 #include "CslDlgOutput.h"
 #include "CslDlgTraffic.h"
-
+#include "CslListCtrlPlayer.h"
 
 class CslVersionCheckThread : public wxThread
 {
@@ -74,22 +74,34 @@ class CslFrame: public wxFrame
                  long style=wxDEFAULT_FRAME_STYLE);
         ~CslFrame();
 
-    private:
-        CslEngine *m_engine;
-
+    protected:
         wxAuiManager m_AuiMgr;
+
+        wxFlexGridSizer *sizer_main,*sizer_search;
+        wxPanel *pane_main,*pane_search;
+        CslListCtrlServer *list_ctrl_master,*list_ctrl_favourites;
+        CslListCtrlPlayer *list_ctrl_players;
+        CslListCtrlInfo *list_ctrl_info;
+        wxTreeCtrl *tree_ctrl_games;
+        wxTextCtrl *text_ctrl_search;
+        wxStaticText *text_search_result;
+        wxButton *button_search;
+        wxBitmapButton *button_search_clear;
+        wxGauge *gauge_search;
+        wxRadioButton *radio_search_server,*radio_search_player;
+        wxMenuBar *menubar;
+        wxMenu *menuMaster;
+
         CslMenu *m_menu;
-        wxMenu *m_menuMaster;
-
-        wxTreeItemId m_treeGamesRoot;
-
         wxImageList m_imgListTree;
         wxImageList m_imgListButton;
+        wxTreeItemId m_treeGamesRoot;
 
-        wxInt32 m_timerCount,m_timerUpdate;
-        wxInt32 m_lightCount,m_statusCount;
-        bool m_timerInit;
         wxTimer m_timer;
+        wxInt32 m_timerCount,m_timerUpdate;
+        bool m_timerInit;
+
+        CslEngine *m_engine;
 
         CslDlgOutput *m_outputDlg;
         CslDlgExtended *m_extendedDlg;
@@ -97,83 +109,57 @@ class CslFrame: public wxFrame
 
         CslVersionCheckThread *m_versionCheckThread;
 
-        void set_properties();
-        void do_layout();
+        vector<CslListCtrlPlayer*> m_playerLists;
 
-        void OnSize(wxSizeEvent& event);
+        vector<CslServerInfo*> m_searchedServers;
+        wxString m_searchString;
+        wxInt32 m_searchResultPlayer,m_searchResultServer;
+
+        void CreateMainMenu();
+        void CreateControls();
+        void SetProperties();
+        void DoLayout();
+
+        wxString PlayerListGetCaption(CslServerInfo *info,bool selected);
+        void PlayerListCreateView(CslServerInfo *info,wxUint32 view,const wxString& name=wxEmptyString);
+
+        void ToggleSearchBar();
+        void TogglePane(wxInt32 id);
+
+        void SetTotalPlaytime(CslGame *game);
+        void SetListCaption(wxInt32 id,const wxString& addon=wxEmptyString);
+        void SetSearchbarColour(bool value);
+
+        wxTreeItemId TreeFindItem(wxTreeItemId parent,CslGame *game,CslMaster *master);
+        void TreeAddMaster(wxTreeItemId parent,CslMaster *master,bool focus=false);
+        void TreeRemoveMaster();
+        void TreeAddGame(CslGame *game,wxInt32 img,bool focus=false);
+        CslGame* TreeGetSelectedGame(wxTreeItemId *item=NULL);
+        CslMaster *TreeGetSelectedMaster(wxTreeItemId *item=NULL);
+
+        void UpdateMaster();
+
+        void LoadSettings();
+        void SaveSettings();
+        bool LoadServers(wxUint32 *numm=NULL,wxUint32 *nums=NULL);
+        void SaveServers();
+
         void OnPong(wxCommandEvent& event);
         void OnTimer(wxTimerEvent& event);
         void OnListItemSelected(wxListEvent& event);
-        void OnTreeLeftClick(wxTreeEvent& event);
+        void OnTreeSelChanged(wxTreeEvent& event);
         void OnTreeRightClick(wxTreeEvent& event);
         void OnCommandEvent(wxCommandEvent& event);
         void OnKeypress(wxKeyEvent& event);
         void OnShow(wxShowEvent& event);
         void OnClose(wxCloseEvent& event);
+        void OnPaneClose(wxAuiManagerEvent& event);
         void OnMouseEnter(wxMouseEvent& event);
         void OnMouseLeave(wxMouseEvent& event);
         void OnMouseLeftDown(wxMouseEvent& event);
         void OnVersionCheck(wxCommandEvent& event);
 
         DECLARE_EVENT_TABLE()
-
-    protected:
-        wxTreeCtrl *tree_ctrl_games;
-        wxPanel *pane_games;
-        CslListCtrlInfo *list_ctrl_info;
-        wxPanel *pane_serverinfo;
-        CslListCtrlPlayer *list_ctrl_players;
-        wxPanel *pane_playerinfo;
-        wxSplitterWindow *splitter_info;
-        wxPanel *pane_info;
-        wxSplitterWindow *splitter_games_info;
-        wxTextCtrl *text_ctrl_search;
-        wxPanel *panel_search;
-        wxPanel *pane_main_left;
-        CslListCtrlServer *list_ctrl_master;
-        wxCheckBox *checkbox_filter_offline_master;
-        wxCheckBox *checkbox_filter_full_master;
-        wxCheckBox *checkbox_filter_empty_master;
-        wxCheckBox *checkbox_filter_nonempty_master;
-        wxCheckBox *checkbox_filter_mm2_master;
-        wxCheckBox *checkbox_filter_mm3_master;
-        wxPanel *pane_master;
-        CslListCtrlServer *list_ctrl_favourites;
-        wxCheckBox *checkbox_filter_offline_favourites;
-        wxCheckBox *checkbox_filter_full_favourites;
-        wxCheckBox *checkbox_filter_empty_favourites;
-        wxCheckBox *checkbox_filter_nonempty_favourites;
-        wxCheckBox *checkbox_filter_mm2_favourites;
-        wxCheckBox *checkbox_filter_mm3_favourites;
-        wxPanel *pane_favourites;
-        wxPanel *pane_main_right;
-        wxSplitterWindow *splitter_main;
-        wxPanel *panel_main;
-
-        wxFlexGridSizer *m_sizerMaster,*m_sizerFavourites;
-        wxFlexGridSizer *m_sizerFilterMaster,*m_sizerFilterFavourites;
-        wxFlexGridSizer *m_sizerLeft,*m_sizerSearch;
-        wxBitmapButton *bitmap_button_search_clear;
-        wxMenuBar *m_menubar;
-
-        void CreateMainMenu();
-
-        void ToggleFilter();
-        void UpdateFilterCheckBoxes();
-        void HandleFilterEvent(const wxInt32 id,const bool checked);
-
-        void UpdateMaster();
-
-        wxTreeItemId TreeFindItem(wxTreeItemId parent,CslGame *game,CslMaster *master);
-        void TreeAddMaster(wxTreeItemId parent,CslMaster *master,bool activate);
-        void TreeRemoveMaster();
-        void TreeAddGame(CslGame *game,bool activate=false);
-        void TreeCalcTotalPlaytime(CslGame *game);
-
-        void LoadSettings();
-        void SaveSettings();
-        bool LoadServers(wxUint32 *numm=NULL,wxUint32 *nums=NULL);
-        void SaveServers();
 };
 
 
@@ -182,7 +168,7 @@ class CslApp: public wxApp
 {
     public:
         bool OnInit();
-        virtual int OnExit();
+        int OnExit();
 
     private:
         wxSingleInstanceChecker *m_single;

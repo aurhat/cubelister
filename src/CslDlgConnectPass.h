@@ -34,12 +34,11 @@
 class CslConnectPassInfo
 {
     public:
-        CslConnectPassInfo(const bool admin,const wxString& password)
-                : m_password(password),m_save(false),m_admin(admin) {}
+        CslConnectPassInfo(const wxString& pass,const wxString& pass2,const bool adm)
+                : password(pass),passwordAdmin(pass2),admin(adm) {}
 
-        wxString m_password;
-        bool m_save;
-        bool m_admin;
+        wxString password,passwordAdmin;
+        bool admin;
 };
 
 
@@ -68,7 +67,6 @@ class CslDlgConnectPass: public wxDialog
     // begin wxGlade: CslDlgConnectPass::attributes
     wxStaticBox* sizer_ctrl_staticbox;
     wxTextCtrl* text_ctrl_password;
-    wxCheckBox* checkbox_save;
     wxCheckBox* checkbox_admin;
     wxButton* button_ok;
     wxButton* button_cancel;

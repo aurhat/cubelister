@@ -36,7 +36,7 @@
 #include <wx/listctrl.h>
 #include <wx/statline.h>
 // end wxGlade
-#include "CslEngine.h"
+#include "engine/CslGame.h"
 #include "CslPanelMap.h"
 #include "CslListCtrlPlayer.h"
 
@@ -54,9 +54,12 @@ class CslDlgExtended: public wxDialog
                        long style=wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
         ~CslDlgExtended();
 
-        void SetEngine(CslEngine *engine) { m_engine=engine; }
         void DoShow(CslServerInfo *info);
         CslServerInfo* GetInfo() { return m_info; }
+
+        void UpdatePlayerData();
+        void UpdateTeamData();
+
 
     private:
     // begin wxGlade: CslDlgExtended::methods
@@ -64,7 +67,6 @@ class CslDlgExtended: public wxDialog
     void do_layout();
     // end wxGlade
 
-        CslEngine *m_engine;
         CslServerInfo *m_info;
         CslMapInfo m_mapInfo;
 
@@ -76,15 +78,12 @@ class CslDlgExtended: public wxDialog
 
         void OnClose(wxCloseEvent& event);
         void OnSize(wxSizeEvent& event);
-        void OnTimer(wxTimerEvent& event);
         void OnCommandEvent(wxCommandEvent& event);
-        void OnPong(wxCommandEvent& event);
 
         DECLARE_EVENT_TABLE()
 
     protected:
     // begin wxGlade: CslDlgExtended::attributes
-    wxStaticBox* sizer_update_staticbox;
     wxStaticBox* sizer_map_label_staticbox;
     wxStaticBox* sizer_info_staticbox;
     wxStaticBox* sizer_team_score_staticbox;
@@ -106,8 +105,6 @@ class CslDlgExtended: public wxDialog
     wxStaticText* label_map;
     wxStaticText* label_author_prefix;
     wxStaticText* label_author;
-    wxButton* button_update;
-    wxCheckBox* checkbox_update;
     wxCheckBox* checkbox_update_end;
     wxCheckBox* checkbox_map;
     wxStaticLine* static_line;
@@ -116,9 +113,6 @@ class CslDlgExtended: public wxDialog
 
         void UpdateMap();
         void ClearTeamScoreLabel(const wxUint32 start,const wxUint32 end);
-        void SetPlayerData();
-        void SetTeamData();
-        void QueryInfo(wxInt32 pid=-1);
         void RecalcMinSize(bool reLayout,wxInt32 decWidth=-1);
         void ShowPanelMap(const bool show);
 

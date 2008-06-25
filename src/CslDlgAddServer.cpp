@@ -21,22 +21,33 @@
 #include "CslDlgAddServer.h"
 
 BEGIN_EVENT_TABLE(CslDlgAddServer,wxDialog)
-    EVT_TEXT(wxID_ANY,CslDlgAddServer::OnText)
-    EVT_BUTTON(wxID_ADD,CslDlgAddServer::OnButton)
-    EVT_TEXT_ENTER(wxID_ANY,CslDlgAddServer::OnButton)
+    EVT_TEXT(wxID_ANY,CslDlgAddServer::OnCommandEvent)
+    EVT_CHOICE(wxID_ANY,CslDlgAddServer::OnCommandEvent)
+    EVT_BUTTON(wxID_ADD,CslDlgAddServer::OnCommandEvent)
+    EVT_TEXT_ENTER(wxID_ANY,CslDlgAddServer::OnCommandEvent)
 END_EVENT_TABLE()
 
-CslDlgAddServer::CslDlgAddServer(wxWindow* parent,CslServerInfo *info,int id,const wxString& title,
+enum
+{
+    CHOICE_CTRL_GAMETYPE = wxID_HIGHEST + 1,
+    TEXT_CTRL_ADDRESS
+};
+
+
+CslDlgAddServer::CslDlgAddServer(wxWindow* parent,int id,const wxString& title,
                                  const wxPoint& pos,const wxSize& size,long style):
-        wxDialog(parent, id, title, pos, size, style), m_info(info)
+        wxDialog(parent, id, title, pos, size, style),
+        m_engine(NULL),m_info(NULL)
 {
     // begin wxGlade: CslDlgAddServer::CslDlgAddServer
     sizer_address_staticbox = new wxStaticBox(this, -1, wxEmptyString);
-    const wxString choice_type_choices[] = {
+    const wxString choice_gametype_choices[] =
+    {
         _("default")
     };
-    choice_type = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 1, choice_type_choices, 0);
-    text_ctrl_address = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
+    choice_gametype = new wxChoice(this, CHOICE_CTRL_GAMETYPE, wxDefaultPosition, wxDefaultSize, 1, choice_gametype_choices, 0);
+    text_ctrl_address = new wxTextCtrl(this, TEXT_CTRL_ADDRESS, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
+    spin_ctrl_port = new wxSpinCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 65535);
     button_add = new wxButton(this, wxID_ADD, _("Add"));
     button_cancel = new wxButton(this, wxID_CANCEL, _("&Cancel"));
 
@@ -50,19 +61,12 @@ void CslDlgAddServer::set_properties()
 {
     // begin wxGlade: CslDlgAddServer::set_properties
     SetTitle(_("CSL - Add new server"));
-    choice_type->SetSelection(0);
-    text_ctrl_address->SetMinSize(wxSize(250,-1));
+    choice_gametype->SetSelection(0);
+    text_ctrl_address->SetMinSize(wxSize(220, -1));
     text_ctrl_address->SetFocus();
     button_add->Enable(false);
     button_add->SetDefault();
     // end wxGlade
-
-    choice_type->Clear();
-    choice_type->Append(CSL_DEFAULT_NAME_SB,(void*)CSL_GAME_SB);
-    choice_type->Append(CSL_DEFAULT_NAME_AC,(void*)CSL_GAME_AC);
-    choice_type->Append(CSL_DEFAULT_NAME_BF,(void*)CSL_GAME_BF);
-    choice_type->Append(CSL_DEFAULT_NAME_CB,(void*)CSL_GAME_CB);
-    choice_type->SetSelection(0);
 }
 
 
@@ -72,15 +76,21 @@ void CslDlgAddServer::do_layout()
     wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(2, 1, 0, 0);
     wxFlexGridSizer* grid_sizer_button = new wxFlexGridSizer(1, 3, 0, 0);
     wxStaticBoxSizer* sizer_address = new wxStaticBoxSizer(sizer_address_staticbox, wxHORIZONTAL);
-    wxFlexGridSizer* grid_sizer_address = new wxFlexGridSizer(2, 2, 0, 0);
+    wxFlexGridSizer* grid_sizer_inpu = new wxFlexGridSizer(2, 2, 0, 0);
+    wxFlexGridSizer* grid_sizer_address = new wxFlexGridSizer(1, 3, 0, 0);
     wxStaticText* label_game_static = new wxStaticText(this, wxID_ANY, _("Game:"));
-    grid_sizer_address->Add(label_game_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_address->Add(choice_type, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_inpu->Add(label_game_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_inpu->Add(choice_gametype, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
     wxStaticText* label_address_static = new wxStaticText(this, wxID_ANY, _("Address:"));
-    grid_sizer_address->Add(label_address_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_inpu->Add(label_address_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_address->Add(text_ctrl_address, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_address->AddGrowableCol(0);
-    sizer_address->Add(grid_sizer_address, 1, wxEXPAND, 0);
+    wxStaticText* label_port_static = new wxStaticText(this, wxID_ANY, _("Port:"));
+    grid_sizer_address->Add(label_port_static, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
+    grid_sizer_address->Add(spin_ctrl_port, 0, wxALL, 4);
+    grid_sizer_inpu->Add(grid_sizer_address, 1, 0, 0);
+    grid_sizer_inpu->AddGrowableRow(1);
+    grid_sizer_inpu->AddGrowableCol(0);
+    sizer_address->Add(grid_sizer_inpu, 1, wxEXPAND, 0);
     grid_sizer_main->Add(sizer_address, 1, wxALL|wxEXPAND, 4);
     grid_sizer_button->Add(1, 1, 0, 0, 0);
     grid_sizer_button->Add(button_add, 0, wxALL|wxEXPAND, 4);
@@ -95,32 +105,85 @@ void CslDlgAddServer::do_layout()
     CentreOnParent();
 }
 
-void CslDlgAddServer::OnText(wxCommandEvent& WXUNUSED(event))
+void CslDlgAddServer::InitDlg(CslEngine *engine,CslServerInfo *info)
 {
-    bool enable=text_ctrl_address->GetValue().IsEmpty();
-    button_add->Enable(!enable);
+    m_engine=engine;
+    m_info=info;
+
+    choice_gametype->Clear();
+    vector<CslGame*>& games=engine->GetGames();
+    loopv(games) choice_gametype->Append(games[i]->GetName(),(void*)games[i]->GetId());
+    choice_gametype->SetSelection(0);
+    UpdatePort();
 }
 
-void CslDlgAddServer::OnButton(wxCommandEvent& event)
+void CslDlgAddServer::UpdatePort()
 {
-    unsigned long port=0;
-    wxString host=text_ctrl_address->GetValue();
-    wxInt32 pos=host.Find(':');
+    wxInt32 gameID=(wxInt32)(long)choice_gametype->GetClientData(choice_gametype->GetSelection());
 
-    if (pos!=wxNOT_FOUND)
+    vector<CslGame*>& games=m_engine->GetGames();
+    loopv(games)
     {
-        host.Mid(pos+1).ToULong(&port);
-        host.Truncate(pos);
+        if (games[i]->GetId()==gameID)
+        {
+            spin_ctrl_port->SetValue(games[i]->GetDefaultPort());
+            break;
+        }
     }
+}
 
-    // check again for empty host - since setting a default button on wxMAC
-    // and hitting enter reaches this position, also if the the button was disabled
-    if (host.IsEmpty())
+void CslDlgAddServer::OnCommandEvent(wxCommandEvent& event)
+{
+    if (!m_engine)
         return;
 
-    CSL_GAMETYPE type=(CSL_GAMETYPE)(long)choice_type->GetClientData(choice_type->GetSelection());
+    switch (event.GetId())
+    {
+        case CHOICE_CTRL_GAMETYPE:
+            UpdatePort();
+            break;
 
-    m_info->CreateFavourite(type,host,port);
+        case TEXT_CTRL_ADDRESS:
+            if (event.GetEventType()==wxEVT_COMMAND_TEXT_UPDATED)
+            {
+                button_add->Enable(!text_ctrl_address->GetValue().IsEmpty());
+                break;
+            }
+            if (event.GetEventType()!=wxEVT_COMMAND_TEXT_ENTER)
+                break;
+        case wxID_ADD:
+        {
+            wxString host=text_ctrl_address->GetValue();
+            wxUint16 port=spin_ctrl_port->GetValue();
 
-    EndModal(wxID_OK);
+            // check again for empty host - since setting a default button on wxMAC
+            // and hitting enter reaches this position, also if the the button was disabled
+            if (host.IsEmpty())
+                return;
+
+            wxInt32 gameID=(wxInt32)(long)choice_gametype->GetClientData(choice_gametype->GetSelection());
+
+            vector<CslGame*>& games=m_engine->GetGames();
+            loopv(games)
+            {
+                if (games[i]->GetId()==gameID)
+                {
+                    m_info->Create(games[i],host,port);
+                    if (games[i]->AddServer(m_info))
+                    {
+                        m_engine->Resolve(m_info);
+                        EndModal(wxID_OK);
+                        return;
+                    }
+                    break;
+                }
+            }
+
+            EndModal(wxID_CANCEL);
+            break;
+        }
+
+        default:
+            break;
+    }
 }

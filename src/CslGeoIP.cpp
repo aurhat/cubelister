@@ -26,7 +26,7 @@
 #include <wx/wx.h>
 #endif
 #include "CslGeoIP.h"
-#include "CslTools.h"
+#include "engine/CslTools.h"
 
 
 GeoIP *s_geoIP=NULL;

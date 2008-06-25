@@ -45,10 +45,9 @@ class CslDlgOutput: public wxDialog
                      const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize,
                      long style=wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
 
-        void HandleOutput(char *text,wxUint32 size);
-
         static void AddOutput(char *text,wxUint32 size);
         static void Reset(const wxString& title);
+        static void SaveFile(const wxString& path);
 
     private:
     // begin wxGlade: CslDlgOutput::methods
@@ -79,21 +78,20 @@ class CslDlgOutput: public wxDialog
     // end wxGlade
 
         static CslDlgOutput* m_self;
+        wxTextAttr m_textDefaultStyle;
 
-        wxString m_lastPath;
-
+        wxString m_title;
         wxString m_text;
         wxUint32 m_filterLevel;
-
         t_aUint m_searchResults;
         wxUint32 m_searchPos;
 
-        wxTextAttr m_textDefaultStyle;
-
+        void HandleOutput(char *text,wxUint32 size);
         void SetSearchTextColour(wxUint32 pos,wxUint32 posOld);
         void SetSearchbarColour(wxInt32 count);
         wxInt32 Search(const wxString& needle);
         wxString Filter(wxUint32 start,wxUint32 end);
+        void FixFilename(wxString *name);
 }; // wxGlade: end class
 
 

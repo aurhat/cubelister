@@ -19,9 +19,9 @@
  ***************************************************************************/
 
 #include "CslListCtrlInfo.h"
+#include "engine/CslTools.h"
 #include "CslSettings.h"
 #include "CslFlags.h"
-#include "CslTools.h"
 #include "CslGeoIP.h"
 #include "img/info_18_12.xpm"
 
@@ -69,7 +69,7 @@ CslListCtrlInfo::CslListCtrlInfo(wxWindow* parent,wxWindowID id,const wxPoint& p
     for (;i>=0;i-=2)
     {
         item.SetId(i);
-        SetItemBackgroundColour(item,g_cslSettings->m_colInfoStripe);
+        SetItemBackgroundColour(item,g_cslSettings->colInfoStripe);
     }
 
     AdjustSize(GetClientSize());
@@ -93,6 +93,8 @@ void CslListCtrlInfo::AdjustSize(wxSize size)
     SetColumnWidth(1,(wxInt32)(w*0.64));
 }
 
+#define CSL_UNKNOWN_STR _("unknown")
+
 void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
 {
     if (!info)
@@ -100,19 +102,18 @@ void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
         wxASSERT_MSG(info,wxT("invalid info"));
         return;
     }
-#define CSL_UNKNOWN_STR _("unknown")
 
     wxDateTime dt;
     wxString s;
     wxInt32 i,ic=0;
     const char *country;
     const char **flag=NULL;
-    char *host=strdup(U2A(info->m_addr.IPAddress().c_str()));
+    char *host=strdup(U2A(info->Addr.IPAddress().c_str()));
 
-    s=info->m_host;
-    if (IsIP(info->m_host))
+    s=wxString::Format("%s:%d",info->Host.c_str(),info->Port);
+    if (IsIP(info->Host))
     {
-        wxString h=info->m_domain;
+        wxString h=info->Domain;
         if (!h.IsEmpty())
             s+=wxT(" (")+h+wxT(")");
     }
@@ -154,22 +155,22 @@ void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
 #endif
     SetItem(ic++,1,s,1);
 
-    SetItem(ic++,1,GetGameStr(info->m_type));
+    SetItem(ic++,1,info->GetGame().GetName());
 
-    if (info->m_protocol>=0)
+    if (info->Protocol>=0)
     {
-        s=s.Format(wxT("%d"),info->m_protocol);
-        if (info->m_extInfoStatus!=CSL_EXT_STATUS_FALSE)
-            s+=wxString::Format(wxT(" / %d"),info->m_extInfoVersion);
+        s=s.Format(wxT("%d"),info->Protocol);
+        if (info->ExtInfoStatus!=CSL_EXT_STATUS_FALSE)
+            s+=wxString::Format(wxT(" / %d"),info->ExtInfoVersion);
     }
     else
         s=CSL_UNKNOWN_STR;
     SetItem(ic++,1,s);
 
-    if (info->m_extInfoStatus!=CSL_EXT_STATUS_FALSE)
+    if (info->ExtInfoStatus!=CSL_EXT_STATUS_FALSE)
     {
-        if (info->m_extInfoStatus==CSL_EXT_STATUS_OK)
-            s=FormatSeconds(info->m_uptime);
+        if (info->ExtInfoStatus==CSL_EXT_STATUS_OK)
+            s=FormatSeconds(info->Uptime);
         else
             s=_("This version of extended info is not supported.");
     }
@@ -177,35 +178,35 @@ void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
         s=_("Extended info not supported.");
     SetItem(ic++,1,s);
 
-    if (info->m_lastSeen)
+    if (info->LastSeen)
     {
-        dt.Set((time_t)info->m_lastSeen);
+        dt.Set((time_t)info->LastSeen);
         s=dt.Format();
     }
     else
         s=CSL_UNKNOWN_STR;
     SetItem(ic++,1,s);
 
-    if (info->m_playLast)
+    if (info->PlayLast)
     {
-        dt.Set((time_t)info->m_playLast);
+        dt.Set((time_t)info->PlayLast);
         s=dt.Format();
     }
     else
         s=CSL_UNKNOWN_STR;
     SetItem(ic++,1,s);
 
-    if (info->m_playTimeLastGame)
-        s=FormatSeconds(info->m_playTimeLastGame);
+    if (info->PlayTimeLastGame)
+        s=FormatSeconds(info->PlayTimeLastGame);
     else
         s=wxT("0");
     SetItem(ic++,1,s);
 
-    if (info->m_playTimeTotal)
-        s=FormatSeconds(info->m_playTimeTotal);
+    if (info->PlayTimeTotal)
+        s=FormatSeconds(info->PlayTimeTotal);
     else
         s=wxT("0");
     SetItem(ic++,1,s);
 
-    SetItem(ic++,1,wxString::Format(wxT("%d"),info->m_connectedTimes));
+    SetItem(ic++,1,wxString::Format(wxT("%d"),info->ConnectedTimes));
 }

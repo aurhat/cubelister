@@ -43,14 +43,14 @@ wxversion=0
 
 AC_DEFUN([WXTEST],
 [
-	AC_REQUIRE([AC_PROG_AWK])
-	AC_MSG_CHECKING([wxWidgets version])
-	if wxversion=`$WXCONFIG --version`; then
-		AC_MSG_RESULT([$wxversion])
-	else
-		AC_MSG_RESULT([not found])
-		AC_MSG_ERROR([wxWidgets is required. Try --with-wx-config.])
-	fi])
+    AC_REQUIRE([AC_PROG_AWK])
+    AC_MSG_CHECKING([wxWidgets version])
+    if wxversion=`$WXCONFIG --version`; then
+        AC_MSG_RESULT([$wxversion])
+    else
+        AC_MSG_RESULT([not found])
+        AC_MSG_ERROR([wxWidgets is required. Try --with-wx-config.])
+    fi])
 
 dnl Call WXTEST function
 WXTEST
@@ -58,10 +58,10 @@ WXTEST
 dnl Check for minimum wx version
 vers=`echo $wxversion | $AWK 'BEGIN { FS = "."; } { printf "% d", ($1 * 1000 + $2) * 1000 + $3;}'`
 if test -n "$vers" && test "$vers" -ge 2008000; then
-	WX_CXXFLAGS="`$WXCONFIG --cxxflags | sed -e 's/-fno-exceptions//'`"
-	WX_LIBS="`$WXCONFIG --libs`"
+    WX_CXXFLAGS="`$WXCONFIG --cxxflags | sed -e 's/-fno-exceptions//'`"
+    WX_LIBS="`$WXCONFIG --libs`"
 else
-	AC_MSG_ERROR([wxWidgets 2.8.0 or newer is required])
+    AC_MSG_ERROR([wxWidgets 2.8.0 or newer is required])
 fi
 
 dnl GeoIP
@@ -86,7 +86,7 @@ AC_ARG_WITH(geoip-datadir,
     if test "$withval" != "yes" -a "$withval" != ""; then
         internal_geoip_database="no"
         GEOIPDATADIR=$withval
-	AC_DEFINE(CSL_EXTERNAL_GEOIP_DATABASE)
+    AC_DEFINE(CSL_EXTERNAL_GEOIP_DATABASE)
     fi
 ])
 AM_CONDITIONAL(with_internal_geoipdatabase,test "x$internal_geoip_database" = "xyes")
@@ -113,8 +113,8 @@ AC_SUBST(WX_LIBS)
 AC_SUBST(GEOIP_LIBS)
 
 AC_OUTPUT(Makefile data/Makefile data/maps/Makefile \
-	data/maps/Sauerbraten/254/Makefile data/maps/Sauerbraten/Makefile po/Makefile.in src/Makefile \
-	src/libGeoIP/Makefile)
+    data/maps/Sauerbraten/254/Makefile data/maps/Sauerbraten/Makefile po/Makefile.in src/Makefile \
+    src/engine/Makefile src/libGeoIP/Makefile)
 
 echo
 echo --------------------------------------

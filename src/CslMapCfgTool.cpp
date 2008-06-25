@@ -21,7 +21,7 @@
 #include <wx/numdlg.h>
 #include <wx/wfstream.h>
 #include "CslMapCfgTool.h"
-#include "CslTools.h"
+#include "engine/CslTools.h"
 
 // begin wxGlade: ::extracode
 
@@ -500,7 +500,7 @@ void CslMapCfgTool::AddVersion()
     CslMapInfo *info;
     wxUint32 i,c,h;
     wxInt32 version=::wxGetNumberFromUser(_("Enter new version number"),_("Version: "),
-                                          _("New version number"),254,0,9999,this);
+                                          _("New version number"),256,0,9999,this);
     if (version==-1)
         return;
 

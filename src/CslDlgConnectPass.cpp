@@ -23,9 +23,10 @@
 BEGIN_EVENT_TABLE(CslDlgConnectPass,wxDialog)
     EVT_BUTTON(wxID_ANY,CslDlgConnectPass::OnCommandEvent)
     EVT_TEXT(wxID_ANY,CslDlgConnectPass::OnCommandEvent)
+    EVT_CHECKBOX(wxID_ANY,CslDlgConnectPass::OnCommandEvent)
 END_EVENT_TABLE()
 
-enum { TEXT_PASSWORD = wxID_HIGHEST + 1 };
+enum { TEXT_PASSWORD = wxID_HIGHEST + 1, CHECK_ADMIN };
 
 
 CslDlgConnectPass::CslDlgConnectPass(wxWindow* parent,CslConnectPassInfo *info,int id,
@@ -36,8 +37,7 @@ CslDlgConnectPass::CslDlgConnectPass(wxWindow* parent,CslConnectPassInfo *info,i
     // begin wxGlade: CslDlgConnectPass::CslDlgConnectPass
     sizer_ctrl_staticbox = new wxStaticBox(this, -1, wxEmptyString);
     text_ctrl_password = new wxTextCtrl(this, TEXT_PASSWORD, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
-    checkbox_save = new wxCheckBox(this, wxID_ANY, _("&Save password"));
-    checkbox_admin = new wxCheckBox(this, wxID_ANY, _("Ad&min connect"));
+    checkbox_admin = new wxCheckBox(this, CHECK_ADMIN, _("Ad&min connect"));
     button_ok = new wxButton(this, wxID_OK, _("&Ok"));
     button_cancel = new wxButton(this, wxID_CANCEL, _("&Cancel"));
 
@@ -55,11 +55,8 @@ void CslDlgConnectPass::set_properties()
     button_ok->SetDefault();
     // end wxGlade
 
-    if (!m_info->m_password.IsEmpty())
-    {
-        checkbox_save->SetValue(true);
-        text_ctrl_password->SetValue(m_info->m_password);
-    }
+    if (!m_info->password.IsEmpty())
+        text_ctrl_password->SetValue(m_info->password);
 }
 
 void CslDlgConnectPass::do_layout()
@@ -69,18 +66,13 @@ void CslDlgConnectPass::do_layout()
     wxFlexGridSizer* grid_sizer_button = new wxFlexGridSizer(1, 3, 0, 0);
     wxStaticBoxSizer* sizer_ctrl = new wxStaticBoxSizer(sizer_ctrl_staticbox, wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_ctrl = new wxFlexGridSizer(2, 1, 0, 0);
-    wxFlexGridSizer* grid_sizer_check = new wxFlexGridSizer(1, 2, 0, 0);
     wxFlexGridSizer* grid_sizer_password = new wxFlexGridSizer(1, 2, 0, 0);
     wxStaticText* label_password_static = new wxStaticText(this, wxID_ANY, _("Password:"));
     grid_sizer_password->Add(label_password_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_password->Add(text_ctrl_password, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_password->AddGrowableCol(1);
     grid_sizer_ctrl->Add(grid_sizer_password, 1, wxEXPAND, 0);
-    grid_sizer_check->Add(checkbox_save, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
-    grid_sizer_check->Add(checkbox_admin, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
-    grid_sizer_check->AddGrowableCol(0);
-    grid_sizer_check->AddGrowableCol(1);
-    grid_sizer_ctrl->Add(grid_sizer_check, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 0);
+    grid_sizer_ctrl->Add(checkbox_admin, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
     grid_sizer_ctrl->AddGrowableCol(0);
     sizer_ctrl->Add(grid_sizer_ctrl, 1, wxEXPAND, 0);
     grid_sizer_main->Add(sizer_ctrl, 1, wxALL|wxEXPAND, 4);
@@ -94,10 +86,10 @@ void CslDlgConnectPass::do_layout()
     Layout();
     // end wxGlade
 
-    if (!m_info->m_admin)
+    if (!m_info->admin)
     {
         checkbox_admin->Hide();
-        grid_sizer_check->Detach(checkbox_admin);
+        grid_sizer_ctrl->Detach(checkbox_admin);
         grid_sizer_main->Fit(this);
         Layout();
     }
@@ -113,11 +105,17 @@ void CslDlgConnectPass::OnCommandEvent(wxCommandEvent& event)
             button_ok->Enable(!event.GetString().IsEmpty());
             break;
 
+        case CHECK_ADMIN:
+            text_ctrl_password->SetValue(event.IsChecked() ? m_info->passwordAdmin:m_info->password);
+            break;
+
         case wxID_OK:
+            m_info->admin=checkbox_admin->IsChecked();
+            if (m_info->admin)
+                m_info->passwordAdmin=text_ctrl_password->GetValue();
+            else
+                m_info->password=text_ctrl_password->GetValue();
             EndModal(wxID_OK);
-            m_info->m_password=text_ctrl_password->GetValue();
-            m_info->m_save=checkbox_save->IsChecked();
-            m_info->m_admin=checkbox_admin->IsChecked();
 
         default:
             break;

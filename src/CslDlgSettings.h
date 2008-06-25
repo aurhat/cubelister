@@ -41,16 +41,42 @@
 #include <wx/filepicker.h>
 #include "CslSettings.h"
 
-class CslDlgSettings: public wxDialog
+
+class CslGamePage : public wxPanel
+{
+    public:
+        CslGamePage(wxWindow *parent,CslGame* game);
+        ~CslGamePage();
+
+        bool SaveSettings(wxString *message);
+
+    private:
+        void OnPicker(wxFileDirPickerEvent& event);
+        void OnCommandEvent(wxCommandEvent& event);
+
+        DECLARE_EVENT_TABLE()
+
+    protected:
+        wxStaticText* label_exe,*label_gamepath,*label_cfgpath,*label_expert;
+        wxTextCtrl *text_ctrl_options;
+        wxCheckBox *checkbox_expert;
+        wxFlexGridSizer *sizer;
+        wxFilePickerCtrl *filepicker;
+        wxDirPickerCtrl *dirpickergame,*dirpickercfg;
+
+        CslGame *m_game;
+
+        void ToggleView(bool expertView);
+};
+
+class CslDlgSettings : public wxDialog
 {
     public:
     // begin wxGlade: CslDlgSettings::ids
     // end wxGlade
-        CslDlgSettings(wxWindow* parent,int id=wxID_ANY,
+        CslDlgSettings(CslEngine *engine,wxWindow* parent,int id=wxID_ANY,
                        const wxString& title=wxEmptyString,const wxPoint& pos=wxDefaultPosition,
                        const wxSize& size=wxDefaultSize,long style=wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
-
-        ~CslDlgSettings();
 
     private:
     // begin wxGlade: CslDlgSettings::methods
@@ -58,28 +84,21 @@ class CslDlgSettings: public wxDialog
     void do_layout();
     // end wxGlade
 
+        CslEngine *m_engine;
         CslSettings m_settings;
 
-        void OnPicker(wxFileDirPickerEvent& event);
         void OnSpinCtrl(wxSpinEvent& event);
+        void OnPicker(wxFileDirPickerEvent& event);
         void OnCommandEvent(wxCommandEvent& event);
 
         DECLARE_EVENT_TABLE()
 
     protected:
     // begin wxGlade: CslDlgSettings::attributes
-    wxStaticBox* sizer_ping_threshold_staticbox;
+    wxStaticBox* sizer_output_staticbox;
+    wxStaticBox* sizer_threshold_staticbox;
     wxStaticBox* sizer_times_staticbox;
     wxStaticBox* sizer_colours_staticbox;
-    wxTextCtrl* text_ctrl_sauer_options;
-    wxCheckBox* checkbox_sauer_priv_config;
-    wxPanel* notebook_pane_sauer;
-    wxTextCtrl* text_ctrl_assault_options;
-    wxPanel* notebook_pane_assault;
-    wxTextCtrl* text_ctrl_frontier_options;
-    wxPanel* notebook_pane_frontier;
-    wxTextCtrl* text_ctrl_cube_options;
-    wxPanel* notebook_pane_cube;
     wxListbook* notebook_games;
     wxPanel* notebook_pane_games;
     wxBitmapButton* button_colour_empty;
@@ -95,19 +114,16 @@ class CslDlgSettings: public wxDialog
     wxSpinCtrl* spin_ctrl_min_playtime;
     wxSpinCtrl* spin_ctrl_ping_good;
     wxSpinCtrl* spin_ctrl_ping_bad;
+    wxCheckBox* checkbox_game_output;
+    wxDirPickerCtrl* dirpicker_game_output;
     wxPanel* notebook_pane_other;
     wxNotebook* notebook_settings;
     wxButton* button_ok;
     wxButton* button_cancel;
     // end wxGlade
 
-#ifndef __WXMAC__
-        wxFilePickerCtrl *fpickSauer,*fpickAssault,*fpickFrontier,*fpickCube;
-#endif
-        wxDirPickerCtrl *dpickSauer,*dpickAssault,*dpickFrontier,*dpickCube;
-
         void SetButtonColour(wxBitmapButton *button,wxButton *refButton,wxColour& colour);
-        bool Validate();
+        bool ValidateSettings();
 }; // wxGlade: end class
 
 

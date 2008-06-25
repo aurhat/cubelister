@@ -34,14 +34,13 @@
 #endif
 #include <wx/imaglist.h>
 #include <wx/process.h>
-#include "CslEngine.h"
+#include "engine/CslEngine.h"
+#include "engine/CslTools.h"
 #include "CslListCtrlInfo.h"
 #include "CslStatusBar.h"
-#include "CslDlgExtended.h"
-#include "CslTools.h"
 
 
-enum { CSL_LIST_MASTER = 0, CSL_LIST_FAVOURITE };
+enum { CSL_HIGHLIGHT_SEARCH_SERVER = 1<<0, CSL_HIGHLIGHT_SEARCH_PLAYER = 1<<1 };
 
 
 class CslListCtrlServer;
@@ -57,7 +56,6 @@ class CslConnectionState
             m_waitTime=0;
             m_activeList=NULL;
             m_activeInfo=NULL;
-            m_activeCfg.Empty();
             CslStatusBar::SetText(1,wxEmptyString);
         }
 
@@ -80,12 +78,10 @@ class CslConnectionState
             return true;
         }
 
-        static void CreatePlayingState(CslServerInfo *info,CslListCtrlServer *list,
-                                       const wxString& cfg)
+        static void CreatePlayingState(CslServerInfo *info,CslListCtrlServer *list)
         {
             m_activeInfo=info;
             m_activeList=list;
-            m_activeCfg=cfg;
             m_playing=true;
         }
 
@@ -94,60 +90,87 @@ class CslConnectionState
         static wxInt32 GetWaitTime() { return m_waitTime; }
         static CslListCtrlServer* GetList() { return m_activeList; }
         static CslServerInfo* GetInfo() { return m_activeInfo; }
-        static wxString& GetConfig() { return m_activeCfg; }
 
     private:
         static bool m_playing;
         static wxInt32 m_waitTime;
         static CslListCtrlServer *m_activeList;
         static CslServerInfo *m_activeInfo;
-        static wxString m_activeCfg;
 };
 
-class CslListServer : public CslServerInfo
+class CslListServerData
 {
     public:
-        CslListServer(CslServerInfo *info) :
-                CslServerInfo(), m_info(info),m_imgId(-1) {}
+        CslListServerData(CslServerInfo *info) :
+                Info(info)
+                {
+                    Reset();
+                }
 
-        //~CslListServer() {}
+        CslListServerData& operator=(const CslServerInfo& info)
+        {
+            Host=info.Host;
+            Description=info.GetBestDescription();
+            GameMode=info.GameMode;
+            Map=info.Map;
+            Protocol=info.Protocol;
+            Ping=info.Ping;
+            TimeRemain=info.TimeRemain;
+            Players=info.Players;
+            PlayersMax=info.PlayersMax;
+            MM=info.MM;
+            return *this;
+        }
 
         void Reset()
         {
-            m_desc.Empty();
-            m_gameMode.Empty();
-            m_map.Empty();
-            m_protocol=-1;
-            m_ping=-1;
-            m_timeRemain=-2;
-            m_players=-1;
-            m_playersMax=-1;
-            m_mm=-1;
-            m_imgId=-1;
+            Host.Empty();
+            Description.Empty();
+            GameMode.Empty();
+            Map.Empty();
+            Protocol=-1;
+            Ping=-1;
+            TimeRemain=-2;
+            Players=-1;
+            PlayersMax=-1;
+            MM=-1;
+            ImgId=-1;
+            HighLight=0;
         }
 
-        CslServerInfo* GetPtr() { return m_info; }
-
-        bool HasStats()
+        bool SetHighlight(const wxInt32 type,const bool value)
         {
-            return m_playLast>0 || m_playTimeLastGame>0 ||
-                   m_playTimeTotal>0 || m_connectedTimes>0;
+            if (value)
+                HighLight|=type;
+            else
+                HighLight&=~type;
+
+            return HighLight!=0;
         }
 
-        wxInt32 ImgId() { return m_imgId; }
-        void ImgId(wxInt32 imgId) { m_imgId=imgId; }
-
-    protected:
-        CslServerInfo *m_info;
-        wxInt32 m_imgId;
+        CslServerInfo *Info;
+        wxString Host;
+        wxString Description;
+        wxString GameMode;
+        wxString Map;
+        wxInt32 Protocol;
+        wxInt32 Ping;
+        wxInt32 TimeRemain;
+        wxInt32 Players;
+        wxInt32 PlayersMax;
+        wxInt32 MM;
+        wxInt32 ImgId;
+        wxUint32 HighLight;
 };
 
-WX_DEFINE_ARRAY_PTR(CslListServer*,t_aCslServerInfo);
+WX_DEFINE_ARRAY_PTR(CslListServerData*,t_aCslListServerData);
 
 
 class CslListCtrlServer : public wxListCtrl
 {
     public:
+        enum { CSL_LIST_MASTER, CSL_LIST_FAVOURITE };
+
         CslListCtrlServer(wxWindow* parent,wxWindowID id,const wxPoint& pos=wxDefaultPosition,
                           const wxSize& size=wxDefaultSize,long style=wxLC_ICON,
                           const wxValidator& validator=wxDefaultValidator,
@@ -156,17 +179,17 @@ class CslListCtrlServer : public wxListCtrl
 
         void ListInit(CslEngine *engine,
                       CslListCtrlInfo *listInfo,
-                      CslListCtrlServer *listMaster,
-                      CslListCtrlServer *listFavourites,
-                      CslDlgExtended *extendedDlg,
-                      wxUint32 filterFlags);
-        wxUint32 ListUpdate(vector<CslServerInfo*> *servers);
+                      CslListCtrlServer *sibling
+                      /*,CslDlgExtended *extendedDlg*/);
+        wxUint32 ListUpdate(vector<CslServerInfo*>& servers);
         void ListClear();
+        void ListSort(wxInt32 column=-1);
         void ToggleSortArrow();
         wxUint32 ListSearch(const wxString& search);
-        wxUint32 ListFilter(const wxUint32 filterFlags);
-        void ListAdjustSize(const wxSize& size,const bool init=false);
+        wxUint32 ListFilter();
+        void ListAdjustSize(const wxSize& size,bool init=false);
         void SetMasterSelected(bool selected) { m_masterSelected=selected; }
+        void Highlight(wxInt32 type,bool highlight,CslServerInfo *info=NULL,wxListItem *listitem=NULL);
 
     private:
         wxInt32 m_id;
@@ -177,17 +200,15 @@ class CslListCtrlServer : public wxListCtrl
         wxUint32 m_timerCount;
 
         CslListCtrlInfo *m_listInfo;
-        CslListCtrlServer *m_listMaster;
-        CslListCtrlServer *m_listFavourites;
-        CslDlgExtended *m_extendedDlg;
+        CslListCtrlServer *m_sibling;
 
         bool m_dontUpdateInfo;  // don't update info list on ctrl+a
         bool m_dontRemoveOnDeselect;
 
-        t_aCslServerInfo m_selected;
-        t_aCslServerInfo m_servers;
+        t_aCslListServerData m_selected;
+        t_aCslListServerData m_servers;
         wxString m_searchString;
-        wxUint32 m_filterFlags;
+        wxUint32 *m_filterFlags;
         wxInt32 m_filterVersion;
 
         wxImageList m_imageList;
@@ -214,16 +235,16 @@ class CslListCtrlServer : public wxListCtrl
 
     protected:
         static bool PingOk(CslServerInfo *info);
-        wxInt32 ListFindItem(CslServerInfo *info);
+
+        void ListCreateGameBitmaps();
+        wxInt32 ListFindItem(CslServerInfo *info,wxListItem& item);
         void ListDeleteItem(wxListItem *item);
         bool ListSearchItemMatches(CslServerInfo *info);
         bool ListFilterItemMatches(CslServerInfo *info);
+    public:
         bool ListUpdateServer(CslServerInfo *info);
-        void RemoveServer(CslListServer *server,CslServerInfo *info,wxInt32 id);
-        void ListSort(wxInt32 column);
-        void ConnectToServer(CslServerInfo *info,
-                             const wxString& password=wxEmptyString,
-                             const bool admin=false);
+        void RemoveServer(CslListServerData *server,CslServerInfo *info,wxInt32 id);
+        void ConnectToServer(CslServerInfo *info,wxUint32 mode=CslGame::CSL_CONNECT_DEFAULT);
         void ListRemoveServers();
         void ListDeleteServers();
 };

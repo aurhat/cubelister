@@ -34,7 +34,7 @@
 #endif
 #include <wx/listctrl.h>
 #include <wx/imaglist.h>
-#include "CslGame.h"
+#include "engine/CslGame.h"
 
 
 class CslListCtrlInfo : public wxListCtrl

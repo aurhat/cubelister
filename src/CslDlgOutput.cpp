@@ -22,7 +22,7 @@
 #include <wx/wupdlock.h>
 #include "CslDlgOutput.h"
 #include "CslSettings.h"
-#include "CslTools.h"
+#include "engine/CslTools.h"
 
 #define CSL_OUTPUT_EXTENSION  _("Text files (*.txt)|*.txt")
 
@@ -213,15 +213,14 @@ void CslDlgOutput::OnCommandEvent(wxCommandEvent& event)
 
         case wxID_OPEN:
         {
-            if (wxDirExists(g_cslSettings->m_outputPath))
-                s=g_cslSettings->m_outputPath;
+            if (wxDirExists(g_cslSettings->gameOutputPath))
+                s=g_cslSettings->gameOutputPath;
             wxFileDialog dlg(this,_("Open log file"),s,wxEmptyString,
                              CSL_OUTPUT_EXTENSION,wxOPEN|wxFILE_MUST_EXIST);
             if (dlg.ShowModal()!=wxID_OK)
                 break;
 
             s=dlg.GetPath();
-            g_cslSettings->m_outputPath=::wxPathOnly(s);
 
             wxFile file(s,wxFile::read);
             if (!file.IsOpened())
@@ -247,33 +246,7 @@ void CslDlgOutput::OnCommandEvent(wxCommandEvent& event)
 
         case wxID_SAVE:
         {
-            wxDateTime now=wxDateTime::Now();
-            s=now.Format(wxT("%Y%m%d-%H%M%S"));
-            if (checkbox_conv_filter->GetValue())
-                s+=wxT("_conversation");
-            else
-                s+=wxT("_full");
-            s+=wxT(".txt");
-
-            wxFileDialog dlg(this,_("Save log file"),wxEmptyString,s,
-                             CSL_OUTPUT_EXTENSION,wxSAVE|wxOVERWRITE_PROMPT);
-            // wxGTK: hmm, doesn't work in the ctor?!
-            if (wxDirExists(g_cslSettings->m_outputPath))
-                dlg.SetPath(g_cslSettings->m_outputPath+wxT("/")+s);
-            if (dlg.ShowModal()!=wxID_OK)
-                return;
-
-            s=dlg.GetPath();
-            g_cslSettings->m_outputPath=::wxPathOnly(s);
-
-            wxFile file(s,wxFile::write);
-            if (!file.IsOpened())
-                return;
-
-            wxString text=text_ctrl_output->GetValue();
-            file.Write((void*)U2A(text),text.Len());
-            file.Close();
-
+            SaveFile(wxEmptyString);
             break;
         }
 
@@ -303,7 +276,7 @@ void CslDlgOutput::SetSearchTextColour(wxUint32 pos,wxUint32 posOld)
     attr.SetFlags(wxTEXT_ATTR_BACKGROUND_COLOUR);
     attr.SetBackgroundColour(wxColour(255,64,64));
     attrOld.SetFlags(wxTEXT_ATTR_BACKGROUND_COLOUR);
-    attrOld.SetBackgroundColour(g_cslSettings->m_colServerHigh);
+    attrOld.SetBackgroundColour(g_cslSettings->colServerHigh);
 #endif
 
     wxUint32 len=text_ctrl_search->GetValue().Len();
@@ -343,7 +316,7 @@ wxInt32 CslDlgOutput::Search(const wxString& needle)
     wxTextAttr attr;
 
     const wxString& haystack=text_ctrl_output->GetValue();
-    wxInt32 hlen=haystack.Len();
+    wxInt32 hlen=haystack.Len()-1;
     wxInt32 nlen=needle.Len();
     wxInt32 count=0;
     wxInt32 pos=0;
@@ -370,7 +343,7 @@ wxInt32 CslDlgOutput::Search(const wxString& needle)
 #ifdef __WXMAC__
         attr.SetTextColour(*wxGREEN);
 #else
-        attr.SetBackgroundColour(g_cslSettings->m_colServerHigh);
+        attr.SetBackgroundColour(g_cslSettings->colServerHigh);
 #endif
         while (pos<=hlen)
         {
@@ -523,16 +496,14 @@ void CslDlgOutput::HandleOutput(char *text,wxUint32 size)
 
 void CslDlgOutput::AddOutput(char *text,wxUint32 size)
 {
-    if (m_self)
-        m_self->HandleOutput(text,size);
+    m_self->HandleOutput(text,size);
 }
 
 void CslDlgOutput::Reset(const wxString& title)
 {
-    if (!m_self)
-        return;
-
     wxString s;
+
+    m_self->m_title=title;
 
     m_self->button_search_prev->Enable(false);
     m_self->button_search_next->Enable(false);
@@ -543,4 +514,59 @@ void CslDlgOutput::Reset(const wxString& title)
     if (!title.IsEmpty())
         s+=wxT(": ")+title;
     m_self->SetTitle(s);
+
+}
+
+void CslDlgOutput::FixFilename(wxString *name)
+{
+    wxUint32 i,j;
+    wxString exclude=wxT("\\/:*?\"<>| ");
+
+    for (i=0;i<name->Length();i++)
+        for (j=0;j<exclude.Length();j++)
+            if (name->GetChar(i)==exclude.GetChar(j))
+                name->SetChar(i,'_');
+}
+
+void CslDlgOutput::SaveFile(const wxString& path)
+{
+    wxString filename;
+    wxDateTime now=wxDateTime::Now();
+
+    if (!path.IsEmpty())
+    {
+        filename=m_self->m_title+wxT("-");
+        m_self->FixFilename(&filename);
+    }
+    filename+=now.Format(wxT("%Y%m%d_%H%M%S"));
+
+    if (path.IsEmpty() && m_self->checkbox_conv_filter->GetValue())
+        filename+=wxT("-conversation");
+    else
+        filename+=wxT("-full");
+    filename+=wxT(".txt");
+
+    if (path.IsEmpty())
+    {
+        wxFileDialog dlg(m_self,_("Save log file"),wxEmptyString,filename,
+                         CSL_OUTPUT_EXTENSION,wxSAVE|wxOVERWRITE_PROMPT);
+        // wxGTK: hmm, doesn't work in the ctor?!
+        if (wxDirExists(g_cslSettings->gameOutputPath))
+            dlg.SetPath(g_cslSettings->gameOutputPath+wxT("/")+filename);
+        if (dlg.ShowModal()!=wxID_OK)
+            return;
+
+        filename=dlg.GetPath();
+        g_cslSettings->gameOutputPath=::wxPathOnly(filename);
+    }
+    else
+    {
+        wxString pathname=path;
+        if (!path.EndsWith(PATHDIV))
+            pathname+=PATHDIV;
+        filename=pathname+filename;
+    }
+
+    const wxString &out=path.IsEmpty() ? m_self->text_ctrl_output->GetValue():m_self->m_text;
+    WriteTextFile(filename,out,wxFile::write);
 }

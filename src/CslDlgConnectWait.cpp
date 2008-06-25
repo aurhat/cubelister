@@ -87,6 +87,6 @@ void CslDlgConnectWait::OnButton(wxCommandEvent& event)
 {
     *m_time=spin_ctrl_time->GetValue();
     if (checkbox_default->IsChecked())
-        g_cslSettings->m_waitServerFull=*m_time;
+        g_cslSettings->waitServerFull=*m_time;
     EndModal(wxID_OK);
 }

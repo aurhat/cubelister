@@ -31,9 +31,8 @@ CslMenu::CslMenu(wxMenuBar *menuBar)
     EnableMenuItem(MENU_MASTER_DEL,false);
     EnableMenuItem(MENU_MASTER_UPDATE,false);
 
-    CheckMenuItem(MENU_VIEW_FILTER,g_cslSettings->m_showFilter);
-    CheckMenuItem(MENU_VIEW_AUTO_FIT,g_cslSettings->m_autoFitColumns);
-    CheckMenuItem(MENU_VIEW_AUTO_SORT,g_cslSettings->m_autoSortColumns);
+    CheckMenuItem(MENU_VIEW_SEARCH,g_cslSettings->showSearch);
+    CheckMenuItem(MENU_VIEW_AUTO_SORT,g_cslSettings->autoSortColumns);
 }
 
 void CslMenu::EnableMenuItem(const wxInt32 id,const bool enable)
@@ -46,14 +45,16 @@ void CslMenu::CheckMenuItem(const wxInt32 id,const bool check)
     m_menuBar->Check(id,check);
 }
 
-wxMenuItem& CslMenu::AddItemToMenu(wxMenu *menu,const wxInt32 id,
-                                   const wxString& text,const wxArtID& art,
-                                   const wxItemKind kind,const wxString& help)
+wxMenuItem& CslMenu::AddItem(wxMenu *menu,const wxInt32 id,
+                             const wxString& text,const wxArtID& art,
+                             const wxItemKind kind,const wxString& help)
 {
     wxMenuItem *item=new wxMenuItem(menu,id,text,help,kind);
+
     wxOperatingSystemId os=wxPlatformInfo().GetOperatingSystemId();
     if (id>wxID_HIGHEST || (os&wxOS_WINDOWS) || (os&wxOS_MAC))
         item->SetBitmap(GET_ART_MENU(art));
+
     menu->Append(item);
 
     return *item;
