@@ -47,13 +47,11 @@ CslDlgAddMaster::CslDlgAddMaster(wxWindow* parent,const wxInt32 id,
 {
     // begin wxGlade: CslDlgAddMaster::CslDlgAddMaster
     sizer_address_staticbox = new wxStaticBox(this, -1, wxEmptyString);
-    const wxString choice_gametype_choices[] =
-    {
+    const wxString choice_gametype_choices[] = {
         _("default")
     };
     choice_gametype = new wxChoice(this, CHOICE_CTRL_GAMETYPE, wxDefaultPosition, wxDefaultSize, 1, choice_gametype_choices, 0);
-    const wxString choice_mastertype_choices[] =
-    {
+    const wxString choice_mastertype_choices[] = {
         _("default")
     };
     choice_mastertype = new wxChoice(this, CHOICE_CTRL_MASTERTYPE, wxDefaultPosition, wxDefaultSize, 1, choice_mastertype_choices, 0);
@@ -75,7 +73,6 @@ void CslDlgAddMaster::set_properties()
     // begin wxGlade: CslDlgAddMaster::set_properties
     SetTitle(_("CSL - Add new Master"));
     choice_gametype->SetSelection(0);
-    choice_mastertype->SetMinSize(wxSize(80,-1));
     choice_mastertype->SetSelection(0);
     text_ctrl_address->SetMinSize(wxSize(160, -1));
     text_ctrl_address->SetFocus();
@@ -132,6 +129,7 @@ void CslDlgAddMaster::do_layout()
     grid_sizer_main->Add(grid_sizer_button, 1, wxBOTTOM|wxEXPAND, 4);
     SetSizer(grid_sizer_main);
     grid_sizer_main->Fit(this);
+    grid_sizer_main->AddGrowableCol(0);
     Layout();
     // end wxGlade
 

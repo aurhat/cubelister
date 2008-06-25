@@ -45,8 +45,8 @@ class CslConnectPassInfo
 class CslDlgConnectPass: public wxDialog
 {
     public:
-        // begin wxGlade: CslDlgConnectPass::ids
-        // end wxGlade
+    // begin wxGlade: CslDlgConnectPass::ids
+    // end wxGlade
         CslDlgConnectPass(wxWindow* parent,CslConnectPassInfo *info,int id=wxID_ANY,
                           const wxString& title=wxEmptyString,
                           const wxPoint& pos=wxDefaultPosition,
@@ -54,23 +54,23 @@ class CslDlgConnectPass: public wxDialog
                           long style=wxDEFAULT_DIALOG_STYLE);
 
     private:
-        // begin wxGlade: CslDlgConnectPass::methods
-        void set_properties();
-        void do_layout();
-        // end wxGlade
+    // begin wxGlade: CslDlgConnectPass::methods
+    void set_properties();
+    void do_layout();
+    // end wxGlade
 
         void OnCommandEvent(wxCommandEvent& event);
 
         DECLARE_EVENT_TABLE()
 
     protected:
-        // begin wxGlade: CslDlgConnectPass::attributes
-        wxStaticBox* sizer_ctrl_staticbox;
-        wxTextCtrl* text_ctrl_password;
-        wxCheckBox* checkbox_admin;
-        wxButton* button_ok;
-        wxButton* button_cancel;
-        // end wxGlade
+    // begin wxGlade: CslDlgConnectPass::attributes
+    wxStaticBox* sizer_ctrl_staticbox;
+    wxTextCtrl* text_ctrl_password;
+    wxCheckBox* checkbox_admin;
+    wxButton* button_ok;
+    wxButton* button_cancel;
+    // end wxGlade
 
         CslConnectPassInfo *m_info;
 }; // wxGlade: end class
