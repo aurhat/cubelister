@@ -45,17 +45,17 @@
 class CslDlgTraffic: public wxDialog
 {
     public:
-    // begin wxGlade: CslDlgTraffic::ids
-    // end wxGlade
+        // begin wxGlade: CslDlgTraffic::ids
+        // end wxGlade
         CslDlgTraffic(wxWindow* parent,int id=wxID_ANY,const wxString& title=wxEmptyString,
                       const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize,
                       long style=wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
 
     private:
-    // begin wxGlade: CslDlgTraffic::methods
-    void set_properties();
-    void do_layout();
-    // end wxGlade
+        // begin wxGlade: CslDlgTraffic::methods
+        void set_properties();
+        void do_layout();
+        // end wxGlade
 
         void UpdateStats();
 
@@ -67,16 +67,16 @@ class CslDlgTraffic: public wxDialog
 
 
     protected:
-    // begin wxGlade: CslDlgTraffic::attributes
-    wxStaticBox* sizer_main_staticbox;
-    wxStaticText* label_in_packet;
-    wxStaticText* label_in;
-    wxStaticText* label_in_raw;
-    wxStaticText* label_out_packet;
-    wxStaticText* label_out;
-    wxStaticText* label_out_raw;
-    wxButton* button_close;
-    // end wxGlade
+        // begin wxGlade: CslDlgTraffic::attributes
+        wxStaticBox* sizer_main_staticbox;
+        wxStaticText* label_in_packet;
+        wxStaticText* label_in;
+        wxStaticText* label_in_raw;
+        wxStaticText* label_out_packet;
+        wxStaticText* label_out;
+        wxStaticText* label_out_raw;
+        wxButton* button_close;
+        // end wxGlade
 }; // wxGlade: end class
 
 

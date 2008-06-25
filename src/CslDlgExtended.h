@@ -46,8 +46,8 @@ WX_DEFINE_ARRAY_PTR(wxStaticText*,t_aLabel);
 class CslDlgExtended: public wxDialog
 {
     public:
-    // begin wxGlade: CslDlgExtended::ids
-    // end wxGlade
+        // begin wxGlade: CslDlgExtended::ids
+        // end wxGlade
 
         CslDlgExtended(wxWindow* parent,int id=wxID_ANY,const wxString& title=wxEmptyString,
                        const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize,
@@ -62,10 +62,10 @@ class CslDlgExtended: public wxDialog
 
 
     private:
-    // begin wxGlade: CslDlgExtended::methods
-    void set_properties();
-    void do_layout();
-    // end wxGlade
+        // begin wxGlade: CslDlgExtended::methods
+        void set_properties();
+        void do_layout();
+        // end wxGlade
 
         CslServerInfo *m_info;
         CslMapInfo m_mapInfo;
@@ -83,33 +83,33 @@ class CslDlgExtended: public wxDialog
         DECLARE_EVENT_TABLE()
 
     protected:
-    // begin wxGlade: CslDlgExtended::attributes
-    wxStaticBox* sizer_map_label_staticbox;
-    wxStaticBox* sizer_info_staticbox;
-    wxStaticBox* sizer_team_score_staticbox;
-    wxStaticBox* sizer_map_staticbox;
-    CslListCtrlPlayer* list_ctrl_players;
-    CslPanelMap* panel_map;
-    wxStaticText* label_team1;
-    wxStaticText* label_team2;
-    wxStaticText* label_team3;
-    wxStaticText* label_team4;
-    wxStaticText* label_team5;
-    wxStaticText* label_team6;
-    wxStaticText* label_team7;
-    wxStaticText* label_team8;
-    wxStaticText* label_server;
-    wxStaticText* label_mode;
-    wxStaticText* label_remaining;
-    wxStaticText* label_records;
-    wxStaticText* label_map;
-    wxStaticText* label_author_prefix;
-    wxStaticText* label_author;
-    wxCheckBox* checkbox_update_end;
-    wxCheckBox* checkbox_map;
-    wxStaticLine* static_line;
-    wxButton* button_close;
-    // end wxGlade
+        // begin wxGlade: CslDlgExtended::attributes
+        wxStaticBox* sizer_map_label_staticbox;
+        wxStaticBox* sizer_info_staticbox;
+        wxStaticBox* sizer_team_score_staticbox;
+        wxStaticBox* sizer_map_staticbox;
+        CslListCtrlPlayer* list_ctrl_players;
+        CslPanelMap* panel_map;
+        wxStaticText* label_team1;
+        wxStaticText* label_team2;
+        wxStaticText* label_team3;
+        wxStaticText* label_team4;
+        wxStaticText* label_team5;
+        wxStaticText* label_team6;
+        wxStaticText* label_team7;
+        wxStaticText* label_team8;
+        wxStaticText* label_server;
+        wxStaticText* label_mode;
+        wxStaticText* label_remaining;
+        wxStaticText* label_records;
+        wxStaticText* label_map;
+        wxStaticText* label_author_prefix;
+        wxStaticText* label_author;
+        wxCheckBox* checkbox_update_end;
+        wxCheckBox* checkbox_map;
+        wxStaticLine* static_line;
+        wxButton* button_close;
+        // end wxGlade
 
         void UpdateMap();
         void ClearTeamScoreLabel(const wxUint32 start,const wxUint32 end);

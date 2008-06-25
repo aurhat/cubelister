@@ -35,8 +35,8 @@
 class CslDlgAddMaster: public wxDialog
 {
     public:
-    // begin wxGlade: CslDlgAddMaster::ids
-    // end wxGlade
+        // begin wxGlade: CslDlgAddMaster::ids
+        // end wxGlade
         CslDlgAddMaster(wxWindow* parent,const wxInt32 id=wxID_ANY,const wxString& title=wxEmptyString,
                         const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize,
                         long style=wxDEFAULT_DIALOG_STYLE);
@@ -44,28 +44,28 @@ class CslDlgAddMaster: public wxDialog
         void InitDlg(CslEngine *engine,wxInt32 *gameID);
 
     private:
-    // begin wxGlade: CslDlgAddMaster::methods
-    void set_properties();
-    void do_layout();
-    // end wxGlade
+        // begin wxGlade: CslDlgAddMaster::methods
+        void set_properties();
+        void do_layout();
+        // end wxGlade
 
         void OnCommandEvent(wxCommandEvent& event);
 
         DECLARE_EVENT_TABLE()
 
     protected:
-    // begin wxGlade: CslDlgAddMaster::attributes
-    wxStaticBox* sizer_address_staticbox;
-    wxChoice* choice_gametype;
-    wxChoice* choice_mastertype;
-    wxTextCtrl* text_ctrl_address;
-    wxSpinCtrl* spin_ctrl_port;
-    wxTextCtrl* text_ctrl_path;
-    wxRadioButton* radio_btn_custom;
-    wxRadioButton* radio_btn_default;
-    wxButton* button_add;
-    wxButton* button_cancel;
-    // end wxGlade
+        // begin wxGlade: CslDlgAddMaster::attributes
+        wxStaticBox* sizer_address_staticbox;
+        wxChoice* choice_gametype;
+        wxChoice* choice_mastertype;
+        wxTextCtrl* text_ctrl_address;
+        wxSpinCtrl* spin_ctrl_port;
+        wxTextCtrl* text_ctrl_path;
+        wxRadioButton* radio_btn_custom;
+        wxRadioButton* radio_btn_default;
+        wxButton* button_add;
+        wxButton* button_cancel;
+        // end wxGlade
 
         CslEngine *m_engine;
         wxInt32 *m_gameID;
