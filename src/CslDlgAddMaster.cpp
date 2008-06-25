@@ -75,10 +75,11 @@ void CslDlgAddMaster::set_properties()
     // begin wxGlade: CslDlgAddMaster::set_properties
     SetTitle(_("CSL - Add new Master"));
     choice_gametype->SetSelection(0);
+    choice_mastertype->SetMinSize(wxSize(80,-1));
     choice_mastertype->SetSelection(0);
-    text_ctrl_address->SetMinSize(wxSize(180, -1));
+    text_ctrl_address->SetMinSize(wxSize(160, -1));
     text_ctrl_address->SetFocus();
-    spin_ctrl_port->SetMinSize(wxSize(60, -1));
+    spin_ctrl_port->SetMinSize(wxSize(80, -1));
     button_add->Enable(false);
     button_add->SetDefault();
     // end wxGlade
