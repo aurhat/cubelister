@@ -134,7 +134,6 @@ void CslDlgExtended::set_properties()
 #endif
 #ifdef __WXMAC__
     list_ctrl_players->SetMinSize(wxSize(580,330));
-    button_update->SetMinSize(wxSize(button_update->GetSize().x+20,-1));
 #endif
 }
 

@@ -34,7 +34,7 @@ CslGameSauerbraten::CslGameSauerbraten()
     m_portDelimiter=wxT(":");
 #ifdef __WXMAC__
     m_clientSettings.ConfigPath=::wxGetHomeDir();
-    m_clientSettings.ConfigPath+=wxT("/Library/Application\\ Support/sauerbraten"));
+    m_clientSettings.ConfigPath+=wxT("/Library/Application Support/sauerbraten");
 #elif __WXGTK__
     m_clientSettings.ConfigPath=::wxGetHomeDir()+wxT("/.sauerbraten");
 #endif

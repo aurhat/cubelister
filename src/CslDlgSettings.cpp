@@ -25,13 +25,11 @@
 #include "engine/CslTools.h"
 
 
-#ifndef __WXMAC__
 BEGIN_EVENT_TABLE(CslGamePage,wxPanel)
     EVT_FILEPICKER_CHANGED(wxID_ANY,CslGamePage::OnPicker)
     EVT_DIRPICKER_CHANGED(wxID_ANY,CslGamePage::OnPicker)
     EVT_CHECKBOX(wxID_ANY,CslGamePage::OnCommandEvent)
 END_EVENT_TABLE()
-#endif // __WXMAC__
 
 
 BEGIN_EVENT_TABLE(CslDlgSettings,wxDialog)
@@ -94,7 +92,7 @@ CslGamePage::CslGamePage(wxWindow *parent,CslGame *game) :
     filepicker=new wxFilePickerCtrl(this,FILE_PICKER,settings.Binary,
                                     s,extensions,wxDefaultPosition,wxDefaultSize,
                                     wxFLP_DEFAULT_STYLE|wxFLP_USE_TEXTCTRL|wxFLP_FILE_MUST_EXIST);
-    sizer->Add(filepicker,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,4);
+    sizer->Add(filepicker,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,dpickBorder);
     filepicker->SetPath(settings.Binary);
 
     label_gamepath=new wxStaticText(this,wxID_ANY,_("Game directory:"));

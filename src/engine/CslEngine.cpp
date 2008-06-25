@@ -864,7 +864,7 @@ void CslEngine::OnPong(wxCommandEvent& event)
 
 void CslEngine::OnResolve(wxCommandEvent& event)
 {
-    CslServerInfo *info;
+    CslServerInfo *info=NULL;
     CslGame *game=NULL;
     CslResolverPacket *packet=(CslResolverPacket*)event.GetClientData();
 

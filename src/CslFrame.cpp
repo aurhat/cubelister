@@ -311,13 +311,13 @@ void CslFrame::CreateMainMenu()
 
     menuMaster=new wxMenu();
     CslMenu::AddItem(menuMaster,MENU_MASTER_UPDATE,_("&Update from master\tF5"),wxART_RELOAD);
-    menu->AppendSeparator();
+    menuMaster->AppendSeparator();
     CslMenu::AddItem(menuMaster,MENU_MASTER_ADD,_("Add a &new master ..."),wxART_ADD_BOOKMARK);
     CslMenu::AddItem(menuMaster,MENU_MASTER_DEL,_("&Remove master"),wxART_DEL_BOOKMARK);
     menubar->Append(menuMaster,_("&Master"));
 #ifdef __WXMAC__
-    CslMenu::AddItem(menu,wxID_PREFERENCES,_("&Settings"),wxART_SETTINGS);
-    CslMenu::AddItem(menu,wxID_EXIT,_("&Exit"),wxART_QUIT);
+    CslMenu::AddItem(menuMaster,wxID_PREFERENCES,_("&Settings"),wxART_SETTINGS);
+    CslMenu::AddItem(menuMaster,wxID_EXIT,_("&Exit"),wxART_QUIT);
 #endif
 
     menu=new wxMenu();
