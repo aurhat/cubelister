@@ -172,7 +172,7 @@ void CslDlgAddServer::OnCommandEvent(wxCommandEvent& event)
                     m_info->Create(games[i],host,port);
                     if (games[i]->AddServer(m_info))
                     {
-                        m_engine->Resolve(m_info);
+                        m_engine->ResolveHost(m_info);
                         EndModal(wxID_OK);
                         return;
                     }

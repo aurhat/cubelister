@@ -119,7 +119,7 @@ bool CslGameSauerbraten::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) con
     getstring(text,buf);
     info.Map=A2U(text);
     getstring(text,buf);
-    l=strlen(text);
+    l=(wxUint32)strlen(text);
     StripColours(text,&l,2);
     info.SetDescription(A2U(text));
 
@@ -208,7 +208,8 @@ wxString CslGameSauerbraten::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
 
     // use Prepend() and do not use opts+= here, since -q<path> must be before -r
 #ifdef __WXMSW__
-    opts.Prepend(wxString(wxT("-q\""))+m_clientSettings.ConfigPath+wxString(wxT("\" ")));
+	wxString s=m_clientSettings.ConfigPath;	
+    opts.Prepend(wxString(wxT("-q\""))+s.RemoveLast()+wxString(wxT("\" ")));
 #else
     opts.Prepend(wxString(wxT("-q"))+m_clientSettings.ConfigPath+wxString(wxT(" ")));
 #endif //__WXMSW__
@@ -299,7 +300,7 @@ wxInt32 CslGameSauerbraten::InjectConfig(const wxString& address,wxString *error
         script=wxString::Format(wxT("if (= $csl_connect 1) [ sleep 1000 [ connect %s ] ]\r\n%s\r\n"),
                                 address.c_str(),wxT("csl_connect = 0"));
 
-    return WriteTextFile(cfg,U2A(script),wxFile::write);
+    return WriteTextFile(cfg,script,wxFile::write);
 }
 
 const char** CslGameSauerbraten::GetIcon(wxInt32 size) const

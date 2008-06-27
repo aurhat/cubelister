@@ -86,8 +86,8 @@ bool IsIP(const wxString& s)
 bool IP2Int(const wxString& s,wxUint32 *ip)
 {
     long unsigned int l;
-    wxUint32 mult=0x1000000;
-    wxUint32 len=s.Len();
+    size_t mult=0x1000000;
+    size_t len=s.Len();
     wxUint32 i=0,v=0;
     wxString m;
 
@@ -294,8 +294,8 @@ wxInt32 WriteTextFile(const wxString& filename,const wxString& data,const wxFile
     if (!file.IsOpened())
         return CSL_ERROR_FILE_OPERATION;
 
-    wxUint32 l=data.Length();
-    wxUint32 w=file.Write(U2A(data),l);
+    size_t l=data.Length();
+    size_t w=file.Write(U2A(data),l);
     file.Close();
 
     return l!=w ? CSL_ERROR_FILE_OPERATION:CSL_ERROR_NONE;

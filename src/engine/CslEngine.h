@@ -119,7 +119,7 @@ class CslEngine : public wxEvtHandler
 
         void SetUpdateInterval(wxUint32 interval) { m_updateInterval=interval; }
 
-        void Resolve(CslServerInfo *info);
+        void ResolveHost(CslServerInfo *info);
 
         bool AddGame(CslGame *game);
         vector<CslGame*>& GetGames() { return m_games; }
@@ -128,8 +128,8 @@ class CslEngine : public wxEvtHandler
         bool Ping(CslServerInfo *info,bool force=false);
         bool PingDefault(CslServerInfo *info);
         bool PingExUptime(CslServerInfo *info);
-        bool PingExPlayerInfo(CslServerInfo *info,wxInt32 pid=-1);
-        bool PingExTeamInfo(CslServerInfo *info);
+        bool PingExPlayerInfo(CslServerInfo *info,wxInt32 pid=-1,bool force=false);
+        bool PingExTeamInfo(CslServerInfo *info,bool force=false);
         wxUint32 PingServers(CslGame *game,bool force=false);
         bool PingEx(CslServerInfo *info,bool force=false);
         wxUint32 PingServersEx(bool force=false);
@@ -157,7 +157,7 @@ class CslEngine : public wxEvtHandler
         void ParsePong(CslServerInfo *info,CslUDPPacket& packet,wxUint32 now);
 
         void OnPong(wxCommandEvent& event);
-        void OnResolve(wxCommandEvent& event);
+        void OnResolveHost(wxCommandEvent& event);
 
         DECLARE_EVENT_TABLE()
 };

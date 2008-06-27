@@ -166,7 +166,7 @@ bool CslBloodFrontier::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
     getstring(text,buf);
     info.Map=A2U(text);
     getstring(text,buf);
-    l=strlen(text);
+    l=(wxUint32)strlen(text);
     StripColours(text,&l,2);
     info.SetDescription(A2U(text));
 

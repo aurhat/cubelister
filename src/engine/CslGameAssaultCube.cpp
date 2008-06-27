@@ -93,7 +93,7 @@ bool CslGameAssaultCube::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) con
     getstring(text,buf);
     info.Map=A2U(text);
     getstring(text,buf);
-    l=strlen(text);
+    l=(wxUint32)strlen(text);
     StripColours(text,&l,2);
     info.SetDescription(A2U(text));
     info.PlayersMax=getint(buf);
@@ -188,7 +188,8 @@ wxString CslGameAssaultCube::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
 
     // use Prepend() and do not use opts+= here, since -q<path> must be before -r
 #ifdef __WXMSW__
-    opts.Prepend(wxString(wxT("--home=\""))+configpath+wxString(wxT("\" ")));
+	wxString s=configpath;
+    opts.Prepend(wxString(wxT("--home=\""))+s.RemoveLast()+wxString(wxT("\" ")));
 #else
     opts.Prepend(wxString(wxT("--home="))+configpath+wxString(wxT(" ")));
 #endif //__WXMSW__
@@ -226,7 +227,7 @@ wxString CslGameAssaultCube::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
                                      mode==CSL_CONNECT_ADMIN_PASS ? wxT("connectadmin") : wxT("connect"),
                                      address.c_str(),password.c_str());
 
-    return WriteTextFile(configpath,U2A(script),wxFile::write_append)==CSL_ERROR_NONE ? bin:wxString(wxEmptyString);
+    return WriteTextFile(configpath,script,wxFile::write_append)==CSL_ERROR_NONE ? bin:wxString(wxEmptyString);
 }
 
 wxInt32 CslGameAssaultCube::GameEnd(wxString *error)

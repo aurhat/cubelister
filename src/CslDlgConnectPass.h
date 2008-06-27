@@ -34,11 +34,13 @@
 class CslConnectPassInfo
 {
     public:
-        CslConnectPassInfo(const wxString& pass,const wxString& pass2,const bool adm)
-                : password(pass),passwordAdmin(pass2),admin(adm) {}
+        CslConnectPassInfo(const wxString& password=wxEmptyString,
+			               const wxString& adminpassword=wxEmptyString,
+						   const bool admin=false) :
+		Password(password),AdminPassword(adminpassword),Admin(Admin) {}
 
-        wxString password,passwordAdmin;
-        bool admin;
+        wxString Password,AdminPassword;
+        bool Admin;
 };
 
 

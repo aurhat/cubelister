@@ -37,7 +37,6 @@
 #include <wx/image.h>
 #include <wx/imaglist.h>
 #include <wx/treectrl.h>
-#include <wx/listctrl.h>
 #include "engine/CslEngine.h"
 #include "CslMenu.h"
 #include "CslDlgExtended.h"
@@ -48,6 +47,7 @@
 #include "CslDlgOutput.h"
 #include "CslDlgTraffic.h"
 #include "CslListCtrlPlayer.h"
+
 
 class CslVersionCheckThread : public wxThread
 {
@@ -111,6 +111,8 @@ class CslFrame: public wxFrame
 
         vector<CslListCtrlPlayer*> m_playerLists;
 
+		CslServerInfo *m_oldSelectedInfo;
+
         vector<CslServerInfo*> m_searchedServers;
         wxString m_searchString;
         wxInt32 m_searchResultPlayer,m_searchResultServer;
@@ -138,6 +140,7 @@ class CslFrame: public wxFrame
         CslMaster *TreeGetSelectedMaster(wxTreeItemId *item=NULL);
 
         void UpdateMaster();
+        void ConnectToServer();
 
         void LoadSettings();
         void SaveSettings();
@@ -147,6 +150,7 @@ class CslFrame: public wxFrame
         void OnPong(wxCommandEvent& event);
         void OnTimer(wxTimerEvent& event);
         void OnListItemSelected(wxListEvent& event);
+		void OnListItemActivated(wxListEvent& event);
         void OnTreeSelChanged(wxTreeEvent& event);
         void OnTreeRightClick(wxTreeEvent& event);
         void OnCommandEvent(wxCommandEvent& event);
@@ -158,6 +162,7 @@ class CslFrame: public wxFrame
         void OnMouseLeave(wxMouseEvent& event);
         void OnMouseLeftDown(wxMouseEvent& event);
         void OnVersionCheck(wxCommandEvent& event);
+        void OnEndProcess(wxCommandEvent& event);
 
         DECLARE_EVENT_TABLE()
 };

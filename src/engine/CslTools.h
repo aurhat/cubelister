@@ -28,6 +28,7 @@
 #include <wx/file.h>
 #include <wx/stdpaths.h>
 #include <wx/stopwatch.h>
+#include <wx/bitmap.h>
 
 // since WX > 2.8.4 the listctrl items
 // get deselected when sorting (only wxGTK ?)

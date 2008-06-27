@@ -145,7 +145,7 @@ class CslGame
         virtual bool ParseTeamPong(wxUint32 protocol,ucharbuf& buf,CslTeamStatsData& info) const { return false; }
         virtual bool ValidateClientSettings(CslGameClientSettings *settings=NULL,wxString *msg=NULL) { return true; }
         virtual void SetClientSettings(const CslGameClientSettings& settings) { m_clientSettings=settings; }
-        virtual wxString GameStart(CslServerInfo *info,const wxUint32 mode,wxString *error) = 0;
+        virtual wxString GameStart(CslServerInfo *info,wxUint32 mode,wxString *error) = 0;
         virtual wxInt32 GameEnd(wxString *error=NULL) = 0;
         virtual const char** GetIcon(wxInt32 size) const { return NULL; }
         //hooks for workarounds or special handling

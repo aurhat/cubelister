@@ -25,23 +25,23 @@
 
 
 BEGIN_DECLARE_EVENT_TYPES()
-DECLARE_EVENT_TYPE(wxCSL_EVT_RESOLVE,wxID_ANY)
+DECLARE_EVENT_TYPE(wxCSL_EVT_RESOLVE_HOST,wxID_ANY)
 END_DECLARE_EVENT_TYPES()
 
-#define CSL_EVT_RESOLVE(id,fn) \
+#define CSL_EVT_RESOLVE_HOST(id,fn) \
     DECLARE_EVENT_TABLE_ENTRY( \
-                               wxCSL_EVT_RESOLVE,id,wxID_ANY, \
+                               wxCSL_EVT_RESOLVE_HOST,id,wxID_ANY, \
                                (wxObjectEventFunction)(wxEventFunction) \
                                wxStaticCastEvent(wxCommandEventFunction,&fn), \
                                (wxObject*)NULL \
                              ),
 
-DEFINE_EVENT_TYPE(wxCSL_EVT_RESOLVE)
+DEFINE_EVENT_TYPE(wxCSL_EVT_RESOLVE_HOST)
 DEFINE_EVENT_TYPE(wxCSL_EVT_PONG)
 
 BEGIN_EVENT_TABLE(CslEngine,wxEvtHandler)
     CSL_EVT_PING(wxID_ANY,CslEngine::OnPong)
-    CSL_EVT_RESOLVE(wxID_ANY,CslEngine::OnResolve)
+    CSL_EVT_RESOLVE_HOST(wxID_ANY,CslEngine::OnResolveHost)
 END_EVENT_TABLE()
 
 wxThread::ExitCode CslResolverThread::Entry()
@@ -70,7 +70,7 @@ wxThread::ExitCode CslResolverThread::Entry()
         packet->Address.Hostname(packet->Host);
         packet->Domain=packet->Address.Hostname();
 
-        wxCommandEvent evt(wxCSL_EVT_RESOLVE);
+        wxCommandEvent evt(wxCSL_EVT_RESOLVE_HOST);
         evt.SetClientData(packet);
         wxPostEvent(m_evtHandler,evt);
     }
@@ -152,7 +152,7 @@ void CslEngine::DeInit()
     m_ok=false;
 }
 
-void CslEngine::Resolve(CslServerInfo *info)
+void CslEngine::ResolveHost(CslServerInfo *info)
 {
     m_resolveThread->AddPacket(new CslResolverPacket(info->Host,info->Addr.Service(),info->GetGame().GetId()));
 }
@@ -231,9 +231,9 @@ bool CslEngine::PingExUptime(CslServerInfo *info)
     return m_pingSock->SendPing(packet);
 }
 
-bool CslEngine::PingExPlayerInfo(CslServerInfo *info,const wxInt32 pid)
+bool CslEngine::PingExPlayerInfo(CslServerInfo *info,const wxInt32 pid,bool force)
 {
-    if (info->ExtInfoStatus!=CSL_EXT_STATUS_OK)
+    if (!force && info->ExtInfoStatus!=CSL_EXT_STATUS_OK)
         return false;
 
     LOG_DEBUG("(%s) INFO(%d) %d\n",U2A(info->GetBestDescription()),GetTicks(),pid);
@@ -260,9 +260,9 @@ bool CslEngine::PingExPlayerInfo(CslServerInfo *info,const wxInt32 pid)
     return false;
 }
 
-bool CslEngine::PingExTeamInfo(CslServerInfo *info)
+bool CslEngine::PingExTeamInfo(CslServerInfo *info,bool force)
 {
-    if (info->ExtInfoStatus!=CSL_EXT_STATUS_OK)
+    if (!force && info->ExtInfoStatus!=CSL_EXT_STATUS_OK)
         return false;
 
     uchar ping[16];
@@ -292,6 +292,9 @@ wxUint32 CslEngine::PingServers(CslGame *game,bool force)
             if (Ping(servers[i],force))
                 c++;
         }
+
+  	    if (!force && c>10)
+		    ResetPingSends(game,NULL);
     }
 
     vector<CslServerInfo*> servers;
@@ -317,9 +320,9 @@ bool CslEngine::PingEx(CslServerInfo *info,bool force)
     if (!force && (GetTicks()-info->PlayerStats.m_lastPing)<m_updateInterval)
         return false;
 
-    if (!PingExPlayerInfo(info))
+    if (!PingExPlayerInfo(info,-1,force))
         return false;
-    if (!PingExTeamInfo(info))
+    if (!PingExTeamInfo(info,force))
         return false;
 
     return true;
@@ -336,7 +339,7 @@ wxUint32 CslEngine::PingServersEx(bool force)
 
         loopvj(servers)
         {
-            if (servers[j]->ExtInfoStatus==CSL_EXT_STATUS_OK && PingEx(servers[j],force))
+            if ((force || servers[j]->ExtInfoStatus==CSL_EXT_STATUS_OK) && PingEx(servers[j],force))
                 c++;
         }
     }
@@ -429,7 +432,7 @@ wxInt32 CslEngine::UpdateFromMaster(CslMaster *master)
 
         CslServerInfo *info=new CslServerInfo(game,A2U(host),port ? atoi(port):0);
         if (game->AddServer(info,master->GetId()))
-            Resolve(info);
+            ResolveHost(info);
         else
             delete info;
 
@@ -511,7 +514,7 @@ void CslEngine::ParsePong(CslServerInfo *info,CslUDPPacket& packet,wxUint32 now)
                     if (exVersion<CSL_EX_VERSION_MIN || exVersion>CSL_EX_VERSION_MAX)
                     {
                         LOG_DEBUG("%s (%s) ERROR: prot=%d\n",dbg_type.c_str(),
-                                  U2A(info->GetBestDescription()),vi);
+                                  U2A(info->GetBestDescription()),exVersion);
                         info->ExtInfoStatus=CSL_EXT_STATUS_ERROR;
                         PingDefault(info);
                         return;
@@ -528,13 +531,6 @@ void CslEngine::ParsePong(CslServerInfo *info,CslUDPPacket& packet,wxUint32 now)
                     }
 
                     info->ExtInfoStatus=CSL_EXT_STATUS_OK;
-                    //info->CreatePlayerStats();
-                    //info->CreateTeamStats();
-                    /*LOG_DEBUG("%s (%s) %s\n",dbg_type.c_str(),U2A(info->GetBestDescription()),
-                              U2A(FormatSeconds(info->m_uptime)));*/
-
-                    //PingDefault(info);
-
                     break;
                 }
 
@@ -558,14 +554,18 @@ void CslEngine::ParsePong(CslServerInfo *info,CslUDPPacket& packet,wxUint32 now)
                     }
 
                     exVersion=getint(p);
+                    info->ExtInfoVersion=exVersion;
+
                     // check protocol
                     if (exVersion<CSL_EX_VERSION_MIN || exVersion>CSL_EX_VERSION_MAX)
                     {
                         LOG_DEBUG("%s (%s) ERROR: prot=%d\n",dbg_type.c_str(),
-                                  U2A(info->GetBestDescription()),vi);
+                                  U2A(info->GetBestDescription()),exVersion);
                         info->ExtInfoStatus=CSL_EXT_STATUS_ERROR;
                         return;
                     }
+
+                    info->ExtInfoStatus=CSL_EXT_STATUS_OK;
 
                     vi=getint(p);
                     if (vi>0)  // check error
@@ -699,14 +699,18 @@ void CslEngine::ParsePong(CslServerInfo *info,CslUDPPacket& packet,wxUint32 now)
                     }
 
                     exVersion=getint(p);
+                    info->ExtInfoVersion=exVersion;
+
                     // check protocol
                     if (exVersion<CSL_EX_VERSION_MIN || exVersion>CSL_EX_VERSION_MAX)
                     {
                         LOG_DEBUG("%s (%s) ERROR: prot=%d\n",dbg_type.c_str(),
-                                  U2A(info->GetBestDescription()),vi);
+                                  U2A(info->GetBestDescription()),exVersion);
                         info->ExtInfoStatus=CSL_EXT_STATUS_ERROR;
                         return;
                     }
+
+					info->ExtInfoStatus=CSL_EXT_STATUS_OK;
 
                     stats.m_teamplay=!getint(p);  // error
                     if (exVersion>=103)
@@ -739,9 +743,11 @@ void CslEngine::ParsePong(CslServerInfo *info,CslUDPPacket& packet,wxUint32 now)
                                 data->Reset();
                                 break;
                             }
-                            /*LOG_DEBUG("%s (%s): team:%s, score:%d, bases:%d, remain:%d\n",
+#if 0
+                            LOG_DEBUG("%s (%s): team:%s, score:%d, bases:%d, remain:%d\n",
                                       dbg_type.c_str(),U2A(info->GetBestDescription()),
-                                      U2A(data->m_team),data->m_score,data->m_bases.length(),stats.m_remain);*/
+                                      U2A(data->m_team),data->m_score,data->m_bases.length(),stats.m_remain);
+#endif
                         }
                         else
                         {
@@ -862,7 +868,7 @@ void CslEngine::OnPong(wxCommandEvent& event)
     delete packet;
 }
 
-void CslEngine::OnResolve(wxCommandEvent& event)
+void CslEngine::OnResolveHost(wxCommandEvent& event)
 {
     CslServerInfo *info=NULL;
     CslGame *game=NULL;

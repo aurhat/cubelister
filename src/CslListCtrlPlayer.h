@@ -56,24 +56,30 @@ class CslListCtrlPlayer : public wxListCtrl
         CslServerInfo* GetInfo() { return m_info; }
         wxInt32 GetView() { return m_view; }
 
+		static void CreateImageList();
+
         static wxSize BestSizeMicro;
         static wxSize BestSizeMini;
 
     private:
-        wxUint32 m_view;
-        wxImageList m_imageList;
+        wxUint32 m_view,freeze;
         CslListSortHelper m_sortHelper;
 
         CslServerInfo *m_info;
 
+		static wxImageList ListImageList;
+
         void OnSize(wxSizeEvent& event);
+		void OnEraseBackground(wxEraseEvent& event);
         void OnColumnLeftClick(wxListEvent& event);
+		void OnItemActivated(wxListEvent& event);
+        void OnContextMenu(wxContextMenuEvent& event);
+		void OnMenu(wxCommandEvent& event);
 
         DECLARE_EVENT_TABLE()
 
     protected:
         void ListSort(const wxInt32 column);
-        void ToggleSortArrow();
         void ShowPanelMap(const bool show);
 
         static int wxCALLBACK ListSortCompareFunc(long item1,long item2,long data);

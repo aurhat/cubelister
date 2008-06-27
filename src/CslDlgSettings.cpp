@@ -66,8 +66,7 @@ CslSettings *g_cslSettings;
 
 
 CslGamePage::CslGamePage(wxWindow *parent,CslGame *game) :
-        wxPanel(parent,wxID_ANY),
-        m_game(game)
+        wxPanel(parent,wxID_ANY),m_game(game)
 {
     wxString s;
 #ifdef __WXMSW__
@@ -195,10 +194,14 @@ void CslGamePage::OnPicker(wxFileDirPickerEvent& event)
         case FILE_PICKER:
             if (dirpickergame->GetPath().IsEmpty())
                 dirpickergame->SetPath(event.GetPath().BeforeLast(PATHDIVA));
+            if (dirpickercfg->GetPath().IsEmpty())
+                dirpickercfg->SetPath(event.GetPath().BeforeLast(PATHDIVA));
             break;
         case DIR_PICKER_GAME:
             if (dirpickergame->GetPath().IsEmpty())
                 dirpickergame->SetPath(event.GetPath().BeforeLast(PATHDIVA));
+            if (dirpickercfg->GetPath().IsEmpty())
+                dirpickercfg->SetPath(event.GetPath().BeforeLast(PATHDIVA));
             break;
         case DIR_PICKER_CFG:
             if (dirpickercfg->GetPath().IsEmpty())
@@ -285,10 +288,6 @@ void CslDlgSettings::set_properties()
     spin_ctrl_ping_good->SetValue(m_settings.pinggood);
     spin_ctrl_ping_bad->SetRange(0,9999);
     spin_ctrl_ping_bad->SetValue(m_settings.pingbad);
-    //dirpicker_game_output->Create(this,wxID_ANY,m_settings.outputPath,
-    //                              _("Select game output path"),wxDefaultPosition,wxDefaultSize,
-    //                              wxDIRP_DEFAULT_STYLE|wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST);
-    dirpicker_game_output->SetWindowStyle(wxDIRP_DEFAULT_STYLE|wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST);
 
     SetButtonColour(button_colour_empty,button_ok,m_settings.colServerEmpty);
     SetButtonColour(button_colour_off,button_ok,m_settings.colServerOff);
@@ -412,7 +411,11 @@ void CslDlgSettings::do_layout()
 
     // hmm ...
     const wxSize& best=notebook_settings->GetBestSize();
+#ifdef __WXMSW__
+    notebook_settings->SetMinSize(wxSize(best.x,best.y+32));
+#else
     notebook_settings->SetMinSize(wxSize(best.x,best.y+4));
+#endif
 
     grid_sizer_main->SetSizeHints(this);
 

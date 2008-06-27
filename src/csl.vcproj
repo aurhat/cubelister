@@ -184,6 +184,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CslConnectionState.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CslDlgAbout.cpp"
 				>
 			</File>
@@ -220,19 +224,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CslEngine.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CslExtendedInfo.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\CslFrame.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CslGame.cpp"
 				>
 			</File>
 			<File
@@ -264,18 +256,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CslTools.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CslUDP.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\cube_tools.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\libGeoIP\GeoIP.c"
 				>
 			</File>
@@ -298,6 +278,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CslConnectionState.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CslDlgAbout.h"
 				>
 			</File>
@@ -311,6 +295,10 @@
 			</File>
 			<File
 				RelativePath=".\CslDlgConnectPass.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CslDlgConnectWait.h"
 				>
 			</File>
 			<File
@@ -334,23 +322,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CslEngine.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CslExtendedInfo.h"
-				>
-			</File>
-			<File
 				RelativePath=".\CslFlags.h"
 				>
 			</File>
 			<File
 				RelativePath=".\CslFrame.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CslGame.h"
 				>
 			</File>
 			<File
@@ -366,7 +342,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\csllistctrlplayer.h"
+				RelativePath=".\CslListCtrlPlayer.h"
 				>
 			</File>
 			<File
@@ -390,19 +366,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CslTools.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CslUDP.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CslVersion.h"
-				>
-			</File>
-			<File
-				RelativePath=".\cube_tools.h"
+				RelativePath=".\libGeoIP\GeoIP.h"
 				>
 			</File>
 		</Filter>

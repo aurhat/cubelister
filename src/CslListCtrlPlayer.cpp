@@ -20,12 +20,13 @@
 
 #include <wx/wupdlock.h>
 #include "CslListCtrlPlayer.h"
+#include "CslDlgConnectPass.h"
+#include "CslConnectionState.h"
+#include "CslMenu.h"
 #include "CslGeoIP.h"
 #include "CslFlags.h"
-#ifndef __WXMSW__
 #include "img/sortasc_18_12.xpm"
 #include "img/sortdsc_18_12.xpm"
-#endif
 
 #define CSL_COLOUR_MASTER    wxColour(64,255,128)
 #define CSL_COLOUR_ADMIN     wxColour(255,128,0)
@@ -54,39 +55,24 @@ enum
 
 BEGIN_EVENT_TABLE(CslListCtrlPlayer,wxListCtrl)
     EVT_SIZE(CslListCtrlPlayer::OnSize)
+	EVT_ERASE_BACKGROUND(CslListCtrlPlayer::OnEraseBackground)
     EVT_LIST_COL_CLICK(wxID_ANY,CslListCtrlPlayer::OnColumnLeftClick)
+    EVT_LIST_ITEM_ACTIVATED(wxID_ANY,CslListCtrlPlayer::OnItemActivated)
+    EVT_CONTEXT_MENU(CslListCtrlPlayer::OnContextMenu)
+    EVT_MENU(wxID_ANY,CslListCtrlPlayer::OnMenu)
 END_EVENT_TABLE()
 
 
 wxSize CslListCtrlPlayer::BestSizeMicro(140,350);
 wxSize CslListCtrlPlayer::BestSizeMini(280,350);
+wxImageList CslListCtrlPlayer::ListImageList;
 
 CslListCtrlPlayer::CslListCtrlPlayer(wxWindow* parent,wxWindowID id,const wxPoint& pos,
                                      const wxSize& size,long style,
                                      const wxValidator& validator, const wxString& name)
         : wxListCtrl(parent,id,pos,size,style,validator,name)
 {
-#ifdef __WXMSW__
-    m_imageList.Create(20,14,true);
-    m_imageList.Add(AdjustIconSize(NULL,wxIcon(wxT("sortasc_18_12"),wxBITMAP_TYPE_ICO_RESOURCE,18,12),
-                                   wxSize(20,14),wxPoint(0,0)));
-    m_imageList.Add(AdjustIconSize(NULL,wxIcon(wxT("sortdsc_18_12"),wxBITMAP_TYPE_ICO_RESOURCE,18,12),
-                                   wxSize(20,14),wxPoint(0,0)));
-    m_imageList.Add(AdjustIconSize(unknown_xpm,wxNullIcon,wxSize(20,14),wxPoint(0,2)));
-
-    wxInt32 i,c=sizeof(codes)/sizeof(codes[0])-1;
-    for (i=0;i<c;i++)
-        m_imageList.Add(AdjustIconSize(flags[i],wxNullIcon,wxSize(20,14),wxPoint(0,2)));
-#else
-    m_imageList.Create(18,12,true);
-    m_imageList.Add(wxBitmap(sortasc_18_12_xpm));
-    m_imageList.Add(wxBitmap(sortdsc_18_12_xpm));
-    m_imageList.Add(wxBitmap(unknown_xpm));
-
-    wxInt32 i,c=sizeof(codes)/sizeof(codes[0])-1;
-    for (i=0;i<c;i++)
-        m_imageList.Add(wxBitmap(flags[i]));
-#endif
+	freeze=0;
 }
 
 void CslListCtrlPlayer::OnSize(wxSizeEvent& event)
@@ -95,9 +81,114 @@ void CslListCtrlPlayer::OnSize(wxSizeEvent& event)
     event.Skip();
 }
 
+void CslListCtrlPlayer::OnEraseBackground(wxEraseEvent& event)
+{
+   //to prevent flickering, erase only content *outside* of the actual items
+
+   if (GetItemCount()>0)
+   {
+       wxDC *dc=event.GetDC();
+
+       long topitem,bottomitem;
+       wxRect toprect,bottomrect;
+       wxCoord x,y,w,h,width,height;
+
+	   GetClientSize(&width,&height);
+
+       dc->SetClippingRegion(0,0,width,height);
+       dc->GetClippingBox(&x,&y,&w,&h); 
+
+       topitem=GetTopItem();
+       bottomitem=topitem+GetCountPerPage();
+
+       if (bottomitem>=GetItemCount())
+           bottomitem=GetItemCount()-1;
+
+       GetItemRect(topitem,toprect,wxLIST_RECT_BOUNDS);
+       GetItemRect(bottomitem,bottomrect,wxLIST_RECT_BOUNDS);
+
+       //set the new clipping region and do erasing
+       wxRect itemsrect(toprect.GetLeftTop(),bottomrect.GetBottomRight());
+	   //somehow there is a border of 2 pixels which needs to be redrawn
+	   itemsrect.x+=2;
+	   itemsrect.width-=2;
+       wxRegion region(wxRegion(x,y,w,h)); 
+       region.Subtract(itemsrect);
+       dc->DestroyClippingRegion();
+       dc->SetClippingRegion(region);
+
+       //do erasing
+       dc->SetBackground(wxBrush(GetBackgroundColour(),wxSOLID));
+       dc->Clear();
+
+       //restore old clipping region
+       dc->DestroyClippingRegion();
+       dc->SetClippingRegion(wxRegion(x,y,w,h));
+   }
+   else
+       event.Skip();
+}
+
+
 void CslListCtrlPlayer::OnColumnLeftClick(wxListEvent& event)
 {
     ListSort(event.GetColumn());
+}
+
+void CslListCtrlPlayer::OnItemActivated(wxListEvent& event)
+{
+	CslConnectionState::CreateConnectState(m_info);
+
+	event.Skip();
+}
+
+void CslListCtrlPlayer::OnContextMenu(wxContextMenuEvent& event)
+{
+    wxMenu menu;
+    wxPoint point=event.GetPosition();
+
+    //from keyboard
+    if (point.x==-1 && point.y==-1)
+        point=wxGetMousePosition();
+
+    CslMenu::AddItem(&menu,MENU_SERVER_CONNECT,MENU_SERVER_CONN_STR,wxART_CONNECT);
+    if (CSL_CAP_CONNECT_PASS(m_info->GetGame().GetCapabilities()))
+        CslMenu::AddItem(&menu,MENU_SERVER_CONNECT_PW,MENU_SERVER_CONN_PW_STR,wxART_CONNECT_PW);
+
+    point=ScreenToClient(point);
+    PopupMenu(&menu,point);
+}
+
+void CslListCtrlPlayer::OnMenu(wxCommandEvent& event)
+{
+    switch (event.GetId())
+    {
+
+        case MENU_SERVER_CONNECT:
+			CslConnectionState::CreateConnectState(m_info);
+   		    event.Skip();
+            break;
+
+        case MENU_SERVER_CONNECT_PW:
+        {
+            wxInt32 i=CSL_CAP_CONNECT_ADMIN_PASS(m_info->GetGame().GetCapabilities());
+
+            CslConnectPassInfo pi(m_info->Password,m_info->PasswordAdmin,i!=0);
+
+            if (CslDlgConnectPass(this,&pi).ShowModal()==wxID_OK)
+            {
+                m_info->Password=pi.Password;
+                m_info->PasswordAdmin=pi.AdminPassword;
+				i=pi.Admin ? CslGame::CSL_CONNECT_ADMIN_PASS:CslGame::CSL_CONNECT_PASS;
+				CslConnectionState::CreateConnectState(m_info,i);
+				event.Skip();
+            }
+            break;
+        }
+
+		default:
+			break;
+	}
 }
 
 void CslListCtrlPlayer::ListUpdatePlayerData(CslGame& game,CslPlayerStats& stats)
@@ -107,6 +198,7 @@ void CslListCtrlPlayer::ListUpdatePlayerData(CslGame& game,CslPlayerStats& stats
     wxListItem item;
     CslPlayerStatsData *data=NULL;
 
+	//fixes flickering if scrollbar is shown
     wxWindowUpdateLocker lock(this);
 
     DeleteAllItems();
@@ -202,6 +294,8 @@ void CslListCtrlPlayer::ListUpdatePlayerData(CslGame& game,CslPlayerStats& stats
     }
 
     ListSort(-1);
+	//wxIdleEvent idle;
+    //wxTheApp->SendIdleEvents(this, idle); 
 }
 
 void CslListCtrlPlayer::ListAdjustSize()
@@ -271,20 +365,6 @@ void CslListCtrlPlayer::ListSort(const wxInt32 column)
         SortItems(ListSortCompareFunc,(long)&m_sortHelper);
 }
 
-void CslListCtrlPlayer::ToggleSortArrow()
-{
-    wxListItem item;
-    wxInt32 img=-1;
-
-    if (m_sortHelper.m_sortMode==CSL_SORT_ASC)
-        img=CSL_LIST_IMG_SORT_ASC;
-    else
-        img=CSL_LIST_IMG_SORT_DSC;
-
-    item.SetImage(img);
-    SetColumn(m_sortHelper.m_sortType,item);
-}
-
 void CslListCtrlPlayer::SetInfo(CslServerInfo *info)
 {
     m_info=info;
@@ -313,7 +393,7 @@ void CslListCtrlPlayer::ListInit(const wxUint32 view)
 
     m_view=view;
 
-    SetImageList(&m_imageList,wxIMAGE_LIST_SMALL);
+    SetImageList(&ListImageList,wxIMAGE_LIST_SMALL);
 
     item.SetMask(wxLIST_MASK_TEXT|wxLIST_MASK_FORMAT);
     item.SetImage(-1);
@@ -364,12 +444,20 @@ void CslListCtrlPlayer::ListInit(const wxUint32 view)
     //assertion on __WXMAC__
     //ListAdjustSize();
 
+	wxInt32 img;
+
     if (m_view==CSL_LISTPLAYER_MICRO_SIZE)
         m_sortHelper.Init(CSL_SORT_ASC,SORT_NAME);
     else
         m_sortHelper.Init(CSL_SORT_DSC,SORT_FRAGS);
 
-    ToggleSortArrow();
+    if (m_sortHelper.m_sortMode==CSL_SORT_ASC)
+        img=CSL_LIST_IMG_SORT_ASC;
+    else
+        img=CSL_LIST_IMG_SORT_DSC;
+
+    item.SetImage(img);
+    SetColumn(m_sortHelper.m_sortType,item);
 }
 
 int wxCALLBACK CslListCtrlPlayer::ListSortCompareFunc(long item1,long item2,long data)
@@ -483,3 +571,25 @@ int wxCALLBACK CslListCtrlPlayer::ListSortCompareFunc(long item1,long item2,long
     return 0;
 }
 
+void CslListCtrlPlayer::CreateImageList()
+{
+	#ifdef __WXMSW__
+    ListImageList.Create(20,14,true);
+    ListImageList.Add(AdjustIconSize(sortasc_18_12_xpm,wxNullIcon,wxSize(20,14),wxPoint(0,0)));
+    ListImageList.Add(AdjustIconSize(sortdsc_18_12_xpm,wxNullIcon,wxSize(20,14),wxPoint(0,0)));
+    ListImageList.Add(AdjustIconSize(unknown_xpm,wxNullIcon,wxSize(20,14),wxPoint(0,2)));
+
+    wxInt32 i,c=sizeof(codes)/sizeof(codes[0])-1;
+    for (i=0;i<c;i++)
+        ListImageList.Add(AdjustIconSize(flags[i],wxNullIcon,wxSize(20,14),wxPoint(0,2)));
+#else
+    ListImageList.Create(18,12,true);
+    ListImageList.Add(wxBitmap(sortasc_18_12_xpm));
+    ListImageList.Add(wxBitmap(sortdsc_18_12_xpm));
+    ListImageList.Add(wxBitmap(unknown_xpm));
+
+    wxInt32 i,c=sizeof(codes)/sizeof(codes[0])-1;
+    for (i=0;i<c;i++)
+        ListImageList.Add(wxBitmap(flags[i]));
+#endif
+}

@@ -79,7 +79,7 @@ bool CslGameCube::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
     getstring(text,buf);
     info.Map=A2U(text);
     getstring(text,buf);
-    l=strlen(text);
+    l=(wxUint32)strlen(text);
     StripColours(text,&l,2);
     info.SetDescription(A2U(text));
 
@@ -196,7 +196,7 @@ wxInt32 CslGameCube::InjectConfig(const wxString& address,const wxString& passwo
     script+=wxString::Format(wxT("\r\nif (= $csl_connect 1) [ sleep 1000 [ connect %s ] ]\r\n%s\r\n"),
                              address.c_str(),wxT("alias csl_connect 0"));
 
-    return WriteTextFile(cfg,U2A(script),wxFile::write_append);
+    return WriteTextFile(cfg,script,wxFile::write_append);
 }
 
 const char** CslGameCube::GetIcon(wxInt32 size) const

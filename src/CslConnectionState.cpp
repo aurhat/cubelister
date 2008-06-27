@@ -18,25 +18,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef CSL_VERSION_H
-#define CSL_VERSION_H
+#include "CslConnectionState.h"
 
-/**
- @author Glen Masgai <mimosius@gmx.de>
-*/
-
-#define CSL_NAME_STR          _("Cube Server Lister (CSL)")
-#define CSL_NAME_SHORT_STR    wxT("csl")
-
-#define CSL_VERSION_STR       wxT("0.7.97")
-#define CSL_VERSION_ADD_STR   wxT("")
-#define CSL_VERSION_LONG_STR  wxString(CSL_VERSION_STR wxT(" ") CSL_VERSION_ADD_STR)
-
-#define CSL_DESCRIPTION_STR   _("Tool to monitor cubeengine-based servers.")
-#define CSL_COPYRIGHT_STR     wxT("(C)2007, Glen Masgai <mimosius@gmx.de>")
-
-#define CSL_WEBADDR_STR       wxT("cubelister.sourceforge.net")
-#define CSL_WEBADDRFULL_STR   wxString(wxT("http://") CSL_WEBADDR_STR)
-
-
-#endif // CSL_VERSION_H
+bool               CslConnectionState::m_playing=false;
+wxInt32            CslConnectionState::m_waitTime=0;
+wxInt32            CslConnectionState::m_connectMode=CslGame::CSL_CONNECT_DEFAULT;
+CslServerInfo*     CslConnectionState::m_activeInfo=NULL;

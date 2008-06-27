@@ -22,30 +22,34 @@
 #include <wx/fileconf.h>
 #include <wx/sysopt.h>
 #include <wx/protocol/http.h>
+#include <wx/process.h>
 #include "engine/CslTools.h"
 #include "engine/CslVersion.h"
 #include "CslFrame.h"
 #include "CslDlgAbout.h"
 #include "CslDlgAddMaster.h"
+#include "CslDlgConnectWait.h"
 #include "CslDlgGeneric.h"
+#include "CslConnectionState.h"
 #include "CslGeoIP.h"
-#include "csl_icon_png.h"
 #include "engine/CslGameSauerbraten.h"
 #include "engine/CslGameAssaultCube.h"
 #include "engine/CslGameBloodFrontier.h"
 #include "engine/CslGameCube.h"
 
 #ifndef __WXMSW__
+#include "csl_icon_png.h"
+#endif
 #include "img/master_24.xpm"
 #include "img/close_14.xpm"
 #include "img/close_high_14.xpm"
 #include "img/close_press_14.xpm"
-#endif
 
 #define CSL_TIMER_SHOT 250
 
 BEGIN_DECLARE_EVENT_TYPES()
 DECLARE_EVENT_TYPE(wxCSL_EVT_VERSIONCHECK,wxID_ANY)
+DECLARE_EVENT_TYPE(wxCSL_EVT_PROCESS,wxID_ANY)
 END_DECLARE_EVENT_TYPES()
 
 #define CSL_EVT_VERSIONCHECK(id,fn) \
@@ -56,7 +60,17 @@ END_DECLARE_EVENT_TYPES()
                                (wxObject*)NULL \
                              ),
 
+
+#define CSL_EVT_PROCESS(id,fn) \
+    DECLARE_EVENT_TABLE_ENTRY( \
+                               wxCSL_EVT_PROCESS,id,wxID_ANY, \
+                               (wxObjectEventFunction)(wxEventFunction) \
+                               wxStaticCastEvent(wxCommandEventFunction,&fn), \
+                               (wxObject*)NULL \
+                             ),
+
 DEFINE_EVENT_TYPE(wxCSL_EVT_VERSIONCHECK)
+DEFINE_EVENT_TYPE(wxCSL_EVT_PROCESS)
 
 
 enum
@@ -73,6 +87,7 @@ BEGIN_EVENT_TABLE(CslFrame, wxFrame)
     CSL_EVT_PONG(wxID_ANY,CslFrame::OnPong)
     EVT_TIMER(wxID_ANY,CslFrame::OnTimer)
     EVT_LIST_ITEM_SELECTED(wxID_ANY,CslFrame::OnListItemSelected)
+    EVT_LIST_ITEM_ACTIVATED(wxID_ANY,CslFrame::OnListItemActivated)
     EVT_TREE_SEL_CHANGED(wxID_ANY,CslFrame::OnTreeSelChanged)
     EVT_TREE_ITEM_RIGHT_CLICK(wxID_ANY,CslFrame::OnTreeRightClick)
     EVT_MENU(wxID_ANY,CslFrame::OnCommandEvent)
@@ -96,6 +111,7 @@ BEGIN_EVENT_TABLE(CslFrame, wxFrame)
     EVT_SHOW(CslFrame::OnShow)
     EVT_CLOSE(CslFrame::OnClose)
     CSL_EVT_VERSIONCHECK(wxID_ANY,CslFrame::OnVersionCheck)
+    CSL_EVT_PROCESS(wxID_ANY,CslFrame::OnEndProcess)
 END_EVENT_TABLE()
 
 
@@ -122,6 +138,108 @@ class CslTreeItemData : public wxTreeItemData
         CslGame *m_game;
         CslMaster *m_master;
 };
+
+class CslProcess : public wxProcess
+{
+    public:
+        CslProcess(wxWindow *parent,CslServerInfo *info,const wxString& cmd) :
+                wxProcess((CslListCtrlServer*)parent),
+                m_parent(parent),m_info(info),m_cmd(cmd)
+        {
+            m_self=this;
+            m_watch.Start(0);
+            Redirect();
+        }
+
+        virtual void OnTerminate(int pid,int code)
+        {
+            m_watch.Pause();
+
+            wxUint32 time=m_watch.Time()/1000;
+            if (time>g_cslSettings->minPlaytime)
+                m_info->SetLastPlayTime(time);
+
+            // Cube returns with 1 - weird
+            if (!m_info->GetGame().ReturnOk(code))
+                wxMessageBox(wxString::Format(_("%s returned with code: %d"),
+                                              m_cmd.c_str(),code),_("Error"),wxICON_ERROR,m_parent);
+
+            ProcessInputStream();
+            ProcessErrorStream();
+
+            if (g_cslSettings->autoSaveOutput && !g_cslSettings->gameOutputPath.IsEmpty())
+                CslDlgOutput::SaveFile(g_cslSettings->gameOutputPath);
+
+            wxCommandEvent evt(wxCSL_EVT_PROCESS);
+            evt.SetClientData(m_info);
+            wxPostEvent(m_parent,evt);
+
+            m_self=NULL;
+
+            delete this;
+        }
+
+        static void ProcessInputStream()
+        {
+            if (!m_self)
+                return;
+
+            wxInputStream *stream=m_self->GetInputStream();
+            if (!stream)
+                return;
+
+            while (stream->CanRead())
+            {
+                char buf[1025];
+                stream->Read((void*)buf,1024);
+                wxUint32 last=stream->LastRead();
+                if (last==0)
+                    break;
+                buf[last]=0;
+                //Cube has color codes in it's outputm
+                m_self->m_info->GetGame().ProcessOutput(buf,&last);
+                CslDlgOutput::AddOutput(buf,last);
+                //LOG_DEBUG("%s", buf);
+            }
+        }
+
+        static void ProcessErrorStream()
+        {
+            if (!m_self)
+                return;
+
+            wxInputStream *stream=m_self->GetErrorStream();
+            if (!stream)
+                return;
+
+            while (stream->CanRead())
+            {
+                char buf[1025];
+                stream->Read((void*)buf,1024);
+
+                wxUint32 last=stream->LastRead();
+                if (last==0)
+                    break;
+                buf[last]=0;
+                /*
+                //Cube has color codes in it's outputm
+                m_self->m_info->GetGame().ProcessOutput(buf,&last);
+                CslDlgOutput::AddOutput(buf,last);
+                */
+                LOG_DEBUG("%s",buf);
+            }
+        }
+
+    protected:
+        static CslProcess *m_self;
+        wxWindow *m_parent;
+        CslServerInfo *m_info;
+        wxString m_cmd;
+        bool m_clear;
+        wxStopWatch m_watch;
+};
+
+CslProcess* CslProcess::m_self=NULL;
 
 
 wxThread::ExitCode CslVersionCheckThread::Entry()
@@ -176,6 +294,8 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
                    const wxPoint& pos,const wxSize& size,long style):
         wxFrame(parent, id, title, pos, size, wxDEFAULT_FRAME_STYLE)
 {
+	m_oldSelectedInfo=NULL;
+
     m_engine=new CslEngine(this);
     if (m_engine->Init())
     {
@@ -196,6 +316,8 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
     m_imgListButton.Add(wxBitmap(close_14_xpm));
     m_imgListButton.Add(wxBitmap(close_high_14_xpm));
     m_imgListButton.Add(wxBitmap(close_press_14_xpm));
+
+	CslListCtrlPlayer::CreateImageList();
 
     m_outputDlg=new CslDlgOutput(this);
     m_extendedDlg=new CslDlgExtended(this);
@@ -290,7 +412,7 @@ CslFrame::~CslFrame()
     }
 
     delete m_menu;
-    tree_ctrl_games->DeleteAllItems();
+
     m_AuiMgr.UnInit();
 }
 
@@ -330,14 +452,14 @@ void CslFrame::CreateMainMenu()
     CslMenu::AddItem(menu,MENU_VIEW_FAVOURITES,_("Show favourites"),
                      wxART_NONE,wxITEM_CHECK);
     menu->AppendSeparator();
-    CslMenu::AddItem(menu,MENU_VIEW_SEARCH,_("Show &search bar\tCTRL+S"),
+    CslMenu::AddItem(menu,MENU_VIEW_SEARCH,_("Show search bar\tCTRL+F"),
                      wxART_NONE,wxITEM_CHECK);
-    CslMenu::AddItem(menu,MENU_VIEW_OUTPUT,_("Show &game output\tCTRL+O"),
+    CslMenu::AddItem(menu,MENU_VIEW_OUTPUT,_("Show game output\tCTRL+O"),
                      wxART_NONE,wxITEM_CHECK);
     menu->AppendSeparator();
-    CslMenu::AddItem(menu,MENU_VIEW_AUTO_SORT,_("Sort &lists automatically\tCTRL+L"),
+    CslMenu::AddItem(menu,MENU_VIEW_AUTO_SORT,_("Sort lists automatically\tCTRL+L"),
                      wxART_NONE,wxITEM_CHECK);
-    CslMenu::AddItem(menu,MENU_VIEW_AUTO_FIT,_("Fit columns on window &resize"),
+    CslMenu::AddItem(menu,MENU_VIEW_AUTO_FIT,_("Fit columns on window resize"),
                      wxART_NONE,wxITEM_CHECK);
     menubar->Append(menu,_("&View"));
 
@@ -377,13 +499,13 @@ void CslFrame::CreateControls()
     text_ctrl_search=new wxTextCtrl(pane_search,CSL_TEXT_SEARCH,wxEmptyString,
                                     wxDefaultPosition,wxDefaultSize,wxTE_RICH|wxTE_RICH2|wxTE_PROCESS_ENTER);
     text_search_result=new wxStaticText(pane_search,wxID_ANY,wxEmptyString);
-    button_search=new wxButton(pane_search,CSL_BUTTON_SEARCH,_("Search"));
+    button_search=new wxButton(pane_search,CSL_BUTTON_SEARCH,_("&Search"));
     button_search_clear=new wxBitmapButton(pane_search,CSL_BUTTON_SEARCH_CLOSE,wxNullBitmap,
                                            wxDefaultPosition,wxDefaultSize,wxNO_BORDER);
-    gauge_search=new wxGauge(pane_search,wxID_ANY,0,wxDefaultPosition,wxSize(-1,16));
-    radio_search_server=new wxRadioButton(pane_search,CSL_RADIO_SEARCH_SERVER,_("Servers"),
+    gauge_search=new wxGauge(pane_search,wxID_ANY,0,wxDefaultPosition,wxSize(button_search->GetBestSize().x,16));
+    radio_search_server=new wxRadioButton(pane_search,CSL_RADIO_SEARCH_SERVER,_("Se&rvers"),
                                           wxDefaultPosition,wxDefaultSize,wxRB_GROUP);
-    radio_search_player=new wxRadioButton(pane_search,CSL_RADIO_SEARCH_PLAYER,_("Players"));
+    radio_search_player=new wxRadioButton(pane_search,CSL_RADIO_SEARCH_PLAYER,_("&Players"));
     list_ctrl_players=new CslListCtrlPlayer(pane_main,wxID_ANY,wxDefaultPosition,wxDefaultSize,listStyle);
     m_playerLists.add(list_ctrl_players);
 
@@ -417,8 +539,8 @@ void CslFrame::SetProperties()
 
     list_ctrl_players->ListInit(CslListCtrlPlayer::CSL_LISTPLAYER_MINI_SIZE);
 
-    list_ctrl_master->ListInit(m_engine,list_ctrl_info,list_ctrl_favourites);
-    list_ctrl_favourites->ListInit(m_engine,list_ctrl_info,list_ctrl_master);
+    list_ctrl_master->ListInit(m_engine,list_ctrl_favourites);
+    list_ctrl_favourites->ListInit(m_engine,list_ctrl_master);
 
     // see wx_wxbitmap.html
 #ifdef __WXMSW__
@@ -442,28 +564,29 @@ void CslFrame::DoLayout()
     sizer_main = new wxFlexGridSizer(2,1,0,0);
     sizer_main->Add(pane_main,1,wxEXPAND,0);
     if (g_cslSettings->showSearch)
-        sizer_main->Add(pane_search,0,wxTOP|wxBOTTOM|wxEXPAND,4);
+        sizer_main->Add(pane_search,0,wxEXPAND);
     else
         pane_search->Hide();
     sizer_main->AddGrowableRow(0);
     sizer_main->AddGrowableCol(0);
     SetSizer(sizer_main);
 
-    sizer_search=new wxFlexGridSizer(1,8,0,0);
+    sizer_search=new wxFlexGridSizer(1,9,0,0);
     wxStaticText* label_search_static=new wxStaticText(pane_search,wxID_ANY,_("Search:"));
 #ifdef __WXMSW__
     i=2; //bitmap button offset
 #endif
+	sizer_search->AddSpacer(4);
     sizer_search->Add(button_search_clear,0,wxRIGHT|wxTOP|wxALIGN_CENTER_VERTICAL,i);
-    sizer_search->Add(label_search_static,0,wxLEFT|wxALIGN_CENTER_VERTICAL,8);
-    sizer_search->Add(text_ctrl_search,0,wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_VERTICAL,4);
-    sizer_search->Add(text_search_result,0,wxLEFT|wxRIGHT|wxALIGN_CENTER_VERTICAL,4);
-    sizer_search->Add(button_search,0,wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_VERTICAL,4);
-    sizer_search->Add(gauge_search,0,wxLEFT|wxRIGHT|wxALIGN_CENTER_VERTICAL,4);
-    sizer_search->Add(radio_search_server,0,wxLEFT|wxRIGHT|wxALIGN_CENTER_VERTICAL,4);
-    sizer_search->Add(radio_search_player,0,wxLEFT|wxRIGHT|wxALIGN_CENTER_VERTICAL,4);
+    sizer_search->Add(label_search_static,0,wxLEFT|wxTOP|wxBOTTOM|wxALIGN_CENTER_VERTICAL,8);
+    sizer_search->Add(text_ctrl_search,0,wxLEFT|wxRIGHT|wxTOP|wxBOTTOM|wxEXPAND|wxALIGN_CENTER_VERTICAL,4);
+    sizer_search->Add(text_search_result,0,wxLEFT|wxRIGHT|wxTOP|wxBOTTOM|wxALIGN_CENTER_VERTICAL,4);
+    sizer_search->Add(button_search,0,wxLEFT|wxRIGHT|wxTOP|wxBOTTOM|wxEXPAND|wxALIGN_CENTER_VERTICAL,4);
+    sizer_search->Add(gauge_search,0,wxLEFT|wxRIGHT|wxTOP|wxBOTTOM|wxALIGN_CENTER_VERTICAL,4);
+    sizer_search->Add(radio_search_server,0,wxLEFT|wxRIGHT|wxTOP|wxBOTTOM|wxALIGN_CENTER_VERTICAL,4);
+    sizer_search->Add(radio_search_player,0,wxLEFT|wxRIGHT|wxTOP|wxBOTTOM|wxALIGN_CENTER_VERTICAL,4);
     pane_search->SetSizer(sizer_search);
-    sizer_search->AddGrowableCol(2);
+    sizer_search->AddGrowableCol(3);
     //sizer_search->AddGrowableCol(3);
 
 #define CSL_CAPTION_MASTER_LIST_SERVERS _("Master list servers")
@@ -612,6 +735,7 @@ void CslFrame::PlayerListCreateView(CslServerInfo *info,wxUint32 view,const wxSt
     m_playerLists.add(list);
 
     info->SetPingExt(true);
+
     m_engine->PingEx(info,true);
 }
 
@@ -652,7 +776,7 @@ void CslFrame::ToggleSearchBar()
 {
     if (g_cslSettings->showSearch && !pane_search->IsShown())
     {
-        sizer_main->Add(pane_search,0,wxTOP|wxBOTTOM|wxEXPAND,4);
+        sizer_main->Add(pane_search,0,wxEXPAND);
         pane_search->Show();
         text_ctrl_search->SetFocus();
     }
@@ -940,6 +1064,67 @@ void CslFrame::UpdateMaster()
 
     m_timerInit=true;
     m_timer.Start(CSL_TIMER_SHOT);
+}
+
+void CslFrame::ConnectToServer()
+{
+    if (CslConnectionState::IsPlaying())
+    {
+        wxMessageBox(_("You are currently playing, so quit the game and try again."),
+                     _("Error"),wxOK|wxICON_ERROR,this);
+        return;
+    }
+
+	CslServerInfo *info=CslConnectionState::GetInfo();
+	wxInt32 mode=CslConnectionState::GetConnectMode();
+
+	CslConnectionState::Reset();
+
+    if (info->Players>0 && info->Players==info->PlayersMax)
+    {
+        wxInt32 time=g_cslSettings->waitServerFull;
+
+        CslDlgConnectWait *dlg=new CslDlgConnectWait(this,&time);
+        if (dlg->ShowModal()==wxID_OK)
+        {
+            m_timerCount=0;
+            CslConnectionState::CreateWaitingState(info,mode,time);
+        }
+        return;
+    }
+
+    wxString error;
+    wxString cmd=info->GetGame().GameStart(info,mode,&error);
+
+    if (cmd.IsEmpty())
+    {
+        if (!error.IsEmpty())
+            wxMessageBox(error,_("Error"),wxICON_ERROR,this);
+        return;
+    }
+
+    CslDlgOutput::Reset(info->GetBestDescription());
+
+    info->Lock();
+    ::wxSetWorkingDirectory(info->GetGame().GetClientSettings().GamePath);
+
+    CslProcess *process=new CslProcess(this,info,cmd);
+    if (!(::wxExecute(cmd,wxEXEC_ASYNC,process)>0))
+    {
+        wxMessageBox(_("Failed to start: ")+cmd,
+                     _("Error"),wxICON_ERROR,this);
+        info->Lock(false);
+        return;
+    }
+
+    CslConnectionState::CreatePlayingState(info);
+
+    info->ConnectedTimes++;
+    info->PlayLast=wxDateTime::Now().GetTicks();
+    list_ctrl_info->UpdateInfo(info);
+
+	list_ctrl_master->Highlight(CSL_HIGHLIGHT_LOCKED,true,info);
+	list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_LOCKED,true,info);
 }
 
 void CslFrame::LoadSettings()
@@ -1272,7 +1457,7 @@ bool CslFrame::LoadServers(wxUint32 *numm,wxUint32 *nums)
 
                 if (games[gt]->AddServer(info,id))
                 {
-                    m_engine->Resolve(info);
+                    m_engine->ResolveHost(info);
 
                     long type;
                     wxInt32 pos,j=0;
@@ -1456,9 +1641,11 @@ void CslFrame::OnPong(wxCommandEvent& event)
             }
         }
 
-        if (packet->Type==CSL_PONG_TYPE_PLAYERSTATS && m_searchedServers.length())
+        if (packet->Type==CSL_PONG_TYPE_PLAYERSTATS &&
+			m_searchedServers.length() &&
+			radio_search_player->GetValue())
         {
-            wxInt32 type,progress;
+            wxInt32 progress;
             bool found;
 
             loopv(m_searchedServers)
@@ -1481,11 +1668,8 @@ void CslFrame::OnPong(wxCommandEvent& event)
                         CslPlayerStatsData *data=stats.m_stats[j];
                         if (data->Ok && data->Name.Lower().Contains(m_searchString))
                         {
-                            type=radio_search_server->GetValue() ?
-                                 CSL_HIGHLIGHT_SEARCH_SERVER:CSL_HIGHLIGHT_SEARCH_PLAYER;
-
-                            list_ctrl_master->Highlight(type,true,packet->Info);
-                            list_ctrl_favourites->Highlight(type,true,packet->Info);
+                            list_ctrl_master->Highlight(CSL_HIGHLIGHT_SEARCH_PLAYER,true,packet->Info);
+                            list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_SEARCH_PLAYER,true,packet->Info);
                             m_searchResultPlayer++;
                             found=true;
                         }
@@ -1527,10 +1711,8 @@ void CslFrame::OnTimer(wxTimerEvent& event)
 
             if (game)
             {
-                //master list
                 list_ctrl_master->ListUpdate(master? master->GetServers():game->GetServers());
 
-                //favourites
                 vector<CslServerInfo*> servers;
                 m_engine->GetFavourites(servers);
                 list_ctrl_favourites->ListUpdate(servers);
@@ -1539,11 +1721,11 @@ void CslFrame::OnTimer(wxTimerEvent& event)
         else
             m_timerCount++;
 
-        if (game && (m_engine->PingServers(game,m_timerInit) || m_engine->PingServersEx()))
-        {
-            if (!CslConnectionState::IsWaiting())
-                CslStatusBar::Light(LIGHT_GREEN);
-        }
+        bool green=game && m_engine->PingServers(game,m_timerInit);
+	    green|=m_engine->PingServersEx()!=0;
+
+		if (green && !CslConnectionState::IsWaiting())
+            CslStatusBar::Light(LIGHT_GREEN);
 
         if (m_timerInit)
         {
@@ -1558,16 +1740,31 @@ void CslFrame::OnTimer(wxTimerEvent& event)
             wxPostEvent(m_trafficDlg,event);
     }
 
-    if (CslConnectionState::IsWaiting())
+    if (CslConnectionState::IsPlaying() && m_timerCount%4==0)
     {
-        wxPostEvent(CslConnectionState::GetList(),event);
-        CslStatusBar::Light(LIGHT_RED);
-    }
+        CslProcess::ProcessInputStream();
+        CslProcess::ProcessErrorStream();
 
-    if (CslConnectionState::IsPlaying())
-    {
-        wxPostEvent(CslConnectionState::GetList(),event);
         CslStatusBar::Light(LIGHT_YELLOW);
+    }
+    else if (CslConnectionState::IsWaiting())
+    {
+		CslServerInfo *info=CslConnectionState::GetInfo();
+
+        if (info->Players!=info->PlayersMax)
+            ConnectToServer();
+        else if (m_timerCount%4==0)
+        {
+            if (CslConnectionState::CountDown())
+                CslStatusBar::SetText(1,wxString::Format(_("Waiting %s for a free slot on \"%s\" " \
+                                      "(press ESC to abort or join another server)"),
+                                      FormatSeconds(CslConnectionState::GetWaitTime(),true,true).c_str(),
+                                      info->GetBestDescription().c_str()));
+            else
+                CslStatusBar::SetText(1,wxT(""));
+        }
+
+		CslStatusBar::Light(LIGHT_RED);
     }
 
     if (CslStatusBar::Light()!=LIGHT_GREY)
@@ -1579,7 +1776,6 @@ void CslFrame::OnTimer(wxTimerEvent& event)
 
 void CslFrame::OnListItemSelected(wxListEvent& event)
 {
-    static CslServerInfo *oldInfo=NULL;
     CslServerInfo *info=(CslServerInfo*)event.GetClientData();
 
     if (!info)
@@ -1591,9 +1787,9 @@ void CslFrame::OnListItemSelected(wxListEvent& event)
 #endif
     list_ctrl_info->UpdateInfo(info);
 
-    if (oldInfo)
-        oldInfo->SetPingExt(false);
-    oldInfo=info;
+    if (m_oldSelectedInfo)
+        m_oldSelectedInfo->SetPingExt(false);
+    m_oldSelectedInfo=info;
 
     list_ctrl_players->SetInfo(info);
 
@@ -1608,6 +1804,11 @@ void CslFrame::OnListItemSelected(wxListEvent& event)
         pane.Caption(PlayerListGetCaption(info,true));
         m_AuiMgr.Update();
     }
+}
+
+void CslFrame::OnListItemActivated(wxListEvent& event)
+{
+	ConnectToServer();
 }
 
 void CslFrame::OnTreeSelChanged(wxTreeEvent& event)
@@ -1638,16 +1839,12 @@ void CslFrame::OnTreeSelChanged(wxTreeEvent& event)
         }
         data=(CslTreeItemData*)tree_ctrl_games->GetItemData(item);
         game=data->GetGame();
-
-        //m_engine->ResetPingSends(NULL,master);
     }
     else
     {
         CslMenu::EnableMenuItem(MENU_MASTER_DEL,false);
         CslMenu::EnableMenuItem(MENU_MASTER_UPDATE,false);
         servers=&game->GetServers();
-
-        //m_engine->ResetPingSends(game,NULL);
     }
 
     if (game)
@@ -1789,10 +1986,12 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
                 gauge_search->Enable(false);
                 gauge_search->SetValue(0);
                 SetSearchbarColour(false);
-                wxInt32 type=radio_search_server->GetValue() ?
-                             CSL_HIGHLIGHT_SEARCH_SERVER:CSL_HIGHLIGHT_SEARCH_PLAYER;
+                wxInt32 type=0xffffffff;
                 list_ctrl_master->Highlight(type,false);
                 list_ctrl_favourites->Highlight(type,false);
+				list_ctrl_master->ListSearch(s);
+				list_ctrl_favourites->ListSearch(s);
+				text_search_result->SetLabel(wxString::Format(_("Search result: %d servers"),0));
             }
             else
             {
@@ -1875,13 +2074,23 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
         }
 
         //events from the server lists
+        case MENU_SERVER_CONNECT:
+        case MENU_SERVER_CONNECT_PW:
+			ConnectToServer();
+			break;
+
         case MENU_SERVER_DEL:
         {
             CslServerInfo *info=(CslServerInfo*)event.GetClientData();
             if (!info)
                 break;
+
+			if (info==m_oldSelectedInfo)
+				m_oldSelectedInfo=NULL;
+
             if (m_extendedDlg->GetInfo()==info)
                 info->SetPingExt(false);
+
             loopvrev(m_playerLists)
             {
                 if (m_playerLists[i]->GetInfo()==info)
@@ -1896,6 +2105,7 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
                     info->SetPingExt(false);
                 }
             }
+
             info->GetGame().DeleteServer(info);
             break;
         }
@@ -1949,7 +2159,7 @@ void CslFrame::OnKeypress(wxKeyEvent& event)
     if (event.GetKeyCode()==WXK_ESCAPE)
     {
         if (CslConnectionState::IsWaiting())
-            CslConnectionState::Reset();
+            ConnectToServer();
         else if (FindFocus()==text_ctrl_search)
         {
             text_ctrl_search->Clear();
@@ -2105,6 +2315,19 @@ void CslFrame::OnVersionCheck(wxCommandEvent& event)
     m_versionCheckThread->Delete();
     delete m_versionCheckThread;
     m_versionCheckThread=NULL;
+}
+
+void CslFrame::OnEndProcess(wxCommandEvent& event)
+{
+    CslServerInfo *info=(CslServerInfo*)event.GetClientData();
+
+    info->Lock(false);
+    info->GetGame().GameEnd();
+    CslConnectionState::Reset();
+
+	list_ctrl_master->Highlight(CSL_HIGHLIGHT_LOCKED,false,info);
+	list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_LOCKED,false,info);
+    list_ctrl_info->UpdateInfo(info);
 }
 
 

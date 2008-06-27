@@ -60,7 +60,6 @@ class CslDlgExtended: public wxDialog
         void UpdatePlayerData();
         void UpdateTeamData();
 
-
     private:
         // begin wxGlade: CslDlgExtended::methods
         void set_properties();
@@ -79,6 +78,8 @@ class CslDlgExtended: public wxDialog
         void OnClose(wxCloseEvent& event);
         void OnSize(wxSizeEvent& event);
         void OnCommandEvent(wxCommandEvent& event);
+		void OnMenu(wxCommandEvent& event);
+		void OnItemActivated(wxListEvent& event);
 
         DECLARE_EVENT_TABLE()
 

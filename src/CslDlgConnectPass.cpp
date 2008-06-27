@@ -55,8 +55,8 @@ void CslDlgConnectPass::set_properties()
     button_ok->SetDefault();
     // end wxGlade
 
-    if (!m_info->password.IsEmpty())
-        text_ctrl_password->SetValue(m_info->password);
+    if (!m_info->Password.IsEmpty())
+        text_ctrl_password->SetValue(m_info->Password);
 }
 
 void CslDlgConnectPass::do_layout()
@@ -86,7 +86,7 @@ void CslDlgConnectPass::do_layout()
     Layout();
     // end wxGlade
 
-    if (!m_info->admin)
+    if (!m_info->Admin)
     {
         checkbox_admin->Hide();
         grid_sizer_ctrl->Detach(checkbox_admin);
@@ -106,16 +106,18 @@ void CslDlgConnectPass::OnCommandEvent(wxCommandEvent& event)
             break;
 
         case CHECK_ADMIN:
-            text_ctrl_password->SetValue(event.IsChecked() ? m_info->passwordAdmin:m_info->password);
+            text_ctrl_password->SetValue(event.IsChecked() ? m_info->AdminPassword:m_info->Password);
+			text_ctrl_password->SetFocus();
             break;
 
         case wxID_OK:
-            m_info->admin=checkbox_admin->IsChecked();
-            if (m_info->admin)
-                m_info->passwordAdmin=text_ctrl_password->GetValue();
+            m_info->Admin=checkbox_admin->IsChecked();
+            if (m_info->Admin)
+                m_info->AdminPassword=text_ctrl_password->GetValue();
             else
-                m_info->password=text_ctrl_password->GetValue();
+                m_info->Password=text_ctrl_password->GetValue();
             EndModal(wxID_OK);
+			break;
 
         default:
             break;

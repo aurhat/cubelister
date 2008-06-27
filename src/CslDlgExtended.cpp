@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <wx/wupdlock.h>
 #include "CslDlgExtended.h"
 #include "CslSettings.h"
 #include "CslMenu.h"
@@ -27,6 +28,8 @@ BEGIN_EVENT_TABLE(CslDlgExtended, wxDialog)
     EVT_SIZE(CslDlgExtended::OnSize)
     EVT_BUTTON(wxID_ANY,CslDlgExtended::OnCommandEvent)
     EVT_CHECKBOX(wxID_ANY,CslDlgExtended::OnCommandEvent)
+    EVT_MENU(wxID_ANY,CslDlgExtended::OnMenu)
+    EVT_LIST_ITEM_ACTIVATED(wxID_ANY,CslDlgExtended::OnItemActivated)
 END_EVENT_TABLE()
 
 
@@ -128,11 +131,9 @@ void CslDlgExtended::set_properties()
     list_ctrl_players->ListInit(MENU_SERVER_EXTENDED_DEFAULT-MENU_SERVER_EXTENDED_MICRO);
 #ifdef __WXMSW__
     list_ctrl_players->SetMinSize(wxSize(520,270));
-#endif
-#ifdef __WXGTK__
+#elif __WXGTK__
     list_ctrl_players->SetMinSize(wxSize(580,320));
-#endif
-#ifdef __WXMAC__
+#elif __WXMAC__
     list_ctrl_players->SetMinSize(wxSize(580,330));
 #endif
 }
@@ -256,9 +257,28 @@ void CslDlgExtended::OnCommandEvent(wxCommandEvent& event)
             if (panel_map->IsOk())
                 ShowPanelMap(event.IsChecked());
             break;
+		default:
+			break;
     }
 
     event.Skip();
+}
+
+void CslDlgExtended::OnMenu(wxCommandEvent& event)
+{
+    switch (event.GetId())
+	{
+	    case MENU_SERVER_CONNECT:
+        case MENU_SERVER_CONNECT_PW:
+			wxPostEvent(m_parent,event);
+		default:
+			return;
+	}
+}
+
+void CslDlgExtended::OnItemActivated(wxListEvent& event)
+{
+    wxPostEvent(m_parent,event);
 }
 
 void CslDlgExtended::UpdateMap()
@@ -339,6 +359,11 @@ void CslDlgExtended::UpdateTeamData()
     wxInt32 lu=0,lc=m_teamLabel.GetCount();
 
     CslTeamStats& stats=m_info->TeamStats;
+
+#ifdef __WXMSW__
+	//fixes flicker of teamscore labels
+	wxWindowUpdateLocker lock(this);
+#endif
 
     UpdateMap();
     m_mapInfo.ResetBasesColour();
@@ -496,7 +521,6 @@ void CslDlgExtended::RecalcMinSize(bool reLayout,wxInt32 decWidth)
         list_ctrl_players->ListAdjustSize();
 
 #ifdef __WXMSW__
-    checkbox_update->Refresh();
     checkbox_update_end->Refresh();
     checkbox_map->Refresh();
 #endif
@@ -558,6 +582,7 @@ void CslDlgExtended::DoShow(CslServerInfo *info)
     }
 
     m_info=info;
+	list_ctrl_players->SetInfo(info);
 
     UpdatePlayerData();
     UpdateTeamData();
