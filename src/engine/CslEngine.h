@@ -140,18 +140,23 @@ class CslEngine : public wxEvtHandler
 
         wxInt32 GetNextGameID();
 
+		static bool PingOk(const CslServerInfo& info,wxUint32 interval)
+		{
+    	    return info.Ping>-1 && (info.PingResp-info.PingSend)<interval*2;
+		}
+
     protected:
         bool m_ok;
         wxEvtHandler *m_evtHandler;
 
         CslResolverThread *m_resolveThread;
 
-        wxUint32 m_updateInterval;
         CslUDP *m_pingSock;
 
         wxInt32 m_gameId;
-
         vector<CslGame*> m_games;
+
+        wxUint32 m_updateInterval;
 
         void ParseDefaultPong(CslServerInfo *info,ucharbuf& buf,wxUint32 now);
         void ParsePong(CslServerInfo *info,CslUDPPacket& packet,wxUint32 now);

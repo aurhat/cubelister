@@ -468,7 +468,6 @@ void CslFrame::CreateMainMenu()
 
 #ifndef __WXMAC__
     menu=new wxMenu();
-    menu->AppendSeparator();
     CslMenu::AddItem(menu,wxID_ABOUT,_("A&bout"),wxART_ABOUT);
     menubar->Append(menu,_("&Help"));
 #endif
@@ -520,8 +519,10 @@ void CslFrame::CreateControls()
 
 void CslFrame::SetProperties()
 {
+#ifndef __WXMSW__
     m_AuiMgr.SetFlags(wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_HINT_FADE |
                       wxAUI_MGR_VENETIAN_BLINDS_HINT | wxAUI_MGR_NO_VENETIAN_BLINDS_FADE);
+#endif
     m_AuiMgr.SetManagedWindow(pane_main);
 
     SetTitle(_("Cube Server Lister"));
@@ -1081,6 +1082,9 @@ void CslFrame::ConnectToServer()
 
     CslServerInfo *info=CslConnectionState::GetInfo();
     wxInt32 mode=CslConnectionState::GetConnectMode();
+
+	if (!info)
+		return;
 
     CslConnectionState::Reset();
 
@@ -1814,6 +1818,8 @@ void CslFrame::OnListItemSelected(wxListEvent& event)
 
 void CslFrame::OnListItemActivated(wxListEvent& event)
 {
+	if (event.GetEventObject()==(void*)list_ctrl_info)
+		return;
     ConnectToServer();
 }
 
@@ -2048,7 +2054,8 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             vector<CslServerInfo*>& servers=game->GetServers();
             loopv(servers)
             {
-                if (servers[i]->ExtInfoStatus==CSL_EXT_STATUS_OK)
+				if (CslEngine::PingOk(*servers[i],g_cslSettings->updateInterval) &&
+					servers[i]->ExtInfoStatus==CSL_EXT_STATUS_OK)
                 {
                     m_searchedServers.add(servers[i]);
                     servers[i]->Search=true;

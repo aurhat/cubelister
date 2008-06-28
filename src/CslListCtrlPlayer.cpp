@@ -301,9 +301,8 @@ void CslListCtrlPlayer::ListUpdatePlayerData(CslGame& game,CslPlayerStats& stats
 #ifndef __WXMSW__
     //removes flicker on autosort for wxGTK and wxMAC
     wxIdleEvent idle;
-#endif
-
     wxTheApp->SendIdleEvents(this, idle);
+#endif
 }
 
 void CslListCtrlPlayer::ListAdjustSize()

@@ -837,7 +837,6 @@ wxInt32 CslEngine::GetNextGameID()
     return ++m_gameId;
 }
 
-
 void CslEngine::OnPong(wxCommandEvent& event)
 {
     CslUDPPacket *packet=(CslUDPPacket*)event.GetClientData();

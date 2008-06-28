@@ -175,8 +175,6 @@ class CslListCtrlServer : public wxListCtrl
         DECLARE_EVENT_TABLE()
 
     protected:
-        static bool PingOk(CslServerInfo *info);
-
         void ListCreateGameBitmaps();
         wxInt32 ListFindItem(CslServerInfo *info,wxListItem& item);
         void ListDeleteItem(wxListItem *item);

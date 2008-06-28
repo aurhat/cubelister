@@ -258,7 +258,7 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
         ext=new wxMenu();
         item=menu.AppendSubMenu(ext,_("Extended information"));
         item->SetBitmap(GET_ART_MENU(wxART_ABOUT));
-        if (info->ExtInfoStatus!=CSL_EXT_STATUS_OK || !PingOk(info))
+		if (info->ExtInfoStatus!=CSL_EXT_STATUS_OK || !CslEngine::PingOk(*info,g_cslSettings->updateInterval))
             item->Enable(false);
         else
         {
@@ -829,12 +829,6 @@ void CslListCtrlServer::Highlight(wxInt32 type,bool high,CslServerInfo *info,wxL
     }
 }
 
-bool CslListCtrlServer::PingOk(CslServerInfo *info)
-{
-    return info->Ping>-1 && (wxInt32)(info->PingSend-info->PingResp) <
-           g_cslSettings->updateInterval*2;
-}
-
 wxInt32 CslListCtrlServer::ListFindItem(CslServerInfo *info,wxListItem& item)
 {
     wxInt32 i;
@@ -889,7 +883,7 @@ bool CslListCtrlServer::ListFilterItemMatches(CslServerInfo *info)
 {
     if (m_filterVersion>-1 && info->Protocol!=m_filterVersion)
         return true;
-    else if (*m_filterFlags&CSL_FILTER_OFFLINE && !PingOk(info))
+	else if (*m_filterFlags&CSL_FILTER_OFFLINE && !CslEngine::PingOk(*info,g_cslSettings->updateInterval))
         return true;
     else if (*m_filterFlags&CSL_FILTER_FULL && info->PlayersMax>0 &&
              info->Players==info->PlayersMax)
@@ -982,7 +976,7 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
         infoCmp=(CslListServerData*)GetItemData(item);
     }
 
-    if (PingOk(info) || info->PingResp)
+    if (CslEngine::PingOk(*info,g_cslSettings->updateInterval) || info->PingResp)
     {
         if (infoCmp->Description!=info->Description)
             SetItem(i,1,info->Description);
@@ -1042,7 +1036,7 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
     }
 
     wxColour colour=m_stdColourListText;
-    if (!PingOk(info))
+    if (!CslEngine::PingOk(*info,g_cslSettings->updateInterval))
         colour=g_cslSettings->colServerOff;
     else if (info->PlayersMax>0 && info->Players==info->PlayersMax)
         colour=g_cslSettings->colServerFull;
@@ -1063,7 +1057,7 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
     item.SetMask(wxLIST_MASK_TEXT|wxLIST_MASK_IMAGE|wxLIST_MASK_DATA);
     if (m_id==CSL_LIST_MASTER)
     {
-        if (!PingOk(info))
+        if (!CslEngine::PingOk(*info,g_cslSettings->updateInterval))
             i=CSL_LIST_IMG_GREY;
         else if (info->Ping>(wxInt32)g_cslSettings->pingbad)
             i=info->ExtInfoStatus!=CSL_EXT_STATUS_FALSE ? CSL_LIST_IMG_RED_EXT : CSL_LIST_IMG_RED;
@@ -1307,8 +1301,8 @@ int wxCALLBACK CslListCtrlServer::ListSortCompareFunc(long item1,long item2,long
     CslListServerData *info1=(CslListServerData*)item1;
     CslListServerData *info2=(CslListServerData*)item2;
 
-    bool ping1Ok=PingOk(info1->Info);
-    bool ping2Ok=PingOk(info2->Info);
+    bool ping1Ok=CslEngine::PingOk(*info1->Info,g_cslSettings->updateInterval);
+    bool ping2Ok=CslEngine::PingOk(*info2->Info,g_cslSettings->updateInterval);
 
     wxInt32 type;
     wxInt32 sortMode=((CslListSortHelper*)data)->m_sortMode;
