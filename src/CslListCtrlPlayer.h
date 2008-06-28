@@ -56,7 +56,7 @@ class CslListCtrlPlayer : public wxListCtrl
         CslServerInfo* GetInfo() { return m_info; }
         wxInt32 GetView() { return m_view; }
 
-		static void CreateImageList();
+        static void CreateImageList();
 
         static wxSize BestSizeMicro;
         static wxSize BestSizeMini;
@@ -67,16 +67,16 @@ class CslListCtrlPlayer : public wxListCtrl
 
         CslServerInfo *m_info;
 
-		static wxImageList ListImageList;
+        static wxImageList ListImageList;
 
 #ifdef __WXMSW__
-		void OnEraseBackground(wxEraseEvent& event);
+        void OnEraseBackground(wxEraseEvent& event);
 #endif
         void OnSize(wxSizeEvent& event);
         void OnColumnLeftClick(wxListEvent& event);
-		void OnItemActivated(wxListEvent& event);
+        void OnItemActivated(wxListEvent& event);
         void OnContextMenu(wxContextMenuEvent& event);
-		void OnMenu(wxCommandEvent& event);
+        void OnMenu(wxCommandEvent& event);
 
         DECLARE_EVENT_TABLE()
 

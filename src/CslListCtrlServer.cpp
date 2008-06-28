@@ -55,9 +55,9 @@ enum
 
 
 BEGIN_EVENT_TABLE(CslListCtrlServer, wxListCtrl)
-#ifdef __WXMSW__
+    #ifdef __WXMSW__
     EVT_ERASE_BACKGROUND(CslListCtrlServer::OnEraseBackground)
-#endif
+    #endif
     EVT_SIZE(CslListCtrlServer::OnSize)
     EVT_MENU(wxID_ANY,CslListCtrlServer::OnMenu)
     EVT_LIST_COL_CLICK(wxID_ANY,CslListCtrlServer::OnColumnLeftClick)
@@ -106,50 +106,50 @@ CslListCtrlServer::~CslListCtrlServer()
 #ifdef __WXMSW__
 void CslListCtrlServer::OnEraseBackground(wxEraseEvent& event)
 {
-   //to prevent flickering, erase only content *outside* of the actual items
+    //to prevent flickering, erase only content *outside* of the actual items
 
-   if (GetItemCount()>0)
-   {
-       wxDC *dc=event.GetDC();
+    if (GetItemCount()>0)
+    {
+        wxDC *dc=event.GetDC();
 
-       long topitem,bottomitem;
-       wxRect toprect,bottomrect;
-       wxCoord x,y,w,h,width,height;
+        long topitem,bottomitem;
+        wxRect toprect,bottomrect;
+        wxCoord x,y,w,h,width,height;
 
-	   GetClientSize(&width,&height);
+        GetClientSize(&width,&height);
 
-       dc->SetClippingRegion(0,0,width,height);
-       dc->GetClippingBox(&x,&y,&w,&h); 
+        dc->SetClippingRegion(0,0,width,height);
+        dc->GetClippingBox(&x,&y,&w,&h);
 
-       topitem=GetTopItem();
-       bottomitem=topitem+GetCountPerPage();
+        topitem=GetTopItem();
+        bottomitem=topitem+GetCountPerPage();
 
-       if (bottomitem>=GetItemCount())
-           bottomitem=GetItemCount()-1;
+        if (bottomitem>=GetItemCount())
+            bottomitem=GetItemCount()-1;
 
-       GetItemRect(topitem,toprect,wxLIST_RECT_BOUNDS);
-       GetItemRect(bottomitem,bottomrect,wxLIST_RECT_BOUNDS);
+        GetItemRect(topitem,toprect,wxLIST_RECT_BOUNDS);
+        GetItemRect(bottomitem,bottomrect,wxLIST_RECT_BOUNDS);
 
-       //set the new clipping region and do erasing
-       wxRect itemsrect(toprect.GetLeftTop(),bottomrect.GetBottomRight());
-	   //somehow there is a border of 2 pixels which needs to be redrawn
-	   itemsrect.x+=2;
-	   itemsrect.width-=2;
-       wxRegion region(wxRegion(x,y,w,h)); 
-       region.Subtract(itemsrect);
-       dc->DestroyClippingRegion();
-       dc->SetClippingRegion(region);
+        //set the new clipping region and do erasing
+        wxRect itemsrect(toprect.GetLeftTop(),bottomrect.GetBottomRight());
+        //somehow there is a border of 2 pixels which needs to be redrawn
+        itemsrect.x+=2;
+        itemsrect.width-=2;
+        wxRegion region(wxRegion(x,y,w,h));
+        region.Subtract(itemsrect);
+        dc->DestroyClippingRegion();
+        dc->SetClippingRegion(region);
 
-       //do erasing
-       dc->SetBackground(wxBrush(GetBackgroundColour(),wxSOLID));
-       dc->Clear();
+        //do erasing
+        dc->SetBackground(wxBrush(GetBackgroundColour(),wxSOLID));
+        dc->Clear();
 
-       //restore old clipping region
-       dc->DestroyClippingRegion();
-       dc->SetClippingRegion(wxRegion(x,y,w,h));
-   }
-   else
-       event.Skip();
+        //restore old clipping region
+        dc->DestroyClippingRegion();
+        dc->SetClippingRegion(wxRegion(x,y,w,h));
+    }
+    else
+        event.Skip();
 }
 #endif
 
@@ -194,9 +194,9 @@ void CslListCtrlServer::OnItemActivated(wxListEvent& event)
 
     item.SetId(event.GetIndex());
     CslListServerData *server=(CslListServerData*)GetItemData(item);
-	CslConnectionState::CreateConnectState(server->Info);
+    CslConnectionState::CreateConnectState(server->Info);
 
-	event.Skip();
+    event.Skip();
 }
 
 void CslListCtrlServer::OnItemSelected(wxListEvent& event)
@@ -255,7 +255,7 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
         if (CSL_CAP_CONNECT_PASS(caps))
             CslMenu::AddItem(&menu,MENU_SERVER_CONNECT_PW,MENU_SERVER_CONN_PW_STR,wxART_CONNECT_PW);
 
-		ext=new wxMenu();
+        ext=new wxMenu();
         item=menu.AppendSubMenu(ext,_("Extended information"));
         item->SetBitmap(GET_ART_MENU(wxART_ABOUT));
         if (info->ExtInfoStatus!=CSL_EXT_STATUS_OK || !PingOk(info))
@@ -388,7 +388,7 @@ void CslListCtrlServer::ListDeleteServers()
     {
         msg.Empty();
         CslListServerData *ls=m_selected.Item(i);
-		info=ls->Info;
+        info=ls->Info;
 
         if (skipFav==wxCANCEL && info->IsFavourite())
         {
@@ -410,8 +410,8 @@ void CslListCtrlServer::ListDeleteServers()
             if (skipStats!=wxNO)
                 continue;
         }
-		if (CslConnectionState::IsWaiting() && CslConnectionState::GetInfo()==info)
-			CslConnectionState::Reset();
+        if (CslConnectionState::IsWaiting() && CslConnectionState::GetInfo()==info)
+            CslConnectionState::Reset();
     }
 
     for (i=m_selected.GetCount()-1;i>=0;i--)
@@ -464,8 +464,8 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
     switch (id)
     {
         case MENU_SERVER_CONNECT:
-			CslConnectionState::CreateConnectState(m_selected.Item(0)->Info);
-   		    event.Skip();
+            CslConnectionState::CreateConnectState(m_selected.Item(0)->Info);
+            event.Skip();
             break;
 
         case MENU_SERVER_CONNECT_PW:
@@ -479,9 +479,9 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
             {
                 info->Password=pi.Password;
                 info->PasswordAdmin=pi.AdminPassword;
-				i=pi.Admin ? CslGame::CSL_CONNECT_ADMIN_PASS:CslGame::CSL_CONNECT_PASS;
-				CslConnectionState::CreateConnectState(info,i);
-				event.Skip();
+                i=pi.Admin ? CslGame::CSL_CONNECT_ADMIN_PASS:CslGame::CSL_CONNECT_PASS;
+                CslConnectionState::CreateConnectState(info,i);
+                event.Skip();
             }
             break;
         }
@@ -493,7 +493,7 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
         {
             info=m_selected.Item(0)->Info;
             event.SetClientData((void*)info);
-			event.Skip();
+            event.Skip();
             break;
         }
 
@@ -637,7 +637,7 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
     {
         ListFilter();
         event.SetClientData((void*)m_id);
-		event.Skip();
+        event.Skip();
     }
 }
 
@@ -781,9 +781,9 @@ void CslListCtrlServer::Highlight(wxInt32 type,bool high,CslServerInfo *info,wxL
 {
     wxListItem item;
     wxUint32 i;
-	wxInt32 t;
+    wxInt32 t;
 
-	wxColour colour;
+    wxColour colour;
 
     if (info)
     {
@@ -798,12 +798,12 @@ void CslListCtrlServer::Highlight(wxInt32 type,bool high,CslServerInfo *info,wxL
         CslListServerData *server=(CslListServerData*)GetItemData(*listitem);
         t=server->SetHighlight(type,high);
 
-		if (t&CSL_HIGHLIGHT_SEARCH_SERVER || t&CSL_HIGHLIGHT_SEARCH_PLAYER)
-			colour=g_cslSettings->colServerHigh;
-		else if (t&CSL_HIGHLIGHT_LOCKED)
-			colour=g_cslSettings->colServerPlay;
-		else
-			colour=m_stdColourListItem;
+        if (t&CSL_HIGHLIGHT_SEARCH_SERVER || t&CSL_HIGHLIGHT_SEARCH_PLAYER)
+            colour=g_cslSettings->colServerHigh;
+        else if (t&CSL_HIGHLIGHT_LOCKED)
+            colour=g_cslSettings->colServerPlay;
+        else
+            colour=m_stdColourListItem;
 
         SetItemBackgroundColour(*listitem,colour);
         return;
@@ -818,12 +818,12 @@ void CslListCtrlServer::Highlight(wxInt32 type,bool high,CslServerInfo *info,wxL
 
         t=m_servers.Item(i)->SetHighlight(type,high);
 
-		if (t&CSL_HIGHLIGHT_SEARCH_SERVER || t&CSL_HIGHLIGHT_SEARCH_PLAYER)
-			colour=g_cslSettings->colServerHigh;
-		else if (t&CSL_HIGHLIGHT_LOCKED)
-			colour=g_cslSettings->colServerPlay;
-		else
-			colour=m_stdColourListItem;
+        if (t&CSL_HIGHLIGHT_SEARCH_SERVER || t&CSL_HIGHLIGHT_SEARCH_PLAYER)
+            colour=g_cslSettings->colServerHigh;
+        else if (t&CSL_HIGHLIGHT_LOCKED)
+            colour=g_cslSettings->colServerPlay;
+        else
+            colour=m_stdColourListItem;
 
         SetItemBackgroundColour(item,colour);
     }
@@ -1137,7 +1137,7 @@ void CslListCtrlServer::RemoveServer(CslListServerData *server,CslServerInfo *in
 
 wxUint32 CslListCtrlServer::ListUpdate(vector<CslServerInfo*>& servers)
 {
-	wxWindowUpdateLocker locker(this);
+    wxWindowUpdateLocker locker(this);
 
     bool sort=false;
     wxUint32 c=0;
@@ -1164,12 +1164,13 @@ wxUint32 CslListCtrlServer::ListUpdate(vector<CslServerInfo*>& servers)
         return c;
 
     ListSort(-1);
-    
-#ifdef __WXMAC__
-    //removes flicker on autosort
+
+#ifndef __WXMSW__
+    //removes flicker on autosort for wxGTK and wxMAC
     wxIdleEvent idle;
     wxTheApp->SendIdleEvents(this, idle);
 #endif
+
     return c;
 }
 
@@ -1185,12 +1186,12 @@ wxUint32 CslListCtrlServer::ListSearch(const wxString& search)
 {
     m_searchString=search.Lower();
 
-	if (m_searchString.IsEmpty())
-		return 0;
+    if (m_searchString.IsEmpty())
+        return 0;
 
     wxUint32 i,l,c=0;
 
-	wxWindowUpdateLocker lock(this);
+    wxWindowUpdateLocker lock(this);
 
     l=m_servers.GetCount();
     for (i=0;i<l;i++)

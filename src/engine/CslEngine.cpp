@@ -293,8 +293,8 @@ wxUint32 CslEngine::PingServers(CslGame *game,bool force)
                 c++;
         }
 
-  	    if (!force && c>10)
-		    ResetPingSends(game,NULL);
+        if (!force && c>10)
+            ResetPingSends(game,NULL);
     }
 
     vector<CslServerInfo*> servers;
@@ -710,7 +710,7 @@ void CslEngine::ParsePong(CslServerInfo *info,CslUDPPacket& packet,wxUint32 now)
                         return;
                     }
 
-					info->ExtInfoStatus=CSL_EXT_STATUS_OK;
+                    info->ExtInfoStatus=CSL_EXT_STATUS_OK;
 
                     stats.m_teamplay=!getint(p);  // error
                     if (exVersion>=103)

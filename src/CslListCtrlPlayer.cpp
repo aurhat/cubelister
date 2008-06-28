@@ -54,9 +54,9 @@ enum
 
 
 BEGIN_EVENT_TABLE(CslListCtrlPlayer,wxListCtrl)
-#ifdef __WXMSW__
-	EVT_ERASE_BACKGROUND(CslListCtrlPlayer::OnEraseBackground)
-#endif
+    #ifdef __WXMSW__
+    EVT_ERASE_BACKGROUND(CslListCtrlPlayer::OnEraseBackground)
+    #endif
     EVT_SIZE(CslListCtrlPlayer::OnSize)
     EVT_LIST_COL_CLICK(wxID_ANY,CslListCtrlPlayer::OnColumnLeftClick)
     EVT_LIST_ITEM_ACTIVATED(wxID_ANY,CslListCtrlPlayer::OnItemActivated)
@@ -74,56 +74,56 @@ CslListCtrlPlayer::CslListCtrlPlayer(wxWindow* parent,wxWindowID id,const wxPoin
                                      const wxValidator& validator, const wxString& name)
         : wxListCtrl(parent,id,pos,size,style,validator,name)
 {
-	freeze=0;
+    freeze=0;
 }
 
 #ifdef __WXMSW__
 void CslListCtrlPlayer::OnEraseBackground(wxEraseEvent& event)
 {
-   //to prevent flickering, erase only content *outside* of the actual items
+    //to prevent flickering, erase only content *outside* of the actual items
 
-   if (GetItemCount()>0)
-   {
-       wxDC *dc=event.GetDC();
+    if (GetItemCount()>0)
+    {
+        wxDC *dc=event.GetDC();
 
-       long topitem,bottomitem;
-       wxRect toprect,bottomrect;
-       wxCoord x,y,w,h,width,height;
+        long topitem,bottomitem;
+        wxRect toprect,bottomrect;
+        wxCoord x,y,w,h,width,height;
 
-	   GetClientSize(&width,&height);
+        GetClientSize(&width,&height);
 
-       dc->SetClippingRegion(0,0,width,height);
-       dc->GetClippingBox(&x,&y,&w,&h); 
+        dc->SetClippingRegion(0,0,width,height);
+        dc->GetClippingBox(&x,&y,&w,&h);
 
-       topitem=GetTopItem();
-       bottomitem=topitem+GetCountPerPage();
+        topitem=GetTopItem();
+        bottomitem=topitem+GetCountPerPage();
 
-       if (bottomitem>=GetItemCount())
-           bottomitem=GetItemCount()-1;
+        if (bottomitem>=GetItemCount())
+            bottomitem=GetItemCount()-1;
 
-       GetItemRect(topitem,toprect,wxLIST_RECT_BOUNDS);
-       GetItemRect(bottomitem,bottomrect,wxLIST_RECT_BOUNDS);
+        GetItemRect(topitem,toprect,wxLIST_RECT_BOUNDS);
+        GetItemRect(bottomitem,bottomrect,wxLIST_RECT_BOUNDS);
 
-       //set the new clipping region and do erasing
-       wxRect itemsrect(toprect.GetLeftTop(),bottomrect.GetBottomRight());
-	   //somehow there is a border of 2 pixels which needs to be redrawn
-	   itemsrect.x+=2;
-	   itemsrect.width-=2;
-       wxRegion region(wxRegion(x,y,w,h)); 
-       region.Subtract(itemsrect);
-       dc->DestroyClippingRegion();
-       dc->SetClippingRegion(region);
+        //set the new clipping region and do erasing
+        wxRect itemsrect(toprect.GetLeftTop(),bottomrect.GetBottomRight());
+        //somehow there is a border of 2 pixels which needs to be redrawn
+        itemsrect.x+=2;
+        itemsrect.width-=2;
+        wxRegion region(wxRegion(x,y,w,h));
+        region.Subtract(itemsrect);
+        dc->DestroyClippingRegion();
+        dc->SetClippingRegion(region);
 
-       //do erasing
-       dc->SetBackground(wxBrush(GetBackgroundColour(),wxSOLID));
-       dc->Clear();
+        //do erasing
+        dc->SetBackground(wxBrush(GetBackgroundColour(),wxSOLID));
+        dc->Clear();
 
-       //restore old clipping region
-       dc->DestroyClippingRegion();
-       dc->SetClippingRegion(wxRegion(x,y,w,h));
-   }
-   else
-       event.Skip();
+        //restore old clipping region
+        dc->DestroyClippingRegion();
+        dc->SetClippingRegion(wxRegion(x,y,w,h));
+    }
+    else
+        event.Skip();
 }
 #endif
 
@@ -140,9 +140,9 @@ void CslListCtrlPlayer::OnColumnLeftClick(wxListEvent& event)
 
 void CslListCtrlPlayer::OnItemActivated(wxListEvent& event)
 {
-	CslConnectionState::CreateConnectState(m_info);
+    CslConnectionState::CreateConnectState(m_info);
 
-	event.Skip();
+    event.Skip();
 }
 
 void CslListCtrlPlayer::OnContextMenu(wxContextMenuEvent& event)
@@ -168,8 +168,8 @@ void CslListCtrlPlayer::OnMenu(wxCommandEvent& event)
     {
 
         case MENU_SERVER_CONNECT:
-			CslConnectionState::CreateConnectState(m_info);
-   		    event.Skip();
+            CslConnectionState::CreateConnectState(m_info);
+            event.Skip();
             break;
 
         case MENU_SERVER_CONNECT_PW:
@@ -182,16 +182,16 @@ void CslListCtrlPlayer::OnMenu(wxCommandEvent& event)
             {
                 m_info->Password=pi.Password;
                 m_info->PasswordAdmin=pi.AdminPassword;
-				i=pi.Admin ? CslGame::CSL_CONNECT_ADMIN_PASS:CslGame::CSL_CONNECT_PASS;
-				CslConnectionState::CreateConnectState(m_info,i);
-				event.Skip();
+                i=pi.Admin ? CslGame::CSL_CONNECT_ADMIN_PASS:CslGame::CSL_CONNECT_PASS;
+                CslConnectionState::CreateConnectState(m_info,i);
+                event.Skip();
             }
             break;
         }
 
-		default:
-			break;
-	}
+        default:
+            break;
+    }
 }
 
 void CslListCtrlPlayer::ListUpdatePlayerData(CslGame& game,CslPlayerStats& stats)
@@ -201,7 +201,7 @@ void CslListCtrlPlayer::ListUpdatePlayerData(CslGame& game,CslPlayerStats& stats
     wxListItem item;
     CslPlayerStatsData *data=NULL;
 
-	//fixes flickering if scrollbar is shown
+    //fixes flickering if scrollbar is shown
     wxWindowUpdateLocker lock(this);
 
     DeleteAllItems();
@@ -298,9 +298,12 @@ void CslListCtrlPlayer::ListUpdatePlayerData(CslGame& game,CslPlayerStats& stats
 
     ListSort(-1);
 
-    //removes flicker on autosort
+#ifndef __WXMSW__
+    //removes flicker on autosort for wxGTK and wxMAC
     wxIdleEvent idle;
-    wxTheApp->SendIdleEvents(this, idle); 
+#endif
+
+    wxTheApp->SendIdleEvents(this, idle);
 }
 
 void CslListCtrlPlayer::ListAdjustSize()
@@ -449,7 +452,7 @@ void CslListCtrlPlayer::ListInit(const wxUint32 view)
     //assertion on __WXMAC__
     //ListAdjustSize();
 
-	wxInt32 img;
+    wxInt32 img;
 
     if (m_view==CSL_LISTPLAYER_MICRO_SIZE)
         m_sortHelper.Init(CSL_SORT_ASC,SORT_NAME);
@@ -578,7 +581,7 @@ int wxCALLBACK CslListCtrlPlayer::ListSortCompareFunc(long item1,long item2,long
 
 void CslListCtrlPlayer::CreateImageList()
 {
-	#ifdef __WXMSW__
+#ifdef __WXMSW__
     ListImageList.Create(20,14,true);
     ListImageList.Add(AdjustIconSize(sortasc_18_12_xpm,wxNullIcon,wxSize(20,14),wxPoint(0,0)));
     ListImageList.Add(AdjustIconSize(sortdsc_18_12_xpm,wxNullIcon,wxSize(20,14),wxPoint(0,0)));

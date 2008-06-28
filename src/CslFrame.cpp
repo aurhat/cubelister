@@ -294,7 +294,7 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
                    const wxPoint& pos,const wxSize& size,long style):
         wxFrame(parent, id, title, pos, size, wxDEFAULT_FRAME_STYLE)
 {
-	m_oldSelectedInfo=NULL;
+    m_oldSelectedInfo=NULL;
 
     m_engine=new CslEngine(this);
     if (m_engine->Init())
@@ -317,7 +317,7 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
     m_imgListButton.Add(wxBitmap(close_high_14_xpm));
     m_imgListButton.Add(wxBitmap(close_press_14_xpm));
 
-	CslListCtrlPlayer::CreateImageList();
+    CslListCtrlPlayer::CreateImageList();
 
     m_outputDlg=new CslDlgOutput(this);
     m_extendedDlg=new CslDlgExtended(this);
@@ -580,7 +580,7 @@ void CslFrame::DoLayout()
 #ifdef __WXMSW__
     i=2; //bitmap button offset
 #endif
-	sizer_search->AddSpacer(4);
+    sizer_search->AddSpacer(4);
     sizer_search->Add(button_search_clear,0,wxRIGHT|wxTOP|wxALIGN_CENTER_VERTICAL,i);
     sizer_search->Add(label_search_static,0,wxLEFT|wxTOP|wxBOTTOM|wxALIGN_CENTER_VERTICAL,8);
     sizer_search->Add(text_ctrl_search,0,wxLEFT|wxRIGHT|wxTOP|wxBOTTOM|wxEXPAND|wxALIGN_CENTER_VERTICAL,4);
@@ -1079,10 +1079,10 @@ void CslFrame::ConnectToServer()
         return;
     }
 
-	CslServerInfo *info=CslConnectionState::GetInfo();
-	wxInt32 mode=CslConnectionState::GetConnectMode();
+    CslServerInfo *info=CslConnectionState::GetInfo();
+    wxInt32 mode=CslConnectionState::GetConnectMode();
 
-	CslConnectionState::Reset();
+    CslConnectionState::Reset();
 
     if (info->Players>0 && info->Players==info->PlayersMax)
     {
@@ -1111,7 +1111,7 @@ void CslFrame::ConnectToServer()
 
     if (!::wxSetWorkingDirectory(info->GetGame().GetClientSettings().GamePath))
         return;
-    
+
     info->Lock();
 
     CslProcess *process=new CslProcess(this,info,cmd);
@@ -1129,8 +1129,8 @@ void CslFrame::ConnectToServer()
     info->PlayLast=wxDateTime::Now().GetTicks();
     list_ctrl_info->UpdateInfo(info);
 
-	list_ctrl_master->Highlight(CSL_HIGHLIGHT_LOCKED,true,info);
-	list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_LOCKED,true,info);
+    list_ctrl_master->Highlight(CSL_HIGHLIGHT_LOCKED,true,info);
+    list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_LOCKED,true,info);
 }
 
 void CslFrame::LoadSettings()
@@ -1648,8 +1648,8 @@ void CslFrame::OnPong(wxCommandEvent& event)
         }
 
         if (packet->Type==CSL_PONG_TYPE_PLAYERSTATS &&
-			m_searchedServers.length() &&
-			radio_search_player->GetValue())
+            m_searchedServers.length() &&
+            radio_search_player->GetValue())
         {
             wxInt32 progress;
             bool found;
@@ -1728,9 +1728,9 @@ void CslFrame::OnTimer(wxTimerEvent& event)
             m_timerCount++;
 
         bool green=game && m_engine->PingServers(game,m_timerInit);
-	    green|=m_engine->PingServersEx()!=0;
+        green|=m_engine->PingServersEx()!=0;
 
-		if (green && !CslConnectionState::IsWaiting())
+        if (green && !CslConnectionState::IsWaiting())
             CslStatusBar::Light(LIGHT_GREEN);
 
         if (m_timerInit)
@@ -1755,7 +1755,7 @@ void CslFrame::OnTimer(wxTimerEvent& event)
     }
     else if (CslConnectionState::IsWaiting())
     {
-		CslServerInfo *info=CslConnectionState::GetInfo();
+        CslServerInfo *info=CslConnectionState::GetInfo();
 
         if (info->Players!=info->PlayersMax)
             ConnectToServer();
@@ -1770,7 +1770,7 @@ void CslFrame::OnTimer(wxTimerEvent& event)
                 CslStatusBar::SetText(1,wxT(""));
         }
 
-		CslStatusBar::Light(LIGHT_RED);
+        CslStatusBar::Light(LIGHT_RED);
     }
 
     if (CslStatusBar::Light()!=LIGHT_GREY)
@@ -1814,7 +1814,7 @@ void CslFrame::OnListItemSelected(wxListEvent& event)
 
 void CslFrame::OnListItemActivated(wxListEvent& event)
 {
-	ConnectToServer();
+    ConnectToServer();
 }
 
 void CslFrame::OnTreeSelChanged(wxTreeEvent& event)
@@ -1998,9 +1998,9 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
                 wxInt32 type=-1;
                 list_ctrl_master->Highlight(type,false);
                 list_ctrl_favourites->Highlight(type,false);
-				list_ctrl_master->ListSearch(s);
-				list_ctrl_favourites->ListSearch(s);
-				text_search_result->SetLabel(wxString::Format(_("Search result: %d servers"),0));
+                list_ctrl_master->ListSearch(s);
+                list_ctrl_favourites->ListSearch(s);
+                text_search_result->SetLabel(wxString::Format(_("Search result: %d servers"),0));
             }
             else
             {
@@ -2093,8 +2093,8 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
         //events from the server lists
         case MENU_SERVER_CONNECT:
         case MENU_SERVER_CONNECT_PW:
-			ConnectToServer();
-			break;
+            ConnectToServer();
+            break;
 
         case MENU_SERVER_DEL:
         {
@@ -2102,8 +2102,8 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             if (!info)
                 break;
 
-			if (info==m_oldSelectedInfo)
-				m_oldSelectedInfo=NULL;
+            if (info==m_oldSelectedInfo)
+                m_oldSelectedInfo=NULL;
 
             if (m_extendedDlg->GetInfo()==info)
                 info->SetPingExt(false);
@@ -2342,8 +2342,8 @@ void CslFrame::OnEndProcess(wxCommandEvent& event)
     info->GetGame().GameEnd();
     CslConnectionState::Reset();
 
-	list_ctrl_master->Highlight(CSL_HIGHLIGHT_LOCKED,false,info);
-	list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_LOCKED,false,info);
+    list_ctrl_master->Highlight(CSL_HIGHLIGHT_LOCKED,false,info);
+    list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_LOCKED,false,info);
     list_ctrl_info->UpdateInfo(info);
 }
 

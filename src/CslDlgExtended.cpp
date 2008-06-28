@@ -257,8 +257,8 @@ void CslDlgExtended::OnCommandEvent(wxCommandEvent& event)
             if (panel_map->IsOk())
                 ShowPanelMap(event.IsChecked());
             break;
-		default:
-			break;
+        default:
+            break;
     }
 
     event.Skip();
@@ -267,13 +267,13 @@ void CslDlgExtended::OnCommandEvent(wxCommandEvent& event)
 void CslDlgExtended::OnMenu(wxCommandEvent& event)
 {
     switch (event.GetId())
-	{
-	    case MENU_SERVER_CONNECT:
+    {
+        case MENU_SERVER_CONNECT:
         case MENU_SERVER_CONNECT_PW:
-			wxPostEvent(m_parent,event);
-		default:
-			return;
-	}
+            wxPostEvent(m_parent,event);
+        default:
+            return;
+    }
 }
 
 void CslDlgExtended::OnItemActivated(wxListEvent& event)
@@ -361,8 +361,8 @@ void CslDlgExtended::UpdateTeamData()
     CslTeamStats& stats=m_info->TeamStats;
 
 #ifdef __WXMSW__
-	//fixes flicker of teamscore labels
-	wxWindowUpdateLocker lock(this);
+    //fixes flicker of teamscore labels
+    wxWindowUpdateLocker lock(this);
 #endif
 
     UpdateMap();
@@ -582,7 +582,7 @@ void CslDlgExtended::DoShow(CslServerInfo *info)
     }
 
     m_info=info;
-	list_ctrl_players->SetInfo(info);
+    list_ctrl_players->SetInfo(info);
 
     UpdatePlayerData();
     UpdateTeamData();

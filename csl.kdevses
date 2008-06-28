@@ -1,34 +1,10 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <!DOCTYPE KDevPrjSession>
 <KDevPrjSession>
- <DocsAndViews NumberOfDocuments="9" >
-  <Doc0 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/engine/CslGame.cpp" >
-   <View0 Encoding="" line="273" Type="Source" />
+ <DocsAndViews NumberOfDocuments="1" >
+  <Doc0 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/wxWidgets/wxWidgets-2.8.5-HTML/docs/mshtml/wx/wx_versionfunctions.html" >
+   <View0 Type="Documentation" />
   </Doc0>
-  <Doc1 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/engine/CslGame.h" >
-   <View0 Encoding="" line="158" Type="Source" />
-  </Doc1>
-  <Doc2 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslDlgSettings.cpp" >
-   <View0 Encoding="" Type="Source" />
-  </Doc2>
-  <Doc3 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslDlgSettings.h" >
-   <View0 Encoding="" Type="Source" />
-  </Doc3>
-  <Doc4 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/engine/CslGameSauerbraten.cpp" >
-   <View0 Encoding="" line="159" Type="Source" />
-  </Doc4>
-  <Doc5 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/engine/CslGameSauerbraten.h" >
-   <View0 Encoding="" line="0" Type="Source" />
-  </Doc5>
-  <Doc6 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/engine/CslEngine.cpp" >
-   <View0 Encoding="" line="455" Type="Source" />
-  </Doc6>
-  <Doc7 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/CslFrame.cpp" >
-   <View0 Encoding="" line="1526" Type="Source" />
-  </Doc7>
-  <Doc8 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/csl/csl/src/engine/CslEngine.h" >
-   <View0 Encoding="" line="0" Type="Source" />
-  </Doc8>
  </DocsAndViews>
  <pluginList>
   <kdevdebugger>

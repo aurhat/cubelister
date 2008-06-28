@@ -111,7 +111,7 @@ class CslFrame: public wxFrame
 
         vector<CslListCtrlPlayer*> m_playerLists;
 
-		CslServerInfo *m_oldSelectedInfo;
+        CslServerInfo *m_oldSelectedInfo;
 
         vector<CslServerInfo*> m_searchedServers;
         wxString m_searchString;
@@ -150,7 +150,7 @@ class CslFrame: public wxFrame
         void OnPong(wxCommandEvent& event);
         void OnTimer(wxTimerEvent& event);
         void OnListItemSelected(wxListEvent& event);
-		void OnListItemActivated(wxListEvent& event);
+        void OnListItemActivated(wxListEvent& event);
         void OnTreeSelChanged(wxTreeEvent& event);
         void OnTreeRightClick(wxTreeEvent& event);
         void OnCommandEvent(wxCommandEvent& event);

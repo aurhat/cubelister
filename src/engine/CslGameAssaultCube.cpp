@@ -144,7 +144,7 @@ void CslGameAssaultCube::SetClientSettings(const CslGameClientSettings& settings
 {
     CslGameClientSettings set=settings;
 
-   if (set.GamePath.IsEmpty() || !::wxDirExists(set.GamePath))
+    if (set.GamePath.IsEmpty() || !::wxDirExists(set.GamePath))
         return;
     if (set.ConfigPath.IsEmpty())
         set.ConfigPath=set.GamePath;
@@ -187,7 +187,7 @@ wxString CslGameAssaultCube::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
     }
 
     // use Prepend() and do not use opts+= here, since -q<path> must be before -r
-	path=configpath;
+    path=configpath;
 #ifdef __WXMSW__
     opts.Prepend(wxString(wxT("--home=\""))+path.RemoveLast()+wxString(wxT("\" ")));
 #else

@@ -107,7 +107,7 @@ void CslDlgConnectPass::OnCommandEvent(wxCommandEvent& event)
 
         case CHECK_ADMIN:
             text_ctrl_password->SetValue(event.IsChecked() ? m_info->AdminPassword:m_info->Password);
-			text_ctrl_password->SetFocus();
+            text_ctrl_password->SetFocus();
             break;
 
         case wxID_OK:
@@ -117,7 +117,7 @@ void CslDlgConnectPass::OnCommandEvent(wxCommandEvent& event)
             else
                 m_info->Password=text_ctrl_password->GetValue();
             EndModal(wxID_OK);
-			break;
+            break;
 
         default:
             break;

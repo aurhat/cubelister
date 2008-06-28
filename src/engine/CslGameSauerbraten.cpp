@@ -207,7 +207,7 @@ wxString CslGameSauerbraten::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
     }
 
     // use Prepend() and do not use opts+= here, since -q<path> must be before -r
-	path=m_clientSettings.ConfigPath;
+    path=m_clientSettings.ConfigPath;
 #ifdef __WXMSW__
     opts.Prepend(wxString(wxT("-q\""))+path.RemoveLast()+wxString(wxT("\" ")));
 #else
