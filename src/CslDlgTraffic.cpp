@@ -104,6 +104,8 @@ void CslDlgTraffic::do_layout()
     Layout();
     // end wxGlade
     grid_sizer_main->SetSizeHints(this);
+    
+    CentreOnParent();
 }
 
 void CslDlgTraffic::OnTimer(wxTimerEvent& event)

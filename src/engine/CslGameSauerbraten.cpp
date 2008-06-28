@@ -175,9 +175,9 @@ void CslGameSauerbraten::SetClientSettings(const CslGameClientSettings& settings
         set.ConfigPath=set.GamePath;
 #ifdef __WXMAC__
     if (set.Binary.IsEmpty())
-        set.Binary=set.GamePath+wxT("/sauerbraten/sauerbraten.app/Contents/MacOS/sauerbraten");
+        set.Binary=set.GamePath+wxT("sauerbraten.app/Contents/MacOS/sauerbraten");
 #endif
-    if (set.Binary.IsEmpty() || !::wxFileExists(settings.Binary))
+    if (set.Binary.IsEmpty() || !::wxFileExists(set.Binary))
         return;
 
     m_clientSettings=set;
@@ -185,7 +185,7 @@ void CslGameSauerbraten::SetClientSettings(const CslGameClientSettings& settings
 
 wxString CslGameSauerbraten::GameStart(CslServerInfo *info,wxUint32 mode,wxString *error)
 {
-    wxString address;
+    wxString address,path;
     wxString bin=m_clientSettings.Binary;
     wxString opts=m_clientSettings.Options;
     bool param=false;
@@ -207,11 +207,12 @@ wxString CslGameSauerbraten::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
     }
 
     // use Prepend() and do not use opts+= here, since -q<path> must be before -r
+	path=m_clientSettings.ConfigPath;
 #ifdef __WXMSW__
-	wxString s=m_clientSettings.ConfigPath;	
-    opts.Prepend(wxString(wxT("-q\""))+s.RemoveLast()+wxString(wxT("\" ")));
+    opts.Prepend(wxString(wxT("-q\""))+path.RemoveLast()+wxString(wxT("\" ")));
 #else
-    opts.Prepend(wxString(wxT("-q"))+m_clientSettings.ConfigPath+wxString(wxT(" ")));
+    path.Replace(wxT(" "),wxT("\\ "));
+    opts.Prepend(wxString(wxT("-q"))+path+wxString(wxT(" ")));
 #endif //__WXMSW__
 
     if (info->MM==MM_PRIVATE)

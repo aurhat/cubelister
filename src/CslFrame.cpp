@@ -440,6 +440,7 @@ void CslFrame::CreateMainMenu()
 #ifdef __WXMAC__
     CslMenu::AddItem(menuMaster,wxID_PREFERENCES,_("&Settings"),wxART_SETTINGS);
     CslMenu::AddItem(menuMaster,wxID_EXIT,_("&Exit"),wxART_QUIT);
+    CslMenu::AddItem(menuMaster,wxID_ABOUT,_("A&bout"),wxART_ABOUT);
 #endif
 
     menu=new wxMenu();
@@ -461,15 +462,16 @@ void CslFrame::CreateMainMenu()
                      wxART_NONE,wxITEM_CHECK);
     CslMenu::AddItem(menu,MENU_VIEW_AUTO_FIT,_("Fit columns on window resize"),
                      wxART_NONE,wxITEM_CHECK);
+    menu->AppendSeparator();
+    CslMenu::AddItem(menu,MENU_VIEW_TRAFFIC,_("&Traffic statistics"),wxART_NONE);
     menubar->Append(menu,_("&View"));
 
-    menu=new wxMenu();
-    CslMenu::AddItem(menu,MENU_INFO_TRAFFIC,_("&Traffic statistics"),wxART_NONE);
 #ifndef __WXMAC__
+    menu=new wxMenu();
     menu->AppendSeparator();
     CslMenu::AddItem(menu,wxID_ABOUT,_("A&bout"),wxART_ABOUT);
-#endif
     menubar->Append(menu,_("&Help"));
+#endif
 
     SetMenuBar(menubar);
     m_menu=new CslMenu(menubar);
@@ -518,6 +520,8 @@ void CslFrame::CreateControls()
 
 void CslFrame::SetProperties()
 {
+    m_AuiMgr.SetFlags(wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_HINT_FADE |
+                      wxAUI_MGR_VENETIAN_BLINDS_HINT | wxAUI_MGR_NO_VENETIAN_BLINDS_FADE);
     m_AuiMgr.SetManagedWindow(pane_main);
 
     SetTitle(_("Cube Server Lister"));
@@ -1105,8 +1109,10 @@ void CslFrame::ConnectToServer()
 
     CslDlgOutput::Reset(info->GetBestDescription());
 
+    if (!::wxSetWorkingDirectory(info->GetGame().GetClientSettings().GamePath))
+        return;
+    
     info->Lock();
-    ::wxSetWorkingDirectory(info->GetGame().GetClientSettings().GamePath);
 
     CslProcess *process=new CslProcess(this,info,cmd);
     if (!(::wxExecute(cmd,wxEXEC_ASYNC,process)>0))
@@ -1956,16 +1962,19 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             g_cslSettings->autoFitColumns=event.IsChecked();
             break;
 
-        case MENU_INFO_TRAFFIC:
+        case MENU_VIEW_TRAFFIC:
         {
             m_trafficDlg=new CslDlgTraffic(this);
-            m_trafficDlg->Show();
+            m_trafficDlg->ShowModal();
             break;
         }
 
         case wxID_ABOUT:
-            CslDlgAbout(this).ShowModal();
+        {
+            CslDlgAbout *dlg=new CslDlgAbout(this);
+            dlg->ShowModal();
             break;
+        }
 
         case CSL_BUTTON_SEARCH_CLOSE:
             g_cslSettings->showSearch=false;
@@ -1986,7 +1995,7 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
                 gauge_search->Enable(false);
                 gauge_search->SetValue(0);
                 SetSearchbarColour(false);
-                wxInt32 type=0xffffffff;
+                wxInt32 type=-1;
                 list_ctrl_master->Highlight(type,false);
                 list_ctrl_favourites->Highlight(type,false);
 				list_ctrl_master->ListSearch(s);
@@ -2060,6 +2069,10 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             sizer_search->Layout();
             text_ctrl_search->SetFocus();
             text_ctrl_search->Clear();
+#ifdef __WXMAC__
+            wxCommandEvent evt(wxEVT_COMMAND_TEXT_UPDATED,CSL_TEXT_SEARCH);
+            wxPostEvent(this,evt);
+#endif
             break;
         }
 
@@ -2070,6 +2083,10 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             sizer_search->Layout();
             text_ctrl_search->SetFocus();
             text_ctrl_search->Clear();
+#ifdef __WXMAC__
+            wxCommandEvent evt(wxEVT_COMMAND_TEXT_UPDATED,CSL_TEXT_SEARCH);
+            wxPostEvent(this,evt);
+#endif
             break;
         }
 
@@ -2347,6 +2364,9 @@ bool CslApp::OnInit()
 
 #ifdef __WXMAC__
     wxSystemOptions::SetOption(wxT("mac.listctrl.always_use_generic"),1);
+    //enables Command-H, Command-M and Command-Q at least when not in fullscreen
+    wxSetEnv(wxT("SDL_SINGLEDISPLAY"),wxT("1"));
+    wxSetEnv(wxT("SDL_ENABLEAPPEVENTS"),wxT("1"));
     //TODO wxApp::SetExitOnFrameDelete(false);
 #endif
 

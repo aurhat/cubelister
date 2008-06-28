@@ -55,8 +55,10 @@ enum
 
 
 BEGIN_EVENT_TABLE(CslListCtrlServer, wxListCtrl)
-    EVT_SIZE(CslListCtrlServer::OnSize)
+#ifdef __WXMSW__
     EVT_ERASE_BACKGROUND(CslListCtrlServer::OnEraseBackground)
+#endif
+    EVT_SIZE(CslListCtrlServer::OnSize)
     EVT_MENU(wxID_ANY,CslListCtrlServer::OnMenu)
     EVT_LIST_COL_CLICK(wxID_ANY,CslListCtrlServer::OnColumnLeftClick)
     EVT_LIST_ITEM_ACTIVATED(wxID_ANY,CslListCtrlServer::OnItemActivated)
@@ -83,7 +85,6 @@ enum
     CSL_LIST_IMG_GAMES_START,
 };
 
-
 CslListCtrlServer::CslListCtrlServer(wxWindow* parent,wxWindowID id,const wxPoint& pos,
                                      const wxSize& size,long style,
                                      const wxValidator& validator, const wxString& name) :
@@ -102,6 +103,7 @@ CslListCtrlServer::~CslListCtrlServer()
 #endif
 }
 
+#ifdef __WXMSW__
 void CslListCtrlServer::OnEraseBackground(wxEraseEvent& event)
 {
    //to prevent flickering, erase only content *outside* of the actual items
@@ -149,6 +151,7 @@ void CslListCtrlServer::OnEraseBackground(wxEraseEvent& event)
    else
        event.Skip();
 }
+#endif
 
 void CslListCtrlServer::OnSize(wxSizeEvent& event)
 {
@@ -1161,7 +1164,12 @@ wxUint32 CslListCtrlServer::ListUpdate(vector<CslServerInfo*>& servers)
         return c;
 
     ListSort(-1);
-
+    
+#ifdef __WXMAC__
+    //removes flicker on autosort
+    wxIdleEvent idle;
+    wxTheApp->SendIdleEvents(this, idle);
+#endif
     return c;
 }
 

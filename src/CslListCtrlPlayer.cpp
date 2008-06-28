@@ -54,8 +54,10 @@ enum
 
 
 BEGIN_EVENT_TABLE(CslListCtrlPlayer,wxListCtrl)
-    EVT_SIZE(CslListCtrlPlayer::OnSize)
+#ifdef __WXMSW__
 	EVT_ERASE_BACKGROUND(CslListCtrlPlayer::OnEraseBackground)
+#endif
+    EVT_SIZE(CslListCtrlPlayer::OnSize)
     EVT_LIST_COL_CLICK(wxID_ANY,CslListCtrlPlayer::OnColumnLeftClick)
     EVT_LIST_ITEM_ACTIVATED(wxID_ANY,CslListCtrlPlayer::OnItemActivated)
     EVT_CONTEXT_MENU(CslListCtrlPlayer::OnContextMenu)
@@ -75,12 +77,7 @@ CslListCtrlPlayer::CslListCtrlPlayer(wxWindow* parent,wxWindowID id,const wxPoin
 	freeze=0;
 }
 
-void CslListCtrlPlayer::OnSize(wxSizeEvent& event)
-{
-    ListAdjustSize();
-    event.Skip();
-}
-
+#ifdef __WXMSW__
 void CslListCtrlPlayer::OnEraseBackground(wxEraseEvent& event)
 {
    //to prevent flickering, erase only content *outside* of the actual items
@@ -128,7 +125,13 @@ void CslListCtrlPlayer::OnEraseBackground(wxEraseEvent& event)
    else
        event.Skip();
 }
+#endif
 
+void CslListCtrlPlayer::OnSize(wxSizeEvent& event)
+{
+    ListAdjustSize();
+    event.Skip();
+}
 
 void CslListCtrlPlayer::OnColumnLeftClick(wxListEvent& event)
 {
@@ -294,8 +297,10 @@ void CslListCtrlPlayer::ListUpdatePlayerData(CslGame& game,CslPlayerStats& stats
     }
 
     ListSort(-1);
-	//wxIdleEvent idle;
-    //wxTheApp->SendIdleEvents(this, idle); 
+
+    //removes flicker on autosort
+    wxIdleEvent idle;
+    wxTheApp->SendIdleEvents(this, idle); 
 }
 
 void CslListCtrlPlayer::ListAdjustSize()

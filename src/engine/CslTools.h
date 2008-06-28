@@ -32,9 +32,9 @@
 
 // since WX > 2.8.4 the listctrl items
 // get deselected when sorting (only wxGTK ?)
-#ifdef __WXGTK__
+#if defined(__WXGTK__) || defined(__WXMAC__)
 #ifndef CSL_USE_WX_LIST_DESELECT_WORKAROUND
-#if wxVERSION_NUMBER > 2804
+#if wxVERSION_NUMBER > 2804 || defined(__WXMAC__)
 #define CSL_USE_WX_LIST_DESELECT_WORKAROUND
 #endif
 #endif

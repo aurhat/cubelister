@@ -199,13 +199,13 @@ void CslGamePage::OnPicker(wxFileDirPickerEvent& event)
             break;
         case DIR_PICKER_GAME:
             if (dirpickergame->GetPath().IsEmpty())
-                dirpickergame->SetPath(event.GetPath().BeforeLast(PATHDIVA));
+                dirpickergame->SetPath(event.GetPath());
             if (dirpickercfg->GetPath().IsEmpty())
-                dirpickercfg->SetPath(event.GetPath().BeforeLast(PATHDIVA));
+                dirpickercfg->SetPath(event.GetPath());
             break;
         case DIR_PICKER_CFG:
             if (dirpickercfg->GetPath().IsEmpty())
-                dirpickercfg->SetPath(event.GetPath().BeforeLast(PATHDIVA));
+                dirpickercfg->SetPath(event.GetPath());
             break;
     }
 }

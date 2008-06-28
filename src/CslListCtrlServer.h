@@ -158,8 +158,10 @@ class CslListCtrlServer : public wxListCtrl
 
         CslListSortHelper m_sortHelper;
 
-        void OnSize(wxSizeEvent& event);
+#ifdef __WXMSW__
 		void OnEraseBackground(wxEraseEvent& event);
+#endif
+        void OnSize(wxSizeEvent& event);
         void OnKeyDown(wxKeyEvent &event);
         void OnColumnLeftClick(wxListEvent& event);
         void OnItemActivated(wxListEvent& event);

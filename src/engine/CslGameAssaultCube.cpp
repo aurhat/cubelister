@@ -144,7 +144,7 @@ void CslGameAssaultCube::SetClientSettings(const CslGameClientSettings& settings
 {
     CslGameClientSettings set=settings;
 
-    if (set.GamePath.IsEmpty() || !::wxDirExists(set.GamePath))
+   if (set.GamePath.IsEmpty() || !::wxDirExists(set.GamePath))
         return;
     if (set.ConfigPath.IsEmpty())
         set.ConfigPath=set.GamePath;
@@ -155,9 +155,9 @@ void CslGameAssaultCube::SetClientSettings(const CslGameClientSettings& settings
 
 #ifdef __WXMAC__
     if (set.Binary.IsEmpty())
-        set.Binary=settings.GamePath+wxT("/assaultcube/actioncube.app/Contents/MacOS/actioncube");
+        set.Binary=settings.GamePath+wxT("actioncube.app/Contents/MacOS/actioncube");
 #endif
-    if (set.Binary.IsEmpty() || !::wxFileExists(settings.Binary))
+    if (set.Binary.IsEmpty() || !::wxFileExists(set.Binary))
         return;
 
     m_clientSettings=set;
@@ -165,7 +165,7 @@ void CslGameAssaultCube::SetClientSettings(const CslGameClientSettings& settings
 
 wxString CslGameAssaultCube::GameStart(CslServerInfo *info,wxUint32 mode,wxString *error)
 {
-    wxString address,password;
+    wxString address,password,path;
     wxString bin=m_clientSettings.Binary;
     wxString configpath=m_clientSettings.ConfigPath;
     wxString opts=m_clientSettings.Options;
@@ -187,10 +187,11 @@ wxString CslGameAssaultCube::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
     }
 
     // use Prepend() and do not use opts+= here, since -q<path> must be before -r
+	path=configpath;
 #ifdef __WXMSW__
-	wxString s=configpath;
-    opts.Prepend(wxString(wxT("--home=\""))+s.RemoveLast()+wxString(wxT("\" ")));
+    opts.Prepend(wxString(wxT("--home=\""))+path.RemoveLast()+wxString(wxT("\" ")));
 #else
+    path.Replace(wxT(" "),wxT("\\ "));
     opts.Prepend(wxString(wxT("--home="))+configpath+wxString(wxT(" ")));
 #endif //__WXMSW__
 

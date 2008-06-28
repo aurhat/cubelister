@@ -86,6 +86,22 @@ bool CslGameCube::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
     return true;
 }
 
+void CslGameCube::SetClientSettings(const CslGameClientSettings& settings)
+{
+    CslGameClientSettings set=settings;
+
+    if (set.GamePath.IsEmpty() || !::wxDirExists(set.GamePath))
+        return;
+#ifdef __WXMAC__
+    if (set.Binary.IsEmpty())
+        set.Binary=set.GamePath+wxT("Cube.app/Contents/MacOS/Cube");
+#endif
+    if (set.Binary.IsEmpty() || !::wxFileExists(set.Binary))
+        return;
+
+    m_clientSettings=set;
+}
+
 wxString CslGameCube::GameStart(CslServerInfo *info,wxUint32 mode,wxString *error)
 {
     wxString address,password;
