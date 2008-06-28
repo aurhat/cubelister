@@ -20,8 +20,8 @@ cslmapcfgtool_LDADD = $(top_builddir)/src/libcslpanelmap.a \
 	$(top_builddir)/src/engine/libcsltools.a ${WX_LIBS}
 lib_LIBRARIES = libcslpanelmap.a
 libcslpanelmap_a_SOURCES = CslPanelMap.cpp
-csl_SOURCES = CslArt.cpp CslDlgAbout.cpp CslDlgAddMaster.cpp \
-	CslDlgAddServer.cpp CslDlgConnectPass.cpp CslDlgConnectWait.cpp CslDlgExtended.cpp \
-	CslDlgOutput.cpp CslDlgSettings.cpp CslDlgTraffic.cpp CslFrame.cpp CslGeoIP.cpp \
-	CslListCtrlInfo.cpp CslListCtrlPlayer.cpp CslListCtrlServer.cpp CslMenu.cpp \
-	CslStatusBar.cpp
+csl_SOURCES = CslArt.cpp CslConnectionState.cpp CslDlgAbout.cpp \
+	CslDlgAddMaster.cpp CslDlgAddServer.cpp CslDlgConnectPass.cpp CslDlgConnectWait.cpp \
+	CslDlgExtended.cpp CslDlgOutput.cpp CslDlgSettings.cpp CslDlgTraffic.cpp CslFrame.cpp \
+	CslGeoIP.cpp CslListCtrlInfo.cpp CslListCtrlPlayer.cpp CslListCtrlServer.cpp \
+	CslMenu.cpp CslStatusBar.cpp
