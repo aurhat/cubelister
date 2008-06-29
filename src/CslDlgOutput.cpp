@@ -81,6 +81,7 @@ void CslDlgOutput::set_properties()
 {
     // begin wxGlade: CslDlgOutput::set_properties
     SetTitle(_("CSL - Game output"));
+    text_ctrl_output->SetMinSize(wxSize(-1,300));
     text_ctrl_search->SetMinSize(wxSize(120,-1));
     button_search_prev->Enable(false);
     button_search_next->Enable(false);
@@ -92,8 +93,6 @@ void CslDlgOutput::set_properties()
     choice_conv_filter->SetSelection(1);
     choice_conv_filter->Enable(false);
     m_filterLevel=1;
-
-    SetMinSize(wxSize(600,400));
 }
 
 void CslDlgOutput::do_layout()

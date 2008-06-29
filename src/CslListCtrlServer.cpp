@@ -257,7 +257,7 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
         ext=new wxMenu();
         item=menu.AppendSubMenu(ext,_("Extended information"));
         item->SetBitmap(GET_ART_MENU(wxART_ABOUT));
-		if (info->ExtInfoStatus!=CSL_EXT_STATUS_OK || !CslEngine::PingOk(*info,g_cslSettings->updateInterval))
+        if (info->ExtInfoStatus!=CSL_EXT_STATUS_OK || !CslEngine::PingOk(*info,g_cslSettings->updateInterval))
             item->Enable(false);
         else
         {
@@ -882,7 +882,7 @@ bool CslListCtrlServer::ListFilterItemMatches(CslServerInfo *info)
 {
     if (m_filterVersion>-1 && info->Protocol!=m_filterVersion)
         return true;
-	else if (*m_filterFlags&CSL_FILTER_OFFLINE && !CslEngine::PingOk(*info,g_cslSettings->updateInterval))
+    else if (*m_filterFlags&CSL_FILTER_OFFLINE && !CslEngine::PingOk(*info,g_cslSettings->updateInterval))
         return true;
     else if (*m_filterFlags&CSL_FILTER_FULL && info->PlayersMax>0 &&
              info->Players==info->PlayersMax)
