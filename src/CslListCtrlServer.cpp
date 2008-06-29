@@ -104,40 +104,60 @@ CslListCtrlServer::~CslListCtrlServer()
 }
 
 #ifdef __WXMSW__
+wxColour alpha;
 void CslListCtrlServer::OnEraseBackground(wxEraseEvent& event)
 {
     //to prevent flickering, erase only content *outside* of the actual items
+			//stopwatch watch;
 
     if (GetItemCount()>0)
     {
         wxDC *dc=event.GetDC();
 
-        long topitem,bottomitem;
-        wxRect toprect,bottomrect;
+        long i,imgId,topItem,bottomItem;
+        wxRect rect1,rect2;
         wxCoord x,y,w,h,width,height;
+		wxListItem item;
 
         GetClientSize(&width,&height);
 
         dc->SetClippingRegion(0,0,width,height);
         dc->GetClippingBox(&x,&y,&w,&h);
 
-        topitem=GetTopItem();
-        bottomitem=topitem+GetCountPerPage();
+        topItem=GetTopItem();
+        bottomItem=topItem+GetCountPerPage();
 
-        if (bottomitem>=GetItemCount())
-            bottomitem=GetItemCount()-1;
+        if (bottomItem>=GetItemCount())
+            bottomItem=GetItemCount()-1;
 
-        GetItemRect(topitem,toprect,wxLIST_RECT_BOUNDS);
-        GetItemRect(bottomitem,bottomrect,wxLIST_RECT_BOUNDS);
+        GetItemRect(topItem,rect1,wxLIST_RECT_LABEL);
+        GetItemRect(bottomItem,rect2,wxLIST_RECT_BOUNDS);
 
         //set the new clipping region and do erasing
-        wxRect itemsrect(toprect.GetLeftTop(),bottomrect.GetBottomRight());
-        //somehow there is a border of 2 pixels which needs to be redrawn
-        itemsrect.x+=2;
-        itemsrect.width-=2;
-        wxRegion region(wxRegion(x,y,w,h));
-        region.Subtract(itemsrect);
-        dc->DestroyClippingRegion();
+		wxRegion region(x,y,w,h);
+        region.Subtract(wxRect(rect1.GetLeftTop(),rect2.GetBottomRight()));
+
+        item.SetMask(wxLIST_MASK_IMAGE);
+
+		for (i=0;i<GetItemCount() && i<=bottomItem;i++)
+		{
+			item.SetId(i);
+            GetItem(item);
+			
+			if ((imgId=item.GetImage())<0)
+				continue;
+
+  		    if (!GetItemRect(i,rect1,wxLIST_RECT_ICON))
+				continue;
+
+			const wxBitmap& bitmap=m_imageList.GetBitmap(imgId);
+
+			wxRegion imgRegion(bitmap);
+			imgRegion.Offset(rect1.x,rect1.y+1);
+		    region.Xor(imgRegion);
+		}
+
+		dc->DestroyClippingRegion();
         dc->SetClippingRegion(region);
 
         //do erasing
@@ -723,6 +743,26 @@ void CslListCtrlServer::ListAdjustSize(const wxSize& size,bool init)
 
 void CslListCtrlServer::ListCreateGameBitmaps()
 {
+	wxInt32 width;
+
+#ifdef __WXMSW__
+	width=18;
+    m_imageList.Create(18,16,true);
+
+	wxIcon icon;
+    m_imageList.Add(AdjustIconSize(green_list_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
+    m_imageList.Add(AdjustIconSize(yellow_list_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
+    m_imageList.Add(AdjustIconSize(red_list_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
+    m_imageList.Add(AdjustIconSize(grey_list_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
+    m_imageList.Add(AdjustIconSize(green_ext_list_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
+    m_imageList.Add(AdjustIconSize(yellow_ext_list_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
+    m_imageList.Add(AdjustIconSize(red_ext_list_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
+    m_imageList.Add(AdjustIconSize(sortasc_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
+    m_imageList.Add(AdjustIconSize(sortdsc_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
+    m_imageList.Add(AdjustIconSize(sortasclight_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
+    m_imageList.Add(AdjustIconSize(sortdsclight_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
+#else
+	width=16;
     m_imageList.Create(16,16,true);
 
     m_imageList.Add(wxBitmap(green_list_16_xpm));
@@ -736,6 +776,7 @@ void CslListCtrlServer::ListCreateGameBitmaps()
     m_imageList.Add(wxBitmap(sortdsc_16_xpm));
     m_imageList.Add(wxBitmap(sortasclight_16_xpm));
     m_imageList.Add(wxBitmap(sortdsclight_16_xpm));
+#endif
 
     //now create the icons for favourites list
     if (m_id==CSL_LIST_FAVOURITE)
@@ -752,16 +793,19 @@ void CslListCtrlServer::ListCreateGameBitmaps()
         loopv(games)
         {
             const char **icon=games[i]->GetIcon(16);
-
-            wxBitmap bmpGame=icon ? wxBitmap(icon):wxBitmap(16,16);
+#ifdef __WXMSW__
+            wxBitmap bmpGame=icon ? (AdjustIconSize(icon,wxNullIcon,wxSize(18,16),wxPoint(0,0))):wxBitmap(width,16);
+#else
+            wxBitmap bmpGame=icon ? wxBitmap(icon):wxBitmap(16,width);
+#endif
             m_imageList.Add(bmpGame);
 
-            wxBitmap bmp(16,16);
+            wxBitmap bmp(width,16);
             dc.SelectObject(bmp);
             //draw transparent background
             dc.SetBrush(magicBrush);
             dc.SetPen(*wxTRANSPARENT_PEN);
-            dc.DrawRectangle(0,0,16,16);
+            dc.DrawRectangle(0,0,width,16);
             //draw the bitmaps
             dc.DrawBitmap(bmpGame,0,0,true);
             dc.DrawBitmap(bmpExt,8,8,true);

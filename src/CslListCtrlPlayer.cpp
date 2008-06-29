@@ -81,37 +81,56 @@ CslListCtrlPlayer::CslListCtrlPlayer(wxWindow* parent,wxWindowID id,const wxPoin
 void CslListCtrlPlayer::OnEraseBackground(wxEraseEvent& event)
 {
     //to prevent flickering, erase only content *outside* of the actual items
+			//stopwatch watch;
 
     if (GetItemCount()>0)
     {
         wxDC *dc=event.GetDC();
 
-        long topitem,bottomitem;
-        wxRect toprect,bottomrect;
+        long i,imgId,topItem,bottomItem;
+        wxRect rect1,rect2;
         wxCoord x,y,w,h,width,height;
+		wxListItem item;
 
         GetClientSize(&width,&height);
 
         dc->SetClippingRegion(0,0,width,height);
         dc->GetClippingBox(&x,&y,&w,&h);
 
-        topitem=GetTopItem();
-        bottomitem=topitem+GetCountPerPage();
+        topItem=GetTopItem();
+        bottomItem=topItem+GetCountPerPage();
 
-        if (bottomitem>=GetItemCount())
-            bottomitem=GetItemCount()-1;
+        if (bottomItem>=GetItemCount())
+            bottomItem=GetItemCount()-1;
 
-        GetItemRect(topitem,toprect,wxLIST_RECT_BOUNDS);
-        GetItemRect(bottomitem,bottomrect,wxLIST_RECT_BOUNDS);
+        GetItemRect(topItem,rect1,wxLIST_RECT_LABEL);
+        GetItemRect(bottomItem,rect2,wxLIST_RECT_BOUNDS);
 
         //set the new clipping region and do erasing
-        wxRect itemsrect(toprect.GetLeftTop(),bottomrect.GetBottomRight());
-        //somehow there is a border of 2 pixels which needs to be redrawn
-        itemsrect.x+=2;
-        itemsrect.width-=2;
-        wxRegion region(wxRegion(x,y,w,h));
-        region.Subtract(itemsrect);
-        dc->DestroyClippingRegion();
+		wxRegion region(x,y,w,h);
+        region.Subtract(wxRect(rect1.GetLeftTop(),rect2.GetBottomRight()));
+
+        item.SetMask(wxLIST_MASK_IMAGE);
+
+		for (i=0;i<GetItemCount() && i<=bottomItem;i++)
+		{
+			item.SetId(i);
+            GetItem(item);
+			
+			if ((imgId=item.GetImage())<0)
+				continue;
+
+  		    if (!GetItemRect(i,rect1,wxLIST_RECT_ICON))
+				continue;
+
+			const wxBitmap& bitmap=ListImageList.GetBitmap(imgId);
+
+			wxRegion imgRegion(bitmap);
+			imgRegion.Offset(rect1.x,rect1.y+1);
+		    region.Xor(imgRegion);
+		}
+
+		dc->DestroyClippingRegion();
         dc->SetClippingRegion(region);
 
         //do erasing

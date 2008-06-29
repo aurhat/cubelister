@@ -1737,8 +1737,10 @@ void CslFrame::OnTimer(wxTimerEvent& event)
         if (m_trafficDlg)
             wxPostEvent(m_trafficDlg,event);
     }
+	else
+		m_timerCount++;
 
-    if (CslConnectionState::IsPlaying() && m_timerCount%4==0)
+    if (CslConnectionState::IsPlaying() && m_timerCount%2==0)
     {
         CslProcess::ProcessInputStream();
         CslProcess::ProcessErrorStream();
