@@ -236,7 +236,7 @@ bool CslEngine::PingExPlayerInfo(CslServerInfo *info,const wxInt32 pid,bool forc
     if (!force && info->ExtInfoStatus!=CSL_EXT_STATUS_OK)
         return false;
 
-    LOG_DEBUG("(%s) INFO(%d) %d\n",U2A(info->GetBestDescription()),GetTicks(),pid);
+    //LOG_DEBUG("(%s) INFO(%d) %d\n",U2A(info->GetBestDescription()),GetTicks(),pid);
 
     uchar ping[16];
     CslUDPPacket *packet=new CslUDPPacket();
@@ -344,9 +344,11 @@ wxUint32 CslEngine::PingServersEx(bool force)
         }
     }
 
-#ifdef ___WXDEBUG__
+#if 0
+#ifdef __WXDEBUG__
     if (c)
         LOG_DEBUG("Pinged %d servers\n",c);
+#endif
 #endif
 
     return c;

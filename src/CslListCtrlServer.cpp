@@ -1270,8 +1270,8 @@ void CslListCtrlServer::ListSort(wxInt32 column)
     if (!GetItemCount())
         return;
 
-#ifdef CSL_USE_WX_LIST_DESELECT_WORKAROUND
     m_dontUpdateInfo=true;
+#ifdef CSL_USE_WX_LIST_DESELECT_WORKAROUND
     CslServerInfo **selected=new CslServerInfo*[GetItemCount()];
     wxInt32 i,j;
 
@@ -1293,8 +1293,8 @@ void CslListCtrlServer::ListSort(wxInt32 column)
     }
 
     delete[] selected;
-    m_dontUpdateInfo=false;
 #endif
+    m_dontUpdateInfo=false;
 }
 
 int wxCALLBACK CslListCtrlServer::ListSortCompareFunc(long item1,long item2,long data)

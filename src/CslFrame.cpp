@@ -664,11 +664,7 @@ wxString CslFrame::PlayerListGetCaption(CslServerInfo *info,bool selected)
     }
 
     if (info)
-    {
-        caption+=info->GetBestDescription();
-        caption+=wxT(" (")+info->GameMode+wxT("/")+info->Map+wxT(")");
-        caption+=wxT(" (")+info->GetGame().GetName()+wxT(")");   
-    }
+        caption+=info->GetBestDescription()+wxT(" (")+info->GetGame().GetName()+wxT(")");
 
     return caption;
 }
@@ -1084,8 +1080,8 @@ void CslFrame::ConnectToServer()
     CslServerInfo *info=CslConnectionState::GetInfo();
     wxInt32 mode=CslConnectionState::GetConnectMode();
 
-	if (!info)
-		return;
+    if (!info)
+        return;
 
     CslConnectionState::Reset();
 
@@ -1604,21 +1600,7 @@ void CslFrame::OnPong(wxCommandEvent& event)
         return;
 
     if (packet->Type==CSL_PONG_TYPE_PING)
-    {
-        loopv(m_playerLists)
-        {
-            if (m_playerLists[i]->GetInfo()!=packet->Info)
-                continue;
-
-             wxAuiPaneInfo& pane=m_AuiMgr.GetPane(m_playerLists[i]);
-             if (pane.IsOk())
-             {
-                 pane.Caption(PlayerListGetCaption(packet->Info,i==0));
-                 m_AuiMgr.Update();
-             }
-        }
         return;
-    }
 
     if (m_extendedDlg->GetInfo()==packet->Info && m_extendedDlg->IsShown())
     {
@@ -1820,8 +1802,8 @@ void CslFrame::OnListItemSelected(wxListEvent& event)
 
 void CslFrame::OnListItemActivated(wxListEvent& event)
 {
-	if (event.GetEventObject()==(void*)list_ctrl_info)
-		return;
+    if (event.GetEventObject()==(void*)list_ctrl_info)
+        return;
     ConnectToServer();
 }
 
@@ -2056,8 +2038,8 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             vector<CslServerInfo*>& servers=game->GetServers();
             loopv(servers)
             {
-				if (CslEngine::PingOk(*servers[i],g_cslSettings->updateInterval) &&
-					servers[i]->ExtInfoStatus==CSL_EXT_STATUS_OK)
+                if (CslEngine::PingOk(*servers[i],g_cslSettings->updateInterval) &&
+                    servers[i]->ExtInfoStatus==CSL_EXT_STATUS_OK)
                 {
                     m_searchedServers.add(servers[i]);
                     servers[i]->Search=true;
