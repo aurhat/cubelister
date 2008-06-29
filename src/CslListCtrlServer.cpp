@@ -201,8 +201,6 @@ void CslListCtrlServer::OnItemActivated(wxListEvent& event)
 
 void CslListCtrlServer::OnItemSelected(wxListEvent& event)
 {
-    event.Skip();
-
     wxListItem item;
     item.SetId(event.GetIndex());
     GetItem(item);
@@ -214,12 +212,11 @@ void CslListCtrlServer::OnItemSelected(wxListEvent& event)
         return;
 
     event.SetClientData((void*)server->Info);
+    event.Skip();
 }
 
 void CslListCtrlServer::OnItemDeselected(wxListEvent& event)
 {
-    event.Skip();
-
     if (m_dontRemoveOnDeselect)
         return;
 
@@ -230,6 +227,8 @@ void CslListCtrlServer::OnItemDeselected(wxListEvent& event)
     CslListServerData *server=(CslListServerData*)GetItemData(item);
     if (m_selected.Index(server)!=wxNOT_FOUND)
         m_selected.Remove(server);
+
+    event.Skip();
 }
 
 void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
@@ -1272,6 +1271,7 @@ void CslListCtrlServer::ListSort(wxInt32 column)
         return;
 
 #ifdef CSL_USE_WX_LIST_DESELECT_WORKAROUND
+    m_dontUpdateInfo=true;
     CslServerInfo **selected=new CslServerInfo*[GetItemCount()];
     wxInt32 i,j;
 
@@ -1293,6 +1293,7 @@ void CslListCtrlServer::ListSort(wxInt32 column)
     }
 
     delete[] selected;
+    m_dontUpdateInfo=false;
 #endif
 }
 

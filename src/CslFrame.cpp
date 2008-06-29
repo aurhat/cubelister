@@ -660,14 +660,15 @@ wxString CslFrame::PlayerListGetCaption(CslServerInfo *info,bool selected)
     {
         caption+=CSL_CAPTION_PLAYERS_SELECTED;
         if (info)
-            caption+=wxT(": \"");
+            caption+=wxT(": ");
     }
 
     if (info)
-        caption+=info->GetBestDescription()+wxT(" (")+info->GetGame().GetName()+wxT(")");
-
-    if (selected && info)
-        caption+=wxT("\"");
+    {
+        caption+=info->GetBestDescription();
+        caption+=wxT(" (")+info->GameMode+wxT("/")+info->Map+wxT(")");
+        caption+=wxT(" (")+info->GetGame().GetName()+wxT(")");   
+    }
 
     return caption;
 }
@@ -1604,16 +1605,19 @@ void CslFrame::OnPong(wxCommandEvent& event)
 
     if (packet->Type==CSL_PONG_TYPE_PING)
     {
-#if 0
-        CslServerInfo *info=(CslServerInfo*)event.GetClientData();
-        if (!info)
-            return;
+        loopv(m_playerLists)
+        {
+            if (m_playerLists[i]->GetInfo()!=packet->Info)
+                continue;
 
-        list_ctrl_master->ListUpdateServer(info);
-        if (info->IsFavourite())
-            list_ctrl_favourites->ListUpdateServer(info);
+             wxAuiPaneInfo& pane=m_AuiMgr.GetPane(m_playerLists[i]);
+             if (pane.IsOk())
+             {
+                 pane.Caption(PlayerListGetCaption(packet->Info,i==0));
+                 m_AuiMgr.Update();
+             }
+        }
         return;
-#endif
     }
 
     if (m_extendedDlg->GetInfo()==packet->Info && m_extendedDlg->IsShown())
@@ -1643,8 +1647,10 @@ void CslFrame::OnPong(wxCommandEvent& event)
             switch (packet->Type)
             {
                 case CSL_PONG_TYPE_PLAYERSTATS:
+                {
                     m_playerLists[i]->ListUpdatePlayerData(packet->Info->GetGame(),packet->Info->PlayerStats);
                     break;
+                }
 
                 default:
                     break;
@@ -1791,10 +1797,6 @@ void CslFrame::OnListItemSelected(wxListEvent& event)
     if (!info)
         return;
 
-#ifdef CSL_USE_WX_LIST_DESELECT_WORKAROUND
-    if (FindFocus()!=event.GetEventObject())
-        return;
-#endif
     list_ctrl_info->UpdateInfo(info);
 
     if (m_oldSelectedInfo)
@@ -2245,7 +2247,7 @@ void CslFrame::OnPaneClose(wxAuiManagerEvent& event)
         {
             if (m_playerLists[i]==event.pane->window)
             {
-                if ((info=m_playerLists[i]->GetInfo())!=NULL);
+                if ((info=m_playerLists[i]->GetInfo())!=NULL)
                     info->SetPingExt(false);
                 if (i==0)
                 {
