@@ -1600,7 +1600,10 @@ void CslFrame::OnPong(wxCommandEvent& event)
         return;
 
     if (packet->Type==CSL_PONG_TYPE_PING)
+	{
+		delete packet;
         return;
+	}
 
     if (m_extendedDlg->GetInfo()==packet->Info && m_extendedDlg->IsShown())
     {
