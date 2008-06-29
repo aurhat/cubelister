@@ -140,10 +140,10 @@ class CslEngine : public wxEvtHandler
 
         wxInt32 GetNextGameID();
 
-		static bool PingOk(const CslServerInfo& info,wxUint32 interval)
-		{
-    	    return info.Ping>-1 && (info.PingResp-info.PingSend)<interval*2;
-		}
+        static bool PingOk(const CslServerInfo& info,wxInt32 interval)
+        {
+            return info.Ping>-1 && (wxInt32)(info.PingSend-info.PingResp)<interval*2;
+        }
 
     protected:
         bool m_ok;

@@ -98,10 +98,7 @@ void CslListCtrlInfo::AdjustSize(wxSize size)
 void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
 {
     if (!info)
-    {
-        wxASSERT_MSG(info,wxT("invalid info"));
         return;
-    }
 
     wxDateTime dt;
     wxString s;
@@ -110,7 +107,7 @@ void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
     const char **flag=NULL;
     char *host=strdup(U2A(info->Addr.IPAddress().c_str()));
 
-    s=wxString::Format("%s:%d",info->Host.c_str(),info->Port);
+    s=wxString::Format(wxT("%s:%d"),info->Host.c_str(),info->Port);
     if (IsIP(info->Host))
     {
         wxString h=info->Domain;
