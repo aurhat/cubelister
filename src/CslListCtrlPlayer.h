@@ -62,7 +62,7 @@ class CslListCtrlPlayer : public wxListCtrl
         static wxSize BestSizeMini;
 
     private:
-        wxUint32 m_view,freeze;
+        wxUint32 m_view;
         CslListSortHelper m_sortHelper;
 
         CslServerInfo *m_info;

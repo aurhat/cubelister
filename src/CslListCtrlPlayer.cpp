@@ -72,9 +72,9 @@ wxImageList CslListCtrlPlayer::ListImageList;
 CslListCtrlPlayer::CslListCtrlPlayer(wxWindow* parent,wxWindowID id,const wxPoint& pos,
                                      const wxSize& size,long style,
                                      const wxValidator& validator, const wxString& name)
-        : wxListCtrl(parent,id,pos,size,style,validator,name)
+        : wxListCtrl(parent,id,pos,size,style,validator,name),
+        m_info(NULL)
 {
-    freeze=0;
 }
 
 #ifdef __WXMSW__

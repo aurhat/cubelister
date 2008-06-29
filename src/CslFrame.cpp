@@ -2237,20 +2237,26 @@ void CslFrame::OnClose(wxCloseEvent& event)
 
 void CslFrame::OnPaneClose(wxAuiManagerEvent& event)
 {
+    CslServerInfo *info;
+
     if (event.pane->name.StartsWith(wxT("players")))
     {
         loopv(m_playerLists)
         {
             if (m_playerLists[i]==event.pane->window)
             {
-                m_playerLists[i]->GetInfo()->SetPingExt(false);
-                if (i>0)
+                if ((info=m_playerLists[i]->GetInfo())!=NULL);
+                    info->SetPingExt(false);
+                if (i==0)
+                {
+                    CslMenu::CheckMenuItem(MENU_VIEW_PLAYER_LIST,false);
+                    m_playerLists[i]->SetInfo(NULL);
+                }
+                else
                     m_playerLists.remove(i);
                 break;
             }
         }
-        if (event.pane->name==(wxT("players0")))
-            CslMenu::CheckMenuItem(MENU_VIEW_PLAYER_LIST,false);
     }
     else if (event.pane->name==(wxT("games")))
         CslMenu::CheckMenuItem(MENU_VIEW_GAMES,false);
