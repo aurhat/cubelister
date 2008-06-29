@@ -140,6 +140,9 @@ void CslListCtrlPlayer::OnColumnLeftClick(wxListEvent& event)
 
 void CslListCtrlPlayer::OnItemActivated(wxListEvent& event)
 {
+    if (!m_info)
+        return;
+
     CslConnectionState::CreateConnectState(m_info);
 
     event.Skip();
@@ -147,6 +150,9 @@ void CslListCtrlPlayer::OnItemActivated(wxListEvent& event)
 
 void CslListCtrlPlayer::OnContextMenu(wxContextMenuEvent& event)
 {
+    if (!m_info)
+        return;
+
     wxMenu menu;
     wxPoint point=event.GetPosition();
 
