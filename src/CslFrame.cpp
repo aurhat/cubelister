@@ -597,6 +597,7 @@ void CslFrame::DoLayout()
 #define CSL_CAPTION_MASTER_LIST_SERVERS _("Master list servers")
 #define CSL_CAPTION_FAVOURITE_LIST_SERVERS _("Favourite servers")
 #define CSL_CAPTION_PLAYERS_SELECTED _("Selected server")
+#define CSL_CAPTION_SERVER_INFO _("Server info")
 
     wxSize size=list_ctrl_master->GetBestSize();
 
@@ -608,7 +609,7 @@ void CslFrame::DoLayout()
                      Caption(_("Games")).Left().Layer(1).Position(0).
                      MinSize(240,20).BestSize(240,250).FloatingSize(240,250));
     m_AuiMgr.AddPane(list_ctrl_info,wxAuiPaneInfo().Name(wxT("info")).
-                     Caption(_("Server Info")).Left().Layer(1).Position(1).
+                     Left().Layer(1).Position(1).
                      MinSize(240,20).BestSize(360,200).FloatingSize(360,200));
     m_AuiMgr.AddPane(list_ctrl_players,wxAuiPaneInfo().Name(wxT("players0")).
                      Left().Layer(1).Position(2).
@@ -623,7 +624,10 @@ void CslFrame::DoLayout()
         CslMenu::CheckMenuItem(MENU_VIEW_GAMES,pane->IsShown());
     pane=&m_AuiMgr.GetPane(list_ctrl_info);
     if (pane->IsOk())
+    {
+        pane->Caption(CSL_CAPTION_SERVER_INFO);
         CslMenu::CheckMenuItem(MENU_VIEW_SERVER_INFO,pane->IsShown());
+    }
     pane=&m_AuiMgr.GetPane(list_ctrl_master);
     if (pane->IsOk())
         pane->Caption(CSL_CAPTION_MASTER_LIST_SERVERS);
@@ -1600,10 +1604,10 @@ void CslFrame::OnPong(wxCommandEvent& event)
         return;
 
     if (packet->Type==CSL_PONG_TYPE_PING)
-	{
-		delete packet;
+    {
+        delete packet;
         return;
-	}
+    }
 
     if (m_extendedDlg->GetInfo()==packet->Info && m_extendedDlg->IsShown())
     {
@@ -1740,8 +1744,8 @@ void CslFrame::OnTimer(wxTimerEvent& event)
         if (m_trafficDlg)
             wxPostEvent(m_trafficDlg,event);
     }
-	else
-		m_timerCount++;
+    else
+        m_timerCount++;
 
     if (CslConnectionState::IsPlaying() && m_timerCount%2==0)
     {
@@ -1797,12 +1801,17 @@ void CslFrame::OnListItemSelected(wxListEvent& event)
     if (!m_engine->PingEx(info))
         list_ctrl_players->ListUpdatePlayerData(info->GetGame(),info->PlayerStats);
 
-    wxAuiPaneInfo& pane=m_AuiMgr.GetPane(list_ctrl_players);
-    if (pane.IsOk())
     {
-        pane.Caption(PlayerListGetCaption(info,true));
-        m_AuiMgr.Update();
+        wxAuiPaneInfo& pane=m_AuiMgr.GetPane(list_ctrl_info);
+        if (pane.IsOk())
+            pane.Caption(wxString(CSL_CAPTION_SERVER_INFO)+wxT(":")+info->GetBestDescription());
     }
+    {
+        wxAuiPaneInfo& pane=m_AuiMgr.GetPane(list_ctrl_players);
+        if (pane.IsOk())
+            pane.Caption(PlayerListGetCaption(info,true));
+    }
+    m_AuiMgr.Update();
 }
 
 void CslFrame::OnListItemActivated(wxListEvent& event)

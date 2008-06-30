@@ -104,11 +104,9 @@ CslListCtrlServer::~CslListCtrlServer()
 }
 
 #ifdef __WXMSW__
-wxColour alpha;
 void CslListCtrlServer::OnEraseBackground(wxEraseEvent& event)
 {
     //to prevent flickering, erase only content *outside* of the actual items
-			//stopwatch watch;
 
     if (GetItemCount()>0)
     {
@@ -117,7 +115,7 @@ void CslListCtrlServer::OnEraseBackground(wxEraseEvent& event)
         long i,imgId,topItem,bottomItem;
         wxRect rect1,rect2;
         wxCoord x,y,w,h,width,height;
-		wxListItem item;
+        wxListItem item;
 
         GetClientSize(&width,&height);
 
@@ -134,30 +132,30 @@ void CslListCtrlServer::OnEraseBackground(wxEraseEvent& event)
         GetItemRect(bottomItem,rect2,wxLIST_RECT_BOUNDS);
 
         //set the new clipping region and do erasing
-		wxRegion region(x,y,w,h);
+        wxRegion region(x,y,w,h);
         region.Subtract(wxRect(rect1.GetLeftTop(),rect2.GetBottomRight()));
 
         item.SetMask(wxLIST_MASK_IMAGE);
 
-		for (i=0;i<GetItemCount() && i<=bottomItem;i++)
-		{
-			item.SetId(i);
+        for (i=0;i<GetItemCount() && i<=bottomItem;i++)
+        {
+            item.SetId(i);
             GetItem(item);
-			
-			if ((imgId=item.GetImage())<0)
-				continue;
 
-  		    if (!GetItemRect(i,rect1,wxLIST_RECT_ICON))
-				continue;
+            if ((imgId=item.GetImage())<0)
+                continue;
 
-			const wxBitmap& bitmap=m_imageList.GetBitmap(imgId);
+            if (!GetItemRect(i,rect1,wxLIST_RECT_ICON))
+                continue;
 
-			wxRegion imgRegion(bitmap);
-			imgRegion.Offset(rect1.x,rect1.y+1);
-		    region.Xor(imgRegion);
-		}
+            const wxBitmap& bitmap=m_imageList.GetBitmap(imgId);
 
-		dc->DestroyClippingRegion();
+            wxRegion imgRegion(bitmap);
+            imgRegion.Offset(rect1.x,rect1.y+1);
+            region.Xor(imgRegion);
+        }
+
+        dc->DestroyClippingRegion();
         dc->SetClippingRegion(region);
 
         //do erasing
@@ -175,9 +173,9 @@ void CslListCtrlServer::OnEraseBackground(wxEraseEvent& event)
 
 void CslListCtrlServer::OnSize(wxSizeEvent& event)
 {
-	Freeze();
+    Freeze();
     ListAdjustSize(event.GetSize());
-	Thaw();
+    Thaw();
     event.Skip();
 }
 
@@ -745,13 +743,13 @@ void CslListCtrlServer::ListAdjustSize(const wxSize& size,bool init)
 
 void CslListCtrlServer::ListCreateGameBitmaps()
 {
-	wxInt32 width;
+    wxInt32 width;
 
 #ifdef __WXMSW__
-	width=18;
+    width=18;
     m_imageList.Create(18,16,true);
 
-	wxIcon icon;
+    wxIcon icon;
     m_imageList.Add(AdjustIconSize(green_list_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
     m_imageList.Add(AdjustIconSize(yellow_list_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
     m_imageList.Add(AdjustIconSize(red_list_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
@@ -764,7 +762,7 @@ void CslListCtrlServer::ListCreateGameBitmaps()
     m_imageList.Add(AdjustIconSize(sortasclight_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
     m_imageList.Add(AdjustIconSize(sortdsclight_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
 #else
-	width=16;
+    width=16;
     m_imageList.Create(16,16,true);
 
     m_imageList.Add(wxBitmap(green_list_16_xpm));

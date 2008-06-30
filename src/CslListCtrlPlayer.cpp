@@ -80,7 +80,6 @@ CslListCtrlPlayer::CslListCtrlPlayer(wxWindow* parent,wxWindowID id,const wxPoin
 void CslListCtrlPlayer::OnEraseBackground(wxEraseEvent& event)
 {
     //to prevent flickering, erase only content *outside* of the actual items
-			//stopwatch watch;
 
     if (GetItemCount()>0)
     {
@@ -89,7 +88,7 @@ void CslListCtrlPlayer::OnEraseBackground(wxEraseEvent& event)
         long i,imgId,topItem,bottomItem;
         wxRect rect1,rect2;
         wxCoord x,y,w,h,width,height;
-		wxListItem item;
+        wxListItem item;
 
         GetClientSize(&width,&height);
 
@@ -106,30 +105,30 @@ void CslListCtrlPlayer::OnEraseBackground(wxEraseEvent& event)
         GetItemRect(bottomItem,rect2,wxLIST_RECT_BOUNDS);
 
         //set the new clipping region and do erasing
-		wxRegion region(x,y,w,h);
+        wxRegion region(x,y,w,h);
         region.Subtract(wxRect(rect1.GetLeftTop(),rect2.GetBottomRight()));
 
         item.SetMask(wxLIST_MASK_IMAGE);
 
-		for (i=0;i<GetItemCount() && i<=bottomItem;i++)
-		{
-			item.SetId(i);
+        for (i=0;i<GetItemCount() && i<=bottomItem;i++)
+        {
+            item.SetId(i);
             GetItem(item);
-			
-			if ((imgId=item.GetImage())<0)
-				continue;
 
-  		    if (!GetItemRect(i,rect1,wxLIST_RECT_ICON))
-				continue;
+            if ((imgId=item.GetImage())<0)
+                continue;
 
-			const wxBitmap& bitmap=ListImageList.GetBitmap(imgId);
+            if (!GetItemRect(i,rect1,wxLIST_RECT_ICON))
+                continue;
 
-			wxRegion imgRegion(bitmap);
-			imgRegion.Offset(rect1.x,rect1.y+2);
-		    region.Xor(imgRegion);
-		}
+            const wxBitmap& bitmap=ListImageList.GetBitmap(imgId);
 
-		dc->DestroyClippingRegion();
+            wxRegion imgRegion(bitmap);
+            imgRegion.Offset(rect1.x,rect1.y+2);
+            region.Xor(imgRegion);
+        }
+
+        dc->DestroyClippingRegion();
         dc->SetClippingRegion(region);
 
         //do erasing
@@ -147,12 +146,12 @@ void CslListCtrlPlayer::OnEraseBackground(wxEraseEvent& event)
 
 void CslListCtrlPlayer::OnSize(wxSizeEvent& event)
 {
-	//grrr, disconnect from the size event, since on VISTA this can end in endless loop
-	Disconnect(wxEVT_SIZE,wxSizeEventHandler(CslListCtrlPlayer::OnSize),NULL,this);
-	Freeze();
+    //grrr, disconnect from the size event, since on VISTA this can end in endless loop
+    Disconnect(wxEVT_SIZE,wxSizeEventHandler(CslListCtrlPlayer::OnSize),NULL,this);
+    Freeze();
     ListAdjustSize();
-	Thaw();
-	Connect(wxEVT_SIZE,wxSizeEventHandler(CslListCtrlPlayer::OnSize),NULL,this);
+    Thaw();
+    Connect(wxEVT_SIZE,wxSizeEventHandler(CslListCtrlPlayer::OnSize),NULL,this);
 
     event.Skip();
 }
@@ -496,7 +495,7 @@ void CslListCtrlPlayer::ListInit(const wxUint32 view)
     item.SetImage(img);
     SetColumn(m_sortHelper.m_sortType,item);
 
-	Connect(wxEVT_SIZE,wxSizeEventHandler(CslListCtrlPlayer::OnSize),NULL,this);
+    Connect(wxEVT_SIZE,wxSizeEventHandler(CslListCtrlPlayer::OnSize),NULL,this);
 }
 
 int wxCALLBACK CslListCtrlPlayer::ListSortCompareFunc(long item1,long item2,long data)
