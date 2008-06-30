@@ -175,7 +175,9 @@ void CslListCtrlServer::OnEraseBackground(wxEraseEvent& event)
 
 void CslListCtrlServer::OnSize(wxSizeEvent& event)
 {
+	Freeze();
     ListAdjustSize(event.GetSize());
+	Thaw();
     event.Skip();
 }
 
@@ -1174,10 +1176,10 @@ void CslListCtrlServer::RemoveServer(CslListServerData *server,CslServerInfo *in
 
 wxUint32 CslListCtrlServer::ListUpdate(vector<CslServerInfo*>& servers)
 {
-    wxWindowUpdateLocker locker(this);
-
     bool sort=false;
     wxUint32 c=0;
+
+    wxWindowUpdateLocker locker(this);
 
     loopv(servers)
     {

@@ -57,7 +57,6 @@ BEGIN_EVENT_TABLE(CslListCtrlPlayer,wxListCtrl)
     #ifdef __WXMSW__
     EVT_ERASE_BACKGROUND(CslListCtrlPlayer::OnEraseBackground)
     #endif
-    EVT_SIZE(CslListCtrlPlayer::OnSize)
     EVT_LIST_COL_CLICK(wxID_ANY,CslListCtrlPlayer::OnColumnLeftClick)
     EVT_LIST_ITEM_ACTIVATED(wxID_ANY,CslListCtrlPlayer::OnItemActivated)
     EVT_CONTEXT_MENU(CslListCtrlPlayer::OnContextMenu)
@@ -126,7 +125,7 @@ void CslListCtrlPlayer::OnEraseBackground(wxEraseEvent& event)
 			const wxBitmap& bitmap=ListImageList.GetBitmap(imgId);
 
 			wxRegion imgRegion(bitmap);
-			imgRegion.Offset(rect1.x,rect1.y+1);
+			imgRegion.Offset(rect1.x,rect1.y+2);
 		    region.Xor(imgRegion);
 		}
 
@@ -148,7 +147,13 @@ void CslListCtrlPlayer::OnEraseBackground(wxEraseEvent& event)
 
 void CslListCtrlPlayer::OnSize(wxSizeEvent& event)
 {
+	//grrr, disconnect from the size event, since on VISTA this can end in endless loop
+	Disconnect(wxEVT_SIZE,wxSizeEventHandler(CslListCtrlPlayer::OnSize),NULL,this);
+	Freeze();
     ListAdjustSize();
+	Thaw();
+	Connect(wxEVT_SIZE,wxSizeEventHandler(CslListCtrlPlayer::OnSize),NULL,this);
+
     event.Skip();
 }
 
@@ -490,6 +495,8 @@ void CslListCtrlPlayer::ListInit(const wxUint32 view)
 
     item.SetImage(img);
     SetColumn(m_sortHelper.m_sortType,item);
+
+	Connect(wxEVT_SIZE,wxSizeEventHandler(CslListCtrlPlayer::OnSize),NULL,this);
 }
 
 int wxCALLBACK CslListCtrlPlayer::ListSortCompareFunc(long item1,long item2,long data)
