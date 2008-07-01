@@ -33,26 +33,37 @@ wxUint32 CslUDP::m_packetsIn=0,CslUDP::m_packetsOut=0;
 
 
 CslUDP::CslUDP(wxEvtHandler *evtHandler) : wxEvtHandler(),
-        m_init(false),m_evtHandler(evtHandler)
+        m_evtHandler(evtHandler),m_socket(NULL)
 {
+    //start of Dynamic Ports (49152 through 65535)
+    wxUint16 port=0xc000;
+
     wxIPV4address address;
     address.AnyAddress();
-    LOG_DEBUG("Listen port: %li\n",address.Service());
 
-    m_socket=new wxDatagramSocket(address,wxSOCKET_NOWAIT);
-    if (!m_socket->IsOk())
+    while (!m_socket)
     {
-        LOG_DEBUG("Couldn't create socket\n");
-        delete m_socket;
-        m_socket=NULL;
-        return;
+        address.Service(port);
+        m_socket=new wxDatagramSocket(address,wxSOCKET_NOWAIT);
+
+        if (!m_socket->IsOk())
+        {
+            delete m_socket;
+            m_socket=NULL;
+
+            if (++port==0xffff)
+            {
+                LOG_DEBUG("Couldn't create socket\n");
+                return;
+            }
+        }
     }
+
+    LOG_DEBUG("Listen port: %li\n",address.Service());
 
     m_socket->SetEventHandler(*this);
     m_socket->SetNotify(wxSOCKET_INPUT_FLAG);
     m_socket->Notify(true);
-
-    m_init=true;
 }
 
 CslUDP::~CslUDP()

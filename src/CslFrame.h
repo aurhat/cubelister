@@ -147,6 +147,7 @@ class CslFrame: public wxFrame
         bool LoadServers(wxUint32 *numm=NULL,wxUint32 *nums=NULL);
         void SaveServers();
 
+    private:
         void OnPong(wxCommandEvent& event);
         void OnTimer(wxTimerEvent& event);
         void OnListItemSelected(wxListEvent& event);

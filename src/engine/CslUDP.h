@@ -111,13 +111,12 @@ class CslUDP : public wxEvtHandler
         CslUDP(wxEvtHandler *evtHandler);
         ~CslUDP();
 
-        bool IsInit() const { return m_init; }
+        bool IsOk() const { return m_socket ? m_socket->IsOk():false; }
         bool SendPing(CslUDPPacket *packet);
         static wxUint32 GetTraffic(wxUint32 type,bool overhead=false);
         static wxUint32 GetPacketCount(wxUint32 type);
 
     private:
-        bool m_init;
         wxEvtHandler *m_evtHandler;
         wxDatagramSocket *m_socket;
         static wxUint32 m_bytesIn,m_bytesOut,m_packetsIn,m_packetsOut;

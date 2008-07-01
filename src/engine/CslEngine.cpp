@@ -120,7 +120,7 @@ bool CslEngine::Init(wxUint32 interval)
         return false;
 
     m_pingSock=new CslUDP(this);
-    m_ok=m_pingSock->IsInit();
+    m_ok=m_pingSock->IsOk();
 
     SetUpdateInterval(interval);
     m_gameId=0;

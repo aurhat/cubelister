@@ -395,15 +395,15 @@ CslFrame::~CslFrame()
     if (CslConnectionState::IsPlaying())
         CslConnectionState::GetInfo()->GetGame().GameEnd();
 
-    SaveSettings();
-    delete g_cslSettings;
-
     if (m_engine)
     {
+        SaveSettings();
         SaveServers();
         m_engine->DeInit();
         delete m_engine;
     }
+
+    delete g_cslSettings;
 
     if (m_versionCheckThread)
     {
@@ -600,7 +600,7 @@ void CslFrame::DoLayout()
     wxSize size=list_ctrl_master->GetBestSize();
 
     m_AuiMgr.AddPane(list_ctrl_master,wxAuiPaneInfo().Name(wxT("masterlist")).
-                     CloseButton(false).Center().BestSize(size));
+                     CloseButton(false).Center().BestSize(size).MinSize(size.x,20));
     m_AuiMgr.AddPane(list_ctrl_favourites,wxAuiPaneInfo().Name(wxT("favlist")).
                      Bottom().Row(2).BestSize(size).MinSize(size).FloatingSize(600,240));
     m_AuiMgr.AddPane(tree_ctrl_games,wxAuiPaneInfo().Name(wxT("games")).
