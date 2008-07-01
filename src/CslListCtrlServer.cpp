@@ -723,11 +723,8 @@ void CslListCtrlServer::ListInit(CslEngine *engine,CslListCtrlServer *sibling)
     ToggleSortArrow();
 }
 
-void CslListCtrlServer::ListAdjustSize(const wxSize& size,bool init)
+void CslListCtrlServer::ListAdjustSize(const wxSize& size)
 {
-    if (!g_cslSettings->autoFitColumns && !init)
-        return;
-
     wxInt32 w=size.x-8;
 
     SetColumnWidth(0,(wxInt32)(w*g_cslSettings->colServerS1));

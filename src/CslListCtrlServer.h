@@ -130,7 +130,7 @@ class CslListCtrlServer : public wxListCtrl
         void ToggleSortArrow();
         wxUint32 ListSearch(const wxString& search);
         wxUint32 ListFilter();
-        void ListAdjustSize(const wxSize& size,bool init=false);
+        void ListAdjustSize(const wxSize& size);
         void SetMasterSelected(bool selected) { m_masterSelected=selected; }
         void Highlight(wxInt32 type,bool highlight,CslServerInfo *info=NULL,wxListItem *listitem=NULL);
 

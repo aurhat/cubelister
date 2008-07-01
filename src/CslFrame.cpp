@@ -460,8 +460,6 @@ void CslFrame::CreateMainMenu()
     menu->AppendSeparator();
     CslMenu::AddItem(menu,MENU_VIEW_AUTO_SORT,_("Sort lists automatically\tCTRL+L"),
                      wxART_NONE,wxITEM_CHECK);
-    CslMenu::AddItem(menu,MENU_VIEW_AUTO_FIT,_("Fit columns on window resize"),
-                     wxART_NONE,wxITEM_CHECK);
     menu->AppendSeparator();
     CslMenu::AddItem(menu,MENU_VIEW_TRAFFIC,_("&Traffic statistics"),wxART_NONE);
     menubar->Append(menu,_("&View"));
@@ -1203,7 +1201,6 @@ void CslFrame::LoadSettings()
 
     /* ListCtrl */
     config.SetPath(wxT("/List"));
-    if (config.Read(wxT("AutoFit"),&val)) g_cslSettings->autoFitColumns=val!=0;
     if (config.Read(wxT("AutoSort"),&val)) g_cslSettings->autoSortColumns=val!=0;
     if (version)
     {
@@ -1294,7 +1291,6 @@ void CslFrame::SaveSettings()
 
     /* ListCtrl */
     config.SetPath(wxT("/List"));
-    config.Write(wxT("AutoFit"),g_cslSettings->autoFitColumns);
     config.Write(wxT("AutoSort"),g_cslSettings->autoSortColumns);
     config.Write(wxT("ColMult1"),g_cslSettings->colServerS1);
     config.Write(wxT("ColMult2"),g_cslSettings->colServerS2);
@@ -1804,7 +1800,7 @@ void CslFrame::OnListItemSelected(wxListEvent& event)
     {
         wxAuiPaneInfo& pane=m_AuiMgr.GetPane(list_ctrl_info);
         if (pane.IsOk())
-            pane.Caption(wxString(CSL_CAPTION_SERVER_INFO)+wxT(":")+info->GetBestDescription());
+            pane.Caption(wxString(CSL_CAPTION_SERVER_INFO)+wxT(": ")+info->GetBestDescription());
     }
     {
         wxAuiPaneInfo& pane=m_AuiMgr.GetPane(list_ctrl_players);
@@ -1960,10 +1956,6 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             list_ctrl_master->ToggleSortArrow();
             list_ctrl_favourites->ListSort();
             list_ctrl_favourites->ToggleSortArrow();
-            break;
-
-        case MENU_VIEW_AUTO_FIT:
-            g_cslSettings->autoFitColumns=event.IsChecked();
             break;
 
         case MENU_VIEW_TRAFFIC:
@@ -2194,8 +2186,8 @@ void CslFrame::OnKeypress(wxKeyEvent& event)
 
 void CslFrame::OnShow(wxShowEvent& event)
 {
-    list_ctrl_master->ListAdjustSize(list_ctrl_master->GetClientSize(),true);
-    list_ctrl_favourites->ListAdjustSize(list_ctrl_favourites->GetClientSize(),true);
+    list_ctrl_master->ListAdjustSize(list_ctrl_master->GetClientSize());
+    list_ctrl_favourites->ListAdjustSize(list_ctrl_favourites->GetClientSize());
 }
 
 void CslFrame::OnClose(wxCloseEvent& event)

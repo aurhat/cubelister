@@ -79,7 +79,6 @@ class CslSettings
                 autoSaveOutput(false),
 
                 /* ListCtrl */
-                autoFitColumns(true),
                 autoSortColumns(true),
                 colServerS1(0.18f),
                 colServerS2(0.18f),
@@ -119,7 +118,7 @@ class CslSettings
         wxString lastGame;
 
         /* ListCtrl*/
-        bool autoFitColumns,autoSortColumns;
+        bool autoSortColumns;
         float colServerS1,colServerS2,colServerS3,colServerS4;
         float colServerS5,colServerS6,colServerS7,colServerS8,colServerS9;
         wxColour colServerEmpty,colServerOff,colServerFull;
