@@ -838,10 +838,12 @@ void CslListCtrlServer::Highlight(wxInt32 type,bool high,CslServerInfo *info,wxL
         CslListServerData *server=(CslListServerData*)GetItemData(*listitem);
         t=server->SetHighlight(type,high);
 
-        if (t&CSL_HIGHLIGHT_SEARCH_SERVER || t&CSL_HIGHLIGHT_SEARCH_PLAYER)
-            colour=g_cslSettings->colServerHigh;
-        else if (t&CSL_HIGHLIGHT_LOCKED)
+        if (t&CSL_HIGHLIGHT_LOCKED)
             colour=g_cslSettings->colServerPlay;
+        else if (t&CSL_HIGHLIGHT_FOUND_SERVER || t&CSL_HIGHLIGHT_FOUND_PLAYER)
+            colour=g_cslSettings->colServerHigh;
+        else if (t&CSL_HIGHLIGHT_SEARCH_PLAYER)
+            colour=wxColour(g_cslSettings->colServerOff);
         else
             colour=m_stdColourListItem;
 
@@ -858,7 +860,7 @@ void CslListCtrlServer::Highlight(wxInt32 type,bool high,CslServerInfo *info,wxL
 
         t=m_servers.Item(i)->SetHighlight(type,high);
 
-        if (t&CSL_HIGHLIGHT_SEARCH_SERVER || t&CSL_HIGHLIGHT_SEARCH_PLAYER)
+        if (t&CSL_HIGHLIGHT_FOUND_SERVER || t&CSL_HIGHLIGHT_FOUND_PLAYER)
             colour=g_cslSettings->colServerHigh;
         else if (t&CSL_HIGHLIGHT_LOCKED)
             colour=g_cslSettings->colServerPlay;
@@ -1092,7 +1094,7 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
 
     // search
     found=m_searchString.IsEmpty() ? false : ListSearchItemMatches(info);
-    Highlight(CSL_HIGHLIGHT_SEARCH_SERVER,found,info,&item);
+    Highlight(CSL_HIGHLIGHT_FOUND_SERVER,found,info,&item);
 
     item.SetMask(wxLIST_MASK_TEXT|wxLIST_MASK_IMAGE|wxLIST_MASK_DATA);
     if (m_id==CSL_LIST_MASTER)

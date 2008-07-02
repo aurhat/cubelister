@@ -114,7 +114,7 @@ CslEngine::~CslEngine()
     wxASSERT(!m_ok);
 }
 
-bool CslEngine::Init(wxUint32 interval)
+bool CslEngine::Init(wxInt32 interval)
 {
     if (m_ok)
         return false;
@@ -122,7 +122,7 @@ bool CslEngine::Init(wxUint32 interval)
     m_pingSock=new CslUDP(this);
     m_ok=m_pingSock->IsOk();
 
-    SetUpdateInterval(interval);
+    m_updateInterval=interval;
     m_gameId=0;
 
     if (m_ok)
@@ -317,7 +317,10 @@ wxUint32 CslEngine::PingServers(CslGame *game,bool force)
 
 bool CslEngine::PingEx(CslServerInfo *info,bool force)
 {
-    if (!force && (GetTicks()-info->PlayerStats.m_lastPing)<m_updateInterval)
+    wxInt32 diff=GetTicks()-info->PlayerStats.m_lastPing;
+    wxInt32 delay=info->Search ? (min(info->Ping,m_updateInterval)/1000+1)*1000:m_updateInterval;
+
+    if (!force && diff<delay)
         return false;
 
     if (!PingExPlayerInfo(info,-1,force))
@@ -806,9 +809,16 @@ void CslEngine::CheckResends()
             CslServerInfo *info=servers[j];
             CslPlayerStats& stats=info->PlayerStats;
 
+            if (!PingOk(*info,m_updateInterval))
+            {
+                stats.Reset();
+                info->ExtInfoStatus=CSL_EXT_STATUS_FALSE;
+                continue;
+            }
+
             if (stats.m_ids.length())
             {
-                if ((wxUint32)info->Ping>m_updateInterval ||
+                if (info->Ping>m_updateInterval ||
                     stats.m_lastPong<stats.m_lastPing ||
                     GetTicks()-stats.m_lastPong<min((wxUint32)info->Ping*2,500))
                     return;

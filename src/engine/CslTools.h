@@ -48,7 +48,7 @@
 #ifndef DATADIR
 #undef LOCALEDIR
 #ifdef __WXMAC__
-#define DATAPATH g_basePath+wxString(wxString(wxT("/../Resources")))
+#define DATAPATH g_basePath+wxString(wxT("/../Resources"))
 #else
 #define DATAPATH g_basePath+wxString(PATHDIV)+wxString(wxT("data"))
 #endif //__WXMAC__

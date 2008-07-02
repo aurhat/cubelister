@@ -1,3 +1,5 @@
+AM_CXXFLAGS = -DLOCALEDIR=\"$(localedir)\" -DDATADIR=\"$(datadir)/csl\"
+
 INCLUDES = -I$(top_srcdir)/src/img/flags -I$(top_srcdir)/src/libGeoIP
 METASOURCES = AUTO
 lib_LIBRARIES = libcsltools.a libcslengine.a

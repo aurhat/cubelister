@@ -156,7 +156,7 @@ class CslExtendedInfo
                 ExtInfoStatus(CSL_EXT_STATUS_FALSE),
                 ExtInfoVersion(0),Uptime(0),m_pingExt(0) {};
 
-        void SetPingExt(bool ping) { ping ? m_pingExt++:m_pingExt-=m_pingExt>0; }
+        void PingExt(bool ping) { ping ? m_pingExt++:m_pingExt-=m_pingExt>0; }
         bool PingExt() { return m_pingExt>0; }
 
         wxInt32 ExtInfoStatus,ExtInfoVersion;

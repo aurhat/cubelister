@@ -1,10 +1,10 @@
 
-AM_CXXFLAGS = -DLOCALEDIR=\"$(localedir)\" -DDATADIR=\"$(datadir)/csl\"
-
 bin_PROGRAMS = csl
 if build_cslmapcfgtool
 bin_PROGRAMS += cslmapcfgtool
 endif
+
+AM_CXXFLAGS = -DLOCALEDIR=\"$(localedir)\" -DDATADIR=\"$(datadir)/csl\"
 
 # set the include path found by configure
 AM_CPPFLAGS =  $(all_includes)

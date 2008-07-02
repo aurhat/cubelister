@@ -738,7 +738,7 @@ void CslFrame::PlayerListCreateView(CslServerInfo *info,wxUint32 view,const wxSt
 
     m_playerLists.add(list);
 
-    info->SetPingExt(true);
+    info->PingExt(true);
 
     m_engine->PingEx(info,true);
 }
@@ -1626,25 +1626,11 @@ void CslFrame::OnPong(wxCommandEvent& event)
     {
         loopv(m_playerLists)
         {
-            if (m_playerLists[i]->GetInfo()!=packet->Info)
-                continue;
-
-            switch (packet->Type)
-            {
-                case CSL_PONG_TYPE_PLAYERSTATS:
-                {
-                    m_playerLists[i]->ListUpdatePlayerData(packet->Info->GetGame(),packet->Info->PlayerStats);
-                    break;
-                }
-
-                default:
-                    break;
-            }
+            if (m_playerLists[i]->GetInfo()==packet->Info)
+                m_playerLists[i]->ListUpdatePlayerData(packet->Info->GetGame(),packet->Info->PlayerStats);
         }
 
-        if (packet->Type==CSL_PONG_TYPE_PLAYERSTATS &&
-            m_searchedServers.length() &&
-            radio_search_player->GetValue())
+        if (m_searchedServers.length() && radio_search_player->GetValue())
         {
             wxInt32 progress;
             bool found;
@@ -1669,8 +1655,8 @@ void CslFrame::OnPong(wxCommandEvent& event)
                         CslPlayerStatsData *data=stats.m_stats[j];
                         if (data->Ok && data->Name.Lower().Contains(m_searchString))
                         {
-                            list_ctrl_master->Highlight(CSL_HIGHLIGHT_SEARCH_PLAYER,true,packet->Info);
-                            list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_SEARCH_PLAYER,true,packet->Info);
+                            list_ctrl_master->Highlight(CSL_HIGHLIGHT_FOUND_PLAYER,true,packet->Info);
+                            list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_FOUND_PLAYER,true,packet->Info);
                             m_searchResultPlayer++;
                             found=true;
                         }
@@ -1678,11 +1664,16 @@ void CslFrame::OnPong(wxCommandEvent& event)
 
                     if (progress==m_searchedServers.length())
                     {
-                        loopv(m_searchedServers) m_searchedServers[i]->SetPingExt(false);
+                        loopv(m_searchedServers) m_searchedServers[i]->PingExt(false);
                         m_searchedServers.setsize(0);
                     }
 
-                    if (found)
+                    if (!found)
+                    {
+                        list_ctrl_master->Highlight(CSL_HIGHLIGHT_SEARCH_PLAYER,false,packet->Info);
+                        list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_SEARCH_PLAYER,false,packet->Info);
+                    }
+                    else
                         m_searchResultServer++;
                 }
             }
@@ -1787,12 +1778,12 @@ void CslFrame::OnListItemSelected(wxListEvent& event)
     list_ctrl_info->UpdateInfo(info);
 
     if (m_oldSelectedInfo)
-        m_oldSelectedInfo->SetPingExt(false);
+        m_oldSelectedInfo->PingExt(false);
     m_oldSelectedInfo=info;
 
     list_ctrl_players->SetInfo(info);
 
-    info->SetPingExt(true);
+    info->PingExt(true);
 
     if (!m_engine->PingEx(info))
         list_ctrl_players->ListUpdatePlayerData(info->GetGame(),info->PlayerStats);
@@ -1984,7 +1975,7 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
 
             if (s.IsEmpty())
             {
-                loopv(m_searchedServers) m_searchedServers[i]->SetPingExt(false);
+                loopv(m_searchedServers) m_searchedServers[i]->PingExt(false);
                 m_searchedServers.setsize(0);
                 m_searchString.Empty();
                 button_search->Enable(false);
@@ -2026,13 +2017,19 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
 
         case CSL_BUTTON_SEARCH:
         {
+            if (!radio_search_player->GetValue())
+                break;
+
             m_searchResultPlayer=m_searchResultServer=0;
-            loopv(m_searchedServers) m_searchedServers[i]->SetPingExt(false);
+
+            loopv(m_searchedServers) m_searchedServers[i]->PingExt(false);
             m_searchedServers.setsize(0);
+
             gauge_search->SetValue(0);
-            list_ctrl_master->Highlight(CSL_HIGHLIGHT_SEARCH_PLAYER,false);
-            list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_SEARCH_PLAYER,false);
             text_search_result->SetLabel(wxString::Format(_("Search result: %d players on %d servers"),0,0));
+
+            list_ctrl_master->Highlight(CSL_HIGHLIGHT_FOUND_PLAYER,false);
+            list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_FOUND_PLAYER,false);
 
             if (text_ctrl_search->GetValue().IsEmpty())
                 break;
@@ -2049,7 +2046,9 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
                 {
                     m_searchedServers.add(servers[i]);
                     servers[i]->Search=true;
-                    servers[i]->SetPingExt(true);
+                    servers[i]->PingExt(true);
+                    list_ctrl_master->Highlight(CSL_HIGHLIGHT_SEARCH_PLAYER,true,servers[i]);
+                    list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_SEARCH_PLAYER,true,servers[i]);
                 }
             }
 
@@ -2103,7 +2102,7 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
                 m_oldSelectedInfo=NULL;
 
             if (m_extendedDlg->GetInfo()==info)
-                info->SetPingExt(false);
+                info->PingExt(false);
 
             loopvrev(m_playerLists)
             {
@@ -2116,7 +2115,7 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
                         delete m_playerLists[i];
                         m_playerLists.remove(i);
                     }
-                    info->SetPingExt(false);
+                    info->PingExt(false);
                 }
             }
 
@@ -2138,7 +2137,7 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             CslServerInfo *info=(CslServerInfo*)event.GetClientData();
             if (info)
             {
-                info->SetPingExt(true);
+                info->PingExt(true);
                 m_extendedDlg->DoShow(info);
             }
             break;
@@ -2236,7 +2235,7 @@ void CslFrame::OnPaneClose(wxAuiManagerEvent& event)
             if (m_playerLists[i]==event.pane->window)
             {
                 if ((info=m_playerLists[i]->GetInfo())!=NULL)
-                    info->SetPingExt(false);
+                    info->PingExt(false);
                 if (i==0)
                 {
                     CslMenu::CheckMenuItem(MENU_VIEW_PLAYER_LIST,false);
