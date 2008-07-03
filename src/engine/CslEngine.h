@@ -113,11 +113,11 @@ class CslEngine : public wxEvtHandler
         CslEngine(wxEvtHandler *evtHandler);
         ~CslEngine();
 
-        bool Init(wxUint32 interval=CSL_UPDATE_INTERVAL_MIN);
+        bool Init(wxInt32 interval=CSL_UPDATE_INTERVAL_MIN);
         void DeInit();
         bool IsOk() const { return m_ok; }
 
-        void SetUpdateInterval(wxUint32 interval) { m_updateInterval=interval; }
+        void SetUpdateInterval(wxInt32 interval) { m_updateInterval=interval; }
 
         void ResolveHost(CslServerInfo *info);
 
@@ -156,7 +156,7 @@ class CslEngine : public wxEvtHandler
         wxInt32 m_gameId;
         vector<CslGame*> m_games;
 
-        wxUint32 m_updateInterval;
+        wxInt32 m_updateInterval;
 
         void ParseDefaultPong(CslServerInfo *info,ucharbuf& buf,wxUint32 now);
         void ParsePong(CslServerInfo *info,CslUDPPacket& packet,wxUint32 now);
