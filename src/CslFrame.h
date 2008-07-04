@@ -92,6 +92,8 @@ class CslFrame: public wxFrame
         wxMenuBar *menubar;
         wxMenu *menuMaster;
 
+        wxString m_defaultLayout;
+
         CslMenu *m_menu;
         wxImageList m_imgListTree;
         wxImageList m_imgListButton;

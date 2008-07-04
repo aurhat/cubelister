@@ -232,6 +232,7 @@ class CslServerInfo : public CslExtendedInfo
         wxString GetBestDescription() const;
 
         CslGame& GetGame() { return *m_game; }
+        const vector<wxInt32>& GetMasterIDs() const { return m_masterIDs; }
 
         void Lock(bool lock=true);
         bool IsLocked() const { return m_lock>0; }
@@ -268,8 +269,6 @@ class CslServerInfo : public CslExtendedInfo
         wxUint32 PlayLast,PlayTimeLastGame,PlayTimeTotal;
         wxUint32 ConnectedTimes;
         bool Search;
-
-        const vector<wxInt32>& GetMasterIDs() const { return m_masterIDs; }
 
     private:
         CslGame *m_game;

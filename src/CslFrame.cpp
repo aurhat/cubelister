@@ -457,11 +457,11 @@ void CslFrame::CreateMainMenu()
                      wxART_NONE,wxITEM_CHECK);
     CslMenu::AddItem(menu,MENU_VIEW_OUTPUT,_("Show game output\tCTRL+O"),
                      wxART_NONE,wxITEM_CHECK);
-    menu->AppendSeparator();
-    CslMenu::AddItem(menu,MENU_VIEW_AUTO_SORT,_("Sort lists automatically\tCTRL+L"),
-                     wxART_NONE,wxITEM_CHECK);
-    menu->AppendSeparator();
     CslMenu::AddItem(menu,MENU_VIEW_TRAFFIC,_("&Traffic statistics"),wxART_NONE);
+    menu->AppendSeparator();
+    CslMenu::AddItem(menu,MENU_VIEW_AUTO_SORT,_("Sort lists automatically\tCTRL+L"),wxART_NONE,wxITEM_CHECK);
+    menu->AppendSeparator();
+    CslMenu::AddItem(menu,MENU_VIEW_RELAYOUT,_("Reset layout"),wxART_NONE);
     menubar->Append(menu,_("&View"));
 
 #ifndef __WXMAC__
@@ -612,6 +612,9 @@ void CslFrame::DoLayout()
     m_AuiMgr.AddPane(list_ctrl_players,wxAuiPaneInfo().Name(wxT("players0")).
                      Left().Layer(1).Position(2).
                      MinSize(240,20).BestSize(CslListCtrlPlayer::BestSizeMini).FloatingSize(280,200));
+
+    m_defaultLayout=m_AuiMgr.SavePerspective();
+
     if (!g_cslSettings->layout.IsEmpty())
         m_AuiMgr.LoadPerspective(g_cslSettings->layout,false);
 
@@ -1941,6 +1944,13 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             m_outputDlg->Show(!m_outputDlg->IsShown());
             break;
 
+        case MENU_VIEW_TRAFFIC:
+        {
+            m_trafficDlg=new CslDlgTraffic(this);
+            m_trafficDlg->ShowModal();
+            break;
+        }
+
         case MENU_VIEW_AUTO_SORT:
             g_cslSettings->autoSortColumns=event.IsChecked();
             list_ctrl_master->ListSort();
@@ -1949,12 +1959,10 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             list_ctrl_favourites->ToggleSortArrow();
             break;
 
-        case MENU_VIEW_TRAFFIC:
-        {
-            m_trafficDlg=new CslDlgTraffic(this);
-            m_trafficDlg->ShowModal();
+        case MENU_VIEW_RELAYOUT:
+            m_AuiMgr.LoadPerspective(m_defaultLayout);
+            m_AuiMgr.Update();
             break;
-        }
 
         case wxID_ABOUT:
         {
@@ -2375,7 +2383,7 @@ bool CslApp::OnInit()
     wxString name=wxString::Format(wxT(".%s-%s.lock"),CSL_NAME_SHORT_STR,wxGetUserId().c_str());
     m_single=new wxSingleInstanceChecker(name);
 
-    if (false &&m_single->IsAnotherRunning())
+    if (m_single->IsAnotherRunning())
     {
         CslDlgGeneric *dlg=new CslDlgGeneric(NULL,CSL_DLG_GENERIC_DEFAULT,
                                              _("CSL already running"),
