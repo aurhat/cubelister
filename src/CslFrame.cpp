@@ -290,6 +290,44 @@ wxThread::ExitCode CslVersionCheckThread::Entry()
 }
 
 
+CslPlayerInfo::CslPlayerInfo(wxWindow* parent,long listStyle)
+        : wxPanel(parent,wxID_ANY)
+{
+    m_sizer=new wxFlexGridSizer(2,1,0,0);
+
+    m_listCtrl=new CslListCtrlPlayer(this,wxID_ANY,wxDefaultPosition,wxDefaultSize,listStyle);
+    m_label=new wxStaticText(this,wxID_ANY,wxEmptyString);
+
+    m_sizer->Add(m_listCtrl,0,wxALL|wxEXPAND,0);
+    m_sizer->Add(m_label,0,wxALL|wxEXPAND,2);
+
+    m_sizer->AddGrowableRow(0);
+    m_sizer->AddGrowableCol(0);
+
+    SetSizer(m_sizer);
+    m_sizer->Fit(this);
+    m_sizer->Layout();
+}
+
+void CslPlayerInfo::UpdateData()
+{
+    CslServerInfo *info=m_listCtrl->ServerInfo();
+
+    if (!info)
+        return;
+
+    wxString s;
+    if (!info->GameMode.IsEmpty())
+        s+=info->GameMode+_(" on ");
+    if (!info->Map.IsEmpty())
+        s+=info->Map+wxT(" ");
+    if (info->TimeRemain>0)
+        s+=wxString::Format(wxT("(%d %s)"),info->TimeRemain,info->TimeRemain==1 ? _("Minute"):_("Minutes"))+wxT(" ");
+    m_label->SetLabel(s);
+
+    m_listCtrl->UpdateData();
+}
+
 CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
                    const wxPoint& pos,const wxSize& size,long style):
         wxFrame(parent, id, title, pos, size, wxDEFAULT_FRAME_STYLE)
@@ -505,8 +543,8 @@ void CslFrame::CreateControls()
     radio_search_server=new wxRadioButton(pane_search,CSL_RADIO_SEARCH_SERVER,_("Se&rvers"),
                                           wxDefaultPosition,wxDefaultSize,wxRB_GROUP);
     radio_search_player=new wxRadioButton(pane_search,CSL_RADIO_SEARCH_PLAYER,_("&Players"));
-    list_ctrl_players=new CslListCtrlPlayer(pane_main,wxID_ANY,wxDefaultPosition,wxDefaultSize,listStyle);
-    m_playerLists.add(list_ctrl_players);
+    player_info=new CslPlayerInfo(pane_main,listStyle);
+    m_playerInfos.add(player_info);
 
     CreateMainMenu();
 
@@ -540,7 +578,7 @@ void CslFrame::SetProperties()
     button_search_clear->Connect(wxEVT_LEFT_DOWN,
                                  wxMouseEventHandler(CslFrame::OnMouseLeftDown),NULL,this);
 
-    list_ctrl_players->ListInit(CslListCtrlPlayer::CSL_LISTPLAYER_MINI_SIZE);
+    player_info->ListCtrl()->ListInit(CslListCtrlPlayer::CSL_LISTPLAYER_MINI_SIZE);
 
     list_ctrl_master->ListInit(m_engine,list_ctrl_favourites);
     list_ctrl_favourites->ListInit(m_engine,list_ctrl_master);
@@ -609,7 +647,7 @@ void CslFrame::DoLayout()
     m_AuiMgr.AddPane(list_ctrl_info,wxAuiPaneInfo().Name(wxT("info")).
                      Left().Layer(1).Position(1).
                      MinSize(240,20).BestSize(360,200).FloatingSize(360,200));
-    m_AuiMgr.AddPane(list_ctrl_players,wxAuiPaneInfo().Name(wxT("players0")).
+    m_AuiMgr.AddPane(player_info,wxAuiPaneInfo().Name(wxT("players0")).
                      Left().Layer(1).Position(2).
                      MinSize(240,20).BestSize(CslListCtrlPlayer::BestSizeMini).FloatingSize(280,200));
 
@@ -638,7 +676,7 @@ void CslFrame::DoLayout()
         pane->Caption(CSL_CAPTION_FAVOURITE_LIST_SERVERS);
         CslMenu::CheckMenuItem(MENU_VIEW_FAVOURITES,pane->IsShown());
     }
-    pane=&m_AuiMgr.GetPane(list_ctrl_players);
+    pane=&m_AuiMgr.GetPane(player_info);
     if (pane->IsOk())
     {
         pane->Caption(CSL_CAPTION_PLAYERS_SELECTED);
@@ -697,12 +735,12 @@ void CslFrame::PlayerListCreateView(CslServerInfo *info,wxUint32 view,const wxSt
         wxInt32 j,id=1;
         vector<wxInt32> ids;
 
-        loopv(m_playerLists)
+        loopv(m_playerInfos)
         {
             if (i==0)
                 continue;
 
-            wxAuiPaneInfo &pane=m_AuiMgr.GetPane(m_playerLists[i]);
+            wxAuiPaneInfo &pane=m_AuiMgr.GetPane(m_playerInfos[i]);
             if (pane.IsOk() && pane.name.Mid(7).ToLong(&l))
             {
                 for (j=0;j<ids.length();j++)
@@ -730,19 +768,17 @@ void CslFrame::PlayerListCreateView(CslServerInfo *info,wxUint32 view,const wxSt
 
     pane_main->Freeze();
 
-    CslListCtrlPlayer *list=new CslListCtrlPlayer(pane_main,wxID_ANY,wxDefaultPosition,wxDefaultSize,style);
-    list->ListInit(view);
-    list->SetInfo(info);
+    CslPlayerInfo *playerinfo=new CslPlayerInfo(pane_main,style);
+    playerinfo->ListCtrl()->ListInit(view);
+    playerinfo->ServerInfo(info);
+    m_playerInfos.add(playerinfo);
 
-    m_AuiMgr.AddPane(list,pane);
+    m_AuiMgr.AddPane(playerinfo,pane);
     m_AuiMgr.Update();
 
     pane_main->Thaw();
 
-    m_playerLists.add(list);
-
     info->PingExt(true);
-
     m_engine->PingEx(info,true);
 }
 
@@ -759,7 +795,7 @@ void CslFrame::TogglePane(wxInt32 id)
             pane=&m_AuiMgr.GetPane(list_ctrl_info);
             break;
         case MENU_VIEW_PLAYER_LIST:
-            pane=&m_AuiMgr.GetPane(list_ctrl_players);
+            pane=&m_AuiMgr.GetPane(player_info);
             break;
         case MENU_VIEW_FAVOURITES:
             pane=&m_AuiMgr.GetPane(list_ctrl_favourites);
@@ -1576,18 +1612,18 @@ void CslFrame::SaveServers()
             config.Write(wxT("ConnectedTimes"),(int)info->ConnectedTimes);
 
             wxUint32 l=0;
-            loopvk(m_playerLists)
+            loopvk(m_playerInfos)
             {
                 if (k==0)
                     continue;
-                CslListCtrlPlayer *list=m_playerLists[k];
-                if (list->GetInfo()==info)
+                CslPlayerInfo *list=m_playerInfos[k];
+                if (list->ServerInfo()==info)
                 {
                     wxAuiPaneInfo& pane=m_AuiMgr.GetPane(list);
                     if (!pane.IsOk())
                         continue;
 
-                    wxString view=wxString::Format(wxT("%d:"),list->GetView())+pane.name;
+                    wxString view=wxString::Format(wxT("%d:"),list->ListCtrl()->View())+pane.name;
                     config.Write(wxString::Format(wxT("GuiView%d"),l++),view);
                 }
             }
@@ -1627,10 +1663,10 @@ void CslFrame::OnPong(wxCommandEvent& event)
 
     if (packet->Type==CSL_PONG_TYPE_PLAYERSTATS)
     {
-        loopv(m_playerLists)
+        loopv(m_playerInfos)
         {
-            if (m_playerLists[i]->GetInfo()==packet->Info)
-                m_playerLists[i]->ListUpdatePlayerData(packet->Info->GetGame(),packet->Info->PlayerStats);
+            if (m_playerInfos[i]->ServerInfo()==packet->Info)
+                m_playerInfos[i]->UpdateData();
         }
 
         if (m_searchedServers.length() && radio_search_player->GetValue())
@@ -1784,12 +1820,12 @@ void CslFrame::OnListItemSelected(wxListEvent& event)
         m_oldSelectedInfo->PingExt(false);
     m_oldSelectedInfo=info;
 
-    list_ctrl_players->SetInfo(info);
+    player_info->ServerInfo(info);
 
     info->PingExt(true);
 
     if (!m_engine->PingEx(info))
-        list_ctrl_players->ListUpdatePlayerData(info->GetGame(),info->PlayerStats);
+        player_info->UpdateData();
 
     {
         wxAuiPaneInfo& pane=m_AuiMgr.GetPane(list_ctrl_info);
@@ -1797,7 +1833,7 @@ void CslFrame::OnListItemSelected(wxListEvent& event)
             pane.Caption(wxString(CSL_CAPTION_SERVER_INFO)+wxT(": ")+info->GetBestDescription());
     }
     {
-        wxAuiPaneInfo& pane=m_AuiMgr.GetPane(list_ctrl_players);
+        wxAuiPaneInfo& pane=m_AuiMgr.GetPane(player_info);
         if (pane.IsOk())
             pane.Caption(PlayerListGetCaption(info,true));
     }
@@ -2112,16 +2148,16 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             if (m_extendedDlg->GetInfo()==info)
                 info->PingExt(false);
 
-            loopvrev(m_playerLists)
+            loopvrev(m_playerInfos)
             {
-                if (m_playerLists[i]->GetInfo()==info)
+                if (m_playerInfos[i]->ServerInfo()==info)
                 {
-                    if (i>0 && m_AuiMgr.DetachPane(m_playerLists[i]))
+                    if (i>0 && m_AuiMgr.DetachPane(m_playerInfos[i]))
                     {
                         m_AuiMgr.Update();
 
-                        delete m_playerLists[i];
-                        m_playerLists.remove(i);
+                        delete m_playerInfos[i];
+                        m_playerInfos.remove(i);
                     }
                     info->PingExt(false);
                 }
@@ -2238,19 +2274,19 @@ void CslFrame::OnPaneClose(wxAuiManagerEvent& event)
 
     if (event.pane->name.StartsWith(wxT("players")))
     {
-        loopv(m_playerLists)
+        loopv(m_playerInfos)
         {
-            if (m_playerLists[i]==event.pane->window)
+            if (m_playerInfos[i]==event.pane->window)
             {
-                if ((info=m_playerLists[i]->GetInfo())!=NULL)
+                if ((info=m_playerInfos[i]->ServerInfo())!=NULL)
                     info->PingExt(false);
                 if (i==0)
                 {
                     CslMenu::CheckMenuItem(MENU_VIEW_PLAYER_LIST,false);
-                    m_playerLists[i]->SetInfo(NULL);
+                    m_playerInfos[i]->ServerInfo(NULL);
                 }
                 else
-                    m_playerLists.remove(i);
+                    m_playerInfos.remove(i);
                 break;
             }
         }

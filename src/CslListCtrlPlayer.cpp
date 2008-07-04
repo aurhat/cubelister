@@ -223,12 +223,13 @@ void CslListCtrlPlayer::OnMenu(wxCommandEvent& event)
     }
 }
 
-void CslListCtrlPlayer::ListUpdatePlayerData(CslGame& game,CslPlayerStats& stats)
+void CslListCtrlPlayer::UpdateData()
 {
     wxInt32 c;
     wxString s;
     wxListItem item;
     CslPlayerStatsData *data=NULL;
+    const CslPlayerStats& stats=m_info->PlayerStats;
 
     //fixes flickering if scrollbar is shown
     wxWindowUpdateLocker lock(this);
@@ -291,7 +292,7 @@ void CslListCtrlPlayer::ListUpdatePlayerData(CslGame& game,CslPlayerStats& stats
                     s=wxString::Format(wxT("%d"),data->Armour);
                 SetItem(i,7,s);
 
-                s=game.GetWeaponName(data->Weapon);
+                s=m_info->GetGame().GetWeaponName(data->Weapon);
                 SetItem(i,8,s.IsEmpty() ? wxString(_("no data")):s);
             }
         }
@@ -401,7 +402,7 @@ void CslListCtrlPlayer::ListSort(const wxInt32 column)
         SortItems(ListSortCompareFunc,(long)&m_sortHelper);
 }
 
-void CslListCtrlPlayer::SetInfo(CslServerInfo *info)
+void CslListCtrlPlayer::ServerInfo(CslServerInfo *info)
 {
     m_info=info;
     DeleteAllItems();

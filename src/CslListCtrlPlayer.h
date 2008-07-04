@@ -50,11 +50,11 @@ class CslListCtrlPlayer : public wxListCtrl
 
         void ListInit(const wxUint32 view);
         void ListAdjustSize();
-        void ListUpdatePlayerData(CslGame& game,CslPlayerStats& stats);
+        void UpdateData();
 
-        void SetInfo(CslServerInfo *info);
-        CslServerInfo* GetInfo() { return m_info; }
-        wxInt32 GetView() { return m_view; }
+        void ServerInfo(CslServerInfo *info);
+        CslServerInfo* ServerInfo() { return m_info; }
+        wxInt32 View() { return m_view; }
 
         static void CreateImageList();
 

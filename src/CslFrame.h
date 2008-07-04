@@ -65,6 +65,24 @@ class CslVersionCheckThread : public wxThread
 };
 
 
+class CslPlayerInfo : public wxPanel
+{
+    public:
+        CslPlayerInfo(wxWindow* parent,long listStyle=wxLC_ICON);
+
+        CslListCtrlPlayer* ListCtrl() { return m_listCtrl; }
+        CslServerInfo* ServerInfo() { return m_listCtrl->ServerInfo(); }
+        void ServerInfo(CslServerInfo *info) { m_listCtrl->ServerInfo(info); }
+
+        void UpdateData();
+
+    private:
+        wxFlexGridSizer *m_sizer;
+        CslListCtrlPlayer *m_listCtrl;
+        wxStaticText *m_label;
+};
+
+
 class CslFrame: public wxFrame
 {
     public:
@@ -80,7 +98,7 @@ class CslFrame: public wxFrame
         wxFlexGridSizer *sizer_main,*sizer_search;
         wxPanel *pane_main,*pane_search;
         CslListCtrlServer *list_ctrl_master,*list_ctrl_favourites;
-        CslListCtrlPlayer *list_ctrl_players;
+        CslPlayerInfo *player_info;
         CslListCtrlInfo *list_ctrl_info;
         wxTreeCtrl *tree_ctrl_games;
         wxTextCtrl *text_ctrl_search;
@@ -111,7 +129,7 @@ class CslFrame: public wxFrame
 
         CslVersionCheckThread *m_versionCheckThread;
 
-        vector<CslListCtrlPlayer*> m_playerLists;
+        vector<CslPlayerInfo*> m_playerInfos;
 
         CslServerInfo *m_oldSelectedInfo;
 

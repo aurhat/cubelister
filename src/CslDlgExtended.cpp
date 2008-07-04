@@ -341,9 +341,10 @@ void CslDlgExtended::ClearTeamScoreLabel(const wxUint32 start,const wxUint32 end
         m_teamLabel.Item(i)->SetFont(m_labelFont);
     }
 }
+
 void CslDlgExtended::UpdatePlayerData()
 {
-    list_ctrl_players->ListUpdatePlayerData(m_info->GetGame(),m_info->PlayerStats);
+    list_ctrl_players->UpdateData();
     label_records->SetLabel(wxString::Format(_("%d players"),list_ctrl_players->GetItemCount()));
 }
 
@@ -582,7 +583,7 @@ void CslDlgExtended::DoShow(CslServerInfo *info)
     }
 
     m_info=info;
-    list_ctrl_players->SetInfo(info);
+    list_ctrl_players->ServerInfo(info);
 
     UpdatePlayerData();
     UpdateTeamData();
