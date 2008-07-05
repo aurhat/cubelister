@@ -620,7 +620,7 @@ void CslListCtrlPlayer::CreateImageList()
     ovi.dwOSVersionInfoSize=sizeof(OSVERSIONINFO);
     GetVersionEx(&ovi);
 
-	if (ovi.dwPlatformId==6)
+	if (ovi.dwMajorVersion>5)
 		m_imgOffsetY=2;
 
     ListImageList.Create(20,14,true);
