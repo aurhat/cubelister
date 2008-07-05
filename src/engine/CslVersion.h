@@ -28,7 +28,7 @@
 #define CSL_NAME_STR          _("Cube Server Lister (CSL)")
 #define CSL_NAME_SHORT_STR    wxT("csl")
 
-#define CSL_VERSION_STR       wxT("0.7.98")
+#define CSL_VERSION_STR       wxT("0.7.99")
 #define CSL_VERSION_ADD_STR   wxT("")
 #define CSL_VERSION_LONG_STR  wxString(CSL_VERSION_STR wxT(" ") CSL_VERSION_ADD_STR)
 

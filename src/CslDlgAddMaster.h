@@ -61,8 +61,6 @@ class CslDlgAddMaster: public wxDialog
         wxTextCtrl* text_ctrl_address;
         wxSpinCtrl* spin_ctrl_port;
         wxTextCtrl* text_ctrl_path;
-        wxRadioButton* radio_btn_custom;
-        wxRadioButton* radio_btn_default;
         wxButton* button_add;
         wxButton* button_cancel;
         // end wxGlade

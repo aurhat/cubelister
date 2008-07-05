@@ -414,9 +414,12 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
         {
             game=games[i];
 
-            if (!serverLoaded || (serverLoaded && game->GetMasters().empty()))
+            CslMaster *master=new CslMaster(game->GetDefaultMasterConnection());
+            if (game->AddMaster(master)<0)
+                delete master;
+
+            if (!serverLoaded)
             {
-                game->AddMaster(new CslMaster(game->GetDefaultMasterConnection()));
                 //add default servers here
             }
 
@@ -1931,7 +1934,8 @@ void CslFrame::OnTreeRightClick(wxTreeEvent& event)
 
     if (master)
     {
-        CslMenu::EnableMenuItem(MENU_MASTER_DEL);
+        bool b=master->GetGame()->GetDefaultMasterConnection()==master->GetConnection();
+        CslMenu::EnableMenuItem(MENU_MASTER_DEL,!b);
         CslMenu::EnableMenuItem(MENU_MASTER_UPDATE);
     }
     else
