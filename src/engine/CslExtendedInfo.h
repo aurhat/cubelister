@@ -142,10 +142,10 @@ class CslTeamStats
         void DeleteStats();
         void Reset();
 
-        bool m_teamplay;
-        wxInt32 m_remain;
-        wxUint32 m_lastPing,m_lastPong;
-        vector<CslTeamStatsData*> m_stats;
+        bool TeamMode;
+        wxInt32 TimeRemain,GameMode;
+        wxUint32 LastPing,LastPong;
+        vector<CslTeamStatsData*> Stats;
 };
 
 

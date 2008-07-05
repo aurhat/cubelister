@@ -285,7 +285,7 @@ wxUint32 CslEngine::PingServers(CslGame *game,bool force)
     CslServerInfo *info;
 
     {
-        vector<CslServerInfo*>& servers=game->GetServers();
+        const vector<CslServerInfo*>& servers=game->GetServers();
 
         loopv(servers)
         {
@@ -295,6 +295,22 @@ wxUint32 CslEngine::PingServers(CslGame *game,bool force)
 
         if (!force && c>10)
             ResetPingSends(game,NULL);
+    }
+
+    {
+        loopv(m_games)
+        {
+            if (game==m_games[i])
+                continue;
+
+            const vector<CslServerInfo*>& servers=m_games[i]->GetServers();
+
+            loopvj(servers)
+            {
+                if (!servers[j]->IsFavourite() && servers[j]->PingExt() && Ping(servers[j],force))
+                    c++;
+            }
+        }
     }
 
     vector<CslServerInfo*> servers;
@@ -717,12 +733,12 @@ void CslEngine::ParsePong(CslServerInfo *info,CslUDPPacket& packet,wxUint32 now)
 
                     info->ExtInfoStatus=CSL_EXT_STATUS_OK;
 
-                    stats.m_teamplay=!getint(p);  // error
+                    stats.TeamMode=!getint(p);  // error
                     if (exVersion>=103)
-                        getint(p); //FIXME dummy for gamemode
-                    stats.m_remain=getint(p);  // remaining time
+                        stats.GameMode=getint(p);
+                    stats.TimeRemain=getint(p);  // remaining time
 
-                    if (!stats.m_teamplay)  // check error (no teammode)
+                    if (!stats.TeamMode)  // check error (no teammode)
                     {
                         stats.Reset();
                         wxCommandEvent evt(wxCSL_EVT_PONG);
@@ -821,7 +837,7 @@ void CslEngine::CheckResends()
                 if (info->Ping>m_updateInterval ||
                     stats.m_lastPong<stats.m_lastPing ||
                     GetTicks()-stats.m_lastPong<min((wxUint32)info->Ping*2,500))
-                    return;
+                    continue;
 
                 loopvk(stats.m_ids)
                 {
@@ -829,7 +845,6 @@ void CslEngine::CheckResends()
                               stats.m_lastPong-stats.m_lastPing,info->Ping,stats.m_ids[k]);
                     PingExPlayerInfo(info,stats.m_ids[k]);
                 }
-                return;
             }
 #if 0
             else if (stats.m_status==CslPlayerStats::CSL_STATS_NEED_IDS)

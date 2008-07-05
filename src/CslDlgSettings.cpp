@@ -112,7 +112,7 @@ CslGamePage::CslGamePage(wxWindow *parent,CslGame *game) :
                                      wxDIRP_DEFAULT_STYLE|wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST);
     sizer->Add(dirpickercfg,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,dpickBorder);
 
-    wxStaticText* label_options=new wxStaticText(this,wxID_ANY,_("Game paramters:"));
+    wxStaticText* label_options=new wxStaticText(this,wxID_ANY,_("Game parameters:"));
     sizer->Add(label_options,0,wxLEFT|wxALIGN_CENTER_VERTICAL,8);
 
     text_ctrl_options=new wxTextCtrl(this,wxID_ANY,wxEmptyString);

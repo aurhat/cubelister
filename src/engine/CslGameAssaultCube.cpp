@@ -85,7 +85,6 @@ bool CslGameAssaultCube::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) con
     info.Version=GetVersionName(info.Protocol);
     wxInt32 mode=getint(buf);
     info.GameMode=GetModeName(mode);
-    info.IsCapture=mode==5;
     info.Players=getint(buf);
     info.TimeRemain=getint(buf);
     if (info.Protocol<1126) // <=0.93
@@ -131,7 +130,11 @@ bool CslGameAssaultCube::ParseTeamPong(wxUint32 protocol,ucharbuf& buf,CslTeamSt
     getstring(text,buf);
     info.Name=A2U(text);
     info.Score=getint(buf);
-    info.Score2=getint(buf);
+    i=getint(buf);
+    if (i>-1)
+        info.Score2=i;
+    else
+        info.Score2=CSL_SCORE_INVALID;
     i=getint(buf);
     if (i>0)
         while (i--)

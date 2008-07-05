@@ -120,10 +120,9 @@ void CslPlayerStats::Reset()
 }
 
 
-
 CslTeamStats::CslTeamStats() :
-        m_teamplay(false),m_remain(-1),
-        m_lastPing(0),m_lastPong(0)
+        TeamMode(false),TimeRemain(-1),
+        LastPing(0),LastPong(0)
 {
 }
 
@@ -134,11 +133,11 @@ CslTeamStats::~CslTeamStats()
 
 CslTeamStatsData* CslTeamStats::GetNewStats()
 {
-    loopv(m_stats)
+    loopv(Stats)
     {
-        if (m_stats[i]->Ok)
+        if (Stats[i]->Ok)
             continue;
-        return m_stats[i];
+        return Stats[i];
     }
     return new CslTeamStatsData;
 }
@@ -146,17 +145,17 @@ CslTeamStatsData* CslTeamStats::GetNewStats()
 void CslTeamStats::AddStats(CslTeamStatsData *data)
 {
     data->Ok=true;
-    loopv(m_stats) if (m_stats[i]==data) return;
-    m_stats.add(data);
+    loopv(Stats) if (Stats[i]==data) return;
+    Stats.add(data);
 }
 
 void CslTeamStats::DeleteStats()
 {
-    loopvrev(m_stats) delete m_stats[i];
-    m_stats.setsize(0);
+    loopvrev(Stats) delete Stats[i];
+    Stats.setsize(0);
 }
 
 void CslTeamStats::Reset()
 {
-    loopv(m_stats) m_stats[i]->Reset();
+    loopv(Stats) Stats[i]->Reset();
 }

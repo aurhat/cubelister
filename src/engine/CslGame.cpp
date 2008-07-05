@@ -300,8 +300,6 @@ CslServerInfo::CslServerInfo(CslGame *game,
     Players=-1;
     PlayersMax=-1;
     MM=-1;
-    IsCapture=false;
-    ModeHasBases=false;
     View=view;
     PingSend=0;
     PingResp=0;

@@ -49,6 +49,7 @@ class CslGameAssaultCube : public CslGame
 
         //implementations for base class
         wxString GetWeaponName(wxInt32 n) const;
+        bool ModeIsCapture(wxInt32 mode) const { return mode==5; }
         wxUint16 GetDefaultPort() const { return CSL_DEFAULT_PORT_AC; }
         bool ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const;
         bool ParsePlayerPong(wxUint32 protocol,ucharbuf& buf,CslPlayerStatsData& info) const;

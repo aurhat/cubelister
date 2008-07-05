@@ -115,6 +115,11 @@ BEGIN_EVENT_TABLE(CslFrame, wxFrame)
 END_EVENT_TABLE()
 
 
+BEGIN_EVENT_TABLE(CslPlayerInfo,wxPanel)
+    EVT_SIZE(CslPlayerInfo::OnSize)
+END_EVENT_TABLE()
+
+
 class CslIDMapping
 {
     public:
@@ -309,24 +314,45 @@ CslPlayerInfo::CslPlayerInfo(wxWindow* parent,long listStyle)
     m_sizer->Layout();
 }
 
-void CslPlayerInfo::UpdateData()
+void CslPlayerInfo::OnSize(wxSizeEvent& event)
+{
+    m_label->SetLabel(GetLabelText());
+    m_label->Wrap(GetSize().x-4);
+#ifdef __WXMAC__
+    m_sizer->Layout();
+#endif
+
+    event.Skip();
+}
+
+wxString CslPlayerInfo::GetLabelText()
 {
     CslServerInfo *info=m_listCtrl->ServerInfo();
 
     if (!info)
-        return;
+        return wxEmptyString;
 
     wxString s;
+
+    if (info)
     if (!info->GameMode.IsEmpty())
         s+=info->GameMode+_(" on ");
     if (!info->Map.IsEmpty())
         s+=info->Map+wxT(" ");
     if (info->TimeRemain>0)
-        s+=wxString::Format(wxT("(%d %s)"),info->TimeRemain,info->TimeRemain==1 ? _("Minute"):_("Minutes"))+wxT(" ");
-    m_label->SetLabel(s);
+        s+=wxString::Format(wxT("(< %d %s)"),info->TimeRemain,info->TimeRemain==1 ? _("Minute"):_("Minutes"))+wxT(" ");
 
-    m_listCtrl->UpdateData();
+    return s;
 }
+
+void CslPlayerInfo::UpdateData()
+{
+    m_label->SetLabel(GetLabelText());
+    m_label->Wrap(GetSize().x-4);
+    m_listCtrl->UpdateData();
+    m_sizer->Layout();
+}
+
 
 CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
                    const wxPoint& pos,const wxSize& size,long style):
@@ -382,7 +408,7 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
     if (m_engine->IsOk())
     {
         CslGame *game;
-        vector<CslGame*>& games=m_engine->GetGames();
+        const vector<CslGame*>& games=m_engine->GetGames();
 
         loopv(games)
         {
@@ -1736,10 +1762,8 @@ void CslFrame::OnTimer(wxTimerEvent& event)
         CslGame *game=TreeGetSelectedGame();
         CslMaster *master=TreeGetSelectedMaster();
 
-        if (m_timerCount>=m_timerUpdate)
+        if (m_timerCount%m_timerUpdate==0)
         {
-            m_timerCount=0;
-
             if (game)
             {
                 list_ctrl_master->ListUpdate(master? master->GetServers():game->GetServers());
@@ -1749,8 +1773,8 @@ void CslFrame::OnTimer(wxTimerEvent& event)
                 list_ctrl_favourites->ListUpdate(servers);
             }
         }
-        else
-            m_timerCount++;
+
+        m_timerCount++;
 
         bool green=game && m_engine->PingServers(game,m_timerInit);
         green|=m_engine->PingServersEx()!=0;
@@ -1802,7 +1826,7 @@ void CslFrame::OnTimer(wxTimerEvent& event)
 
     if (CslStatusBar::Light()!=LIGHT_GREY)
     {
-        if ((lightCount=++lightCount%3)==0)
+        if ((lightCount=++lightCount%4)==0)
             CslStatusBar::Light(LIGHT_GREY);
     }
 }
@@ -2082,17 +2106,35 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             if (!game)
                 break;
 
-            vector<CslServerInfo*>& servers=game->GetServers();
-            loopv(servers)
             {
-                if (CslEngine::PingOk(*servers[i],g_cslSettings->updateInterval) &&
-                    servers[i]->ExtInfoStatus==CSL_EXT_STATUS_OK)
+                const vector<CslServerInfo*>& servers=game->GetServers();
+                loopv(servers)
                 {
-                    m_searchedServers.add(servers[i]);
-                    servers[i]->Search=true;
-                    servers[i]->PingExt(true);
-                    list_ctrl_master->Highlight(CSL_HIGHLIGHT_SEARCH_PLAYER,true,servers[i]);
-                    list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_SEARCH_PLAYER,true,servers[i]);
+                    if (!servers[i]->IsFavourite() &&
+                        CslEngine::PingOk(*servers[i],g_cslSettings->updateInterval) &&
+                        servers[i]->ExtInfoStatus==CSL_EXT_STATUS_OK)
+                    {
+                        m_searchedServers.add(servers[i]);
+                        servers[i]->Search=true;
+                        servers[i]->PingExt(true);
+                        list_ctrl_master->Highlight(CSL_HIGHLIGHT_SEARCH_PLAYER,true,servers[i]);
+                    }
+                }
+            }
+
+            {
+                vector<CslServerInfo*> servers;
+                m_engine->GetFavourites(servers);
+                loopv(servers)
+                {
+                    if (CslEngine::PingOk(*servers[i],g_cslSettings->updateInterval) &&
+                        servers[i]->ExtInfoStatus==CSL_EXT_STATUS_OK)
+                    {
+                        m_searchedServers.add(servers[i]);
+                        servers[i]->Search=true;
+                        servers[i]->PingExt(true);
+                        list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_SEARCH_PLAYER,true,servers[i]);
+                    }
                 }
             }
 

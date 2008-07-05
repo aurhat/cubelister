@@ -73,13 +73,19 @@ class CslPlayerInfo : public wxPanel
         CslListCtrlPlayer* ListCtrl() { return m_listCtrl; }
         CslServerInfo* ServerInfo() { return m_listCtrl->ServerInfo(); }
         void ServerInfo(CslServerInfo *info) { m_listCtrl->ServerInfo(info); }
-
         void UpdateData();
 
     private:
+        void OnSize(wxSizeEvent& event);
+
+        DECLARE_EVENT_TABLE()
+
+    protected:
         wxFlexGridSizer *m_sizer;
         CslListCtrlPlayer *m_listCtrl;
         wxStaticText *m_label;
+
+        wxString GetLabelText();
 };
 
 

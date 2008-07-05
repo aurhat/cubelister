@@ -85,6 +85,15 @@ wxString CslGameSauerbraten::GetWeaponName(wxInt32 n) const
            wxString(weapons[n]) : wxString(_("unknown"));
 }
 
+wxInt32 CslGameSauerbraten::ModeScoreLimit(wxInt32 mode) const
+{
+    if (ModeHasBases(mode))
+        return 10000;
+    if (ModeIsCapture(mode))
+        return 10;
+    return -1;
+}
+
 bool CslGameSauerbraten::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
 {
     char text[_MAXDEFSTR];
@@ -101,10 +110,7 @@ bool CslGameSauerbraten::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) con
         info.Version=GetVersionName(info.Protocol);
     }
     if (numattr>=2)
-    {
         info.GameMode=GetModeName(attr[1]);
-        info.ModeHasBases=attr[1]>11 && attr[1]<15;
-    }
     if (numattr>=3)
     {
         info.TimeRemain=attr[2];

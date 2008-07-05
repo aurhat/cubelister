@@ -54,6 +54,9 @@ class CslGameSauerbraten : public CslGame
         //implementations for base class
         wxString GetWeaponName(wxInt32 n) const;
         wxUint16 GetDefaultPort() const { return CSL_DEFAULT_PORT_SB; }
+        bool ModeIsCapture(wxInt32 mode) const { return mode>16 && mode<19; }
+        bool ModeHasBases(wxInt32 mode) const { return mode>11 && mode<15; }
+        wxInt32 ModeScoreLimit(wxInt32 mode) const;
         bool ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const;
         bool ParsePlayerPong(wxUint32 protocol,ucharbuf& buf,CslPlayerStatsData& info) const;
         bool ParseTeamPong(wxUint32 protocol,ucharbuf& buf,CslTeamStatsData& info) const;

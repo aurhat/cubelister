@@ -139,6 +139,9 @@ class CslGame
 
         virtual void GetPlayerstatsDescriptions(vector<wxString>& desc) const;
         virtual wxString GetWeaponName(wxInt32 n) const { return wxEmptyString; }
+        virtual bool ModeIsCapture(wxInt32 mode) const { return false; }
+        virtual bool ModeHasBases(wxInt32 mode) const { return false; }
+        virtual wxInt32 ModeScoreLimit(wxInt32 mode) const { return -1; }
         virtual wxUint16 GetDefaultPort() const = 0;
         virtual bool ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const = 0;
         virtual bool ParsePlayerPong(wxUint32 protocol,ucharbuf& buf,CslPlayerStatsData& info) const { return false; }
@@ -263,7 +266,6 @@ class CslServerInfo : public CslExtendedInfo
         wxInt32 Ping,TimeRemain;
         wxInt32 Players,PlayersMax;
         wxInt32 MM;
-        bool IsCapture,ModeHasBases;
         wxUint32 View;
         wxUint32 LastSeen,PingSend,PingResp;
         wxUint32 PlayLast,PlayTimeLastGame,PlayTimeTotal;

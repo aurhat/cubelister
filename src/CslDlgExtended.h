@@ -69,6 +69,8 @@ class CslDlgExtended: public wxDialog
         CslServerInfo *m_info;
         CslMapInfo m_mapInfo;
 
+        bool m_update;
+
         wxFont m_labelFont;
         t_aLabel m_teamLabel;
 
@@ -106,7 +108,7 @@ class CslDlgExtended: public wxDialog
         wxStaticText* label_map;
         wxStaticText* label_author_prefix;
         wxStaticText* label_author;
-        wxCheckBox* checkbox_update_end;
+        wxCheckBox* checkbox_update;
         wxCheckBox* checkbox_map;
         wxStaticLine* static_line;
         wxButton* button_close;
