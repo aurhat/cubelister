@@ -125,7 +125,7 @@ void CslListCtrlPlayer::OnEraseBackground(wxEraseEvent& event)
             const wxBitmap& bitmap=ListImageList.GetBitmap(imgId);
 
             wxRegion imgRegion(bitmap);
-            imgRegion.Offset(rect1.x,rect1.y);
+            imgRegion.Offset(rect1.x,rect1.y+m_imgOffsetY);
             region.Xor(imgRegion);
         }
 
