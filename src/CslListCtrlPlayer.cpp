@@ -124,9 +124,11 @@ void CslListCtrlPlayer::OnEraseBackground(wxEraseEvent& event)
             const wxBitmap& bitmap=ListImageList.GetBitmap(imgId);
 
             wxRegion imgRegion(bitmap);
-            imgRegion.Offset(rect1.x,rect1.y+2);
+            imgRegion.Offset(rect1.x,rect1.y);
             region.Xor(imgRegion);
         }
+		wxBitmap b=region.ConvertToBitmap();
+		b.SaveFile("region.bmp",wxBITMAP_TYPE_BMP);
 
         dc->DestroyClippingRegion();
         dc->SetClippingRegion(region);

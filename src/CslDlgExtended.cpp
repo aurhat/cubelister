@@ -533,7 +533,7 @@ void CslDlgExtended::RecalcMinSize(bool reLayout,wxInt32 decWidth)
         list_ctrl_players->ListAdjustSize();
 
 #ifdef __WXMSW__
-    checkbox_update_end->Refresh();
+    checkbox_update->Refresh();
     checkbox_map->Refresh();
 #endif
 }
