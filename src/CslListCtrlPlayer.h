@@ -67,7 +67,8 @@ class CslListCtrlPlayer : public wxListCtrl
 
         CslServerInfo *m_info;
 
-        static wxImageList ListImageList;
+		static wxImageList ListImageList;
+		static wxInt32 m_imgOffsetY;
 
 #ifdef __WXMSW__
         void OnEraseBackground(wxEraseEvent& event);

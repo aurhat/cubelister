@@ -67,6 +67,7 @@ END_EVENT_TABLE()
 wxSize CslListCtrlPlayer::BestSizeMicro(140,350);
 wxSize CslListCtrlPlayer::BestSizeMini(280,350);
 wxImageList CslListCtrlPlayer::ListImageList;
+wxInt32 CslListCtrlPlayer::m_imgOffsetY=0;
 
 CslListCtrlPlayer::CslListCtrlPlayer(wxWindow* parent,wxWindowID id,const wxPoint& pos,
                                      const wxSize& size,long style,
@@ -127,8 +128,6 @@ void CslListCtrlPlayer::OnEraseBackground(wxEraseEvent& event)
             imgRegion.Offset(rect1.x,rect1.y);
             region.Xor(imgRegion);
         }
-		//wxBitmap b=region.ConvertToBitmap();
-		//b.SaveFile("region.bmp",wxBITMAP_TYPE_BMP);
 
         dc->DestroyClippingRegion();
         dc->SetClippingRegion(region);
@@ -615,6 +614,15 @@ int wxCALLBACK CslListCtrlPlayer::ListSortCompareFunc(long item1,long item2,long
 void CslListCtrlPlayer::CreateImageList()
 {
 #ifdef __WXMSW__
+	//detect vista and set the offset fot the flag images to 2
+	//so the region should be correct drawing the background
+	OSVERSIONINFO ovi;
+    ovi.dwOSVersionInfoSize=sizeof(OSVERSIONINFO);
+    GetVersionEx(&ovi);
+
+	if (ovi.dwPlatformId==6)
+		m_imgOffsetY=2;
+
     ListImageList.Create(20,14,true);
     ListImageList.Add(AdjustIconSize(sortasc_18_12_xpm,wxNullIcon,wxSize(20,14),wxPoint(0,0)));
     ListImageList.Add(AdjustIconSize(sortdsc_18_12_xpm,wxNullIcon,wxSize(20,14),wxPoint(0,0)));
