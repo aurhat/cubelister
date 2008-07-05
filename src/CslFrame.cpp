@@ -23,6 +23,7 @@
 #include <wx/sysopt.h>
 #include <wx/protocol/http.h>
 #include <wx/process.h>
+#include <wx/wupdlock.h>
 #include "engine/CslTools.h"
 #include "engine/CslVersion.h"
 #include "CslFrame.h"
@@ -347,6 +348,11 @@ wxString CslPlayerInfo::GetLabelText()
 
 void CslPlayerInfo::UpdateData()
 {
+#ifdef __WXMSW__
+	//fixes flicker of label text
+	wxWindowUpdateLocker lock(this);
+#endif
+
     m_label->SetLabel(GetLabelText());
     m_label->Wrap(GetSize().x-4);
     m_listCtrl->UpdateData();
