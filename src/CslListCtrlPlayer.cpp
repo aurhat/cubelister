@@ -605,14 +605,14 @@ int wxCALLBACK CslListCtrlPlayer::ListSortCompareFunc(long item1,long item2,long
 void CslListCtrlPlayer::CreateImageList()
 {
 #ifdef __WXMSW__
-	//detect vista and set the offset fot the flag images to 2
-	//so the region should be correct drawing the background
-	OSVERSIONINFO ovi;
+    //detect vista and set the offset fot the flag images to 2
+    //so the region should be correct drawing the background
+    OSVERSIONINFO ovi;
     ovi.dwOSVersionInfoSize=sizeof(OSVERSIONINFO);
     GetVersionEx(&ovi);
 
-	if (ovi.dwMajorVersion>5)
-		m_imgOffsetY=2;
+    if (ovi.dwMajorVersion>5)
+        m_imgOffsetY=2;
 
     ListImageList.Create(20,14,true);
     ListImageList.Add(AdjustIconSize(sortasc_18_12_xpm,wxNullIcon,wxSize(20,14),wxPoint(0,0)));

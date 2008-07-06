@@ -323,11 +323,13 @@ void CslPlayerInfo::OnSize(wxSizeEvent& event)
     wxSize size=event.GetSize();
     size.y-=m_label->GetBestSize().y+4;
     m_listCtrl->SetSize(size);
+#endif //__WXMAC__
     m_listCtrl->ListAdjustSize();
+#ifdef __WXMAC__
     //fixes flicker after resizing
     wxIdleEvent idle;
     wxTheApp->SendIdleEvents(this,idle);
-#endif
+#endif //__WXMAC__
 
     event.Skip();
 }
@@ -342,8 +344,8 @@ wxString CslPlayerInfo::GetLabelText()
     wxString s;
 
     if (info)
-    if (!info->GameMode.IsEmpty())
-        s+=info->GameMode+_(" on ");
+        if (!info->GameMode.IsEmpty())
+            s+=info->GameMode+_(" on ");
     if (!info->Map.IsEmpty())
         s+=info->Map+wxT(" ");
     if (info->TimeRemain>0)
@@ -355,8 +357,8 @@ wxString CslPlayerInfo::GetLabelText()
 void CslPlayerInfo::UpdateData()
 {
 #ifdef __WXMSW__
-	//fixes flicker of label text
-	wxWindowUpdateLocker lock(this);
+    //fixes flicker of label text
+    wxWindowUpdateLocker lock(this);
 #endif
 
     m_label->SetLabel(GetLabelText());
