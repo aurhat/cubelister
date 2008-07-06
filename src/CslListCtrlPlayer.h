@@ -48,7 +48,7 @@ class CslListCtrlPlayer : public wxListCtrl
                           const wxValidator& validator=wxDefaultValidator,
                           const wxString& name=wxListCtrlNameStr);
 
-        void ListInit(const wxUint32 view);
+        void ListInit(const wxInt32 view);
         void ListAdjustSize();
         void UpdateData();
 
@@ -62,18 +62,17 @@ class CslListCtrlPlayer : public wxListCtrl
         static wxSize BestSizeMini;
 
     private:
-        wxUint32 m_view;
+        wxInt32 m_view;
         CslListSortHelper m_sortHelper;
 
         CslServerInfo *m_info;
 
 		static wxImageList ListImageList;
+#ifdef __WXMSW__
 		static wxInt32 m_imgOffsetY;
 
-#ifdef __WXMSW__
         void OnEraseBackground(wxEraseEvent& event);
 #endif
-        void OnSize(wxSizeEvent& event);
         void OnColumnLeftClick(wxListEvent& event);
         void OnItemActivated(wxListEvent& event);
         void OnContextMenu(wxContextMenuEvent& event);

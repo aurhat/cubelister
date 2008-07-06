@@ -67,13 +67,15 @@ END_EVENT_TABLE()
 wxSize CslListCtrlPlayer::BestSizeMicro(140,350);
 wxSize CslListCtrlPlayer::BestSizeMini(280,350);
 wxImageList CslListCtrlPlayer::ListImageList;
+#ifdef __WXMSW__
 wxInt32 CslListCtrlPlayer::m_imgOffsetY=0;
+#endif
 
 CslListCtrlPlayer::CslListCtrlPlayer(wxWindow* parent,wxWindowID id,const wxPoint& pos,
                                      const wxSize& size,long style,
                                      const wxValidator& validator, const wxString& name)
         : wxListCtrl(parent,id,pos,size,style,validator,name),
-        m_info(NULL)
+        m_view(-1),m_info(NULL)
 {
 }
 
@@ -144,18 +146,6 @@ void CslListCtrlPlayer::OnEraseBackground(wxEraseEvent& event)
         event.Skip();
 }
 #endif
-
-void CslListCtrlPlayer::OnSize(wxSizeEvent& event)
-{
-    //grrr, disconnect from the size event, since on VISTA this can end in endless loop
-    Disconnect(wxEVT_SIZE,wxSizeEventHandler(CslListCtrlPlayer::OnSize),NULL,this);
-    Freeze();
-    ListAdjustSize();
-    Thaw();
-    Connect(wxEVT_SIZE,wxSizeEventHandler(CslListCtrlPlayer::OnSize),NULL,this);
-
-    event.Skip();
-}
 
 void CslListCtrlPlayer::OnColumnLeftClick(wxListEvent& event)
 {
@@ -332,12 +322,15 @@ void CslListCtrlPlayer::UpdateData()
 #ifndef __WXMSW__
     //removes flicker on autosort for wxGTK and wxMAC
     wxIdleEvent idle;
-    wxTheApp->SendIdleEvents(this, idle);
+    wxTheApp->SendIdleEvents(this,idle);
 #endif
 }
 
 void CslListCtrlPlayer::ListAdjustSize()
 {
+    if (m_view<0)
+        return;
+
     wxInt32 w=GetClientSize().x-8;
 
     if (m_view==CSL_LIST_PLAYER_DEFAULT_SIZE)
@@ -425,7 +418,7 @@ void CslListCtrlPlayer::ServerInfo(CslServerInfo *info)
     }
 }
 
-void CslListCtrlPlayer::ListInit(const wxUint32 view)
+void CslListCtrlPlayer::ListInit(const wxInt32 view)
 {
     wxListItem item;
 
@@ -496,8 +489,6 @@ void CslListCtrlPlayer::ListInit(const wxUint32 view)
 
     item.SetImage(img);
     SetColumn(m_sortHelper.m_sortType,item);
-
-    Connect(wxEVT_SIZE,wxSizeEventHandler(CslListCtrlPlayer::OnSize),NULL,this);
 }
 
 int wxCALLBACK CslListCtrlPlayer::ListSortCompareFunc(long item1,long item2,long data)

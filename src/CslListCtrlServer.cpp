@@ -1204,7 +1204,7 @@ wxUint32 CslListCtrlServer::ListUpdate(vector<CslServerInfo*>& servers)
 #ifndef __WXMSW__
     //removes flicker on autosort for wxGTK and wxMAC
     wxIdleEvent idle;
-    wxTheApp->SendIdleEvents(this, idle);
+    wxTheApp->SendIdleEvents(this,idle);
 #endif
 
     return c;

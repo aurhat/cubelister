@@ -320,7 +320,13 @@ void CslPlayerInfo::OnSize(wxSizeEvent& event)
     m_label->SetLabel(GetLabelText());
     m_label->Wrap(GetSize().x-4);
 #ifdef __WXMAC__
-    m_sizer->Layout();
+    wxSize size=event.GetSize();
+    size.y-=m_label->GetBestSize().y+4;
+    m_listCtrl->SetSize(size);
+    m_listCtrl->ListAdjustSize();
+    //fixes flicker after resizing
+    wxIdleEvent idle;
+    wxTheApp->SendIdleEvents(this,idle);
 #endif
 
     event.Skip();
@@ -355,6 +361,11 @@ void CslPlayerInfo::UpdateData()
 
     m_label->SetLabel(GetLabelText());
     m_label->Wrap(GetSize().x-4);
+#ifdef __WXMAC__
+    wxSize size=m_listCtrl->GetSize();
+    size.y-=m_label->GetBestSize().y+4;
+    m_listCtrl->SetSize(size);
+#endif
     m_listCtrl->UpdateData();
     m_sizer->Layout();
 }
