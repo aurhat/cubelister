@@ -250,6 +250,7 @@ wxString CslGameSauerbraten::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
 #endif
     }
 
+    bin.Replace(wxT(" "),wxT("\\ "));
     bin+=wxString(wxT(" "))+opts;
 
     if (!param)

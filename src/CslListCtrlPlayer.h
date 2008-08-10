@@ -34,6 +34,7 @@
 #endif
 #include <wx/listctrl.h>
 #include <wx/imaglist.h>
+#include <wx/tooltip.h>
 #include "engine/CslGame.h"
 #include "engine/CslTools.h"
 
@@ -63,9 +64,10 @@ class CslListCtrlPlayer : public wxListCtrl
 
     private:
         wxInt32 m_view;
-        CslListSortHelper m_sortHelper;
-
         CslServerInfo *m_info;
+
+        CslListSortHelper m_sortHelper;
+        wxToolTip *m_toolTip;
 
         static wxImageList ListImageList;
 #ifdef __WXMSW__
@@ -77,6 +79,7 @@ class CslListCtrlPlayer : public wxListCtrl
         void OnItemActivated(wxListEvent& event);
         void OnContextMenu(wxContextMenuEvent& event);
         void OnMenu(wxCommandEvent& event);
+        void OnMouseMove(wxMouseEvent& event);
 
         DECLARE_EVENT_TABLE()
 

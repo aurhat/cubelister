@@ -113,8 +113,8 @@ AC_SUBST(WX_LIBS)
 AC_SUBST(GEOIP_LIBS)
 
 AC_OUTPUT(Makefile data/Makefile data/maps/Makefile \
-    data/maps/Sauerbraten/254/Makefile data/maps/Sauerbraten/Makefile po/Makefile.in src/Makefile \
-    src/engine/Makefile src/libGeoIP/Makefile)
+	data/maps/Sauerbraten/254/Makefile data/maps/Sauerbraten/256/Makefile data/maps/Sauerbraten/Makefile \
+	po/Makefile.in src/Makefile src/engine/Makefile src/libGeoIP/Makefile)
 
 echo
 echo --------------------------------------

@@ -134,6 +134,7 @@ class CslListCtrlServer : public wxListCtrl
         void ListAdjustSize(const wxSize& size);
         void SetMasterSelected(bool selected) { m_masterSelected=selected; }
         void Highlight(wxInt32 type,bool highlight,CslServerInfo *info=NULL,wxListItem *listitem=NULL);
+        wxUint32 GetPlayerCount();
 
     private:
         wxInt32 m_id;
@@ -154,8 +155,6 @@ class CslListCtrlServer : public wxListCtrl
         wxInt32 m_filterVersion;
 
         wxImageList m_imageList;
-        wxColour m_stdColourListText;
-        wxColour m_stdColourListItem;
 
         CslListSortHelper m_sortHelper;
 

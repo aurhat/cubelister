@@ -385,7 +385,6 @@ void CslDlgExtended::UpdateTeamData()
 
     if (stats.TeamMode)
     {
-
         loopv(stats.Stats)
         {
             data=stats.Stats[i];
@@ -481,6 +480,9 @@ void CslDlgExtended::UpdateTeamData()
         else
             label_team1->SetLabel(_("Not a team game."));
         label_team1->SetMinSize(label_team1->GetBestSize());
+
+        if (checkbox_update->IsChecked() && (stats.TimeRemain==0 || data->Score==limit))
+            m_update=false;
     }
 
     panel_map->UpdateBases(m_mapInfo.m_bases,bases);

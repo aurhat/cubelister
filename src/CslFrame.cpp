@@ -202,7 +202,7 @@ class CslProcess : public wxProcess
                 if (last==0)
                     break;
                 buf[last]=0;
-                //Cube has color codes in it's outputm
+                //Cube has color codes in it's output
                 m_self->m_info->GetGame().ProcessOutput(buf,&last);
                 CslDlgOutput::AddOutput(buf,last);
                 //LOG_DEBUG("%s", buf);
@@ -228,7 +228,7 @@ class CslProcess : public wxProcess
                     break;
                 buf[last]=0;
                 /*
-                //Cube has color codes in it's outputm
+                //Cube has color codes in it's output
                 m_self->m_info->GetGame().ProcessOutput(buf,&last);
                 CslDlgOutput::AddOutput(buf,last);
                 */
@@ -1559,7 +1559,7 @@ bool CslFrame::LoadServers(wxUint32 *numm,wxUint32 *nums)
 
                     while (config.Read(wxString::Format(wxT("GuiView%d"),j++),&guiview))
                     {
-                        if ((pos=guiview.Find(wxChar(':')))<0)
+                        if ((pos=guiview.Find(wxT(':')))<0)
                             continue;
                         if (!guiview.Mid(0,pos).ToLong(&type))
                             continue;
@@ -1793,6 +1793,14 @@ void CslFrame::OnTimer(wxTimerEvent& event)
                 vector<CslServerInfo*> servers;
                 m_engine->GetFavourites(servers);
                 list_ctrl_favourites->ListUpdate(servers);
+
+                wxTreeItemId item=tree_ctrl_games->GetSelection();
+                if (item.IsOk())
+                {
+                    wxString s=master ? master->GetConnection().GetAddress() : game->GetName();
+                    s+=s.Format(wxT(" (%d Players)"),list_ctrl_master->GetPlayerCount());
+                    tree_ctrl_games->SetItemText(item,s);
+                }
             }
         }
 
@@ -1898,6 +1906,18 @@ void CslFrame::OnTreeSelChanged(wxTreeEvent& event)
     event.Skip();
 
     wxTreeItemId item=event.GetItem();
+    wxTreeItemId olditem=event.GetOldItem();
+
+    if (olditem.IsOk())
+    {
+        wxString s=tree_ctrl_games->GetItemText(olditem);
+        s=s.BeforeLast(wxT('('));
+        tree_ctrl_games->SetItemText(olditem,s);
+    }
+
+    if (!item.IsOk())
+        return;
+
     CslTreeItemData *data=(CslTreeItemData*)tree_ctrl_games->GetItemData(item);
 
     CslGame *game=data->GetGame();
@@ -2062,23 +2082,21 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
 
         case CSL_TEXT_SEARCH:
         {
-            wxString s=event.GetString();
+            wxString s=text_ctrl_search->GetValue();
 
             if (s.IsEmpty())
             {
-                loopv(m_searchedServers) m_searchedServers[i]->PingExt(false);
-                m_searchedServers.setsize(0);
-                m_searchString.Empty();
                 button_search->Enable(false);
                 gauge_search->Enable(false);
-                gauge_search->SetValue(0);
                 SetSearchbarColour(false);
-                wxInt32 type=-1;
-                list_ctrl_master->Highlight(type,false);
-                list_ctrl_favourites->Highlight(type,false);
-                list_ctrl_master->ListSearch(s);
-                list_ctrl_favourites->ListSearch(s);
-                text_search_result->SetLabel(wxString::Format(_("Search result: %d servers"),0));
+                if (radio_search_server->GetValue())
+                {
+                    list_ctrl_master->Highlight(-1,false);
+                    list_ctrl_favourites->Highlight(-1,false);
+                    list_ctrl_master->ListSearch(wxEmptyString);
+                    list_ctrl_favourites->ListSearch(wxEmptyString);
+                    text_search_result->SetLabel(wxString::Format(_("Search result: %d servers"),0));
+                }
             }
             else
             {
@@ -2086,21 +2104,15 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
                 gauge_search->Enable();
             }
 
-            if (event.GetEventType()==wxEVT_COMMAND_TEXT_UPDATED)
+            if (event.GetEventType()==wxEVT_COMMAND_TEXT_UPDATED && radio_search_server->GetValue())
             {
-                if (radio_search_server->GetValue())
-                {
-                    wxInt32 sr=list_ctrl_master->ListSearch(s);
-                    sr+=list_ctrl_favourites->ListSearch(s);
+                wxInt32 c=list_ctrl_master->ListSearch(s);
+                c+=list_ctrl_favourites->ListSearch(s);
 
-                    SetSearchbarColour(!(sr || s.IsEmpty()));
+                SetSearchbarColour(!(c || s.IsEmpty()));
 
-                    text_search_result->SetLabel(wxString::Format(_("Search result: %d servers"),sr));
-                    sizer_search->Layout();
-                }
-                else if (radio_search_player->GetValue())
-                    m_searchString=text_ctrl_search->GetValue().Lower();
-                break;
+                text_search_result->SetLabel(wxString::Format(_("Search result: %d servers"),c));
+                sizer_search->Layout();
             }
             else if (event.GetEventType()!=wxEVT_COMMAND_TEXT_ENTER)
                 break;
@@ -2111,10 +2123,11 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             if (!radio_search_player->GetValue())
                 break;
 
-            m_searchResultPlayer=m_searchResultServer=0;
-
             loopv(m_searchedServers) m_searchedServers[i]->PingExt(false);
             m_searchedServers.setsize(0);
+
+            m_searchString=text_ctrl_search->GetValue().Lower();
+            m_searchResultPlayer=m_searchResultServer=0;
 
             gauge_search->SetValue(0);
             text_search_result->SetLabel(wxString::Format(_("Search result: %d players on %d servers"),0,0));
@@ -2122,7 +2135,9 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             list_ctrl_master->Highlight(CSL_HIGHLIGHT_FOUND_PLAYER,false);
             list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_FOUND_PLAYER,false);
 
-            if (text_ctrl_search->GetValue().IsEmpty())
+            text_ctrl_search->SetFocus();
+
+            if (m_searchString.IsEmpty())
                 break;
 
             CslGame *game=TreeGetSelectedGame();
@@ -2173,11 +2188,11 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             gauge_search->Hide();
             sizer_search->Layout();
             text_ctrl_search->SetFocus();
-            text_ctrl_search->Clear();
-#ifdef __WXMAC__
+            list_ctrl_master->Highlight(-1,false);
+            list_ctrl_favourites->Highlight(-1,false);
+
             wxCommandEvent evt(wxEVT_COMMAND_TEXT_UPDATED,CSL_TEXT_SEARCH);
             wxPostEvent(this,evt);
-#endif
             break;
         }
 
@@ -2185,13 +2200,17 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
         {
             button_search->Show();
             gauge_search->Show();
-            sizer_search->Layout();
             text_ctrl_search->SetFocus();
-            text_ctrl_search->Clear();
-#ifdef __WXMAC__
+            text_search_result->SetLabel(wxString::Format(_("Search result: %d players on %d servers"),0,0));
+            sizer_search->Layout();
+            list_ctrl_master->ListSearch(wxEmptyString);
+            list_ctrl_favourites->ListSearch(wxEmptyString);
+            list_ctrl_master->Highlight(-1,false);
+            list_ctrl_favourites->Highlight(-1,false);
+            SetSearchbarColour(false);
+
             wxCommandEvent evt(wxEVT_COMMAND_TEXT_UPDATED,CSL_TEXT_SEARCH);
             wxPostEvent(this,evt);
-#endif
             break;
         }
 
@@ -2217,9 +2236,21 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             {
                 if (m_playerInfos[i]->ServerInfo()==info)
                 {
-                    if (i>0 && m_AuiMgr.DetachPane(m_playerInfos[i]))
+                    if (i==0)
                     {
-                        m_AuiMgr.Update();
+                        m_playerInfos[i]->ServerInfo(NULL);
+                        m_playerInfos[i]->UpdateData();
+                        wxAuiPaneInfo& pane=m_AuiMgr.GetPane(m_playerInfos[i]);
+                        if (pane.IsOk())
+                        {
+                            pane.Caption(PlayerListGetCaption(NULL,true));
+                            m_AuiMgr.Update();
+                        }
+                    }
+                    else
+                    {
+                        if (m_AuiMgr.DetachPane(m_playerInfos[i]))
+                            m_AuiMgr.Update();
 
                         delete m_playerInfos[i];
                         m_playerInfos.remove(i);
@@ -2281,10 +2312,11 @@ void CslFrame::OnKeypress(wxKeyEvent& event)
     if (event.GetKeyCode()==WXK_ESCAPE)
     {
         if (CslConnectionState::IsWaiting())
-            ConnectToServer();
-        else if (FindFocus()==text_ctrl_search)
+            CslConnectionState::Reset();
+        else// if (FindFocus()==text_ctrl_search)
         {
             text_ctrl_search->Clear();
+            text_ctrl_search->SetFocus();
             wxCommandEvent evt(wxEVT_COMMAND_TEXT_UPDATED,CSL_TEXT_SEARCH);
             wxPostEvent(this,evt);
             return;

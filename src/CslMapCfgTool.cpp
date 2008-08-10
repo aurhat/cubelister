@@ -377,7 +377,7 @@ bool CslMapCfgTool::LoadImage()
 
     s=dlg.GetPath();
     m_pngPath=::wxPathOnly(s);
-    m_fileName=dlg.GetFilename().BeforeLast('.');
+    m_fileName=dlg.GetFilename().BeforeLast(wxT('.'));
 
     wxBitmap bitmap;
 

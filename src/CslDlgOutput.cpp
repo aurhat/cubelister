@@ -525,7 +525,7 @@ void CslDlgOutput::FixFilename(wxString *name)
     for (i=0;i<name->Length();i++)
         for (j=0;j<exclude.Length();j++)
             if (name->GetChar(i)==exclude.GetChar(j))
-                name->SetChar(i,'_');
+                name->SetChar(i,wxT('_'));
 }
 
 void CslDlgOutput::SaveFile(const wxString& path)

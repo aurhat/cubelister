@@ -123,6 +123,7 @@ wxString CslGameCube::GameStart(CslServerInfo *info,wxUint32 mode,wxString *erro
     if (GetDefaultPort()!=info->Port)
         address+=m_portDelimiter+wxString::Format(wxT("%d"),info->Port);
 
+    bin.Replace(wxT(" "),wxT("\\ "));
     bin+=wxString(wxT(" "))+opts;
 
     if (mode==CSL_CONNECT_ADMIN_PASS)

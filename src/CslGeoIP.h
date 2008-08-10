@@ -36,7 +36,7 @@ class CslGeoIP
         static const char* GetCountryCodeByAddr(const char *host);
         static const char* GetCountryCodeByIPnum(const unsigned long ipnum);
         static const char* GetCountryNameByAddr(const char *host);
-
+        static const char* GetCountryNameByIPnum(const unsigned long ipnum);
 };
 
 #endif

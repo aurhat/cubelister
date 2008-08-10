@@ -39,27 +39,30 @@ CslBloodFrontier::~CslBloodFrontier()
 enum
 {
     G_DEMO = 0,
+    G_LOBBY,
     G_EDITMODE,
-    G_SINGLEPLAYER,
+    G_MISSION,
     G_DEATHMATCH,
-    G_CAPTURE,
+    G_STF,
     G_CTF,
     G_MAX
 };
 
-#define G_M_TEAM        0x0001  // team
-#define G_M_INSTA       0x0002  // instagib
-#define G_M_DUEL        0x0004  // duel
-#define G_M_PROG        0x0008  // progressive
+#define G_M_TEAM    0x0001  // team
+#define G_M_INSTA   0x0002  // instagib
+#define G_M_DUEL    0x0004  // duel
+#define G_M_PROG    0x0008  // progressive
 
-#define G_M_MULTI       0x0010  // mutli team
-#define G_M_DLMS        0x0020  // last man standing
+#define G_M_MULTI   0x0010  // mutli team
+#define G_M_DLMS    0x0020  // last man standing
+#define G_M_MAYHEM  0x0040  // mayhem
 
-#define G_M_NUM         6
+#define G_M_NUM     6
 
-#define G_M_ALL         G_M_TEAM|G_M_INSTA|G_M_DUEL|G_M_PROG|G_M_MULTI
-#define G_M_FRAG        G_M_TEAM|G_M_INSTA|G_M_DUEL|G_M_MULTI
-#define G_M_BASE        G_M_INSTA|G_M_PROG|G_M_MULTI
+#define G_M_ALL     G_M_TEAM|G_M_INSTA|G_M_DUEL|G_M_PROG|G_M_MULTI|G_M_DLMS
+#define G_M_FIGHT   G_M_TEAM|G_M_INSTA|G_M_DUEL|G_M_MULTI|G_M_DLMS
+#define G_M_STF     G_M_TEAM|G_M_INSTA|G_M_PROG|G_M_MULTI|G_M_MAYHEM
+#define G_M_CTF     G_M_TEAM|G_M_INSTA|G_M_PROG|G_M_MULTI|G_M_MAYHEM
 
 static struct
 {
@@ -67,21 +70,23 @@ static struct
 }
 gametype[] =
 {
-    { G_DEMO,         0,        0,        wxT("Demo")    },
-    { G_EDITMODE,     0,        0,        wxT("Editing") },
-    { G_SINGLEPLAYER, 0,        0,        wxT("Mission") },
-    { G_DEATHMATCH,   G_M_FRAG, 0,        wxT("DM")      },
-    { G_CAPTURE,      G_M_BASE, G_M_TEAM, wxT("STF")     },
-    { G_CTF,          G_M_BASE, G_M_TEAM, wxT("CTF")     },
+    { G_DEMO,       0,         0,        wxT("Demo")    },
+    { G_LOBBY,      0,         0,        wxT("Lobby")   },
+    { G_EDITMODE,   0,         0,        wxT("Editing") },
+    { G_MISSION,    0,         0,        wxT("Mission") },
+    { G_DEATHMATCH, G_M_FIGHT, 0,        wxT("DM")      },
+    { G_STF,        G_M_STF,   G_M_TEAM, wxT("STF")     },
+    { G_CTF,        G_M_CTF,   G_M_TEAM, wxT("CTF")     },
 },
 mutstype[] =
 {
-    { G_M_TEAM,  G_M_ALL, 0,        wxT("Team")  },
-    { G_M_INSTA, G_M_ALL, 0,        wxT("Insta") },
-    { G_M_DUEL,  G_M_ALL, 0,        wxT("Duel")  },
-    { G_M_PROG,  G_M_ALL, 0,        wxT("PG")    },
-    { G_M_MULTI, G_M_ALL, G_M_TEAM, wxT("MS")    },
-    { G_M_DLMS,  G_M_ALL, G_M_DUEL, wxT("LMS")   }
+    { G_M_TEAM,   G_M_ALL, 0,        wxT("Team")   },
+    { G_M_INSTA,  G_M_ALL, 0,        wxT("Insta")  },
+    { G_M_DUEL,   G_M_ALL, 0,        wxT("Duel")   },
+    { G_M_PROG,   G_M_ALL, 0,        wxT("PG")     },
+    { G_M_MULTI,  G_M_ALL, G_M_TEAM, wxT("MS")     },
+    { G_M_DLMS,   G_M_ALL, G_M_DUEL, wxT("LMS")    },
+    { G_M_MAYHEM, G_M_ALL, 0,        wxT("Mayhem") },
 };
 
 wxString CslBloodFrontier::GetModeName(wxInt32 n,wxInt32 m) const

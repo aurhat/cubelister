@@ -61,6 +61,7 @@ BEGIN_EVENT_TABLE(CslListCtrlPlayer,wxListCtrl)
     EVT_LIST_ITEM_ACTIVATED(wxID_ANY,CslListCtrlPlayer::OnItemActivated)
     EVT_CONTEXT_MENU(CslListCtrlPlayer::OnContextMenu)
     EVT_MENU(wxID_ANY,CslListCtrlPlayer::OnMenu)
+    EVT_MOTION(CslListCtrlPlayer::OnMouseMove)
 END_EVENT_TABLE()
 
 
@@ -71,12 +72,15 @@ wxImageList CslListCtrlPlayer::ListImageList;
 wxInt32 CslListCtrlPlayer::m_imgOffsetY=0;
 #endif
 
+
 CslListCtrlPlayer::CslListCtrlPlayer(wxWindow* parent,wxWindowID id,const wxPoint& pos,
                                      const wxSize& size,long style,
                                      const wxValidator& validator, const wxString& name)
         : wxListCtrl(parent,id,pos,size,style,validator,name),
         m_view(-1),m_info(NULL)
 {
+    m_toolTip=new wxToolTip(wxEmptyString);
+    SetToolTip(m_toolTip);
 }
 
 #ifdef __WXMSW__
@@ -214,31 +218,81 @@ void CslListCtrlPlayer::OnMenu(wxCommandEvent& event)
     }
 }
 
+void CslListCtrlPlayer::OnMouseMove(wxMouseEvent& event)
+{
+    wxInt32 i,offset;
+    wxRect rect;
+    wxListItem item;
+    bool first=true;
+    wxPoint pos=event.GetPosition();
+
+    event.Skip();
+
+    if (pos!=wxDefaultPosition)
+    {
+        for (i=GetTopItem();i<GetItemCount();i++)
+        {
+            item.SetId(i);
+            GetItemRect(item,rect,wxLIST_RECT_BOUNDS);
+
+            if (first)
+            {
+                offset=rect.y;
+                first=false;
+            }
+
+            rect.y-=offset;
+
+            if (rect.Contains(pos))
+            {
+                CslPlayerStatsData *data=(CslPlayerStatsData*)GetItemData(item);
+                const char *country=CslGeoIP::GetCountryNameByIPnum(data->IP);
+                wxString tip=wxString::Format(_("Name: %s   Country: %s"),data->Name.c_str(),
+                                              (country ? (A2U(country)).c_str() : CslGeoIP::IsOk() ?
+                                              _("Unknown"):_("GeoIP database not found")));
+                tip+=wxString::Format(_("   ID: %d   IP: %d.%d.%d.x"),data->ID,
+                                      data->IP>>24,data->IP>>16&0xff,data->IP>>8&0xff);
+                m_toolTip->SetTip(tip);
+                return;
+            }
+        }
+    }
+
+    m_toolTip->SetTip(_("Select a player and press CTRL+C to copy to clipboard."));
+}
+
 void CslListCtrlPlayer::UpdateData()
 {
-    wxInt32 c;
+    //fixes flickering if scrollbar is shown
+    wxWindowUpdateLocker lock(this);
+
+    if (!m_info)
+    {
+        DeleteAllItems();
+        return;
+    }
+
+    wxInt32 i,j,l;
     wxString s;
     wxListItem item;
     CslPlayerStatsData *data=NULL;
     const CslPlayerStats& stats=m_info->PlayerStats;
 
-    //fixes flickering if scrollbar is shown
-    wxWindowUpdateLocker lock(this);
-
-    DeleteAllItems();
-
+    l=GetItemCount()-1;
     item.SetMask(wxLIST_MASK_TEXT|wxLIST_MASK_DATA);
 
-    loopv(stats.m_stats)
+    for (i=0;i<stats.m_stats.length();i++)
     {
         data=stats.m_stats[i];
         if (!data->Ok)
+        {
+            i--;
             break;
-        if (i<GetItemCount())
-            continue;
+        }
 
         item.SetId(i);
-        InsertItem(item);
+        if (i>l)
+            InsertItem(item);
         SetItemData(i,(long)data);
 
         if (data->Name.IsEmpty())
@@ -294,20 +348,22 @@ void CslListCtrlPlayer::UpdateData()
             SetItemBackgroundColour(item,CSL_COLOUR_ADMIN);
         else if (data->State==CSL_PLAYER_STATE_SPECTATOR)
             SetItemBackgroundColour(item,CSL_COLOUR_SPECTATOR);
+        else
+            SetItemBackgroundColour(item,GetBackgroundColour());
 
         const char *country;
         wxInt32 flag=CSL_LIST_IMG_UNKNOWN;
 
-        if (data->IP && CslGeoIP::IsOk())
+        if (data->IP)
         {
             country=CslGeoIP::GetCountryCodeByIPnum(data->IP);
             if (country)
             {
-                for (c=sizeof(codes)/sizeof(codes[0])-1;c>=0;c--)
+                for (j=sizeof(codes)/sizeof(codes[0])-1;j>=0;j--)
                 {
-                    if (!strcasecmp(country,codes[c]))
+                    if (!strcasecmp(country,codes[j]))
                     {
-                        flag+=++c;
+                        flag+=++j;
                         break;
                     }
                 }
@@ -315,6 +371,13 @@ void CslListCtrlPlayer::UpdateData()
         }
 
         SetItemImage(item,flag);
+    }
+
+    while (l>i)
+    {
+        item.SetId(l);
+        DeleteItem(item);
+        l--;
     }
 
     ListSort(-1);

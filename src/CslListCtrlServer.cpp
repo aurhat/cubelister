@@ -668,9 +668,6 @@ void CslListCtrlServer::ListInit(CslEngine *engine,CslListCtrlServer *sibling)
     m_filterFlags=m_id==CSL_LIST_MASTER ? &g_cslSettings->filterMaster:&g_cslSettings->filterFavourites;
     m_filterVersion=-1;
 
-    m_stdColourListText=GetTextColour();
-    m_stdColourListItem=GetBackgroundColour();
-
     ListCreateGameBitmaps();
 
     wxListItem item;
@@ -845,7 +842,7 @@ void CslListCtrlServer::Highlight(wxInt32 type,bool high,CslServerInfo *info,wxL
         else if (t&CSL_HIGHLIGHT_SEARCH_PLAYER)
             colour=wxColour(g_cslSettings->colServerOff);
         else
-            colour=m_stdColourListItem;
+            colour=GetBackgroundColour();
 
         SetItemBackgroundColour(*listitem,colour);
         return;
@@ -865,10 +862,21 @@ void CslListCtrlServer::Highlight(wxInt32 type,bool high,CslServerInfo *info,wxL
         else if (t&CSL_HIGHLIGHT_LOCKED)
             colour=g_cslSettings->colServerPlay;
         else
-            colour=m_stdColourListItem;
+            colour=GetBackgroundColour();
 
         SetItemBackgroundColour(item,colour);
     }
+}
+
+wxUint32 CslListCtrlServer::GetPlayerCount()
+{
+    wxUint32 c=0,i;
+
+    for (i=0;i<m_servers.GetCount();i++)
+        if (m_servers.Item(i)->Players>=0)
+            c+=m_servers.Item(i)->Players;
+
+    return c;
 }
 
 wxInt32 CslListCtrlServer::ListFindItem(CslServerInfo *info,wxListItem& item)
@@ -1077,7 +1085,7 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
             SetItem(i,1,info->DescriptionOld);
     }
 
-    wxColour colour=m_stdColourListText;
+    wxColour colour(GetTextColour());
     if (!CslEngine::PingOk(*info,g_cslSettings->updateInterval))
         colour=g_cslSettings->colServerOff;
     else if (info->PlayersMax>0 && info->Players==info->PlayersMax)

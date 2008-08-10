@@ -202,6 +202,7 @@ wxString CslGameAssaultCube::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
     if (GetDefaultPort()!=info->Port)
         address+=m_portDelimiter+wxString::Format(wxT("%d"),info->Port);
 
+    bin.Replace(wxT(" "),wxT("\\ "));
     bin+=wxString(wxT(" "))+opts;
 
     password=mode==CSL_CONNECT_PASS ? info->Password:

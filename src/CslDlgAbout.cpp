@@ -38,15 +38,18 @@ BEGIN_EVENT_TABLE(CslDlgAbout, wxDialog)
 END_EVENT_TABLE()
 
 const wxChar *csl_credits = wxT(\
-                                "Extended info server patches:\n"
-                                "  }TC{noob\n"
+                                "Application icon:\n"
+                                "  Jakub 'SandMan' Uhlik\n"
                                 "\n"
                                 "Map previews:\n"
-                                "  }TC{apflstrudl\n"
-                                "  }TC{Hero\n"
+                                "  'K!NG' Berk Inan\n"
+                                "  Clemens 'Hero' Wloczka\n"
+                                "  'apflstrudl'\n"
+                                "  'shmutzwurst'\n"
+                                "  'ZuurKool'\n"
                                 "\n"
-                                "Application icon:\n"
-                                "  }TC{SandMan\n"
+                                "Previous extended info server patches:\n"
+                                "  noob\n"
                                 "\n"
                                 "Country Flags:\n"
                                 "  http://flags.blogpotato.de\n");

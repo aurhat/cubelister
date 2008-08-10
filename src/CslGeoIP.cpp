@@ -74,30 +74,20 @@ bool CslGeoIP::IsOk()
 
 const char* CslGeoIP::GetCountryCodeByAddr(const char *host)
 {
-    if (!s_geoIP)
-    {
-        wxASSERT_MSG(!s_geoIP,wxT("GeoIP not initialised!"));
-        return NULL;
-    }
-    return GeoIP_country_code_by_addr(s_geoIP,host);
+    return s_geoIP ? GeoIP_country_code_by_addr(s_geoIP,host):NULL;
 }
 
 const char* CslGeoIP::GetCountryCodeByIPnum(const unsigned long ipnum)
 {
-    if (!s_geoIP)
-    {
-        wxASSERT_MSG(!s_geoIP,wxT("GeoIP not initialised!"));
-        return NULL;
-    }
-    return GeoIP_country_code_by_ipnum(s_geoIP,ipnum);
+    return s_geoIP ? GeoIP_country_code_by_ipnum(s_geoIP,ipnum):NULL;
 }
 
 const char* CslGeoIP::GetCountryNameByAddr(const char *host)
 {
-    if (!s_geoIP)
-    {
-        wxASSERT_MSG(!s_geoIP,wxT("GeoIP not initialised!"));
-        return NULL;
-    }
-    return GeoIP_country_name_by_addr(s_geoIP,host);
+    return s_geoIP ? GeoIP_country_name_by_addr(s_geoIP,host):NULL;
+}
+
+const char* CslGeoIP::GetCountryNameByIPnum(const unsigned long ipnum)
+{
+    return s_geoIP ? GeoIP_country_name_by_ipnum(s_geoIP,ipnum):NULL;
 }
