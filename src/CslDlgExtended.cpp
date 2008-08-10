@@ -363,13 +363,12 @@ void CslDlgExtended::UpdateTeamData()
     if (!m_update)
         return;
 
-    CslTeamStatsData *data;
     wxSize size;
     wxString s;
     wxInt32 h=-1,hs=0;
     wxInt32 lu=0,lc=m_teamLabel.GetCount();
-
     CslTeamStats& stats=m_info->TeamStats;
+    CslTeamStatsData *data=NULL;
 
 #ifdef __WXMSW__
     //fixes flicker of teamscore labels
@@ -481,7 +480,7 @@ void CslDlgExtended::UpdateTeamData()
             label_team1->SetLabel(_("Not a team game."));
         label_team1->SetMinSize(label_team1->GetBestSize());
 
-        if (checkbox_update->IsChecked() && (stats.TimeRemain==0 || data->Score==limit))
+        if (checkbox_update->IsChecked() && stats.TimeRemain==0)
             m_update=false;
     }
 
