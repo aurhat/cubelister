@@ -393,7 +393,7 @@ void CslDlgSettings::do_layout()
     grid_sizer_times->Add(spin_ctrl_server_cleanup, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_server_cleanup->Add(checkbox_server_cleanup_favourites, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_server_cleanup->Add(checkbox_server_cleanup_stats, 0, wxALL, 4);
-    grid_sizer_times->Add(grid_sizer_server_cleanup, 1, wxEXPAND, 0);
+    grid_sizer_times->Add(grid_sizer_server_cleanup, 1, wxALIGN_CENTER_VERTICAL, 0);
     grid_sizer_times->AddGrowableCol(1);
     sizer_times->Add(grid_sizer_times, 1, wxEXPAND, 0);
     grid_sizer_pane_other->Add(sizer_times, 1, wxALL|wxEXPAND, 4);

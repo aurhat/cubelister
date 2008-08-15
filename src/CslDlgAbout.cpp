@@ -43,7 +43,7 @@ const wxChar *csl_credits = wxT(\
                                 "\n"
                                 "Map previews:\n"
                                 "  'K!NG' Berk Inan\n"
-                                "  Bernd 'apflstrudl' Möller\n"
+                                "  Bernd 'apflstrudl' Moeller\n"
                                 "  Clemens 'Hero' Wloczka\n"
                                 "  'shmutzwurst'\n"
                                 "  'ZuurKool'\n"
