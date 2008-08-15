@@ -282,8 +282,8 @@ void CslListCtrlPlayer::OnMouseMove(wxMouseEvent& event)
                 CslPlayerStatsData *data=(CslPlayerStatsData*)GetItemData(item);
                 const char *country=CslGeoIP::GetCountryNameByIPnum(data->IP);
                 tip=wxString::Format(_("Name: %s   Country: %s"),data->Name.c_str(),
-                                              (country ? (A2U(country)).c_str() : CslGeoIP::IsOk() ?
-                                               _("Unknown"):_("GeoIP database not found")));
+                                     (country ? (A2U(country)).c_str() : CslGeoIP::IsOk() ?
+                                      _("Unknown"):_("GeoIP database not found")));
                 tip+=wxString::Format(wxT("   ID: %d   IP: %d.%d.%d.x"),data->ID,
                                       data->IP>>24,data->IP>>16&0xff,data->IP>>8&0xff);
                 m_toolTip->SetTip(tip);

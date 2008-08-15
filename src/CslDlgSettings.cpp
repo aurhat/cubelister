@@ -275,10 +275,10 @@ void CslDlgSettings::set_properties()
     button_colour_mm2->SetSize(button_colour_mm2->GetBestSize());
     button_colour_full->SetSize(button_colour_full->GetBestSize());
     button_colour_mm3->SetSize(button_colour_mm3->GetBestSize());
-    spin_ctrl_update->SetMinSize(wxSize(48, -1));
-    spin_ctrl_wait->SetMinSize(wxSize(48, -1));
-    spin_ctrl_min_playtime->SetMinSize(wxSize(48, -1));
-    spin_ctrl_server_cleanup->SetMinSize(wxSize(48, -1));
+    spin_ctrl_update->SetMinSize(wxSize(64, -1));
+    spin_ctrl_wait->SetMinSize(wxSize(64, -1));
+    spin_ctrl_min_playtime->SetMinSize(wxSize(64, -1));
+    spin_ctrl_server_cleanup->SetMinSize(wxSize(64, -1));
     checkbox_server_cleanup_favourites->SetValue(1);
     checkbox_server_cleanup_stats->SetValue(1);
     dirpicker_game_output->Enable(false);
@@ -391,7 +391,7 @@ void CslDlgSettings::do_layout()
     wxStaticText* label_server_cleanup = new wxStaticText(notebook_pane_other, wxID_ANY, _("Cleanup dead servers (days)"));
     grid_sizer_times->Add(label_server_cleanup, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_times->Add(spin_ctrl_server_cleanup, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_server_cleanup->Add(checkbox_server_cleanup_favourites, 0, wxALL, 4);
+    grid_sizer_server_cleanup->Add(checkbox_server_cleanup_favourites, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_server_cleanup->Add(checkbox_server_cleanup_stats, 0, wxALL, 4);
     grid_sizer_times->Add(grid_sizer_server_cleanup, 1, wxEXPAND, 0);
     grid_sizer_times->AddGrowableCol(1);
