@@ -291,6 +291,10 @@ void CslListCtrlPlayer::OnMouseMove(wxMouseEvent& event)
                 tip+=wxString::Format(wxT("   ID: %d   IP: %d.%d.%d.x"),data->ID,
                                       data->IP>>24,data->IP>>16&0xff,data->IP>>8&0xff);
                 m_toolTip->SetTip(tip);
+// arr, undocumented function - totally weird!
+#ifdef __WXMAC__
+                wxToolTip::RelayEvent(this,event);
+#endif
                 return;
             }
         }
