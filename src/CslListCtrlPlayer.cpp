@@ -256,9 +256,11 @@ void CslListCtrlPlayer::OnMouseMove(wxMouseEvent& event)
     wxRect rect;
     wxListItem item;
     wxString tip;
-    bool first=true;
     wxInt32 i,offset=0;
     wxPoint pos=event.GetPosition();
+#ifndef __WXMSW__
+    bool first=true;
+#endif
 
     event.Skip();
 
@@ -269,11 +271,13 @@ void CslListCtrlPlayer::OnMouseMove(wxMouseEvent& event)
             item.SetId(i);
             GetItemRect(item,rect,wxLIST_RECT_BOUNDS);
 
+#ifndef __WXMSW__
             if (first)
             {
                 offset=rect.y;
                 first=false;
             }
+#endif
 
             rect.y-=offset;
 
