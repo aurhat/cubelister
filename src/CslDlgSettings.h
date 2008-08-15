@@ -112,6 +112,9 @@ class CslDlgSettings : public wxDialog
         wxCheckBox* checkbox_play_update;
         wxSpinCtrl* spin_ctrl_wait;
         wxSpinCtrl* spin_ctrl_min_playtime;
+        wxSpinCtrl* spin_ctrl_server_cleanup;
+        wxCheckBox* checkbox_server_cleanup_favourites;
+        wxCheckBox* checkbox_server_cleanup_stats;
         wxSpinCtrl* spin_ctrl_ping_good;
         wxSpinCtrl* spin_ctrl_ping_bad;
         wxCheckBox* checkbox_game_output;

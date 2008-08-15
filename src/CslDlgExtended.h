@@ -54,7 +54,7 @@ class CslDlgExtended: public wxDialog
                        long style=wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
         ~CslDlgExtended();
 
-        void DoShow(CslServerInfo *info);
+        void DoShow(CslServerInfo *info,bool show=true);
         CslServerInfo* GetInfo() { return m_info; }
 
         void UpdatePlayerData();

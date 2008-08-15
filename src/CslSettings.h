@@ -53,6 +53,9 @@
 #define CSL_WAIT_SERVER_FULL_MAX   600
 #define CSL_WAIT_SERVER_FULL_STD   60
 
+#define CSL_CLEANUP_SERVERS      28
+#define CSL_CLEANUP_SERVERS_MAX  365
+
 #define CSL_MIN_PLAYTIME_MIN   0
 #define CSL_MIN_PLAYTIME_MAX   60
 #define CSL_MIN_PLAYTIME_STD   30
@@ -76,6 +79,9 @@ class CslSettings
                 waitServerFull(CSL_WAIT_SERVER_FULL_STD),
                 pinggood(CSL_PING_GOOD_STD),
                 pingbad(CSL_PING_BAD_STD),
+                cleanupServers(CSL_CLEANUP_SERVERS*86400),
+                cleanupServersKeepFav(true),
+                cleanupServersKeepStats(true),
                 autoSaveOutput(false),
 
                 /* ListCtrl */
@@ -110,10 +116,12 @@ class CslSettings
         wxInt32 updateInterval;
         bool dontUpdatePlaying;
         bool showSearch;
-        wxUint32 filterMaster,filterFavourites;
+        wxInt32 filterMaster,filterFavourites;
         wxInt32 waitServerFull;
-        wxUint32 pinggood,pingbad;
+        wxInt32 pinggood,pingbad;
         wxString gameOutputPath;
+        wxUint32 cleanupServers;
+        bool cleanupServersKeepFav,cleanupServersKeepStats;
         bool autoSaveOutput;
         wxString lastGame;
 

@@ -130,7 +130,7 @@ void CslDlgExtended::set_properties()
     m_teamLabel.Add(label_team7);
     m_teamLabel.Add(label_team8);
 
-    list_ctrl_players->ListInit(MENU_SERVER_EXTENDED_DEFAULT-MENU_SERVER_EXTENDED_MICRO);
+    list_ctrl_players->ListInit(CslListCtrlPlayer::CSL_LIST_PLAYER_DEFAULT_SIZE_DLG);
 #ifdef __WXMSW__
     list_ctrl_players->SetMinSize(wxSize(520,270));
 #elif __WXGTK__
@@ -224,7 +224,7 @@ void CslDlgExtended::do_layout()
     m_sizerMapLabel=sizer_map_label;
 
     grid_sizer_main->SetSizeHints(this);
-    CentreOnScreen();
+    //CentreOnScreen();
 }
 
 void CslDlgExtended::OnClose(wxCloseEvent& event)
@@ -275,6 +275,11 @@ void CslDlgExtended::OnMenu(wxCommandEvent& event)
 {
     switch (event.GetId())
     {
+        case MENU_SERVER_EXTENDED_FULL:
+        case MENU_SERVER_EXTENDED_MICRO:
+        case MENU_SERVER_EXTENDED_MINI:
+        case MENU_SERVER_EXTENDED_DEFAULT:
+            event.SetClientData(m_info);
         case MENU_SERVER_CONNECT:
         case MENU_SERVER_CONNECT_PW:
             wxPostEvent(m_parent,event);
@@ -584,7 +589,7 @@ void CslDlgExtended::ShowPanelMap(const bool show)
         Thaw();
 }
 
-void CslDlgExtended::DoShow(CslServerInfo *info)
+void CslDlgExtended::DoShow(CslServerInfo *info,bool show)
 {
     wxString s;
 
@@ -596,6 +601,12 @@ void CslDlgExtended::DoShow(CslServerInfo *info)
 
     m_info=info;
     list_ctrl_players->ServerInfo(info);
+
+    if (!show && IsShown())
+        Hide();
+
+    if (!info)
+        return;
 
     UpdatePlayerData();
     UpdateTeamData();

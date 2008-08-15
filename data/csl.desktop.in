@@ -8,4 +8,4 @@ Exec=csl
 StartupNotify=true
 Terminal=false
 Icon=csl.png
-Categories=Games
+Categories=Game

@@ -172,6 +172,7 @@ void CslListCtrlPlayer::OnContextMenu(wxContextMenuEvent& event)
         return;
 
     wxMenu menu;
+    wxMenuItem *item;
     wxPoint point=event.GetPosition();
 
     //from keyboard
@@ -181,6 +182,31 @@ void CslListCtrlPlayer::OnContextMenu(wxContextMenuEvent& event)
     CslMenu::AddItem(&menu,MENU_SERVER_CONNECT,MENU_SERVER_CONN_STR,wxART_CONNECT);
     if (CSL_CAP_CONNECT_PASS(m_info->GetGame().GetCapabilities()))
         CslMenu::AddItem(&menu,MENU_SERVER_CONNECT_PW,MENU_SERVER_CONN_PW_STR,wxART_CONNECT_PW);
+
+    if (m_info)
+    {
+        menu.AppendSeparator();
+
+        wxMenu *ext=new wxMenu();
+        item=menu.AppendSubMenu(ext,_("Extended information"));
+        item->SetBitmap(GET_ART_MENU(wxART_ABOUT));
+        if (m_info->ExtInfoStatus!=CSL_EXT_STATUS_OK || !CslEngine::PingOk(*m_info,g_cslSettings->updateInterval))
+            item->Enable(false);
+        else
+        {
+            if (m_view!=CSL_LIST_PLAYER_DEFAULT_SIZE_DLG)
+            {
+                CslMenu::AddItem(ext,MENU_SERVER_EXTENDED_FULL,_("Full"),wxART_ABOUT);
+                ext->AppendSeparator();
+            }
+            if (m_view!=CSL_LISTPLAYER_MICRO_SIZE)
+                CslMenu::AddItem(ext,MENU_SERVER_EXTENDED_MICRO,_("Micro"),wxART_EXTINFO_MICRO);
+            if (m_view!=CSL_LISTPLAYER_MINI_SIZE)
+                CslMenu::AddItem(ext,MENU_SERVER_EXTENDED_MINI,_("Mini"),wxART_EXTINFO_MINI);
+            if (m_view!=CSL_LIST_PLAYER_DEFAULT_SIZE)
+                CslMenu::AddItem(ext,MENU_SERVER_EXTENDED_DEFAULT,_("Default"),wxART_EXTINFO_DEFAULT);
+        }
+    }
 
     point=ScreenToClient(point);
     PopupMenu(&menu,point);
@@ -212,6 +238,13 @@ void CslListCtrlPlayer::OnMenu(wxCommandEvent& event)
             }
             break;
         }
+        case MENU_SERVER_EXTENDED_FULL:
+        case MENU_SERVER_EXTENDED_MICRO:
+        case MENU_SERVER_EXTENDED_MINI:
+        case MENU_SERVER_EXTENDED_DEFAULT:
+            event.SetClientData(m_info);
+            event.Skip();
+            break;
 
         default:
             break;
@@ -220,10 +253,11 @@ void CslListCtrlPlayer::OnMenu(wxCommandEvent& event)
 
 void CslListCtrlPlayer::OnMouseMove(wxMouseEvent& event)
 {
-    wxInt32 i,offset;
     wxRect rect;
     wxListItem item;
+    wxString tip;
     bool first=true;
+    wxInt32 i,offset=0;
     wxPoint pos=event.GetPosition();
 
     event.Skip();
@@ -247,10 +281,10 @@ void CslListCtrlPlayer::OnMouseMove(wxMouseEvent& event)
             {
                 CslPlayerStatsData *data=(CslPlayerStatsData*)GetItemData(item);
                 const char *country=CslGeoIP::GetCountryNameByIPnum(data->IP);
-                wxString tip=wxString::Format(_("Name: %s   Country: %s"),data->Name.c_str(),
+                tip=wxString::Format(_("Name: %s   Country: %s"),data->Name.c_str(),
                                               (country ? (A2U(country)).c_str() : CslGeoIP::IsOk() ?
-                                              _("Unknown"):_("GeoIP database not found")));
-                tip+=wxString::Format(_("   ID: %d   IP: %d.%d.%d.x"),data->ID,
+                                               _("Unknown"):_("GeoIP database not found")));
+                tip+=wxString::Format(wxT("   ID: %d   IP: %d.%d.%d.x"),data->ID,
                                       data->IP>>24,data->IP>>16&0xff,data->IP>>8&0xff);
                 m_toolTip->SetTip(tip);
                 return;
@@ -258,7 +292,10 @@ void CslListCtrlPlayer::OnMouseMove(wxMouseEvent& event)
         }
     }
 
-    m_toolTip->SetTip(_("Select a player and press CTRL+C to copy to clipboard."));
+    tip=_("Player list");
+    if (m_info)
+        tip+=_(" for server: ")+m_info->GetBestDescription();
+    m_toolTip->SetTip(tip);
 }
 
 void CslListCtrlPlayer::UpdateData()
@@ -396,7 +433,7 @@ void CslListCtrlPlayer::ListAdjustSize()
 
     wxInt32 w=GetClientSize().x-8;
 
-    if (m_view==CSL_LIST_PLAYER_DEFAULT_SIZE)
+    if (m_view>=CSL_LIST_PLAYER_DEFAULT_SIZE)
     {
         SetColumnWidth(0,(wxInt32)(w*0.20f));
         SetColumnWidth(1,(wxInt32)(w*0.10f));

@@ -48,21 +48,26 @@ enum
     G_MAX
 };
 
-#define G_M_TEAM    0x0001  // team
-#define G_M_INSTA   0x0002  // instagib
-#define G_M_DUEL    0x0004  // duel
-#define G_M_PROG    0x0008  // progressive
+enum
+{
+    G_M_NONE    = 0,
+    G_M_TEAM    = 1<<0,
+    G_M_INSTA   = 1<<1,
+    G_M_DUEL    = 1<<2,
+    G_M_PROG    = 1<<3,
+    G_M_MULTI   = 1<<4,
+    G_M_DLMS    = 1<<5,
+    G_M_MAYHEM  = 1<<6,
+    G_M_NOITEMS = 1<<7,
+    G_M_ALL     = G_M_TEAM|G_M_INSTA|G_M_DUEL|G_M_PROG|G_M_MULTI|G_M_DLMS|G_M_MAYHEM|G_M_NOITEMS,
+    G_M_FIGHT   = G_M_TEAM|G_M_INSTA|G_M_DUEL|G_M_MULTI|G_M_DLMS|G_M_NOITEMS,
+    G_M_DUKE    = G_M_INSTA|G_M_DUEL|G_M_DLMS|G_M_NOITEMS,
+    G_M_STF     = G_M_TEAM|G_M_INSTA|G_M_PROG|G_M_MULTI|G_M_MAYHEM|G_M_NOITEMS,
+    G_M_CTF     = G_M_TEAM|G_M_INSTA|G_M_PROG|G_M_MULTI|G_M_MAYHEM|G_M_NOITEMS,
+};
 
-#define G_M_MULTI   0x0010  // mutli team
-#define G_M_DLMS    0x0020  // last man standing
-#define G_M_MAYHEM  0x0040  // mayhem
+#define G_M_NUM     8
 
-#define G_M_NUM     6
-
-#define G_M_ALL     G_M_TEAM|G_M_INSTA|G_M_DUEL|G_M_PROG|G_M_MULTI|G_M_DLMS
-#define G_M_FIGHT   G_M_TEAM|G_M_INSTA|G_M_DUEL|G_M_MULTI|G_M_DLMS
-#define G_M_STF     G_M_TEAM|G_M_INSTA|G_M_PROG|G_M_MULTI|G_M_MAYHEM
-#define G_M_CTF     G_M_TEAM|G_M_INSTA|G_M_PROG|G_M_MULTI|G_M_MAYHEM
 
 static struct
 {
@@ -70,23 +75,24 @@ static struct
 }
 gametype[] =
 {
-    { G_DEMO,       0,         0,        wxT("Demo")    },
-    { G_LOBBY,      0,         0,        wxT("Lobby")   },
-    { G_EDITMODE,   0,         0,        wxT("Editing") },
-    { G_MISSION,    0,         0,        wxT("Mission") },
-    { G_DEATHMATCH, G_M_FIGHT, 0,        wxT("DM")      },
-    { G_STF,        G_M_STF,   G_M_TEAM, wxT("STF")     },
-    { G_CTF,        G_M_CTF,   G_M_TEAM, wxT("CTF")     },
+    { G_DEMO,       G_M_NONE,  G_M_NONE,    wxT("Demo")    },
+    { G_LOBBY,      G_M_NONE,  G_M_NOITEMS, wxT("Lobby")   },
+    { G_EDITMODE,   G_M_NONE,  G_M_NONE,    wxT("Editing") },
+    { G_MISSION,    G_M_NONE,  G_M_NONE,    wxT("Mission") },
+    { G_DEATHMATCH, G_M_FIGHT, G_M_NONE,    wxT("DM")      },
+    { G_STF,        G_M_STF,   G_M_TEAM,    wxT("STF")     },
+    { G_CTF,        G_M_CTF,   G_M_TEAM,    wxT("CTF")     },
 },
 mutstype[] =
 {
-    { G_M_TEAM,   G_M_ALL, 0,        wxT("Team")   },
-    { G_M_INSTA,  G_M_ALL, 0,        wxT("Insta")  },
-    { G_M_DUEL,   G_M_ALL, 0,        wxT("Duel")   },
-    { G_M_PROG,   G_M_ALL, 0,        wxT("PG")     },
-    { G_M_MULTI,  G_M_ALL, G_M_TEAM, wxT("MS")     },
-    { G_M_DLMS,   G_M_ALL, G_M_DUEL, wxT("LMS")    },
-    { G_M_MAYHEM, G_M_ALL, 0,        wxT("Mayhem") },
+    { G_M_TEAM,    G_M_ALL,  G_M_NONE,    wxT("Team")   },
+    { G_M_INSTA,   G_M_ALL,  G_M_NOITEMS, wxT("Insta")  },
+    { G_M_DUEL,    G_M_DUKE, G_M_NONE,    wxT("Duel")   },
+    { G_M_PROG,    G_M_ALL,  G_M_NONE,    wxT("PG")     },
+    { G_M_MULTI,   G_M_ALL,  G_M_TEAM,    wxT("MS")     },
+    { G_M_DLMS,    G_M_DUKE, G_M_DUEL,    wxT("LMS")    },
+    { G_M_MAYHEM,  G_M_ALL,  G_M_NONE,    wxT("Mayhem") },
+    { G_M_NOITEMS, G_M_ALL,  G_M_NONE,    wxT("NI")     },
 };
 
 wxString CslBloodFrontier::GetModeName(wxInt32 n,wxInt32 m) const
@@ -121,7 +127,7 @@ wxString CslBloodFrontier::GetVersionName(wxInt32 n) const
 {
     static const wxChar* versions[] =
     {
-        wxT("")
+        wxT("Alpha 2")
     };
     wxUint32 v=CSL_LAST_PROTOCOL_BF-n;
     return (v>=0 && v<sizeof(versions)/sizeof(versions[0])) ?
@@ -132,8 +138,8 @@ wxString CslBloodFrontier::GetWeaponName(wxInt32 n) const
 {
     static const wxChar* weapons[] =
     {
-        wxT("Pistol"),wxT("Shotgun"),wxT("Chaingun"),wxT("Grenades"),
-        wxT("Flamer"),wxT("Rifle"),wxT("Rockets")
+        wxT("Pistol"),wxT("Shotgun"),wxT("Chaingun"),
+        wxT("Grenades"),wxT("Flamer"),wxT("Rifle")
     };
     return (n>=0 && (size_t)n<sizeof(weapons)/sizeof(weapons[0])) ?
            wxString(weapons[n]) : wxString(_("unknown"));

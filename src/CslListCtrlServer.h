@@ -151,7 +151,7 @@ class CslListCtrlServer : public wxListCtrl
         t_aCslListServerData m_selected;
         t_aCslListServerData m_servers;
         wxString m_searchString;
-        wxUint32 *m_filterFlags;
+        wxInt32 *m_filterFlags;
         wxInt32 m_filterVersion;
 
         wxImageList m_imageList;

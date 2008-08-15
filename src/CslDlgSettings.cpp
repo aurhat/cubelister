@@ -43,19 +43,21 @@ END_EVENT_TABLE()
 
 enum
 {
-    BUTTON_COLOUR_EMPTY = wxID_HIGHEST + 1,
+    CHECK_GAME_EXPERT = wxID_HIGHEST + 1,
+
+    BUTTON_COLOUR_EMPTY,
     BUTTON_COLOUR_OFF,
     BUTTON_COLOUR_FULL,
     BUTTON_COLOUR_MM1,
     BUTTON_COLOUR_MM2,
     BUTTON_COLOUR_MM3,
 
+    SPIN_CLEANUP_SERVERS,
+
     SPIN_PING_GOOD,
     SPIN_PING_BAD,
 
-    CHECK_GAME_EXPERT,
     CHECK_GAME_OUTPUT,
-
     FILE_PICKER,
     DIR_PICKER_GAME,
     DIR_PICKER_CFG
@@ -248,6 +250,9 @@ CslDlgSettings::CslDlgSettings(CslEngine *engine,wxWindow* parent,int id,const w
     checkbox_play_update = new wxCheckBox(notebook_pane_other, wxID_ANY, _("Don't update when playing"));
     spin_ctrl_wait = new wxSpinCtrl(notebook_pane_other, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100);
     spin_ctrl_min_playtime = new wxSpinCtrl(notebook_pane_other, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100);
+    spin_ctrl_server_cleanup = new wxSpinCtrl(notebook_pane_other, SPIN_CLEANUP_SERVERS, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100);
+    checkbox_server_cleanup_favourites = new wxCheckBox(notebook_pane_other, wxID_ANY, _("Keep favourites"));
+    checkbox_server_cleanup_stats = new wxCheckBox(notebook_pane_other, wxID_ANY, _("Keep servers with statistics"));
     spin_ctrl_ping_good = new wxSpinCtrl(notebook_pane_other, SPIN_PING_GOOD, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100);
     spin_ctrl_ping_bad = new wxSpinCtrl(notebook_pane_other, SPIN_PING_BAD, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100);
     checkbox_game_output = new wxCheckBox(notebook_pane_other, CHECK_GAME_OUTPUT, _("Auto &save game output to:"));
@@ -270,9 +275,12 @@ void CslDlgSettings::set_properties()
     button_colour_mm2->SetSize(button_colour_mm2->GetBestSize());
     button_colour_full->SetSize(button_colour_full->GetBestSize());
     button_colour_mm3->SetSize(button_colour_mm3->GetBestSize());
-    spin_ctrl_update->SetMinSize(wxDLG_UNIT(spin_ctrl_update, wxSize(48, -1)));
-    spin_ctrl_wait->SetMinSize(wxDLG_UNIT(spin_ctrl_wait, wxSize(48, -1)));
-    spin_ctrl_min_playtime->SetMinSize(wxDLG_UNIT(spin_ctrl_min_playtime, wxSize(48, -1)));
+    spin_ctrl_update->SetMinSize(wxSize(48, -1));
+    spin_ctrl_wait->SetMinSize(wxSize(48, -1));
+    spin_ctrl_min_playtime->SetMinSize(wxSize(48, -1));
+    spin_ctrl_server_cleanup->SetMinSize(wxSize(48, -1));
+    checkbox_server_cleanup_favourites->SetValue(1);
+    checkbox_server_cleanup_stats->SetValue(1);
     dirpicker_game_output->Enable(false);
     button_ok->SetDefault();
     // end wxGlade
@@ -284,6 +292,12 @@ void CslDlgSettings::set_properties()
     spin_ctrl_wait->SetValue(m_settings.waitServerFull);
     spin_ctrl_min_playtime->SetRange(CSL_MIN_PLAYTIME_MIN,CSL_MIN_PLAYTIME_MAX);
     spin_ctrl_min_playtime->SetValue(m_settings.minPlaytime);
+    spin_ctrl_server_cleanup->SetRange(0,CSL_CLEANUP_SERVERS_MAX);
+    spin_ctrl_server_cleanup->SetValue(m_settings.cleanupServers/86400);
+    checkbox_server_cleanup_favourites->SetValue(m_settings.cleanupServersKeepFav);
+    checkbox_server_cleanup_stats->SetValue(m_settings.cleanupServersKeepStats);
+    checkbox_server_cleanup_favourites->Enable(m_settings.cleanupServers!=0);
+    checkbox_server_cleanup_stats->Enable(m_settings.cleanupServers!=0);
     spin_ctrl_ping_good->SetRange(0,9999);
     spin_ctrl_ping_good->SetValue(m_settings.pinggood);
     spin_ctrl_ping_bad->SetRange(0,9999);
@@ -327,7 +341,8 @@ void CslDlgSettings::do_layout()
     wxStaticBoxSizer* sizer_threshold = new wxStaticBoxSizer(sizer_threshold_staticbox, wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_threshold = new wxFlexGridSizer(1, 5, 0, 0);
     wxStaticBoxSizer* sizer_times = new wxStaticBoxSizer(sizer_times_staticbox, wxHORIZONTAL);
-    wxFlexGridSizer* grid_sizer_times = new wxFlexGridSizer(3, 3, 0, 0);
+    wxFlexGridSizer* grid_sizer_times = new wxFlexGridSizer(4, 3, 0, 0);
+    wxFlexGridSizer* grid_sizer_server_cleanup = new wxFlexGridSizer(1, 2, 0, 0);
     wxFlexGridSizer* grid_sizer_pane_colours = new wxFlexGridSizer(1, 1, 0, 0);
     wxStaticBoxSizer* sizer_colours = new wxStaticBoxSizer(sizer_colours_staticbox, wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_colours = new wxFlexGridSizer(3, 5, 0, 0);
@@ -363,16 +378,22 @@ void CslDlgSettings::do_layout()
     grid_sizer_pane_colours->AddGrowableCol(1);
     wxStaticText* label_update_static = new wxStaticText(notebook_pane_other, wxID_ANY, _("Update interval (sec):"));
     grid_sizer_times->Add(label_update_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_times->Add(spin_ctrl_update, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_times->Add(checkbox_play_update, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
+    grid_sizer_times->Add(spin_ctrl_update, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_times->Add(checkbox_play_update, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     wxStaticText* label_wait_static = new wxStaticText(notebook_pane_other, wxID_ANY, _("Wait on full server (sec):"));
     grid_sizer_times->Add(label_wait_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_times->Add(spin_ctrl_wait, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_times->Add(spin_ctrl_wait, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_times->Add(1, 1, 0, 0, 0);
     wxStaticText* label_min_playtime_static = new wxStaticText(notebook_pane_other, wxID_ANY, _("Minimum playtime for statistics (sec):"));
     grid_sizer_times->Add(label_min_playtime_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_times->Add(spin_ctrl_min_playtime, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_times->Add(spin_ctrl_min_playtime, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_times->Add(1, 1, 0, 0, 0);
+    wxStaticText* label_server_cleanup = new wxStaticText(notebook_pane_other, wxID_ANY, _("Cleanup dead servers (days)"));
+    grid_sizer_times->Add(label_server_cleanup, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_times->Add(spin_ctrl_server_cleanup, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_server_cleanup->Add(checkbox_server_cleanup_favourites, 0, wxALL, 4);
+    grid_sizer_server_cleanup->Add(checkbox_server_cleanup_stats, 0, wxALL, 4);
+    grid_sizer_times->Add(grid_sizer_server_cleanup, 1, wxEXPAND, 0);
     grid_sizer_times->AddGrowableCol(1);
     sizer_times->Add(grid_sizer_times, 1, wxEXPAND, 0);
     grid_sizer_pane_other->Add(sizer_times, 1, wxALL|wxEXPAND, 4);
@@ -410,11 +431,9 @@ void CslDlgSettings::do_layout()
     // end wxGlade
 
     // hmm ...
-    const wxSize& best=notebook_settings->GetBestSize();
 #ifdef __WXMSW__
-    notebook_settings->SetMinSize(wxSize(best.x,best.y+32));
-#else
-    notebook_settings->SetMinSize(wxSize(best.x,best.y+4));
+    const wxSize& best=notebook_settings->GetBestSize();
+    notebook_settings->SetMinSize(wxSize(best.x,best.y+16));
 #endif
 
     grid_sizer_main->SetSizeHints(this);
@@ -426,6 +445,13 @@ void CslDlgSettings::OnSpinCtrl(wxSpinEvent& event)
 {
     switch (event.GetId())
     {
+        case SPIN_CLEANUP_SERVERS:
+        {
+            wxUint32 val=event.GetPosition();
+            checkbox_server_cleanup_favourites->Enable(val!=0);
+            checkbox_server_cleanup_stats->Enable(val!=0);
+            break;
+        }
         case SPIN_PING_GOOD:
         {
             wxUint32 val=event.GetPosition();
@@ -514,6 +540,9 @@ void CslDlgSettings::OnCommandEvent(wxCommandEvent& event)
             m_settings.waitServerFull=spin_ctrl_wait->GetValue();
             m_settings.dontUpdatePlaying=checkbox_play_update->IsChecked();
             m_settings.minPlaytime=spin_ctrl_min_playtime->GetValue();
+            m_settings.cleanupServers=spin_ctrl_server_cleanup->GetValue()*86400;
+            m_settings.cleanupServersKeepFav=checkbox_server_cleanup_favourites->GetValue();
+            m_settings.cleanupServersKeepStats=checkbox_server_cleanup_stats->GetValue();
             m_settings.pinggood=spin_ctrl_ping_good->GetValue();
             m_settings.pingbad=spin_ctrl_ping_bad->GetValue();
             m_settings.gameOutputPath=dirpicker_game_output->GetPath();

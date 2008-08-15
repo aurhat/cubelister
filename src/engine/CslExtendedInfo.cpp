@@ -44,7 +44,10 @@ CslPlayerStatsData* CslPlayerStats::GetNewStats()
 bool CslPlayerStats::AddStats(CslPlayerStatsData *data)
 {
     if (m_status!=CSL_STATS_NEED_STATS)
+    {
+        printf("m_status!=CSL_STATS_NEED_STATS\n");
         return false;
+    }
 
     loopv(m_ids)
     {
@@ -54,7 +57,7 @@ bool CslPlayerStats::AddStats(CslPlayerStatsData *data)
         data->Ok=true;
         if (m_ids.length()==0)
             m_status=CSL_STATS_NEED_IDS;
-        loopv(m_stats) if (m_stats[i]==data) return true;
+        loopvj(m_stats) if (m_stats[j]==data) return true;
         m_stats.add(data);
         return true;
     }

@@ -740,7 +740,7 @@ void CslFrame::DoLayout()
     Layout();
     SetSize(g_cslSettings->frameSize);
 
-    CentreOnScreen();
+    //CentreOnScreen();
 }
 
 wxString CslFrame::PlayerListGetCaption(CslServerInfo *info,bool selected)
@@ -1134,12 +1134,63 @@ void CslFrame::UpdateMaster()
     if (!master)
         return;
 
-    SetStatusText(_("Sending request to master: ")+master->GetConnection().GetAddress(),1);
     m_timer.Stop();
 
     CslMenu::EnableMenuItem(MENU_MASTER_UPDATE,false);
     tree_ctrl_games->Enable(false);
 
+    CslGame *game=master->GetGame();
+    if (game)
+    {
+        CslServerInfo *info;
+        wxUint32 now=wxDateTime::Now().GetTicks();
+        vector<CslServerInfo*>& servers=game->GetServers();
+
+        loopvrev(servers)
+        {
+            info=servers[i];
+
+            if (g_cslSettings->cleanupServers &&
+                info->LastSeen && now-info->LastSeen>g_cslSettings->cleanupServers &&
+                !(g_cslSettings->cleanupServersKeepFav && info->IsFavourite()) &&
+                !(g_cslSettings->cleanupServersKeepStats && info->HasStats()))
+            {
+                loopvj(m_playerInfos)
+                {
+                    if (j!=0 && m_playerInfos[j]->ServerInfo()==info)
+                    {
+                        info=NULL;
+                        break;
+                    }
+                }
+
+                if (info)
+                {
+                    LOG_DEBUG("Cleanup: %s - %s (%s)\n",U2A(game->GetName()),
+                              U2A(info->GetBestDescription()),U2A(info->Addr.IPAddress()));
+
+                    if (m_playerInfos.length() && m_playerInfos[0]->ServerInfo()==info)
+                    {
+                        m_playerInfos[0]->ServerInfo(NULL);
+                        m_playerInfos[0]->UpdateData();
+                        wxAuiPaneInfo& pane=m_AuiMgr.GetPane(m_playerInfos[0]);
+                        if (pane.IsOk())
+                        {
+                            pane.Caption(PlayerListGetCaption(NULL,true));
+                            m_AuiMgr.Update();
+                        }
+                    }
+
+                    if (info->IsFavourite())
+                        list_ctrl_favourites->RemoveServer(NULL,info,-1);
+
+                    game->DeleteServer(info);
+                }
+            }
+        }
+    }
+
+    SetStatusText(_("Sending request to master: ")+master->GetConnection().GetAddress(),1);
     wxInt32 num=m_engine->UpdateFromMaster(master);
     if (num<0)
         SetStatusText(_("Error on update from master: ")+master->GetConnection().GetAddress(),1);
@@ -1207,8 +1258,7 @@ void CslFrame::ConnectToServer()
     CslProcess *process=new CslProcess(this,info,cmd);
     if (!(::wxExecute(cmd,wxEXEC_ASYNC,process)>0))
     {
-        wxMessageBox(_("Failed to start: ")+cmd,
-                     _("Error"),wxICON_ERROR,this);
+        wxMessageBox(_("Failed to start: ")+cmd,_("Error"),wxICON_ERROR,this);
         info->Lock(false);
         return;
     }
@@ -1248,9 +1298,8 @@ void CslFrame::LoadSettings()
     if (config.Read(wxT("Layout"),&s)) g_cslSettings->layout=s;
     if (config.Read(wxT("UpdateInterval"),&val))
     {
-        if (val<CSL_UPDATE_INTERVAL_MIN || val>CSL_UPDATE_INTERVAL_MAX)
-            val=CSL_UPDATE_INTERVAL_MIN;
-        g_cslSettings->updateInterval=val;
+        if (val>=CSL_UPDATE_INTERVAL_MIN && val<=CSL_UPDATE_INTERVAL_MAX)
+            g_cslSettings->updateInterval=val;
     }
     if (config.Read(wxT("NoUpdatePlaying"),&val)) g_cslSettings->dontUpdatePlaying=val!=0;
     if (config.Read(wxT("ShowSearch"),&val)) g_cslSettings->showSearch=val!=0;
@@ -1258,21 +1307,29 @@ void CslFrame::LoadSettings()
     if (config.Read(wxT("FilterFavourites"),&val)) g_cslSettings->filterFavourites=val;
     if (config.Read(wxT("WaitOnFullServer"),&val))
     {
-        if (val<CSL_WAIT_SERVER_FULL_MIN || val>CSL_WAIT_SERVER_FULL_MAX)
-            val=CSL_WAIT_SERVER_FULL_STD;
-        g_cslSettings->waitServerFull=val;
+        if (val>=CSL_WAIT_SERVER_FULL_MIN && val<=CSL_WAIT_SERVER_FULL_MAX)
+            g_cslSettings->waitServerFull=val;
     }
+    if (config.Read(wxT("CleanupServers"),&val))
+    {
+        if ((!val || (val && val>=86400)) && val<=CSL_CLEANUP_SERVERS_MAX*86400)
+            g_cslSettings->cleanupServers=val;
+    }
+    if (config.Read(wxT("CleanupServersKeepFavourites"),&val))
+        g_cslSettings->cleanupServersKeepFav=val!=0;
+    if (config.Read(wxT("CleanupServersKeepStats"),&val))
+        g_cslSettings->cleanupServersKeepStats=val!=0;
     if (config.Read(wxT("PingGood"),&val))
     {
-        g_cslSettings->pinggood=val;
-        if (g_cslSettings->pinggood>9999)
-            g_cslSettings->pinggood=CSL_PING_GOOD_STD;
+        if (val<=9999)
+            g_cslSettings->pinggood=val;
     }
     if (config.Read(wxT("PingBad"),&val))
     {
-        g_cslSettings->pingbad=val;
-        if (g_cslSettings->pingbad<g_cslSettings->pinggood)
+        if (val<g_cslSettings->pinggood)
             g_cslSettings->pingbad=g_cslSettings->pinggood;
+        else
+            g_cslSettings->pingbad=val;
     }
     if (config.Read(wxT("GameOutputPath"),&s)) g_cslSettings->gameOutputPath=s;
     if (g_cslSettings->gameOutputPath.IsEmpty())
@@ -1281,9 +1338,8 @@ void CslFrame::LoadSettings()
     if (config.Read(wxT("LastSelectedGame"),&s)) g_cslSettings->lastGame=s;
     if (config.Read(wxT("MinPlaytime"),&val))
     {
-        if (val<CSL_MIN_PLAYTIME_MIN || val>CSL_MIN_PLAYTIME_MAX)
-            val=CSL_MIN_PLAYTIME_STD;
-        g_cslSettings->minPlaytime=val;
+        if (val>=CSL_MIN_PLAYTIME_MIN && val<=CSL_MIN_PLAYTIME_MAX)
+            g_cslSettings->minPlaytime=val;
     }
 
     /* ListCtrl */
@@ -1369,6 +1425,9 @@ void CslFrame::SaveSettings()
     config.Write(wxT("FilterMaster"),(long int)g_cslSettings->filterMaster);
     config.Write(wxT("FilterFavourites"),(long int)g_cslSettings->filterFavourites);
     config.Write(wxT("WaitOnFullServer"),(long int)g_cslSettings->waitServerFull);
+    config.Write(wxT("CleanupServers"),(long int)g_cslSettings->cleanupServers);
+    config.Write(wxT("CleanupServersKeepFavourites"),(long int)g_cslSettings->cleanupServersKeepFav);
+    config.Write(wxT("CleanupServersKeepStats"),(long int)g_cslSettings->cleanupServersKeepStats);
     config.Write(wxT("PingGood"),(long int)g_cslSettings->pinggood);
     config.Write(wxT("PingBad"),(long int)g_cslSettings->pingbad);
     config.Write(wxT("GameOutputPath"),g_cslSettings->gameOutputPath);
@@ -2230,7 +2289,10 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
                 m_oldSelectedInfo=NULL;
 
             if (m_extendedDlg->GetInfo()==info)
+            {
                 info->PingExt(false);
+                m_extendedDlg->DoShow(NULL,false);
+            }
 
             loopvrev(m_playerInfos)
             {
@@ -2334,7 +2396,6 @@ void CslFrame::OnClose(wxCloseEvent& event)
 {
     if (event.GetEventObject()==m_extendedDlg)
     {
-        LOG_DEBUG("\n");
     }
     if (event.GetEventObject()==m_outputDlg)
     {
