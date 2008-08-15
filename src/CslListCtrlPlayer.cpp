@@ -303,7 +303,10 @@ void CslListCtrlPlayer::OnMouseMove(wxMouseEvent& event)
     tip=_("Player list");
     if (m_info)
         tip+=_(" for server: ")+m_info->GetBestDescription();
+// arr, undocumented function - totally weird!
+#ifdef __WXMAC__
     m_toolTip->SetTip(tip);
+#endif
 }
 
 void CslListCtrlPlayer::UpdateData()
