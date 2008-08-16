@@ -78,9 +78,9 @@ wxString CslGameSauerbraten::GetWeaponName(wxInt32 n) const
 {
     static const wxChar* weapons[] =
     {
-        wxT("Fist"),wxT("Shotgun"),wxT("Chaingun"),wxT("Rocketlauncher"),
-        wxT("Rifle"),wxT("Grenadelauncher"),wxT("Pistol"),wxT("Fireball"),
-        wxT("Iceball"),wxT("Slimeball"),wxT("Bite")
+        _("Fist"),_("Shotgun"),_("Chaingun"),_("Rocketlauncher"),
+        _("Rifle"),_("Grenadelauncher"),_("Pistol"),_("Fireball"),
+        _("Iceball"),_("Slimeball"),_("Bite")
     };
     return (n>=0 && (size_t)n<sizeof(weapons)/sizeof(weapons[0])) ?
            wxString(weapons[n]) : wxString(_("unknown"));

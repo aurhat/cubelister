@@ -72,8 +72,8 @@ wxString CslGameAssaultCube::GetWeaponName(wxInt32 n) const
 {
     static const wxChar* weapons[] =
     {
-        wxT("Knife"),wxT("Pistol"),wxT("Shotgun"),wxT("Subgun"),
-        wxT("Sniper"),wxT("Assault"),wxT("Grenade"),wxT("Pistol (auto)")
+        _("Knife"),_("Pistol"),_("Shotgun"),_("Subgun"),
+        _("Sniper"),_("Assault"),_("Grenade"),_("Pistol (auto)")
     };
     return (n>=0 && (size_t)n<sizeof(weapons)/sizeof(weapons[0])) ?
            wxString(weapons[n]) : wxString(_("unknown"));

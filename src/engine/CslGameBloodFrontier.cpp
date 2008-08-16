@@ -144,8 +144,8 @@ wxString CslBloodFrontier::GetWeaponName(wxInt32 n) const
 {
     static const wxChar* weapons[] =
     {
-        wxT("Pistol"),wxT("Shotgun"),wxT("Chaingun"),
-        wxT("Grenades"),wxT("Flamer"),wxT("Rifle")
+        _("Pistol"),_("Shotgun"),_("Chaingun"),
+        _("Grenades"),_("Flamer"),_("Rifle")
     };
     return (n>=0 && (size_t)n<sizeof(weapons)/sizeof(weapons[0])) ?
            wxString(weapons[n]) : wxString(_("unknown"));
