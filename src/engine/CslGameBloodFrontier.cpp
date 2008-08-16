@@ -30,6 +30,12 @@ CslBloodFrontier::CslBloodFrontier()
     m_name=CSL_DEFAULT_NAME_BF;
     m_defaultMasterConnection=CslMasterConnection(CSL_DEFAULT_MASTER_BF,CSL_DEFAULT_MASTER_PORT_BF);
     m_capabilities=CSL_CAPABILITY_EXTINFO | CSL_CAPABILITY_CUSTOM_CONFIG;
+#ifdef __WXMAC__
+    m_clientSettings.ConfigPath=::wxGetHomeDir();
+    m_clientSettings.ConfigPath+=wxT("/Library/Application Support/bloodfrontier");
+#elif __WXGTK__
+    m_clientSettings.ConfigPath=::wxGetHomeDir()+wxT("/.bloodfrontier");
+#endif
 }
 
 CslBloodFrontier::~CslBloodFrontier()
@@ -113,8 +119,8 @@ wxString CslBloodFrontier::GetModeName(wxInt32 n,wxInt32 m) const
                 !(gametype[n].implied & mutstype[i].type))
             {
                 if (!addition.IsEmpty())
-                    mode+=wxT("/");
-                mode+=wxString(mutstype[i].name);
+                    addition+=wxT("/");
+                addition+=wxString(mutstype[i].name);
             }
         }
         mode+=addition+wxT(")");
@@ -223,9 +229,70 @@ bool CslBloodFrontier::ParseTeamPong(wxUint32 protocol,ucharbuf& buf,CslTeamStat
     return true;
 }
 
+void CslBloodFrontier::SetClientSettings(const CslGameClientSettings& settings)
+{
+    CslGameClientSettings set=settings;
+
+    if (set.GamePath.IsEmpty() || !::wxDirExists(set.GamePath))
+        return;
+    if (set.ConfigPath.IsEmpty() || !::wxDirExists(set.ConfigPath))
+        set.ConfigPath=set.GamePath;
+#ifdef __WXMAC__
+    if (set.Binary.IsEmpty())
+        set.Binary=set.GamePath+wxT("sauerbraten.app/Contents/MacOS/sauerbraten");
+#endif
+    if (set.Binary.IsEmpty() || !::wxFileExists(set.Binary))
+        return;
+
+    m_clientSettings=set;
+}
+
 wxString CslBloodFrontier::GameStart(CslServerInfo *info,wxUint32 mode,wxString *error)
 {
-    return wxEmptyString;
+    wxString address,path;
+    wxString bin=m_clientSettings.Binary;
+    wxString opts=m_clientSettings.Options;
+
+    if (m_clientSettings.Binary.IsEmpty() || !::wxFileExists(m_clientSettings.Binary))
+    {
+        *error=_("Client binary for game Blood Frontier not found!\nCheck your settings.");
+        return wxEmptyString;
+    }
+    if (m_clientSettings.GamePath.IsEmpty() || !::wxDirExists(m_clientSettings.GamePath))
+    {
+        *error=_("Game path for game Blood Frontier not found!\nCheck check your settings.");
+        return wxEmptyString;
+    }
+    if (m_clientSettings.ConfigPath.IsEmpty() || !::wxDirExists(m_clientSettings.ConfigPath))
+    {
+        *error=_("Config path for game Blood Frontier not found!\nCheck check your settings.");
+        return wxEmptyString;
+    }
+
+    // use Prepend() and do not use opts+= here, since -q<path> must be before -r
+    path=m_clientSettings.ConfigPath;
+#ifdef __WXMSW__
+    opts.Prepend(wxString(wxT("-h\""))+path.RemoveLast()+wxString(wxT("\" ")));
+#else
+    path.Replace(wxT(" "),wxT("\\ "));
+    opts.Prepend(wxString(wxT("-h"))+path+wxString(wxT(" ")));
+#endif //__WXMSW__
+
+    address=info->Host;
+    if (GetDefaultPort()!=info->Port)
+        address+=m_portDelimiter+wxString::Format(wxT("%d"),info->Port);
+
+#ifdef __WXMSW__
+        opts+=wxString(wxT(" -x\"sleep 1000 [connect "))+address+wxString(wxT("]\""));
+#else
+        address.Replace(wxT(" "),wxT("\\ "));
+        opts+=wxString(wxT(" -xsleep\\ 1000\\ [connect\\ "))+address+wxString(wxT("]"));
+#endif
+
+    bin.Replace(wxT(" "),wxT("\\ "));
+    bin+=wxString(wxT(" "))+opts;
+
+    return bin;
 }
 
 wxInt32 CslBloodFrontier::GameEnd(wxString *error)

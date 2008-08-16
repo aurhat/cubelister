@@ -54,6 +54,7 @@ class CslBloodFrontier : public CslGame
         bool ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const;
         bool ParsePlayerPong(wxUint32 protocol,ucharbuf& buf,CslPlayerStatsData& info) const ;
         bool ParseTeamPong(wxUint32 protocol,ucharbuf& buf,CslTeamStatsData& info) const;
+        void SetClientSettings(const CslGameClientSettings& settings);
         wxString GameStart(CslServerInfo *info,wxUint32 mode,wxString *error);
         wxInt32 GameEnd(wxString *error=NULL);
         const char** GetIcon(wxInt32 size) const;

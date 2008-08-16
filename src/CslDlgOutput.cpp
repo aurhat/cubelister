@@ -60,10 +60,9 @@ CslDlgOutput::CslDlgOutput(wxWindow* parent,int id,const wxString& title,
     const wxString choice_conv_filter_choices[] =
     {
         _("0 (Low)"),
-        _("1 (Default)"),
-        _("2 (TC-Server)")
+        _("1 (Default)")
     };
-    choice_conv_filter = new wxChoice(this, CHOICE_CONV_FILTER, wxDefaultPosition, wxDefaultSize, 3, choice_conv_filter_choices, 0);
+    choice_conv_filter = new wxChoice(this, CHOICE_CONV_FILTER, wxDefaultPosition, wxDefaultSize, 2, choice_conv_filter_choices, 0);
     button_load = new wxButton(this, wxID_OPEN, _("&Open"));
     button_save = new wxButton(this, wxID_SAVE, _("&Save"));
     button_close = new wxButton(this, wxID_CLOSE, _("&Close"));
@@ -155,7 +154,7 @@ void CslDlgOutput::do_layout()
 #endif
 
     grid_sizer_main->SetSizeHints(this);
-    CentreOnScreen();
+    //CentreOnScreen();
 }
 
 void CslDlgOutput::OnClose(wxCloseEvent& event)
@@ -415,9 +414,9 @@ wxString CslDlgOutput::Filter(wxUint32 start,wxUint32 end)
                     cmp=m_text.Mid(b,i-b);
                     if (cmp==wxT("init"))
                         skip=true;
-                    else if (cmp==wxT("Renderer"))
+                    else if (!cmp.CmpNoCase(wxT("Renderer")))
                         skip=true;
-                    else if (cmp==wxT("Driver"))
+                    else if (!cmp.CmpNoCase(wxT("Driver")))
                         skip=true;
                     else if (cmp==wxT("WARNING"))
                         skip=true;
@@ -426,13 +425,13 @@ wxString CslDlgOutput::Filter(wxUint32 start,wxUint32 end)
                     else if (cmp==wxT("intermission"))
                         skip=true;
                 }
-                if (!skip && m_filterLevel>=2)
+                /*if (!skip && m_filterLevel>=2)
                 {
                     if (cmp==wxT("NAME"))
                         skip=true;
                     if (cmp==wxT("PLAYER"))
                         skip=true;
-                }
+                }*/
                 if (!skip && i+1<end && m_text.GetChar(i+1)!=' ')
                     skip=true;
 
@@ -442,13 +441,13 @@ wxString CslDlgOutput::Filter(wxUint32 start,wxUint32 end)
                 if (!colon&&!lb)
                 {
                     skip=true;
-                    if (m_filterLevel==2)
+                    /*if (m_filterLevel==2)
                     {
                         if (i<10)
                             break;
                         if (m_text.Mid(i-10,10)==wxT("(TEAMCHAT)"))
                             skip=false;
-                    }
+                    }*/
 
                 }
                 break;
