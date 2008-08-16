@@ -35,6 +35,9 @@ CslGameAssaultCube::CslGameAssaultCube()
 #ifdef __WXGTK__
     m_clientSettings.ConfigPath=::wxGetHomeDir()+wxT("/.assaultcube");
 #endif
+#ifdef __WXMAC__
+    m_configType=CSL_CONFIG_DIR;
+#endif
 }
 
 CslGameAssaultCube::~CslGameAssaultCube()

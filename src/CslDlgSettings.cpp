@@ -178,13 +178,16 @@ void CslGamePage::ToggleView(bool expertView)
         dirpickercfg->Show(expert);
     }
 
-#ifdef __WXMAC__
-    label_exe->Show(expert);
-    filepicker->Show(expert);
-#else
-    label_gamepath->Show(expert);
-    dirpickergame->Show(expert);
-#endif
+    if (m_game->GetConfigType()==CslGame::CSL_CONFIG_DIR)
+    {
+        label_exe->Show(expert);
+        filepicker->Show(expert);
+    }
+    else if (m_game->GetConfigType()==CslGame::CSL_CONFIG_EXE) 
+    {
+        label_gamepath->Show(expert);
+        dirpickergame->Show(expert);
+    }
 
     sizer->Layout();
 }
@@ -194,7 +197,11 @@ void CslGamePage::OnPicker(wxFileDirPickerEvent& event)
     switch (event.GetId())
     {
         case FILE_PICKER:
+#ifdef __WXMAC__
+            if (m_game->GetConfigType()==CslGame::CSL_CONFIG_DIR && dirpickergame->GetPath().IsEmpty())
+#else
             if (dirpickergame->GetPath().IsEmpty())
+#endif
                 dirpickergame->SetPath(event.GetPath().BeforeLast(PATHDIVA));
             if (dirpickercfg->GetPath().IsEmpty())
                 dirpickercfg->SetPath(event.GetPath().BeforeLast(PATHDIVA));

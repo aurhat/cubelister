@@ -33,6 +33,7 @@ CslGameSauerbraten::CslGameSauerbraten()
     m_capabilities=CSL_CAPABILITY_EXTINFO | CSL_CAPABILITY_CUSTOM_CONFIG;
     m_portDelimiter=wxT(":");
 #ifdef __WXMAC__
+    m_configType=CSL_CONFIG_DIR;
     m_clientSettings.ConfigPath=::wxGetHomeDir();
     m_clientSettings.ConfigPath+=wxT("/Library/Application Support/sauerbraten");
 #elif __WXGTK__
@@ -182,6 +183,8 @@ void CslGameSauerbraten::SetClientSettings(const CslGameClientSettings& settings
 #ifdef __WXMAC__
     if (set.Binary.IsEmpty())
         set.Binary=set.GamePath+wxT("sauerbraten.app/Contents/MacOS/sauerbraten");
+    if (set.Options.IsEmpty())
+        set.Options=wxT("-r");
 #endif
     if (set.Binary.IsEmpty() || !::wxFileExists(set.Binary))
         return;

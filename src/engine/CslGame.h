@@ -105,6 +105,7 @@ class CslGame
     public:
         enum { MM_OPEN, MM_VETO, MM_LOCKED, MM_PRIVATE };
         enum { CSL_CONNECT_DEFAULT, CSL_CONNECT_PASS, CSL_CONNECT_ADMIN_PASS };
+        enum { CSL_CONFIG_DIR, CSL_CONFIG_EXE };
 
         CslGame();
         virtual ~CslGame();
@@ -130,6 +131,7 @@ class CslGame
         wxInt32 GetId() { return m_gameId; }
         wxString GetName() { return m_name; }
         wxUint32 GetCapabilities() { return m_capabilities; }
+        wxUint32 GetConfigType() { return m_configType; }
         CslMasterConnection& GetDefaultMasterConnection() { return m_defaultMasterConnection; }
 
         wxString& GetPortDelimiter() { return m_portDelimiter; }
@@ -164,6 +166,7 @@ class CslGame
         wxString m_name;
         wxInt32 m_gameId;
         wxUint32 m_capabilities;
+        wxUint32 m_configType;
         wxString m_portDelimiter;
 
         CslMasterConnection m_defaultMasterConnection;

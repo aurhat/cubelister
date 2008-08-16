@@ -233,13 +233,30 @@ void CslBloodFrontier::SetClientSettings(const CslGameClientSettings& settings)
 {
     CslGameClientSettings set=settings;
 
+#ifdef __WXMAC__
+    bool isApp=set.Binary.EndsWith(wxT(".app"));
+
+    if (set.Binary.IsEmpty() || isApp ? !::wxDirExists(set.Binary) : !::wxFileExists(set.Binary))
+        return;
+    if (set.GamePath.IsEmpty() || !::wxDirExists(set.GamePath))
+    {
+        if (!isApp)
+            return;
+        set.GamePath=set.Binary+wxT("/Contents/gamedata/");
+        if (!::wxDirExists(set.GamePath))
+        return;
+    }
+    if (set.ConfigPath.IsEmpty() || !::wxDirExists(set.ConfigPath))
+        set.ConfigPath=set.GamePath;
+    if (isApp)
+        set.Binary+=wxT("/Contents/gamedata/bloodfrontier.app/Contents/MacOS/bloodfrontier");
+    if (set.Options.IsEmpty())
+        set.Options=wxT("-rinit.cfg");
+#else
     if (set.GamePath.IsEmpty() || !::wxDirExists(set.GamePath))
         return;
     if (set.ConfigPath.IsEmpty() || !::wxDirExists(set.ConfigPath))
         set.ConfigPath=set.GamePath;
-#ifdef __WXMAC__
-    if (set.Binary.IsEmpty())
-        set.Binary=set.GamePath+wxT("sauerbraten.app/Contents/MacOS/sauerbraten");
 #endif
     if (set.Binary.IsEmpty() || !::wxFileExists(set.Binary))
         return;

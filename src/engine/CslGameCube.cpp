@@ -30,6 +30,9 @@ CslGameCube::CslGameCube()
     m_name=CSL_DEFAULT_NAME_CB;
     m_defaultMasterConnection=CslMasterConnection(CSL_DEFAULT_MASTER_CB,CSL_DEFAULT_MASTER_PATH_CB);
     m_capabilities=CSL_CAPABILITY_CONNECT_PASS;
+#ifdef __WXMAC__
+    m_configType=CSL_CONFIG_DIR;
+#endif
 }
 
 CslGameCube::~CslGameCube()

@@ -84,7 +84,7 @@ void CslMaster::Init(CslGame *game,wxUint32 id)
  *  class CslGame
  */
 
-CslGame::CslGame() : m_gameId(-1), m_capabilities(0), m_portDelimiter(wxT(" "))
+CslGame::CslGame() : m_gameId(-1),m_capabilities(0),m_configType(CSL_CONFIG_EXE),m_portDelimiter(wxT(" "))
 {
 }
 
