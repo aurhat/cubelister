@@ -2604,9 +2604,9 @@ bool CslApp::OnInit()
     wxInitAllImageHandlers();
     CslFrame* frame_csl=new CslFrame(NULL,wxID_ANY,wxEmptyString,
 #ifdef __WXMSW__
-		                             wxPoint(0,0));
+                                     wxPoint(0,0));
 #else
-		                             wxDefaultPosition);
+                                     wxDefaultPosition);
 #endif
     frame_csl->Show();
     SetTopWindow(frame_csl);

@@ -57,8 +57,8 @@ enum
 BEGIN_EVENT_TABLE(CslListCtrlServer, wxListCtrl)
     #ifdef __WXMSW__
     EVT_ERASE_BACKGROUND(CslListCtrlServer::OnEraseBackground)
-	EVT_LIST_COL_BEGIN_DRAG(wxID_ANY,CslListCtrlServer::OnColumnDragStart)
-	EVT_LIST_COL_END_DRAG(wxID_ANY,CslListCtrlServer::OnColumnDragEnd)
+    EVT_LIST_COL_BEGIN_DRAG(wxID_ANY,CslListCtrlServer::OnColumnDragStart)
+    EVT_LIST_COL_END_DRAG(wxID_ANY,CslListCtrlServer::OnColumnDragEnd)
     #endif
     EVT_SIZE(CslListCtrlServer::OnSize)
     EVT_MENU(wxID_ANY,CslListCtrlServer::OnMenu)
@@ -93,7 +93,10 @@ CslListCtrlServer::CslListCtrlServer(wxWindow* parent,wxWindowID id,const wxPoin
         wxListCtrl(parent,id,pos,size,style,validator,name),
         m_id(id),m_engine(NULL),m_masterSelected(false),
         m_sibling(NULL),m_dontUpdateInfo(false),m_dontRemoveOnDeselect(false),
-		m_dontAdjustSize(false),m_filterFlags(0)
+#ifdef __WXMSW__
+        m_dontAdjustSize(false),
+#endif
+        m_filterFlags(0)
 {
     wxArtProvider::Push(new CslArt);
 }
@@ -175,12 +178,12 @@ void CslListCtrlServer::OnEraseBackground(wxEraseEvent& event)
 
 void CslListCtrlServer::OnColumnDragStart(wxListEvent& WXUNUSED(event))
 {
-	m_dontAdjustSize=true;
+    m_dontAdjustSize=true;
 }
 
 void CslListCtrlServer::OnColumnDragEnd(wxListEvent& WXUNUSED(event))
 {
-	m_dontAdjustSize=false;
+    m_dontAdjustSize=false;
 }
 #endif
 
@@ -735,8 +738,10 @@ void CslListCtrlServer::ListInit(CslEngine *engine,CslListCtrlServer *sibling)
 
 void CslListCtrlServer::ListAdjustSize(const wxSize& size)
 {
-	if (m_dontAdjustSize)
-		return;
+#ifdef __WXMSW__
+    if (m_dontAdjustSize)
+        return;
+#endif
 
     wxInt32 w=size.x-8;
 

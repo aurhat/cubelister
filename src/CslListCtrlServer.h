@@ -168,8 +168,8 @@ class CslListCtrlServer : public wxListCtrl
 
 #ifdef __WXMSW__
         void OnEraseBackground(wxEraseEvent& event);
-		void OnColumnDragStart(wxListEvent& event);
-		void OnColumnDragEnd(wxListEvent& event);
+        void OnColumnDragStart(wxListEvent& event);
+        void OnColumnDragEnd(wxListEvent& event);
 #endif
         void OnSize(wxSizeEvent& event);
         void OnKeyDown(wxKeyEvent &event);
@@ -189,7 +189,7 @@ class CslListCtrlServer : public wxListCtrl
         wxInt32 ListFindItem(CslServerInfo *info,wxListItem& item);
         void ListDeleteItem(wxListItem *item);
         bool ListSearchItemMatches(CslServerInfo *info);
-        bool ListFilterItemMatches(CslServerInfo *info);    
+        bool ListFilterItemMatches(CslServerInfo *info);
 };
 
 #endif // CSLLISTCTRLSERVER_H

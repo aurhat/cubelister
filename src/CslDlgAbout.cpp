@@ -37,45 +37,10 @@ BEGIN_EVENT_TABLE(CslDlgAbout, wxDialog)
     EVT_BUTTON(wxID_ANY,CslDlgAbout::OnCommandEvent)
 END_EVENT_TABLE()
 
-wxString g_csl_credits = wxString(_(
-                                      "Application icon:\n"
-                                  ))+
-                         wxString(wxT(
-                                      "  Jakub 'SandMan' Uhlik\n\n"
-                                  ))+
-                         wxString(_(
-                                      "Map previews:\n"
-                                  ))+
-                         wxString(wxT(
-                                      "  'K!NG' Berk Inan\n"
-                                      "  Bernd 'apflstrudl' Moeller\n"
-                                      "  Clemens 'Hero' Wloczka\n"
-                                      "  'shmutzwurst'\n"
-                                      "  'ZuurKool'\n\n"
-                                  ))+
-                         wxString(_(
-                                      "Translations:\n"
-                                  ))+
-                         wxString(wxT(
-                                      "  Dutch: 'ZuurKool'\n\n"
-                                  ))+
-                         wxString(_(
-                                      "Previous extended info server patches:\n"
-                                  ))+
-                         wxString(wxT(
-                                      "  noob\n\n"
-                                  ))+
-                         wxString(_(
-                                      "Country Flags:\n"
-                                  ))+
-                         wxString(wxT(
-                                      "  http://flags.blogpotato.de\n"
-                                  ));
 
-
-const wxChar *g_csl_license_pre = wxT("Cube Server Lister is free software; you can redistribute it and/or\n"
-                                      "modify it under the terms of the GNU General Public License version 2\n"
-                                      "as published by the Free Software Foundation.\n\n\n");
+static const wxChar *g_csl_license_pre = wxT("Cube Server Lister is free software; you can redistribute it and/or\n"
+        "modify it under the terms of the GNU General Public License version 2\n"
+        "as published by the Free Software Foundation.\n\n\n");
 
 
 CslPanelAboutImage::CslPanelAboutImage(wxWindow *parent,wxInt32 id) :
@@ -147,6 +112,41 @@ void CslDlgAbout::set_properties()
 
     SetTitle(_("About Cube Server Lister (CSL)"));
 
+    wxString credits = wxString(_(
+                                    "Application icon:\n"
+                                ))+
+                       wxString(wxT(
+                                    "  Jakub 'SandMan' Uhlik\n\n"
+                                ))+
+                       wxString(_(
+                                    "Map previews:\n"
+                                ))+
+                       wxString(wxT(
+                                    "  'K!NG' Berk Inan\n"
+                                    "  Bernd 'apflstrudl' Moeller\n"
+                                    "  Clemens 'Hero' Wloczka\n"
+                                    "  'shmutzwurst'\n"
+                                    "  'ZuurKool'\n\n"
+                                ))+
+                       wxString(_(
+                                    "Translations:\n"
+                                ))+
+                       wxString(wxT(
+                                    "  Dutch: 'ZuurKool'\n\n"
+                                ))+
+                       wxString(_(
+                                    "Previous extended info server patches:\n"
+                                ))+
+                       wxString(wxT(
+                                    "  noob\n\n"
+                                ))+
+                       wxString(_(
+                                    "Country Flags:\n"
+                                ))+
+                       wxString(wxT(
+                                    "  http://flags.blogpotato.de\n"
+                                ));
+
     wxFont font=label_copyright->GetFont();
     //font.SetPointSize(font.GetPointSize()-1);
     font.SetStyle(wxFONTSTYLE_ITALIC);
@@ -161,7 +161,7 @@ void CslDlgAbout::set_properties()
     label_desc->SetLabel(CSL_DESCRIPTION_STR);
     label_copyright->SetLabel(CSL_COPYRIGHT_STR);
 
-    text_ctrl_credits->SetValue(g_csl_credits);
+    text_ctrl_credits->SetValue(credits);
     text_ctrl_license->SetValue(g_csl_license_pre);
     text_ctrl_license->AppendText(csl_license);
     text_ctrl_credits->ShowPosition(0);

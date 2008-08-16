@@ -153,8 +153,8 @@ void CslListCtrlPlayer::OnEraseBackground(wxEraseEvent& event)
 
 void CslListCtrlPlayer::OnSize(wxSizeEvent& event)
 {
-	ListAdjustSize();
-	event.Skip();
+    ListAdjustSize();
+    event.Skip();
 }
 #endif
 
@@ -450,8 +450,8 @@ void CslListCtrlPlayer::ListAdjustSize()
         return;
 
     wxInt32 w=GetClientSize().x-8;
-	if (w<0)
-		return;
+    if (w<0)
+        return;
 
     if (m_view>=CSL_LIST_PLAYER_DEFAULT_SIZE)
     {

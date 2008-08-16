@@ -183,7 +183,7 @@ void CslGamePage::ToggleView(bool expertView)
         label_exe->Show(expert);
         filepicker->Show(expert);
     }
-    else if (m_game->GetConfigType()==CslGame::CSL_CONFIG_EXE) 
+    else if (m_game->GetConfigType()==CslGame::CSL_CONFIG_EXE)
     {
         label_gamepath->Show(expert);
         dirpickergame->Show(expert);
