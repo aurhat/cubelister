@@ -22,7 +22,7 @@
   <kdevautoproject>
     <general>
       <activetarget>src/csl</activetarget>
-      <useconfiguration>debug</useconfiguration>
+      <useconfiguration>default</useconfiguration>
     </general>
     <run>
       <mainprogram>/home/mimosius/Documents/Development/csl</mainprogram>

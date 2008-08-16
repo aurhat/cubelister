@@ -114,7 +114,7 @@ CslEngine::~CslEngine()
     wxASSERT(!m_ok);
 }
 
-bool CslEngine::Init(wxInt32 interval)
+bool CslEngine::Init(wxInt32 interval,wxInt32 pingsPerSecond)
 {
     if (m_ok)
         return false;
@@ -123,6 +123,7 @@ bool CslEngine::Init(wxInt32 interval)
     m_ok=m_pingSock->IsOk();
 
     m_updateInterval=interval;
+    m_pingsPerSecond=pingsPerSecond;
     m_gameId=0;
 
     if (m_ok)
@@ -293,8 +294,11 @@ wxUint32 CslEngine::PingServers(CslGame *game,bool force)
                 c++;
         }
 
-        if (!force && c>10)
-            ResetPingSends(game,NULL);
+        if (!force && m_pingsPerSecond)
+        {
+            if (c>(wxUint32)(servers.length()*3000/m_updateInterval/m_pingsPerSecond+1))
+                ResetPingSends(game,NULL);
+        }
     }
 
     {
@@ -631,7 +635,7 @@ void CslEngine::ParsePong(CslServerInfo *info,CslUDPPacket& packet,wxUint32 now)
                             }
                         }
                         stats.SetWaitForStats();
-                        LOG_DEBUG("wait for stats %s: %d\n",U2A(info->GetBestDescription()),stats.m_status);
+                        //LOG_DEBUG("wait for stats %s: %d\n",U2A(info->GetBestDescription()),stats.m_status);
 
                         if (rid==-1 && stats.m_ids.length()==0)
                         {

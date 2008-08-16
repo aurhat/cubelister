@@ -380,7 +380,7 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
     m_oldSelectedInfo=NULL;
 
     m_engine=new CslEngine(this);
-    if (m_engine->Init())
+    if (m_engine->Init(CSL_UPDATE_INTERVAL_MIN,1000/CSL_TIMER_SHOT))
     {
         m_engine->AddGame(new CslGameSauerbraten());
         m_engine->AddGame(new CslGameAssaultCube());
@@ -611,6 +611,7 @@ void CslFrame::SetProperties()
 
     SetTitle(_("Cube Server Lister"));
 
+    radio_search_server->SetValue(true);
     gauge_search->Enable(false);
     gauge_search->Hide();
     button_search->Enable(false);

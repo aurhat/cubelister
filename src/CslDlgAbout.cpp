@@ -37,30 +37,45 @@ BEGIN_EVENT_TABLE(CslDlgAbout, wxDialog)
     EVT_BUTTON(wxID_ANY,CslDlgAbout::OnCommandEvent)
 END_EVENT_TABLE()
 
-const wxChar *csl_credits = wxT(\
-                                "Application icon:\n"
-                                "  Jakub 'SandMan' Uhlik\n"
-                                "\n"
-                                "Map previews:\n"
-                                "  'K!NG' Berk Inan\n"
-                                "  Bernd 'apflstrudl' Moeller\n"
-                                "  Clemens 'Hero' Wloczka\n"
-                                "  'shmutzwurst'\n"
-                                "  'ZuurKool'\n"
-                                "\n"
-                                "Translations:\n"
-                                "  Dutch: 'ZuurKool'\n"
-                                "\n"
-                                "Previous extended info server patches:\n"
-                                "  noob\n"
-                                "\n"
-                                "Country Flags:\n"
-                                "  http://flags.blogpotato.de\n");
+wxString g_csl_credits = wxString(_(
+                                      "Application icon:\n"
+                                  ))+
+                         wxString(wxT(
+                                      "  Jakub 'SandMan' Uhlik\n\n"
+                                  ))+
+                         wxString(_(
+                                      "Map previews:\n"
+                                  ))+
+                         wxString(wxT(
+                                      "  'K!NG' Berk Inan\n"
+                                      "  Bernd 'apflstrudl' Moeller\n"
+                                      "  Clemens 'Hero' Wloczka\n"
+                                      "  'shmutzwurst'\n"
+                                      "  'ZuurKool'\n\n"
+                                  ))+
+                         wxString(_(
+                                      "Translations:\n"
+                                  ))+
+                         wxString(wxT(
+                                      "  Dutch: 'ZuurKool'\n\n"
+                                  ))+
+                         wxString(_(
+                                      "Previous extended info server patches:\n"
+                                  ))+
+                         wxString(wxT(
+                                      "  noob\n\n"
+                                  ))+
+                         wxString(_(
+                                      "Country Flags:\n"
+                                  ))+
+                         wxString(wxT(
+                                      "  http://flags.blogpotato.de\n"
+                                  ));
 
-const wxChar *csl_license_pre = wxT(\
-                                    "Cube Server Lister is free software; you can redistribute it and/or\n"
-                                    "modify it under the terms of the GNU General Public License version 2\n"
-                                    "as published by the Free Software Foundation.\n\n\n");
+
+const wxChar *g_csl_license_pre = wxT("Cube Server Lister is free software; you can redistribute it and/or\n"
+                                      "modify it under the terms of the GNU General Public License version 2\n"
+                                      "as published by the Free Software Foundation.\n\n\n");
 
 
 CslPanelAboutImage::CslPanelAboutImage(wxWindow *parent,wxInt32 id) :
@@ -146,8 +161,8 @@ void CslDlgAbout::set_properties()
     label_desc->SetLabel(CSL_DESCRIPTION_STR);
     label_copyright->SetLabel(CSL_COPYRIGHT_STR);
 
-    text_ctrl_credits->SetValue(csl_credits);
-    text_ctrl_license->SetValue(csl_license_pre);
+    text_ctrl_credits->SetValue(g_csl_credits);
+    text_ctrl_license->SetValue(g_csl_license_pre);
     text_ctrl_license->AppendText(csl_license);
     text_ctrl_credits->ShowPosition(0);
     text_ctrl_license->ShowPosition(0);
