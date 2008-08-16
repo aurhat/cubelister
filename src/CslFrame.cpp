@@ -324,7 +324,9 @@ void CslPlayerInfo::OnSize(wxSizeEvent& event)
     size.y-=m_label->GetBestSize().y+4;
     m_listCtrl->SetSize(size);
 #endif //__WXMAC__
+#ifndef __WXMSW__
     m_listCtrl->ListAdjustSize();
+#endif
 #ifdef __WXMAC__
     //fixes flicker after resizing
     wxIdleEvent idle;
@@ -2600,7 +2602,12 @@ bool CslApp::OnInit()
     CslGeoIP::Init();
 
     wxInitAllImageHandlers();
-    CslFrame* frame_csl=new CslFrame(NULL,wxID_ANY,wxEmptyString);
+    CslFrame* frame_csl=new CslFrame(NULL,wxID_ANY,wxEmptyString,
+#ifdef __WXMSW__
+		                             wxPoint(0,0));
+#else
+		                             wxDefaultPosition);
+#endif
     frame_csl->Show();
     SetTopWindow(frame_csl);
 

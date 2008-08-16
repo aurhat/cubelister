@@ -131,7 +131,12 @@ class CslListCtrlServer : public wxListCtrl
         void ToggleSortArrow();
         wxUint32 ListSearch(const wxString& search);
         wxUint32 ListFilter();
+        bool ListUpdateServer(CslServerInfo *info);
+        void RemoveServer(CslListServerData *server,CslServerInfo *info,wxInt32 id);
+        void ListRemoveServers();
+        void ListDeleteServers();
         void ListAdjustSize(const wxSize& size);
+
         void SetMasterSelected(bool selected) { m_masterSelected=selected; }
         void Highlight(wxInt32 type,bool highlight,CslServerInfo *info=NULL,wxListItem *listitem=NULL);
         wxUint32 GetPlayerCount();
@@ -147,6 +152,9 @@ class CslListCtrlServer : public wxListCtrl
 
         bool m_dontUpdateInfo;  // don't update info list on ctrl+a
         bool m_dontRemoveOnDeselect;
+#ifdef __WXMSW__
+        bool m_dontAdjustSize;
+#endif
 
         t_aCslListServerData m_selected;
         t_aCslListServerData m_servers;
@@ -160,6 +168,8 @@ class CslListCtrlServer : public wxListCtrl
 
 #ifdef __WXMSW__
         void OnEraseBackground(wxEraseEvent& event);
+		void OnColumnDragStart(wxListEvent& event);
+		void OnColumnDragEnd(wxListEvent& event);
 #endif
         void OnSize(wxSizeEvent& event);
         void OnKeyDown(wxKeyEvent &event);
@@ -179,12 +189,7 @@ class CslListCtrlServer : public wxListCtrl
         wxInt32 ListFindItem(CslServerInfo *info,wxListItem& item);
         void ListDeleteItem(wxListItem *item);
         bool ListSearchItemMatches(CslServerInfo *info);
-        bool ListFilterItemMatches(CslServerInfo *info);
-    public:
-        bool ListUpdateServer(CslServerInfo *info);
-        void RemoveServer(CslListServerData *server,CslServerInfo *info,wxInt32 id);
-        void ListRemoveServers();
-        void ListDeleteServers();
+        bool ListFilterItemMatches(CslServerInfo *info);    
 };
 
 #endif // CSLLISTCTRLSERVER_H

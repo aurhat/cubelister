@@ -56,6 +56,7 @@ enum
 BEGIN_EVENT_TABLE(CslListCtrlPlayer,wxListCtrl)
     #ifdef __WXMSW__
     EVT_ERASE_BACKGROUND(CslListCtrlPlayer::OnEraseBackground)
+    EVT_SIZE(CslListCtrlPlayer::OnSize)
     #endif
     EVT_LIST_COL_CLICK(wxID_ANY,CslListCtrlPlayer::OnColumnLeftClick)
     EVT_LIST_ITEM_ACTIVATED(wxID_ANY,CslListCtrlPlayer::OnItemActivated)
@@ -148,6 +149,12 @@ void CslListCtrlPlayer::OnEraseBackground(wxEraseEvent& event)
     }
     else
         event.Skip();
+}
+
+void CslListCtrlPlayer::OnSize(wxSizeEvent& event)
+{
+	ListAdjustSize();
+	event.Skip();
 }
 #endif
 
@@ -443,6 +450,8 @@ void CslListCtrlPlayer::ListAdjustSize()
         return;
 
     wxInt32 w=GetClientSize().x-8;
+	if (w<0)
+		return;
 
     if (m_view>=CSL_LIST_PLAYER_DEFAULT_SIZE)
     {

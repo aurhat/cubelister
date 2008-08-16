@@ -78,6 +78,7 @@ class CslListCtrlPlayer : public wxListCtrl
         static wxInt32 m_imgOffsetY;
 
         void OnEraseBackground(wxEraseEvent& event);
+		void OnSize(wxSizeEvent& event);
 #endif
         void OnColumnLeftClick(wxListEvent& event);
         void OnItemActivated(wxListEvent& event);
