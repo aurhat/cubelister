@@ -118,7 +118,7 @@ wxString CslGameCube::GameStart(CslServerInfo *info,wxUint32 mode,wxString *erro
     }
     if (m_clientSettings.GamePath.IsEmpty() || !::wxDirExists(m_clientSettings.GamePath))
     {
-        *error=_("Game path for game Cube not found!\nCheck check your settings.");
+        *error=_("Game path for game Cube not found!\nCheck your settings.");
         return wxEmptyString;
     }
 

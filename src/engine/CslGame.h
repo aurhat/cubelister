@@ -40,11 +40,6 @@
 #define CSL_CAP_CONNECT_ADMIN_PASS(x)  (x&CSL_CAPABILITY_CONNECT_ADMIN_PASS)
 #define CSL_CAP_CUSTOM_CONFIG(x)       (x&CSL_CAPABILITY_CUSTOM_CONFIG)
 
-#define CSL_ERROR_SETTINGS_PATH_STR \
-    _("Game installation path missing!\n" \
-      "For game %s the directory which contains\n"\
-      "\"%s\" is necessary to start the game.")
-
 class CslMaster;
 class CslServerInfo;
 

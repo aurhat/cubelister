@@ -41,7 +41,6 @@
 #define MENU_SERVER_CONN_PW_STR          _("Connect (&Password)")
 #define MENU_SERVER_COPY_STR             _("C&opy to clipboard")
 #define MENU_SERVER_MAS_ADD_STR          _("&Add to favourites")
-#define MENU_SERVER_MAS_REM_STR          _("&Remove from master")
 #define MENU_SERVER_FAV_ADD_STR          _("&Add server ...")
 #define MENU_SERVER_FAV_REM_STR          _("&Remove from favourites")
 #define MENU_SERVER_DEL_STR              _("&Delete server")

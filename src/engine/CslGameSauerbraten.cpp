@@ -206,12 +206,12 @@ wxString CslGameSauerbraten::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
     }
     if (m_clientSettings.GamePath.IsEmpty() || !::wxDirExists(m_clientSettings.GamePath))
     {
-        *error=_("Game path for game Sauerbraten not found!\nCheck check your settings.");
+        *error=_("Game path for game Sauerbraten not found!\nCheck your settings.");
         return wxEmptyString;
     }
     if (m_clientSettings.ConfigPath.IsEmpty() || !::wxDirExists(m_clientSettings.ConfigPath))
     {
-        *error=_("Config path for game Sauerbraten not found!\nCheck check your settings.");
+        *error=_("Config path for game Sauerbraten not found!\nCheck your settings.");
         return wxEmptyString;
     }
 

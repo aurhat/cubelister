@@ -132,6 +132,7 @@ void CslDlgAbout::set_properties()
                                     "Translations:\n"
                                 ))+
                        wxString(wxT(
+                                    "  Czech: Jakub 'SandMan' Uhlik\n"
                                     "  Dutch: 'ZuurKool'\n\n"
                                 ))+
                        wxString(_(

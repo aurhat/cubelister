@@ -277,12 +277,12 @@ wxString CslBloodFrontier::GameStart(CslServerInfo *info,wxUint32 mode,wxString 
     }
     if (m_clientSettings.GamePath.IsEmpty() || !::wxDirExists(m_clientSettings.GamePath))
     {
-        *error=_("Game path for game Blood Frontier not found!\nCheck check your settings.");
+        *error=_("Game path for game Blood Frontier not found!\nCheck your settings.");
         return wxEmptyString;
     }
     if (m_clientSettings.ConfigPath.IsEmpty() || !::wxDirExists(m_clientSettings.ConfigPath))
     {
-        *error=_("Config path for game Blood Frontier not found!\nCheck check your settings.");
+        *error=_("Config path for game Blood Frontier not found!\nCheck your settings.");
         return wxEmptyString;
     }
 

@@ -44,10 +44,7 @@ CslPlayerStatsData* CslPlayerStats::GetNewStats()
 bool CslPlayerStats::AddStats(CslPlayerStatsData *data)
 {
     if (m_status!=CSL_STATS_NEED_STATS)
-    {
-        printf("m_status!=CSL_STATS_NEED_STATS\n");
         return false;
-    }
 
     loopv(m_ids)
     {
