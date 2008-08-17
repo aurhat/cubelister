@@ -7,44 +7,46 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-16 16:49+0200\n"
-"PO-Revision-Date: 2008-08-14 23:30+0100\n"
+"POT-Creation-Date: 2008-08-16 19:33+0200\n"
+"PO-Revision-Date: 2008-08-16 22:40+0100\n"
 "Last-Translator: ZuurKool <zuurkool@the-conquerors.net>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/CslDlgAbout.cpp:41
-msgid "Application icon:\n"
-msgstr ""
-
-#: ../src/CslDlgAbout.cpp:47
-msgid "Map previews:\n"
-msgstr ""
-
-#: ../src/CslDlgAbout.cpp:57
-msgid "Translations:\n"
-msgstr ""
-
-#: ../src/CslDlgAbout.cpp:63
-msgid "Previous extended info server patches:\n"
-msgstr ""
-
-#: ../src/CslDlgAbout.cpp:69
-msgid "Country Flags:\n"
-msgstr ""
-
-#: ../src/CslDlgAbout.cpp:132 ../src/CslDlgExtended.cpp:96
-#: ../src/CslDlgGeneric.h:64 ../src/CslDlgOutput.cpp:68
+#: ../src/CslDlgAbout.cpp:97
+#: ../src/CslDlgExtended.cpp:96
+#: ../src/CslDlgGeneric.h:64
+#: ../src/CslDlgOutput.cpp:68
 #: ../src/CslDlgTraffic.cpp:49
 msgid "&Close"
 msgstr "&Sluiten"
 
 #. end wxGlade
-#: ../src/CslDlgAbout.cpp:148
+#: ../src/CslDlgAbout.cpp:113
 msgid "About Cube Server Lister (CSL)"
 msgstr "Over Cube Server Lister (CSL)"
+
+#: ../src/CslDlgAbout.cpp:116
+msgid "Application icon:\n"
+msgstr "Applicatie icoon:\n"
+
+#: ../src/CslDlgAbout.cpp:122
+msgid "Map previews:\n"
+msgstr "Map voorvertoningen:\n"
+
+#: ../src/CslDlgAbout.cpp:132
+msgid "Translations:\n"
+msgstr "Vertalingen:\n"
+
+#: ../src/CslDlgAbout.cpp:138
+msgid "Previous extended info server patches:\n"
+msgstr "Eerdere uitgebreide info server patches:\n"
+
+#: ../src/CslDlgAbout.cpp:144
+msgid "Country Flags:\n"
+msgstr "Vlaggen van landen:\n"
 
 #: ../src/CslDlgAbout.cpp:195
 msgid "Credits"
@@ -54,27 +56,32 @@ msgstr "Credits"
 msgid "License"
 msgstr "Licentie"
 
-#: ../src/CslDlgAddMaster.cpp:49 ../src/CslDlgAddMaster.cpp:54
+#: ../src/CslDlgAddMaster.cpp:49
+#: ../src/CslDlgAddMaster.cpp:54
 #: ../src/CslDlgAddServer.cpp:46
 msgid "default"
 msgstr "standaard"
 
-#: ../src/CslDlgAddMaster.cpp:60 ../src/CslDlgAddServer.cpp:51
+#: ../src/CslDlgAddMaster.cpp:60
+#: ../src/CslDlgAddServer.cpp:51
 msgid "Add"
 msgstr "Toevoegen"
 
-#: ../src/CslDlgAddMaster.cpp:61 ../src/CslDlgAddServer.cpp:52
-#: ../src/CslDlgConnectPass.cpp:42 ../src/CslDlgConnectWait.cpp:37
+#: ../src/CslDlgAddMaster.cpp:61
+#: ../src/CslDlgAddServer.cpp:52
+#: ../src/CslDlgConnectPass.cpp:42
+#: ../src/CslDlgConnectWait.cpp:37
 #: ../src/CslDlgSettings.cpp:268
 msgid "&Cancel"
-msgstr "&afbreken"
+msgstr "&Afbreken"
 
 #. begin wxGlade: CslDlgAddMaster::set_properties
 #: ../src/CslDlgAddMaster.cpp:71
 msgid "CSL - Add new Master"
 msgstr "CSL - Nieuwe Master toevoegen"
 
-#: ../src/CslDlgAddMaster.cpp:91 ../src/CslDlgAddServer.cpp:82
+#: ../src/CslDlgAddMaster.cpp:91
+#: ../src/CslDlgAddServer.cpp:82
 msgid "Game:"
 msgstr "Spel:"
 
@@ -82,11 +89,13 @@ msgstr "Spel:"
 msgid "Master type:"
 msgstr "Master type:"
 
-#: ../src/CslDlgAddMaster.cpp:100 ../src/CslDlgAddServer.cpp:85
+#: ../src/CslDlgAddMaster.cpp:100
+#: ../src/CslDlgAddServer.cpp:85
 msgid "Address:"
 msgstr "Adres:"
 
-#: ../src/CslDlgAddMaster.cpp:103 ../src/CslDlgAddServer.cpp:88
+#: ../src/CslDlgAddMaster.cpp:103
+#: ../src/CslDlgAddServer.cpp:88
 msgid "Port:"
 msgstr "Port:"
 
@@ -98,11 +107,16 @@ msgstr "Path:"
 msgid "Master already exists!"
 msgstr "Master bestaat al!"
 
-#: ../src/CslDlgAddMaster.cpp:232 ../src/CslDlgSettings.cpp:564
-#: ../src/CslDlgSettings.cpp:601 ../src/CslDlgSettings.cpp:608
-#: ../src/CslFrame.cpp:171 ../src/CslFrame.cpp:1217 ../src/CslFrame.cpp:1248
-#: ../src/CslFrame.cpp:1262 ../src/CslFrame.cpp:2417
-#: ../src/CslListCtrlServer.cpp:449
+#: ../src/CslDlgAddMaster.cpp:232
+#: ../src/CslDlgSettings.cpp:564
+#: ../src/CslDlgSettings.cpp:601
+#: ../src/CslDlgSettings.cpp:608
+#: ../src/CslFrame.cpp:171
+#: ../src/CslFrame.cpp:1219
+#: ../src/CslFrame.cpp:1250
+#: ../src/CslFrame.cpp:1264
+#: ../src/CslFrame.cpp:2419
+#: ../src/CslListCtrlServer.cpp:465
 msgid "Error"
 msgstr "Error"
 
@@ -115,7 +129,8 @@ msgstr "CSL - Nieuwe server toevoegen"
 msgid "Ad&min connect"
 msgstr "Ad&min verbinden"
 
-#: ../src/CslDlgConnectPass.cpp:41 ../src/CslDlgConnectWait.cpp:36
+#: ../src/CslDlgConnectPass.cpp:41
+#: ../src/CslDlgConnectWait.cpp:36
 #: ../src/CslDlgSettings.cpp:267
 msgid "&Ok"
 msgstr "&Ok"
@@ -151,7 +166,8 @@ msgid "Time to wait (sec):"
 msgstr "Wachttijd (sec):"
 
 #. begin wxGlade: CslDlgExtended::CslDlgExtended
-#: ../src/CslDlgExtended.cpp:72 ../src/CslDlgExtended.cpp:430
+#: ../src/CslDlgExtended.cpp:72
+#: ../src/CslDlgExtended.cpp:430
 #: ../src/CslDlgExtended.cpp:433
 msgid "Team score"
 msgstr "Team score"
@@ -164,11 +180,13 @@ msgstr "Spel informatie"
 msgid "Map information"
 msgstr "Map informatie"
 
-#: ../src/CslDlgExtended.cpp:75 ../src/CslListCtrlServer.cpp:701
+#: ../src/CslDlgExtended.cpp:75
+#: ../src/CslListCtrlServer.cpp:717
 msgid "Map"
 msgstr "Map"
 
-#: ../src/CslDlgExtended.cpp:91 ../src/CslDlgExtended.cpp:326
+#: ../src/CslDlgExtended.cpp:91
+#: ../src/CslDlgExtended.cpp:326
 msgid "by"
 msgstr "door"
 
@@ -178,10 +196,11 @@ msgstr "Stop auto update wanneer de map &eindigt"
 
 #: ../src/CslDlgExtended.cpp:94
 msgid "&Show map if possible"
-msgstr "&Toon map daar waar mogelijk"
+msgstr "&Toon map wanneer mogelijk"
 
 #. begin wxGlade: CslDlgExtended::set_properties
-#: ../src/CslDlgExtended.cpp:112 ../src/CslDlgExtended.cpp:622
+#: ../src/CslDlgExtended.cpp:112
+#: ../src/CslDlgExtended.cpp:622
 msgid "CSL - Extended info"
 msgstr "CSL - Uitgebreide info"
 
@@ -205,7 +224,8 @@ msgstr "Spelers:"
 msgid "no map"
 msgstr "geen map"
 
-#: ../src/CslDlgExtended.cpp:363 ../src/CslDlgExtended.cpp:599
+#: ../src/CslDlgExtended.cpp:363
+#: ../src/CslDlgExtended.cpp:599
 #, c-format
 msgid "%d players"
 msgstr "%d spelers"
@@ -214,7 +234,8 @@ msgstr "%d spelers"
 msgid "Flag score"
 msgstr "Vlag score"
 
-#: ../src/CslDlgExtended.cpp:466 ../src/CslDlgExtended.cpp:468
+#: ../src/CslDlgExtended.cpp:466
+#: ../src/CslDlgExtended.cpp:468
 msgid "WINNER"
 msgstr "WINNAAR"
 
@@ -226,7 +247,8 @@ msgstr "Geen teams."
 msgid "Not a team game."
 msgstr "Geen teamspel."
 
-#: ../src/CslDlgExtended.cpp:497 ../src/CslDlgExtended.cpp:619
+#: ../src/CslDlgExtended.cpp:497
+#: ../src/CslDlgExtended.cpp:619
 msgid "Time is up"
 msgstr "Tijd is om"
 
@@ -243,10 +265,11 @@ msgstr "Chat"
 msgid "Search"
 msgstr "Zoek"
 
-#: ../src/CslDlgOutput.cpp:56 ../src/CslDlgOutput.cpp:364
+#: ../src/CslDlgOutput.cpp:56
+#: ../src/CslDlgOutput.cpp:364
 #, c-format
 msgid "%d matches"
-msgstr "&d Treffers"
+msgstr "%d resultaten"
 
 #: ../src/CslDlgOutput.cpp:57
 msgid "&Back"
@@ -277,7 +300,8 @@ msgid "&Save"
 msgstr "&Bewaar"
 
 #. begin wxGlade: CslDlgOutput::set_properties
-#: ../src/CslDlgOutput.cpp:82 ../src/CslDlgOutput.cpp:512
+#: ../src/CslDlgOutput.cpp:82
+#: ../src/CslDlgOutput.cpp:512
 msgid "CSL - Game output"
 msgstr "CSL - Spel output"
 
@@ -393,7 +417,8 @@ msgstr "Mastermode 1"
 msgid "Server offline"
 msgstr "Server offline"
 
-#: ../src/CslDlgSettings.cpp:370 ../src/CslMenu.h:55
+#: ../src/CslDlgSettings.cpp:370
+#: ../src/CslMenu.h:55
 msgid "Mastermode 2"
 msgstr "Mastermode 2"
 
@@ -401,13 +426,14 @@ msgstr "Mastermode 2"
 msgid "Server full"
 msgstr "Server vol"
 
-#: ../src/CslDlgSettings.cpp:377 ../src/CslMenu.h:56
+#: ../src/CslDlgSettings.cpp:377
+#: ../src/CslMenu.h:56
 msgid "Mastermode 3"
 msgstr "Mastermode 3"
 
 #: ../src/CslDlgSettings.cpp:386
 msgid "Update interval (sec):"
-msgstr "Update interval (sec)"
+msgstr "Update interval (sec):"
 
 #: ../src/CslDlgSettings.cpp:390
 msgid "Wait on full server (sec):"
@@ -429,7 +455,8 @@ msgstr "Goed"
 msgid "Bad"
 msgstr "Slecht"
 
-#: ../src/CslDlgSettings.cpp:424 ../src/CslFrame.cpp:694
+#: ../src/CslDlgSettings.cpp:424
+#: ../src/CslFrame.cpp:696
 msgid "Games"
 msgstr "Spellen"
 
@@ -456,7 +483,7 @@ msgstr "Selecteer een map voor spel output logs of zet autosave uit."
 #. begin wxGlade: CslDlgTraffic::set_properties
 #: ../src/CslDlgTraffic.cpp:60
 msgid "CSL - Traffic statistics"
-msgstr "CSL - Verkeer statistics"
+msgstr "CSL - Verkeer statistieken"
 
 #: ../src/CslDlgTraffic.cpp:74
 msgid "Packets"
@@ -483,19 +510,19 @@ msgstr "Output"
 msgid "%s returned with code: %d"
 msgstr "%s komt terug met code: %d"
 
-#: ../src/CslFrame.cpp:348
+#: ../src/CslFrame.cpp:350
 msgid " on "
-msgstr " aan"
+msgstr " op "
 
-#: ../src/CslFrame.cpp:352
+#: ../src/CslFrame.cpp:354
 msgid "Minute"
 msgstr "Minuut"
 
-#: ../src/CslFrame.cpp:352
+#: ../src/CslFrame.cpp:354
 msgid "Minutes"
 msgstr "Minuten"
 
-#: ../src/CslFrame.cpp:464
+#: ../src/CslFrame.cpp:466
 msgid ""
 "Failed to initialise internal engine!\n"
 "Please try to restart the application."
@@ -503,180 +530,181 @@ msgstr ""
 "Het initialiseren van de interne engine is mislukt!\n"
 "Probeer het programma opnieuw op te starten."
 
-#: ../src/CslFrame.cpp:466
+#: ../src/CslFrame.cpp:468
 msgid "Fatal error!"
 msgstr "Fatale fout!"
 
-#: ../src/CslFrame.cpp:515
+#: ../src/CslFrame.cpp:517
 msgid "&File"
 msgstr "&Bestand"
 
-#: ../src/CslFrame.cpp:516 ../src/CslFrame.cpp:527
+#: ../src/CslFrame.cpp:518
+#: ../src/CslFrame.cpp:529
 msgid "&Settings"
 msgstr "&Instellingen"
 
-#: ../src/CslFrame.cpp:517 ../src/CslFrame.cpp:528
+#: ../src/CslFrame.cpp:519
+#: ../src/CslFrame.cpp:530
 msgid "&Exit"
 msgstr "&Verlaat"
 
-#: ../src/CslFrame.cpp:521
+#: ../src/CslFrame.cpp:523
 msgid "&Update from master\tF5"
 msgstr "&Update van master\tF5"
 
-#: ../src/CslFrame.cpp:523
+#: ../src/CslFrame.cpp:525
 msgid "Add a &new master ..."
 msgstr "&Nieuwe master toevoegen ..."
 
-#: ../src/CslFrame.cpp:524
+#: ../src/CslFrame.cpp:526
 msgid "&Remove master"
 msgstr "&Verwijder master"
 
-#: ../src/CslFrame.cpp:525
+#: ../src/CslFrame.cpp:527
 msgid "&Master"
 msgstr "&Master"
 
-#: ../src/CslFrame.cpp:529 ../src/CslFrame.cpp:555
+#: ../src/CslFrame.cpp:531
+#: ../src/CslFrame.cpp:557
 msgid "A&bout"
 msgstr "O&ver"
 
-#: ../src/CslFrame.cpp:533
+#: ../src/CslFrame.cpp:535
 msgid "Show games"
 msgstr "Toon spellen"
 
-#: ../src/CslFrame.cpp:535
+#: ../src/CslFrame.cpp:537
 msgid "Show server information"
 msgstr "Toon server informatie"
 
-#: ../src/CslFrame.cpp:537
+#: ../src/CslFrame.cpp:539
 msgid "Show player list"
 msgstr "Toon spelers lijst"
 
-#: ../src/CslFrame.cpp:539
+#: ../src/CslFrame.cpp:541
 msgid "Show favourites"
 msgstr "Toon favorieten"
 
-#: ../src/CslFrame.cpp:542
+#: ../src/CslFrame.cpp:544
 msgid "Show search bar\tCTRL+F"
 msgstr "Toon zoekbalk\tCTRL+F"
 
-#: ../src/CslFrame.cpp:544
+#: ../src/CslFrame.cpp:546
 msgid "Show game output\tCTRL+O"
 msgstr "Toon spel output\tCTRL+O"
 
-#: ../src/CslFrame.cpp:546
+#: ../src/CslFrame.cpp:548
 msgid "&Traffic statistics"
 msgstr "&Verkeer statistieken"
 
-#: ../src/CslFrame.cpp:548
+#: ../src/CslFrame.cpp:550
 msgid "Sort lists automatically\tCTRL+L"
 msgstr "Sorteer lijsten automatisch\tCTRL+L"
 
-#: ../src/CslFrame.cpp:550
+#: ../src/CslFrame.cpp:552
 msgid "Reset layout"
-msgstr "Reset uiterlijk"
+msgstr "Herstel uiterlijk"
 
-#: ../src/CslFrame.cpp:551
+#: ../src/CslFrame.cpp:553
 msgid "&View"
-msgstr "&Bekijk"
+msgstr "&Weergave"
 
-#: ../src/CslFrame.cpp:556
+#: ../src/CslFrame.cpp:558
 msgid "&Help"
 msgstr "&Help"
 
-#: ../src/CslFrame.cpp:587
+#: ../src/CslFrame.cpp:589
 msgid "&Search"
 msgstr "&Zoek"
 
-#: ../src/CslFrame.cpp:591
+#: ../src/CslFrame.cpp:593
 msgid "Se&rvers"
 msgstr "Se&rvers"
 
-#: ../src/CslFrame.cpp:593
+#: ../src/CslFrame.cpp:595
 msgid "&Players"
 msgstr "&Spelers"
 
-#: ../src/CslFrame.cpp:612
+#: ../src/CslFrame.cpp:614
 msgid "Cube Server Lister"
 msgstr "Cube Server Lister"
 
-#: ../src/CslFrame.cpp:619 ../src/CslFrame.cpp:2158 ../src/CslFrame.cpp:2174
+#: ../src/CslFrame.cpp:621
+#: ../src/CslFrame.cpp:2160
+#: ../src/CslFrame.cpp:2176
 #, c-format
 msgid "Search result: %d servers"
 msgstr "Zoek resultaten: %d servers"
 
-#: ../src/CslFrame.cpp:665
+#: ../src/CslFrame.cpp:667
 msgid "Search:"
 msgstr "Zoek:"
 
 #. sizer_search->AddGrowableCol(3);
-#: ../src/CslFrame.cpp:682
+#: ../src/CslFrame.cpp:684
 msgid "Master list servers"
-msgstr "Master lijst servers"
+msgstr "Master servers lijst"
 
-#: ../src/CslFrame.cpp:683
+#: ../src/CslFrame.cpp:685
 msgid "Favourite servers"
 msgstr "Favoriete servers"
 
-#: ../src/CslFrame.cpp:684
+#: ../src/CslFrame.cpp:686
 msgid "Selected server"
 msgstr "Geselecteerde server"
 
-#: ../src/CslFrame.cpp:685
+#: ../src/CslFrame.cpp:687
 msgid "Server info"
 msgstr "Server info"
 
-#: ../src/CslFrame.cpp:914
+#: ../src/CslFrame.cpp:916
 #, c-format
 msgid "Total play time for game %s: %s"
 msgstr "Totale speeltijd voor spel %s: %s"
 
-#: ../src/CslFrame.cpp:920
+#: ../src/CslFrame.cpp:922
 #, c-format
 msgid "most played server: '%s' (total play time: %s)"
 msgstr "Meest gespeelde server: '%s' (totale speeltijd: %s)"
 
-#: ../src/CslFrame.cpp:956
+#: ../src/CslFrame.cpp:958
 msgid "  (Filters: "
-msgstr " (Filters:"
+msgstr "  (Filters:"
 
-#: ../src/CslFrame.cpp:1194
-#, fuzzy
+#: ../src/CslFrame.cpp:1196
 msgid "Sending request to master: "
 msgstr "Stuur opdracht naar master:"
 
-#: ../src/CslFrame.cpp:1197
+#: ../src/CslFrame.cpp:1199
 msgid "Error on update from master: "
 msgstr "Fout bij update van master:"
 
-#: ../src/CslFrame.cpp:1202
+#: ../src/CslFrame.cpp:1204
 #, c-format
 msgid "Got %d servers from master"
 msgstr "Ontvangen: %d servers van master"
 
-#: ../src/CslFrame.cpp:1216
+#: ../src/CslFrame.cpp:1218
 msgid "You are currently playing, so quit the game and try again."
-msgstr ""
-"Je bent op dit moment aan het spelen, sluit het spel af en probeer opnieuw."
+msgstr "Je bent op dit moment aan het spelen, sluit het spel af en probeer opnieuw."
 
-#: ../src/CslFrame.cpp:1262
+#: ../src/CslFrame.cpp:1264
 msgid "Failed to start: "
 msgstr "Mislukt om te starten:"
 
-#: ../src/CslFrame.cpp:1828 ../src/CslFrame.cpp:2193 ../src/CslFrame.cpp:2264
+#: ../src/CslFrame.cpp:1830
+#: ../src/CslFrame.cpp:2195
+#: ../src/CslFrame.cpp:2266
 #, c-format
 msgid "Search result: %d players on %d servers"
 msgstr "Zoek resultaat: %d spelers op %d servers"
 
-#: ../src/CslFrame.cpp:1906
+#: ../src/CslFrame.cpp:1908
 #, c-format
-msgid ""
-"Waiting %s for a free slot on \"%s\" (press ESC to abort or join another "
-"server)"
-msgstr ""
-"Wachten %s op een vrije plek op \"%s\" (toets ESC om af te breken of een "
-"andere server te kiezen)"
+msgid "Waiting %s for a free slot on \"%s\" (press ESC to abort or join another server)"
+msgstr "Wachten %s op een vrije plek op \"%s\" (toets ESC om af te breken of een andere server te kiezen)"
 
-#: ../src/CslFrame.cpp:2415
+#: ../src/CslFrame.cpp:2417
 msgid ""
 "There is currently a game running.\n"
 "Quit the game first and try again."
@@ -684,20 +712,20 @@ msgstr ""
 "Er is op dit moment een spel bezig.\n"
 "Sluit het spel af en probeer opnieuw."
 
-#: ../src/CslFrame.cpp:2421
+#: ../src/CslFrame.cpp:2423
 msgid "CSL terminating"
 msgstr "CSL sluit af"
 
-#: ../src/CslFrame.cpp:2422
+#: ../src/CslFrame.cpp:2424
 msgid "Waiting for engine to terminate ..."
-msgstr "Wachten totdat de engine afsluit ..."
+msgstr "Wachten totdat de engine is afgesloten ..."
 
-#: ../src/CslFrame.cpp:2522
+#: ../src/CslFrame.cpp:2524
 #, c-format
 msgid "New version %s"
 msgstr "Nieuwe versie %s"
 
-#: ../src/CslFrame.cpp:2523
+#: ../src/CslFrame.cpp:2525
 #, c-format
 msgid ""
 "There is a new version (%s)\n"
@@ -706,11 +734,11 @@ msgstr ""
 "Er is een nieuwe versie (%s)\n"
 "van Cube Server Lister beschikbaar.\n"
 
-#: ../src/CslFrame.cpp:2584
+#: ../src/CslFrame.cpp:2586
 msgid "CSL already running"
 msgstr "CSL loopt al"
 
-#: ../src/CslFrame.cpp:2585
+#: ../src/CslFrame.cpp:2587
 msgid "CSL is already running."
 msgstr "CSL loopt al."
 
@@ -754,9 +782,11 @@ msgstr "Totale speelduur"
 msgid "Connects"
 msgstr "Verbindingen"
 
-#: ../src/CslListCtrlInfo.cpp:96 ../src/engine/CslGameAssaultCube.cpp:68
+#: ../src/CslListCtrlInfo.cpp:96
+#: ../src/engine/CslGameAssaultCube.cpp:68
 #: ../src/engine/CslGameAssaultCube.cpp:79
-#: ../src/engine/CslGameBloodFrontier.cpp:151 ../src/engine/CslGameCube.cpp:62
+#: ../src/engine/CslGameBloodFrontier.cpp:151
+#: ../src/engine/CslGameCube.cpp:62
 #: ../src/engine/CslGameSauerbraten.cpp:74
 #: ../src/engine/CslGameSauerbraten.cpp:86
 msgid "unknown"
@@ -768,182 +798,197 @@ msgstr "GeoIP database niet gevonden."
 
 #: ../src/CslListCtrlInfo.cpp:172
 msgid "This version of extended info is not supported."
-msgstr "Deze versie van uitgebreide info is niet ondersteund"
+msgstr "Deze versie van uitgebreide info is niet ondersteund."
 
 #: ../src/CslListCtrlInfo.cpp:175
 msgid "Extended info not supported."
-msgstr "Uitgebreide info niet ondersteund"
+msgstr "Uitgebreide info niet ondersteund."
 
-#: ../src/CslListCtrlPlayer.cpp:191 ../src/CslListCtrlServer.cpp:278
+#: ../src/CslListCtrlPlayer.cpp:198
+#: ../src/CslListCtrlServer.cpp:294
 msgid "Extended information"
 msgstr "Uitgebreide informatie"
 
-#: ../src/CslListCtrlPlayer.cpp:199 ../src/CslListCtrlServer.cpp:284
+#: ../src/CslListCtrlPlayer.cpp:206
+#: ../src/CslListCtrlServer.cpp:300
 #: ../src/CslMenu.h:52
 msgid "Full"
-msgstr "Vol"
+msgstr "Volledig"
 
-#: ../src/CslListCtrlPlayer.cpp:203 ../src/CslListCtrlServer.cpp:286
+#: ../src/CslListCtrlPlayer.cpp:210
+#: ../src/CslListCtrlServer.cpp:302
 msgid "Micro"
-msgstr "Klein"
-
-#: ../src/CslListCtrlPlayer.cpp:205 ../src/CslListCtrlServer.cpp:287
-msgid "Mini"
 msgstr "Mini"
 
-#: ../src/CslListCtrlPlayer.cpp:207 ../src/CslListCtrlServer.cpp:288
+#: ../src/CslListCtrlPlayer.cpp:212
+#: ../src/CslListCtrlServer.cpp:303
+msgid "Mini"
+msgstr "Klein"
+
+#: ../src/CslListCtrlPlayer.cpp:214
+#: ../src/CslListCtrlServer.cpp:304
 msgid "Default"
 msgstr "Standaard"
 
-#: ../src/CslListCtrlPlayer.cpp:288
+#: ../src/CslListCtrlPlayer.cpp:295
 #, c-format
 msgid "Name: %s   Country: %s"
 msgstr "Naam: %s   Land: %s"
 
-#: ../src/CslListCtrlPlayer.cpp:290
+#: ../src/CslListCtrlPlayer.cpp:297
 msgid "Unknown"
 msgstr "Onbekend"
 
-#: ../src/CslListCtrlPlayer.cpp:290
+#: ../src/CslListCtrlPlayer.cpp:297
 msgid "GeoIP database not found"
 msgstr "GeoIP database niet gevonden"
 
-#: ../src/CslListCtrlPlayer.cpp:303
-#, fuzzy
+#: ../src/CslListCtrlPlayer.cpp:310
 msgid "Player list"
-msgstr "Toon spelers lijst"
+msgstr "Spelers lijst"
 
-#: ../src/CslListCtrlPlayer.cpp:305
-#, fuzzy
+#: ../src/CslListCtrlPlayer.cpp:312
 msgid " for server: "
-msgstr "Server:"
+msgstr " voor server:"
 
-#: ../src/CslListCtrlPlayer.cpp:347
+#: ../src/CslListCtrlPlayer.cpp:354
 msgid "- connecting -"
-msgstr " - aan het verbinden - "
+msgstr " - verbinden - "
 
-#: ../src/CslListCtrlPlayer.cpp:355
+#: ../src/CslListCtrlPlayer.cpp:362
 msgid "Spectator"
 msgstr "Spectator"
 
-#: ../src/CslListCtrlPlayer.cpp:369 ../src/CslListCtrlPlayer.cpp:381
-#: ../src/CslListCtrlPlayer.cpp:389
+#: ../src/CslListCtrlPlayer.cpp:376
+#: ../src/CslListCtrlPlayer.cpp:388
+#: ../src/CslListCtrlPlayer.cpp:396
 msgid "no data"
 msgstr "geen data"
 
-#: ../src/CslListCtrlPlayer.cpp:371
+#: ../src/CslListCtrlPlayer.cpp:378
 msgid "dead"
 msgstr "dood"
 
-#: ../src/CslListCtrlPlayer.cpp:373
-#, fuzzy
+#: ../src/CslListCtrlPlayer.cpp:380
 msgid "editing"
 msgstr "aan het editen"
 
-#: ../src/CslListCtrlPlayer.cpp:544 ../src/CslListCtrlServer.cpp:711
-#: ../src/engine/CslGameBloodFrontier.cpp:156 ../src/engine/CslGame.cpp:263
+#: ../src/CslListCtrlPlayer.cpp:553
+#: ../src/CslListCtrlServer.cpp:727
+#: ../src/engine/CslGameBloodFrontier.cpp:156
+#: ../src/engine/CslGame.cpp:263
 msgid "Player"
-msgstr "Speler"
+msgstr "Spelers"
 
-#: ../src/CslListCtrlPlayer.cpp:550 ../src/engine/CslGameBloodFrontier.cpp:157
+#: ../src/CslListCtrlPlayer.cpp:559
+#: ../src/engine/CslGameBloodFrontier.cpp:157
 #: ../src/engine/CslGame.cpp:264
 msgid "Team"
 msgstr "Team"
 
-#: ../src/CslListCtrlPlayer.cpp:554 ../src/engine/CslGameBloodFrontier.cpp:158
+#: ../src/CslListCtrlPlayer.cpp:563
+#: ../src/engine/CslGameBloodFrontier.cpp:158
 #: ../src/engine/CslGame.cpp:265
 msgid "Frags"
 msgstr "Frags"
 
-#: ../src/CslListCtrlPlayer.cpp:558 ../src/engine/CslGameBloodFrontier.cpp:159
+#: ../src/CslListCtrlPlayer.cpp:567
+#: ../src/engine/CslGameBloodFrontier.cpp:159
 #: ../src/engine/CslGame.cpp:266
 msgid "Deaths"
-msgstr "Deaths"
+msgstr "Gedood"
 
-#: ../src/CslListCtrlPlayer.cpp:562 ../src/engine/CslGameBloodFrontier.cpp:160
+#: ../src/CslListCtrlPlayer.cpp:571
+#: ../src/engine/CslGameBloodFrontier.cpp:160
 #: ../src/engine/CslGame.cpp:267
 msgid "Teamkills"
-msgstr "Teamkills"
+msgstr "Teammoorden"
 
-#: ../src/CslListCtrlPlayer.cpp:568 ../src/engine/CslGameBloodFrontier.cpp:161
+#: ../src/CslListCtrlPlayer.cpp:577
+#: ../src/engine/CslGameBloodFrontier.cpp:161
 #: ../src/engine/CslGame.cpp:268
 msgid "Accuracy"
 msgstr "Accuratesse"
 
-#: ../src/CslListCtrlPlayer.cpp:572 ../src/engine/CslGameBloodFrontier.cpp:162
+#: ../src/CslListCtrlPlayer.cpp:581
+#: ../src/engine/CslGameBloodFrontier.cpp:162
 #: ../src/engine/CslGame.cpp:269
 msgid "Health"
 msgstr "Leven"
 
-#: ../src/CslListCtrlPlayer.cpp:576 ../src/engine/CslGame.cpp:270
+#: ../src/CslListCtrlPlayer.cpp:585
+#: ../src/engine/CslGame.cpp:270
 msgid "Armour"
 msgstr "Schild"
 
-#: ../src/CslListCtrlPlayer.cpp:580 ../src/engine/CslGameBloodFrontier.cpp:164
+#: ../src/CslListCtrlPlayer.cpp:589
+#: ../src/engine/CslGameBloodFrontier.cpp:164
 #: ../src/engine/CslGame.cpp:271
 msgid "Weapon"
 msgstr "Wapen"
 
-#: ../src/CslListCtrlServer.cpp:396
+#: ../src/CslListCtrlServer.cpp:412
 msgid ""
 "\n"
 "Choose Yes to keep these servers, No to delete them or\n"
 "Cancel the operation."
 msgstr ""
 "\n"
-"Kies Ja om deze servers te bewaren, Nee om ze te verwijderen of\n"
-"Breek operatie af."
+"Kies 'Ja' om deze servers te bewaren, 'Nee' om te verwijderen\n"
+"of breek operatie af."
 
-#: ../src/CslListCtrlServer.cpp:414
+#: ../src/CslListCtrlServer.cpp:430
 msgid "You are about to delete servers which are also favourites!\n"
 msgstr "Je gaat servers verwijderen die favoriet zijn!\n"
 
-#: ../src/CslListCtrlServer.cpp:416 ../src/CslListCtrlServer.cpp:426
+#: ../src/CslListCtrlServer.cpp:432
+#: ../src/CslListCtrlServer.cpp:442
 msgid "Warning"
 msgstr "Waarschuwing"
 
-#: ../src/CslListCtrlServer.cpp:424
+#: ../src/CslListCtrlServer.cpp:440
 msgid "You are about to delete servers which have statistics!\n"
 msgstr "Je gaat servers verwijderen die statistieken hebben!\n"
 
-#: ../src/CslListCtrlServer.cpp:447
+#: ../src/CslListCtrlServer.cpp:463
 #, c-format
 msgid ""
 "Server \"%s\" is currently locked,\n"
 "so deletion is not possible!"
 msgstr ""
 "Server \"%s\" is op dit moment op slot,\n"
-" verwijderen is niet mogelijk!"
+"verwijderen is niet mogelijk!"
 
-#: ../src/CslListCtrlServer.cpp:679
+#: ../src/CslListCtrlServer.cpp:695
 msgid "Host"
 msgstr "Host"
 
-#: ../src/CslListCtrlServer.cpp:683
+#: ../src/CslListCtrlServer.cpp:699
 msgid "Description"
 msgstr "Beschrijving"
 
-#: ../src/CslListCtrlServer.cpp:687 ../src/CslMenu.h:57
+#: ../src/CslListCtrlServer.cpp:703
+#: ../src/CslMenu.h:57
 msgid "Version"
 msgstr "Versie"
 
-#: ../src/CslListCtrlServer.cpp:692
+#: ../src/CslListCtrlServer.cpp:708
 msgid "Ping"
 msgstr "Ping"
 
-#: ../src/CslListCtrlServer.cpp:697
+#: ../src/CslListCtrlServer.cpp:713
 msgid "Mode"
 msgstr "Mode"
 
-#: ../src/CslListCtrlServer.cpp:706
+#: ../src/CslListCtrlServer.cpp:722
 msgid "Time"
 msgstr "Tijd"
 
-#: ../src/CslListCtrlServer.cpp:715
+#: ../src/CslListCtrlServer.cpp:731
 msgid "MM"
 msgstr "MM"
 
-#: ../src/CslListCtrlServer.cpp:1049
+#: ../src/CslListCtrlServer.cpp:1070
 msgid "no limit"
 msgstr "geen limiet"
 
@@ -999,12 +1044,48 @@ msgstr "Leeg"
 msgid "Not empty"
 msgstr "Niet leeg"
 
+#: ../src/engine/CslGameAssaultCube.cpp:75
+msgid "Knife"
+msgstr "Mes"
+
+#: ../src/engine/CslGameAssaultCube.cpp:75
+#: ../src/engine/CslGameBloodFrontier.cpp:147
+#: ../src/engine/CslGameSauerbraten.cpp:82
+msgid "Pistol"
+msgstr "Pistool"
+
+#: ../src/engine/CslGameAssaultCube.cpp:75
+#: ../src/engine/CslGameBloodFrontier.cpp:147
+#: ../src/engine/CslGameSauerbraten.cpp:81
+msgid "Shotgun"
+msgstr "Jachtgeweer"
+
+#: ../src/engine/CslGameAssaultCube.cpp:75
+msgid "Subgun"
+msgstr "Machinegeweer"
+
+#: ../src/engine/CslGameAssaultCube.cpp:76
+msgid "Sniper"
+msgstr "Sluipschutter"
+
+#: ../src/engine/CslGameAssaultCube.cpp:76
+msgid "Assault"
+msgstr "Assault"
+
+#: ../src/engine/CslGameAssaultCube.cpp:76
+msgid "Grenade"
+msgstr "Granaat"
+
+#: ../src/engine/CslGameAssaultCube.cpp:76
+msgid "Pistol (auto)"
+msgstr "Pistool (auto)"
+
 #: ../src/engine/CslGameAssaultCube.cpp:181
 msgid ""
 "Client binary for game AssaultCube not found!\n"
 "Check your settings."
 msgstr ""
-"Client binary voor het spel Assaultcube niet gevonden!\n"
+"Client binary voor het spel AssaultCube niet gevonden!\n"
 "Controleer de instellingen."
 
 #: ../src/engine/CslGameAssaultCube.cpp:186
@@ -1012,7 +1093,7 @@ msgid ""
 "Game path for game AssaultCube not found!\n"
 "Check check your settings."
 msgstr ""
-"Spel path voor het spel Assaultcube niet gevonden!\n"
+"Spel path voor het spel AssaultCube niet gevonden!\n"
 "Controleer de instellingen."
 
 #: ../src/engine/CslGameAssaultCube.cpp:191
@@ -1020,38 +1101,53 @@ msgid ""
 "Config path for game AssaultCube not found!\n"
 "Check check your settings."
 msgstr ""
-"Config path voor het spel Assaultcube niet gevonden!\n"
+"Config path voor het spel AssaultCube niet gevonden!\n"
 "Controleer de instellingen."
+
+#: ../src/engine/CslGameBloodFrontier.cpp:147
+#: ../src/engine/CslGameSauerbraten.cpp:81
+msgid "Chaingun"
+msgstr "Machinegeweer"
+
+#: ../src/engine/CslGameBloodFrontier.cpp:148
+msgid "Grenades"
+msgstr "Granaten"
+
+#: ../src/engine/CslGameBloodFrontier.cpp:148
+msgid "Flamer"
+msgstr "Vlammenwerper"
+
+#: ../src/engine/CslGameBloodFrontier.cpp:148
+#: ../src/engine/CslGameSauerbraten.cpp:82
+msgid "Rifle"
+msgstr "Scherpschuttersgeweer"
 
 #: ../src/engine/CslGameBloodFrontier.cpp:163
 msgid "Spree"
 msgstr "Spree"
 
 #: ../src/engine/CslGameBloodFrontier.cpp:275
-#, fuzzy
 msgid ""
 "Client binary for game Blood Frontier not found!\n"
 "Check your settings."
 msgstr ""
-"Client binary voor het spel Cube niet gevonden!\n"
+"Client binary voor het spel Blood Frontier niet gevonden!\n"
 "Controleer de instellingen."
 
 #: ../src/engine/CslGameBloodFrontier.cpp:280
-#, fuzzy
 msgid ""
 "Game path for game Blood Frontier not found!\n"
 "Check check your settings."
 msgstr ""
-"Spel path voor het spel Cube niet gevonden!\n"
+"Spel path voor het spel Blood Frontier niet gevonden!\n"
 "Controleer de instellingen."
 
 #: ../src/engine/CslGameBloodFrontier.cpp:285
-#, fuzzy
 msgid ""
 "Config path for game Blood Frontier not found!\n"
 "Check check your settings."
 msgstr ""
-"Config path voor het spel Assaultcube niet gevonden!\n"
+"Config path voor het spel Blood Frontier niet gevonden!\n"
 "Controleer de instellingen."
 
 #: ../src/engine/CslGameCube.cpp:116
@@ -1080,6 +1176,34 @@ msgstr ""
 "Spel installatie path ontbreekt!\n"
 "Voor het spel %s is de folder met daarin\n"
 " \"%s\" noodzakelijk om het spel te starten."
+
+#: ../src/engine/CslGameSauerbraten.cpp:81
+msgid "Fist"
+msgstr "Vuist"
+
+#: ../src/engine/CslGameSauerbraten.cpp:81
+msgid "Rocketlauncher"
+msgstr "Raketwerper"
+
+#: ../src/engine/CslGameSauerbraten.cpp:82
+msgid "Grenadelauncher"
+msgstr "Granaatwerper"
+
+#: ../src/engine/CslGameSauerbraten.cpp:82
+msgid "Fireball"
+msgstr "Vuurbal"
+
+#: ../src/engine/CslGameSauerbraten.cpp:83
+msgid "Iceball"
+msgstr "IJsbal"
+
+#: ../src/engine/CslGameSauerbraten.cpp:83
+msgid "Slimeball"
+msgstr "Slijmbal"
+
+#: ../src/engine/CslGameSauerbraten.cpp:83
+msgid "Bite"
+msgstr "Bijten"
 
 #: ../src/engine/CslGameSauerbraten.cpp:204
 msgid ""
@@ -1179,6 +1303,6 @@ msgstr "Server Lister"
 
 #~ msgid "2 (TC-Server)"
 #~ msgstr "2 (TC-Server)"
-
 #~ msgid "Select a player and press CTRL+C to copy to clipboard."
 #~ msgstr "Selecteer een speler en druk CTRL+C om te kopieren naar klembord."
+
