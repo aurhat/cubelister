@@ -54,7 +54,7 @@ class CslListCtrlPlayer : public wxListCtrl
                           const wxString& name=wxListCtrlNameStr);
 
         void ListInit(const wxInt32 view);
-        void ListAdjustSize();
+        void ListAdjustSize(const wxSize& size=wxDefaultSize);
         void UpdateData();
 
         void ServerInfo(CslServerInfo *info);
@@ -78,7 +78,6 @@ class CslListCtrlPlayer : public wxListCtrl
         static wxInt32 m_imgOffsetY;
 
         void OnEraseBackground(wxEraseEvent& event);
-        void OnSize(wxSizeEvent& event);
 #endif
         void OnColumnLeftClick(wxListEvent& event);
         void OnItemActivated(wxListEvent& event);

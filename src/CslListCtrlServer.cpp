@@ -189,10 +189,16 @@ void CslListCtrlServer::OnColumnDragEnd(wxListEvent& WXUNUSED(event))
 
 void CslListCtrlServer::OnSize(wxSizeEvent& event)
 {
+    event.Skip();
+
+#ifdef __WXMSW__
+    if (m_dontAdjustSize)
+        return;
+#endif
+
     Freeze();
     ListAdjustSize(event.GetSize());
     Thaw();
-    event.Skip();
 }
 
 void CslListCtrlServer::OnKeyDown(wxKeyEvent &event)
@@ -738,11 +744,6 @@ void CslListCtrlServer::ListInit(CslEngine *engine,CslListCtrlServer *sibling)
 
 void CslListCtrlServer::ListAdjustSize(const wxSize& size)
 {
-#ifdef __WXMSW__
-    if (m_dontAdjustSize)
-        return;
-#endif
-
     wxInt32 w=size.x-8;
 
     SetColumnWidth(0,(wxInt32)(w*g_cslSettings->colServerS1));

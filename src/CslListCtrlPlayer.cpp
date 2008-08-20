@@ -56,7 +56,6 @@ enum
 BEGIN_EVENT_TABLE(CslListCtrlPlayer,wxListCtrl)
     #ifdef __WXMSW__
     EVT_ERASE_BACKGROUND(CslListCtrlPlayer::OnEraseBackground)
-    EVT_SIZE(CslListCtrlPlayer::OnSize)
     #endif
     EVT_LIST_COL_CLICK(wxID_ANY,CslListCtrlPlayer::OnColumnLeftClick)
     EVT_LIST_ITEM_ACTIVATED(wxID_ANY,CslListCtrlPlayer::OnItemActivated)
@@ -149,12 +148,6 @@ void CslListCtrlPlayer::OnEraseBackground(wxEraseEvent& event)
     }
     else
         event.Skip();
-}
-
-void CslListCtrlPlayer::OnSize(wxSizeEvent& event)
-{
-    ListAdjustSize();
-    event.Skip();
 }
 #endif
 
@@ -308,9 +301,10 @@ void CslListCtrlPlayer::OnMouseMove(wxMouseEvent& event)
     tip=_("Player list");
     if (m_info)
         tip+=_(" for server: ")+m_info->GetBestDescription();
+    m_toolTip->SetTip(tip);
 // arr, undocumented function - totally weird!
 #ifdef __WXMAC__
-    m_toolTip->SetTip(tip);
+    wxToolTip::RelayEvent(this,event);
 #endif
 }
 
@@ -442,12 +436,12 @@ void CslListCtrlPlayer::UpdateData()
 #endif
 }
 
-void CslListCtrlPlayer::ListAdjustSize()
+void CslListCtrlPlayer::ListAdjustSize(const wxSize& size)
 {
     if (m_view<0)
         return;
 
-    wxInt32 w=GetClientSize().x-8;
+	wxInt32 w=size==wxDefaultSize ? GetClientSize().x-8 : size.x-8;
     if (w<0)
         return;
 
