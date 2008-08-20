@@ -286,13 +286,16 @@ wxString CslBloodFrontier::GameStart(CslServerInfo *info,wxUint32 mode,wxString 
         return wxEmptyString;
     }
 
-    // use Prepend() and do not use opts+= here, since -q<path> must be before -r
     path=m_clientSettings.ConfigPath;
 #ifdef __WXMSW__
-    opts.Prepend(wxString(wxT("-h\""))+path.RemoveLast()+wxString(wxT("\" ")));
+    //binary must be surrounded by quotes if the path contains spaces
+    bin=wxT("\"")+m_clientSettings.Binary+wxT("\"");
+    opts.Prepend(wxT("-h\"")+path.RemoveLast()+wxT("\" "));
 #else
+    bin.Replace(wxT(" "),wxT("\\ "));
     path.Replace(wxT(" "),wxT("\\ "));
-    opts.Prepend(wxString(wxT("-h"))+path+wxString(wxT(" ")));
+    // use Prepend() and do not use opts+= here, since -h<path> must be before -r
+    opts.Prepend(wxT("-h")+path+wxT(" "));
 #endif //__WXMSW__
 
     address=info->Host;
@@ -300,14 +303,13 @@ wxString CslBloodFrontier::GameStart(CslServerInfo *info,wxUint32 mode,wxString 
         address+=m_portDelimiter+wxString::Format(wxT("%d"),info->Port);
 
 #ifdef __WXMSW__
-        opts+=wxString(wxT(" -x\"sleep 1000 [connect "))+address+wxString(wxT("]\""));
+        opts+=wxT(" -x\"sleep 1000 [connect ")+address+wxT("]\"");
 #else
         address.Replace(wxT(" "),wxT("\\ "));
-        opts+=wxString(wxT(" -xsleep\\ 1000\\ [connect\\ "))+address+wxString(wxT("]"));
+        opts+=wxT(" -xsleep\\ 1000\\ [connect\\ ")+address+wxT("]");
 #endif
 
-    bin.Replace(wxT(" "),wxT("\\ "));
-    bin+=wxString(wxT(" "))+opts;
+    bin+=wxT(" ")+opts;
 
     return bin;
 }

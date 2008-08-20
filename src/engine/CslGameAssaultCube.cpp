@@ -192,21 +192,23 @@ wxString CslGameAssaultCube::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
         return wxEmptyString;
     }
 
-    // use Prepend() and do not use opts+= here, since -q<path> must be before -r
     path=configpath;
 #ifdef __WXMSW__
-    opts.Prepend(wxString(wxT("--home=\""))+path.RemoveLast()+wxString(wxT("\" ")));
+    //binary must be surrounded by quotes if the path contains spaces
+    bin=wxT("\"")+m_clientSettings.Binary+wxT("\"");
+    opts.Prepend(wxT("--home=\"")+path.RemoveLast()+wxT("\" "));
 #else
+    bin.Replace(wxT(" "),wxT("\\ "));
     path.Replace(wxT(" "),wxT("\\ "));
-    opts.Prepend(wxString(wxT("--home="))+configpath+wxString(wxT(" ")));
+    // use Prepend() and do not use opts+= here, since --home=<path> must be before -r
+    opts.Prepend(wxT("--home=")+configpath+wxT(" "));
 #endif //__WXMSW__
 
     address=info->Host;
     if (GetDefaultPort()!=info->Port)
         address+=m_portDelimiter+wxString::Format(wxT("%d"),info->Port);
 
-    bin.Replace(wxT(" "),wxT("\\ "));
-    bin+=wxString(wxT(" "))+opts;
+    bin+=wxT(" ")+opts;
 
     password=mode==CSL_CONNECT_PASS ? info->Password:
              mode==CSL_CONNECT_ADMIN_PASS ? info->PasswordAdmin:wxString(wxEmptyString);

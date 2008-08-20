@@ -126,7 +126,12 @@ wxString CslGameCube::GameStart(CslServerInfo *info,wxUint32 mode,wxString *erro
     if (GetDefaultPort()!=info->Port)
         address+=m_portDelimiter+wxString::Format(wxT("%d"),info->Port);
 
+#ifdef __WXMSW__
+    //binary must be surrounded by quotes if the path contains spaces
+    bin=wxT("\"")+m_clientSettings.Binary+wxT("\"");
+#else
     bin.Replace(wxT(" "),wxT("\\ "));
+#endif
     bin+=wxString(wxT(" "))+opts;
 
     if (mode==CSL_CONNECT_ADMIN_PASS)

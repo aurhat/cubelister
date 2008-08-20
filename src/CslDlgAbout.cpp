@@ -68,13 +68,10 @@ void CslPanelAboutImage::OnPaint(wxPaintEvent& event)
     if (!m_bitmap->IsOk())
         return;
 
-    wxMemoryDC memDC;
-
     wxPaintDC dc(this);
     PrepareDC(dc);
 
-    memDC.SelectObject(*m_bitmap);
-    dc.Blit(0,0,m_bitmap->GetWidth(),m_bitmap->GetHeight(),&memDC,0,0,wxCOPY,true);
+    dc.DrawBitmap(*m_bitmap,0,0,true);
 }
 
 
@@ -139,7 +136,7 @@ void CslDlgAbout::set_properties()
                                     "Previous extended info server patches:\n"
                                 ))+
                        wxString(wxT(
-                                    "  noob\n\n"
+                                    "  'noob'\n\n"
                                 ))+
                        wxString(_(
                                     "Country Flags:\n"

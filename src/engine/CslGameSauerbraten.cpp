@@ -215,13 +215,16 @@ wxString CslGameSauerbraten::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
         return wxEmptyString;
     }
 
-    // use Prepend() and do not use opts+= here, since -q<path> must be before -r
     path=m_clientSettings.ConfigPath;
 #ifdef __WXMSW__
-    opts.Prepend(wxString(wxT("-q\""))+path.RemoveLast()+wxString(wxT("\" ")));
+    //binary must be surrounded by quotes if the path contains spaces
+    bin=wxT("\"")+m_clientSettings.Binary+wxT("\"");
+    opts.Prepend(wxT("-q\"")+path.RemoveLast()+wxT("\" "));
 #else
+    bin.Replace(wxT(" "),wxT("\\ "));
     path.Replace(wxT(" "),wxT("\\ "));
-    opts.Prepend(wxString(wxT("-q"))+path+wxString(wxT(" ")));
+    // use Prepend() and do not use opts+= here, since -q<path> must be before -r
+    opts.Prepend(wxT("-q")+path+wxT(" "));
 #endif //__WXMSW__
 
     if (info->MM==MM_PRIVATE)
@@ -239,22 +242,21 @@ wxString CslGameSauerbraten::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
     if (param)
     {
 #ifdef __WXMSW__
-        opts+=wxString(wxT(" -x\"connect "))+address+wxString(wxT("\""));
+        opts+=wxT(" -x\"connect ")+address+wxT("\"");
 #else
-        opts+=wxString(wxT(" -xconnect\\ "))+address;
+        opts+=wxT(" -xconnect\\ ")+address;
 #endif
     }
     else
     {
 #ifdef __WXMSW__
-        opts+=wxString(wxT(" -x\"csl_connect = 1\" -l"))+wxString(CSL_DEFAULT_INJECT_FIL_SB);
+        opts+=wxT(" -x\"csl_connect = 1\" -l")+wxString(CSL_DEFAULT_INJECT_FIL_SB);
 #else
-        opts+=wxString(wxT(" -xcsl_connect\\ =\\ 1 -l"))+wxString(CSL_DEFAULT_INJECT_FIL_SB);
+        opts+=wxT(" -xcsl_connect\\ =\\ 1 -l")+wxString(CSL_DEFAULT_INJECT_FIL_SB);
 #endif
     }
 
-    bin.Replace(wxT(" "),wxT("\\ "));
-    bin+=wxString(wxT(" "))+opts;
+    bin+=wxT(" ")+opts;
 
     if (!param)
     {
