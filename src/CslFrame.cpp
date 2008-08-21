@@ -317,7 +317,7 @@ CslPlayerInfo::CslPlayerInfo(wxWindow* parent,long listStyle)
 
 void CslPlayerInfo::OnSize(wxSizeEvent& event)
 {
-	const wxSize& size=event.GetSize();
+    const wxSize& size=event.GetSize();
 
     m_label->SetLabel(GetLabelText());
     m_label->Wrap(size.x-4);
@@ -326,9 +326,7 @@ void CslPlayerInfo::OnSize(wxSizeEvent& event)
     size.y-=m_label->GetBestSize().y+4;
     m_listCtrl->SetSize(size);
 #endif //__WXMAC__
-#ifdef __WXMSW__
     m_listCtrl->ListAdjustSize(size);
-#endif
 #ifdef __WXMAC__
     //fixes flicker after resizing
     wxIdleEvent idle;
@@ -744,11 +742,13 @@ void CslFrame::DoLayout()
     sizer_main->Fit(this);
     Layout();
 
+#ifdef __WXMSW__
+    CentreOnScreen();
+#endif
     SetSize(g_cslSettings->frameSize);
-	Maximize(g_cslSettings->maximized);
-    //CentreOnScreen();
+    Maximize(g_cslSettings->maximized);
 
-	//connect after calling size functions, so g_cslSettings->frameSize has the right value
+    //connect after calling size functions, so g_cslSettings->frameSize has the right value
     Connect(wxEVT_SIZE,wxSizeEventHandler(CslFrame::OnSize),NULL,this);
 }
 
@@ -1304,7 +1304,7 @@ void CslFrame::LoadSettings()
     config.SetPath(wxT("/Gui"));
     if (config.Read(wxT("SizeX"),&val)) g_cslSettings->frameSize.SetWidth(val);
     if (config.Read(wxT("SizeY"),&val)) g_cslSettings->frameSize.SetHeight(val);
-	if (config.Read(wxT("Maximized"),&val)) g_cslSettings->maximized=val!=0;
+    if (config.Read(wxT("Maximized"),&val)) g_cslSettings->maximized=val!=0;
     if (config.Read(wxT("Layout"),&s)) g_cslSettings->layout=s;
     if (config.Read(wxT("UpdateInterval"),&val))
     {
@@ -1424,12 +1424,12 @@ void CslFrame::SaveSettings()
     config.Write(wxT("Version"),CSL_CONFIG_VERSION);
 
     /* GUI */
-	bool maximized=IsMaximized();
+    bool maximized=IsMaximized();
     const wxSize& size=g_cslSettings->frameSize;
     config.SetPath(wxT("/Gui"));
     config.Write(wxT("SizeX"),(long int)size.GetWidth());
     config.Write(wxT("SizeY"),(long int)size.GetHeight());
-	config.Write(wxT("Maximized"),maximized);
+    config.Write(wxT("Maximized"),maximized);
     config.Write(wxT("Layout"),m_AuiMgr.SavePerspective());
     config.Write(wxT("UpdateInterval"),(long int)g_cslSettings->updateInterval);
     config.Write(wxT("NoUpdatePlaying"),g_cslSettings->dontUpdatePlaying);
@@ -2400,10 +2400,10 @@ void CslFrame::OnKeypress(wxKeyEvent& event)
 
 void CslFrame::OnSize(wxSizeEvent& event)
 {
-	if (!IsMaximized())
-		g_cslSettings->frameSize=event.GetSize();
+    if (!IsMaximized())
+        g_cslSettings->frameSize=event.GetSize();
 
-	event.Skip();
+    event.Skip();
 }
 
 void CslFrame::OnShow(wxShowEvent& event)
@@ -2619,14 +2619,9 @@ bool CslApp::OnInit()
     CslGeoIP::Init();
 
     wxInitAllImageHandlers();
-    CslFrame* frame_csl=new CslFrame(NULL,wxID_ANY,wxEmptyString,
-#ifdef __WXMSW__
-                                     wxPoint(0,0));
-#else
-                                     wxDefaultPosition);
-#endif
-    frame_csl->Show();
-    SetTopWindow(frame_csl);
+    CslFrame* frame=new CslFrame(NULL,wxID_ANY,wxEmptyString,wxDefaultPosition);
+    SetTopWindow(frame);
+    frame->Show();
 
     return true;
 }
