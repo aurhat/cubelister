@@ -745,8 +745,18 @@ void CslFrame::DoLayout()
 #ifdef __WXMSW__
     CentreOnScreen();
 #endif
-    SetSize(g_cslSettings->frameSize);
-    Maximize(g_cslSettings->maximized);
+    if (g_cslSettings->frameSizeMax!=wxDefaultSize)
+    {
+        m_maximized=true;
+        SetMinSize(g_cslSettings->frameSize);
+        SetSize(g_cslSettings->frameSizeMax);
+        Maximize(true);
+    }
+    else
+    {
+        m_maximized=false;
+        SetSize(g_cslSettings->frameSize);
+    }
 
     //connect after calling size functions, so g_cslSettings->frameSize has the right value
     Connect(wxEVT_SIZE,wxSizeEventHandler(CslFrame::OnSize),NULL,this);
@@ -1160,7 +1170,7 @@ void CslFrame::UpdateMaster()
             info=servers[i];
 
             if (g_cslSettings->cleanupServers &&
-                info->LastSeen && now-info->LastSeen>g_cslSettings->cleanupServers &&
+                now-info->LastSeen>g_cslSettings->cleanupServers &&
                 !(g_cslSettings->cleanupServersKeepFav && info->IsFavourite()) &&
                 !(g_cslSettings->cleanupServersKeepStats && info->HasStats()))
             {
@@ -1304,7 +1314,8 @@ void CslFrame::LoadSettings()
     config.SetPath(wxT("/Gui"));
     if (config.Read(wxT("SizeX"),&val)) g_cslSettings->frameSize.SetWidth(val);
     if (config.Read(wxT("SizeY"),&val)) g_cslSettings->frameSize.SetHeight(val);
-    if (config.Read(wxT("Maximized"),&val)) g_cslSettings->maximized=val!=0;
+    if (config.Read(wxT("SizeMaxX"),&val)) g_cslSettings->frameSizeMax.SetWidth(val);
+    if (config.Read(wxT("SizeMaxY"),&val)) g_cslSettings->frameSizeMax.SetHeight(val);
     if (config.Read(wxT("Layout"),&s)) g_cslSettings->layout=s;
     if (config.Read(wxT("UpdateInterval"),&val))
     {
@@ -1424,12 +1435,13 @@ void CslFrame::SaveSettings()
     config.Write(wxT("Version"),CSL_CONFIG_VERSION);
 
     /* GUI */
-    bool maximized=IsMaximized();
-    const wxSize& size=g_cslSettings->frameSize;
+    wxSize size=g_cslSettings->frameSize;
     config.SetPath(wxT("/Gui"));
     config.Write(wxT("SizeX"),(long int)size.GetWidth());
     config.Write(wxT("SizeY"),(long int)size.GetHeight());
-    config.Write(wxT("Maximized"),maximized);
+    size=m_maximized ? GetSize() : wxDefaultSize;
+    config.Write(wxT("SizeMaxX"),(long int)size.GetWidth());
+    config.Write(wxT("SizeMaxY"),(long int)size.GetHeight());
     config.Write(wxT("Layout"),m_AuiMgr.SavePerspective());
     config.Write(wxT("UpdateInterval"),(long int)g_cslSettings->updateInterval);
     config.Write(wxT("NoUpdatePlaying"),g_cslSettings->dontUpdatePlaying);
@@ -2400,8 +2412,20 @@ void CslFrame::OnKeypress(wxKeyEvent& event)
 
 void CslFrame::OnSize(wxSizeEvent& event)
 {
-    if (!IsMaximized())
+    static bool init=true;
+
+    if (!IsMaximized() && event.GetSize()!=g_cslSettings->frameSizeMax)
+    {
+        if (init)
+        {
+            SetMinSize(GetBestSize());
+            init=false;
+        }
         g_cslSettings->frameSize=event.GetSize();
+        m_maximized=false;
+    }
+    else
+        m_maximized=true;
 
     event.Skip();
 }

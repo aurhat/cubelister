@@ -1,5 +1,5 @@
 AC_INIT(configure.in)
-AM_INIT_AUTOMAKE(csl, 0.8)
+AM_INIT_AUTOMAKE(csl, 0.8.1)
 
 DEFAULT_FLAGS="-fsigned-char -Wall -fno-strict-aliasing"
 CFLAGS="$CFLAGS $DEFAULT_FLAGS"

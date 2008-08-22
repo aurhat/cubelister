@@ -100,6 +100,7 @@ class CslFrame: public wxFrame
 
     protected:
         wxAuiManager m_AuiMgr;
+        bool m_maximized;
 
         wxFlexGridSizer *sizer_main,*sizer_search;
         wxPanel *pane_main,*pane_search;
