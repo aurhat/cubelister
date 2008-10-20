@@ -41,6 +41,7 @@
 #ifndef __WXMSW__
 #include "csl_icon_png.h"
 #endif
+#include "img/csl_22.xpm"
 #include "img/master_24.xpm"
 #include "img/close_14.xpm"
 #include "img/close_high_14.xpm"
@@ -108,6 +109,8 @@ BEGIN_EVENT_TABLE(CslFrame, wxFrame)
     #else
     // on wxGTK EVT_CHAR gets not send since version >= 2.8.5
     EVT_KEY_UP(CslFrame::OnKeypress)
+    EVT_ICONIZE(CslFrame::OnIconize)
+    EVT_TASKBAR_LEFT_DOWN(CslFrame::OnTrayIcon)
     #endif
     EVT_SHOW(CslFrame::OnShow)
     EVT_CLOSE(CslFrame::OnClose)
@@ -198,8 +201,8 @@ class CslProcess : public wxProcess
             {
                 char buf[1025];
                 stream->Read((void*)buf,1024);
-                wxUint32 last=stream->LastRead();
-                if (last==0)
+                wxInt32 last=(wxInt32)stream->LastRead();
+                if (last<=0)
                     break;
                 buf[last]=0;
                 //Cube has color codes in it's output
@@ -223,8 +226,8 @@ class CslProcess : public wxProcess
                 char buf[1025];
                 stream->Read((void*)buf,1024);
 
-                wxUint32 last=stream->LastRead();
-                if (last==0)
+                wxInt32 last=(wxInt32)stream->LastRead();
+                if (last<=0)
                     break;
                 buf[last]=0;
                 /*
@@ -380,6 +383,7 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
         wxFrame(parent, id, title, pos, size, wxDEFAULT_FRAME_STYLE)
 {
     m_oldSelectedInfo=NULL;
+    m_tbIcon=NULL;
 
     m_engine=new CslEngine(this);
     if (m_engine->Init(CSL_UPDATE_INTERVAL_MIN,1000/CSL_TIMER_SHOT))
@@ -483,6 +487,11 @@ CslFrame::~CslFrame()
     if (CslConnectionState::IsPlaying())
         CslConnectionState::GetInfo()->GetGame().GameEnd();
 
+    delete m_menu;
+
+    if (m_tbIcon)
+        delete m_tbIcon;
+
     if (m_engine)
     {
         SaveSettings();
@@ -498,8 +507,6 @@ CslFrame::~CslFrame()
         m_versionCheckThread->Delete();
         delete m_versionCheckThread;
     }
-
-    delete m_menu;
 
     m_AuiMgr.UnInit();
 }
@@ -636,17 +643,21 @@ void CslFrame::SetProperties()
 
     // see wx_wxbitmap.html
 #ifdef __WXMSW__
-    SetIcon(wxICON(aa_csl_48));
+    m_appIcon=wxICON(aa_csl_48);
+    SetIcon(m_appIcon);
 #else
     wxMemoryInputStream stream(csl_icon_png,sizeof(csl_icon_png));
-    wxIcon icon;
     wxImage image(stream,wxBITMAP_TYPE_PNG);
     wxBitmap bitmap(image);
+    wxIcon icon;
     icon.CopyFromBitmap(bitmap);
     SetIcon(icon);
 #endif
 
-    SetMinSize(wxSize(CSL_FRAME_MIN_WIDTH,CSL_FRAME_MIN_HEIGHT));
+#ifndef __WXMAC__
+    ToggleTaskbarIcon(false);
+    m_shown=true;
+#endif
 }
 
 void CslFrame::DoLayout()
@@ -756,6 +767,7 @@ void CslFrame::DoLayout()
     {
         m_maximized=false;
         SetSize(g_cslSettings->frameSize);
+        SetMinSize(wxSize(CSL_FRAME_MIN_WIDTH,CSL_FRAME_MIN_HEIGHT));
     }
 
     //connect after calling size functions, so g_cslSettings->frameSize has the right value
@@ -881,6 +893,36 @@ void CslFrame::TogglePane(wxInt32 id)
 
     m_AuiMgr.Update();
 }
+
+#ifndef __WXMAC__
+void CslFrame::ToggleTaskbarIcon(bool iconized)
+{
+    if ((g_cslSettings->systray>0 && !m_tbIcon) &&
+        (g_cslSettings->systray==1 || (g_cslSettings->systray==2 && iconized)))
+    {
+        m_tbIcon=new wxTaskBarIcon();
+        m_tbIcon->SetNextHandler(this);
+        m_tbIcon->SetIcon(csl_22_xpm);
+
+        wxUint32 style=GetWindowStyle();
+        if (!(style&wxFRAME_NO_TASKBAR))
+        {
+            style|=wxFRAME_NO_TASKBAR;
+            SetWindowStyle(style);
+        }
+    }
+    else if (m_tbIcon && g_cslSettings->systray!=1)
+    {
+        if (!iconized)
+        {
+            if (GetWindowStyle()&wxFRAME_NO_TASKBAR)
+                SetWindowStyle(wxDEFAULT_FRAME_STYLE);
+        }
+        delete m_tbIcon;
+        m_tbIcon=NULL;
+    }
+}
+#endif
 
 void CslFrame::ToggleSearchBar()
 {
@@ -1249,12 +1291,17 @@ void CslFrame::ConnectToServer()
         wxInt32 time=g_cslSettings->waitServerFull;
 
         CslDlgConnectWait *dlg=new CslDlgConnectWait(this,&time);
-        if (dlg->ShowModal()==wxID_OK)
+
+        switch (dlg->ShowModal())
         {
-            m_timerCount=0;
-            CslConnectionState::CreateWaitingState(info,mode,time);
+            case wxID_OK:
+                m_timerCount=0;
+                CslConnectionState::CreateWaitingState(info,mode,time);
+            case wxID_CANCEL:
+                return;
+            default:
+                break;
         }
-        return;
     }
 
     wxString error;
@@ -1317,6 +1364,7 @@ void CslFrame::LoadSettings()
     if (config.Read(wxT("SizeMaxX"),&val)) g_cslSettings->frameSizeMax.SetWidth(val);
     if (config.Read(wxT("SizeMaxY"),&val)) g_cslSettings->frameSizeMax.SetHeight(val);
     if (config.Read(wxT("Layout"),&s)) g_cslSettings->layout=s;
+    if (config.Read(wxT("Systray"),&val)) g_cslSettings->systray=val;
     if (config.Read(wxT("UpdateInterval"),&val))
     {
         if (val>=CSL_UPDATE_INTERVAL_MIN && val<=CSL_UPDATE_INTERVAL_MAX)
@@ -1443,6 +1491,7 @@ void CslFrame::SaveSettings()
     config.Write(wxT("SizeMaxX"),(long int)size.GetWidth());
     config.Write(wxT("SizeMaxY"),(long int)size.GetHeight());
     config.Write(wxT("Layout"),m_AuiMgr.SavePerspective());
+    config.Write(wxT("Systray"),g_cslSettings->systray);
     config.Write(wxT("UpdateInterval"),(long int)g_cslSettings->updateInterval);
     config.Write(wxT("NoUpdatePlaying"),g_cslSettings->dontUpdatePlaying);
     config.Write(wxT("ShowSearch"),g_cslSettings->showSearch);
@@ -2418,7 +2467,7 @@ void CslFrame::OnSize(wxSizeEvent& event)
     {
         if (init)
         {
-            SetMinSize(GetBestSize());
+            SetMinSize(wxSize(CSL_FRAME_MIN_WIDTH,CSL_FRAME_MIN_HEIGHT));
             init=false;
         }
         g_cslSettings->frameSize=event.GetSize();
@@ -2429,6 +2478,36 @@ void CslFrame::OnSize(wxSizeEvent& event)
 
     event.Skip();
 }
+
+#ifndef __WXMAC__
+void CslFrame::OnIconize(wxIconizeEvent& event)
+{
+    m_shown=!event.Iconized();
+    ToggleTaskbarIcon(!m_shown);
+    event.Skip();
+}
+
+void CslFrame::OnTrayIcon(wxTaskBarIconEvent& event)
+{
+    if (!m_shown)
+    {
+        if (g_cslSettings->systray==1)
+            Show();
+        else
+            Raise();
+    }
+    else
+    {
+        if (!wxTheApp->IsActive())
+        {
+            Refresh();
+            Raise();
+        }
+        else
+            Hide();
+    }
+}
+#endif
 
 void CslFrame::OnShow(wxShowEvent& event)
 {

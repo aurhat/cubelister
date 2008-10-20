@@ -65,10 +65,10 @@ wxString CslGameCube::GetModeName(wxInt32 n) const
 bool CslGameCube::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
 {
     char text[_MAXDEFSTR];
-    wxUint32 l;
+    wxInt32 l;
 
     //weird hack
-    for (l=0;l<(wxUint32)buf.maxlength();l++)
+    for (l=0;l<buf.maxlength();l++)
         *buf.at(l)^=0x61;
 
     wxInt32 prot=getint(buf);
@@ -82,8 +82,8 @@ bool CslGameCube::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
     getstring(text,buf);
     info.Map=A2U(text);
     getstring(text,buf);
-    l=(wxUint32)strlen(text);
-    StripColours(text,&l,2);
+    l=strlen(text);
+    StripColours(text,&l,1);
     info.SetDescription(A2U(text));
 
     return true;
@@ -238,7 +238,7 @@ const char** CslGameCube::GetIcon(wxInt32 size) const
     return NULL;
 }
 
-void CslGameCube::ProcessOutput(char *data,wxUint32 *len) const
+void CslGameCube::ProcessOutput(char *data,wxInt32 *len) const
 {
-    StripColours(data,len,1);
+    StripColours(data,len,0);
 }

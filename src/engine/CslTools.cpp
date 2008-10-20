@@ -44,7 +44,7 @@ void Debug_Printf(const char *DbgFunc, const char *FmtStr,...)
 }
 #endif
 
-char* StripColours(char *s,wxUint32 *l,wxUint32 count)
+char* StripColours2(char *s,wxUint32 *l,wxUint32 count)
 {
     wxUint32 i=0;
 
@@ -70,6 +70,32 @@ char* StripColours(char *s,wxUint32 *l,wxUint32 count)
     s[*l]=0;
 
     return s;
+}
+
+void StripColours(char *src,wxInt32 *len,wxInt32 count)
+{
+    char *dst=src;
+    wxInt32 c,l=0;
+
+    for (c=*src;c && *len>0;c=*(++src))
+    {
+        if (c=='\f')
+        {
+            src+=count;
+            *len-=count+1;
+            continue;
+        }
+
+        if (isprint(c))
+        {
+            *dst++=c;
+            (*len)--;
+            l++;
+        }
+    }
+
+    *dst=0;
+    *len=l;
 }
 
 bool IsIP(const wxString& s)

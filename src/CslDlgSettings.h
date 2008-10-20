@@ -96,6 +96,7 @@ class CslDlgSettings : public wxDialog
     protected:
         // begin wxGlade: CslDlgSettings::attributes
         wxStaticBox* sizer_output_staticbox;
+        wxStaticBox* sizer_systray_staticbox;
         wxStaticBox* sizer_threshold_staticbox;
         wxStaticBox* sizer_times_staticbox;
         wxStaticBox* sizer_colours_staticbox;
@@ -117,6 +118,9 @@ class CslDlgSettings : public wxDialog
         wxCheckBox* checkbox_server_cleanup_stats;
         wxSpinCtrl* spin_ctrl_ping_good;
         wxSpinCtrl* spin_ctrl_ping_bad;
+        wxCheckBox* checkbox_systray;
+        wxRadioButton* radio_btn_systray_always;
+        wxRadioButton* radio_btn_systray_minimize;
         wxCheckBox* checkbox_game_output;
         wxDirPickerCtrl* dirpicker_game_output;
         wxPanel* notebook_pane_other;

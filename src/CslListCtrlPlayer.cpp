@@ -288,6 +288,8 @@ void CslListCtrlPlayer::OnMouseMove(wxMouseEvent& event)
                 tip=wxString::Format(_("Name: %s   Country: %s"),data->Name.c_str(),
                                      (country ? (A2U(country)).c_str() : CslGeoIP::IsOk() ?
                                       _("Unknown"):_("GeoIP database not found")));
+                tip+=wxString::Format(wxT("   ID: %d   IP: %d.%d.%d.x"),data->ID,
+                                      data->IP>>24,data->IP>>16&0xff,data->IP>>8&0xff);
                 m_toolTip->SetTip(tip);
 // arr, undocumented function - totally weird!
 #ifdef __WXMAC__
@@ -441,7 +443,7 @@ void CslListCtrlPlayer::ListAdjustSize(const wxSize& size)
     if (m_view<0)
         return;
 
-	wxInt32 w=size==wxDefaultSize ? GetClientSize().x-8 : size.x-8;
+    wxInt32 w=size==wxDefaultSize ? GetClientSize().x-8 : size.x-8;
     if (w<0)
         return;
 

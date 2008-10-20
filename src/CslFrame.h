@@ -34,6 +34,7 @@
 #endif
 #include "wx/aui/aui.h"
 #include <wx/snglinst.h>
+#include <wx/taskbar.h>
 #include <wx/image.h>
 #include <wx/imaglist.h>
 #include <wx/treectrl.h>
@@ -101,6 +102,10 @@ class CslFrame: public wxFrame
     protected:
         wxAuiManager m_AuiMgr;
         bool m_maximized;
+#ifndef __WXMAC__
+        wxTaskBarIcon *m_tbIcon;
+        bool m_shown;
+#endif
 
         wxFlexGridSizer *sizer_main,*sizer_search;
         wxPanel *pane_main,*pane_search;
@@ -152,6 +157,9 @@ class CslFrame: public wxFrame
         wxString PlayerListGetCaption(CslServerInfo *info,bool selected);
         void PlayerListCreateView(CslServerInfo *info,wxUint32 view,const wxString& name=wxEmptyString);
 
+#ifndef __WXMAC__
+        void ToggleTaskbarIcon(bool iconized);
+#endif
         void ToggleSearchBar();
         void TogglePane(wxInt32 id);
 
@@ -183,7 +191,11 @@ class CslFrame: public wxFrame
         void OnTreeRightClick(wxTreeEvent& event);
         void OnCommandEvent(wxCommandEvent& event);
         void OnKeypress(wxKeyEvent& event);
-		void OnSize(wxSizeEvent& event);
+        void OnSize(wxSizeEvent& event);
+#ifndef __WXMAC__
+        void OnIconize(wxIconizeEvent& event);
+        void OnTrayIcon(wxTaskBarIconEvent& WXUNUSED(event));
+#endif
         void OnShow(wxShowEvent& event);
         void OnClose(wxCloseEvent& event);
         void OnPaneClose(wxAuiManagerEvent& event);

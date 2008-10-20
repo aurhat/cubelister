@@ -895,7 +895,8 @@ wxUint32 CslListCtrlServer::GetPlayerCount()
     wxUint32 c=0,i;
 
     for (i=0;i<m_servers.GetCount();i++)
-        if (m_servers.Item(i)->Players>=0)
+        if (m_servers.Item(i)->Players>0 &&
+            CslEngine::PingOk(*m_servers.Item(i)->Info,g_cslSettings->updateInterval))
             c+=m_servers.Item(i)->Players;
 
     return c;

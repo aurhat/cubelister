@@ -105,7 +105,7 @@ enum
 
 extern wxString g_basePath;
 
-extern char* StripColours(char *s,wxUint32 *l,wxUint32 count);
+extern void StripColours(char *src,wxInt32 *len,wxInt32 count);
 extern bool IsIP(const wxString& s);
 extern bool IP2Int(const wxString& s,wxUint32 *ip);
 extern wxString FormatBytes(wxUint64 size);

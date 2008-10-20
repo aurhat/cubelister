@@ -167,7 +167,7 @@ void CslBloodFrontier::GetPlayerstatsDescriptions(vector<wxString>& desc) const
 bool CslBloodFrontier::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
 {
     char text[_MAXDEFSTR];
-    wxUint32 l;
+    wxInt32 l;
     vector<int>attr;
     attr.setsize(0);
 
@@ -183,8 +183,8 @@ bool CslBloodFrontier::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
     getstring(text,buf);
     info.Map=A2U(text);
     getstring(text,buf);
-    l=(wxUint32)strlen(text);
-    StripColours(text,&l,2);
+    l=strlen(text);
+    StripColours(text,&l,1);
     info.SetDescription(A2U(text));
 
     return true;

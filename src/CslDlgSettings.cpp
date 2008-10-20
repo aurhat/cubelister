@@ -57,7 +57,12 @@ enum
     SPIN_PING_GOOD,
     SPIN_PING_BAD,
 
+    CHECK_SYSTRAY,
+    RADIO_SYSTRAY_ALWAYS,
+    RADIO_SYSTRAY_MINIMIZE,
+
     CHECK_GAME_OUTPUT,
+
     FILE_PICKER,
     DIR_PICKER_GAME,
     DIR_PICKER_CFG
@@ -244,6 +249,7 @@ CslDlgSettings::CslDlgSettings(CslEngine *engine,wxWindow* parent,int id,const w
     sizer_colours_staticbox = new wxStaticBox(notebook_pane_colour, -1, _("Server lists"));
     sizer_times_staticbox = new wxStaticBox(notebook_pane_other, -1, _("Times && Intervals"));
     sizer_threshold_staticbox = new wxStaticBox(notebook_pane_other, -1, _("Ping thresholds"));
+    sizer_systray_staticbox = new wxStaticBox(notebook_pane_other, -1, _("System tray"));
     sizer_output_staticbox = new wxStaticBox(notebook_pane_other, -1, _("Game output"));
     notebook_pane_games = new wxPanel(notebook_settings, wxID_ANY);
     notebook_games = new wxListbook(notebook_pane_games, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0);
@@ -262,6 +268,9 @@ CslDlgSettings::CslDlgSettings(CslEngine *engine,wxWindow* parent,int id,const w
     checkbox_server_cleanup_stats = new wxCheckBox(notebook_pane_other, wxID_ANY, _("Keep servers with statistics"));
     spin_ctrl_ping_good = new wxSpinCtrl(notebook_pane_other, SPIN_PING_GOOD, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100);
     spin_ctrl_ping_bad = new wxSpinCtrl(notebook_pane_other, SPIN_PING_BAD, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100);
+    checkbox_systray = new wxCheckBox(notebook_pane_other, CHECK_SYSTRAY, _("Use system tray icon"));
+    radio_btn_systray_always = new wxRadioButton(notebook_pane_other, RADIO_SYSTRAY_ALWAYS, _("Always use system tray"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+    radio_btn_systray_minimize = new wxRadioButton(notebook_pane_other, RADIO_SYSTRAY_MINIMIZE, _("Minimize to system tray"));
     checkbox_game_output = new wxCheckBox(notebook_pane_other, CHECK_GAME_OUTPUT, _("Auto &save game output to:"));
     dirpicker_game_output = new wxDirPickerCtrl(notebook_pane_other, wxID_ANY, m_settings.gameOutputPath, _("Select game output path"), wxDefaultPosition, wxDefaultSize, wxDIRP_DEFAULT_STYLE|wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST);
     button_ok = new wxButton(this, wxID_OK, _("&Ok"));
@@ -317,6 +326,21 @@ void CslDlgSettings::set_properties()
     SetButtonColour(button_colour_mm2,button_ok,m_settings.colServerMM2);
     SetButtonColour(button_colour_mm3,button_ok,m_settings.colServerMM3);
 
+    if (g_cslSettings->systray>0)
+    {
+        checkbox_systray->SetValue(true);
+        if (g_cslSettings->systray==1)
+            radio_btn_systray_always->SetValue(true);
+        else
+            radio_btn_systray_minimize->SetValue(true);
+    }
+    else
+    {
+        checkbox_systray->SetValue(false);
+        radio_btn_systray_always->Enable(false);
+        radio_btn_systray_minimize->Enable(false);
+    }
+
     checkbox_game_output->SetValue(m_settings.autoSaveOutput);
     dirpicker_game_output->SetPath(m_settings.gameOutputPath);
     dirpicker_game_output->Enable(m_settings.autoSaveOutput);
@@ -342,9 +366,11 @@ void CslDlgSettings::do_layout()
     // begin wxGlade: CslDlgSettings::do_layout
     wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(2, 1, 0, 0);
     wxFlexGridSizer* grid_sizer_button = new wxFlexGridSizer(1, 3, 0, 0);
-    wxFlexGridSizer* grid_sizer_pane_other = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* grid_sizer_pane_other = new wxFlexGridSizer(4, 1, 0, 0);
     wxStaticBoxSizer* sizer_output = new wxStaticBoxSizer(sizer_output_staticbox, wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_output = new wxFlexGridSizer(1, 2, 0, 0);
+    wxStaticBoxSizer* sizer_systray = new wxStaticBoxSizer(sizer_systray_staticbox, wxHORIZONTAL);
+    wxFlexGridSizer* grid_sizer_systray = new wxFlexGridSizer(1, 3, 0, 0);
     wxStaticBoxSizer* sizer_threshold = new wxStaticBoxSizer(sizer_threshold_staticbox, wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_threshold = new wxFlexGridSizer(1, 5, 0, 0);
     wxStaticBoxSizer* sizer_times = new wxStaticBoxSizer(sizer_times_staticbox, wxHORIZONTAL);
@@ -414,6 +440,14 @@ void CslDlgSettings::do_layout()
     grid_sizer_threshold->AddGrowableCol(2);
     sizer_threshold->Add(grid_sizer_threshold, 1, wxEXPAND, 0);
     grid_sizer_pane_other->Add(sizer_threshold, 1, wxALL|wxEXPAND, 4);
+    grid_sizer_systray->Add(checkbox_systray, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_systray->Add(radio_btn_systray_always, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_systray->Add(radio_btn_systray_minimize, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_systray->AddGrowableCol(0);
+    grid_sizer_systray->AddGrowableCol(1);
+    grid_sizer_systray->AddGrowableCol(2);
+    sizer_systray->Add(grid_sizer_systray, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 0);
+    grid_sizer_pane_other->Add(sizer_systray, 1, wxALL|wxEXPAND, 4);
     grid_sizer_output->Add(checkbox_game_output, 0, wxALL, 4);
     grid_sizer_output->Add(dirpicker_game_output, 1, wxEXPAND, 0);
     grid_sizer_output->AddGrowableCol(1);
@@ -533,6 +567,11 @@ void CslDlgSettings::OnCommandEvent(wxCommandEvent& event)
             SetButtonColour(colButton,button_ok,*colour);
             break;
 
+        case CHECK_SYSTRAY:
+            radio_btn_systray_always->Enable(event.IsChecked());
+            radio_btn_systray_minimize->Enable(event.IsChecked());
+            break;
+
         case CHECK_GAME_OUTPUT:
             dirpicker_game_output->Enable(event.IsChecked());
             break;
@@ -552,6 +591,7 @@ void CslDlgSettings::OnCommandEvent(wxCommandEvent& event)
             m_settings.cleanupServersKeepStats=checkbox_server_cleanup_stats->GetValue();
             m_settings.pinggood=spin_ctrl_ping_good->GetValue();
             m_settings.pingbad=spin_ctrl_ping_bad->GetValue();
+        m_settings.systray=checkbox_systray->GetValue() ? radio_btn_systray_always->GetValue() ? 1 : 2 : 0;
             m_settings.gameOutputPath=dirpicker_game_output->GetPath();
             m_settings.autoSaveOutput=checkbox_game_output->IsChecked();
 

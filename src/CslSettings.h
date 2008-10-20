@@ -72,6 +72,7 @@ class CslSettings
                 frameSize(wxSize(CSL_FRAME_MIN_WIDTH,CSL_FRAME_MIN_HEIGHT)),
                 frameSizeMax(wxDefaultSize),
                 layout(CSL_AUI_DEFAULT_LAYOUT),
+                systray(0),
                 updateInterval(CSL_UPDATE_INTERVAL_MIN),
                 dontUpdatePlaying(true),
                 showSearch(true),
@@ -113,6 +114,7 @@ class CslSettings
         /* GUI */
         wxSize frameSize,frameSizeMax;
         wxString layout;
+        wxInt32 systray;
         wxStringList layouts;
         wxInt32 updateInterval;
         bool dontUpdatePlaying;
