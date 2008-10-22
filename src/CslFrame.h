@@ -113,7 +113,7 @@ class CslFrame: public wxFrame
         CslPlayerInfo *player_info;
         CslListCtrlInfo *list_ctrl_info;
         wxTreeCtrl *tree_ctrl_games;
-        wxTextCtrl *text_ctrl_search;
+        wxComboBox *combo_ctrl_search;
         wxStaticText *text_search_result;
         wxButton *button_search;
         wxBitmapButton *button_search_clear;

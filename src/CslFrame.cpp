@@ -424,7 +424,7 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
     list_ctrl_favourites->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeypress),NULL,this);
     list_ctrl_info->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeypress),NULL,this);
     tree_ctrl_games->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeypress),NULL,this);
-    text_ctrl_search->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeypress),NULL,this);
+    combo_ctrl_search->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeypress),NULL,this);
 #endif
 
     tree_ctrl_games->SetImageList(&m_imgListTree);
@@ -590,8 +590,8 @@ void CslFrame::CreateControls()
     list_ctrl_favourites=new CslListCtrlServer(pane_main,CslListCtrlServer::CSL_LIST_FAVOURITE,
             wxDefaultPosition,wxDefaultSize,listStyle);
     pane_search=new wxPanel(this,wxID_ANY,wxDefaultPosition,wxDefaultSize,wxNO_BORDER|wxTAB_TRAVERSAL);
-    text_ctrl_search=new wxTextCtrl(pane_search,CSL_TEXT_SEARCH,wxEmptyString,
-                                    wxDefaultPosition,wxDefaultSize,wxTE_RICH|wxTE_RICH2|wxTE_PROCESS_ENTER);
+    combo_ctrl_search=new wxComboBox(pane_search,CSL_TEXT_SEARCH,wxEmptyString,wxDefaultPosition,
+                                     wxDefaultSize,0,NULL,wxCB_DROPDOWN|wxTE_PROCESS_ENTER);
     text_search_result=new wxStaticText(pane_search,wxID_ANY,wxEmptyString);
     button_search=new wxButton(pane_search,CSL_BUTTON_SEARCH,_("&Search"));
     button_search_clear=new wxBitmapButton(pane_search,CSL_BUTTON_SEARCH_CLOSE,wxNullBitmap,
@@ -682,7 +682,7 @@ void CslFrame::DoLayout()
     sizer_search->AddSpacer(4);
     sizer_search->Add(button_search_clear,0,wxRIGHT|wxTOP|wxALIGN_CENTER_VERTICAL,i);
     sizer_search->Add(label_search_static,0,wxLEFT|wxTOP|wxBOTTOM|wxALIGN_CENTER_VERTICAL,8);
-    sizer_search->Add(text_ctrl_search,0,wxLEFT|wxRIGHT|wxTOP|wxBOTTOM|wxEXPAND|wxALIGN_CENTER_VERTICAL,4);
+    sizer_search->Add(combo_ctrl_search,0,wxLEFT|wxRIGHT|wxTOP|wxBOTTOM|wxEXPAND|wxALIGN_CENTER_VERTICAL,4);
     sizer_search->Add(text_search_result,0,wxLEFT|wxRIGHT|wxTOP|wxBOTTOM|wxALIGN_CENTER_VERTICAL,4);
     sizer_search->Add(button_search,0,wxLEFT|wxRIGHT|wxTOP|wxBOTTOM|wxEXPAND|wxALIGN_CENTER_VERTICAL,4);
     sizer_search->Add(gauge_search,0,wxLEFT|wxRIGHT|wxTOP|wxBOTTOM|wxALIGN_CENTER_VERTICAL,4);
@@ -930,13 +930,13 @@ void CslFrame::ToggleSearchBar()
     {
         sizer_main->Add(pane_search,0,wxEXPAND);
         pane_search->Show();
-        text_ctrl_search->SetFocus();
+        combo_ctrl_search->SetFocus();
     }
     else if (!g_cslSettings->showSearch && pane_search->IsShown())
     {
         pane_search->Hide();
-        text_ctrl_search->Clear();
-        text_ctrl_search->SetBackgroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOW));
+        combo_ctrl_search->Clear();
+        combo_ctrl_search->SetBackgroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOW));
         list_ctrl_master->ListSearch(wxEmptyString);
         sizer_main->Detach(pane_search);
     }
@@ -1042,24 +1042,24 @@ void CslFrame::SetSearchbarColour(bool value)
     {
 #ifdef __WXMAC__
         // very ugly - setting back to black doesnt work, so add 1
-        text_ctrl_search->SetForegroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOWTEXT).Red()+1);
+        combo_ctrl_search->SetForegroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOWTEXT).Red()+1);
 #else
-        text_ctrl_search->SetBackgroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOW));
-        text_ctrl_search->SetForegroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOWTEXT));
+        combo_ctrl_search->SetBackgroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOW));
+        combo_ctrl_search->SetForegroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOWTEXT));
 #endif
     }
     else
     {
 #ifdef __WXMAC__
-        text_ctrl_search->SetForegroundColour(*wxRED);
+        combo_ctrl_search->SetForegroundColour(*wxRED);
 #else
-        text_ctrl_search->SetBackgroundColour(wxColour(255,100,100));
-        text_ctrl_search->SetForegroundColour(*wxWHITE);
+        combo_ctrl_search->SetBackgroundColour(wxColour(255,100,100));
+        combo_ctrl_search->SetForegroundColour(*wxWHITE);
 #endif
     }
 
 #ifdef __WXMSW__
-    text_ctrl_search->Refresh();
+    combo_ctrl_search->Refresh();
 #endif
 }
 
@@ -2214,7 +2214,7 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
 
         case CSL_TEXT_SEARCH:
         {
-            wxString s=text_ctrl_search->GetValue();
+            wxString s=combo_ctrl_search->GetValue();
 
             if (s.IsEmpty())
             {
@@ -2258,7 +2258,7 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             loopv(m_searchedServers) m_searchedServers[i]->PingExt(false);
             m_searchedServers.setsize(0);
 
-            m_searchString=text_ctrl_search->GetValue().Lower();
+            m_searchString=combo_ctrl_search->GetValue().Lower();
             m_searchResultPlayer=m_searchResultServer=0;
 
             gauge_search->SetValue(0);
@@ -2267,7 +2267,7 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             list_ctrl_master->Highlight(CSL_HIGHLIGHT_FOUND_PLAYER,false);
             list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_FOUND_PLAYER,false);
 
-            text_ctrl_search->SetFocus();
+            combo_ctrl_search->SetFocus();
 
             if (m_searchString.IsEmpty())
                 break;
@@ -2319,7 +2319,7 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             button_search->Hide();
             gauge_search->Hide();
             sizer_search->Layout();
-            text_ctrl_search->SetFocus();
+            combo_ctrl_search->SetFocus();
             list_ctrl_master->Highlight(-1,false);
             list_ctrl_favourites->Highlight(-1,false);
 
@@ -2332,7 +2332,7 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
         {
             button_search->Show();
             gauge_search->Show();
-            text_ctrl_search->SetFocus();
+            combo_ctrl_search->SetFocus();
             text_search_result->SetLabel(wxString::Format(_("Search result: %d players on %d servers"),0,0));
             sizer_search->Layout();
             list_ctrl_master->ListSearch(wxEmptyString);
@@ -2448,10 +2448,10 @@ void CslFrame::OnKeypress(wxKeyEvent& event)
     {
         if (CslConnectionState::IsWaiting())
             CslConnectionState::Reset();
-        else// if (FindFocus()==text_ctrl_search)
+        else// if (FindFocus()==combo_ctrl_search)
         {
-            text_ctrl_search->Clear();
-            text_ctrl_search->SetFocus();
+            combo_ctrl_search->Clear();
+            combo_ctrl_search->SetFocus();
             wxCommandEvent evt(wxEVT_COMMAND_TEXT_UPDATED,CSL_TEXT_SEARCH);
             wxPostEvent(this,evt);
             return;
