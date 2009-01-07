@@ -79,17 +79,17 @@ AM_CONDITIONAL(with_internal_geoip,test "x$internal_geoip" = "xyes")
 
 
 GEOIPDATADIR=""
-internal_geoip_database="yes"
+internal_geoip_db="yes"
 AC_ARG_WITH(geoip-datadir,
 [[  --with-geoip-datadir=DIR   Use the given path for GeoIP database lookup]],
 [
     if test "$withval" != "yes" -a "$withval" != ""; then
-        internal_geoip_database="no"
+        internal_geoip_db="no"
         GEOIPDATADIR=$withval
     AC_DEFINE(CSL_EXTERNAL_GEOIP_DATABASE)
     fi
 ])
-AM_CONDITIONAL(with_internal_geoipdatabase,test "x$internal_geoip_database" = "xyes")
+AM_CONDITIONAL(with_internal_geoipdatabase,test "x$internal_geoip_db" = "xyes")
 AC_SUBST(GEOIPDATADIR)
 
 
@@ -114,7 +114,9 @@ AC_SUBST(GEOIP_LIBS)
 
 AC_OUTPUT(Makefile data/Makefile data/maps/Makefile \
 	data/maps/Sauerbraten/254/Makefile data/maps/Sauerbraten/256/Makefile data/maps/Sauerbraten/Makefile \
-	po/Makefile.in src/Makefile src/engine/Makefile src/libGeoIP/Makefile)
+	po/Makefile.in src/Makefile src/engine/Makefile src/irc/Makefile \
+	src/irc/libircclient/Makefile src/irc/libircclient/include/Makefile src/irc/libircclient/src/Makefile \
+	src/libGeoIP/Makefile)
 
 echo
 echo --------------------------------------
@@ -124,7 +126,7 @@ echo
 echo wxWidgets version............. : $wxversion
 echo
 echo Need internal libGeoIP........ : $internal_geoip
-echo Need internal GeoIP database.. : $internal_geoip_database
+echo Need internal GeoIP database.. : $internal_geoip_db
 echo
 echo Build map config tool......... : $cslmapcfgtool
 echo --------------------------------------

@@ -43,21 +43,22 @@ CslPlayerStatsData* CslPlayerStats::GetNewStats()
 
 bool CslPlayerStats::AddStats(CslPlayerStatsData *data)
 {
-    if (m_status!=CSL_STATS_NEED_STATS)
-        return false;
-
-    loopv(m_ids)
+    if (m_status==CSL_STATS_NEED_STATS)
     {
-        if (m_ids[i]!=data->ID)
-            continue;
-        m_ids.remove(i);
-        data->Ok=true;
-        if (m_ids.length()==0)
-            m_status=CSL_STATS_NEED_IDS;
-        loopvj(m_stats) if (m_stats[j]==data) return true;
-        m_stats.add(data);
-        return true;
+        loopv(m_ids)
+        {
+            if (m_ids[i]!=data->ID)
+                continue;
+            m_ids.remove(i);
+            data->Ok=true;
+            if (m_ids.length()==0)
+                m_status=CSL_STATS_NEED_IDS;
+            loopvj(m_stats) if (m_stats[j]==data) return true;
+            m_stats.add(data);
+            return true;
+        }
     }
+
     return false;
 }
 
@@ -133,11 +134,11 @@ CslTeamStats::~CslTeamStats()
 
 CslTeamStatsData* CslTeamStats::GetNewStats()
 {
-    loopv(Stats)
+    loopv(m_stats)
     {
-        if (Stats[i]->Ok)
+        if (m_stats[i]->Ok)
             continue;
-        return Stats[i];
+        return m_stats[i];
     }
     return new CslTeamStatsData;
 }
@@ -145,17 +146,30 @@ CslTeamStatsData* CslTeamStats::GetNewStats()
 void CslTeamStats::AddStats(CslTeamStatsData *data)
 {
     data->Ok=true;
-    loopv(Stats) if (Stats[i]==data) return;
-    Stats.add(data);
+    loopv(m_stats) if (m_stats[i]==data) return;
+    m_stats.add(data);
+}
+
+void CslTeamStats::RemoveStats(CslTeamStatsData *data)
+{
+    loopv(m_stats)
+    {
+        if (m_stats[i]==data)
+        {
+            m_stats[i]->Ok=false;
+            return;
+        }
+    }
+    delete data;
 }
 
 void CslTeamStats::DeleteStats()
 {
-    loopvrev(Stats) delete Stats[i];
-    Stats.setsize(0);
+    loopvrev(m_stats) delete m_stats[i];
+    m_stats.setsize(0);
 }
 
 void CslTeamStats::Reset()
 {
-    loopv(Stats) Stats[i]->Reset();
+    loopv(m_stats) m_stats[i]->Reset();
 }

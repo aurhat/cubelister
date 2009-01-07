@@ -41,8 +41,7 @@ CslDlgAddServer::CslDlgAddServer(wxWindow* parent,int id,const wxString& title,
 {
     // begin wxGlade: CslDlgAddServer::CslDlgAddServer
     sizer_address_staticbox = new wxStaticBox(this, -1, wxEmptyString);
-    const wxString choice_gametype_choices[] =
-    {
+    const wxString choice_gametype_choices[] = {
         _("default")
     };
     choice_gametype = new wxChoice(this, CHOICE_CTRL_GAMETYPE, wxDefaultPosition, wxDefaultSize, 1, choice_gametype_choices, 0);

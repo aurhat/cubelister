@@ -25,19 +25,12 @@
  @author Glen Masgai <mimosius@gmx.de>
 */
 
-#include <wx/wxprec.h>
-#ifdef __BORLANDC__
-#pragma hdrstop
-#endif
-#ifndef WX_PRECOMP
-#include <wx/wx.h>
-#endif
-#include <wx/listctrl.h>
-#include <wx/imaglist.h>
+
+#include "CslListCtrl.h"
 #include "engine/CslGame.h"
 
 
-class CslListCtrlInfo : public wxListCtrl
+class CslListCtrlInfo : public CslListCtrl
 {
     public:
         CslListCtrlInfo(wxWindow* parent,wxWindowID id,const wxPoint& pos=wxDefaultPosition,
@@ -56,7 +49,7 @@ class CslListCtrlInfo : public wxListCtrl
 
     protected:
         void AdjustSize(wxSize size);
-
+        void GetToolTipText(wxInt32 row,wxString& title,wxArrayString& text);
 };
 
 #endif // CSLLISTCTRLINFO_H

@@ -26,6 +26,10 @@
 #include "../img/sb_24.xpm"
 #include "../img/sb_16.xpm"
 
+
+enum { MM_OPEN, MM_VETO, MM_LOCKED, MM_PRIVATE };
+
+
 CslGameSauerbraten::CslGameSauerbraten()
 {
     m_name=CSL_DEFAULT_NAME_SB;
@@ -46,7 +50,7 @@ CslGameSauerbraten::~CslGameSauerbraten()
 {
 }
 
-wxString CslGameSauerbraten::GetVersionName(wxInt32 n) const
+const wxChar* CslGameSauerbraten::GetVersionName(wxInt32 prot) const
 {
     static const wxChar* versions[] =
     {
@@ -55,26 +59,44 @@ wxString CslGameSauerbraten::GetVersionName(wxInt32 n) const
         wxT("Occlusion"),wxT("Shader"),wxT("Physics"),wxT("Mp"),
         wxT(""),wxT("Agc"),wxT("Quakecon"),wxT("Independence")
     };
-    wxUint32 v=CSL_LAST_PROTOCOL_SB-n;
-    return (v>=0 && v<sizeof(versions)/sizeof(versions[0])) ?
-           wxString(versions[v]) : wxString::Format(wxT("%d"),n);
+
+    wxInt32 v=CSL_LAST_PROTOCOL_SB-prot;
+
+    return (v>=0 && (size_t)v<sizeof(versions)/sizeof(versions[0])) ?
+           versions[v] : wxString::Format(wxT("%d"),prot).c_str();
 }
 
-wxString CslGameSauerbraten::GetModeName(wxInt32 n) const
+const wxChar* CslGameSauerbraten::GetModeName(wxInt32 mode,wxInt32 prot) const
 {
-    static const wxChar* modes[] =
+    if (prot<257)
     {
-        wxT("ffa/default"),wxT("coopedit"),wxT("ffa/duel"),wxT("teamplay"),
-        wxT("instagib"),wxT("instagib team"),wxT("efficiency"),wxT("efficiency team"),
-        wxT("insta arena"),wxT("insta clan arena"),wxT("tactics arena"),wxT("tactics clan arena"),
-        wxT("capture"),wxT("insta capture"),wxT("regen capture"),wxT("assassin"),
-        wxT("insta assassin"),wxT("ctf"),wxT("insta ctf")
-    };
-    return (n>=0 && (size_t)n<sizeof(modes)/sizeof(modes[0])) ?
-           wxString(modes[n]) : wxString(_("unknown"));
+        static const wxChar* modes[] =
+        {
+            wxT("ffa/default"),wxT("coopedit"),wxT("ffa/duel"),wxT("teamplay"),
+            wxT("instagib"),wxT("instagib team"),wxT("efficiency"),wxT("efficiency team"),
+            wxT("insta arena"),wxT("insta clan arena"),wxT("tactics arena"),wxT("tactics clan arena"),
+            wxT("capture"),wxT("insta capture"),wxT("regen capture"),wxT("assassin"),
+            wxT("insta assassin"),wxT("ctf"),wxT("insta ctf")
+        };
+        return (mode>=0 && (size_t)mode<sizeof(modes)/sizeof(modes[0])) ?
+               modes[mode] : _("unknown");
+    }
+    else
+    {
+        static const wxChar* modes[] =
+        {
+            wxT("ffa"),wxT("coop edit"),wxT("teamplay"),wxT("instagib"),wxT("instagib team"),
+            wxT("efficiency"),wxT("efficiency team"),wxT("tactics"),wxT("tactics team"),
+            wxT("capture"),wxT("regen capture"),wxT("ctf"),wxT("insta ctf")
+        };
+        return (mode>=0 && (size_t)mode<sizeof(modes)/sizeof(modes[0])) ?
+               modes[mode] : _("unknown");
+    }
+
+    return _("unknown");
 }
 
-wxString CslGameSauerbraten::GetWeaponName(wxInt32 n) const
+const wxChar* CslGameSauerbraten::GetWeaponName(wxInt32 n) const
 {
     static const wxChar* weapons[] =
     {
@@ -86,24 +108,63 @@ wxString CslGameSauerbraten::GetWeaponName(wxInt32 n) const
            wxString(weapons[n]) : wxString(_("unknown"));
 }
 
-wxInt32 CslGameSauerbraten::ModeScoreLimit(wxInt32 mode) const
+bool CslGameSauerbraten::ModeHasFlags(wxInt32 mode,wxInt32 prot) const
 {
-    if (ModeHasBases(mode))
+    if (prot<257)
+        return mode>16 && mode<19;
+    else
+        return mode>10 && mode<13;
+
+    return false;
+}
+
+bool CslGameSauerbraten::ModeHasBases(wxInt32 mode,wxInt32 prot) const
+{
+    if (prot<257)
+        return mode>11 && mode<15;
+    else
+        return mode>8 && mode<11;
+
+    return false;
+}
+
+wxInt32 CslGameSauerbraten::ModeScoreLimit(wxInt32 mode,wxInt32 prot) const
+{
+    if (ModeHasBases(mode,prot))
         return 10000;
-    if (ModeIsCapture(mode))
+    if (ModeHasFlags(mode,prot))
         return 10;
+
     return -1;
+}
+
+wxInt32 CslGameSauerbraten::GetBestTeam(CslTeamStats& stats,wxInt32 prot) const
+{
+    wxInt32 i,best=-1;
+
+    if (stats.TeamMode && stats.m_stats.length()>0 && stats.m_stats[0]->Ok)
+    {
+        best=0;
+
+        for (i=1;i<stats.m_stats.length() && stats.m_stats[i]->Ok;i++)
+        {
+            if (stats.m_stats[i]->Score>=stats.m_stats[best]->Score)
+                best=i;
+        }
+    }
+
+    return best;
 }
 
 bool CslGameSauerbraten::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
 {
     char text[_MAXDEFSTR];
-    wxInt32 l;
+    wxInt32 l,numattr;
     vector<int>attr;
     attr.setsize(0);
 
     info.Players=getint(buf);
-    int numattr=getint(buf);
+    numattr=getint(buf);
     loopj(numattr) attr.add(getint(buf));
     if (numattr>=1)
     {
@@ -111,7 +172,7 @@ bool CslGameSauerbraten::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) con
         info.Version=GetVersionName(info.Protocol);
     }
     if (numattr>=2)
-        info.GameMode=GetModeName(attr[1]);
+        info.GameMode=GetModeName(attr[1],info.Protocol);
     if (numattr>=3)
     {
         info.TimeRemain=attr[2];
@@ -120,8 +181,31 @@ bool CslGameSauerbraten::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) con
     }
     if (numattr>=4)
         info.PlayersMax=attr[3];
+
+    info.MM=CSL_SERVER_OPEN;
     if (numattr>=5)
-        info.MM=attr[4];
+    {
+        info.MMDescription=wxString::Format(wxT("%d"),attr[4]);
+        if (attr[4]==MM_OPEN)
+            info.MMDescription+=wxT(" (O)");
+        else if (attr[4]==MM_VETO)
+        {
+            info.MMDescription+=wxT(" (V)");
+            info.MM=CSL_SERVER_VETO;
+        }
+        else if (attr[4]==MM_LOCKED)
+        {
+            info.MMDescription+=wxT(" (L)");
+            info.MM=CSL_SERVER_LOCKED;
+        }
+        else if (attr[4]==MM_PRIVATE)
+        {
+            info.MMDescription+=wxT(" (P)");
+            info.MM=CSL_SERVER_PRIVATE;
+        }
+    }
+    else
+        info.MMDescription=wxEmptyString;
 
     getstring(text,buf);
     info.Map=A2U(text);
@@ -130,7 +214,7 @@ bool CslGameSauerbraten::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) con
     StripColours(text,&l,1);
     info.SetDescription(A2U(text));
 
-    return true;
+    return !buf.overread();
 }
 
 bool CslGameSauerbraten::ParsePlayerPong(wxUint32 protocol,ucharbuf& buf,CslPlayerStatsData& info) const
@@ -153,7 +237,7 @@ bool CslGameSauerbraten::ParsePlayerPong(wxUint32 protocol,ucharbuf& buf,CslPlay
     info.Privileges=getint(buf);
     info.State=getint(buf);
 
-    return true;
+    return !buf.overread();
 }
 
 bool CslGameSauerbraten::ParseTeamPong(wxUint32 protocol,ucharbuf& buf,CslTeamStatsData& info) const
@@ -169,7 +253,7 @@ bool CslGameSauerbraten::ParseTeamPong(wxUint32 protocol,ucharbuf& buf,CslTeamSt
         while (i--)
             info.Bases.add(getint(buf));
 
-    return true;
+    return !buf.overread();
 }
 
 void CslGameSauerbraten::SetClientSettings(const CslGameClientSettings& settings)

@@ -85,7 +85,9 @@ enum
     MENU_VIEW_GAMES,
     MENU_VIEW_SERVER_INFO,
     MENU_VIEW_PLAYER_LIST,
+    MENU_VIEW_PLAYER_SEARCH,
     MENU_VIEW_FAVOURITES,
+    MENU_VIEW_USER_CHAT,
     MENU_VIEW_SEARCH,
     MENU_VIEW_OUTPUT,
     MENU_VIEW_TRAFFIC,
@@ -103,7 +105,8 @@ class CslMenu
         static void EnableMenuItem(const wxInt32 id,const bool enable=true);
         static void CheckMenuItem(const wxInt32 id,const bool check=true);
         static wxMenuItem& AddItem(wxMenu *menu,const wxInt32 id,
-                                   const wxString& text,const wxArtID& art,
+                                   const wxString& text,
+                                   const wxArtID& art=wxART_NONE,
                                    const wxItemKind kind=wxITEM_NORMAL,
                                    const wxString& help=wxEmptyString);
     protected:

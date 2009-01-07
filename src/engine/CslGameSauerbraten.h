@@ -46,17 +46,18 @@ class CslGameSauerbraten : public CslGame
     private:
         bool m_injected;
 
-        wxString GetVersionName(wxInt32 n) const;
-        wxString GetModeName(wxInt32 n) const;
+        const wxChar* GetVersionName(wxInt32 prot) const;
+        const wxChar* GetModeName(wxInt32 mode,wxInt32 prot) const;
 
         wxInt32 InjectConfig(const wxString& address,wxString *error);
 
         //implementations for base class
-        wxString GetWeaponName(wxInt32 n) const;
+        const wxChar* GetWeaponName(wxInt32 n) const;
+        bool ModeHasFlags(wxInt32 mode,wxInt32 prot) const;
+        bool ModeHasBases(wxInt32 mode,wxInt32 prot) const;
+        wxInt32 ModeScoreLimit(wxInt32 mode,wxInt32 prot) const;
+        wxInt32 GetBestTeam(CslTeamStats& stats,wxInt32 prot) const;
         wxUint16 GetDefaultPort() const { return CSL_DEFAULT_PORT_SB; }
-        bool ModeIsCapture(wxInt32 mode) const { return mode>16 && mode<19; }
-        bool ModeHasBases(wxInt32 mode) const { return mode>11 && mode<15; }
-        wxInt32 ModeScoreLimit(wxInt32 mode) const;
         bool ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const;
         bool ParsePlayerPong(wxUint32 protocol,ucharbuf& buf,CslPlayerStatsData& info) const;
         bool ParseTeamPong(wxUint32 protocol,ucharbuf& buf,CslTeamStatsData& info) const;

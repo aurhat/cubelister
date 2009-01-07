@@ -49,6 +49,8 @@
 
 #define CSL_TIMER_SHOT 250
 
+IMPLEMENT_APP(CslApp)
+
 BEGIN_DECLARE_EVENT_TYPES()
 DECLARE_EVENT_TYPE(wxCSL_EVT_VERSIONCHECK,wxID_ANY)
 DECLARE_EVENT_TYPE(wxCSL_EVT_PROCESS,wxID_ANY)
@@ -85,7 +87,7 @@ enum
 };
 
 
-BEGIN_EVENT_TABLE(CslFrame, wxFrame)
+BEGIN_EVENT_TABLE(CslFrame,wxFrame)
     CSL_EVT_PONG(wxID_ANY,CslFrame::OnPong)
     EVT_TIMER(wxID_ANY,CslFrame::OnTimer)
     EVT_LIST_ITEM_SELECTED(wxID_ANY,CslFrame::OnListItemSelected)
@@ -208,7 +210,7 @@ class CslProcess : public wxProcess
                 //Cube has color codes in it's output
                 m_self->m_info->GetGame().ProcessOutput(buf,&last);
                 CslDlgOutput::AddOutput(buf,last);
-                //LOG_DEBUG("%s", buf);
+                //LOG_DEBUG("%s",buf);
             }
         }
 
@@ -354,7 +356,8 @@ wxString CslPlayerInfo::GetLabelText()
     if (!info->Map.IsEmpty())
         s+=info->Map+wxT(" ");
     if (info->TimeRemain>0)
-        s+=wxString::Format(wxT("(< %d %s)"),info->TimeRemain,info->TimeRemain==1 ? _("Minute"):_("Minutes"))+wxT(" ");
+        s+=wxString::Format(wxT("(< %d %s)"),info->TimeRemain,info->TimeRemain==1 ?
+                            _("Minute"):_("Minutes"))+wxT(" ");
 
     return s;
 }
@@ -365,7 +368,6 @@ void CslPlayerInfo::UpdateData()
     //fixes flicker of label text
     wxWindowUpdateLocker lock(this);
 #endif
-
     m_label->SetLabel(GetLabelText());
     m_label->Wrap(GetSize().x-4);
 #ifdef __WXMAC__
@@ -385,8 +387,8 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
     m_oldSelectedInfo=NULL;
     m_tbIcon=NULL;
 
-    m_engine=new CslEngine(this);
-    if (m_engine->Init(CSL_UPDATE_INTERVAL_MIN,1000/CSL_TIMER_SHOT))
+    m_engine=::wxGetApp().GetCslEngine();
+    if (m_engine->Init(this,CSL_UPDATE_INTERVAL_MIN,1000/CSL_TIMER_SHOT))
     {
         m_engine->AddGame(new CslGameSauerbraten());
         m_engine->AddGame(new CslGameAssaultCube());
@@ -395,6 +397,34 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
     }
 
     LoadSettings();
+
+    CslIrcNetwork *network;
+    network=new CslIrcNetwork(wxT("GameSurge"),wxT("WahnFred|CSL"),wxT("WahnFred|CSL"));
+    network->AddServer(new CslIrcServer(network,wxT("irc.eu.gamesurge.net"),6667));
+    network->AddAutoChannel(new CslIrcChannel(wxT("#cubelister")));
+    //network->AddAutoChannel(new CslIrcChannel(wxT("#tc-intern"),wxT("gr4ndch4mp$")));
+    /*network->AddAutoChannel(new CslIrcChannel(wxT("#tc-server")));
+    network->AddAutoChannel(new CslIrcChannel(wxT("#psl-server")));
+    network->AddAutoChannel(new CslIrcChannel(wxT("#cubelister2")));
+    network->AddAutoChannel(new CslIrcChannel(wxT("#cubelister3")));
+    network->AddAutoChannel(new CslIrcChannel(wxT("#cubelister4")));
+    network->AddAutoChannel(new CslIrcChannel(wxT("#cubelister5")));
+    network->AddAutoChannel(new CslIrcChannel(wxT("#cubelister6")));
+    network->AddAutoChannel(new CslIrcChannel(wxT("#cubelister7")));
+    network->AddAutoChannel(new CslIrcChannel(wxT("#cubelister8")));
+    network->AddAutoChannel(new CslIrcChannel(wxT("#cubelister9")));
+    network->AddAutoChannel(new CslIrcChannel(wxT("#cubelister10")));
+    network->AddAutoChannel(new CslIrcChannel(wxT("#cubelister11")));
+    network->AddAutoChannel(new CslIrcChannel(wxT("#cubelister12")));*/
+    g_CslIrcNetworks.Add(network);
+    network=new CslIrcNetwork(wxT("Quakenet"),wxT("WahnFred|CSL"),wxT("WahnFred|CSL"));
+    network->AddServer(new CslIrcServer(network,wxT("xs4all.nl.quakenet.org"),6667));
+    network->AddAutoChannel(new CslIrcChannel(wxT("#cubelister")));
+    g_CslIrcNetworks.Add(network);
+    network=new CslIrcNetwork(wxT("Freenode"),wxT("WahnFred|CSL"),wxT("WahnFred|CSL"));
+    network->AddServer(new CslIrcServer(network,wxT("irc.freenode.org"),6667));
+    network->AddAutoChannel(new CslIrcChannel(wxT("#cubelister")));
+    g_CslIrcNetworks.Add(network);
 
     m_engine->SetUpdateInterval(g_cslSettings->updateInterval);
 
@@ -406,7 +436,7 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
     m_imgListButton.Add(wxBitmap(close_high_14_xpm));
     m_imgListButton.Add(wxBitmap(close_press_14_xpm));
 
-    CslListCtrlPlayer::CreateImageList();
+    CslListCtrl::CreateCountryFlagImageList();
 
     m_outputDlg=new CslDlgOutput(this);
     m_extendedDlg=new CslDlgExtended(this);
@@ -424,7 +454,7 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
     list_ctrl_favourites->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeypress),NULL,this);
     list_ctrl_info->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeypress),NULL,this);
     tree_ctrl_games->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeypress),NULL,this);
-    combo_ctrl_search->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeypress),NULL,this);
+    text_ctrl_search->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeypress),NULL,this);
 #endif
 
     tree_ctrl_games->SetImageList(&m_imgListTree);
@@ -471,12 +501,12 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
                        "Please try to restart the application."),
                      _("Fatal error!"),wxICON_ERROR,this);
         m_engine->DeInit();
-        delete m_engine;
-        m_engine=NULL;
     }
 
     m_versionCheckThread=new CslVersionCheckThread(this);
-    m_versionCheckThread->Run();
+
+    if (m_versionCheckThread->IsOk())
+        m_versionCheckThread->Run();
 }
 
 CslFrame::~CslFrame()
@@ -487,20 +517,19 @@ CslFrame::~CslFrame()
     if (CslConnectionState::IsPlaying())
         CslConnectionState::GetInfo()->GetGame().GameEnd();
 
-    delete m_menu;
-
-    if (m_tbIcon)
-        delete m_tbIcon;
-
-    if (m_engine)
+    if (m_engine->IsOk())
     {
         SaveSettings();
         SaveServers();
         m_engine->DeInit();
-        delete m_engine;
     }
 
     delete g_cslSettings;
+
+    delete m_menu;
+
+    if (m_tbIcon)
+        delete m_tbIcon;
 
     if (m_versionCheckThread)
     {
@@ -516,8 +545,8 @@ void CslFrame::CreateMainMenu()
     wxMenu *menu;
 
     menubar=new wxMenuBar();
-    // Do not add the File menu on __wxMAC__, since Preferences and Exit getting moved
-    // to the "Mac menu" so the File menu is empty then.
+    // Do not add the File menu on wxMAC, since Preferences and Exit are
+    // getting moved to the "Mac menu" so the File menu is empty then.
     // Add Prefernces and Exit to any other menu.
 #ifndef __WXMAC__
     menu=new wxMenu();
@@ -545,7 +574,11 @@ void CslFrame::CreateMainMenu()
                      wxART_NONE,wxITEM_CHECK);
     CslMenu::AddItem(menu,MENU_VIEW_PLAYER_LIST,_("Show player list"),
                      wxART_NONE,wxITEM_CHECK);
+    CslMenu::AddItem(menu,MENU_VIEW_PLAYER_SEARCH,_("Show player search result"),
+                     wxART_NONE,wxITEM_CHECK);
     CslMenu::AddItem(menu,MENU_VIEW_FAVOURITES,_("Show favourites"),
+                     wxART_NONE,wxITEM_CHECK);
+    CslMenu::AddItem(menu,MENU_VIEW_USER_CHAT,_("Show user chat\tCTRL+U"),
                      wxART_NONE,wxITEM_CHECK);
     menu->AppendSeparator();
     CslMenu::AddItem(menu,MENU_VIEW_SEARCH,_("Show search bar\tCTRL+F"),
@@ -585,13 +618,15 @@ void CslFrame::CreateControls()
     pane_main=new wxPanel(this,wxID_ANY);
     tree_ctrl_games=new wxTreeCtrl(pane_main,wxID_ANY,wxDefaultPosition,wxDefaultSize,treeStyle);
     list_ctrl_info=new CslListCtrlInfo(pane_main,wxID_ANY,wxDefaultPosition,wxDefaultSize,listStyle|wxLC_NO_HEADER);
+    list_ctrl_player_search=new CslListCtrlPlayerSearch(pane_main,wxID_ANY,wxDefaultPosition,wxDefaultSize,listStyle);
     list_ctrl_master=new CslListCtrlServer(pane_main,CslListCtrlServer::CSL_LIST_MASTER,
                                            wxDefaultPosition,wxDefaultSize,listStyle);
+    notebook_irc=new CslIrcNotebook(this);
     list_ctrl_favourites=new CslListCtrlServer(pane_main,CslListCtrlServer::CSL_LIST_FAVOURITE,
             wxDefaultPosition,wxDefaultSize,listStyle);
     pane_search=new wxPanel(this,wxID_ANY,wxDefaultPosition,wxDefaultSize,wxNO_BORDER|wxTAB_TRAVERSAL);
-    combo_ctrl_search=new wxComboBox(pane_search,CSL_TEXT_SEARCH,wxEmptyString,wxDefaultPosition,
-                                     wxDefaultSize,0,NULL,wxCB_DROPDOWN|wxTE_PROCESS_ENTER);
+    text_ctrl_search=new wxTextCtrl(pane_search,CSL_TEXT_SEARCH,wxEmptyString,wxDefaultPosition,
+                                    wxDefaultSize,wxTE_PROCESS_ENTER|wxTE_RICH|wxTE_RICH2);
     text_search_result=new wxStaticText(pane_search,wxID_ANY,wxEmptyString);
     button_search=new wxButton(pane_search,CSL_BUTTON_SEARCH,_("&Search"));
     button_search_clear=new wxBitmapButton(pane_search,CSL_BUTTON_SEARCH_CLOSE,wxNullBitmap,
@@ -641,6 +676,8 @@ void CslFrame::SetProperties()
     list_ctrl_master->ListInit(m_engine,list_ctrl_favourites);
     list_ctrl_favourites->ListInit(m_engine,list_ctrl_master);
 
+    notebook_irc->AddPage(new CslIrcPanel(notebook_irc),_("Chat"),true);
+
     // see wx_wxbitmap.html
 #ifdef __WXMSW__
     m_appIcon=wxICON(aa_csl_48);
@@ -664,7 +701,7 @@ void CslFrame::DoLayout()
 {
     wxInt32 i=0;
 
-    sizer_main = new wxFlexGridSizer(2,1,0,0);
+    sizer_main=new wxFlexGridSizer(2,1,0,0);
     sizer_main->Add(pane_main,1,wxEXPAND,0);
     if (g_cslSettings->showSearch)
         sizer_main->Add(pane_search,0,wxEXPAND);
@@ -682,7 +719,7 @@ void CslFrame::DoLayout()
     sizer_search->AddSpacer(4);
     sizer_search->Add(button_search_clear,0,wxRIGHT|wxTOP|wxALIGN_CENTER_VERTICAL,i);
     sizer_search->Add(label_search_static,0,wxLEFT|wxTOP|wxBOTTOM|wxALIGN_CENTER_VERTICAL,8);
-    sizer_search->Add(combo_ctrl_search,0,wxLEFT|wxRIGHT|wxTOP|wxBOTTOM|wxEXPAND|wxALIGN_CENTER_VERTICAL,4);
+    sizer_search->Add(text_ctrl_search,0,wxLEFT|wxRIGHT|wxTOP|wxBOTTOM|wxEXPAND|wxALIGN_CENTER_VERTICAL,4);
     sizer_search->Add(text_search_result,0,wxLEFT|wxRIGHT|wxTOP|wxBOTTOM|wxALIGN_CENTER_VERTICAL,4);
     sizer_search->Add(button_search,0,wxLEFT|wxRIGHT|wxTOP|wxBOTTOM|wxEXPAND|wxALIGN_CENTER_VERTICAL,4);
     sizer_search->Add(gauge_search,0,wxLEFT|wxRIGHT|wxTOP|wxBOTTOM|wxALIGN_CENTER_VERTICAL,4);
@@ -692,10 +729,13 @@ void CslFrame::DoLayout()
     sizer_search->AddGrowableCol(3);
     //sizer_search->AddGrowableCol(3);
 
+#define CSL_CAPTION_GAMES _("Games")
 #define CSL_CAPTION_MASTER_LIST_SERVERS _("Master list servers")
 #define CSL_CAPTION_FAVOURITE_LIST_SERVERS _("Favourite servers")
 #define CSL_CAPTION_PLAYERS_SELECTED _("Selected server")
+#define CSL_CAPTION_PLAYER_SEARCH _("Player search result")
 #define CSL_CAPTION_SERVER_INFO _("Server info")
+#define CSL_CAPTION_IRC _("IRC chat")
 
     wxSize size=list_ctrl_master->GetBestSize();
 
@@ -712,6 +752,12 @@ void CslFrame::DoLayout()
     m_AuiMgr.AddPane(player_info,wxAuiPaneInfo().Name(wxT("players0")).
                      Left().Layer(1).Position(2).
                      MinSize(240,20).BestSize(CslListCtrlPlayer::BestSizeMini).FloatingSize(280,200));
+    m_AuiMgr.AddPane(list_ctrl_player_search,wxAuiPaneInfo().Name(wxT("search")).
+                     Left().Layer(1).Position(3).
+                     MinSize(240,20).BestSize(CslListCtrlPlayer::BestSizeMini).FloatingSize(280,200));
+    m_AuiMgr.AddPane(notebook_irc,wxAuiPaneInfo().Name(wxT("irc")).
+                     Left().Layer(1).Position(3).
+                     MinSize(240,20).BestSize(360,200).FloatingSize(360,200));
 
     m_defaultLayout=m_AuiMgr.SavePerspective();
 
@@ -722,7 +768,10 @@ void CslFrame::DoLayout()
 
     pane=&m_AuiMgr.GetPane(tree_ctrl_games);
     if (pane->IsOk())
+    {
+        pane->Caption(CSL_CAPTION_GAMES);
         CslMenu::CheckMenuItem(MENU_VIEW_GAMES,pane->IsShown());
+    }
     pane=&m_AuiMgr.GetPane(list_ctrl_info);
     if (pane->IsOk())
     {
@@ -743,6 +792,18 @@ void CslFrame::DoLayout()
     {
         pane->Caption(CSL_CAPTION_PLAYERS_SELECTED);
         CslMenu::CheckMenuItem(MENU_VIEW_PLAYER_LIST,pane->IsShown());
+    }
+    pane=&m_AuiMgr.GetPane(list_ctrl_player_search);
+    if (pane->IsOk())
+    {
+        pane->Caption(CSL_CAPTION_PLAYER_SEARCH);
+        CslMenu::CheckMenuItem(MENU_VIEW_PLAYER_SEARCH,pane->IsShown());
+    }
+    pane=&m_AuiMgr.GetPane(notebook_irc);
+    if (pane->IsOk())
+    {
+        pane->Caption(CSL_CAPTION_IRC);
+        CslMenu::CheckMenuItem(MENU_VIEW_USER_CHAT,pane->IsShown());
     }
 
     SetListCaption(CslListCtrlServer::CSL_LIST_MASTER);
@@ -873,8 +934,14 @@ void CslFrame::TogglePane(wxInt32 id)
         case MENU_VIEW_SERVER_INFO:
             pane=&m_AuiMgr.GetPane(list_ctrl_info);
             break;
+        case MENU_VIEW_USER_CHAT:
+            pane=&m_AuiMgr.GetPane(notebook_irc);
+            break;
         case MENU_VIEW_PLAYER_LIST:
             pane=&m_AuiMgr.GetPane(player_info);
+            break;
+        case MENU_VIEW_PLAYER_SEARCH:
+            pane=&m_AuiMgr.GetPane(list_ctrl_player_search);
             break;
         case MENU_VIEW_FAVOURITES:
             pane=&m_AuiMgr.GetPane(list_ctrl_favourites);
@@ -930,13 +997,13 @@ void CslFrame::ToggleSearchBar()
     {
         sizer_main->Add(pane_search,0,wxEXPAND);
         pane_search->Show();
-        combo_ctrl_search->SetFocus();
+        text_ctrl_search->SetFocus();
     }
     else if (!g_cslSettings->showSearch && pane_search->IsShown())
     {
         pane_search->Hide();
-        combo_ctrl_search->Clear();
-        combo_ctrl_search->SetBackgroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOW));
+        text_ctrl_search->Clear();
+        text_ctrl_search->SetBackgroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOW));
         list_ctrl_master->ListSearch(wxEmptyString);
         sizer_main->Detach(pane_search);
     }
@@ -1013,24 +1080,24 @@ void CslFrame::SetListCaption(wxInt32 id,const wxString& addon)
 
     if (filter)
     {
-        caption+=_("  (Filters: ");
+        caption << wxT("  (") << _("Filters:") << wxT(" ");
         if (filter&CSL_FILTER_OFFLINE)
-            caption+=MENU_SERVER_FILTER_OFF_STR+wxString(wxT(", "));
+            caption << MENU_SERVER_FILTER_OFF_STR << (wxT(", "));
         if (filter&CSL_FILTER_FULL)
-            caption+=MENU_SERVER_FILTER_FULL_STR+wxString(wxT(", "));
+            caption << MENU_SERVER_FILTER_FULL_STR << (wxT(", "));
         if (filter&CSL_FILTER_EMPTY)
-            caption+=MENU_SERVER_FILTER_EMPTY_STR+wxString(wxT(", "));
+            caption << MENU_SERVER_FILTER_EMPTY_STR << (wxT(", "));
         if (filter&CSL_FILTER_NONEMPTY)
-            caption+=MENU_SERVER_FILTER_NONEMPTY_STR+wxString(wxT(", "));
+            caption << MENU_SERVER_FILTER_NONEMPTY_STR << (wxT(", "));
         if (filter&CSL_FILTER_MM2)
-            caption+=MENU_SERVER_FILTER_MM2_STR+wxString(wxT(", "));
+            caption << MENU_SERVER_FILTER_MM2_STR << (wxT(", "));
         if (filter&CSL_FILTER_MM3)
-            caption+=MENU_SERVER_FILTER_MM3_STR+wxString(wxT(", "));
+            caption << MENU_SERVER_FILTER_MM3_STR << (wxT(", "));
         caption.Remove(caption.Length()-2);
-        caption+=wxT(")");
+        caption << wxT(")");
     }
 
-    caption+=wxT(" ")+addon;
+    caption << wxT(" ") << addon;
 
     pane.Caption(caption);
     m_AuiMgr.Update();
@@ -1042,24 +1109,24 @@ void CslFrame::SetSearchbarColour(bool value)
     {
 #ifdef __WXMAC__
         // very ugly - setting back to black doesnt work, so add 1
-        combo_ctrl_search->SetForegroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOWTEXT).Red()+1);
+        text_ctrl_search->SetForegroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOWTEXT).Red()+1);
 #else
-        combo_ctrl_search->SetBackgroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOW));
-        combo_ctrl_search->SetForegroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOWTEXT));
+        text_ctrl_search->SetBackgroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOW));
+        text_ctrl_search->SetForegroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOWTEXT));
 #endif
     }
     else
     {
 #ifdef __WXMAC__
-        combo_ctrl_search->SetForegroundColour(*wxRED);
+        text_ctrl_search->SetForegroundColour(*wxRED);
 #else
-        combo_ctrl_search->SetBackgroundColour(wxColour(255,100,100));
-        combo_ctrl_search->SetForegroundColour(*wxWHITE);
+        text_ctrl_search->SetBackgroundColour(wxColour(255,100,100));
+        text_ctrl_search->SetForegroundColour(*wxWHITE);
 #endif
     }
 
 #ifdef __WXMSW__
-    combo_ctrl_search->Refresh();
+    text_ctrl_search->Refresh();
 #endif
 }
 
@@ -1335,8 +1402,12 @@ void CslFrame::ConnectToServer()
     info->PlayLast=wxDateTime::Now().GetTicks();
     list_ctrl_info->UpdateInfo(info);
 
-    list_ctrl_master->Highlight(CSL_HIGHLIGHT_LOCKED,true,info);
-    list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_LOCKED,true,info);
+    list_ctrl_master->Highlight(CSL_HIGHLIGHT_LOCKED,true,false,info);
+    list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_LOCKED,true,false,info);
+
+    wxString s=wxT("csl://")+info->GetGame().GetName()+wxT("/")+info->Host+
+               wxT(" (")+info->GetBestDescription()+wxT(")");
+    //notebook_irc->SendChatMessage(s);
 }
 
 void CslFrame::LoadSettings()
@@ -1349,7 +1420,9 @@ void CslFrame::LoadSettings()
         return;
 
     long int val;
+#if 0 // enable later if there is any custom column size support
     double dval;
+#endif
     wxUint32 version;
     wxString s;
 
@@ -1388,6 +1461,11 @@ void CslFrame::LoadSettings()
         g_cslSettings->cleanupServersKeepFav=val!=0;
     if (config.Read(wxT("CleanupServersKeepStats"),&val))
         g_cslSettings->cleanupServersKeepStats=val!=0;
+    if (config.Read(wxT("TooltipDelay"),&val))
+    {
+        if (val>=CSL_TOOLTIP_DELAY_MIN && val<=CSL_TOOLTIP_DELAY_MAX)
+            g_cslSettings->tooltipDelay=val/CSL_TOOLTIP_DELAY_STEP*CSL_TOOLTIP_DELAY_STEP;
+    }
     if (config.Read(wxT("PingGood"),&val))
     {
         if (val<=9999)
@@ -1414,6 +1492,7 @@ void CslFrame::LoadSettings()
     /* ListCtrl */
     config.SetPath(wxT("/List"));
     if (config.Read(wxT("AutoSort"),&val)) g_cslSettings->autoSortColumns=val!=0;
+#if 0 // enable later if there is any custom column size support
     if (version)
     {
         if (config.Read(wxT("ColMult1"),&dval)) g_cslSettings->colServerS1=(float)dval;
@@ -1426,6 +1505,7 @@ void CslFrame::LoadSettings()
         if (config.Read(wxT("ColMult8"),&dval)) g_cslSettings->colServerS8=(float)dval;
         if (config.Read(wxT("ColMult9"),&dval)) g_cslSettings->colServerS9=(float)dval;
     }
+#endif
     if (config.Read(wxT("ColourEmpty"),&val)) g_cslSettings->colServerEmpty=INT2COLOUR(val);
     if (config.Read(wxT("ColourOffline"),&val)) g_cslSettings->colServerOff=INT2COLOUR(val);
     if (config.Read(wxT("ColourFull"),&val)) g_cslSettings->colServerFull=INT2COLOUR(val);
@@ -1501,6 +1581,7 @@ void CslFrame::SaveSettings()
     config.Write(wxT("CleanupServers"),(long int)g_cslSettings->cleanupServers);
     config.Write(wxT("CleanupServersKeepFavourites"),(long int)g_cslSettings->cleanupServersKeepFav);
     config.Write(wxT("CleanupServersKeepStats"),(long int)g_cslSettings->cleanupServersKeepStats);
+    config.Write(wxT("TooltipDelay"),(long int)g_cslSettings->tooltipDelay);
     config.Write(wxT("PingGood"),(long int)g_cslSettings->pinggood);
     config.Write(wxT("PingBad"),(long int)g_cslSettings->pingbad);
     config.Write(wxT("GameOutputPath"),g_cslSettings->gameOutputPath);
@@ -1510,6 +1591,7 @@ void CslFrame::SaveSettings()
 
     /* ListCtrl */
     config.SetPath(wxT("/List"));
+#if 0 // enable later if there is any custom column size support
     config.Write(wxT("AutoSort"),g_cslSettings->autoSortColumns);
     config.Write(wxT("ColMult1"),g_cslSettings->colServerS1);
     config.Write(wxT("ColMult2"),g_cslSettings->colServerS2);
@@ -1520,6 +1602,7 @@ void CslFrame::SaveSettings()
     config.Write(wxT("ColMult7"),g_cslSettings->colServerS7);
     config.Write(wxT("ColMult8"),g_cslSettings->colServerS8);
     config.Write(wxT("ColMult9"),g_cslSettings->colServerS9);
+#endif
     config.Write(wxT("ColourEmpty"),COLOUR2INT(g_cslSettings->colServerEmpty));
     config.Write(wxT("ColourOffline"),COLOUR2INT(g_cslSettings->colServerOff));
     config.Write(wxT("ColourFull"),COLOUR2INT(g_cslSettings->colServerFull));
@@ -1852,17 +1935,14 @@ void CslFrame::OnPong(wxCommandEvent& event)
         if (m_searchedServers.length() && radio_search_player->GetValue())
         {
             wxInt32 progress;
-            bool found;
+            bool found=false;
 
             loopv(m_searchedServers)
             {
-                found=false;
-
-                if (m_searchedServers[i]==packet->Info)
+                if (m_searchedServers[i]!=packet->Info)
+                    continue;
+                if (packet->Info->Search)
                 {
-                    if (!packet->Info->Search)
-                        continue;
-
                     packet->Info->Search=false;
 
                     progress=gauge_search->GetValue()+1;
@@ -1874,9 +1954,16 @@ void CslFrame::OnPong(wxCommandEvent& event)
                         CslPlayerStatsData *data=stats.m_stats[j];
                         if (data->Ok && data->Name.Lower().Contains(m_searchString))
                         {
-                            list_ctrl_master->Highlight(CSL_HIGHLIGHT_FOUND_PLAYER,true,packet->Info);
-                            list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_FOUND_PLAYER,true,packet->Info);
-                            m_searchResultPlayer++;
+                            list_ctrl_player_search->AddResult(packet->Info,data);
+                            if (++m_searchResultPlayer==1)
+                            {
+                                wxAuiPaneInfo& pane=m_AuiMgr.GetPane(list_ctrl_player_search);
+                                if (pane.IsOk() && !pane.IsShown())
+                                {
+                                    pane.Show();
+                                    m_AuiMgr.Update();
+                                }
+                            }
                             found=true;
                         }
                     }
@@ -1887,14 +1974,20 @@ void CslFrame::OnPong(wxCommandEvent& event)
                         m_searchedServers.setsize(0);
                     }
 
-                    if (!found)
+                    if (found)
                     {
-                        list_ctrl_master->Highlight(CSL_HIGHLIGHT_SEARCH_PLAYER,false,packet->Info);
-                        list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_SEARCH_PLAYER,false,packet->Info);
+                        list_ctrl_master->Highlight(CSL_HIGHLIGHT_FOUND_PLAYER,true,true,packet->Info);
+                        list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_FOUND_PLAYER,true,true,packet->Info);
+                        m_searchResultServer++;
                     }
                     else
-                        m_searchResultServer++;
+                    {
+                        list_ctrl_master->Highlight(CSL_HIGHLIGHT_SEARCH_PLAYER,false,false,packet->Info);
+                        list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_SEARCH_PLAYER,false,false,packet->Info);
+                    }
                 }
+
+                break;
             }
 
             text_search_result->SetLabel(wxString::Format(_("Search result: %d players on %d servers"),
@@ -2165,7 +2258,9 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
 
         case MENU_VIEW_GAMES:
         case MENU_VIEW_SERVER_INFO:
+        case MENU_VIEW_USER_CHAT:
         case MENU_VIEW_PLAYER_LIST:
+        case MENU_VIEW_PLAYER_SEARCH:
         case MENU_VIEW_FAVOURITES:
             TogglePane(event.GetId());
             break;
@@ -2214,7 +2309,7 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
 
         case CSL_TEXT_SEARCH:
         {
-            wxString s=combo_ctrl_search->GetValue();
+            wxString s=text_ctrl_search->GetValue();
 
             if (s.IsEmpty())
             {
@@ -2223,8 +2318,8 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
                 SetSearchbarColour(false);
                 if (radio_search_server->GetValue())
                 {
-                    list_ctrl_master->Highlight(-1,false);
-                    list_ctrl_favourites->Highlight(-1,false);
+                    list_ctrl_master->Highlight(-1,false,true);
+                    list_ctrl_favourites->Highlight(-1,false,true);
                     list_ctrl_master->ListSearch(wxEmptyString);
                     list_ctrl_favourites->ListSearch(wxEmptyString);
                     text_search_result->SetLabel(wxString::Format(_("Search result: %d servers"),0));
@@ -2258,16 +2353,17 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             loopv(m_searchedServers) m_searchedServers[i]->PingExt(false);
             m_searchedServers.setsize(0);
 
-            m_searchString=combo_ctrl_search->GetValue().Lower();
+            m_searchString=text_ctrl_search->GetValue().Lower();
             m_searchResultPlayer=m_searchResultServer=0;
 
             gauge_search->SetValue(0);
             text_search_result->SetLabel(wxString::Format(_("Search result: %d players on %d servers"),0,0));
 
-            list_ctrl_master->Highlight(CSL_HIGHLIGHT_FOUND_PLAYER,false);
-            list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_FOUND_PLAYER,false);
+            list_ctrl_master->Highlight(CSL_HIGHLIGHT_FOUND_PLAYER,false,true);
+            list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_FOUND_PLAYER,false,true);
+            list_ctrl_player_search->ListClear();
 
-            combo_ctrl_search->SetFocus();
+            text_ctrl_search->SetFocus();
 
             if (m_searchString.IsEmpty())
                 break;
@@ -2287,7 +2383,7 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
                         m_searchedServers.add(servers[i]);
                         servers[i]->Search=true;
                         servers[i]->PingExt(true);
-                        list_ctrl_master->Highlight(CSL_HIGHLIGHT_SEARCH_PLAYER,true,servers[i]);
+                        list_ctrl_master->Highlight(CSL_HIGHLIGHT_SEARCH_PLAYER,true,false,servers[i]);
                     }
                 }
             }
@@ -2303,7 +2399,7 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
                         m_searchedServers.add(servers[i]);
                         servers[i]->Search=true;
                         servers[i]->PingExt(true);
-                        list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_SEARCH_PLAYER,true,servers[i]);
+                        list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_SEARCH_PLAYER,true,false,servers[i]);
                     }
                 }
             }
@@ -2319,9 +2415,9 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             button_search->Hide();
             gauge_search->Hide();
             sizer_search->Layout();
-            combo_ctrl_search->SetFocus();
-            list_ctrl_master->Highlight(-1,false);
-            list_ctrl_favourites->Highlight(-1,false);
+            text_ctrl_search->SetFocus();
+            list_ctrl_master->Highlight(-1,false,true);
+            list_ctrl_favourites->Highlight(-1,false,true);
 
             wxCommandEvent evt(wxEVT_COMMAND_TEXT_UPDATED,CSL_TEXT_SEARCH);
             wxPostEvent(this,evt);
@@ -2332,13 +2428,13 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
         {
             button_search->Show();
             gauge_search->Show();
-            combo_ctrl_search->SetFocus();
+            text_ctrl_search->SetFocus();
             text_search_result->SetLabel(wxString::Format(_("Search result: %d players on %d servers"),0,0));
             sizer_search->Layout();
             list_ctrl_master->ListSearch(wxEmptyString);
             list_ctrl_favourites->ListSearch(wxEmptyString);
-            list_ctrl_master->Highlight(-1,false);
-            list_ctrl_favourites->Highlight(-1,false);
+            list_ctrl_master->Highlight(-1,false,true);
+            list_ctrl_favourites->Highlight(-1,false,true);
             SetSearchbarColour(false);
 
             wxCommandEvent evt(wxEVT_COMMAND_TEXT_UPDATED,CSL_TEXT_SEARCH);
@@ -2440,7 +2536,7 @@ void CslFrame::OnKeypress(wxKeyEvent& event)
     static wxUint32 lastTicks=0;
     wxUint32 ticks=GetTicks();
 
-    if (ticks-lastTicks<500)
+    if (ticks-lastTicks<200)
         return;
     lastTicks=ticks;
 
@@ -2448,13 +2544,12 @@ void CslFrame::OnKeypress(wxKeyEvent& event)
     {
         if (CslConnectionState::IsWaiting())
             CslConnectionState::Reset();
-        else// if (FindFocus()==combo_ctrl_search)
+        else if (wxWindow::FindFocus()==text_ctrl_search)
         {
-            combo_ctrl_search->Clear();
-            combo_ctrl_search->SetFocus();
+            text_ctrl_search->Clear();
+            text_ctrl_search->SetFocus();
             wxCommandEvent evt(wxEVT_COMMAND_TEXT_UPDATED,CSL_TEXT_SEARCH);
             wxPostEvent(this,evt);
-            return;
         }
     }
 }
@@ -2540,12 +2635,6 @@ void CslFrame::OnClose(wxCloseEvent& event)
         return;
     }
 
-    CslDlgGeneric *dlg=new CslDlgGeneric(this,CSL_DLG_GENERIC_DEFAULT,_("CSL terminating"),
-                                         _("Waiting for engine to terminate ..."),
-                                         wxArtProvider::GetBitmap(wxART_INFORMATION,wxART_CMN_DIALOG));
-    dlg->Show();
-    wxYield();
-
     event.Skip();
 }
 
@@ -2572,11 +2661,17 @@ void CslFrame::OnPaneClose(wxAuiManagerEvent& event)
             }
         }
     }
-    else if (event.pane->name==(wxT("games")))
+    else if (event.pane->name==wxT("games"))
         CslMenu::CheckMenuItem(MENU_VIEW_GAMES,false);
-    else if (event.pane->name==(wxT("info")))
+    else if (event.pane->name==wxT("info"))
         CslMenu::CheckMenuItem(MENU_VIEW_SERVER_INFO,false);
-    else if (event.pane->name==(wxT("favlist")))
+    else if (event.pane->name==wxT("playerlist"))
+        CslMenu::CheckMenuItem(MENU_VIEW_PLAYER_LIST,false);
+    else if (event.pane->name==wxT("search"))
+        CslMenu::CheckMenuItem(MENU_VIEW_PLAYER_SEARCH,false);
+    else if (event.pane->name==wxT("irc"))
+        CslMenu::CheckMenuItem(MENU_VIEW_USER_CHAT,false);
+    else if (event.pane->name==wxT("favlist"))
         CslMenu::CheckMenuItem(MENU_VIEW_FAVOURITES,false);
 }
 
@@ -2669,13 +2764,11 @@ void CslFrame::OnEndProcess(wxCommandEvent& event)
     info->GetGame().GameEnd();
     CslConnectionState::Reset();
 
-    list_ctrl_master->Highlight(CSL_HIGHLIGHT_LOCKED,false,info);
-    list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_LOCKED,false,info);
+    list_ctrl_master->Highlight(CSL_HIGHLIGHT_LOCKED,false,false,info);
+    list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_LOCKED,false,false,info);
     list_ctrl_info->UpdateInfo(info);
 }
 
-
-IMPLEMENT_APP(CslApp)
 
 bool CslApp::OnInit()
 {
@@ -2719,9 +2812,10 @@ bool CslApp::OnInit()
         return false;
     }
 
+    wxInitAllImageHandlers();
+
     CslGeoIP::Init();
 
-    wxInitAllImageHandlers();
     CslFrame* frame=new CslFrame(NULL,wxID_ANY,wxEmptyString,wxDefaultPosition);
     SetTopWindow(frame);
     frame->Show();

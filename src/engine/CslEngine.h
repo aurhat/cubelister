@@ -87,11 +87,13 @@ class CslResolverThread : public wxThread
                 wxThread(wxTHREAD_JOINABLE),m_evtHandler(evtHandler),m_terminate(false)
         {
             m_condition=new wxCondition(m_mutex);
-            Create();
+            m_ok=Create()==wxTHREAD_NO_ERROR;
         }
         ~CslResolverThread() { delete m_condition; }
 
         virtual ExitCode Entry();
+
+        bool IsOk() { return m_ok; }
         void AddPacket(CslResolverPacket *packet);
         void Terminate();
 
@@ -100,6 +102,7 @@ class CslResolverThread : public wxThread
         wxMutex m_mutex;
         wxCondition *m_condition;
         bool m_terminate;
+        bool m_ok;
 
         wxCriticalSection m_section;
         vector<CslResolverPacket*> m_packets;
@@ -110,10 +113,10 @@ class CslResolverThread : public wxThread
 class CslEngine : public wxEvtHandler
 {
     public:
-        CslEngine(wxEvtHandler *evtHandler);
+        CslEngine();
         ~CslEngine();
 
-        bool Init(wxInt32 interval,wxInt32 pingsPerSecond);
+        bool Init(wxEvtHandler *handler,wxInt32 interval,wxInt32 pingsPerSecond);
         void DeInit();
         bool IsOk() const { return m_ok; }
 
@@ -122,8 +125,12 @@ class CslEngine : public wxEvtHandler
         void ResolveHost(CslServerInfo *info);
 
         bool AddGame(CslGame *game);
+        wxInt32 GetNextGameID() { return ++m_gameId; }
         vector<CslGame*>& GetGames() { return m_games; }
-        void GetFavourites(vector<CslServerInfo*>& servers) { loopv(m_games) m_games[i]->GetFavourites(servers); }
+        void GetFavourites(vector<CslServerInfo*>& servers)
+        {
+            loopv(m_games) m_games[i]->GetFavourites(servers);
+        }
 
         bool Ping(CslServerInfo *info,bool force=false);
         bool PingDefault(CslServerInfo *info);
@@ -138,20 +145,16 @@ class CslEngine : public wxEvtHandler
 
         wxInt32 UpdateFromMaster(CslMaster *master);
 
-        wxInt32 GetNextGameID();
-
         static bool PingOk(const CslServerInfo& info,wxInt32 interval)
         {
             return info.Ping>-1 && (wxInt32)(info.PingSend-info.PingResp)<interval*2;
         }
 
-    protected:
+    private:
         bool m_ok;
-        wxEvtHandler *m_evtHandler;
-
-        CslResolverThread *m_resolveThread;
 
         CslUDP *m_pingSock;
+        CslResolverThread *m_resolveThread;
 
         wxInt32 m_gameId;
         vector<CslGame*> m_games;

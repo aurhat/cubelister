@@ -25,21 +25,12 @@
     @author Glen Masgai <mimosius@gmx.de>
 */
 
-#include <wx/wxprec.h>
-#ifdef __BORLANDC__
-#pragma hdrstop
-#endif
-#ifndef WX_PRECOMP
-#include <wx/wx.h>
-#endif
-#include <wx/listctrl.h>
-#include <wx/imaglist.h>
-#include <wx/tooltip.h>
+#include "CslListCtrl.h"
 #include "engine/CslGame.h"
 #include "engine/CslTools.h"
 
 
-class CslListCtrlPlayer : public wxListCtrl
+class CslListCtrlPlayer : public CslListCtrl
 {
     public:
         enum
@@ -61,8 +52,6 @@ class CslListCtrlPlayer : public wxListCtrl
         CslServerInfo* ServerInfo() { return m_info; }
         wxInt32 View() { return m_view; }
 
-        static void CreateImageList();
-
         static wxSize BestSizeMicro;
         static wxSize BestSizeMini;
 
@@ -71,9 +60,6 @@ class CslListCtrlPlayer : public wxListCtrl
         CslServerInfo *m_info;
 
         CslListSortHelper m_sortHelper;
-        wxToolTip *m_toolTip;
-
-        static wxImageList ListImageList;
 #ifdef __WXMSW__
         static wxInt32 m_imgOffsetY;
 
@@ -83,13 +69,13 @@ class CslListCtrlPlayer : public wxListCtrl
         void OnItemActivated(wxListEvent& event);
         void OnContextMenu(wxContextMenuEvent& event);
         void OnMenu(wxCommandEvent& event);
-        void OnMouseMove(wxMouseEvent& event);
 
         DECLARE_EVENT_TABLE()
 
     protected:
         void ListSort(const wxInt32 column);
-        void ShowPanelMap(const bool show);
+
+        void GetToolTipText(wxInt32 row,wxString& title,wxArrayString& text);
 
         static int wxCALLBACK ListSortCompareFunc(long item1,long item2,long data);
 };

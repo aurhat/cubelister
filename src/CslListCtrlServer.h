@@ -25,21 +25,12 @@
  @author Glen Masgai <mimosius@gmx.de>
 */
 
-#include <wx/wxprec.h>
-#ifdef __BORLANDC__
-#pragma hdrstop
-#endif
-#ifndef WX_PRECOMP
-#include <wx/wx.h>
-#endif
-#include <wx/imaglist.h>
-#include <wx/listctrl.h>
 #include "engine/CslEngine.h"
+#include "CslListCtrl.h"
 #include "CslStatusBar.h"
 
 
-
-#define	CSL_HIGHLIGHT_FOUND_SERVER   1<<0
+#define CSL_HIGHLIGHT_FOUND_SERVER   1<<0
 #define CSL_HIGHLIGHT_FOUND_PLAYER   1<<1
 #define CSL_HIGHLIGHT_SEARCH_PLAYER  1<<2
 #define CSL_HIGHLIGHT_LOCKED         1<<3
@@ -60,12 +51,13 @@ class CslListServerData
             Description=info.GetBestDescription();
             GameMode=info.GameMode;
             Map=info.Map;
+            MMDescription=info.MMDescription;
+            MM=info.MM;
             Protocol=info.Protocol;
             Ping=info.Ping;
             TimeRemain=info.TimeRemain;
             Players=info.Players;
             PlayersMax=info.PlayersMax;
-            MM=info.MM;
             return *this;
         }
 
@@ -75,12 +67,13 @@ class CslListServerData
             Description.Empty();
             GameMode.Empty();
             Map.Empty();
+            MMDescription.Empty();
+            MM=-1;
             Protocol=-1;
             Ping=-1;
             TimeRemain=-2;
             Players=-1;
             PlayersMax=-1;
-            MM=-1;
             ImgId=-1;
             HighLight=0;
         }
@@ -100,12 +93,13 @@ class CslListServerData
         wxString Description;
         wxString GameMode;
         wxString Map;
+        wxString MMDescription;
+        wxInt32 MM;
         wxInt32 Protocol;
         wxInt32 Ping;
         wxInt32 TimeRemain;
         wxInt32 Players;
         wxInt32 PlayersMax;
-        wxInt32 MM;
         wxInt32 ImgId;
         wxUint32 HighLight;
 };
@@ -113,7 +107,7 @@ class CslListServerData
 WX_DEFINE_ARRAY_PTR(CslListServerData*,t_aCslListServerData);
 
 
-class CslListCtrlServer : public wxListCtrl
+class CslListCtrlServer : public CslListCtrl
 {
     public:
         enum { CSL_LIST_MASTER, CSL_LIST_FAVOURITE };
@@ -138,7 +132,7 @@ class CslListCtrlServer : public wxListCtrl
         void ListAdjustSize(const wxSize& size);
 
         void SetMasterSelected(bool selected) { m_masterSelected=selected; }
-        void Highlight(wxInt32 type,bool highlight,CslServerInfo *info=NULL,wxListItem *listitem=NULL);
+        void Highlight(wxInt32 type,bool high,bool sort,CslServerInfo *info=NULL,wxListItem *item=NULL);
         wxUint32 GetPlayerCount();
 
     private:
@@ -190,6 +184,8 @@ class CslListCtrlServer : public wxListCtrl
         void ListDeleteItem(wxListItem *item);
         bool ListSearchItemMatches(CslServerInfo *info);
         bool ListFilterItemMatches(CslServerInfo *info);
+
+        void GetToolTipText(wxInt32 row,wxString& title,wxArrayString& text);
 };
 
-#endif // CSLLISTCTRLSERVER_H
+#endif //CSLLISTCTRLSERVER_H

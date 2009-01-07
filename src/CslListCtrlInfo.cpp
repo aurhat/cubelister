@@ -25,7 +25,7 @@
 #include "CslGeoIP.h"
 #include "img/info_18_12.xpm"
 
-BEGIN_EVENT_TABLE(CslListCtrlInfo,wxListCtrl)
+BEGIN_EVENT_TABLE(CslListCtrlInfo,CslListCtrl)
     EVT_SIZE(CslListCtrlInfo::OnSize)
 END_EVENT_TABLE()
 
@@ -33,7 +33,7 @@ END_EVENT_TABLE()
 CslListCtrlInfo::CslListCtrlInfo(wxWindow* parent,wxWindowID id,const wxPoint& pos,
                                  const wxSize& size,long style,
                                  const wxValidator& validator, const wxString& name)
-        : wxListCtrl(parent,id,pos,size,style,validator,name)
+        : CslListCtrl(parent,id,pos,size,style,validator,name)
 {
 #ifdef __WXMSW__
     m_imgList.Create(23,12,true);
@@ -47,14 +47,14 @@ CslListCtrlInfo::CslListCtrlInfo(wxWindow* parent,wxWindowID id,const wxPoint& p
 
     SetImageList(&m_imgList,wxIMAGE_LIST_SMALL);
 
+    wxInt32 i=0;
     wxListItem item;
-    item.SetMask(wxLIST_MASK_TEXT);
 
+    item.SetMask(wxLIST_MASK_TEXT);
     item.SetText(wxT(""));
     InsertColumn(0,item);
     InsertColumn(1,item);
 
-    wxInt32 i=0;
     InsertItem(i++,_("Address"),0);
     InsertItem(i++,_("Location"),0);
     InsertItem(i++,_("Game"),0);
@@ -93,7 +93,32 @@ void CslListCtrlInfo::AdjustSize(wxSize size)
     SetColumnWidth(1,(wxInt32)(w*0.64));
 }
 
-#define CSL_UNKNOWN_STR _("unknown")
+void CslListCtrlInfo::GetToolTipText(wxInt32 WXUNUSED(row),wxString& title,wxArrayString& text)
+{
+    wxInt32 i;
+    wxString attr,val;
+    wxListItem item;
+
+    for (i=0;i<GetItemCount();i++)
+    {
+        item.SetId(i);
+        item.SetColumn(1);
+        GetItem(item);
+        val=item.GetText();
+
+        if (val.IsEmpty())
+            continue;
+
+        item.SetColumn(0);
+        GetItem(item);
+        attr=item.GetText();
+
+        text.Add(attr);
+        text.Add(val);
+    }
+
+    title=_("Server information");
+}
 
 void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
 {
@@ -110,18 +135,19 @@ void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
     s=wxString::Format(wxT("%s:%d"),info->Host.c_str(),info->Port);
     if (IsIP(info->Host))
     {
-        wxString h=info->Domain;
-        if (!h.IsEmpty())
-            s+=wxT(" (")+h+wxT(")");
+        if (!info->Domain.IsEmpty())
+            s+=wxT(" (")+info->Domain+wxT(")");
     }
     SetItem(ic++,1,s);
 
     if (CslGeoIP::IsOk())
     {
         country=CslGeoIP::GetCountryCodeByAddr(host);
+
         if (country)
         {
             i=sizeof(codes)/sizeof(codes[0])-1;
+
             for (;i>=0;i--)
             {
                 if (!strcasecmp(country,codes[i]))
@@ -130,8 +156,10 @@ void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
                     break;
                 }
             }
+
             s=A2U(country);
             country=CslGeoIP::GetCountryNameByAddr(host);
+
             if (country)
                 s+=wxT(" (")+A2U(country)+wxT(")");
         }
@@ -156,12 +184,12 @@ void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
 
     if (info->Protocol>=0)
     {
-        s=s.Format(wxT("%d"),info->Protocol);
+        s=wxString::Format(wxT("%d"),info->Protocol);
         if (info->ExtInfoStatus!=CSL_EXT_STATUS_FALSE)
             s+=wxString::Format(wxT(" / %d"),info->ExtInfoVersion);
     }
     else
-        s=CSL_UNKNOWN_STR;
+        s=_("unknown");
     SetItem(ic++,1,s);
 
     if (info->ExtInfoStatus!=CSL_EXT_STATUS_FALSE)
@@ -181,7 +209,7 @@ void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
         s=dt.Format();
     }
     else
-        s=CSL_UNKNOWN_STR;
+        s=_("unknown");
     SetItem(ic++,1,s);
 
     if (info->PlayLast)
@@ -190,7 +218,7 @@ void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
         s=dt.Format();
     }
     else
-        s=CSL_UNKNOWN_STR;
+        s=_("unknown");
     SetItem(ic++,1,s);
 
     if (info->PlayTimeLastGame)

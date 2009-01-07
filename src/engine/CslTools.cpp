@@ -33,12 +33,14 @@
 wxString g_basePath;
 
 #ifdef __WXDEBUG__
-void Debug_Printf(const char *DbgFunc, const char *FmtStr,...)
+void Debug_Printf(const char *file,int line,const char *func,const char *fmt,...)
 {
+    const char *filename=strstr(file,"/src/");
+    filename=filename ? filename+1:file;
     va_list ArgList;
-    va_start(ArgList,FmtStr);
-    fprintf(stdout,"%s(): ",DbgFunc);
-    vfprintf(stdout,FmtStr,ArgList);
+    va_start(ArgList,fmt);
+    fprintf(stdout,"%u:%s:%d:%s(): ",GetTicks(),filename,line,func);
+    vfprintf(stdout,fmt,ArgList);
     fflush(stdout);
     va_end(ArgList);
 }
@@ -109,31 +111,28 @@ bool IsIP(const wxString& s)
     return regex.Matches(s);
 }
 
-bool IP2Int(const wxString& s,wxUint32 *ip)
+wxUint32 IP2Int(const wxString& s)
 {
-    long unsigned int l;
-    size_t mult=0x1000000;
-    size_t len=s.Len();
-    wxUint32 i=0,v=0;
+    long unsigned int ul;
+    wxUint32 i=0,ip=0,l=s.Len(),mult=0x1000000;
     wxString m;
 
-    for (;i<=len;i++)
+    for (;i<=l;i++)
     {
-        if (i<len && s.Mid(i,1).IsNumber())
+        if (i<l && s.Mid(i,1).IsNumber())
             m+=s.Mid(i,1);
         else
         {
-            m.ToULong(&l,10);
-            if (l>255)
-                return false;
-            v+=l*mult;
+            m.ToULong(&ul,10);
+            if (ul>255)
+                return 0;
+            ip+=ul*mult;
             mult>>=8;
             m.Empty();
         }
     }
 
-    *ip=v;
-    return true;
+    return ip;
 }
 
 wxString FormatBytes(wxUint64 size)

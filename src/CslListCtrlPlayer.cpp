@@ -24,20 +24,10 @@
 #include "CslConnectionState.h"
 #include "CslMenu.h"
 #include "CslGeoIP.h"
-#include "CslFlags.h"
-#include "img/sortasc_18_12.xpm"
-#include "img/sortdsc_18_12.xpm"
 
 #define CSL_COLOUR_MASTER    wxColour(64,255,128)
 #define CSL_COLOUR_ADMIN     wxColour(255,128,0)
 #define CSL_COLOUR_SPECTATOR wxColour(192,192,192)
-
-enum
-{
-    CSL_LIST_IMG_SORT_ASC = 0,
-    CSL_LIST_IMG_SORT_DSC,
-    CSL_LIST_IMG_UNKNOWN
-};
 
 enum
 {
@@ -46,6 +36,7 @@ enum
     SORT_FRAGS,
     SORT_DEATHS,
     SORT_TEAMKILLS,
+    SORT_PING,
     SORT_ACCURACY,
     SORT_HEALTH,
     SORT_ARMOUR,
@@ -53,7 +44,7 @@ enum
 };
 
 
-BEGIN_EVENT_TABLE(CslListCtrlPlayer,wxListCtrl)
+BEGIN_EVENT_TABLE(CslListCtrlPlayer,CslListCtrl)
     #ifdef __WXMSW__
     EVT_ERASE_BACKGROUND(CslListCtrlPlayer::OnEraseBackground)
     #endif
@@ -61,26 +52,19 @@ BEGIN_EVENT_TABLE(CslListCtrlPlayer,wxListCtrl)
     EVT_LIST_ITEM_ACTIVATED(wxID_ANY,CslListCtrlPlayer::OnItemActivated)
     EVT_CONTEXT_MENU(CslListCtrlPlayer::OnContextMenu)
     EVT_MENU(wxID_ANY,CslListCtrlPlayer::OnMenu)
-    EVT_MOTION(CslListCtrlPlayer::OnMouseMove)
 END_EVENT_TABLE()
 
 
 wxSize CslListCtrlPlayer::BestSizeMicro(140,350);
 wxSize CslListCtrlPlayer::BestSizeMini(280,350);
-wxImageList CslListCtrlPlayer::ListImageList;
-#ifdef __WXMSW__
-wxInt32 CslListCtrlPlayer::m_imgOffsetY=0;
-#endif
 
 
 CslListCtrlPlayer::CslListCtrlPlayer(wxWindow* parent,wxWindowID id,const wxPoint& pos,
                                      const wxSize& size,long style,
-                                     const wxValidator& validator, const wxString& name)
-        : wxListCtrl(parent,id,pos,size,style,validator,name),
+                                     const wxValidator& validator,const wxString& name) :
+        CslListCtrl(parent,id,pos,size,style,validator,name),
         m_view(-1),m_info(NULL)
 {
-    m_toolTip=new wxToolTip(wxEmptyString);
-    SetToolTip(m_toolTip);
 }
 
 #ifdef __WXMSW__
@@ -232,7 +216,7 @@ void CslListCtrlPlayer::OnMenu(wxCommandEvent& event)
             {
                 m_info->Password=pi.Password;
                 m_info->PasswordAdmin=pi.AdminPassword;
-                i=pi.Admin ? CslGame::CSL_CONNECT_ADMIN_PASS:CslGame::CSL_CONNECT_PASS;
+                i=pi.Admin ? CslServerInfo::CSL_CONNECT_ADMIN_PASS:CslServerInfo::CSL_CONNECT_PASS;
                 CslConnectionState::CreateConnectState(m_info,i);
                 event.Skip();
             }
@@ -251,63 +235,44 @@ void CslListCtrlPlayer::OnMenu(wxCommandEvent& event)
     }
 }
 
-void CslListCtrlPlayer::OnMouseMove(wxMouseEvent& event)
+void CslListCtrlPlayer::GetToolTipText(wxInt32 row,wxString& title,wxArrayString& text)
 {
-    wxRect rect;
-    wxListItem item;
-    wxString tip;
-    wxInt32 i,offset=0;
-    wxPoint pos=event.GetPosition();
-#ifndef __WXMSW__
-    bool first=true;
-#endif
-
-    event.Skip();
-
-    if (pos!=wxDefaultPosition)
+    if (row<GetItemCount())
     {
-        for (i=GetTopItem();i<GetItemCount();i++)
+        wxInt32 i;
+        const char *c;
+        wxListItem item,column;
+
+        item.SetId(row);
+
+        for (i=0;i<GetColumnCount();i++)
         {
-            item.SetId(i);
-            GetItemRect(item,rect,wxLIST_RECT_BOUNDS);
+            item.SetColumn(i);
+            GetItem(item);
+            GetColumn(i,column);
 
-#ifndef __WXMSW__
-            if (first)
+            const wxString& s=item.GetText();
+
+            if (!s.IsEmpty())
             {
-                offset=rect.y;
-                first=false;
-            }
-#endif
-
-            rect.y-=offset;
-
-            if (rect.Contains(pos))
-            {
-                CslPlayerStatsData *data=(CslPlayerStatsData*)GetItemData(item);
-                const char *country=CslGeoIP::GetCountryNameByIPnum(data->IP);
-                tip=wxString::Format(_("Name: %s   Country: %s"),data->Name.c_str(),
-                                     (country ? (A2U(country)).c_str() : CslGeoIP::IsOk() ?
-                                      _("Unknown"):_("GeoIP database not found")));
-                tip+=wxString::Format(wxT("   ID: %d   IP: %d.%d.%d.x"),data->ID,
-                                      data->IP>>24,data->IP>>16&0xff,data->IP>>8&0xff);
-                m_toolTip->SetTip(tip);
-// arr, undocumented function - totally weird!
-#ifdef __WXMAC__
-                wxToolTip::RelayEvent(this,event);
-#endif
-                return;
+                text.Add(column.GetText());
+                text.Add(s);
             }
         }
-    }
 
-    tip=_("Player list");
-    if (m_info)
-        tip+=_(" for server: ")+m_info->GetBestDescription();
-    m_toolTip->SetTip(tip);
-// arr, undocumented function - totally weird!
-#ifdef __WXMAC__
-    wxToolTip::RelayEvent(this,event);
-#endif
+        CslPlayerStatsData *data=(CslPlayerStatsData*)GetItemData(item);
+
+        c=CslGeoIP::GetCountryNameByIPnum(data->IP);
+        text.Add(_("Country"));
+        text.Add(c ? (A2U(c)).c_str() : CslGeoIP::IsOk() ?
+                 _("Unknown") : _("GeoIP database not found"));
+
+        text.Add(wxT("ID / IP"));
+        text.Add(wxString::Format(wxT("%d / %d.%d.%d.x"),data->ID,
+                                  data->IP>>24,data->IP>>16&0xff,data->IP>>8&0xff));
+
+        title=_("Player information");
+    }
 }
 
 void CslListCtrlPlayer::UpdateData()
@@ -321,13 +286,13 @@ void CslListCtrlPlayer::UpdateData()
         return;
     }
 
-    wxInt32 i,j,l;
+    wxInt32 i,j;
     wxString s;
     wxListItem item;
     CslPlayerStatsData *data=NULL;
     const CslPlayerStats& stats=m_info->PlayerStats;
 
-    l=GetItemCount()-1;
+    j=GetItemCount()-1;
     item.SetMask(wxLIST_MASK_TEXT|wxLIST_MASK_DATA);
 
     for (i=0;i<stats.m_stats.length();i++)
@@ -340,7 +305,7 @@ void CslListCtrlPlayer::UpdateData()
         }
 
         item.SetId(i);
-        if (i>l)
+        if (i>j)
             InsertItem(item);
         SetItemData(i,(long)data);
 
@@ -358,13 +323,26 @@ void CslListCtrlPlayer::UpdateData()
                 s=data->Team;
             SetItem(i,1,s);
 
-            SetItem(i,2,wxString::Format(wxT("%d"),data->Frags));
+            if (data->Flagscore!=0)
+                SetItem(i,2,wxString::Format(wxT("%d / %d"),data->Frags,data->Flagscore));
+            else
+                SetItem(i,2,wxString::Format(wxT("%d"),data->Frags));
+
             SetItem(i,3,wxString::Format(wxT("%d"),data->Deaths));
+
             SetItem(i,4,wxString::Format(wxT("%d"),data->Teamkills));
 
             if (m_view>=CSL_LIST_PLAYER_DEFAULT_SIZE)
             {
-                SetItem(i,5,wxString::Format(wxT("%d%%"),data->Accuracy));
+                if (data->Ping<0)
+                    s=_("no data");
+                else if (data->Ping>=9999)
+                    s=_("LAG");
+                else
+                    s=wxString::Format(wxT("%d"),data->Ping);
+                SetItem(i,5,s);
+
+                SetItem(i,6,wxString::Format(wxT("%d%%"),data->Accuracy));
 
                 if (data->State==CSL_PLAYER_STATE_UNKNOWN)
                     s=_("no data");
@@ -376,7 +354,7 @@ void CslListCtrlPlayer::UpdateData()
                     s=wxT("0");
                 else
                     s=wxString::Format(wxT("%d"),data->Health);
-                SetItem(i,6,s);
+                SetItem(i,7,s);
 
                 if (data->State==CSL_PLAYER_STATE_UNKNOWN)
                     s=_("no data");
@@ -384,10 +362,10 @@ void CslListCtrlPlayer::UpdateData()
                     s=wxT("0");
                 else
                     s=wxString::Format(wxT("%d"),data->Armour);
-                SetItem(i,7,s);
+                SetItem(i,8,s);
 
                 s=m_info->GetGame().GetWeaponName(data->Weapon);
-                SetItem(i,8,s.IsEmpty() ? wxString(_("no data")):s);
+                SetItem(i,9,s.IsEmpty() ? wxString(_("no data")):s);
             }
         }
 
@@ -400,33 +378,14 @@ void CslListCtrlPlayer::UpdateData()
         else
             SetItemBackgroundColour(item,GetBackgroundColour());
 
-        const char *country;
-        wxInt32 flag=CSL_LIST_IMG_UNKNOWN;
-
-        if (data->IP)
-        {
-            country=CslGeoIP::GetCountryCodeByIPnum(data->IP);
-            if (country)
-            {
-                for (j=sizeof(codes)/sizeof(codes[0])-1;j>=0;j--)
-                {
-                    if (!strcasecmp(country,codes[j]))
-                    {
-                        flag+=++j;
-                        break;
-                    }
-                }
-            }
-        }
-
-        SetItemImage(item,flag);
+        SetItemImage(item,GetCountryFlag(data->IP));
     }
 
-    while (l>i)
+    while (j>i)
     {
-        item.SetId(l);
+        item.SetId(j);
         DeleteItem(item);
-        l--;
+        j--;
     }
 
     ListSort(-1);
@@ -449,15 +408,16 @@ void CslListCtrlPlayer::ListAdjustSize(const wxSize& size)
 
     if (m_view>=CSL_LIST_PLAYER_DEFAULT_SIZE)
     {
-        SetColumnWidth(0,(wxInt32)(w*0.20f));
-        SetColumnWidth(1,(wxInt32)(w*0.10f));
-        SetColumnWidth(2,(wxInt32)(w*0.10f));
-        SetColumnWidth(3,(wxInt32)(w*0.10f));
-        SetColumnWidth(4,(wxInt32)(w*0.10f));
-        SetColumnWidth(5,(wxInt32)(w*0.10f));
-        SetColumnWidth(6,(wxInt32)(w*0.10f));
-        SetColumnWidth(7,(wxInt32)(w*0.10f));
-        SetColumnWidth(8,(wxInt32)(w*0.10f));
+        SetColumnWidth(0,(wxInt32)(w*0.18f));
+        SetColumnWidth(1,(wxInt32)(w*0.09f));
+        SetColumnWidth(2,(wxInt32)(w*0.09f));
+        SetColumnWidth(3,(wxInt32)(w*0.09f));
+        SetColumnWidth(4,(wxInt32)(w*0.09f));
+        SetColumnWidth(5,(wxInt32)(w*0.08f));
+        SetColumnWidth(6,(wxInt32)(w*0.09f));
+        SetColumnWidth(7,(wxInt32)(w*0.09f));
+        SetColumnWidth(8,(wxInt32)(w*0.09f));
+        SetColumnWidth(9,(wxInt32)(w*0.10f));
     }
     else if (m_view==CSL_LISTPLAYER_MINI_SIZE)
     {
@@ -568,21 +528,25 @@ void CslListCtrlPlayer::ListInit(const wxInt32 view)
 
         if (m_view>=CSL_LIST_PLAYER_DEFAULT_SIZE)
         {
-            item.SetText(_("Accuracy"));
+            item.SetText(_("Ping"));
             InsertColumn(5,item);
             SetColumn(5,item);
 
-            item.SetText(_("Health"));
+            item.SetText(_("Accuracy"));
             InsertColumn(6,item);
             SetColumn(6,item);
 
-            item.SetText(_("Armour"));
+            item.SetText(_("Health"));
             InsertColumn(7,item);
             SetColumn(7,item);
 
-            item.SetText(_("Weapon"));
+            item.SetText(_("Armour"));
             InsertColumn(8,item);
             SetColumn(8,item);
+
+            item.SetText(_("Weapon"));
+            InsertColumn(9,item);
+            SetColumn(9,item);
         }
     }
 
@@ -714,36 +678,4 @@ int wxCALLBACK CslListCtrlPlayer::ListSortCompareFunc(long item1,long item2,long
     }
 
     return 0;
-}
-
-void CslListCtrlPlayer::CreateImageList()
-{
-#ifdef __WXMSW__
-    //detect vista and set the offset fot the flag images to 2
-    //so the region should be correct drawing the background
-    OSVERSIONINFO ovi;
-    ovi.dwOSVersionInfoSize=sizeof(OSVERSIONINFO);
-    GetVersionEx(&ovi);
-
-    if (ovi.dwMajorVersion>5)
-        m_imgOffsetY=2;
-
-    ListImageList.Create(20,14,true);
-    ListImageList.Add(AdjustIconSize(sortasc_18_12_xpm,wxNullIcon,wxSize(20,14),wxPoint(0,0)));
-    ListImageList.Add(AdjustIconSize(sortdsc_18_12_xpm,wxNullIcon,wxSize(20,14),wxPoint(0,0)));
-    ListImageList.Add(AdjustIconSize(unknown_xpm,wxNullIcon,wxSize(20,14),wxPoint(0,2)));
-
-    wxInt32 i,c=sizeof(codes)/sizeof(codes[0])-1;
-    for (i=0;i<c;i++)
-        ListImageList.Add(AdjustIconSize(flags[i],wxNullIcon,wxSize(20,14),wxPoint(0,2)));
-#else
-    ListImageList.Create(18,12,true);
-    ListImageList.Add(wxBitmap(sortasc_18_12_xpm));
-    ListImageList.Add(wxBitmap(sortdsc_18_12_xpm));
-    ListImageList.Add(wxBitmap(unknown_xpm));
-
-    wxInt32 i,c=sizeof(codes)/sizeof(codes[0])-1;
-    for (i=0;i<c;i++)
-        ListImageList.Add(wxBitmap(flags[i]));
-#endif
 }

@@ -79,8 +79,8 @@
 #endif
 
 #ifdef __WXDEBUG__
-void Debug_Printf(const char *DbgFunc, const char *FmtStr,...);
-#define LOG_DEBUG(...) Debug_Printf(__FUNCTION__,## __VA_ARGS__);
+void Debug_Printf(const char *file,int line,const char *func,const char *fmt,...);
+#define LOG_DEBUG(...) Debug_Printf(__FILE__,__LINE__,__FUNCTION__,## __VA_ARGS__);
 #else
 #define LOG_DEBUG(...)
 #endif
@@ -89,10 +89,8 @@ class stopwatch : wxStopWatch
 {
     public:
         stopwatch() : wxStopWatch() {}
-        ~stopwatch()
-        {
-            printf("%li ms\n",Time());
-        }
+        ~stopwatch() { dump(); }
+        void dump() { printf("%li ms\n",Time()); }
 };
 
 enum
@@ -107,7 +105,7 @@ extern wxString g_basePath;
 
 extern void StripColours(char *src,wxInt32 *len,wxInt32 count);
 extern bool IsIP(const wxString& s);
-extern bool IP2Int(const wxString& s,wxUint32 *ip);
+extern wxUint32 IP2Int(const wxString& s);
 extern wxString FormatBytes(wxUint64 size);
 extern wxString FormatSeconds(wxUint32 time,bool space=false,bool full=false);
 extern wxUint32 GetTicks();

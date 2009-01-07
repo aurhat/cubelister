@@ -22,7 +22,7 @@
   <kdevautoproject>
     <general>
       <activetarget>src/csl</activetarget>
-      <useconfiguration>default</useconfiguration>
+      <useconfiguration>debug</useconfiguration>
     </general>
     <run>
       <mainprogram>/home/mimosius/Documents/Development/csl</mainprogram>
@@ -130,8 +130,8 @@
         <ccompilerbinary/>
         <cxxcompilerbinary/>
         <f77compilerbinary/>
-        <cflags/>
-        <cxxflags/>
+        <cflags>-O0 -ggdb3</cflags>
+        <cxxflags>-O0 -ggdb3</cxxflags>
         <f77flags/>
       </default>
     </configurations>

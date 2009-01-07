@@ -39,18 +39,20 @@ CslGameCube::~CslGameCube()
 {
 }
 
-wxString CslGameCube::GetVersionName(wxInt32 n) const
+const wxChar* CslGameCube::GetVersionName(wxInt32 prot) const
 {
     static const wxChar* versions[] =
     {
         wxT("122")
     };
-    wxUint32 v=CSL_LAST_PROTOCOL_CB-n;
-    return (v>=0 && v<sizeof(versions)/sizeof(versions[0])) ?
-           wxString(versions[v]) : wxString::Format(wxT("%d"),n);
+
+    wxInt32 v=CSL_LAST_PROTOCOL_CB-prot;
+
+    return (v>=0 && (size_t)v<sizeof(versions)/sizeof(versions[0])) ?
+           versions[v] : wxString::Format(wxT("%d"),prot).c_str();
 }
 
-wxString CslGameCube::GetModeName(wxInt32 n) const
+const wxChar* CslGameCube::GetModeName(wxInt32 mode) const
 {
     static const wxChar* modes[] =
     {
@@ -58,8 +60,9 @@ wxString CslGameCube::GetModeName(wxInt32 n) const
         wxT("instagib"),wxT("instagib team"),wxT("efficiency"),wxT("efficiency team"),
         wxT("insta arena"),wxT("insta clan arena"),wxT("tactics arena")
     };
-    return (n>=0 && (size_t)n<sizeof(modes)/sizeof(modes[0])) ?
-           wxString(modes[n]) : wxString(_("unknown"));
+
+    return (mode>=0 && (size_t)mode<sizeof(modes)/sizeof(modes[0])) ?
+           modes[mode] : _("unknown");
 }
 
 bool CslGameCube::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
@@ -76,6 +79,8 @@ bool CslGameCube::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
         return false;
     info.Protocol=prot;
     info.Version=GetVersionName(prot);
+    info.MM=CSL_SERVER_OPEN;
+    info.MMDescription=wxEmptyString;
     info.GameMode=GetModeName(getint(buf));
     info.Players=getint(buf);
     info.TimeRemain=getint(buf);
@@ -86,7 +91,7 @@ bool CslGameCube::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
     StripColours(text,&l,1);
     info.SetDescription(A2U(text));
 
-    return true;
+    return !buf.overread();
 }
 
 void CslGameCube::SetClientSettings(const CslGameClientSettings& settings)
@@ -128,13 +133,13 @@ wxString CslGameCube::GameStart(CslServerInfo *info,wxUint32 mode,wxString *erro
 
 #ifdef __WXMSW__
     //binary must be surrounded by quotes if the path contains spaces
-    bin=wxT("\"")+m_clientSettings.Binary+wxT("\"");
+    bin << wxT("\"") << m_clientSettings.Binary << wxT("\"");
 #else
     bin.Replace(wxT(" "),wxT("\\ "));
 #endif
-    bin+=wxString(wxT(" "))+opts;
+    bin << wxT(" ") << opts;
 
-    if (mode==CSL_CONNECT_ADMIN_PASS)
+    if (mode==CslServerInfo::CSL_CONNECT_ADMIN_PASS)
         password=info->Password;
 
     return InjectConfig(address,password,error)==CSL_ERROR_NONE ? bin:wxString(wxEmptyString);

@@ -26,6 +26,16 @@
 #include "../img/ac_24.xpm"
 #include "../img/ac_16.xpm"
 
+enum
+{
+    PONGFLAG_PASSWORD   = 1<<0,
+    PONGFLAG_BANNED     = 1<<1,
+    PONGFLAG_BLACKLIST  = 1<<2,
+    PONGFLAG_MASTERMODE = 1<<6,
+    PONGFLAG_NUM        = 1<<7
+};
+
+
 CslGameAssaultCube::CslGameAssaultCube()
 {
     m_name=CSL_DEFAULT_NAME_AC;
@@ -33,7 +43,7 @@ CslGameAssaultCube::CslGameAssaultCube()
     m_capabilities=CSL_CAPABILITY_EXTINFO | CSL_CAPABILITY_CUSTOM_CONFIG |
                    CSL_CAPABILITY_CONNECT_PASS | CSL_CAPABILITY_CONNECT_ADMIN_PASS;
 #ifdef __WXGTK__
-    m_clientSettings.ConfigPath=::wxGetHomeDir()+wxT("/.assaultcube");
+    m_clientSettings.ConfigPath=::wxGetHomeDir()+wxT("/.assaultcube_v1.0");
 #endif
 #ifdef __WXMAC__
     m_configType=CSL_CONFIG_DIR;
@@ -44,45 +54,80 @@ CslGameAssaultCube::~CslGameAssaultCube()
 {
 }
 
-wxString CslGameAssaultCube::GetVersionName(wxInt32 n) const
+const wxChar* CslGameAssaultCube::GetVersionName(wxInt32 prot) const
 {
     static const wxChar* versions[] =
     {
-        wxT("1.0"),wxT("0.93.x"),wxT("0.92"),wxT("0.91.x"),wxT("0.90")
+        wxT("1.0.x"),wxT("1.0beta2"),wxT("1.0beta1"),
+        wxT("0.93.x"),wxT("0.92"),wxT("0.91.x"),wxT("0.90")
     };
-    wxUint32 v=CSL_LAST_PROTOCOL_AC-n;
-    return (v>=0 && v<sizeof(versions)/sizeof(versions[0])) ?
-           wxString(versions[v]) : wxString::Format(wxT("%d"),n);
+
+    wxInt32 v=CSL_LAST_PROTOCOL_AC-prot;
+
+    return (v>=0 && (size_t)v<sizeof(versions)/sizeof(versions[0])) ?
+           versions[v] : wxString::Format(wxT("%d"),prot).c_str();
 }
 
-wxString CslGameAssaultCube::GetModeName(wxInt32 n) const
+const wxChar* CslGameAssaultCube::GetModeName(wxInt32 mode) const
 {
     static const wxChar* modes[] =
     {
         wxT("team deathmatch"),wxT("coopedit"),wxT("deathmatch"),wxT("survivor"),
         wxT("team survivor"),wxT("ctf"),wxT("pistol frenzy"),wxT("bot team deathmatch"),
         wxT("bot deathmatch"),wxT("last swiss standing"),wxT("one shot,one kill"),
-        wxT("team one shot,one kill"),wxT("bot one shot,one skill")
+        wxT("team one shot,one kill"),wxT("bot one shot,one skill"),
+        wxT("hunt the flag"),wxT("team keep the flag"),wxT("keep the flag")
     };
-    return (n>=0 && (size_t)n<sizeof(modes)/sizeof(modes[0])) ?
-           wxString(modes[n]) : wxString(_("unknown"));
+
+    return (mode>=0 && (size_t)mode<sizeof(modes)/sizeof(modes[0])) ?
+           modes[mode] : _("unknown");
 }
 
-wxString CslGameAssaultCube::GetWeaponName(wxInt32 n) const
+const wxChar* CslGameAssaultCube::GetWeaponName(wxInt32 n) const
 {
     static const wxChar* weapons[] =
     {
         _("Knife"),_("Pistol"),_("Shotgun"),_("Subgun"),
         _("Sniper"),_("Assault"),_("Grenade"),_("Pistol (auto)")
     };
+
     return (n>=0 && (size_t)n<sizeof(weapons)/sizeof(weapons[0])) ?
-           wxString(weapons[n]) : wxString(_("unknown"));
+           weapons[n] : _("unknown");
+}
+
+wxInt32 CslGameAssaultCube::GetBestTeam(CslTeamStats& stats,wxInt32 prot) const
+{
+    wxInt32 i,best=-1;
+
+    if (stats.TeamMode && stats.m_stats.length()>0 && stats.m_stats[0]->Ok)
+    {
+        best=0;
+
+        for (i=1;i<stats.m_stats.length() && stats.m_stats[i]->Ok;i++)
+        {
+            if (ModeHasFlags(stats.GameMode,prot))
+            {
+                if (stats.m_stats[i]->Score2>stats.m_stats[best]->Score2)
+                {
+                    best=i;
+                    continue;
+                }
+                else if (stats.m_stats[i]->Score2<stats.m_stats[best]->Score2)
+                    continue;
+            }
+
+            if (stats.m_stats[i]->Score>=stats.m_stats[best]->Score)
+                best=i;
+        }
+    }
+
+    return best;
 }
 
 bool CslGameAssaultCube::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
 {
     char text[_MAXDEFSTR];
-    wxInt32 l;
+    wxInt32 i;
 
     info.Protocol=getint(buf);
     info.Version=GetVersionName(info.Protocol);
@@ -95,11 +140,46 @@ bool CslGameAssaultCube::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) con
     getstring(text,buf);
     info.Map=A2U(text);
     getstring(text,buf);
-    l=strlen(text);
-    StripColours(text,&l,1);
+    i=strlen(text);
+    StripColours(text,&i,1);
     info.SetDescription(A2U(text));
     info.PlayersMax=getint(buf);
-    return true;
+
+    info.MMDescription.Empty();
+    info.MM=CSL_SERVER_OPEN;
+
+    if (info.Protocol>=1128 && buf.remaining()) // >1.0.1 (not sure if there is any prot bump for 1.0.2)
+    {
+        i=getint(buf);
+
+        if (i&PONGFLAG_MASTERMODE)
+        {
+            info.MMDescription=wxT("P");
+            info.MM=CSL_SERVER_PRIVATE;
+        }
+        else
+            info.MMDescription=wxT("O");
+        if (i&PONGFLAG_BANNED)
+        {
+            info.MMDescription+=wxT("/BAN");
+            info.MM|=CSL_SERVER_BAN;
+        }
+        if (i&PONGFLAG_BLACKLIST)
+        {
+            info.MMDescription+=wxT("/BLACK");
+            info.MM|=CSL_SERVER_BLACKLIST;
+        }
+
+        if ((info.PasswordProtected=i&PONGFLAG_PASSWORD))
+        {
+            info.MMDescription+=wxT("/PASS");
+            info.MM|=CSL_SERVER_PASSWORD;
+        }
+    }
+    else
+        info.MMDescription=_("no data");
+
+    return !buf.overread();
 }
 
 bool CslGameAssaultCube::ParsePlayerPong(wxUint32 protocol,ucharbuf& buf,CslPlayerStatsData& info) const
@@ -107,11 +187,15 @@ bool CslGameAssaultCube::ParsePlayerPong(wxUint32 protocol,ucharbuf& buf,CslPlay
     char text[_MAXDEFSTR];
 
     info.ID=getint(buf);
+    if (protocol>=104)
+        info.Ping=getint(buf);
     getstring(text,buf);
     info.Name=A2U(text);
     getstring(text,buf);
     info.Team=A2U(text);
     info.Frags=getint(buf);
+    if (protocol>=104)
+        info.Flagscore=getint(buf);
     info.Deaths=getint(buf);
     info.Teamkills=getint(buf);
     if (protocol>=103)
@@ -122,7 +206,7 @@ bool CslGameAssaultCube::ParsePlayerPong(wxUint32 protocol,ucharbuf& buf,CslPlay
     info.Privileges=getint(buf);
     info.State=getint(buf);
 
-    return true;
+    return !buf.overread();
 }
 
 bool CslGameAssaultCube::ParseTeamPong(wxUint32 protocol,ucharbuf& buf,CslTeamStatsData& info) const
@@ -143,7 +227,7 @@ bool CslGameAssaultCube::ParseTeamPong(wxUint32 protocol,ucharbuf& buf,CslTeamSt
         while (i--)
             info.Bases.add(getint(buf));
 
-    return true;
+    return !buf.overread();
 }
 
 void CslGameAssaultCube::SetClientSettings(const CslGameClientSettings& settings)
@@ -210,8 +294,9 @@ wxString CslGameAssaultCube::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
 
     bin+=wxT(" ")+opts;
 
-    password=mode==CSL_CONNECT_PASS ? info->Password:
-             mode==CSL_CONNECT_ADMIN_PASS ? info->PasswordAdmin:wxString(wxEmptyString);
+    password=mode==CslServerInfo::CSL_CONNECT_PASS ? info->Password:
+             mode==CslServerInfo::CSL_CONNECT_ADMIN_PASS ?
+             info->PasswordAdmin:wxString(wxEmptyString);
 
     configpath+=wxString(CSL_DEFAULT_INJECT_DIR_AC);
 
@@ -233,8 +318,9 @@ wxString CslGameAssaultCube::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
         file.Close();
     }
 
-    wxString script=wxString::Format(wxT("sleep 1000 [ %s %s %s ]\r\n"),
-                                     mode==CSL_CONNECT_ADMIN_PASS ? wxT("connectadmin") : wxT("connect"),
+    wxString script=wxString::Format(wxT("\r\n%s %s %s\r\n"),
+                                     mode==CslServerInfo::CSL_CONNECT_ADMIN_PASS ?
+                                     wxT("connectadmin"):wxT("connect"),
                                      address.c_str(),password.c_str());
 
     return WriteTextFile(configpath,script,wxFile::write_append)==CSL_ERROR_NONE ? bin:wxString(wxEmptyString);
@@ -242,8 +328,9 @@ wxString CslGameAssaultCube::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
 
 wxInt32 CslGameAssaultCube::GameEnd(wxString *error)
 {
-    wxString cfg=m_clientSettings.ConfigPath+wxString(CSL_DEFAULT_INJECT_DIR_AC)+wxString(CSL_DEFAULT_INJECT_FILE_AC);
-    wxString bak=cfg+wxT(".csl");
+    wxString cfg,bak;
+    cfg << m_clientSettings.ConfigPath << CSL_DEFAULT_INJECT_DIR_AC << wxString(CSL_DEFAULT_INJECT_FILE_AC);
+    bak << cfg << wxT(".csl");
 
     if (!::wxFileExists(bak))
         return CSL_ERROR_FILE_DONT_EXIST;

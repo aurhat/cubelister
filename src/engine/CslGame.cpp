@@ -265,6 +265,7 @@ void CslGame::GetPlayerstatsDescriptions(vector<wxString>& desc) const
     desc.add(_("Frags"));
     desc.add(_("Deaths"));
     desc.add(_("Teamkills"));
+    desc.add(_("Ping"));
     desc.add(_("Accuracy"));
     desc.add(_("Health"));
     desc.add(_("Armour"));
@@ -299,7 +300,6 @@ CslServerInfo::CslServerInfo(CslGame *game,
     TimeRemain=-2;
     Players=-1;
     PlayersMax=-1;
-    MM=-1;
     View=view;
     PingSend=0;
     PingResp=0;
@@ -309,6 +309,9 @@ CslServerInfo::CslServerInfo(CslGame *game,
     PlayTimeTotal=playTimeTotal;
     ConnectedTimes=connectedTimes;
     DescriptionOld=oldDescription;
+    MMDescription=wxEmptyString;
+    MM=-1;
+    PasswordProtected=false;
     Password=password;
     PasswordAdmin=passwordAdmin;
     Search=false;

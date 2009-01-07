@@ -35,7 +35,7 @@
 #include "cube_tools.h"
 
 #define CSL_EX_VERSION_MIN      102
-#define CSL_EX_VERSION_MAX      103
+#define CSL_EX_VERSION_MAX      104
 // commands
 #define CSL_EX_PING_UPTIME      0
 #define CSL_EX_PING_PLAYERSTATS 1
@@ -77,16 +77,15 @@ class CslPlayerStatsData
 {
     public:
         CslPlayerStatsData() :
-                Frags(0),Deaths(0),Teamkills(0),Accuracy(0),
+                Frags(0),Flagscore(0),Deaths(0),Teamkills(0),Accuracy(0),
                 Health(-1),Armour(-1),Weapon(-1),ID(-1),
                 Privileges(CSL_PLAYER_STATE_UNKNOWN),State(CSL_PLAYER_PRIV_UNKNOWN),
-                IP(0),Ok(false) {}
+                Ping(-1),IP(0),Ok(false) {}
 
         wxString Name,Team;
-        wxInt32 Frags,Deaths,Teamkills,Accuracy;
+        wxInt32 Frags,Flagscore,Deaths,Teamkills,Accuracy;
         wxInt32 Health,Armour,Weapon;
-        wxInt32 ID;
-        wxInt32 Privileges,State;
+        wxInt32 ID,Privileges,State,Ping;
         wxUint32 IP;
         bool Ok;
 };
@@ -139,13 +138,14 @@ class CslTeamStats
 
         CslTeamStatsData* GetNewStats();
         void AddStats(CslTeamStatsData *data);
+        void RemoveStats(CslTeamStatsData *data);
         void DeleteStats();
         void Reset();
 
         bool TeamMode;
         wxInt32 TimeRemain,GameMode;
         wxUint32 LastPing,LastPong;
-        vector<CslTeamStatsData*> Stats;
+        vector<CslTeamStatsData*> m_stats;
 };
 
 

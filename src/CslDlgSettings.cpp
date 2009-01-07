@@ -53,6 +53,7 @@ enum
     BUTTON_COLOUR_MM3,
 
     SPIN_CLEANUP_SERVERS,
+    SPIN_TOOLTIP_DELAY,
 
     SPIN_PING_GOOD,
     SPIN_PING_BAD,
@@ -244,6 +245,7 @@ CslDlgSettings::CslDlgSettings(CslEngine *engine,wxWindow* parent,int id,const w
 {
     // begin wxGlade: CslDlgSettings::CslDlgSettings
     notebook_settings = new wxNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0);
+    notebook_pane_irc = new wxPanel(notebook_settings, wxID_ANY);
     notebook_pane_other = new wxPanel(notebook_settings, wxID_ANY);
     notebook_pane_colour = new wxPanel(notebook_settings, wxID_ANY);
     sizer_colours_staticbox = new wxStaticBox(notebook_pane_colour, -1, _("Server lists"));
@@ -251,6 +253,10 @@ CslDlgSettings::CslDlgSettings(CslEngine *engine,wxWindow* parent,int id,const w
     sizer_threshold_staticbox = new wxStaticBox(notebook_pane_other, -1, _("Ping thresholds"));
     sizer_systray_staticbox = new wxStaticBox(notebook_pane_other, -1, _("System tray"));
     sizer_output_staticbox = new wxStaticBox(notebook_pane_other, -1, _("Game output"));
+    sizer_network_staticbox = new wxStaticBox(notebook_pane_irc, -1, _("Networks"));
+    sizer_1_staticbox = new wxStaticBox(notebook_pane_irc, -1, _("Server"));
+    sizer_2_staticbox = new wxStaticBox(notebook_pane_irc, -1, _("Name"));
+    sizer_3_staticbox = new wxStaticBox(notebook_pane_irc, -1, _("Autojoin channels"));
     notebook_pane_games = new wxPanel(notebook_settings, wxID_ANY);
     notebook_games = new wxListbook(notebook_pane_games, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0);
     button_colour_empty = new wxBitmapButton(notebook_pane_colour, BUTTON_COLOUR_EMPTY, wxNullBitmap);
@@ -259,13 +265,14 @@ CslDlgSettings::CslDlgSettings(CslEngine *engine,wxWindow* parent,int id,const w
     button_colour_mm2 = new wxBitmapButton(notebook_pane_colour, BUTTON_COLOUR_MM2, wxNullBitmap);
     button_colour_full = new wxBitmapButton(notebook_pane_colour, BUTTON_COLOUR_FULL, wxNullBitmap);
     button_colour_mm3 = new wxBitmapButton(notebook_pane_colour, BUTTON_COLOUR_MM3, wxNullBitmap);
-    spin_ctrl_update = new wxSpinCtrl(notebook_pane_other, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100);
+    spin_ctrl_update = new wxSpinCtrl(notebook_pane_other, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_AUTO_URL, 0, 100);
     checkbox_play_update = new wxCheckBox(notebook_pane_other, wxID_ANY, _("Don't update when playing"));
-    spin_ctrl_wait = new wxSpinCtrl(notebook_pane_other, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100);
-    spin_ctrl_min_playtime = new wxSpinCtrl(notebook_pane_other, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100);
-    spin_ctrl_server_cleanup = new wxSpinCtrl(notebook_pane_other, SPIN_CLEANUP_SERVERS, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100);
+    spin_ctrl_wait = new wxSpinCtrl(notebook_pane_other, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_AUTO_URL, 0, 100);
+    spin_ctrl_min_playtime = new wxSpinCtrl(notebook_pane_other, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_AUTO_URL, 0, 100);
+    spin_ctrl_server_cleanup = new wxSpinCtrl(notebook_pane_other, SPIN_CLEANUP_SERVERS, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_AUTO_URL, 0, 100);
     checkbox_server_cleanup_favourites = new wxCheckBox(notebook_pane_other, wxID_ANY, _("Keep favourites"));
     checkbox_server_cleanup_stats = new wxCheckBox(notebook_pane_other, wxID_ANY, _("Keep servers with statistics"));
+    spin_ctrl_tooltip_delay = new wxSpinCtrl(notebook_pane_other, SPIN_TOOLTIP_DELAY, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_AUTO_URL, 0, 100);
     spin_ctrl_ping_good = new wxSpinCtrl(notebook_pane_other, SPIN_PING_GOOD, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100);
     spin_ctrl_ping_bad = new wxSpinCtrl(notebook_pane_other, SPIN_PING_BAD, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100);
     checkbox_systray = new wxCheckBox(notebook_pane_other, CHECK_SYSTRAY, _("Use system tray icon"));
@@ -273,6 +280,27 @@ CslDlgSettings::CslDlgSettings(CslEngine *engine,wxWindow* parent,int id,const w
     radio_btn_systray_minimize = new wxRadioButton(notebook_pane_other, RADIO_SYSTRAY_MINIMIZE, _("Minimize to system tray"));
     checkbox_game_output = new wxCheckBox(notebook_pane_other, CHECK_GAME_OUTPUT, _("Auto &save game output to:"));
     dirpicker_game_output = new wxDirPickerCtrl(notebook_pane_other, wxID_ANY, m_settings.gameOutputPath, _("Select game output path"), wxDefaultPosition, wxDefaultSize, wxDIRP_DEFAULT_STYLE|wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST);
+    tree_ctrl_network = new wxTreeCtrl(notebook_pane_irc, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_HAS_BUTTONS|wxTR_NO_LINES|wxTR_DEFAULT_STYLE|wxSUNKEN_BORDER);
+    label_7 = new wxStaticText(notebook_pane_irc, wxID_ANY, _("Server address:"));
+    text_ctrl_1 = new wxTextCtrl(notebook_pane_irc, wxID_ANY, wxEmptyString);
+    label_8 = new wxStaticText(notebook_pane_irc, wxID_ANY, _("Port:"));
+    spin_ctrl_1 = new wxSpinCtrl(notebook_pane_irc, wxID_ANY, wxT("6667"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 65535);
+    label_9 = new wxStaticText(notebook_pane_irc, wxID_ANY, _("Password:"));
+    text_ctrl_2 = new wxTextCtrl(notebook_pane_irc, wxID_ANY, wxEmptyString);
+    label_10 = new wxStaticText(notebook_pane_irc, wxID_ANY, _("Auto connect:"));
+    checkbox_1 = new wxCheckBox(notebook_pane_irc, wxID_ANY, wxEmptyString);
+    label_11 = new wxStaticText(notebook_pane_irc, wxID_ANY, _("Real name:"));
+    text_ctrl_3 = new wxTextCtrl(notebook_pane_irc, wxID_ANY, wxEmptyString);
+    label_12 = new wxStaticText(notebook_pane_irc, wxID_ANY, _("Ident:"));
+    text_ctrl_4 = new wxTextCtrl(notebook_pane_irc, wxID_ANY, wxEmptyString);
+    const wxString *list_box_1_choices = NULL;
+    list_box_1 = new wxListBox(notebook_pane_irc, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, list_box_1_choices, 0);
+    button_2 = new wxButton(notebook_pane_irc, wxID_UP, wxEmptyString);
+    button_3 = new wxButton(notebook_pane_irc, wxID_DOWN, wxEmptyString);
+    const wxString *list_box_2_choices = NULL;
+    list_box_2 = new wxListBox(notebook_pane_irc, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, list_box_2_choices, 0);
+    button_4 = new wxButton(notebook_pane_irc, wxID_UP, wxEmptyString);
+    button_5 = new wxButton(notebook_pane_irc, wxID_DOWN, wxEmptyString);
     button_ok = new wxButton(this, wxID_OK, _("&Ok"));
     button_cancel = new wxButton(this, wxID_CANCEL, _("&Cancel"));
 
@@ -298,6 +326,7 @@ void CslDlgSettings::set_properties()
     checkbox_server_cleanup_favourites->SetValue(1);
     checkbox_server_cleanup_stats->SetValue(1);
     dirpicker_game_output->Enable(false);
+    tree_ctrl_network->SetMinSize(wxSize(180, -1));
     button_ok->SetDefault();
     // end wxGlade
 
@@ -310,6 +339,8 @@ void CslDlgSettings::set_properties()
     spin_ctrl_min_playtime->SetValue(m_settings.minPlaytime);
     spin_ctrl_server_cleanup->SetRange(0,CSL_CLEANUP_SERVERS_MAX);
     spin_ctrl_server_cleanup->SetValue(m_settings.cleanupServers/86400);
+    spin_ctrl_tooltip_delay->SetRange(CSL_TOOLTIP_DELAY_MIN,CSL_TOOLTIP_DELAY_MAX);
+    spin_ctrl_tooltip_delay->SetValue(m_settings.tooltipDelay);
     checkbox_server_cleanup_favourites->SetValue(m_settings.cleanupServersKeepFav);
     checkbox_server_cleanup_stats->SetValue(m_settings.cleanupServersKeepStats);
     checkbox_server_cleanup_favourites->Enable(m_settings.cleanupServers!=0);
@@ -366,6 +397,19 @@ void CslDlgSettings::do_layout()
     // begin wxGlade: CslDlgSettings::do_layout
     wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(2, 1, 0, 0);
     wxFlexGridSizer* grid_sizer_button = new wxFlexGridSizer(1, 3, 0, 0);
+    wxFlexGridSizer* grid_sizer_pane_irc = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* grid_sizer_1 = new wxFlexGridSizer(3, 1, 0, 0);
+    wxStaticBoxSizer* sizer_3 = new wxStaticBoxSizer(sizer_3_staticbox, wxHORIZONTAL);
+    wxFlexGridSizer* grid_sizer_6 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* sizer_5 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxStaticBoxSizer* sizer_2 = new wxStaticBoxSizer(sizer_2_staticbox, wxHORIZONTAL);
+    wxFlexGridSizer* grid_sizer_3 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* grid_sizer_5 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* sizer_4 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* grid_sizer_4 = new wxFlexGridSizer(1, 4, 0, 0);
+    wxStaticBoxSizer* sizer_1 = new wxStaticBoxSizer(sizer_1_staticbox, wxHORIZONTAL);
+    wxFlexGridSizer* grid_sizer_2 = new wxFlexGridSizer(2, 4, 0, 0);
+    wxStaticBoxSizer* sizer_network = new wxStaticBoxSizer(sizer_network_staticbox, wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_pane_other = new wxFlexGridSizer(4, 1, 0, 0);
     wxStaticBoxSizer* sizer_output = new wxStaticBoxSizer(sizer_output_staticbox, wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_output = new wxFlexGridSizer(1, 2, 0, 0);
@@ -374,7 +418,7 @@ void CslDlgSettings::do_layout()
     wxStaticBoxSizer* sizer_threshold = new wxStaticBoxSizer(sizer_threshold_staticbox, wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_threshold = new wxFlexGridSizer(1, 5, 0, 0);
     wxStaticBoxSizer* sizer_times = new wxStaticBoxSizer(sizer_times_staticbox, wxHORIZONTAL);
-    wxFlexGridSizer* grid_sizer_times = new wxFlexGridSizer(4, 3, 0, 0);
+    wxFlexGridSizer* grid_sizer_times = new wxFlexGridSizer(6, 3, 0, 0);
     wxFlexGridSizer* grid_sizer_server_cleanup = new wxFlexGridSizer(1, 2, 0, 0);
     wxFlexGridSizer* grid_sizer_pane_colours = new wxFlexGridSizer(1, 1, 0, 0);
     wxStaticBoxSizer* sizer_colours = new wxStaticBoxSizer(sizer_colours_staticbox, wxHORIZONTAL);
@@ -382,26 +426,26 @@ void CslDlgSettings::do_layout()
     wxBoxSizer* sizer_games = new wxBoxSizer(wxVERTICAL);
     sizer_games->Add(notebook_games, 1, wxALL|wxEXPAND|wxFIXED_MINSIZE, 4);
     notebook_pane_games->SetSizer(sizer_games);
-    wxStaticText* label_6 = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Server empty"));
-    grid_sizer_colours->Add(label_6, 0, wxALL|wxALIGN_CENTER_VERTICAL, 6);
+    wxStaticText* label_colour_empty = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Server empty"));
+    grid_sizer_colours->Add(label_colour_empty, 0, wxALL|wxALIGN_CENTER_VERTICAL, 6);
     grid_sizer_colours->Add(button_colour_empty, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_colours->Add(1, 1, 0, 0, 0);
-    wxStaticText* label_3 = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Mastermode 1"));
-    grid_sizer_colours->Add(label_3, 0, wxALL|wxALIGN_CENTER_VERTICAL, 6);
+    wxStaticText* label_colour_open = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Server veto mode"));
+    grid_sizer_colours->Add(label_colour_open, 0, wxALL|wxALIGN_CENTER_VERTICAL, 6);
     grid_sizer_colours->Add(button_colour_mm1, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
-    wxStaticText* label_1 = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Server offline"));
-    grid_sizer_colours->Add(label_1, 0, wxALL|wxALIGN_CENTER_VERTICAL, 6);
+    wxStaticText* label_colour_offline = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Server offline"));
+    grid_sizer_colours->Add(label_colour_offline, 0, wxALL|wxALIGN_CENTER_VERTICAL, 6);
     grid_sizer_colours->Add(button_colour_off, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_colours->Add(1, 1, 0, 0, 0);
-    wxStaticText* label_4 = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Mastermode 2"));
-    grid_sizer_colours->Add(label_4, 0, wxALL|wxALIGN_CENTER_VERTICAL, 6);
+    wxStaticText* label_colour_limited = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Server game locked"));
+    grid_sizer_colours->Add(label_colour_limited, 0, wxALL|wxALIGN_CENTER_VERTICAL, 6);
     grid_sizer_colours->Add(button_colour_mm2, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
-    wxStaticText* label_2 = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Server full"));
-    grid_sizer_colours->Add(label_2, 0, wxALL|wxALIGN_CENTER_VERTICAL, 6);
+    wxStaticText* label_colour_full = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Server full"));
+    grid_sizer_colours->Add(label_colour_full, 0, wxALL|wxALIGN_CENTER_VERTICAL, 6);
     grid_sizer_colours->Add(button_colour_full, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_colours->Add(1, 1, 0, 0, 0);
-    wxStaticText* label_5 = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Mastermode 3"));
-    grid_sizer_colours->Add(label_5, 0, wxALL|wxALIGN_CENTER_VERTICAL, 6);
+    wxStaticText* label_colour_restricted = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Server restricted (password, banned, private)"));
+    grid_sizer_colours->Add(label_colour_restricted, 0, wxALL|wxALIGN_CENTER_VERTICAL, 6);
     grid_sizer_colours->Add(button_colour_mm3, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_colours->AddGrowableCol(2);
     sizer_colours->Add(grid_sizer_colours, 1, wxEXPAND, 0);
@@ -409,15 +453,15 @@ void CslDlgSettings::do_layout()
     notebook_pane_colour->SetSizer(grid_sizer_pane_colours);
     grid_sizer_pane_colours->AddGrowableCol(0);
     grid_sizer_pane_colours->AddGrowableCol(1);
-    wxStaticText* label_update_static = new wxStaticText(notebook_pane_other, wxID_ANY, _("Update interval (sec):"));
+    wxStaticText* label_update_static = new wxStaticText(notebook_pane_other, wxID_ANY, _("Update interval (seconds):"));
     grid_sizer_times->Add(label_update_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_times->Add(spin_ctrl_update, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_times->Add(checkbox_play_update, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    wxStaticText* label_wait_static = new wxStaticText(notebook_pane_other, wxID_ANY, _("Wait on full server (sec):"));
+    wxStaticText* label_wait_static = new wxStaticText(notebook_pane_other, wxID_ANY, _("Wait on full server (seconds):"));
     grid_sizer_times->Add(label_wait_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_times->Add(spin_ctrl_wait, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_times->Add(1, 1, 0, 0, 0);
-    wxStaticText* label_min_playtime_static = new wxStaticText(notebook_pane_other, wxID_ANY, _("Minimum playtime for statistics (sec):"));
+    wxStaticText* label_min_playtime_static = new wxStaticText(notebook_pane_other, wxID_ANY, _("Minimum playtime for statistics (seconds):"));
     grid_sizer_times->Add(label_min_playtime_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_times->Add(spin_ctrl_min_playtime, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_times->Add(1, 1, 0, 0, 0);
@@ -427,6 +471,14 @@ void CslDlgSettings::do_layout()
     grid_sizer_server_cleanup->Add(checkbox_server_cleanup_favourites, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_server_cleanup->Add(checkbox_server_cleanup_stats, 0, wxALL, 4);
     grid_sizer_times->Add(grid_sizer_server_cleanup, 1, wxALIGN_CENTER_VERTICAL, 0);
+    grid_sizer_times->Add(40, 16, 0, 0, 0);
+    grid_sizer_times->Add(40, 16, 0, 0, 0);
+    grid_sizer_times->Add(40, 16, 0, 0, 0);
+    wxStaticText* label_tooltip_delay = new wxStaticText(notebook_pane_other, wxID_ANY, _("Tooltip delay (milliseconds)"));
+    grid_sizer_times->Add(label_tooltip_delay, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_times->Add(spin_ctrl_tooltip_delay, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    wxStaticText* label_tooltip_delay_help = new wxStaticText(notebook_pane_other, wxID_ANY, _("To disable tooltips, set this value to 0."));
+    grid_sizer_times->Add(label_tooltip_delay_help, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_times->AddGrowableCol(1);
     sizer_times->Add(grid_sizer_times, 1, wxEXPAND, 0);
     grid_sizer_pane_other->Add(sizer_times, 1, wxALL|wxEXPAND, 4);
@@ -455,9 +507,60 @@ void CslDlgSettings::do_layout()
     grid_sizer_pane_other->Add(sizer_output, 1, wxALL|wxEXPAND, 4);
     notebook_pane_other->SetSizer(grid_sizer_pane_other);
     grid_sizer_pane_other->AddGrowableCol(0);
+    sizer_network->Add(tree_ctrl_network, 1, wxEXPAND, 0);
+    grid_sizer_pane_irc->Add(sizer_network, 1, wxALL|wxEXPAND, 4);
+    grid_sizer_2->Add(label_7, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_2->Add(text_ctrl_1, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_2->Add(label_8, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_2->Add(spin_ctrl_1, 0, wxALL, 4);
+    grid_sizer_2->Add(label_9, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_2->Add(text_ctrl_2, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_2->Add(label_10, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_2->Add(checkbox_1, 0, wxALL, 4);
+    grid_sizer_2->AddGrowableCol(1);
+    sizer_1->Add(grid_sizer_2, 1, wxEXPAND, 0);
+    grid_sizer_1->Add(sizer_1, 1, wxRIGHT|wxTOP|wxBOTTOM|wxEXPAND, 4);
+    grid_sizer_4->Add(label_11, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_4->Add(text_ctrl_3, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_4->Add(label_12, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_4->Add(text_ctrl_4, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_4->AddGrowableCol(1);
+    grid_sizer_4->AddGrowableCol(3);
+    grid_sizer_3->Add(grid_sizer_4, 1, wxEXPAND, 0);
+    grid_sizer_5->Add(list_box_1, 0, wxALL|wxEXPAND, 4);
+    sizer_4->Add(button_2, 0, wxALL|wxALIGN_BOTTOM, 4);
+    sizer_4->Add(button_3, 0, wxALL, 4);
+    sizer_4->AddGrowableRow(0);
+    sizer_4->AddGrowableRow(1);
+    grid_sizer_5->Add(sizer_4, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 0);
+    grid_sizer_5->AddGrowableRow(0);
+    grid_sizer_5->AddGrowableCol(0);
+    grid_sizer_3->Add(grid_sizer_5, 1, wxEXPAND, 0);
+    grid_sizer_3->AddGrowableRow(1);
+    grid_sizer_3->AddGrowableCol(0);
+    sizer_2->Add(grid_sizer_3, 1, wxEXPAND, 0);
+    grid_sizer_1->Add(sizer_2, 1, wxRIGHT|wxTOP|wxBOTTOM|wxEXPAND, 4);
+    grid_sizer_6->Add(list_box_2, 0, wxALL|wxEXPAND, 4);
+    sizer_5->Add(button_4, 0, wxALL|wxALIGN_BOTTOM, 4);
+    sizer_5->Add(button_5, 0, wxALL, 4);
+    sizer_5->AddGrowableRow(0);
+    sizer_5->AddGrowableRow(1);
+    grid_sizer_6->Add(sizer_5, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 0);
+    grid_sizer_6->AddGrowableRow(0);
+    grid_sizer_6->AddGrowableCol(0);
+    sizer_3->Add(grid_sizer_6, 1, wxEXPAND, 0);
+    grid_sizer_1->Add(sizer_3, 1, wxRIGHT|wxTOP|wxBOTTOM|wxEXPAND, 4);
+    grid_sizer_1->AddGrowableRow(1);
+    grid_sizer_1->AddGrowableRow(2);
+    grid_sizer_1->AddGrowableCol(0);
+    grid_sizer_pane_irc->Add(grid_sizer_1, 1, wxEXPAND, 0);
+    notebook_pane_irc->SetSizer(grid_sizer_pane_irc);
+    grid_sizer_pane_irc->AddGrowableRow(0);
+    grid_sizer_pane_irc->AddGrowableCol(1);
     notebook_settings->AddPage(notebook_pane_games, _("Games"));
     notebook_settings->AddPage(notebook_pane_colour, _("Colours"));
     notebook_settings->AddPage(notebook_pane_other, _("Other"));
+    notebook_settings->AddPage(notebook_pane_irc, _("IRC"));
     grid_sizer_main->Add(notebook_settings, 1, wxALL|wxEXPAND, 4);
     grid_sizer_button->Add(1, 1, 0, 0, 0);
     grid_sizer_button->Add(button_ok, 0, wxALL, 4);
@@ -484,29 +587,47 @@ void CslDlgSettings::do_layout()
 
 void CslDlgSettings::OnSpinCtrl(wxSpinEvent& event)
 {
+    wxInt32 i1,i2;
+
     switch (event.GetId())
     {
         case SPIN_CLEANUP_SERVERS:
         {
-            wxUint32 val=event.GetPosition();
-            checkbox_server_cleanup_favourites->Enable(val!=0);
-            checkbox_server_cleanup_stats->Enable(val!=0);
+            i1=event.GetPosition();
+            checkbox_server_cleanup_favourites->Enable(i1!=0);
+            checkbox_server_cleanup_stats->Enable(i1!=0);
+            break;
+        }
+        case SPIN_TOOLTIP_DELAY:
+        {
+            i1=event.GetPosition();
+
+            if (i1==m_settings.tooltipDelay)
+                break;
+
+            if (i1>m_settings.tooltipDelay)
+                i1=max(i1-m_settings.tooltipDelay,CSL_TOOLTIP_DELAY_STEP);
+            else
+                i1=min(i1-m_settings.tooltipDelay,-CSL_TOOLTIP_DELAY_STEP);
+
+            m_settings.tooltipDelay+=(i1/CSL_TOOLTIP_DELAY_STEP*CSL_TOOLTIP_DELAY_STEP);
+            spin_ctrl_tooltip_delay->SetValue(m_settings.tooltipDelay);
             break;
         }
         case SPIN_PING_GOOD:
         {
-            wxUint32 val=event.GetPosition();
-            wxUint32 bad=spin_ctrl_ping_bad->GetValue();
-            if (val>bad)
-                spin_ctrl_ping_bad->SetValue(val);
+            i1=event.GetPosition();
+            i2=spin_ctrl_ping_bad->GetValue();
+            if (i1>i2)
+                spin_ctrl_ping_bad->SetValue(i1);
             break;
         }
         case SPIN_PING_BAD:
         {
-            wxUint32 val=event.GetPosition();
-            wxUint32 good=spin_ctrl_ping_good->GetValue();
-            if (val<good)
-                spin_ctrl_ping_good->SetValue(val);
+            i1=event.GetPosition();
+            i2=spin_ctrl_ping_good->GetValue();
+            if (i1<i2)
+                spin_ctrl_ping_good->SetValue(i1);
             break;
         }
     }
@@ -589,9 +710,10 @@ void CslDlgSettings::OnCommandEvent(wxCommandEvent& event)
             m_settings.cleanupServers=spin_ctrl_server_cleanup->GetValue()*86400;
             m_settings.cleanupServersKeepFav=checkbox_server_cleanup_favourites->GetValue();
             m_settings.cleanupServersKeepStats=checkbox_server_cleanup_stats->GetValue();
+            m_settings.tooltipDelay=spin_ctrl_tooltip_delay->GetValue();
             m_settings.pinggood=spin_ctrl_ping_good->GetValue();
             m_settings.pingbad=spin_ctrl_ping_bad->GetValue();
-        m_settings.systray=checkbox_systray->GetValue() ? radio_btn_systray_always->GetValue() ? 1 : 2 : 0;
+            m_settings.systray=checkbox_systray->GetValue() ? radio_btn_systray_always->GetValue() ? 1 : 2 : 0;
             m_settings.gameOutputPath=dirpicker_game_output->GetPath();
             m_settings.autoSaveOutput=checkbox_game_output->IsChecked();
 

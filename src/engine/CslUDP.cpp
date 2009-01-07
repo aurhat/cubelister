@@ -59,7 +59,7 @@ CslUDP::CslUDP(wxEvtHandler *evtHandler) : wxEvtHandler(),
         }
     }
 
-    LOG_DEBUG("Listen port: %li\n",address.Service());
+    LOG_DEBUG("Ping port: %li\n",address.Service());
 
     m_socket->SetEventHandler(*this);
     m_socket->SetNotify(wxSOCKET_INPUT_FLAG);

@@ -20,8 +20,6 @@
 
 #include <wx/wupdlock.h>
 #include <wx/clipbrd.h>
-#include <wx/txtstrm.h>
-#include <wx/wupdlock.h>
 #include "engine/CslTools.h"
 #include "CslDlgAddServer.h"
 #include "CslDlgConnectPass.h"
@@ -54,7 +52,7 @@ enum
 };
 
 
-BEGIN_EVENT_TABLE(CslListCtrlServer, wxListCtrl)
+BEGIN_EVENT_TABLE(CslListCtrlServer, CslListCtrl)
     #ifdef __WXMSW__
     EVT_ERASE_BACKGROUND(CslListCtrlServer::OnEraseBackground)
     EVT_LIST_COL_BEGIN_DRAG(wxID_ANY,CslListCtrlServer::OnColumnDragStart)
@@ -73,24 +71,25 @@ END_EVENT_TABLE()
 
 enum
 {
-    CSL_LIST_IMG_GREEN,
-    CSL_LIST_IMG_YELLOW,
-    CSL_LIST_IMG_RED,
-    CSL_LIST_IMG_GREY,
-    CSL_LIST_IMG_GREEN_EXT,
-    CSL_LIST_IMG_YELLOW_EXT,
-    CSL_LIST_IMG_RED_EXT,
-    CSL_LIST_IMG_SORT_ASC,
-    CSL_LIST_IMG_SORT_DSC,
-    CSL_LIST_IMG_SORT_ASC_LIGHT,
-    CSL_LIST_IMG_SORT_DSC_LIGHT,
-    CSL_LIST_IMG_GAMES_START,
+    LIST_IMG_GREEN,
+    LIST_IMG_YELLOW,
+    LIST_IMG_RED,
+    LIST_IMG_GREY,
+    LIST_IMG_GREEN_EXT,
+    LIST_IMG_YELLOW_EXT,
+    LIST_IMG_RED_EXT,
+    LIST_IMG_SORT_ASC,
+    LIST_IMG_SORT_DSC,
+    LIST_IMG_SORT_ASC_LIGHT,
+    LIST_IMG_SORT_DSC_LIGHT,
+    LIST_IMG_GAMES_START,
 };
+
 
 CslListCtrlServer::CslListCtrlServer(wxWindow* parent,wxWindowID id,const wxPoint& pos,
                                      const wxSize& size,long style,
                                      const wxValidator& validator, const wxString& name) :
-        wxListCtrl(parent,id,pos,size,style,validator,name),
+        CslListCtrl(parent,id,pos,size,style,validator,name),
         m_id(id),m_engine(NULL),m_masterSelected(false),
         m_sibling(NULL),m_dontUpdateInfo(false),m_dontRemoveOnDeselect(false),
 #ifdef __WXMSW__
@@ -282,7 +281,7 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
     wxPoint point=event.GetPosition();
 
     //from keyboard
-    if (point.x==-1 && point.y==-1)
+    if (point==wxDefaultPosition)
         point=wxGetMousePosition();
 
     if ((selected=m_selected.GetCount())>0)
@@ -520,7 +519,7 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
             {
                 info->Password=pi.Password;
                 info->PasswordAdmin=pi.AdminPassword;
-                i=pi.Admin ? CslGame::CSL_CONNECT_ADMIN_PASS:CslGame::CSL_CONNECT_PASS;
+                i=pi.Admin ? CslServerInfo::CSL_CONNECT_ADMIN_PASS:CslServerInfo::CSL_CONNECT_PASS;
                 CslConnectionState::CreateConnectState(info,i);
                 event.Skip();
             }
@@ -836,25 +835,23 @@ void CslListCtrlServer::ListCreateGameBitmaps()
     SetImageList(&m_imageList,wxIMAGE_LIST_SMALL);
 }
 
-void CslListCtrlServer::Highlight(wxInt32 type,bool high,CslServerInfo *info,wxListItem *listitem)
+void CslListCtrlServer::Highlight(wxInt32 type,bool high,bool sort,CslServerInfo *info,wxListItem *item)
 {
-    wxListItem item;
-    wxUint32 i;
-    wxInt32 t;
+    wxUint32 i,t;
+    wxListItem it;
 
     wxColour colour;
 
     if (info)
     {
-        if (!listitem)
+        if (!item)
         {
-            if (ListFindItem(info,item)==wxNOT_FOUND)
+            if (ListFindItem(info,it)==wxNOT_FOUND)
                 return;
-
-            listitem=&item;
+            item=&it;
         }
 
-        CslListServerData *server=(CslListServerData*)GetItemData(*listitem);
+        CslListServerData *server=(CslListServerData*)GetItemData(*item);
         t=server->SetHighlight(type,high);
 
         if (t&CSL_HIGHLIGHT_LOCKED)
@@ -866,27 +863,39 @@ void CslListCtrlServer::Highlight(wxInt32 type,bool high,CslServerInfo *info,wxL
         else
             colour=GetBackgroundColour();
 
-        SetItemBackgroundColour(*listitem,colour);
-        return;
+        SetItemBackgroundColour(*item,colour);
+    }
+    else
+    {
+        for (i=0;i<m_servers.GetCount();i++)
+        {
+            info=m_servers.Item(i)->Info;
+
+            if (ListFindItem(info,it)==wxNOT_FOUND)
+                continue;
+
+            t=m_servers.Item(i)->SetHighlight(type,high);
+
+            if (t&CSL_HIGHLIGHT_FOUND_SERVER || t&CSL_HIGHLIGHT_FOUND_PLAYER)
+                colour=g_cslSettings->colServerHigh;
+            else if (t&CSL_HIGHLIGHT_LOCKED)
+                colour=g_cslSettings->colServerPlay;
+            else
+                colour=GetBackgroundColour();
+
+            SetItemBackgroundColour(it,colour);
+        }
     }
 
-    for (i=0;i<m_servers.GetCount();i++)
+    if (sort)
     {
-        info=m_servers.Item(i)->Info;
+        ListSort();
 
-        if (ListFindItem(info,item)==wxNOT_FOUND)
-            continue;
-
-        t=m_servers.Item(i)->SetHighlight(type,high);
-
-        if (t&CSL_HIGHLIGHT_FOUND_SERVER || t&CSL_HIGHLIGHT_FOUND_PLAYER)
-            colour=g_cslSettings->colServerHigh;
-        else if (t&CSL_HIGHLIGHT_LOCKED)
-            colour=g_cslSettings->colServerPlay;
-        else
-            colour=GetBackgroundColour();
-
-        SetItemBackgroundColour(item,colour);
+#ifndef __WXMSW__
+        //removes flicker after sorting
+        wxIdleEvent idle;
+        wxTheApp->SendIdleEvents(this,idle);
+#endif
     }
 }
 
@@ -959,7 +968,7 @@ bool CslListCtrlServer::ListFilterItemMatches(CslServerInfo *info)
     else if (*m_filterFlags&CSL_FILTER_OFFLINE && !CslEngine::PingOk(*info,g_cslSettings->updateInterval))
         return true;
     else if (*m_filterFlags&CSL_FILTER_FULL && info->PlayersMax>0 &&
-             info->Players==info->PlayersMax)
+             info->Players>=info->PlayersMax)
         return true;
     else if (*m_filterFlags&CSL_FILTER_EMPTY && info->Players==0)
         return true;
@@ -971,6 +980,34 @@ bool CslListCtrlServer::ListFilterItemMatches(CslServerInfo *info)
         return true;
 
     return false;
+}
+
+void CslListCtrlServer::GetToolTipText(wxInt32 row,wxString& title,wxArrayString& text)
+{
+    if (row<GetItemCount())
+    {
+        wxInt32 i;
+        wxListItem item,column;
+
+        item.SetId(row);
+
+        for (i=0;i<GetColumnCount();i++)
+        {
+            item.SetColumn(i);
+            GetItem(item);
+            GetColumn(i,column);
+
+            const wxString& s=item.GetText();
+
+            if (!s.IsEmpty())
+            {
+                text.Add(column.GetText());
+                text.Add(s);
+            }
+        }
+
+        title=_("Server information");
+    }
 }
 
 bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
@@ -1086,21 +1123,7 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
         }
 
         if (infoCmp->MM!=info->MM)
-        {
-            if (info->MM>=0)
-            {
-                s=s.Format(wxT("%d"),info->MM);
-                if (info->MM==CslGame::MM_OPEN)
-                    s+=wxT(" (O)");
-                else if (info->MM==CslGame::MM_VETO)
-                    s+=wxT(" (V)");
-                else if (info->MM==CslGame::MM_LOCKED)
-                    s+=wxT(" (L)");
-                else if (info->MM==CslGame::MM_PRIVATE)
-                    s+=wxT(" (P)");
-                SetItem(i,8,s);
-            }
-        }
+            SetItem(i,8,info->MMDescription);
     }
     else
     {
@@ -1109,35 +1132,44 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
     }
 
     wxColour colour(GetTextColour());
+
     if (!CslEngine::PingOk(*info,g_cslSettings->updateInterval))
         colour=g_cslSettings->colServerOff;
-    else if (info->PlayersMax>0 && info->Players==info->PlayersMax)
-        colour=g_cslSettings->colServerFull;
-    else if (info->MM==CslGame::MM_VETO)
-        colour=g_cslSettings->colServerMM1;
-    else if (info->MM==CslGame::MM_LOCKED)
-        colour=g_cslSettings->colServerMM2;
-    else if (info->MM==CslGame::MM_PRIVATE)
+    else if (CSL_SERVER_IS_BAN(info->MM) ||
+             CSL_SERVER_IS_PASSWORD(info->MM) ||
+             CSL_SERVER_IS_BLACKLIST(info->MM))
         colour=g_cslSettings->colServerMM3;
-    else if (info->Players==0)
-        colour=g_cslSettings->colServerEmpty;
+    else
+    {
+        if (info->Players>0 && info->Players>=info->PlayersMax && info->PlayersMax>-1)
+            colour=g_cslSettings->colServerFull;
+        else if (CSL_SERVER_IS_PRIVATE(info->MM))
+            colour=g_cslSettings->colServerMM3;
+        else if (CSL_SERVER_IS_LOCKED(info->MM))
+            colour=g_cslSettings->colServerMM2;
+        else if (CSL_SERVER_IS_VETO(info->MM))
+            colour=g_cslSettings->colServerMM1;
+        else if (info->Players==0)
+            colour=g_cslSettings->colServerEmpty;
+    }
+
     SetItemTextColour(i,colour);
 
     // search
     found=m_searchString.IsEmpty() ? false : ListSearchItemMatches(info);
-    Highlight(CSL_HIGHLIGHT_FOUND_SERVER,found,info,&item);
+    Highlight(CSL_HIGHLIGHT_FOUND_SERVER,found,false,info,&item);
 
     item.SetMask(wxLIST_MASK_TEXT|wxLIST_MASK_IMAGE|wxLIST_MASK_DATA);
     if (m_id==CSL_LIST_MASTER)
     {
         if (!CslEngine::PingOk(*info,g_cslSettings->updateInterval))
-            i=CSL_LIST_IMG_GREY;
+            i=LIST_IMG_GREY;
         else if (info->Ping>(wxInt32)g_cslSettings->pingbad)
-            i=info->ExtInfoStatus!=CSL_EXT_STATUS_FALSE ? CSL_LIST_IMG_RED_EXT : CSL_LIST_IMG_RED;
+            i=info->ExtInfoStatus!=CSL_EXT_STATUS_FALSE ? LIST_IMG_RED_EXT : LIST_IMG_RED;
         else if (info->Ping>(wxInt32)g_cslSettings->pinggood)
-            i=info->ExtInfoStatus!=CSL_EXT_STATUS_FALSE ? CSL_LIST_IMG_YELLOW_EXT : CSL_LIST_IMG_YELLOW;
+            i=info->ExtInfoStatus!=CSL_EXT_STATUS_FALSE ? LIST_IMG_YELLOW_EXT : LIST_IMG_YELLOW;
         else
-            i=info->ExtInfoStatus!=CSL_EXT_STATUS_FALSE ? CSL_LIST_IMG_GREEN_EXT : CSL_LIST_IMG_GREEN;
+            i=info->ExtInfoStatus!=CSL_EXT_STATUS_FALSE ? LIST_IMG_GREEN_EXT : LIST_IMG_GREEN;
 
         if (infoCmp->ImgId!=i)
         {
@@ -1147,7 +1179,7 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
     }
     else
     {
-        i=CSL_LIST_IMG_GAMES_START+info->GetGame().GetId()*2-
+        i=LIST_IMG_GAMES_START+info->GetGame().GetId()*2-
           (info->ExtInfoStatus==CSL_EXT_STATUS_OK ? 1:2);
         if (infoCmp->ImgId!=i)
         {
@@ -1230,10 +1262,10 @@ wxUint32 CslListCtrlServer::ListUpdate(vector<CslServerInfo*>& servers)
     if (!sort || !g_cslSettings->autoSortColumns)
         return c;
 
-    ListSort(-1);
+    ListSort();
 
 #ifndef __WXMSW__
-    //removes flicker on autosort for wxGTK and wxMAC
+    //removes flicker after sorting
     wxIdleEvent idle;
     wxTheApp->SendIdleEvents(this,idle);
 #endif
@@ -1256,12 +1288,9 @@ wxUint32 CslListCtrlServer::ListSearch(const wxString& search)
     if (m_searchString.IsEmpty())
         return 0;
 
-    wxUint32 i,l,c=0;
+    wxUint32 i,c=0;
 
-    wxWindowUpdateLocker lock(this);
-
-    l=m_servers.GetCount();
-    for (i=0;i<l;i++)
+    for (i=0;i<m_servers.GetCount();i++)
     {
         CslServerInfo *info=m_servers.Item(i)->Info;
         if (ListUpdateServer(info))
@@ -1298,9 +1327,9 @@ void CslListCtrlServer::ToggleSortArrow()
     if (g_cslSettings->autoSortColumns)
     {
         if (m_sortHelper.m_sortMode==CSL_SORT_ASC)
-            img=CSL_LIST_IMG_SORT_ASC;
+            img=LIST_IMG_SORT_ASC;
         else
-            img=CSL_LIST_IMG_SORT_DSC;
+            img=LIST_IMG_SORT_DSC;
     }
     item.SetImage(img);
     SetColumn(m_sortHelper.m_sortType,item);
@@ -1319,15 +1348,15 @@ void CslListCtrlServer::ListSort(wxInt32 column)
         GetColumn(column,item);
 
         if (item.GetImage()==-1 ||
-            item.GetImage()==CSL_LIST_IMG_SORT_DSC ||
-            item.GetImage()==CSL_LIST_IMG_SORT_DSC_LIGHT)
+            item.GetImage()==LIST_IMG_SORT_DSC ||
+            item.GetImage()==LIST_IMG_SORT_DSC_LIGHT)
         {
-            g_cslSettings->autoSortColumns ? img=CSL_LIST_IMG_SORT_ASC : img=CSL_LIST_IMG_SORT_ASC_LIGHT;
+            g_cslSettings->autoSortColumns ? img=LIST_IMG_SORT_ASC : img=LIST_IMG_SORT_ASC_LIGHT;
             m_sortHelper.m_sortMode=CSL_SORT_ASC;
         }
         else
         {
-            g_cslSettings->autoSortColumns ? img=CSL_LIST_IMG_SORT_DSC : img=CSL_LIST_IMG_SORT_DSC_LIGHT;
+            g_cslSettings->autoSortColumns ? img=LIST_IMG_SORT_DSC : img=LIST_IMG_SORT_DSC_LIGHT;
             m_sortHelper.m_sortMode=CSL_SORT_DSC;
         }
 
@@ -1378,13 +1407,12 @@ int wxCALLBACK CslListCtrlServer::ListSortCompareFunc(long item1,long item2,long
 
     bool ping1Ok=CslEngine::PingOk(*info1->Info,g_cslSettings->updateInterval);
     bool ping2Ok=CslEngine::PingOk(*info2->Info,g_cslSettings->updateInterval);
-
-    wxInt32 type;
-    wxInt32 sortMode=((CslListSortHelper*)data)->m_sortMode;
+    bool high1=info1->HighLight&CSL_HIGHLIGHT_FOUND_SERVER || info1->HighLight&CSL_HIGHLIGHT_FOUND_PLAYER;
+    bool high2=info2->HighLight&CSL_HIGHLIGHT_FOUND_SERVER || info2->HighLight&CSL_HIGHLIGHT_FOUND_PLAYER;
     wxInt32 sortType=((CslListSortHelper*)data)->m_sortType;
-    wxInt32 vi1=0,vi2=0;
-    wxUint32 vui1=0,vui2=0;
-    wxString vs1=wxEmptyString,vs2=wxEmptyString;
+
+    if ((high1 || high2) && !(high1 && high2))
+        return high1 ? -1:1;
 
     if (sortType!=SORT_HOST)
     {
@@ -1395,6 +1423,12 @@ int wxCALLBACK CslListCtrlServer::ListSortCompareFunc(long item1,long item2,long
         if (!ping2Ok)
             return -1;
     }
+
+    wxInt32 type;
+    wxInt32 sortMode=((CslListSortHelper*)data)->m_sortMode;
+    wxInt32 vi1=0,vi2=0;
+    wxUint32 vui1=0,vui2=0;
+    wxString vs1=wxEmptyString,vs2=wxEmptyString;
 
     switch (sortType)
     {
@@ -1412,8 +1446,8 @@ int wxCALLBACK CslListCtrlServer::ListSortCompareFunc(long item1,long item2,long
             else if (isip1&&isip2)
             {
                 type=CSL_LIST_SORT_UINT;
-                IP2Int(vs1,&vui1);
-                IP2Int(vs2,&vui2);
+                vui1=IP2Int(vs1);
+                vui2=IP2Int(vs2);
             }
             break;
         }

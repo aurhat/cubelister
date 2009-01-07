@@ -40,6 +40,25 @@
 #define CSL_CAP_CONNECT_ADMIN_PASS(x)  (x&CSL_CAPABILITY_CONNECT_ADMIN_PASS)
 #define CSL_CAP_CUSTOM_CONFIG(x)       (x&CSL_CAPABILITY_CUSTOM_CONFIG)
 
+enum
+{
+    CSL_SERVER_OPEN,
+    CSL_SERVER_VETO,
+    CSL_SERVER_LOCKED,
+    CSL_SERVER_PRIVATE,
+    CSL_SERVER_PASSWORD  = 1<<8,
+    CSL_SERVER_BAN       = 1<<9,
+    CSL_SERVER_BLACKLIST = 1<<10,
+};
+#define CSL_SERVER_IS_OPEN(x)       ((x&0xff)==0)
+#define CSL_SERVER_IS_VETO(x)       ((x&0xff)==1)
+#define CSL_SERVER_IS_LOCKED(x)     ((x&0xff)==2)
+#define CSL_SERVER_IS_PRIVATE(x)    ((x&0xff)==3)
+#define CSL_SERVER_IS_PASSWORD(x)   (x&CSL_SERVER_PASSWORD)
+#define CSL_SERVER_IS_BAN(x)        (x&CSL_SERVER_BAN)
+#define CSL_SERVER_IS_BLACKLIST(x)  (x&CSL_SERVER_BLACKLIST)
+
+
 class CslMaster;
 class CslServerInfo;
 
@@ -98,8 +117,6 @@ class CslGame
         friend class CslEngine;
 
     public:
-        enum { MM_OPEN, MM_VETO, MM_LOCKED, MM_PRIVATE };
-        enum { CSL_CONNECT_DEFAULT, CSL_CONNECT_PASS, CSL_CONNECT_ADMIN_PASS };
         enum { CSL_CONFIG_DIR, CSL_CONFIG_EXE };
 
         CslGame();
@@ -135,10 +152,11 @@ class CslGame
         CslGameClientSettings& GetClientSettings() { return  m_clientSettings; }
 
         virtual void GetPlayerstatsDescriptions(vector<wxString>& desc) const;
-        virtual wxString GetWeaponName(wxInt32 n) const { return wxEmptyString; }
-        virtual bool ModeIsCapture(wxInt32 mode) const { return false; }
-        virtual bool ModeHasBases(wxInt32 mode) const { return false; }
-        virtual wxInt32 ModeScoreLimit(wxInt32 mode) const { return -1; }
+        virtual const wxChar* GetWeaponName(wxInt32 n) const { return wxEmptyString; }
+        virtual bool ModeHasFlags(wxInt32 mode,wxInt32 prot) const { return false; }
+        virtual bool ModeHasBases(wxInt32 mode,wxInt32 prot) const { return false; }
+        virtual wxInt32 ModeScoreLimit(wxInt32 mode,wxInt32 prot) const { return -1; }
+        virtual wxInt32 GetBestTeam(CslTeamStats& stats,wxInt32 prot) const { return -1; }
         virtual wxUint16 GetDefaultPort() const = 0;
         virtual bool ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const = 0;
         virtual bool ParsePlayerPong(wxUint32 protocol,ucharbuf& buf,CslPlayerStatsData& info) const { return false; }
@@ -209,7 +227,8 @@ class CslServerInfo : public CslExtendedInfo
         friend class CslMaster;
 
     public:
-        enum { CSL_VIEW_DEFAULT = 1<<0, CSL_VIEW_FAVOURITE=1<<1 };
+        enum { CSL_VIEW_DEFAULT=0x1, CSL_VIEW_FAVOURITE=0x2 };
+        enum { CSL_CONNECT_DEFAULT, CSL_CONNECT_PASS, CSL_CONNECT_ADMIN_PASS };
 
         CslServerInfo(CslGame *game=NULL,
                       const wxString& host=wxT("localhost"),wxUint16 port=0,
@@ -256,14 +275,16 @@ class CslServerInfo : public CslExtendedInfo
         wxUint16 Port;
         wxIPV4address Addr;
         bool Pingable;
+        bool PasswordProtected;
         wxString Password,PasswordAdmin;
         wxString Description,DescriptionOld;
         wxString GameMode,Map;
         wxString Version;
+        wxString MMDescription;
+        wxInt32 MM;
         wxInt32 Protocol;
         wxInt32 Ping,TimeRemain;
         wxInt32 Players,PlayersMax;
-        wxInt32 MM;
         wxUint32 View;
         wxUint32 LastSeen,PingSend,PingResp;
         wxUint32 PlayLast,PlayTimeLastGame,PlayTimeTotal;

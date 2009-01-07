@@ -26,7 +26,7 @@
 */
 
 #define CSL_DEFAULT_NAME_AC           wxT("AssaultCube")
-#define CSL_LAST_PROTOCOL_AC          1126
+#define CSL_LAST_PROTOCOL_AC          1128
 
 #define CSL_DEFAULT_PORT_AC           28763
 
@@ -44,12 +44,13 @@ class CslGameAssaultCube : public CslGame
         ~CslGameAssaultCube();
 
     private:
-        wxString GetVersionName(wxInt32 n) const;
-        wxString GetModeName(wxInt32 n) const;
+        const wxChar* GetVersionName(wxInt32 prot) const;
+        const wxChar* GetModeName(wxInt32 mode) const;
 
         //implementations for base class
-        wxString GetWeaponName(wxInt32 n) const;
-        bool ModeIsCapture(wxInt32 mode) const { return mode==5; }
+        const wxChar* GetWeaponName(wxInt32 n) const;
+        bool ModeHasFlags(wxInt32 mode,wxInt32 prot) const { return mode==5 || (mode>=13 && mode<=15); }
+        wxInt32 GetBestTeam(CslTeamStats& stats,wxInt32 prot) const;
         wxUint16 GetDefaultPort() const { return CSL_DEFAULT_PORT_AC; }
         bool ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const;
         bool ParsePlayerPong(wxUint32 protocol,ucharbuf& buf,CslPlayerStatsData& info) const;

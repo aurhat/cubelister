@@ -35,13 +35,6 @@ END_EVENT_TABLE()
 
 enum
 {
-    CSL_LIST_IMG_SORT_ASC = 0,
-    CSL_LIST_IMG_SORT_DSC,
-    CSL_LIST_IMG_UNKNOWN
-};
-
-enum
-{
     SORT_PLAYER = 0, SORT_TEAM,
     SORT_FRAGS, SORT_DEATHS, SORT_TEAMKILLS,
     SORT_HEALTH, SORT_ARMOUR, SORT_WEAPON
@@ -110,8 +103,6 @@ void CslDlgExtended::set_properties()
 {
     // begin wxGlade: CslDlgExtended::set_properties
     SetTitle(_("CSL - Extended info"));
-    label_team1->SetMinSize(wxSize(60, -1));
-    label_team2->SetMinSize(wxSize(60, -1));
     button_close->SetDefault();
     // end wxGlade
 
@@ -177,6 +168,8 @@ void CslDlgExtended::do_layout()
     grid_sizer_team_score->Add(label_team6, 0, wxALL, 4);
     grid_sizer_team_score->Add(label_team7, 0, wxALL, 4);
     grid_sizer_team_score->Add(label_team8, 0, wxALL, 4);
+    grid_sizer_team_score->AddGrowableCol(0);
+    grid_sizer_team_score->AddGrowableCol(1);
     sizer_team_score->Add(grid_sizer_team_score, 1, wxALIGN_CENTER_VERTICAL, 0);
     grid_sizer_info_team->Add(sizer_team_score, 1, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 4);
     wxStaticText* label_server_static = new wxStaticText(this, wxID_ANY, _("Server:"));
@@ -301,7 +294,7 @@ void CslDlgExtended::UpdateMap()
         panel_map->SetOk(false);
         ShowPanelMap(false);
 
-        label_map->SetLabel(_("no map"));
+        label_map->SetLabel(_("No map"));
         label_author->SetLabel(wxEmptyString);
         label_author_prefix->SetLabel(wxEmptyString);
 
@@ -368,10 +361,9 @@ void CslDlgExtended::UpdateTeamData()
     if (!m_update)
         return;
 
-    wxSize size;
     wxString s;
-    wxInt32 h=-1,hs=0;
-    wxInt32 lu=0,lc=m_teamLabel.GetCount();
+    wxSize size;
+    wxInt32 h,lu=0,lc=m_teamLabel.GetCount();
     CslTeamStats& stats=m_info->TeamStats;
     CslTeamStatsData *data=NULL;
 
@@ -380,28 +372,30 @@ void CslDlgExtended::UpdateTeamData()
     wxWindowUpdateLocker lock(this);
 #endif
 
-    bool capture=m_info->GetGame().ModeIsCapture(stats.GameMode);
-    bool bases=m_info->GetGame().ModeHasBases(stats.GameMode);
-    wxInt32 limit=m_info->GetGame().ModeScoreLimit(stats.GameMode);
+    bool bases=m_info->GetGame().ModeHasBases(stats.GameMode,m_info->Protocol);
+    wxInt32 limit=m_info->GetGame().ModeScoreLimit(stats.GameMode,m_info->Protocol);
 
     UpdateMap();
     m_mapInfo.ResetBasesColour();
 
-    if (stats.TeamMode)
+
+    if (!m_info->Players)
     {
-        loopv(stats.Stats)
+        label_team1->SetFont(m_labelFont);
+        label_team1->SetForegroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOWTEXT));
+
+        label_team1->SetLabel(_("No teams."));
+        label_team1->SetMinSize(label_team1->GetBestSize());
+    }
+    else if (stats.TeamMode)
+    {
+        loopv(stats.m_stats)
         {
-            data=stats.Stats[i];
+            data=stats.m_stats[i];
 
             // TODO remove i==c and dynamically add labels
             if (!data->Ok || i==lc)
                 break;
-
-            if (data->Score>hs)
-            {
-                hs=data->Score;
-                h=i;
-            }
 
             // colour bases
             if (bases && m_mapInfo.m_basesOk)
@@ -417,16 +411,12 @@ void CslDlgExtended::UpdateTeamData()
                 }
             }
 
-            s=data->Name;
-            s+=wxT(": ");
-            s+=wxString::Format(wxT("%d"),data->Score);
+            s.Empty();
+            s << data->Name << wxT(": ") << data->Score;
 
             if (CSL_SCORE_IS_VALID(data->Score2))
             {
-                wxInt32 score2=data->Score2;
-                if (score2<0)
-                    score2=0;
-                s+=wxString::Format(wxT(" / %d"),score2);
+                s << wxT(" / ") << data->Score2;
                 sizer_team_score_staticbox->SetLabel(_("Team score")+wxString(wxT(" / "))+_("Flag score"));
             }
             else
@@ -438,25 +428,20 @@ void CslDlgExtended::UpdateTeamData()
 
             size=m_teamLabel.Item(i)->GetBestSize();
             if (i%2==0)
-                size.x+=40;
-            else
-                size.x+=6;
+                size.x+=20;
             m_teamLabel.Item(i)->SetMinSize(size);
 
             lu++;
         }
 
         // TODO remove h<c and dynamically add labels
-        if (h>-1 && h<lc)
+        if ((h=m_info->GetGame().GetBestTeam(stats,m_info->Protocol))>-1 && h<lc)
         {
-            data=stats.Stats[h];
+            data=stats.m_stats[h];
 
-            if (!capture)
-            {
-                wxFont font=m_labelFont;
-                font.SetWeight(wxFONTWEIGHT_BOLD);
-                m_teamLabel.Item(h)->SetFont(font);
-            }
+            wxFont font=m_labelFont;
+            font.SetWeight(wxFONTWEIGHT_BOLD);
+            m_teamLabel.Item(h)->SetFont(font);
 
             if (data->Score==limit || stats.TimeRemain==0)
             {
@@ -465,24 +450,33 @@ void CslDlgExtended::UpdateTeamData()
                 if (data->Score==limit)
                     s+=_("WINNER");
                 else
-                    s+=wxString::Format(wxT("%d - "),data->Score)+_("WINNER");
+                {
+                    s << data->Score;
+                    if (m_info->GetGame().ModeHasFlags(stats.GameMode,m_info->Protocol) &&
+                        CSL_SCORE_IS_VALID(data->Score2))
+                        s << wxT(" / ") << data->Score2;
+                    s << wxT(" - ") << _("WINNER");
+
+                }
 
                 m_teamLabel.Item(h)->SetLabel(s);
-                m_teamLabel.Item(h)->SetMinSize(m_teamLabel.Item(h)->GetBestSize());
 
                 if (checkbox_update->IsChecked())
                     m_update=false;
             }
+
+            size=m_teamLabel.Item(h)->GetBestSize();
+            if (h%2==0)
+                size.x+=20;
+            m_teamLabel.Item(h)->SetMinSize(size);
         }
     }
     else
     {
         label_team1->SetFont(m_labelFont);
         label_team1->SetForegroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOWTEXT));
-        if (!m_info->Players)
-            label_team1->SetLabel(_("No teams."));
-        else
-            label_team1->SetLabel(_("Not a team game."));
+
+        label_team1->SetLabel(_("Not a team game."));
         label_team1->SetMinSize(label_team1->GetBestSize());
 
         if (checkbox_update->IsChecked() && stats.TimeRemain==0)
@@ -602,7 +596,9 @@ void CslDlgExtended::DoShow(CslServerInfo *info,bool show)
     m_info=info;
     list_ctrl_players->ServerInfo(info);
 
-    if (!show && IsShown())
+    if (show)
+        RecalcMinSize(true);
+    else if (IsShown())
         Hide();
 
     if (!info)

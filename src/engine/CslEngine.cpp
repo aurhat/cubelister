@@ -55,11 +55,9 @@ wxThread::ExitCode CslResolverThread::Entry()
             LOG_DEBUG("Resolver waiting...\n");
             m_condition->Wait();
             LOG_DEBUG("Resolver signaled!\n");
-            if (m_terminate)
-                break;
         }
 
-        if (!m_packets.length())
+        if (m_terminate || !m_packets.length())
             continue;
 
         m_section.Enter();
@@ -69,6 +67,9 @@ wxThread::ExitCode CslResolverThread::Entry()
 
         packet->Address.Hostname(packet->Host);
         packet->Domain=packet->Address.Hostname();
+
+        if (m_terminate)
+            break;
 
         wxCommandEvent evt(wxCSL_EVT_RESOLVE_HOST);
         evt.SetClientData(packet);
@@ -87,10 +88,12 @@ void CslResolverThread::AddPacket(CslResolverPacket *packet)
     m_section.Enter();
     m_packets.add(packet);
     m_section.Leave();
-    if (m_mutex.TryLock()!=wxMUTEX_NO_ERROR)
-        return;
-    m_condition->Signal();
-    m_mutex.Unlock();
+
+    if (m_mutex.TryLock()==wxMUTEX_NO_ERROR)
+    {
+        m_condition->Signal();
+        m_mutex.Unlock();
+    }
 }
 
 void CslResolverThread::Terminate()
@@ -101,35 +104,57 @@ void CslResolverThread::Terminate()
 }
 
 
-CslEngine::CslEngine(wxEvtHandler *evtHandler) : wxEvtHandler(),
-        m_ok(false),
-        m_evtHandler(evtHandler)
+CslEngine::CslEngine() : wxEvtHandler(),
+        m_ok(false),m_pingSock(NULL),m_resolveThread(NULL)
 {
-    SetNextHandler(evtHandler);
-    GetTicks();
-};
+}
 
 CslEngine::~CslEngine()
 {
-    wxASSERT(!m_ok);
+    if (m_pingSock)
+        delete m_pingSock;
+
+    if (m_resolveThread)
+    {
+        m_resolveThread->Terminate();
+        m_resolveThread->Wait();
+        delete m_resolveThread;
+    }
 }
 
-bool CslEngine::Init(wxInt32 interval,wxInt32 pingsPerSecond)
+bool CslEngine::Init(wxEvtHandler *handler,wxInt32 interval,wxInt32 pingsPerSecond)
 {
     if (m_ok)
         return false;
-
-    m_pingSock=new CslUDP(this);
-    m_ok=m_pingSock->IsOk();
 
     m_updateInterval=interval;
     m_pingsPerSecond=pingsPerSecond;
     m_gameId=0;
 
-    if (m_ok)
+    GetTicks();
+    SetNextHandler(handler);
+
+    if (!m_pingSock)
+    {
+        m_pingSock=new CslUDP(this);
+
+        if (!(m_ok=m_pingSock->IsOk()))
+        {
+            delete m_pingSock;
+            m_pingSock=NULL;
+        }
+    }
+
+    if (m_ok && !m_resolveThread)
     {
         m_resolveThread=new CslResolverThread(this);
-        m_resolveThread->Run();
+
+        if (!m_resolveThread->IsOk() || m_resolveThread->Run()!=wxTHREAD_NO_ERROR)
+        {
+            delete m_resolveThread;
+            m_resolveThread=NULL;
+            m_ok=false;
+        }
     }
 
     return m_ok;
@@ -137,19 +162,8 @@ bool CslEngine::Init(wxInt32 interval,wxInt32 pingsPerSecond)
 
 void CslEngine::DeInit()
 {
-    if (!m_ok)
-        return;
-
-    if (m_resolveThread)
-    {
-        m_resolveThread->Terminate();
-        m_resolveThread->Delete();
-        delete m_resolveThread;
-    }
-
-    delete m_pingSock;
+    SetNextHandler(NULL);
     loopv(m_games) delete m_games[i];
-
     m_ok=false;
 }
 
@@ -490,11 +504,17 @@ void CslEngine::ParseDefaultPong(CslServerInfo *info,ucharbuf& buf,wxUint32 now)
     info->Ping=info->PingResp-info->PingSend;
     info->LastSeen=now;
 
-    info->GetGame().ParseDefaultPong(buf,*info);
+    if (!info->GetGame().ParseDefaultPong(buf,*info))
+        info->Ping=-1;
 
-    wxCommandEvent evt(wxCSL_EVT_PONG,CSL_PONG_TYPE_PING);
-    evt.SetClientData(new CslPongPacket(info,CSL_PONG_TYPE_PING));
-    wxPostEvent(m_evtHandler,evt);
+    wxEvtHandler *handler;
+
+    if ((handler=GetNextHandler()))
+    {
+        wxCommandEvent evt(wxCSL_EVT_PONG,CSL_PONG_TYPE_PING);
+        evt.SetClientData(new CslPongPacket(info,CSL_PONG_TYPE_PING));
+        wxPostEvent(handler,evt);
+    }
 }
 
 void CslEngine::ParsePong(CslServerInfo *info,CslUDPPacket& packet,wxUint32 now)
@@ -504,315 +524,368 @@ void CslEngine::ParsePong(CslServerInfo *info,CslUDPPacket& packet,wxUint32 now)
     wxUint32 exVersion;
     wxInt32 cmd=-1;
     ucharbuf p((uchar*)packet.Data(),packet.Size());
+    wxEvtHandler *handler=GetNextHandler();
 
 #ifdef __WXDEBUG__
     wxString dbg_type=wxT("unknown");
 #endif
 
-    vu=getint(p);
-
-    while (packet.Size() > (wxUint32)p.length())
+    if ((vu=getint(p))==0) // extended info
     {
-        if (vu==0) // extended info
-        {
-            cmd=getint(p);
+        cmd=getint(p);
 
-            switch (cmd)
+        switch (cmd)
+        {
+            case CSL_EX_PING_UPTIME:
             {
-                case CSL_EX_PING_UPTIME:
-                {
 #ifdef __WXDEBUG__
-                    dbg_type=wxT("uptime");
+                dbg_type=wxT("uptime");
 #endif
-                    vu=p.length();
-                    if (getint(p)!=-1)  // check ack
+                vu=p.length(); // remember buffer position
+                if (getint(p)!=-1)  // check ack
+                {
+                    info->ExtInfoStatus=CSL_EXT_STATUS_FALSE;
+                    p.len=vu;
+                    ParseDefaultPong(info,p,now);
+                    break;
+                }
+
+                exVersion=getint(p);
+
+                // check protocol
+                if (exVersion<CSL_EX_VERSION_MIN || exVersion>CSL_EX_VERSION_MAX)
+                {
+                    LOG_DEBUG("%s (%s) ERROR: prot=%d\n",U2A(dbg_type),
+                              U2A(info->GetBestDescription()),exVersion);
+                    info->ExtInfoStatus=CSL_EXT_STATUS_ERROR;
+                    PingDefault(info);
+                    return;
+                }
+
+                info->Uptime=getint(p);
+
+                if (p.overread())
+                {
+                    LOG_DEBUG("%s (%s) OVERREAD!\n",U2A(dbg_type),U2A(info->GetBestDescription()));
+                    info->ExtInfoStatus=CSL_EXT_STATUS_ERROR;
+                    PingDefault(info);
+                    return;
+                }
+
+                info->ExtInfoVersion=exVersion;
+                info->ExtInfoStatus=CSL_EXT_STATUS_OK;
+
+                break;
+            }
+
+            case CSL_EX_PING_PLAYERSTATS:
+            {
+#ifdef __WXDEBUG__
+                dbg_type=wxT("playerstats");
+#endif
+                CslPlayerStats& stats=info->PlayerStats;
+                stats.m_lastPong=GetTicks();
+
+                info->ExtInfoStatus=CSL_EXT_STATUS_ERROR;
+
+                wxInt32 rid=getint(p);  // resend id or -1
+
+                if (getint(p)!=-1)  // check ack
+                {
+                    LOG_DEBUG("%s (%s) ERROR: missing ACK\n",U2A(dbg_type),
+                              U2A(info->GetBestDescription()));
+                    info->ExtInfoStatus=CSL_EXT_STATUS_FALSE;
+                    return;
+                }
+
+                exVersion=getint(p);
+                info->ExtInfoVersion=exVersion;
+
+                // check protocol
+                if (exVersion<CSL_EX_VERSION_MIN || exVersion>CSL_EX_VERSION_MAX)
+                {
+                    LOG_DEBUG("%s (%s) ERROR: prot=%d\n",U2A(dbg_type),
+                              U2A(info->GetBestDescription()),exVersion);
+                    info->ExtInfoStatus=CSL_EXT_STATUS_ERROR;
+                    return;
+                }
+
+                vi=getint(p); // get error code
+
+                if (p.overread())
+                {
+                    LOG_DEBUG("%s (%s) OVERREAD!\n",U2A(dbg_type),U2A(info->GetBestDescription()));
+                    return;
+                }
+
+                if (vi>0)  // check error
+                {
+                    LOG_DEBUG("%s (%s) INFO: player doesn't exist (%d)\n",U2A(dbg_type),
+                              U2A(info->GetBestDescription()),rid);
+
+                    info->ExtInfoStatus=CSL_EXT_STATUS_OK;
+
+                    if (rid>-1)  // check for resend error, client doesn't exist anymore
                     {
-                        info->ExtInfoStatus=CSL_EXT_STATUS_FALSE;
-                        p.len=vu;
-                        ParseDefaultPong(info,p,now);
+                        stats.RemoveId(rid);
+
+                        if (handler && stats.m_ids.length()==0)
+                        {
+                            wxCommandEvent evt(wxCSL_EVT_PONG);
+                            evt.SetClientData((void*)new CslPongPacket(info,CSL_PONG_TYPE_PLAYERSTATS));
+                            wxPostEvent(handler,evt);
+                        }
+                    }
+
+                    break;
+                }
+
+                vi=getint(p); // get subcommand
+
+                if (p.overread())
+                {
+                    LOG_DEBUG("%s (%s) OVERREAD!\n",U2A(dbg_type),U2A(info->GetBestDescription()));
+                    return;
+                }
+
+                if (vi==-10) // check for following ID's
+                {
+                    if (rid>-1 && stats.m_ids.find(rid)<0)
+                    {
+                        LOG_DEBUG("%s (%s) ERROR(%d): resend id not found (%d | %d).\n",U2A(dbg_type),
+                                  U2A(info->GetBestDescription()),GetTicks(),rid,stats.m_ids.length());
                         break;
                     }
 
-                    exVersion=getint(p);
-                    info->ExtInfoVersion=exVersion;
-                    // check protocol
-                    if (exVersion<CSL_EX_VERSION_MIN || exVersion>CSL_EX_VERSION_MAX)
+                    while (p.remaining())
                     {
-                        LOG_DEBUG("%s (%s) ERROR: prot=%d\n",U2A(dbg_type),
-                                  U2A(info->GetBestDescription()),exVersion);
-                        info->ExtInfoStatus=CSL_EXT_STATUS_ERROR;
-                        PingDefault(info);
-                        return;
+                        vi=getint(p);
+#if 0
+                        LOG_DEBUG("%s (%s) INFO(%d): got id (%d).\n",U2A(dbg_type),
+                                  U2A(info->GetBestDescription()),GetTicks(),vi);
+#endif
+                        if (rid==-1 && !stats.AddId(vi))
+                        {
+                            stats.Reset();
+                            LOG_DEBUG("%s (%s) ERROR: AddId(%d)\n",U2A(dbg_type),
+                                      U2A(info->GetBestDescription()),vi);
+                            break;
+                        }
+                    }
+                    stats.SetWaitForStats();
+                    //LOG_DEBUG("wait for stats %s: %d\n",U2A(info->GetBestDescription()),stats.m_status);
+
+                    info->ExtInfoStatus=CSL_EXT_STATUS_OK;
+
+                    if (rid==-1 && stats.m_ids.length()==0)
+                    {
+                        if (handler)
+                        {
+                            wxCommandEvent evt(wxCSL_EVT_PONG);
+                            evt.SetClientData((void*)new CslPongPacket(info,CSL_PONG_TYPE_PLAYERSTATS));
+                            wxPostEvent(handler,evt);
+                        }
                     }
 
-                    info->Uptime=getint(p);
+                    break;
+                }
+                else if (vi!=-11)  // check for following stats
+                    break;
+
+                CslPlayerStatsData *data=stats.GetNewStats();
+
+                if (info->GetGame().ParsePlayerPong(info->ExtInfoVersion,p,*data))
+                {
+                    if (exVersion>=103)
+                    {
+                        p.get((unsigned char*)&data->IP,3);
+#if wxBYTE_ORDER == wxLITTLE_ENDIAN
+                        data->IP=wxUINT32_SWAP_ALWAYS(data->IP);
+#endif
+                    }
+                    else if (exVersion==102)
+                    {
+                        p.get((unsigned char*)&data->IP,3);
+#if wxBYTE_ORDER == wxLITTLE_ENDIAN
+                        data->IP<<=8;
+#else
+                        data->IP>>=8;
+                        data->IP=wxUINT32_SWAP_ALWAYS(data->IP);
+#endif
+                    }
 
                     if (p.overread())
                     {
-                        LOG_DEBUG("%s (%s) OVERREAD!\n",U2A(dbg_type),U2A(info->GetBestDescription()));
-                        info->ExtInfoStatus=CSL_EXT_STATUS_ERROR;
-                        PingDefault(info);
+                        LOG_DEBUG("%s (%s) OVERREAD!\n",U2A(dbg_type),
+                                  U2A(info->GetBestDescription()));
+                        stats.RemoveStats(data);
+                        stats.Reset();
                         return;
                     }
 
                     info->ExtInfoStatus=CSL_EXT_STATUS_OK;
+
+                    if (!stats.AddStats(data))
+                    {
+                        LOG_DEBUG("%s (%s) ERROR: AddStats()\n",U2A(dbg_type),
+                                  U2A(info->GetBestDescription()));
+                        stats.RemoveStats(data);
+                        stats.Reset();
+                        break;
+                    }
+#if 0
+                    LOG_DEBUG("%s (%s) INFO(%d): player: %s, IP:%d.%d.%d.%d (%u)\n",
+                              U2A(dbg_type),U2A(info->GetBestDescription()),
+                              GetTicks(),U2A(data->Name),
+                              data->IP>>24,data->IP>>16&0xff,data->IP>>8&0xff,data->IP&0xff,data->IP);
+#endif
+                    if (stats.m_ids.length()==0)
+                    {
+                        if (handler)
+                        {
+                            wxCommandEvent evt(wxCSL_EVT_PONG);
+                            evt.SetClientData((void*)new CslPongPacket(info,CSL_PONG_TYPE_PLAYERSTATS));
+                            wxPostEvent(handler,evt);
+                        }
+                    }
+                }
+                else
+                {
+                    stats.RemoveStats(data);
+                    stats.Reset();
+                    info->ExtInfoStatus=CSL_EXT_STATUS_FALSE;
+                    LOG_DEBUG("%s (%s) ERROR: ParsePlayerPong()\n",U2A(dbg_type),
+                              U2A(info->GetBestDescription()));
+                }
+                break;
+            }
+
+            case CSL_EX_PING_TEAMSTATS:
+            {
+#ifdef __WXDEBUG__
+                dbg_type=wxT("teamstats");
+#endif
+                CslTeamStats& stats=info->TeamStats;
+
+                info->ExtInfoStatus=CSL_EXT_STATUS_ERROR;
+
+                if (getint(p)!=-1)  // check ack
+                {
+                    LOG_DEBUG("%s(%s) ERROR: missing ACK\n",U2A(dbg_type),
+                              U2A(info->GetBestDescription()));
+                    info->ExtInfoStatus=CSL_EXT_STATUS_FALSE;
                     break;
                 }
 
-                case CSL_EX_PING_PLAYERSTATS:
+                exVersion=getint(p);
+                info->ExtInfoVersion=exVersion;
+
+                // check protocol
+                if (exVersion<CSL_EX_VERSION_MIN || exVersion>CSL_EX_VERSION_MAX)
                 {
+                    LOG_DEBUG("%s (%s) ERROR: prot=%d\n",U2A(dbg_type),
+                              U2A(info->GetBestDescription()),exVersion);
+                    return;
+                }
 
-                    CslPlayerStats& stats=info->PlayerStats;
+                stats.TeamMode=!getint(p);  // check for teammode (send as error code)
 
-                    stats.m_lastPong=GetTicks();
-#ifdef __WXDEBUG__
-                    dbg_type=wxT("playerstats");
-#endif
-                    wxInt32 rid=getint(p);  // resent id or -1
+                // wrong order in the AC extinfo 103
+                // but don't include AssaultCube.h here
+                if (exVersion==103 && info->GetGame().GetName()==wxT("AssaultCube"))
+                {
+                    stats.TimeRemain=getint(p);  // remaining time
 
-                    if (getint(p)!=-1)  // check ack
+                    if (stats.TeamMode)
+                        stats.GameMode=getint(p);
+                }
+                else
+                {
+                    if (exVersion>=103)
+                        stats.GameMode=getint(p);
+
+                    stats.TimeRemain=getint(p);  // remaining time
+                }
+
+                if (p.overread())
+                {
+                    LOG_DEBUG("%s (%s) OVERREAD!\n",U2A(dbg_type),
+                              U2A(info->GetBestDescription()));
+                    stats.Reset();
+                    return;
+                }
+
+                info->ExtInfoStatus=CSL_EXT_STATUS_OK;
+
+                if (!stats.TeamMode)  // check error (no teammode)
+                {
+                    stats.Reset();
+
+                    if (handler)
                     {
-                        LOG_DEBUG("%s (%s) ERROR: missing ACK\n",U2A(dbg_type),
-                                  U2A(info->GetBestDescription()));
-                        info->ExtInfoStatus=CSL_EXT_STATUS_FALSE;
-                        return;
+                        wxCommandEvent evt(wxCSL_EVT_PONG);
+                        evt.SetClientData((void*)new CslPongPacket(info,CSL_PONG_TYPE_TEAMSTATS));
+                        wxPostEvent(handler,evt);
                     }
-
-                    exVersion=getint(p);
-                    info->ExtInfoVersion=exVersion;
-
-                    // check protocol
-                    if (exVersion<CSL_EX_VERSION_MIN || exVersion>CSL_EX_VERSION_MAX)
-                    {
-                        LOG_DEBUG("%s (%s) ERROR: prot=%d\n",U2A(dbg_type),
-                                  U2A(info->GetBestDescription()),exVersion);
-                        info->ExtInfoStatus=CSL_EXT_STATUS_ERROR;
-                        return;
-                    }
-
-                    info->ExtInfoStatus=CSL_EXT_STATUS_OK;
-
-                    vi=getint(p);
-                    if (vi>0)  // check error
-                    {
-                        LOG_DEBUG("%s (%s) INFO: player doesn't exist (%d)\n",U2A(dbg_type),
-                                  U2A(info->GetBestDescription()),rid);
-                        if (rid>-1)  // check for resend error, client doesn't exist anymore
-                        {
-                            stats.RemoveId(rid);
-
-                            wxCommandEvent evt(wxCSL_EVT_PONG);
-                            evt.SetClientData((void*)new CslPongPacket(info,CSL_PONG_TYPE_PLAYERSTATS));
-                            wxPostEvent(m_evtHandler,evt);
-                            return;
-                        }
-                        return;
-                    }
-
-                    vi=getint(p);
-                    if (vi==-10) // check for following ids
-                    {
-#ifdef __WXDEBUG__
-                        if (rid>-1 && stats.m_ids.find(rid)<0)
-                            LOG_DEBUG("%s (%s) ERROR(%d): resend id not found (%d | %d).\n",U2A(dbg_type),
-                                      U2A(info->GetBestDescription()),GetTicks(),rid,stats.m_ids.length());
-#endif
-                        while (!p.overread())
-                        {
-                            vi=getint(p);
-                            if (p.overread())
-                                break;
 #if 0
-                            LOG_DEBUG("%s (%s) INFO(%d): got id (%d).\n",U2A(dbg_type),
-                                      U2A(info->GetBestDescription()),GetTicks(),vi);
+                    LOG_DEBUG("%s (%s) ERROR: received - no teammode\n",
+                              U2A(dbg_type),U2A(info->GetBestDescription()));
 #endif
-                            if (rid==-1 && !stats.AddId(vi))
-                            {
-                                stats.Reset();
-                                LOG_DEBUG("%s (%s) ERROR: AddId(%d)\n",U2A(dbg_type),
-                                          U2A(info->GetBestDescription()),vi);
-                                return;
-                            }
-                        }
-                        stats.SetWaitForStats();
-                        //LOG_DEBUG("wait for stats %s: %d\n",U2A(info->GetBestDescription()),stats.m_status);
+                    break;
+                }
 
-                        if (rid==-1 && stats.m_ids.length()==0)
-                        {
-                            wxCommandEvent evt(wxCSL_EVT_PONG);
-                            evt.SetClientData((void*)new CslPongPacket(info,CSL_PONG_TYPE_PLAYERSTATS));
-                            wxPostEvent(m_evtHandler,evt);
-                        }
+                while (p.remaining())
+                {
+                    CslTeamStatsData *data=stats.GetNewStats();
 
-                        break;
-                    }
-                    else if (vi!=-11)  // check for following stats
-                        return;
-
-                    CslPlayerStatsData *data=stats.GetNewStats();
-
-                    if (!info->GetGame().ParsePlayerPong(info->ExtInfoVersion,p,*data))
+                    if (info->GetGame().ParseTeamPong(info->ExtInfoVersion,p,*data))
                     {
-                        stats.RemoveStats(data);
-                        stats.Reset();
-                        info->ExtInfoStatus=CSL_EXT_STATUS_FALSE;
-                        LOG_DEBUG("%s (%s) ERROR: ParsePlayerPong()\n",U2A(dbg_type),
-                                  U2A(info->GetBestDescription()));
+                        stats.AddStats(data);
+#if 0
+                        LOG_DEBUG("%s (%s): team:%s, score:%d, bases:%d, remain:%d\n",
+                                  U2A(dbg_type),U2A(info->GetBestDescription()),
+                                  U2A(data->Name),data->Score,data->Bases.length(),stats.TimeRemain);
+#endif
                     }
                     else
                     {
-                        if (exVersion>=103)
-                        {
-                            p.get((unsigned char*)&data->IP,3);
-#if wxBYTE_ORDER == wxLITTLE_ENDIAN
-                            data->IP=wxUINT32_SWAP_ALWAYS(data->IP);
-#endif
-                        }
-                        else if (exVersion==102)
-                        {
-                            p.get((unsigned char*)&data->IP,3);
-#if wxBYTE_ORDER == wxLITTLE_ENDIAN
-                            data->IP<<=8;
-#else
-                            data->IP>>=8;
-                            data->IP=wxUINT32_SWAP_ALWAYS(data->IP);
-#endif
-                        }
-
-                        if (p.overread())
-                        {
-                            LOG_DEBUG("%s (%s) OVERREAD!\n",U2A(dbg_type),
-                                      U2A(info->GetBestDescription()));
-                            return;
-                        }
-
-                        if (!stats.AddStats(data))
-                        {
-                            stats.RemoveStats(data);
-                            stats.Reset();
-                            LOG_DEBUG("%s (%s) ERROR: AddStats()\n",U2A(dbg_type),
-                                      U2A(info->GetBestDescription()));
-                            break;
-                        }
-#if 0
-                        LOG_DEBUG("%s (%s) INFO(%d): player: %s, IP:%d.%d.%d.%d (%u)\n",
-                                  U2A(dbg_type),U2A(info->GetBestDescription()),
-                                  GetTicks(),U2A(data->Name),
-                                  data->IP>>24,data->IP>>16&0xff,data->IP>>8&0xff,data->IP&0xff,data->IP);
-#endif
-                        if (stats.m_ids.length()==0)
-                        {
-                            wxCommandEvent evt(wxCSL_EVT_PONG);
-                            evt.SetClientData((void*)new CslPongPacket(info,CSL_PONG_TYPE_PLAYERSTATS));
-                            wxPostEvent(m_evtHandler,evt);
-                        }
+                        LOG_DEBUG("%s (%s) ERROR: ParseTeamPong()\n",U2A(dbg_type),
+                                  U2A(info->GetBestDescription()));
+                        data->Reset();
+                        stats.RemoveStats(data);
+                        info->ExtInfoStatus=CSL_EXT_STATUS_FALSE;
+                        break;
                     }
-                    break;
                 }
 
-                case CSL_EX_PING_TEAMSTATS:
+                if (info->ExtInfoStatus==CSL_EXT_STATUS_FALSE)
+                    break;
+
+                if (handler)
                 {
-                    CslTeamStats& stats=info->TeamStats;
-#ifdef __WXDEBUG__
-                    dbg_type=wxT("teamstats");
-#endif
-                    if (getint(p)!=-1)  // check ack
-                    {
-                        LOG_DEBUG("%s(%s) ERROR: missing ACK\n",U2A(dbg_type),
-                                  U2A(info->GetBestDescription()));
-                        info->ExtInfoStatus=CSL_EXT_STATUS_FALSE;
-                        return;
-                    }
-
-                    exVersion=getint(p);
-                    info->ExtInfoVersion=exVersion;
-
-                    // check protocol
-                    if (exVersion<CSL_EX_VERSION_MIN || exVersion>CSL_EX_VERSION_MAX)
-                    {
-                        LOG_DEBUG("%s (%s) ERROR: prot=%d\n",U2A(dbg_type),
-                                  U2A(info->GetBestDescription()),exVersion);
-                        info->ExtInfoStatus=CSL_EXT_STATUS_ERROR;
-                        return;
-                    }
-
-                    info->ExtInfoStatus=CSL_EXT_STATUS_OK;
-
-                    stats.TeamMode=!getint(p);  // error
-                    if (exVersion>=103)
-                        stats.GameMode=getint(p);
-                    stats.TimeRemain=getint(p);  // remaining time
-
-                    if (!stats.TeamMode)  // check error (no teammode)
-                    {
-                        stats.Reset();
-                        wxCommandEvent evt(wxCSL_EVT_PONG);
-                        evt.SetClientData((void*)new CslPongPacket(info,CSL_PONG_TYPE_TEAMSTATS));
-                        wxPostEvent(m_evtHandler,evt);
-#if 0
-                        LOG_DEBUG("%s (%s) ERROR: received - no teammode\n",
-                                  U2A(dbg_type),U2A(info->GetBestDescription()));
-#endif
-                        return;
-                    }
-
-                    while (!p.overread())
-                    {
-                        CslTeamStatsData *data=stats.GetNewStats();
-
-                        if (info->GetGame().ParseTeamPong(info->ExtInfoVersion,p,*data))
-                        {
-                            stats.AddStats(data);
-
-                            if (p.overread())
-                            {
-                                data->Reset();
-                                break;
-                            }
-#if 0
-                            LOG_DEBUG("%s (%s): team:%s, score:%d, bases:%d, remain:%d\n",
-                                      U2A(dbg_type),U2A(info->GetBestDescription()),
-                                      U2A(data->m_team),data->m_score,data->m_bases.length(),stats.m_remain);
-#endif
-                        }
-                        else
-                        {
-                            LOG_DEBUG("%s (%s) ERROR: ParseTeamPong()\n",U2A(dbg_type),
-                                      U2A(info->GetBestDescription()));
-                            data->Reset();
-                            info->ExtInfoStatus=CSL_EXT_STATUS_FALSE;
-                            break;
-                        }
-                    }
-
-                    if (info->ExtInfoStatus==CSL_EXT_STATUS_FALSE)
-                        break;
-
                     wxCommandEvent evt(wxCSL_EVT_PONG);
                     evt.SetClientData((void*)new CslPongPacket(info,CSL_PONG_TYPE_TEAMSTATS));
-                    wxPostEvent(m_evtHandler,evt);
-
-                    break;
+                    wxPostEvent(handler,evt);
                 }
 
-                default:
-                {
+                break;
+            }
+
+            default:
+            {
 #ifdef __WXDEBUG__
-                    dbg_type=wxT("unknown tag");
+                dbg_type=wxT("unknown tag");
 #endif
-                    LOG_DEBUG("%s: ERROR: unknown tag: %d\n",U2A(info->GetBestDescription()),cmd);
-                    break;
-                }
+                LOG_DEBUG("%s: ERROR: unknown tag: %d\n",U2A(info->GetBestDescription()),cmd);
+                break;
             }
         }
-        else
-            ParseDefaultPong(info,p,now);
-
-        break;
     }
+    else
+        ParseDefaultPong(info,p,now);
 
 #ifdef __WXDEBUG__
-    if (p.length()<(wxInt32)packet.Size())
+    if (!p.overread() && p.remaining())
         LOG_DEBUG("%s: %d bytes left (type=%s)\n",U2A(info->GetBestDescription()),
                   packet.Size()-p.length(),U2A(dbg_type));
 #endif
@@ -844,10 +917,13 @@ void CslEngine::CheckResends()
                     GetTicks()-stats.m_lastPong<min((wxUint32)info->Ping*2,500))
                     continue;
 
+#ifdef __WXDEBUG__
+                wxInt32 _diff=stats.m_lastPong-stats.m_lastPing;
+#endif
                 loopvk(stats.m_ids)
                 {
-                    LOG_DEBUG("Resend: %s Diff: %d  Ping: %d (%d)\n",U2A(info->GetBestDescription()),
-                              stats.m_lastPong-stats.m_lastPing,info->Ping,stats.m_ids[k]);
+                    LOG_DEBUG("%s  Diff: %d  Ping: %d  ID: %d\n",U2A(info->GetBestDescription()),
+                              _diff,info->Ping,stats.m_ids[k]);
                     PingExPlayerInfo(info,stats.m_ids[k]);
                 }
             }
@@ -864,15 +940,11 @@ void CslEngine::CheckResends()
     }
 }
 
-wxInt32 CslEngine::GetNextGameID()
-{
-    return ++m_gameId;
-}
-
 void CslEngine::OnPong(wxCommandEvent& event)
 {
-    CslUDPPacket *packet=(CslUDPPacket*)event.GetClientData();
-    if (!packet)
+    CslUDPPacket *packet;
+
+    if (!(packet=(CslUDPPacket*)event.GetClientData()))
         return;
 
     if (!packet->Size())
@@ -893,20 +965,18 @@ void CslEngine::OnPong(wxCommandEvent& event)
         }
     }
 
-    event.SetClientData((void*)info);
-    event.Skip();
-
     delete packet;
 }
 
 void CslEngine::OnResolveHost(wxCommandEvent& event)
 {
-    CslServerInfo *info=NULL;
-    CslGame *game=NULL;
-    CslResolverPacket *packet=(CslResolverPacket*)event.GetClientData();
+    CslResolverPacket *packet;
 
-    if (!packet)
+    if (!(packet=(CslResolverPacket*)event.GetClientData()))
         return;
+
+    CslGame *game=NULL;
+    CslServerInfo *info=NULL;
 
     loopv(m_games)
     {

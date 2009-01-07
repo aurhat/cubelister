@@ -25,22 +25,7 @@
 #include "../img/bf_24.xpm"
 #include "../img/bf_16.xpm"
 
-CslBloodFrontier::CslBloodFrontier()
-{
-    m_name=CSL_DEFAULT_NAME_BF;
-    m_defaultMasterConnection=CslMasterConnection(CSL_DEFAULT_MASTER_BF,CSL_DEFAULT_MASTER_PORT_BF);
-    m_capabilities=CSL_CAPABILITY_EXTINFO | CSL_CAPABILITY_CUSTOM_CONFIG;
-#ifdef __WXMAC__
-    m_clientSettings.ConfigPath=::wxGetHomeDir();
-    m_clientSettings.ConfigPath+=wxT("/Library/Application Support/bloodfrontier");
-#elif __WXGTK__
-    m_clientSettings.ConfigPath=::wxGetHomeDir()+wxT("/.bloodfrontier");
-#endif
-}
-
-CslBloodFrontier::~CslBloodFrontier()
-{
-}
+enum { MM_OPEN, MM_VETO, MM_LOCKED, MM_PRIVATE };
 
 enum
 {
@@ -101,6 +86,24 @@ mutstype[] =
     { G_M_NOITEMS, G_M_ALL,  G_M_NONE,    wxT("NI")     },
 };
 
+
+CslBloodFrontier::CslBloodFrontier()
+{
+    m_name=CSL_DEFAULT_NAME_BF;
+    m_defaultMasterConnection=CslMasterConnection(CSL_DEFAULT_MASTER_BF,CSL_DEFAULT_MASTER_PORT_BF);
+    m_capabilities=CSL_CAPABILITY_EXTINFO | CSL_CAPABILITY_CUSTOM_CONFIG;
+#ifdef __WXMAC__
+    m_clientSettings.ConfigPath=::wxGetHomeDir();
+    m_clientSettings.ConfigPath+=wxT("/Library/Application Support/bloodfrontier");
+#elif __WXGTK__
+    m_clientSettings.ConfigPath=::wxGetHomeDir()+wxT("/.bloodfrontier");
+#endif
+}
+
+CslBloodFrontier::~CslBloodFrontier()
+{
+}
+
 wxString CslBloodFrontier::GetModeName(wxInt32 n,wxInt32 m) const
 {
     if (n<0 || m<0 || (size_t)n>=sizeof(gametype)/sizeof(gametype[0]))
@@ -129,18 +132,20 @@ wxString CslBloodFrontier::GetModeName(wxInt32 n,wxInt32 m) const
     return mode;
 }
 
-wxString CslBloodFrontier::GetVersionName(wxInt32 n) const
+const wxChar* CslBloodFrontier::GetVersionName(wxInt32 prot) const
 {
     static const wxChar* versions[] =
     {
         wxT("Alpha 2")
     };
-    wxUint32 v=CSL_LAST_PROTOCOL_BF-n;
-    return (v>=0 && v<sizeof(versions)/sizeof(versions[0])) ?
-           wxString(versions[v]) : wxString::Format(wxT("%d"),n);
+
+    wxInt32 v=CSL_LAST_PROTOCOL_BF-prot;
+
+    return (v>=0 && (size_t)v<sizeof(versions)/sizeof(versions[0])) ?
+           versions[v] : wxString::Format(wxT("%d"),prot).c_str();
 }
 
-wxString CslBloodFrontier::GetWeaponName(wxInt32 n) const
+const wxChar* CslBloodFrontier::GetWeaponName(wxInt32 n) const
 {
     static const wxChar* weapons[] =
     {
@@ -148,7 +153,7 @@ wxString CslBloodFrontier::GetWeaponName(wxInt32 n) const
         _("Grenades"),_("Flamer"),_("Rifle")
     };
     return (n>=0 && (size_t)n<sizeof(weapons)/sizeof(weapons[0])) ?
-           wxString(weapons[n]) : wxString(_("unknown"));
+           weapons[n] : _("unknown");
 }
 
 void CslBloodFrontier::GetPlayerstatsDescriptions(vector<wxString>& desc) const
@@ -164,22 +169,68 @@ void CslBloodFrontier::GetPlayerstatsDescriptions(vector<wxString>& desc) const
     desc.add(_("Weapon"));
 }
 
+wxInt32 CslBloodFrontier::GetBestTeam(CslTeamStats& stats,wxInt32 prot) const
+{
+    wxInt32 i,best=-1;
+
+    if (stats.TeamMode && stats.m_stats.length()>0 && stats.m_stats[0]->Ok)
+    {
+        best=0;
+
+        for (i=1;i<stats.m_stats.length() && stats.m_stats[i]->Ok;i++)
+        {
+            if (stats.m_stats[i]->Score>=stats.m_stats[best]->Score)
+                best=i;
+        }
+    }
+
+    return best;
+}
+
 bool CslBloodFrontier::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
 {
     char text[_MAXDEFSTR];
-    wxInt32 l;
+    wxInt32 l,numattr;
     vector<int>attr;
     attr.setsize(0);
 
     info.Players=getint(buf);
-    int numattr=getint(buf);
+    numattr=getint(buf);
     loopj(numattr) attr.add(getint(buf));
-    info.Protocol=attr[0];
-    info.Version=GetVersionName(info.Protocol);
-    info.GameMode=GetModeName(attr[1],attr[2]);
-    info.TimeRemain=attr[3];
-    info.PlayersMax=attr[4];
-    info.MM=attr[5];
+    if (numattr>=1)
+    {
+        info.Protocol=attr[0];
+        info.Version=GetVersionName(info.Protocol);
+    }
+    if (numattr>=3)
+        info.GameMode=GetModeName(attr[1],attr[2]);
+    if (numattr>=4)
+        info.TimeRemain=attr[3];
+    if (numattr>=5)
+        info.PlayersMax=attr[4];
+    info.MM=CSL_SERVER_OPEN;
+    if (numattr>=6)
+    {
+        if (attr[5]==MM_OPEN)
+            info.MMDescription+=wxT(" (O)");
+        else if (attr[5]==MM_VETO)
+        {
+            info.MMDescription+=wxT(" (V)");
+            info.MM=CSL_SERVER_VETO;
+        }
+        else if (attr[5]==MM_LOCKED)
+        {
+            info.MMDescription+=wxT(" (L)");
+            info.MM=CSL_SERVER_LOCKED;
+        }
+        else if (attr[5]==MM_PRIVATE)
+        {
+            info.MMDescription+=wxT(" (P)");
+            info.MM=CSL_SERVER_PRIVATE;
+        }
+    }
+    else
+        info.MMDescription=wxString::Format(wxT("%d"),attr[5]);
     getstring(text,buf);
     info.Map=A2U(text);
     getstring(text,buf);
@@ -187,7 +238,7 @@ bool CslBloodFrontier::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
     StripColours(text,&l,1);
     info.SetDescription(A2U(text));
 
-    return true;
+    return !buf.overread();
 }
 
 bool CslBloodFrontier::ParsePlayerPong(wxUint32 protocol,ucharbuf& buf,CslPlayerStatsData& info) const
@@ -210,7 +261,7 @@ bool CslBloodFrontier::ParsePlayerPong(wxUint32 protocol,ucharbuf& buf,CslPlayer
     info.Privileges=getint(buf);
     info.State=getint(buf);
 
-    return true;
+    return !buf.overread();
 }
 
 bool CslBloodFrontier::ParseTeamPong(wxUint32 protocol,ucharbuf& buf,CslTeamStatsData& info) const
@@ -226,7 +277,7 @@ bool CslBloodFrontier::ParseTeamPong(wxUint32 protocol,ucharbuf& buf,CslTeamStat
         while (i--)
             info.Bases.add(getint(buf));
 
-    return true;
+    return !buf.overread();
 }
 
 void CslBloodFrontier::SetClientSettings(const CslGameClientSettings& settings)
@@ -244,7 +295,7 @@ void CslBloodFrontier::SetClientSettings(const CslGameClientSettings& settings)
             return;
         set.GamePath=set.Binary+wxT("/Contents/gamedata/");
         if (!::wxDirExists(set.GamePath))
-        return;
+            return;
     }
     if (set.ConfigPath.IsEmpty() || !::wxDirExists(set.ConfigPath))
         set.ConfigPath=set.GamePath;
@@ -303,10 +354,10 @@ wxString CslBloodFrontier::GameStart(CslServerInfo *info,wxUint32 mode,wxString 
         address+=m_portDelimiter+wxString::Format(wxT("%d"),info->Port);
 
 #ifdef __WXMSW__
-        opts+=wxT(" -x\"sleep 1000 [connect ")+address+wxT("]\"");
+    opts+=wxT(" -x\"sleep 1000 [connect ")+address+wxT("]\"");
 #else
-        address.Replace(wxT(" "),wxT("\\ "));
-        opts+=wxT(" -xsleep\\ 1000\\ [connect\\ ")+address+wxT("]");
+    address.Replace(wxT(" "),wxT("\\ "));
+    opts+=wxT(" -xsleep\\ 1000\\ [connect\\ ")+address+wxT("]");
 #endif
 
     bin+=wxT(" ")+opts;

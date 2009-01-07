@@ -48,20 +48,24 @@
 #include "CslDlgOutput.h"
 #include "CslDlgTraffic.h"
 #include "CslListCtrlPlayer.h"
+#include "CslListCtrlPlayerSearch.h"
+#include "CslIRC.h"
 
 
 class CslVersionCheckThread : public wxThread
 {
     public:
         CslVersionCheckThread(wxEvtHandler *evtHandler) :
-                wxThread(wxTHREAD_JOINABLE),m_evtHandler(evtHandler)
+                wxThread(wxTHREAD_JOINABLE),m_ok(false),m_evtHandler(evtHandler)
         {
-            Create();
+            m_ok=Create()==wxTHREAD_NO_ERROR;
         }
 
         virtual ExitCode Entry();
+        bool IsOk() { return m_ok; }
 
-    private:
+    protected:
+        bool m_ok;
         wxEvtHandler *m_evtHandler;
 };
 
@@ -112,8 +116,10 @@ class CslFrame: public wxFrame
         CslListCtrlServer *list_ctrl_master,*list_ctrl_favourites;
         CslPlayerInfo *player_info;
         CslListCtrlInfo *list_ctrl_info;
+        CslListCtrlPlayerSearch *list_ctrl_player_search;
+        CslIrcNotebook *notebook_irc;
         wxTreeCtrl *tree_ctrl_games;
-        wxComboBox *combo_ctrl_search;
+        wxTextCtrl *text_ctrl_search;
         wxStaticText *text_search_result;
         wxButton *button_search;
         wxBitmapButton *button_search_clear;
@@ -191,6 +197,8 @@ class CslFrame: public wxFrame
         void OnTreeRightClick(wxTreeEvent& event);
         void OnCommandEvent(wxCommandEvent& event);
         void OnKeypress(wxKeyEvent& event);
+        void OnNotebookPageSelected(wxAuiNotebookEvent& event);
+        void OnNotebookPageClose(wxAuiNotebookEvent& event);
         void OnSize(wxSizeEvent& event);
 #ifndef __WXMAC__
         void OnIconize(wxIconizeEvent& event);
@@ -209,16 +217,18 @@ class CslFrame: public wxFrame
 };
 
 
-
 class CslApp: public wxApp
 {
     public:
-        bool OnInit();
-        int OnExit();
+        CslEngine* GetCslEngine() { return &m_engine; }
 
     private:
         wxSingleInstanceChecker *m_single;
         wxLocale m_locale;
+        CslEngine m_engine;
+
+        bool OnInit();
+        int OnExit();
 };
 
-#endif // CSLFRAME_H
+#endif //CSLFRAME_H

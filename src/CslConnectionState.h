@@ -47,7 +47,7 @@ class CslConnectionState
                 m_activeInfo->SetWaiting(false);
             m_playing=false;
             m_waitTime=0;
-            m_connectMode=CslGame::CSL_CONNECT_DEFAULT;
+            m_connectMode=CslServerInfo::CSL_CONNECT_DEFAULT;
             m_activeInfo=NULL;
             CslStatusBar::SetText(1,wxEmptyString);
         }
@@ -76,7 +76,7 @@ class CslConnectionState
             m_playing=true;
         }
 
-        static void CreateConnectState(CslServerInfo *info,wxInt32 mode=CslGame::CSL_CONNECT_DEFAULT)
+        static void CreateConnectState(CslServerInfo *info,wxInt32 mode=CslServerInfo::CSL_CONNECT_DEFAULT)
         {
             m_activeInfo=info;
             m_connectMode=mode;

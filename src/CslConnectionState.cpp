@@ -22,5 +22,5 @@
 
 bool               CslConnectionState::m_playing=false;
 wxInt32            CslConnectionState::m_waitTime=0;
-wxInt32            CslConnectionState::m_connectMode=CslGame::CSL_CONNECT_DEFAULT;
+wxInt32            CslConnectionState::m_connectMode=CslServerInfo::CSL_CONNECT_DEFAULT;
 CslServerInfo*     CslConnectionState::m_activeInfo=NULL;

@@ -146,11 +146,13 @@ void CslPanelMap::UpdateBases(const t_aBaseInfo& bases,const bool hasBases)
     WX_CLEAR_ARRAY(m_bases);
 
     if (hasBases)
+    {
         for (i=0;i<bases.GetCount();i++)
         {
             base=new CslBaseInfo(*bases.Item(i));
             m_bases.Add(base);
         }
+    }
 
     if (!IsShown())
         return;

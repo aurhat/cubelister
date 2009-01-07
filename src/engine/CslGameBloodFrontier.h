@@ -44,12 +44,13 @@ class CslBloodFrontier : public CslGame
         ~CslBloodFrontier();
 
     private:
-        wxString GetVersionName(wxInt32 n) const;
+        const wxChar* GetVersionName(wxInt32 prot) const;
         wxString GetModeName(wxInt32 n,wxInt32 m) const;
 
         //implementations for base class
         void GetPlayerstatsDescriptions(vector<wxString>& desc) const;
-        wxString GetWeaponName(wxInt32 n) const;
+        const wxChar* GetWeaponName(wxInt32 n) const;
+        wxInt32 GetBestTeam(CslTeamStats& stats,wxInt32 prot) const;
         wxUint16 GetDefaultPort() const { return CSL_DEFAULT_PORT_BF; }
         bool ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const;
         bool ParsePlayerPong(wxUint32 protocol,ucharbuf& buf,CslPlayerStatsData& info) const ;

@@ -50,18 +50,23 @@
 #define CSL_FILTER_MM3         1<<5
 
 #define CSL_WAIT_SERVER_FULL_MIN   10
-#define CSL_WAIT_SERVER_FULL_MAX   600
 #define CSL_WAIT_SERVER_FULL_STD   60
+#define CSL_WAIT_SERVER_FULL_MAX   600
+
+#define CSL_MIN_PLAYTIME_MIN   0
+#define CSL_MIN_PLAYTIME_STD   30
+#define CSL_MIN_PLAYTIME_MAX   60
 
 #define CSL_CLEANUP_SERVERS      14
 #define CSL_CLEANUP_SERVERS_MAX  365
 
-#define CSL_MIN_PLAYTIME_MIN   0
-#define CSL_MIN_PLAYTIME_MAX   60
-#define CSL_MIN_PLAYTIME_STD   30
+#define CSL_TOOLTIP_DELAY_MIN   0
+#define CSL_TOOLTIP_DELAY_STD   1500
+#define CSL_TOOLTIP_DELAY_MAX   10000
+#define CSL_TOOLTIP_DELAY_STEP  500
 
-#define CSL_PING_GOOD_STD    200
-#define CSL_PING_BAD_STD     400
+#define CSL_PING_GOOD_STD  200
+#define CSL_PING_BAD_STD   400
 
 
 class CslSettings
@@ -73,6 +78,7 @@ class CslSettings
                 frameSizeMax(wxDefaultSize),
                 layout(CSL_AUI_DEFAULT_LAYOUT),
                 systray(0),
+                tooltipDelay(CSL_TOOLTIP_DELAY_STD),
                 updateInterval(CSL_UPDATE_INTERVAL_MIN),
                 dontUpdatePlaying(true),
                 showSearch(true),
@@ -89,14 +95,14 @@ class CslSettings
                 /* ListCtrl */
                 autoSortColumns(true),
                 colServerS1(0.18f),
-                colServerS2(0.18f),
+                colServerS2(0.19f),
                 colServerS3(0.09f),
-                colServerS4(0.09f),
+                colServerS4(0.07f),
                 colServerS5(0.10f),
                 colServerS6(0.14f),
                 colServerS7(0.07f),
                 colServerS8(0.07f),
-                colServerS9(0.07f),
+                colServerS9(0.08f),
                 colServerEmpty(wxColour(60,15,15)),
                 colServerOff(wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT)),
                 colServerFull(*wxRED),
@@ -116,6 +122,7 @@ class CslSettings
         wxString layout;
         wxInt32 systray;
         wxStringList layouts;
+        wxInt32 tooltipDelay;
         wxInt32 updateInterval;
         bool dontUpdatePlaying;
         bool showSearch;
