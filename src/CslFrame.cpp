@@ -2483,18 +2483,19 @@ void CslFrame::OnTrayIcon(wxTaskBarIconEvent& event)
     if (!IsShown())
     {
 #ifdef __WXGTK__
-        // neccessary otherwise the window hasn't the right frame size
-        // after minimising from maximised state and then restoring the
-        // last frame size
+        // neccessary otherwise the window hasn't the right frame size after
+        // minimising from maximised state and then restoring the last frame size
         SetSize(g_cslSettings->frameSize);
+        Show();
+        Raise();
 #endif
 #ifdef __WXMSW__
+        Show();
         // neccessary otherwise the window doesn't get raised after
         // minimising using the minimise button or context menu function
         Maximize(m_maximised);
-#endif
-        Show();
         Raise();
+#endif
     }
     else
     {
