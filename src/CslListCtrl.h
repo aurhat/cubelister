@@ -55,7 +55,11 @@ class CslToolTip : public wxFrame
         wxBoxSizer *m_sizer;
         wxStaticText *m_title,*m_left,*m_right;
 
+#ifdef __WXMSW__
+        void OnEraseBackground(wxEraseEvent& event);
+#else
         void OnPaint(wxPaintEvent& event);
+#endif
         void OnMouse(wxMouseEvent& event);
 
         DECLARE_EVENT_TABLE();
@@ -83,6 +87,11 @@ class CslListCtrl : public wxListCtrl
         wxString m_toolTipTitle;
         wxArrayString m_toolTipText;
 
+        bool m_flickerFree;
+
+#ifdef __WXMSW__
+        void OnEraseBackground(wxEraseEvent& event);
+#endif
         void OnMouseMove(wxMouseEvent& event);
         void OnMouseLeave(wxMouseEvent& event);
         void OnTimer(wxTimerEvent& event);
@@ -92,7 +101,9 @@ class CslListCtrl : public wxListCtrl
     protected:
         static wxImageList ListImageList;
 
+        void FlickerFree(bool val) { m_flickerFree=val; }
         virtual void GetToolTipText(wxInt32 row,wxString& title,wxArrayString& text) {}
+        virtual wxSize GetImageListSize() { return wxDefaultSize; }
 };
 
 #endif //CSLLISTCTRL_H

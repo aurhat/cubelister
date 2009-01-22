@@ -41,9 +41,15 @@
 #endif
 
 #ifdef _MSC_VER
+#ifdef UNICODE
+#define _L_ L
+#else
+#define _L_
+#endif //__UNICODE__
 #define strcasecmp _stricmp
 #else
-#endif
+#define _L_
+#endif //_MSC_VER
 
 #ifndef DATADIR
 #undef LOCALEDIR

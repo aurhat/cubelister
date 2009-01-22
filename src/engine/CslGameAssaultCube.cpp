@@ -64,8 +64,13 @@ const wxChar* CslGameAssaultCube::GetVersionName(wxInt32 prot) const
 
     wxInt32 v=CSL_LAST_PROTOCOL_AC-prot;
 
-    return (v>=0 && (size_t)v<sizeof(versions)/sizeof(versions[0])) ?
-           versions[v] : wxString::Format(wxT("%d"),prot).c_str();
+    if (v<0 || (size_t)v>=sizeof(versions)/sizeof(versions[0]))
+    {
+        static wxString version=wxString::Format(wxT("%d"),prot);
+        return version.c_str();
+    }
+    else
+        return versions[v];
 }
 
 const wxChar* CslGameAssaultCube::GetModeName(wxInt32 mode) const
@@ -140,7 +145,7 @@ bool CslGameAssaultCube::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) con
     getstring(text,buf);
     info.Map=A2U(text);
     getstring(text,buf);
-    i=strlen(text);
+    i=(wxInt32)strlen(text);
     StripColours(text,&i,1);
     info.SetDescription(A2U(text));
     info.PlayersMax=getint(buf);

@@ -43,11 +43,11 @@ enum
     SORT_WEAPON
 };
 
+BEGIN_EVENT_TABLE(CslPanelPlayer,wxPanel)
+    EVT_SIZE(CslPanelPlayer::OnSize)
+END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(CslListCtrlPlayer,CslListCtrl)
-    #ifdef __WXMSW__
-    EVT_ERASE_BACKGROUND(CslListCtrlPlayer::OnEraseBackground)
-    #endif
     EVT_LIST_COL_CLICK(wxID_ANY,CslListCtrlPlayer::OnColumnLeftClick)
     EVT_LIST_ITEM_ACTIVATED(wxID_ANY,CslListCtrlPlayer::OnItemActivated)
     EVT_CONTEXT_MENU(CslListCtrlPlayer::OnContextMenu)
@@ -55,9 +55,87 @@ BEGIN_EVENT_TABLE(CslListCtrlPlayer,CslListCtrl)
 END_EVENT_TABLE()
 
 
+CslPanelPlayer::CslPanelPlayer(wxWindow* parent,long listStyle)
+        : wxPanel(parent,wxID_ANY)
+{
+    m_sizer=new wxFlexGridSizer(2,1,0,0);
+
+    m_listCtrl=new CslListCtrlPlayer(this,wxID_ANY,wxDefaultPosition,wxDefaultSize,listStyle);
+    m_label=new wxStaticText(this,wxID_ANY,wxEmptyString);
+
+    m_sizer->Add(m_listCtrl,0,wxALL|wxEXPAND,0);
+    m_sizer->Add(m_label,0,wxALL|wxEXPAND,2);
+
+    m_sizer->AddGrowableRow(0);
+    m_sizer->AddGrowableCol(0);
+
+    SetSizer(m_sizer);
+    m_sizer->Fit(this);
+    m_sizer->Layout();
+}
+
+void CslPanelPlayer::OnSize(wxSizeEvent& event)
+{
+    const wxSize& size=event.GetSize();
+
+    m_label->SetLabel(GetLabelText());
+    m_label->Wrap(size.x-4);
+#ifdef __WXMAC__
+    wxSize size=event.GetSize();
+    size.y-=m_label->GetBestSize().y+4;
+    m_listCtrl->SetSize(size);
+#endif //__WXMAC__
+    m_listCtrl->ListAdjustSize(size);
+#ifdef __WXMAC__
+    //fixes flicker after resizing
+    wxIdleEvent idle;
+    wxTheApp->SendIdleEvents(this,idle);
+#endif //__WXMAC__
+
+    event.Skip();
+}
+
+wxString CslPanelPlayer::GetLabelText()
+{
+    CslServerInfo *info=m_listCtrl->ServerInfo();
+
+    if (!info)
+        return wxEmptyString;
+
+    wxString s;
+
+    if (info)
+        if (!info->GameMode.IsEmpty())
+            s+=info->GameMode+_(" on ");
+    if (!info->Map.IsEmpty())
+        s+=info->Map+wxT(" ");
+    if (info->TimeRemain>0)
+        s+=wxString::Format(wxT("(< %d %s)"),info->TimeRemain,info->TimeRemain==1 ?
+                            _("Minute"):_("Minutes"))+wxT(" ");
+
+    return s;
+}
+
+void CslPanelPlayer::UpdateData()
+{
+#ifdef __WXMSW__
+    //fixes flicker of label text
+    wxWindowUpdateLocker lock(this);
+#endif
+    m_label->SetLabel(GetLabelText());
+    m_label->Wrap(GetSize().x-4);
+#ifdef __WXMAC__
+    wxSize size=m_listCtrl->GetSize();
+    size.y-=m_label->GetBestSize().y+4;
+    m_listCtrl->SetSize(size);
+#endif
+    m_listCtrl->UpdateData();
+    m_sizer->Layout();
+}
+
+
 wxSize CslListCtrlPlayer::BestSizeMicro(140,350);
 wxSize CslListCtrlPlayer::BestSizeMini(280,350);
-
 
 CslListCtrlPlayer::CslListCtrlPlayer(wxWindow* parent,wxWindowID id,const wxPoint& pos,
                                      const wxSize& size,long style,
@@ -66,74 +144,6 @@ CslListCtrlPlayer::CslListCtrlPlayer(wxWindow* parent,wxWindowID id,const wxPoin
         m_view(-1),m_info(NULL)
 {
 }
-
-#ifdef __WXMSW__
-void CslListCtrlPlayer::OnEraseBackground(wxEraseEvent& event)
-{
-    //to prevent flickering, erase only content *outside* of the actual items
-
-    if (GetItemCount()>0)
-    {
-        wxDC *dc=event.GetDC();
-
-        long i,imgId,topItem,bottomItem;
-        wxRect rect1,rect2;
-        wxCoord x,y,w,h,width,height;
-        wxListItem item;
-
-        GetClientSize(&width,&height);
-
-        dc->SetClippingRegion(0,0,width,height);
-        dc->GetClippingBox(&x,&y,&w,&h);
-
-        topItem=GetTopItem();
-        bottomItem=topItem+GetCountPerPage();
-
-        if (bottomItem>=GetItemCount())
-            bottomItem=GetItemCount()-1;
-
-        GetItemRect(topItem,rect1,wxLIST_RECT_LABEL);
-        GetItemRect(bottomItem,rect2,wxLIST_RECT_BOUNDS);
-
-        //set the new clipping region and do erasing
-        wxRegion region(x,y,w,h);
-        region.Subtract(wxRect(rect1.GetLeftTop(),rect2.GetBottomRight()));
-
-        item.SetMask(wxLIST_MASK_IMAGE);
-
-        for (i=0;i<GetItemCount() && i<=bottomItem;i++)
-        {
-            item.SetId(i);
-            GetItem(item);
-
-            if ((imgId=item.GetImage())<0)
-                continue;
-
-            if (!GetItemRect(i,rect1,wxLIST_RECT_ICON))
-                continue;
-
-            const wxBitmap& bitmap=ListImageList.GetBitmap(imgId);
-
-            wxRegion imgRegion(bitmap);
-            imgRegion.Offset(rect1.x,rect1.y+m_imgOffsetY);
-            region.Xor(imgRegion);
-        }
-
-        dc->DestroyClippingRegion();
-        dc->SetClippingRegion(region);
-
-        //do erasing
-        dc->SetBackground(wxBrush(GetBackgroundColour(),wxSOLID));
-        dc->Clear();
-
-        //restore old clipping region
-        dc->DestroyClippingRegion();
-        dc->SetClippingRegion(wxRegion(x,y,w,h));
-    }
-    else
-        event.Skip();
-}
-#endif
 
 void CslListCtrlPlayer::OnColumnLeftClick(wxListEvent& event)
 {
@@ -243,6 +253,8 @@ void CslListCtrlPlayer::GetToolTipText(wxInt32 row,wxString& title,wxArrayString
         const char *c;
         wxListItem item,column;
 
+        column.SetMask(wxLIST_MASK_TEXT);
+        item.SetMask(wxLIST_MASK_TEXT);
         item.SetId(row);
 
         for (i=0;i<GetColumnCount();i++)
@@ -421,7 +433,11 @@ void CslListCtrlPlayer::ListAdjustSize(const wxSize& size)
     }
     else if (m_view==CSL_LISTPLAYER_MINI_SIZE)
     {
+#ifdef __WXMSW__
+        SetColumnWidth(0,(wxInt32)(w*0.44f));
+#else
         SetColumnWidth(0,(wxInt32)(w*0.46f));
+#endif
         SetColumnWidth(1,(wxInt32)(w*0.14f));
         SetColumnWidth(2,(wxInt32)(w*0.13f));
         SetColumnWidth(3,(wxInt32)(w*0.13f));

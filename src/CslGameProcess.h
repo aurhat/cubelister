@@ -18,65 +18,55 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef CSLDLGADDSERVER_H
-#define CSLDLGADDSERVER_H
+#ifndef CSLGAMEPROCESS_H
+#define CSLGAMEPROCESS_H
 
 /**
- @author Glen Masgai <mimosius@gmx.de>
+    @author Glen Masgai <mimosius@gmx.de>
 */
 
-#include "wx/wxprec.h"
+#include <wx/wxprec.h>
 #ifdef __BORLANDC__
 #pragma hdrstop
 #endif
 #ifndef WX_PRECOMP
-#include "wx/wx.h"
+#include <wx/wx.h>
 #endif
-#include <wx/image.h>
-#include "engine/CslEngine.h"
-// begin wxGlade: ::dependencies
-#include <wx/spinctrl.h>
-// end wxGlade
+#include <wx/process.h>
+#include "engine/CslGame.h"
 
 
-class CslDlgAddServer: public wxDialog
+BEGIN_DECLARE_EVENT_TYPES()
+DECLARE_EVENT_TYPE(wxCSL_EVT_PROCESS,wxID_ANY)
+END_DECLARE_EVENT_TYPES()
+
+
+#define CSL_EVT_PROCESS(id,fn) \
+    DECLARE_EVENT_TABLE_ENTRY( \
+                               wxCSL_EVT_PROCESS,id,wxID_ANY, \
+                               (wxObjectEventFunction)(wxEventFunction) \
+                               wxStaticCastEvent(wxCommandEventFunction,&fn), \
+                               (wxObject*)NULL \
+                             ),
+
+
+class CslGameProcess : public wxProcess
 {
     public:
-        // begin wxGlade: CslDlgAddServer::ids
-        // end wxGlade
+        CslGameProcess(wxWindow *parent,CslServerInfo *info,const wxString& cmd);
 
-        CslDlgAddServer(wxWindow* parent,const wxInt32 id=wxID_ANY,const wxString& title=wxEmptyString,
-                        const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize,
-                        long style=wxDEFAULT_DIALOG_STYLE);
-
-        void InitDlg(CslEngine *engine,CslServerInfo *info);
-
-    private:
-        // begin wxGlade: CslDlgAddServer::methods
-        void set_properties();
-        void do_layout();
-        // end wxGlade
-
-        void UpdatePort();
-
-        void OnCommandEvent(wxCommandEvent& event);
-
-        DECLARE_EVENT_TABLE()
+        static void ProcessInputStream();
+        static void ProcessErrorStream();
 
     protected:
-        // begin wxGlade: CslDlgAddServer::attributes
-        wxStaticBox* sizer_address_staticbox;
-        wxChoice* choice_gametype;
-        wxTextCtrl* text_ctrl_address;
-        wxSpinCtrl* spin_ctrl_port;
-        wxButton* button_add;
-        wxButton* button_cancel;
-        // end wxGlade
-
-        CslEngine *m_engine;
+        static CslGameProcess *m_self;
+        wxWindow *m_parent;
         CslServerInfo *m_info;
+        wxString m_cmd;
+        bool m_clear;
+        wxStopWatch m_watch;
 
-}; // wxGlade: end class
+        virtual void OnTerminate(int pid,int code);
+};
 
-
-#endif // CSLDLGADDSERVER_H
+#endif //CSLGAMEPROCESS_H

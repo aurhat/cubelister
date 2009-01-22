@@ -39,8 +39,8 @@ END_EVENT_TABLE()
 
 
 static const wxChar *g_csl_license_pre = wxT("Cube Server Lister is free software; you can redistribute it and/or\n"
-        "modify it under the terms of the GNU General Public License version 2\n"
-        "as published by the Free Software Foundation.\n\n\n");
+        _L_"modify it under the terms of the GNU General Public License version 2\n"
+        _L_"as published by the Free Software Foundation.\n\n\n");
 
 
 CslPanelAboutImage::CslPanelAboutImage(wxWindow *parent,wxInt32 id) :
@@ -89,6 +89,7 @@ CslDlgAbout::CslDlgAbout(wxWindow* parent,int id,const wxString& title,
     label_desc = new wxStaticText(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
     hyperlink_web = new wxHyperlinkCtrl(this, wxID_ANY, CSL_WEBADDRFULL_STR, CSL_WEBADDRFULL_STR);
     label_copyright = new wxStaticText(this, wxID_ANY, wxEmptyString);
+    label_wxversion = new wxStaticText(this, wxID_ANY, wxEmptyString);
     text_ctrl_credits = new wxTextCtrl(notebook_pane_credits, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxHSCROLL);
     text_ctrl_license = new wxTextCtrl(notebook_pane_license, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxHSCROLL);
     button_close = new wxButton(this, wxID_CLOSE, _("&Close"));
@@ -107,43 +108,9 @@ void CslDlgAbout::set_properties()
     button_close->SetDefault();
     // end wxGlade
 
-    SetTitle(_("About Cube Server Lister (CSL)"));
+    wxString s;
 
-    wxString credits = wxString(_(
-                                    "Application icon:\n"
-                                ))+
-                       wxString(wxT(
-                                    "  Jakub 'SandMan' Uhlik\n\n"
-                                ))+
-                       wxString(_(
-                                    "Map previews:\n"
-                                ))+
-                       wxString(wxT(
-                                    "  'K!NG' Berk Inan\n"
-                                    "  Bernd 'apflstrudl' Moeller\n"
-                                    "  Clemens 'Hero' Wloczka\n"
-                                    "  'shmutzwurst'\n"
-                                    "  'ZuurKool'\n\n"
-                                ))+
-                       wxString(_(
-                                    "Translations:\n"
-                                ))+
-                       wxString(wxT(
-                                    "  Czech: Jakub 'SandMan' Uhlik\n"
-                                    "  Dutch: 'ZuurKool'\n\n"
-                                ))+
-                       wxString(_(
-                                    "Previous extended info server patches:\n"
-                                ))+
-                       wxString(wxT(
-                                    "  'noob'\n\n"
-                                ))+
-                       wxString(_(
-                                    "Country Flags:\n"
-                                ))+
-                       wxString(wxT(
-                                    "  http://flags.blogpotato.de\n"
-                                ));
+    SetTitle(_("About Cube Server Lister (CSL)"));
 
     wxFont font=label_copyright->GetFont();
     //font.SetPointSize(font.GetPointSize()-1);
@@ -154,12 +121,51 @@ void CslDlgAbout::set_properties()
     font.SetWeight(wxFONTWEIGHT_BOLD);
     hyperlink_web->SetFont(font);
 
+    s << _("Compiled using:") << wxT(" ") << CSL_WXVERSION_STR;
+
     label_name->SetLabel(CSL_NAME_STR);
     label_version->SetLabel(CSL_VERSION_LONG_STR);
     label_desc->SetLabel(CSL_DESCRIPTION_STR);
     label_copyright->SetLabel(CSL_COPYRIGHT_STR);
+    label_wxversion->SetLabel(s);
 
-    text_ctrl_credits->SetValue(credits);
+    s = wxString(_(
+                     "Application icon:\n"
+                 ))+
+        wxString(wxT(
+                     "  Jakub 'SandMan' Uhlik\n\n"
+                 ))+
+        wxString(_(
+                     "Map previews:\n"
+                 ))+
+        wxString(wxT(
+                     "  'K!NG' Berk Inan\n"
+                     _L_"  Bernd 'apflstrudl' Moeller\n"
+                     _L_"  Clemens 'Hero' Wloczka\n"
+                     _L_"  'shmutzwurst'\n"
+                     _L_"  'ZuurKool'\n\n"
+                 ))+
+        wxString(_(
+                     "Translations:\n"
+                 ))+
+        wxString(wxT(
+                     "  Czech: Jakub 'SandMan' Uhlik\n"
+                     _L_"  Dutch: 'ZuurKool'\n\n"
+                 ))+
+        wxString(_(
+                     "Previous extended info server patches:\n"
+                 ))+
+        wxString(wxT(
+                     "  'noob'\n\n"
+                 ))+
+        wxString(_(
+                     "Country Flags:\n"
+                 ))+
+        wxString(wxT(
+                     "  http://flags.blogpotato.de\n"
+                 ));
+
+    text_ctrl_credits->SetValue(s);
     text_ctrl_license->SetValue(g_csl_license_pre);
     text_ctrl_license->AppendText(csl_license);
     text_ctrl_credits->ShowPosition(0);
@@ -177,7 +183,7 @@ void CslDlgAbout::set_properties()
 void CslDlgAbout::do_layout()
 {
     // begin wxGlade: CslDlgAbout::do_layout
-    wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(8, 1, 0, 0);
+    wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(9, 1, 0, 0);
     wxGridSizer* sizer_license = new wxGridSizer(1, 1, 0, 0);
     wxGridSizer* sizer_credits = new wxGridSizer(1, 1, 0, 0);
     grid_sizer_main->Add(panel_bitmap, 1, wxALIGN_CENTER_HORIZONTAL, 0);
@@ -186,6 +192,7 @@ void CslDlgAbout::do_layout()
     grid_sizer_main->Add(label_desc, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
     grid_sizer_main->Add(hyperlink_web, 1, wxTOP|wxALIGN_CENTER_HORIZONTAL, 8);
     grid_sizer_main->Add(label_copyright, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
+    grid_sizer_main->Add(label_wxversion, 0, wxTOP|wxALIGN_CENTER_HORIZONTAL, 8);
     sizer_credits->Add(text_ctrl_credits, 0, wxALL|wxEXPAND, 4);
     notebook_pane_credits->SetSizer(sizer_credits);
     sizer_license->Add(text_ctrl_license, 0, wxALL|wxEXPAND, 4);
@@ -196,7 +203,7 @@ void CslDlgAbout::do_layout()
     grid_sizer_main->Add(button_close, 0, wxBOTTOM|wxALIGN_CENTER_HORIZONTAL, 8);
     SetSizer(grid_sizer_main);
     grid_sizer_main->Fit(this);
-    grid_sizer_main->AddGrowableRow(6);
+    grid_sizer_main->AddGrowableRow(7);
     grid_sizer_main->AddGrowableCol(0);
     Layout();
     // end wxGlade

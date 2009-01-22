@@ -35,6 +35,8 @@ CslListCtrlInfo::CslListCtrlInfo(wxWindow* parent,wxWindowID id,const wxPoint& p
                                  const wxValidator& validator, const wxString& name)
         : CslListCtrl(parent,id,pos,size,style,validator,name)
 {
+    FlickerFree(false);
+
 #ifdef __WXMSW__
     m_imgList.Create(23,12,true);
     m_imgList.Add(AdjustIconSize(info_18_12_xpm,wxNullIcon,wxSize(23,12),wxPoint(2,0)));
@@ -98,6 +100,8 @@ void CslListCtrlInfo::GetToolTipText(wxInt32 WXUNUSED(row),wxString& title,wxArr
     wxInt32 i;
     wxString attr,val;
     wxListItem item;
+
+    item.SetMask(wxLIST_MASK_TEXT);
 
     for (i=0;i<GetItemCount();i++)
     {

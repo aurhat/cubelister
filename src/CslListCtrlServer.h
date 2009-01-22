@@ -149,7 +149,6 @@ class CslListCtrlServer : public CslListCtrl
 #ifdef __WXMSW__
         bool m_dontAdjustSize;
 #endif
-
         t_aCslListServerData m_selected;
         t_aCslListServerData m_servers;
         wxString m_searchString;
@@ -161,7 +160,6 @@ class CslListCtrlServer : public CslListCtrl
         CslListSortHelper m_sortHelper;
 
 #ifdef __WXMSW__
-        void OnEraseBackground(wxEraseEvent& event);
         void OnColumnDragStart(wxListEvent& event);
         void OnColumnDragEnd(wxListEvent& event);
 #endif
@@ -186,6 +184,13 @@ class CslListCtrlServer : public CslListCtrl
         bool ListFilterItemMatches(CslServerInfo *info);
 
         void GetToolTipText(wxInt32 row,wxString& title,wxArrayString& text);
+        wxSize GetImageListSize()
+        {
+            wxInt32 x,y;
+            if (m_imageList.GetSize(0,x,y))
+                return wxSize(x,y);
+            return wxDefaultSize;
+        }
 };
 
 #endif //CSLLISTCTRLSERVER_H

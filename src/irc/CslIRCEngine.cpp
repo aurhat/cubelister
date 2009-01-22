@@ -53,16 +53,17 @@ wxColour IrcColours[16] =
 
 void irc_auto_rename_nick(irc_session_t *session)
 {
-    /*CslIrcContext *context=(CslIrcContext*)irc_get_ctx(session);
+	static int tries=0;
+    CslIrcContext *context=(CslIrcContext*)irc_get_ctx(session);
 
-    if (context->RenameTries<=IRC_MAX_RENAME_TRIES)
+    if (++tries<2)
     {
-        context->Server->Network->Nick+=wxT("'");
-        irc_cmd_nick(session,U2A(context->Server->Network->Nick));
-        context->RenameTries++;
+        //context->Server->Network->Nick+=wxT("'");
+		context->Server->Network->Nick=context->Server->Network->AltNick;
+        irc_cmd_nick(session,U2A(context->Server->Network->AltNick));
     }
     else
-        irc_cmd_quit(session,NULL);*/
+        irc_cmd_quit(session,NULL);
 }
 
 void irc_notify_player_list(irc_session_t *session,const char *channel,const char *players)
@@ -279,6 +280,7 @@ void event_numeric(irc_session_t *session,unsigned int event,const char *origin,
             if (count>2)
             {
                 CslIrcEvent evt(context->Target,CslIrcEvent::TOPIC,A2U(params[1]));
+				evt.Ints.Add(event);
                 evt.Strings.Add(A2U(params[2]));
                 wxPostEvent(context->EvtHandler,evt);
             }
@@ -297,6 +299,7 @@ void event_numeric(irc_session_t *session,unsigned int event,const char *origin,
             if (count>2)
             {
                 CslIrcEvent evt(context->Target,CslIrcEvent::NUMERIC,A2U(params[1]));
+				evt.Ints.Add(event);
                 evt.Strings.Add(A2U(params[2]));
                 wxPostEvent(context->EvtHandler,evt);
                 return;
@@ -486,10 +489,10 @@ void CslIrcThread::LibIrcError(CslIrcContext *context,wxInt32 error)
 {
     LOG_DEBUG("libirc error (%d): \n",error,irc_strerror(errno));
 
-    CslIrcEvent evt(context->Target,CslIrcEvent::ERROR);
+	wxEvtHandler *handler=context->EvtHandler;
+	CslIrcEvent evt(context->Target,CslIrcEvent::ERR);
     evt.Strings.Add(A2U(irc_strerror(error)));
     evt.Ints.Add(error);
-    wxPostEvent(context->EvtHandler,evt);
 
     switch (error)
     {
@@ -515,6 +518,8 @@ void CslIrcThread::LibIrcError(CslIrcContext *context,wxInt32 error)
             RemoveContext(context);
             break;
     }
+
+    wxPostEvent(handler,evt);
 }
 
 
@@ -536,19 +541,21 @@ void CslIrcSession::OnIrcEvent(CslIrcEvent& event)
 {
     switch (event.Type)
     {
-        case CslIrcEvent::ERROR:
+        case CslIrcEvent::ERR:
         {
             switch (event.Ints.Item(0))
             {
                 case LIBIRC_ERR_RESOLV:
-                    break;
-
+                case LIBIRC_ERR_SOCKET:
+                case LIBIRC_ERR_CONNECT:
                 case LIBIRC_ERR_CLOSED:
+                case LIBIRC_ERR_NOMEM:
                 case LIBIRC_ERR_TERMINATED:
                     for (wxUint32 i=0;i<m_channels.GetCount();i++)
                         m_channels.Item(i)->Connected=false;
                     if (m_state==STATE_DISCONNECTED)
                         return;
+					m_state=STATE_DISCONNECTED;
                     break;
             }
             break;

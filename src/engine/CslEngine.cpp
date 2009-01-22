@@ -86,7 +86,10 @@ wxThread::ExitCode CslResolverThread::Entry()
 void CslResolverThread::AddPacket(CslResolverPacket *packet)
 {
     m_section.Enter();
-    m_packets.add(packet);
+    if (IsIP(packet->Host))
+        m_packets.add(packet);
+    else
+        m_packets.insert(0,packet);
     m_section.Leave();
 
     if (m_mutex.TryLock()==wxMUTEX_NO_ERROR)
@@ -169,7 +172,8 @@ void CslEngine::DeInit()
 
 void CslEngine::ResolveHost(CslServerInfo *info)
 {
-    m_resolveThread->AddPacket(new CslResolverPacket(info->Host,info->Addr.Service(),info->GetGame().GetId()));
+    m_resolveThread->AddPacket(new CslResolverPacket(info->Host,info->Addr.Service(),
+                               info->GetGame().GetId()));
 }
 
 bool CslEngine::AddGame(CslGame *game)
@@ -184,6 +188,25 @@ bool CslEngine::AddGame(CslGame *game)
     game->SetGameID(GetNextGameID());
 
     return true;
+}
+
+CslGame* CslEngine::FindGame(const wxString& name)
+{
+    loopv(m_games)
+    {
+        if (m_games[i]->GetName().CmpNoCase(name)==0)
+            return m_games[i];
+    }
+
+    return NULL;
+}
+
+void CslEngine::GetFavourites(vector<CslServerInfo*>& servers)
+{
+    loopv(m_games)
+    {
+        m_games[i]->GetFavourites(servers);
+    }
 }
 
 bool CslEngine::Ping(CslServerInfo *info,bool force)

@@ -42,12 +42,12 @@
 
 #define CSL_AUI_DEFAULT_LAYOUT wxT("")
 
-#define CSL_FILTER_OFFLINE     1<<0
-#define CSL_FILTER_FULL        1<<1
-#define CSL_FILTER_EMPTY       1<<2
-#define CSL_FILTER_NONEMPTY    1<<3
-#define CSL_FILTER_MM2         1<<4
-#define CSL_FILTER_MM3         1<<5
+#define CSL_FILTER_OFFLINE     (1<<0)
+#define CSL_FILTER_FULL        (1<<1)
+#define CSL_FILTER_EMPTY       (1<<2)
+#define CSL_FILTER_NONEMPTY    (1<<3)
+#define CSL_FILTER_MM2         (1<<4)
+#define CSL_FILTER_MM3         (1<<5)
 
 #define CSL_WAIT_SERVER_FULL_MIN   10
 #define CSL_WAIT_SERVER_FULL_STD   60
@@ -67,6 +67,9 @@
 
 #define CSL_PING_GOOD_STD  200
 #define CSL_PING_BAD_STD   400
+
+#define CSL_USE_SYSTRAY    (1<<0)
+#define CSL_SYSTRAY_CLOSE  (1<<1)
 
 
 class CslSettings

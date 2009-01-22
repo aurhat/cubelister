@@ -141,8 +141,13 @@ const wxChar* CslBloodFrontier::GetVersionName(wxInt32 prot) const
 
     wxInt32 v=CSL_LAST_PROTOCOL_BF-prot;
 
-    return (v>=0 && (size_t)v<sizeof(versions)/sizeof(versions[0])) ?
-           versions[v] : wxString::Format(wxT("%d"),prot).c_str();
+    if (v<0 || (size_t)v>=sizeof(versions)/sizeof(versions[0]))
+    {
+        static wxString version=wxString::Format(wxT("%d"),prot);
+        return version.c_str();
+    }
+    else
+        return versions[v];
 }
 
 const wxChar* CslBloodFrontier::GetWeaponName(wxInt32 n) const
@@ -234,7 +239,7 @@ bool CslBloodFrontier::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
     getstring(text,buf);
     info.Map=A2U(text);
     getstring(text,buf);
-    l=strlen(text);
+    l=(wxInt32)strlen(text);
     StripColours(text,&l,1);
     info.SetDescription(A2U(text));
 

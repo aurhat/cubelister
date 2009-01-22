@@ -18,65 +18,47 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef CSLDLGADDSERVER_H
-#define CSLDLGADDSERVER_H
+#ifndef CSLVERSIONCHECK_H
+#define CSLVERSIONCHECK_H
 
 /**
- @author Glen Masgai <mimosius@gmx.de>
+    @author Glen Masgai <mimosius@gmx.de>
 */
 
-#include "wx/wxprec.h"
+#include <wx/wxprec.h>
 #ifdef __BORLANDC__
 #pragma hdrstop
 #endif
 #ifndef WX_PRECOMP
-#include "wx/wx.h"
+#include <wx/wx.h>
 #endif
-#include <wx/image.h>
-#include "engine/CslEngine.h"
-// begin wxGlade: ::dependencies
-#include <wx/spinctrl.h>
-// end wxGlade
+#include "engine/CslVersion.h"
 
 
-class CslDlgAddServer: public wxDialog
+BEGIN_DECLARE_EVENT_TYPES()
+DECLARE_EVENT_TYPE(wxCSL_EVT_VERSIONCHECK,wxID_ANY)
+END_DECLARE_EVENT_TYPES()
+
+#define CSL_EVT_VERSIONCHECK(id,fn) \
+    DECLARE_EVENT_TABLE_ENTRY( \
+                               wxCSL_EVT_VERSIONCHECK,id,wxID_ANY, \
+                               (wxObjectEventFunction)(wxEventFunction) \
+                               wxStaticCastEvent(wxCommandEventFunction,&fn), \
+                               (wxObject*)NULL \
+                             ),
+
+
+class CslVersionCheckThread : public wxThread
 {
     public:
-        // begin wxGlade: CslDlgAddServer::ids
-        // end wxGlade
+        CslVersionCheckThread(wxEvtHandler *evtHandler);
 
-        CslDlgAddServer(wxWindow* parent,const wxInt32 id=wxID_ANY,const wxString& title=wxEmptyString,
-                        const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize,
-                        long style=wxDEFAULT_DIALOG_STYLE);
-
-        void InitDlg(CslEngine *engine,CslServerInfo *info);
-
-    private:
-        // begin wxGlade: CslDlgAddServer::methods
-        void set_properties();
-        void do_layout();
-        // end wxGlade
-
-        void UpdatePort();
-
-        void OnCommandEvent(wxCommandEvent& event);
-
-        DECLARE_EVENT_TABLE()
+        virtual ExitCode Entry();
+        bool IsOk() { return m_ok; }
 
     protected:
-        // begin wxGlade: CslDlgAddServer::attributes
-        wxStaticBox* sizer_address_staticbox;
-        wxChoice* choice_gametype;
-        wxTextCtrl* text_ctrl_address;
-        wxSpinCtrl* spin_ctrl_port;
-        wxButton* button_add;
-        wxButton* button_cancel;
-        // end wxGlade
+        bool m_ok;
+        wxEvtHandler *m_evtHandler;
+};
 
-        CslEngine *m_engine;
-        CslServerInfo *m_info;
-
-}; // wxGlade: end class
-
-
-#endif // CSLDLGADDSERVER_H
+#endif //CSLVERSIONCHECK_H

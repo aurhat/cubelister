@@ -127,10 +127,9 @@ class CslEngine : public wxEvtHandler
         bool AddGame(CslGame *game);
         wxInt32 GetNextGameID() { return ++m_gameId; }
         vector<CslGame*>& GetGames() { return m_games; }
-        void GetFavourites(vector<CslServerInfo*>& servers)
-        {
-            loopv(m_games) m_games[i]->GetFavourites(servers);
-        }
+        CslGame* FindGame(const wxString& name);
+
+        void GetFavourites(vector<CslServerInfo*>& servers);
 
         bool Ping(CslServerInfo *info,bool force=false);
         bool PingDefault(CslServerInfo *info);

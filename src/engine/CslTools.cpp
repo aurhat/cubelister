@@ -35,7 +35,11 @@ wxString g_basePath;
 #ifdef __WXDEBUG__
 void Debug_Printf(const char *file,int line,const char *func,const char *fmt,...)
 {
+#ifdef __WXMSW__
+    const char *filename=strstr(file,"\\src\\");
+#else
     const char *filename=strstr(file,"/src/");
+#endif
     filename=filename ? filename+1:file;
     va_list ArgList;
     va_start(ArgList,fmt);
@@ -114,7 +118,7 @@ bool IsIP(const wxString& s)
 wxUint32 IP2Int(const wxString& s)
 {
     long unsigned int ul;
-    wxUint32 i=0,ip=0,l=s.Len(),mult=0x1000000;
+    wxUint32 i=0,ip=0,l=(wxUint32)s.Len(),mult=0x1000000;
     wxString m;
 
     for (;i<=l;i++)

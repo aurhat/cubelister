@@ -232,6 +232,7 @@ CslServerInfo* CslGame::FindServerByAddr(const wxIPV4address& addr)
     loopv(m_servers)
     {
         info=m_servers[i];
+
         if (info->Addr.IPAddress()==addr.IPAddress() &&
             info->Addr.Service()==addr.Service())
             return info;
@@ -319,11 +320,15 @@ CslServerInfo::CslServerInfo(CslGame *game,
     m_waiting=false;
 }
 
-void CslServerInfo::Create(CslGame *game,const wxString& host,wxUint16 port)
+void CslServerInfo::Create(CslGame *game,const wxString& host,wxUint16 port,
+                           const wxString& pass,const wxString& admpass)
 {
     m_game=game;
+
     Host=host;
     Port=port ? port:m_game->GetDefaultPort();
+    Addr.Service(Port+1);
+
     if (IsIP(host))
     {
         Addr.Hostname(host);
@@ -331,8 +336,12 @@ void CslServerInfo::Create(CslGame *game,const wxString& host,wxUint16 port)
     }
     else
         Pingable=false;
-    Addr.Service(port ? port+1:Port+1);
+
     View=CSL_VIEW_FAVOURITE;
+
+    Password=pass;
+    PasswordAdmin=admpass;
+
 }
 
 void CslServerInfo::Destroy()

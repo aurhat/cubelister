@@ -54,7 +54,6 @@ enum
 
 BEGIN_EVENT_TABLE(CslListCtrlServer, CslListCtrl)
     #ifdef __WXMSW__
-    EVT_ERASE_BACKGROUND(CslListCtrlServer::OnEraseBackground)
     EVT_LIST_COL_BEGIN_DRAG(wxID_ANY,CslListCtrlServer::OnColumnDragStart)
     EVT_LIST_COL_END_DRAG(wxID_ANY,CslListCtrlServer::OnColumnDragEnd)
     #endif
@@ -109,72 +108,6 @@ CslListCtrlServer::~CslListCtrlServer()
 }
 
 #ifdef __WXMSW__
-void CslListCtrlServer::OnEraseBackground(wxEraseEvent& event)
-{
-    //to prevent flickering, erase only content *outside* of the actual items
-
-    if (GetItemCount()>0)
-    {
-        wxDC *dc=event.GetDC();
-
-        long i,imgId,topItem,bottomItem;
-        wxRect rect1,rect2;
-        wxCoord x,y,w,h,width,height;
-        wxListItem item;
-
-        GetClientSize(&width,&height);
-
-        dc->SetClippingRegion(0,0,width,height);
-        dc->GetClippingBox(&x,&y,&w,&h);
-
-        topItem=GetTopItem();
-        bottomItem=topItem+GetCountPerPage();
-
-        if (bottomItem>=GetItemCount())
-            bottomItem=GetItemCount()-1;
-
-        GetItemRect(topItem,rect1,wxLIST_RECT_LABEL);
-        GetItemRect(bottomItem,rect2,wxLIST_RECT_BOUNDS);
-
-        //set the new clipping region and do erasing
-        wxRegion region(x,y,w,h);
-        region.Subtract(wxRect(rect1.GetLeftTop(),rect2.GetBottomRight()));
-
-        item.SetMask(wxLIST_MASK_IMAGE);
-
-        for (i=0;i<GetItemCount() && i<=bottomItem;i++)
-        {
-            item.SetId(i);
-            GetItem(item);
-
-            if ((imgId=item.GetImage())<0)
-                continue;
-
-            if (!GetItemRect(i,rect1,wxLIST_RECT_ICON))
-                continue;
-
-            const wxBitmap& bitmap=m_imageList.GetBitmap(imgId);
-
-            wxRegion imgRegion(bitmap);
-            imgRegion.Offset(rect1.x,rect1.y+1);
-            region.Xor(imgRegion);
-        }
-
-        dc->DestroyClippingRegion();
-        dc->SetClippingRegion(region);
-
-        //do erasing
-        dc->SetBackground(wxBrush(GetBackgroundColour(),wxSOLID));
-        dc->Clear();
-
-        //restore old clipping region
-        dc->DestroyClippingRegion();
-        dc->SetClippingRegion(wxRegion(x,y,w,h));
-    }
-    else
-        event.Skip();
-}
-
 void CslListCtrlServer::OnColumnDragStart(wxListEvent& WXUNUSED(event))
 {
     m_dontAdjustSize=true;
@@ -415,7 +348,7 @@ void CslListCtrlServer::ListRemoveServers()
 }
 
 #define CSL_DELETE_YESNOCANCEL_STR _("\nChoose Yes to keep these servers, " \
-                                     "No to delete them or\nCancel the operation.")
+                                     _L_"No to delete them or\nCancel the operation.")
 
 void CslListCtrlServer::ListDeleteServers()
 {
@@ -989,6 +922,8 @@ void CslListCtrlServer::GetToolTipText(wxInt32 row,wxString& title,wxArrayString
         wxInt32 i;
         wxListItem item,column;
 
+        column.SetMask(wxLIST_MASK_TEXT);
+        item.SetMask(wxLIST_MASK_TEXT);
         item.SetId(row);
 
         for (i=0;i<GetColumnCount();i++)

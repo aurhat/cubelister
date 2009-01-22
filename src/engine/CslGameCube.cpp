@@ -39,19 +39,6 @@ CslGameCube::~CslGameCube()
 {
 }
 
-const wxChar* CslGameCube::GetVersionName(wxInt32 prot) const
-{
-    static const wxChar* versions[] =
-    {
-        wxT("122")
-    };
-
-    wxInt32 v=CSL_LAST_PROTOCOL_CB-prot;
-
-    return (v>=0 && (size_t)v<sizeof(versions)/sizeof(versions[0])) ?
-           versions[v] : wxString::Format(wxT("%d"),prot).c_str();
-}
-
 const wxChar* CslGameCube::GetModeName(wxInt32 mode) const
 {
     static const wxChar* modes[] =
@@ -78,7 +65,7 @@ bool CslGameCube::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
     if (prot!=CSL_LAST_PROTOCOL_CB)
         return false;
     info.Protocol=prot;
-    info.Version=GetVersionName(prot);
+    info.Version=wxString::Format(wxT("%d"),prot);
     info.MM=CSL_SERVER_OPEN;
     info.MMDescription=wxEmptyString;
     info.GameMode=GetModeName(getint(buf));
@@ -87,7 +74,7 @@ bool CslGameCube::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
     getstring(text,buf);
     info.Map=A2U(text);
     getstring(text,buf);
-    l=strlen(text);
+    l=(wxInt32)strlen(text);
     StripColours(text,&l,1);
     info.SetDescription(A2U(text));
 

@@ -28,7 +28,11 @@
 
 
 BEGIN_EVENT_TABLE(CslToolTip,wxFrame)
+    #ifdef __WXMSW__
+    EVT_ERASE_BACKGROUND(CslToolTip::OnEraseBackground)
+    #else
     EVT_PAINT(CslToolTip::OnPaint)
+    #endif
     EVT_LEFT_DOWN(CslToolTip::OnMouse)
     EVT_RIGHT_DOWN(CslToolTip::OnMouse)
     EVT_LEAVE_WINDOW(CslToolTip::OnMouse)
@@ -36,6 +40,9 @@ END_EVENT_TABLE()
 
 
 BEGIN_EVENT_TABLE(CslListCtrl,wxListCtrl)
+    #ifdef __WXMSW__
+    EVT_ERASE_BACKGROUND(CslListCtrl::OnEraseBackground)
+    #endif
     EVT_MOTION(CslListCtrl::OnMouseMove)
     EVT_LEAVE_WINDOW(CslListCtrl::OnMouseLeave)
     EVT_TIMER(wxID_ANY,CslListCtrl::OnTimer)
@@ -44,7 +51,7 @@ END_EVENT_TABLE()
 
 CslToolTip::CslToolTip(wxWindow *parent) :
         wxFrame(parent,wxID_ANY,wxEmptyString,wxDefaultPosition,wxDefaultSize,
-                wxNO_BORDER|wxSTAY_ON_TOP|wxFRAME_SHAPED|wxFRAME_NO_TASKBAR)
+                wxNO_BORDER|wxSTAY_ON_TOP|wxFRAME_SHAPED|wxFRAME_TOOL_WINDOW)
 {
     m_sizer=new wxBoxSizer(wxVERTICAL);
     m_title=new wxStaticText(this,wxID_ANY,wxEmptyString);
@@ -70,10 +77,16 @@ CslToolTip::CslToolTip(wxWindow *parent) :
     m_right->Connect(wxEVT_RIGHT_DOWN,wxMouseEventHandler(CslToolTip::OnMouse),NULL,this);
 }
 
+#ifdef __WXMSW__
+void CslToolTip::OnEraseBackground(wxEraseEvent& event)
+{
+    wxDC& dc=*event.GetDC();
+#else
 void CslToolTip::OnPaint(wxPaintEvent& event)
 {
     wxPaintDC dc(this);
-
+    PrepareDC(dc);
+#endif
     wxInt32 w=0,h=0;
     GetClientSize(&w,&h);
 
@@ -96,8 +109,16 @@ void CslToolTip::OnMouse(wxMouseEvent& event)
 
 void CslToolTip::ShowTip(const wxString& title,const wxArrayString& text,const wxPoint& position)
 {
-    wxUint32 i=0;
+    wxUint32 i;
     wxString left,right;
+
+    //set the default tooltip bg colour otherwise it's the default window bg colour
+#ifdef __WXMSW__
+    const wxColour& bg=wxSystemSettings::GetColour(wxSYS_COLOUR_INFOBK);
+    m_left->SetBackgroundColour(bg);
+    m_right->SetBackgroundColour(bg);
+    m_title->SetBackgroundColour(bg);
+#endif
 
     for (i=0;i<text.GetCount();i++)
     {
@@ -112,20 +133,18 @@ void CslToolTip::ShowTip(const wxString& title,const wxArrayString& text,const w
     m_title->SetLabel(title);
 
     m_sizer->SetSizeHints(this);
+
     Move(position);
     Show();
 }
 
 
 wxImageList CslListCtrl::ListImageList;
-#ifdef __WXMSW__
-wxInt32 CslListCtrl::m_imgOffsetY=0;
-#endif
 
 CslListCtrl::CslListCtrl(wxWindow* parent,wxWindowID id,const wxPoint& pos,const wxSize& size,
                          long style,const wxValidator& validator,const wxString& name) :
         wxListCtrl(parent,id,pos,size,style,validator,name),
-        m_mouseLastMove(0)
+        m_mouseLastMove(0),m_flickerFree(true)
 {
     m_toolTip=new CslToolTip(this);
     m_timer.SetOwner(this);
@@ -135,6 +154,66 @@ CslListCtrl::~CslListCtrl()
 {
     delete m_toolTip;
 }
+
+#ifdef __WXMSW__
+void CslListCtrl::OnEraseBackground(wxEraseEvent& event)
+{
+    //to prevent flickering, erase only content *outside* of the actual items
+    if (m_flickerFree && GetItemCount()>0)
+    {
+        long tItem,bItem;
+        wxRect tRect,bRect;
+        wxDC *dc=event.GetDC();
+        wxSize imgSize=GetImageListSize();
+        const wxRect& cRect=GetClientRect();
+
+        tItem=GetTopItem();
+        bItem=tItem+GetCountPerPage();
+
+        if (bItem>=GetItemCount())
+            bItem=GetItemCount()-1;
+
+        GetItemRect(tItem,tRect,wxLIST_RECT_LABEL);
+        GetItemRect(bItem,bRect,wxLIST_RECT_BOUNDS);
+
+        //set the new clipping region and do erasing
+        wxRegion region(cRect);
+        region.Subtract(wxRect(tRect.GetLeftTop(),bRect.GetBottomRight()));
+
+        if (imgSize!=wxDefaultSize)
+        {
+            GetItemRect(0,bRect,wxLIST_RECT_ICON);
+            bRect.height-=3;
+            wxRegion imgRegion(imgSize);
+            imgRegion.Offset(bRect.x,bRect.y+1);
+            region.Xor(imgRegion);
+
+            for (wxInt32 i=1;i<GetItemCount() && i<=bItem;i++)
+            {
+                imgRegion.Offset(0,bRect.height+3);
+                region.Xor(imgRegion);
+            }
+        }
+
+        dc->DestroyClippingRegion();
+        dc->SetClippingRegion(region);
+#if 0
+        static int c=0;
+        wxBitmap bmp=region.ConvertToBitmap();
+        if (bmp.Ok()) bmp.SaveFile(wxString::Format("%-2.2d.bmp",c++),wxBITMAP_TYPE_BMP);
+#endif
+        //do erasing
+        dc->SetBackground(wxBrush(GetBackgroundColour(),wxSOLID));
+        dc->Clear();
+
+        //restore old clipping region
+        dc->DestroyClippingRegion();
+        dc->SetClippingRegion(cRect);
+    }
+    else
+        event.Skip();
+}
+#endif
 
 void CslListCtrl::OnMouseMove(wxMouseEvent& event)
 {
@@ -212,7 +291,7 @@ void CslListCtrl::OnTimer(wxTimerEvent& WXUNUSED(event))
 
 wxUint32 CslListCtrl::GetCountryFlag(wxUint32 ip)
 {
-    wxUint32 i;
+    wxInt32 i;
     const char *country;
 
     if (ip && (country=CslGeoIP::GetCountryCodeByIPnum(ip)))
@@ -230,15 +309,6 @@ wxUint32 CslListCtrl::GetCountryFlag(wxUint32 ip)
 void CslListCtrl::CreateCountryFlagImageList()
 {
 #ifdef __WXMSW__
-    //detect vista and set the offset fot the flag images to 2
-    //so the region should be correct drawing the background
-    OSVERSIONINFO ovi;
-    ovi.dwOSVersionInfoSize=sizeof(OSVERSIONINFO);
-    GetVersionEx(&ovi);
-
-    if (ovi.dwMajorVersion>5)
-        m_imgOffsetY=2;
-
     ListImageList.Create(20,14,true);
     ListImageList.Add(AdjustIconSize(sortasc_18_12_xpm,wxNullIcon,wxSize(20,14),wxPoint(0,0)));
     ListImageList.Add(AdjustIconSize(sortdsc_18_12_xpm,wxNullIcon,wxSize(20,14),wxPoint(0,0)));

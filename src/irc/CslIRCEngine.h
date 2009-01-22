@@ -93,6 +93,7 @@ class CslIrcChannel
 
         bool Connected;
         wxString Name,Password;
+		wxString Topic;
 };
 
 
@@ -112,7 +113,7 @@ class CslIrcNetwork
 {
     public:
         CslIrcNetwork(const wxString& name,const wxString& nick,const wxString& altnick) :
-                Name(name),Nick(nick),AltNick(nick) {}
+                Name(name),Nick(nick),AltNick(altnick) {}
         ~CslIrcNetwork() { WX_CLEAR_ARRAY(Servers); WX_CLEAR_ARRAY(AutoChannels); }
 
         wxString Name;
@@ -128,8 +129,8 @@ class CslIrcEvent : public wxEvent
 {
     public:
         enum
-        {
-            ERROR, CONNECT, NOTICE, JOIN, JOINED, NAMES, NICK, KICK,
+		{
+            ERR, CONNECT, NOTICE, JOIN, JOINED, NAMES, NICK, KICK,
             QUIT, PART, CHANMSG, PRIVMSG, ACTION, MODE, TOPIC, NUMERIC
         };
 

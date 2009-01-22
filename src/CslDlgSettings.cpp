@@ -276,11 +276,10 @@ CslDlgSettings::CslDlgSettings(CslEngine *engine,wxWindow* parent,int id,const w
     spin_ctrl_ping_good = new wxSpinCtrl(notebook_pane_other, SPIN_PING_GOOD, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100);
     spin_ctrl_ping_bad = new wxSpinCtrl(notebook_pane_other, SPIN_PING_BAD, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100);
     checkbox_systray = new wxCheckBox(notebook_pane_other, CHECK_SYSTRAY, _("Use system tray icon"));
-    radio_btn_systray_always = new wxRadioButton(notebook_pane_other, RADIO_SYSTRAY_ALWAYS, _("Always use system tray"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
-    radio_btn_systray_minimize = new wxRadioButton(notebook_pane_other, RADIO_SYSTRAY_MINIMIZE, _("Minimize to system tray"));
+    checkbox_systray_close = new wxCheckBox(notebook_pane_other, wxID_ANY, _("Minimise on close button"));
     checkbox_game_output = new wxCheckBox(notebook_pane_other, CHECK_GAME_OUTPUT, _("Auto &save game output to:"));
     dirpicker_game_output = new wxDirPickerCtrl(notebook_pane_other, wxID_ANY, m_settings.gameOutputPath, _("Select game output path"), wxDefaultPosition, wxDefaultSize, wxDIRP_DEFAULT_STYLE|wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST);
-    tree_ctrl_network = new wxTreeCtrl(notebook_pane_irc, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_HAS_BUTTONS|wxTR_NO_LINES|wxTR_DEFAULT_STYLE|wxSUNKEN_BORDER);
+    tree_ctrl_network = new wxTreeCtrl(notebook_pane_irc, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_HAS_BUTTONS|wxTR_NO_LINES|wxTR_LINES_AT_ROOT|wxTR_DEFAULT_STYLE|wxSUNKEN_BORDER);
     label_7 = new wxStaticText(notebook_pane_irc, wxID_ANY, _("Server address:"));
     text_ctrl_1 = new wxTextCtrl(notebook_pane_irc, wxID_ANY, wxEmptyString);
     label_8 = new wxStaticText(notebook_pane_irc, wxID_ANY, _("Port:"));
@@ -357,20 +356,17 @@ void CslDlgSettings::set_properties()
     SetButtonColour(button_colour_mm2,button_ok,m_settings.colServerMM2);
     SetButtonColour(button_colour_mm3,button_ok,m_settings.colServerMM3);
 
-    if (g_cslSettings->systray>0)
+    if (g_cslSettings->systray&CSL_USE_SYSTRAY)
     {
         checkbox_systray->SetValue(true);
-        if (g_cslSettings->systray==1)
-            radio_btn_systray_always->SetValue(true);
-        else
-            radio_btn_systray_minimize->SetValue(true);
+        checkbox_systray_close->Enable();
     }
     else
     {
         checkbox_systray->SetValue(false);
-        radio_btn_systray_always->Enable(false);
-        radio_btn_systray_minimize->Enable(false);
+        checkbox_systray_close->Enable(false);
     }
+    checkbox_systray_close->SetValue((g_cslSettings->systray&CSL_SYSTRAY_CLOSE)!=0);
 
     checkbox_game_output->SetValue(m_settings.autoSaveOutput);
     dirpicker_game_output->SetPath(m_settings.gameOutputPath);
@@ -493,8 +489,7 @@ void CslDlgSettings::do_layout()
     sizer_threshold->Add(grid_sizer_threshold, 1, wxEXPAND, 0);
     grid_sizer_pane_other->Add(sizer_threshold, 1, wxALL|wxEXPAND, 4);
     grid_sizer_systray->Add(checkbox_systray, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_systray->Add(radio_btn_systray_always, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_systray->Add(radio_btn_systray_minimize, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_systray->Add(checkbox_systray_close, 0, wxALL|wxALIGN_RIGHT, 4);
     grid_sizer_systray->AddGrowableCol(0);
     grid_sizer_systray->AddGrowableCol(1);
     grid_sizer_systray->AddGrowableCol(2);
@@ -689,8 +684,7 @@ void CslDlgSettings::OnCommandEvent(wxCommandEvent& event)
             break;
 
         case CHECK_SYSTRAY:
-            radio_btn_systray_always->Enable(event.IsChecked());
-            radio_btn_systray_minimize->Enable(event.IsChecked());
+            checkbox_systray_close->Enable(event.IsChecked());
             break;
 
         case CHECK_GAME_OUTPUT:
@@ -713,7 +707,8 @@ void CslDlgSettings::OnCommandEvent(wxCommandEvent& event)
             m_settings.tooltipDelay=spin_ctrl_tooltip_delay->GetValue();
             m_settings.pinggood=spin_ctrl_ping_good->GetValue();
             m_settings.pingbad=spin_ctrl_ping_bad->GetValue();
-            m_settings.systray=checkbox_systray->GetValue() ? radio_btn_systray_always->GetValue() ? 1 : 2 : 0;
+            m_settings.systray=checkbox_systray->GetValue() ? CSL_USE_SYSTRAY : 0;
+            m_settings.systray|=checkbox_systray_close->GetValue() ? CSL_SYSTRAY_CLOSE : 0;
             m_settings.gameOutputPath=dirpicker_game_output->GetPath();
             m_settings.autoSaveOutput=checkbox_game_output->IsChecked();
 
@@ -760,7 +755,7 @@ bool CslDlgSettings::ValidateSettings()
     if (m_settings.pinggood>m_settings.pingbad)
     {
         wxMessageBox(_("Threshold for good ping can't be higher than\n" \
-                       "threshold for bad ping."),_("Error"),wxICON_ERROR,this);
+                       _L_"threshold for bad ping."),_("Error"),wxICON_ERROR,this);
         return false;
     }
 

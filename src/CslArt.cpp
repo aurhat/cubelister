@@ -8,6 +8,7 @@
 #include "img/extinfo_micro_16.xpm"
 #include "img/extinfo_mini_16.xpm"
 #include "img/extinfo_default_16.xpm"
+#include "img/flags/unknown.xpm"
 #if defined(__WXMSW__) || defined(__WXMAC__)
 #include "img/add_16.xpm"
 #include "img/delete_16.xpm"
@@ -35,6 +36,8 @@ wxBitmap CslArt::CreateBitmap(const wxArtID& id,const wxArtClient& client,const 
                 return wxBitmap(extinfo_mini_16_xpm);
             else if (id==wxART_EXTINFO_DEFAULT)
                 return wxBitmap(extinfo_default_16_xpm);
+            else if (id==wxART_COUNTRY_UNKNOWN)
+                return wxBitmap(unknown_xpm);
 
 #if defined(__WXMSW__) || defined(__WXMAC__)
             else if (id==wxART_ADD_BOOKMARK)

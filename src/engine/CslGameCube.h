@@ -43,7 +43,6 @@ class CslGameCube : public CslGame
         ~CslGameCube();
 
     private:
-        const wxChar* GetVersionName(wxInt32 prot) const;
         const wxChar* GetModeName(wxInt32 mode) const;
 
         wxInt32 InjectConfig(const wxString& address,const wxString& password,wxString *error);

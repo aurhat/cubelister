@@ -21,22 +21,24 @@
 #ifndef CSLIRC_H
 #define CSLIRC_H
 
+//allows stroken text but the memory usage nearly explodes
 //#define CSL_USE_RICHTEXT
 
 #include "wx/wxprec.h"
 #ifdef __BORLANDC__
 #pragma hdrstop
-#endif // __BORLANDC__
+#endif //__BORLANDC__
 #ifndef WX_PRECOMP
 #include "wx/wx.h"
-#endif // WX_PRECOMP
-#include "wx/aui/aui.h"
+#endif //WX_PRECOMP
+#include <wx/listctrl.h>
+#include <wx/aui/aui.h>
 #include <wx/splitter.h>
 #ifdef CSL_USE_RICHTEXT
 #include <wx/richtext/richtextctrl.h>
 #else
 #include <wx/richtext/richtextbuffer.h>
-#endif // CSL_USE_RICHTEXT
+#endif //CSL_USE_RICHTEXT
 #include "irc/CslIRCEngine.h"
 #include "engine/CslTools.h"
 
@@ -123,18 +125,19 @@ class CslIrcPanel: public wxPanel
 #ifdef CSL_USE_RICHTEXT
         wxRichTextCtrl* text_ctrl_chat;
 #else
-        wxTextCtrl* text_ctrl_chat;
+        wxTextCtrl *text_ctrl_chat;
 #endif
-        wxPanel* pane_users;
-        wxListCtrl* list_ctrl_users;
-        wxChoice* choice_connection;
-        wxTextCtrl* text_ctrl_input;
-        wxSplitterWindow* splitter;
+        wxPanel *pane_users;
+        wxListCtrl *list_ctrl_users;
+        wxChoice *choice_connection;
+        wxTextCtrl *text_ctrl_input;
+        wxSplitterWindow *splitter;
 
         static int wxCALLBACK ListSortCompareFunc(long item1,long item2,long data);
 
         void OnKeypress(wxKeyEvent& event);
         void OnListCtrlActivated(wxListEvent& event);
+        void OnSize(wxSizeEvent& event);
         void OnCommandEvent(wxCommandEvent& event);
         void OnSplitter(wxSplitterEvent& event);
         void OnTimer(wxTimerEvent& event);
@@ -143,4 +146,4 @@ class CslIrcPanel: public wxPanel
         DECLARE_EVENT_TABLE()
 };
 
-#endif // CSLIRC_H
+#endif //CSLIRC_H

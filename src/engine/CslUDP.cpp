@@ -85,7 +85,9 @@ void CslUDP::OnSocketEvent(wxSocketEvent& event)
     if (m_socket->Error())
     {
         packet->FreeData();
+#ifndef __WXMSW__
         LOG_DEBUG("Error reading on UDP socket\n");
+#endif
     }
 
     size=m_socket->LastCount();

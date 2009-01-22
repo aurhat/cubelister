@@ -35,6 +35,7 @@ CslListCtrlPlayerSearch::CslListCtrlPlayerSearch(wxWindow* parent,wxWindowID id,
         const wxValidator& validator,const wxString& name) :
         CslListCtrl(parent,id,pos,size,style,validator,name)
 {
+    FlickerFree(false);
     ListInit();
 }
 

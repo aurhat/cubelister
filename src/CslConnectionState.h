@@ -35,53 +35,16 @@
 #include <wx/imaglist.h>
 #include <wx/listctrl.h>
 #include "engine/CslEngine.h"
-#include "CslStatusBar.h"
 
 
 class CslConnectionState
 {
     public:
-        static void Reset()
-        {
-            if (m_activeInfo)
-                m_activeInfo->SetWaiting(false);
-            m_playing=false;
-            m_waitTime=0;
-            m_connectMode=CslServerInfo::CSL_CONNECT_DEFAULT;
-            m_activeInfo=NULL;
-            CslStatusBar::SetText(1,wxEmptyString);
-        }
-
-        static void CreateWaitingState(CslServerInfo *info,wxInt32 mode,wxInt32 time)
-        {
-            m_activeInfo=info;
-            m_waitTime=time;
-            m_connectMode=mode;
-            info->SetWaiting(true);
-        }
-
-        static bool CountDown()
-        {
-            if (--m_waitTime==0)
-            {
-                Reset();
-                return false;
-            }
-            return true;
-        }
-
-        static void CreatePlayingState(CslServerInfo *info)
-        {
-            m_activeInfo=info;
-            m_playing=true;
-        }
-
-        static void CreateConnectState(CslServerInfo *info,wxInt32 mode=CslServerInfo::CSL_CONNECT_DEFAULT)
-        {
-            m_activeInfo=info;
-            m_connectMode=mode;
-        }
-
+        static void Reset();
+        static void CreateWaitingState(CslServerInfo *info,wxInt32 mode,wxInt32 time);
+        static bool CountDown();
+        static void CreatePlayingState(CslServerInfo *info);
+        static bool CreateConnectState(CslServerInfo *info,wxInt32 mode=CslServerInfo::CSL_CONNECT_DEFAULT);
         static bool IsPlaying() { return m_playing; }
         static bool IsWaiting() { return m_waitTime>0; }
         static wxInt32 GetWaitTime() { return m_waitTime; }

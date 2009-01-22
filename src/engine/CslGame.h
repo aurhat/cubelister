@@ -227,7 +227,7 @@ class CslServerInfo : public CslExtendedInfo
         friend class CslMaster;
 
     public:
-        enum { CSL_VIEW_DEFAULT=0x1, CSL_VIEW_FAVOURITE=0x2 };
+        enum { CSL_VIEW_DEFAULT = 1<<0, CSL_VIEW_FAVOURITE = 1<<1 };
         enum { CSL_CONNECT_DEFAULT, CSL_CONNECT_PASS, CSL_CONNECT_ADMIN_PASS };
 
         CslServerInfo(CslGame *game=NULL,
@@ -244,7 +244,8 @@ class CslServerInfo : public CslExtendedInfo
             return (Host==info.Host && Port==info.Port);
         }
 
-        void Create(CslGame *game,const wxString& host=wxT("localhost"),wxUint16 port=0);
+        void Create(CslGame *game,const wxString& host=wxT("localhost"),wxUint16 port=0,
+                    const wxString& pass=wxEmptyString,const wxString& admpass=wxEmptyString);
         void Destroy();
         void SetLastPlayTime(wxUint32 time);
 

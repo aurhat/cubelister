@@ -40,11 +40,11 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;libGeoIP;img/flags"
+				AdditionalIncludeDirectories=".;libGeoIP;img/flags;irc/libircclient/include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
+				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28d.lib wxbase28d_net.lib wxmsw28d_adv.lib wxmsw28d_core.lib wxmsw28d_aui.lib wxtiffd.lib wxjpegd.lib wxpngd.lib wxzlibd.lib wxregexd.lib wxexpatd.lib comctl32.lib rpcrt4.lib wsock32.lib"
+				AdditionalDependencies="wxbase28d.lib wxbase28d_net.lib wxmsw28d_adv.lib wxmsw28d_core.lib wxmsw28d_richtext.lib wxmsw28d_html.lib wxmsw28d_aui.lib wxtiffd.lib wxjpegd.lib wxpngd.lib wxzlibd.lib wxregexd.lib wxexpatd.lib comctl32.lib rpcrt4.lib wsock32.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -118,9 +118,9 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=".;libGeoIP;img/flags"
+				AdditionalIncludeDirectories=".;libGeoIP;img/flags;irc/libircclient/include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE"
-				RuntimeLibrary="0"
+				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
@@ -137,7 +137,162 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxbase28.lib wxbase28_net.lib wxmsw28_adv.lib wxmsw28_core.lib wxmsw28_aui.lib wxtiff.lib wxjpeg.lib wxpng.lib wxzlib.lib wxregex.lib wxexpat.lib comctl32.lib rpcrt4.lib wsock32.lib"
+				AdditionalDependencies="wxbase28.lib wxbase28_net.lib wxmsw28_adv.lib wxmsw28_core.lib wxmsw28_richtext.lib wxmsw28_html.lib wxmsw28_aui.lib wxtiff.lib wxjpeg.lib wxpng.lib wxzlib.lib wxregex.lib wxexpat.lib comctl32.lib rpcrt4.lib wsock32.lib"
+				LinkIncremental="1"
+				GenerateDebugInformation="true"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Unicode-Debug|Win32"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories=".;libGeoIP;img/flags;irc/libircclient/include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="false"
+				DebugInformationFormat="4"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="wxbase28ud.lib wxbase28ud_net.lib wxmsw28ud_adv.lib wxmsw28ud_core.lib wxmsw28ud_richtext.lib wxmsw28ud_html.lib wxmsw28ud_aui.lib wxregexud.lib wxtiffd.lib wxjpegd.lib wxpngd.lib wxzlibd.lib wxexpatd.lib comctl32.lib rpcrt4.lib wsock32.lib"
+				LinkIncremental="2"
+				GenerateDebugInformation="true"
+				SubSystem="2"
+				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="&quot;$(VCInstallDir)\bin\EditBin.exe&quot; /subsystem:console &quot;$(OutDir)\$(ProjectName).exe&quot;"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Unicode-Release|Win32"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="1"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories=".;libGeoIP;img/flags;irc/libircclient/include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE"
+				RuntimeLibrary="2"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="false"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="wxbase28u.lib wxbase28u_net.lib wxmsw28u_adv.lib wxmsw28u_core.lib wxmsw28u_richtext.lib wxmsw28u_html.lib wxmsw28u_aui.lib wxregexu.lib wxtiff.lib wxjpeg.lib wxpng.lib wxzlib.lib wxexpat.lib comctl32.lib rpcrt4.lib wsock32.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -228,7 +383,31 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CslGameProcess.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CslGeoIP.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CslIPC.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CslIRC.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\irc\CslIRCEngine.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CslListCtrl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CslListCtrlCountry.cpp"
 				>
 			</File>
 			<File
@@ -237,6 +416,10 @@
 			</File>
 			<File
 				RelativePath=".\CslListCtrlPlayer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CslListCtrlPlayerSearch.cpp"
 				>
 			</File>
 			<File
@@ -256,6 +439,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CslVersionCheck.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\libGeoIP\GeoIP.c"
 				>
 			</File>
@@ -265,10 +452,6 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath=".\csl.rc"
-				>
-			</File>
 			<File
 				RelativePath=".\csl_logo_png.h"
 				>
@@ -330,11 +513,35 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CslGameProcess.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CslGeoIP.h"
 				>
 			</File>
 			<File
+				RelativePath=".\CslIPC.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CslIRC.h"
+				>
+			</File>
+			<File
+				RelativePath=".\irc\CslIRCEngine.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CslLicense.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CslListCtrl.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CslListCtrlCountry.h"
 				>
 			</File>
 			<File
@@ -343,6 +550,10 @@
 			</File>
 			<File
 				RelativePath=".\CslListCtrlPlayer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CslListCtrlPlayerSearch.h"
 				>
 			</File>
 			<File
@@ -366,10 +577,18 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CslVersionCheck.h"
+				>
+			</File>
+			<File
 				RelativePath=".\libGeoIP\GeoIP.h"
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\csl.rc"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

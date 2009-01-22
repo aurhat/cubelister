@@ -74,6 +74,7 @@ void CslIrcNotebook::OnNotebookPageClose(wxAuiNotebookEvent& event)
 
 
 BEGIN_EVENT_TABLE(CslIrcPanel,wxPanel)
+    EVT_SIZE(CslIrcPanel::OnSize)
     EVT_MENU(wxID_ANY,CslIrcPanel::OnCommandEvent)
     EVT_LIST_ITEM_ACTIVATED(wxID_ANY,CslIrcPanel::OnListCtrlActivated)
     EVT_CHOICE(wxID_ANY,CslIrcPanel::OnCommandEvent)
@@ -94,14 +95,14 @@ CslIrcPanel::CslIrcPanel(CslIrcNotebook* parent,CslIrcSession *session,
     pane_chat=new wxPanel(splitter,wxID_ANY);
     pane_users=new wxPanel(splitter,wxID_ANY);
     list_ctrl_users=new wxListCtrl(pane_users,wxID_ANY,wxDefaultPosition,wxDefaultSize,
-                                   wxLC_REPORT|wxSUNKEN_BORDER|wxLC_NO_HEADER|wxLC_SORT_ASCENDING);
+                                   wxLC_REPORT|wxSUNKEN_BORDER|wxLC_NO_HEADER);
     static_topic=new wxStaticText(pane_chat,wxID_ANY,wxEmptyString);
 #ifdef CSL_USE_RICHTEXT
     text_ctrl_chat=new wxRichTextCtrl(pane_chat,wxID_ANY,wxEmptyString,wxDefaultPosition,wxDefaultSize,
                                       wxRE_MULTILINE|wxTE_READONLY);
 #else
     text_ctrl_chat=new wxTextCtrl(pane_chat,wxID_ANY,wxEmptyString,wxDefaultPosition,wxDefaultSize,
-                                  wxTE_MULTILINE|wxTE_READONLY|wxTE_AUTO_URL|wxTE_RICH2);
+                                  wxTE_MULTILINE|wxTE_READONLY|wxTE_AUTO_URL|wxTE_RICH|wxTE_RICH2);
 #endif
     wxString choices[]={ _("Disconnect") };
     choice_connection=new wxChoice(this,CHOICE_CONNECTION,wxDefaultPosition,wxDefaultSize,1,choices);
@@ -171,6 +172,11 @@ CslIrcPanel::CslIrcPanel(CslIrcNotebook* parent,CslIrcSession *session,
 #ifdef CSL_USE_RICHTEXT
     //disable undo, otherwise it's eating all the ram
     text_ctrl_chat->BeginSuppressUndo();
+#else
+    //set some colour here otherwise further calls to SetDefaultStyle() don't work
+#ifdef __WXMSW__
+    text_ctrl_chat->SetDefaultStyle(GetForegroundColour());
+#endif
 #endif
 
     text_ctrl_input->Connect(wxEVT_CHAR,wxKeyEventHandler(CslIrcPanel::OnKeypress),NULL,this);
@@ -197,26 +203,26 @@ void CslIrcPanel::OnKeypress(wxKeyEvent& event)
     {
         case WXK_UP:
             if (!m_commandBuffer.GetCount())
-                break;
+                return;
             if (m_commandBufferPos)
                 m_commandBufferPos--;
-            text_ctrl_input->Clear();
-            text_ctrl_input->AppendText(m_commandBuffer.Item(m_commandBufferPos));
-            break;
+            text_ctrl_input->ChangeValue(m_commandBuffer.Item(m_commandBufferPos));
+            text_ctrl_input->SetInsertionPointEnd();
+            return;
 
         case WXK_DOWN:
             if (m_commandBuffer.GetCount()==0)
-                break;
+                return;
             m_commandBufferPos++;
             if (m_commandBufferPos>=m_commandBuffer.GetCount())
             {
                 m_commandBufferPos=m_commandBuffer.GetCount();
                 text_ctrl_input->Clear();
-                break;
+                return;
             }
-            text_ctrl_input->Clear();
-            text_ctrl_input->AppendText(m_commandBuffer.Item(m_commandBufferPos));
-            break;
+            text_ctrl_input->ChangeValue(m_commandBuffer.Item(m_commandBufferPos));
+            text_ctrl_input->SetInsertionPointEnd();
+            return;
 
         case WXK_TAB:
         {
@@ -262,6 +268,24 @@ void CslIrcPanel::OnListCtrlActivated(wxListEvent& event)
 {
     CslIrcUser *user=(CslIrcUser*)list_ctrl_users->GetItemData(event.GetIndex());
     GetOrCreatePanel(user->Nick,m_session);
+}
+
+void CslIrcPanel::OnSize(wxSizeEvent& event)
+{
+    const wxSize& size=static_topic->GetClientSize();
+
+    if (size.x)
+    {
+        if (!m_channel.Topic.IsEmpty())
+        {
+            LOG_DEBUG("size: %d - label: %s\n",size.x,U2A(m_channel.Topic));
+            static_topic->SetLabel(m_channel.Topic);
+            static_topic->Wrap(size.x-4);
+            grid_sizer_chat->Layout();
+        }
+    }
+
+    event.Skip();
 }
 
 void CslIrcPanel::OnCommandEvent(wxCommandEvent& event)
@@ -346,6 +370,7 @@ void CslIrcPanel::OnCommandEvent(wxCommandEvent& event)
 void CslIrcPanel::OnSplitter(wxSplitterEvent& WXUNUSED(event))
 {
     list_ctrl_users->SetColumnWidth(0,list_ctrl_users->GetBestSize().x);
+    LOG_DEBUG("\n");
 }
 
 void CslIrcPanel::OnTimer(wxTimerEvent& event)
@@ -361,7 +386,7 @@ void CslIrcPanel::OnIrcEvent(CslIrcEvent& event)
 
     switch (event.Type)
     {
-        case CslIrcEvent::ERROR:
+        case CslIrcEvent::ERR:
             switch (event.Ints.Item(0))
             {
                 case LIBIRC_ERR_RESOLV:
@@ -389,8 +414,11 @@ void CslIrcPanel::OnIrcEvent(CslIrcEvent& event)
             }
             else
                 u=0;
-            panel->static_topic->SetLabel(FormatToText(event.Strings.Item(u)));
-            grid_sizer_chat->Layout();
+            panel->m_channel.Topic=event.Strings.Item(u);
+            //panel->static_topic->SetLabel(FormatToText(panel->m_channel.Topic));
+            wxPostEvent(panel,wxSizeEvent());
+            //panel->static_topic->Wrap(panel->static_topic->GetSize().GetWidth()-2);
+            //grid_sizer_chat->Layout();
             break;
 
         case CslIrcEvent::NUMERIC:
@@ -402,8 +430,8 @@ void CslIrcPanel::OnIrcEvent(CslIrcEvent& event)
                     break;
 
                 case 333: //topic info "channel nickname time"
-
                     break;
+
                 default:
                     if (!event.Channel.IsEmpty())
                     {
@@ -887,34 +915,38 @@ void CslIrcPanel::AddLine(const wxString& line,bool scroll)
     wxString buf;
     wxTextAttrEx attr,basic;
     wxInt32 fg=-1,bg=-1;
-    wxUint32 i,len=line.Length();
+    wxUint32 i,j,len=line.Length();
     wxDateTime now=wxDateTime::Now();
     bool bold=false,italic=false,strike=false,underline=false;
+    static wxUint32 lines=0;
 
 #ifdef CSL_USE_RICHTEXT
     scroll|=text_ctrl_chat->IsPositionVisible(m_textLength);
     basic=text_ctrl_chat->GetBasicStyle();
-    text_ctrl_chat->Freeze();
 #else
     wxInt32 pos=text_ctrl_chat->GetScrollPos(wxVERTICAL);
     wxInt32 range=text_ctrl_chat->GetScrollRange(wxVERTICAL);
     wxInt32 height=text_ctrl_chat->GetClientSize().y;
-    scroll|=(range-height<pos);
+    scroll|=(range-pos<=height+1);
+#if 0
+    LOG_DEBUG("pos: %d - range:%d - height:%d - range-pos:%d -  scroll:%d\n",
+              pos,range,height,range-pos,scroll);
+#endif //0
+#ifdef __WXGTK__
     if (!scroll)
         text_ctrl_chat->SetWindowStyle(text_ctrl_chat->GetWindowStyle()&~wxTE_READONLY);
-    //LOG_DEBUG("pos: %d - range:%d - height:%d - scroll:%d\n",pos,range,height,scroll);
+#endif //__WXGTK__
     basic=text_ctrl_chat->GetDefaultStyle();
-#endif
+#endif //CSL_USE_RICHTEXT
+
+    text_ctrl_chat->Freeze();
+
     attr=basic;
 
     if (m_textLength)
-    {
         buf=wxT("\n");
-        m_textLength++;
-    }
 
     buf+=wxString::Format(wxT("[%-2.2d:%-2.2d] "),now.GetHour(),now.GetMinute());
-    m_textLength+=8;
 
 #define WRITEBUFFER \
     if (!buf.IsEmpty()) \
@@ -1025,19 +1057,43 @@ void CslIrcPanel::AddLine(const wxString& line,bool scroll)
     }
 
     WRITEBUFFER
-#undef WRITEBUFFER
+    lines++;
+
+    if ((i=line.Find(wxT("csl://")))!=wxNOT_FOUND)
+    {
+        for (j=i+6;j<len;j++)
+        {
+            if (line.GetChar(j)==wxT(' '))
+                break;
+        }
+
+        attr=basic;
+        font=attr.GetFont();
+        font.SetUnderlined(true);
+        attr.SetFont(font);
+        attr.SetTextColour(*wxBLUE);
+        text_ctrl_chat->SetStyle(m_textLength-len+i,m_textLength-len+i+(j-i),attr);
+    }
 
     text_ctrl_chat->SetDefaultStyle(basic);
 
 #ifdef CSL_USE_RICHTEXT
     text_ctrl_chat->Thaw();
 #endif
+
     if (scroll)
+    {
+        text_ctrl_chat->ScrollLines(lines+1);
         text_ctrl_chat->ShowPosition(m_textLength);
+    }
+
 #ifndef CSL_USE_RICHTEXT
+    text_ctrl_chat->Thaw();
+#ifdef __WXGTK__
     else
         text_ctrl_chat->SetWindowStyle(text_ctrl_chat->GetWindowStyle()|wxTE_READONLY);
-#endif
+#endif //__WXGTK__
+#endif //CSL_USE_RICHTEXT
 
     if (!IsShownOnScreen())
     {
@@ -1255,11 +1311,11 @@ void CslIrcPanel::HandleInput(const wxString& text)
             s=text;
             TextToFormat(s);
             m_session->SendTextMessage(m_channel.Name,s);
-            s=m_session->GetNick()+wxT(": \0033")+s+wxT("\003");
+            s=wxT("<")+m_session->GetNick()+wxT("> \0033")+s+wxT("\003");
         }
     }
 
-    AddLine(s.IsEmpty() ? text:s,true);
+    AddLine(s.IsEmpty() ? text:s,false);
 }
 
 int wxCALLBACK CslIrcPanel::ListSortCompareFunc(long item1,long item2,long data)

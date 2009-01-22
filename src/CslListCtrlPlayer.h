@@ -60,11 +60,7 @@ class CslListCtrlPlayer : public CslListCtrl
         CslServerInfo *m_info;
 
         CslListSortHelper m_sortHelper;
-#ifdef __WXMSW__
-        static wxInt32 m_imgOffsetY;
 
-        void OnEraseBackground(wxEraseEvent& event);
-#endif
         void OnColumnLeftClick(wxListEvent& event);
         void OnItemActivated(wxListEvent& event);
         void OnContextMenu(wxContextMenuEvent& event);
@@ -76,8 +72,40 @@ class CslListCtrlPlayer : public CslListCtrl
         void ListSort(const wxInt32 column);
 
         void GetToolTipText(wxInt32 row,wxString& title,wxArrayString& text);
+        wxSize GetImageListSize()
+        {
+            wxInt32 x,y;
+            if (ListImageList.GetSize(0,x,y))
+                return wxSize(x,y);
+            return wxDefaultSize;
+        }
+
 
         static int wxCALLBACK ListSortCompareFunc(long item1,long item2,long data);
+};
+
+
+class CslPanelPlayer : public wxPanel
+{
+    public:
+        CslPanelPlayer(wxWindow* parent,long listStyle=wxLC_ICON);
+
+        CslListCtrlPlayer* ListCtrl() { return m_listCtrl; }
+        CslServerInfo* ServerInfo() { return m_listCtrl->ServerInfo(); }
+        void ServerInfo(CslServerInfo *info) { m_listCtrl->ServerInfo(info); }
+        void UpdateData();
+
+    private:
+        void OnSize(wxSizeEvent& event);
+
+        DECLARE_EVENT_TABLE()
+
+    protected:
+        wxFlexGridSizer *m_sizer;
+        CslListCtrlPlayer *m_listCtrl;
+        wxStaticText *m_label;
+
+        wxString GetLabelText();
 };
 
 #endif

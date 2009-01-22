@@ -32,13 +32,14 @@
 #ifndef WX_PRECOMP
 #include "wx/wx.h"
 #endif
-#include "wx/aui/aui.h"
+#include <wx/aui/aui.h>
 #include <wx/snglinst.h>
 #include <wx/taskbar.h>
 #include <wx/image.h>
 #include <wx/imaglist.h>
 #include <wx/treectrl.h>
 #include "engine/CslEngine.h"
+#include "CslVersionCheck.h"
 #include "CslMenu.h"
 #include "CslDlgExtended.h"
 #include "CslStatusBar.h"
@@ -48,51 +49,10 @@
 #include "CslDlgOutput.h"
 #include "CslDlgTraffic.h"
 #include "CslListCtrlPlayer.h"
+#include "CslListCtrlCountry.h"
 #include "CslListCtrlPlayerSearch.h"
+#include "CslIPC.h"
 #include "CslIRC.h"
-
-
-class CslVersionCheckThread : public wxThread
-{
-    public:
-        CslVersionCheckThread(wxEvtHandler *evtHandler) :
-                wxThread(wxTHREAD_JOINABLE),m_ok(false),m_evtHandler(evtHandler)
-        {
-            m_ok=Create()==wxTHREAD_NO_ERROR;
-        }
-
-        virtual ExitCode Entry();
-        bool IsOk() { return m_ok; }
-
-    protected:
-        bool m_ok;
-        wxEvtHandler *m_evtHandler;
-};
-
-
-class CslPlayerInfo : public wxPanel
-{
-    public:
-        CslPlayerInfo(wxWindow* parent,long listStyle=wxLC_ICON);
-
-        CslListCtrlPlayer* ListCtrl() { return m_listCtrl; }
-        CslServerInfo* ServerInfo() { return m_listCtrl->ServerInfo(); }
-        void ServerInfo(CslServerInfo *info) { m_listCtrl->ServerInfo(info); }
-        void UpdateData();
-
-    private:
-        void OnSize(wxSizeEvent& event);
-
-        DECLARE_EVENT_TABLE()
-
-    protected:
-        wxFlexGridSizer *m_sizer;
-        CslListCtrlPlayer *m_listCtrl;
-        wxStaticText *m_label;
-
-        wxString GetLabelText();
-};
-
 
 class CslFrame: public wxFrame
 {
@@ -103,20 +63,20 @@ class CslFrame: public wxFrame
                  long style=wxDEFAULT_FRAME_STYLE);
         ~CslFrame();
 
-    protected:
+    private:
         wxAuiManager m_AuiMgr;
-        bool m_maximized;
 #ifndef __WXMAC__
         wxTaskBarIcon *m_tbIcon;
-        bool m_shown;
 #endif
+        bool m_maximised;
 
         wxFlexGridSizer *sizer_main,*sizer_search;
         wxPanel *pane_main,*pane_search;
         CslListCtrlServer *list_ctrl_master,*list_ctrl_favourites;
-        CslPlayerInfo *player_info;
+        CslPanelPlayer *player_info;
         CslListCtrlInfo *list_ctrl_info;
         CslListCtrlPlayerSearch *list_ctrl_player_search;
+        CslPanelCountry *pane_country;
         CslIrcNotebook *notebook_irc;
         wxTreeCtrl *tree_ctrl_games;
         wxTextCtrl *text_ctrl_search;
@@ -141,15 +101,19 @@ class CslFrame: public wxFrame
 
         CslEngine *m_engine;
 
+        CslIpcServer *m_ipc;
+
         CslDlgOutput *m_outputDlg;
         CslDlgExtended *m_extendedDlg;
         CslDlgTraffic *m_trafficDlg;
 
         CslVersionCheckThread *m_versionCheckThread;
 
-        vector<CslPlayerInfo*> m_playerInfos;
+        vector<CslPanelPlayer*> m_playerInfos;
 
         CslServerInfo *m_oldSelectedInfo;
+
+        vector<CslServerInfo*> m_countryServers;
 
         vector<CslServerInfo*> m_searchedServers;
         wxString m_searchString;
@@ -160,14 +124,16 @@ class CslFrame: public wxFrame
         void SetProperties();
         void DoLayout();
 
+        void PanelCountrySetCaption(CslServerInfo *info);
+
         wxString PlayerListGetCaption(CslServerInfo *info,bool selected);
         void PlayerListCreateView(CslServerInfo *info,wxUint32 view,const wxString& name=wxEmptyString);
 
 #ifndef __WXMAC__
-        void ToggleTaskbarIcon(bool iconized);
+        void ToggleTrayIcon();
 #endif
         void ToggleSearchBar();
-        void TogglePane(wxInt32 id);
+        void TogglePane(wxInt32 id,bool forceShow=false);
 
         void SetTotalPlaytime(CslGame *game);
         void SetListCaption(wxInt32 id,const wxString& addon=wxEmptyString);
@@ -212,6 +178,7 @@ class CslFrame: public wxFrame
         void OnMouseLeftDown(wxMouseEvent& event);
         void OnVersionCheck(wxCommandEvent& event);
         void OnEndProcess(wxCommandEvent& event);
+        void OnIPC(CslIpcEvent& event);
 
         DECLARE_EVENT_TABLE()
 };
@@ -220,15 +187,33 @@ class CslFrame: public wxFrame
 class CslApp: public wxApp
 {
     public:
+        enum
+        {
+            CSL_SHUTDOWN_NONE = 0,
+            CSL_SHUTDOWN_NORMAL,
+            CSL_SHUTDOWN_FORCE
+        };
+
         CslEngine* GetCslEngine() { return &m_engine; }
+        void Shutdown(wxInt32 val) { m_shutdown=val; }
+        wxInt32 Shutdown() { return m_shutdown; }
 
     private:
         wxSingleInstanceChecker *m_single;
         wxLocale m_locale;
+        wxInt32 m_shutdown;
+
         CslEngine m_engine;
 
-        bool OnInit();
-        int OnExit();
+        virtual bool OnInit();
+        virtual int OnRun();
+        virtual int OnExit();
+
+        void IPCCall(const wxString& value);
+
+        void OnEndSession(wxCloseEvent& event);
+
+        DECLARE_EVENT_TABLE()
 };
 
 #endif //CSLFRAME_H

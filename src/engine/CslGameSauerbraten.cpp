@@ -62,8 +62,13 @@ const wxChar* CslGameSauerbraten::GetVersionName(wxInt32 prot) const
 
     wxInt32 v=CSL_LAST_PROTOCOL_SB-prot;
 
-    return (v>=0 && (size_t)v<sizeof(versions)/sizeof(versions[0])) ?
-           versions[v] : wxString::Format(wxT("%d"),prot).c_str();
+    if (v<0 || (size_t)v>=sizeof(versions)/sizeof(versions[0]))
+    {
+        static wxString version=wxString::Format(wxT("%d"),prot);
+        return version.c_str();
+    }
+    else
+        return versions[v];
 }
 
 const wxChar* CslGameSauerbraten::GetModeName(wxInt32 mode,wxInt32 prot) const
@@ -105,7 +110,7 @@ const wxChar* CslGameSauerbraten::GetWeaponName(wxInt32 n) const
         _("Iceball"),_("Slimeball"),_("Bite")
     };
     return (n>=0 && (size_t)n<sizeof(weapons)/sizeof(weapons[0])) ?
-           wxString(weapons[n]) : wxString(_("unknown"));
+           weapons[n] : _("unknown");
 }
 
 bool CslGameSauerbraten::ModeHasFlags(wxInt32 mode,wxInt32 prot) const
@@ -210,7 +215,7 @@ bool CslGameSauerbraten::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) con
     getstring(text,buf);
     info.Map=A2U(text);
     getstring(text,buf);
-    l=strlen(text);
+    l=(wxInt32)strlen(text);
     StripColours(text,&l,1);
     info.SetDescription(A2U(text));
 
