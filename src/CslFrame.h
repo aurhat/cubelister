@@ -101,7 +101,7 @@ class CslFrame: public wxFrame
 
         CslEngine *m_engine;
 
-        CslIpcServer *m_ipc;
+        CslIpcServer *m_ipcServer;
 
         CslDlgOutput *m_outputDlg;
         CslDlgExtended *m_extendedDlg;
@@ -194,22 +194,22 @@ class CslApp: public wxApp
             CSL_SHUTDOWN_FORCE
         };
 
-        CslEngine* GetCslEngine() { return &m_engine; }
+        CslEngine* GetCslEngine() { return m_engine; }
         void Shutdown(wxInt32 val) { m_shutdown=val; }
         wxInt32 Shutdown() { return m_shutdown; }
 
     private:
+        CslEngine *m_engine;
+
         wxSingleInstanceChecker *m_single;
         wxLocale m_locale;
         wxInt32 m_shutdown;
-
-        CslEngine m_engine;
 
         virtual bool OnInit();
         virtual int OnRun();
         virtual int OnExit();
 
-        void IPCCall(const wxString& value);
+        void IpcCall(const wxString& value,wxEvtHandler *evtHandler=NULL);
 
         void OnEndSession(wxCloseEvent& event);
 

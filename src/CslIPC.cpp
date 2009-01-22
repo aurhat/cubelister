@@ -23,8 +23,8 @@
 DEFINE_EVENT_TYPE(wxCSL_EVT_IPC)
 
 CslIpcConnection::CslIpcConnection(wxEvtHandler *evtHandler) :
-        m_evtHandler(evtHandler),
-        wxConnection()
+        wxConnection(),
+        m_evtHandler(evtHandler)
 {
 }
 
@@ -50,8 +50,8 @@ bool CslIpcConnection::OnDisconnect()
 
 
 CslIpcServer::CslIpcServer(wxEvtHandler *evtHandler) :
-        m_evtHandler(evtHandler),m_connection(NULL),
-        wxServer()
+        wxServer(),
+        m_evtHandler(evtHandler),m_connection(NULL)
 {
 }
 

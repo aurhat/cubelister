@@ -1,0 +1,8 @@
+[Protocol]
+exec=csl %u
+protocol=csl
+input=none
+output=none
+Icon=csl.png
+helper=true
+Description=Tool to monitor cubeengine-based servers.

@@ -28,8 +28,8 @@ DEFINE_EVENT_TYPE(wxCSL_EVT_VERSIONCHECK)
 
 
 CslVersionCheckThread::CslVersionCheckThread(wxEvtHandler *evtHandler) :
-        m_ok(false),m_evtHandler(evtHandler),
-        wxThread(wxTHREAD_JOINABLE)
+        wxThread(wxTHREAD_JOINABLE),
+        m_ok(false),m_evtHandler(evtHandler)
 {
     m_ok=Create()==wxTHREAD_NO_ERROR;
 }

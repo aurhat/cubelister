@@ -24,8 +24,9 @@ cslmapcfgtool_LDADD = libcslpanelmap.a \
 csl_SOURCES = CslArt.cpp CslConnectionState.cpp CslDlgAbout.cpp \
 	CslDlgAddMaster.cpp CslDlgAddServer.cpp CslDlgConnectPass.cpp CslDlgConnectWait.cpp \
 	CslDlgExtended.cpp CslDlgOutput.cpp CslDlgSettings.cpp CslDlgTraffic.cpp CslFrame.cpp \
-	CslGeoIP.cpp CslIRC.cpp CslListCtrl.cpp CslListCtrlInfo.cpp CslListCtrlPlayer.cpp \
-	CslListCtrlPlayerSearch.cpp CslListCtrlServer.cpp CslMenu.cpp CslStatusBar.cpp
+	CslGameProcess.cpp CslGeoIP.cpp CslIPC.cpp CslIRC.cpp CslListCtrl.cpp \
+	CslListCtrlCountry.cpp CslListCtrlInfo.cpp CslListCtrlPlayer.cpp CslListCtrlPlayerSearch.cpp \
+	CslListCtrlServer.cpp CslMenu.cpp CslStatusBar.cpp CslVersionCheck.cpp
 noinst_LIBRARIES = libcslpanelmap.a
 libcslpanelmap_a_SOURCES = CslPanelMap.cpp
 noinst_HEADERS = CslIRC.h CslListCtrl.h CslListCtrlPlayerSearch.h

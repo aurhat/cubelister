@@ -403,6 +403,7 @@ void CslIrcPanel::OnIrcEvent(CslIrcEvent& event)
             break;
 
         case CslIrcEvent::TOPIC:
+        {
             if (!(panel=GetPanel(event.Channel,m_session)))
                 break;
             if (event.Strings.GetCount()>1)
@@ -416,10 +417,12 @@ void CslIrcPanel::OnIrcEvent(CslIrcEvent& event)
                 u=0;
             panel->m_channel.Topic=event.Strings.Item(u);
             //panel->static_topic->SetLabel(FormatToText(panel->m_channel.Topic));
-            wxPostEvent(panel,wxSizeEvent());
+            wxSizeEvent evt;
+            wxPostEvent(panel,evt);
             //panel->static_topic->Wrap(panel->static_topic->GetSize().GetWidth()-2);
             //grid_sizer_chat->Layout();
             break;
+        }
 
         case CslIrcEvent::NUMERIC:
             switch (event.Ints.Item(0))
@@ -1059,7 +1062,7 @@ void CslIrcPanel::AddLine(const wxString& line,bool scroll)
     WRITEBUFFER
     lines++;
 
-    if ((i=line.Find(wxT("csl://")))!=wxNOT_FOUND)
+    if ((i=line.Find(wxT("csl://")))!=(wxUint32)wxNOT_FOUND)
     {
         for (j=i+6;j<len;j++)
         {
@@ -1079,20 +1082,18 @@ void CslIrcPanel::AddLine(const wxString& line,bool scroll)
 
 #ifdef CSL_USE_RICHTEXT
     text_ctrl_chat->Thaw();
-#endif
-
+#endif //CSL_USE_RICHTEXT
     if (scroll)
     {
         text_ctrl_chat->ScrollLines(lines+1);
         text_ctrl_chat->ShowPosition(m_textLength);
     }
-
 #ifndef CSL_USE_RICHTEXT
-    text_ctrl_chat->Thaw();
 #ifdef __WXGTK__
     else
         text_ctrl_chat->SetWindowStyle(text_ctrl_chat->GetWindowStyle()|wxTE_READONLY);
 #endif //__WXGTK__
+    text_ctrl_chat->Thaw();
 #endif //CSL_USE_RICHTEXT
 
     if (!IsShownOnScreen())

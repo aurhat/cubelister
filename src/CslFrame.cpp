@@ -229,11 +229,11 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
             TreeAddGame(game,icon ? i+1:-1,select);
         }
 
-        m_ipc=new CslIpcServer(this);
-        if (!m_ipc->Create(CSL_IPC_SERV))
+        m_ipcServer=new CslIpcServer(this);
+        if (!m_ipcServer->Create(CSL_IPC_SERV))
         {
-            delete m_ipc;
-            m_ipc=NULL;
+            delete m_ipcServer;
+            m_ipcServer=NULL;
         }
 
         CslMenu::EnableMenuItem(MENU_MASTER_ADD);
@@ -268,10 +268,10 @@ CslFrame::~CslFrame()
     if (CslConnectionState::IsPlaying())
         CslConnectionState::GetInfo()->GetGame().GameEnd();
 
-    if (m_ipc)
+    if (m_ipcServer)
     {
-        delete m_ipc;
-        m_ipc=NULL;
+        delete m_ipcServer;
+        m_ipcServer=NULL;
     }
 
     if (m_engine->IsOk())
@@ -2271,7 +2271,6 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
                 const vector<CslServerInfo*>& servers=game->GetServers();
                 loopv(servers)
                 {
-                    CslServerInfo *server=servers[i];
                     if (!servers[i]->IsFavourite() &&
                         CslEngine::PingOk(*servers[i],g_cslSettings->updateInterval) &&
                         servers[i]->ExtInfoStatus==CSL_EXT_STATUS_OK)
@@ -2483,12 +2482,18 @@ void CslFrame::OnTrayIcon(wxTaskBarIconEvent& event)
 {
     if (!IsShown())
     {
-        Show();
+#ifdef __WXGTK__
+        // neccessary otherwise the window hasn't the right frame size
+        // after minimising from maximised state and then restoring the
+        // last frame size
+        SetSize(g_cslSettings->frameSize);
+#endif
 #ifdef __WXMSW__
-        // neccessary otherwise the window isn't shown after minimising
-        // using the minimise button or function on window context menu
+        // neccessary otherwise the window doesn't get raised after
+        // minimising using the minimise button or context menu function
         Maximize(m_maximised);
 #endif
+        Show();
         Raise();
     }
     else
@@ -2695,11 +2700,8 @@ void CslFrame::OnIPC(CslIpcEvent& event)
     switch (event.Type)
     {
         case CslIpcEvent::IPC_DISCONNECT:
-            if (m_ipc)
-            {
-                LOG_DEBUG("IPC disconnect\n");
-                m_ipc->Disconnect();
-            }
+            if (m_ipcServer)
+                m_ipcServer->Disconnect();
             break;
 
         case CslIpcEvent::IPC_COMMAND:
@@ -2738,7 +2740,7 @@ void CslFrame::OnIPC(CslIpcEvent& event)
 
                 while (tkz.HasMoreTokens())
                 {
-                    wxUint32 pos;
+                    wxInt32 pos;
                     wxString s;
                     wxString token=tkz.GetNextToken();
 
@@ -2780,11 +2782,7 @@ void CslFrame::OnIPC(CslIpcEvent& event)
                     addr.Hostname(host);
                     addr.Hostname();
 
-                    info=game->FindServerByAddr(addr);
-                    LOG_DEBUG("found:%d  orig:%s  host:%s  ip:%s\n",info!=0,U2A(host),
-                              U2A(addr.Hostname()),U2A(addr.IPAddress()));
-
-                    if (!info)
+                    if (!(info=game->FindServerByAddr(addr)))
                     {
                         info=new CslServerInfo;
                         info->Create(game,host,port,pass);
@@ -2823,6 +2821,8 @@ void CslFrame::OnIPC(CslIpcEvent& event)
 
 bool CslApp::OnInit()
 {
+    m_engine=NULL;
+    m_single=NULL;
     m_shutdown=CSL_SHUTDOWN_NONE;
 
     ::wxSetWorkingDirectory(wxPathOnly(wxTheApp->argv[0]));
@@ -2843,19 +2843,14 @@ bool CslApp::OnInit()
     //TODO wxApp::SetExitOnFrameDelete(false);
 #endif
 
-    wxString opt;
+    wxString uri;
 
-    if (wxApp::argc>1)
+    for (wxInt32 i=1;i<wxApp::argc;i++)
     {
-        opt=wxApp::argv[1];
+        uri=wxApp::argv[i];
 
-        if (opt.StartsWith(wxT("-uri:")))
-        {
-            opt=opt.Mid(5);
-
-            if (opt.IsEmpty() && wxApp::argc>2)
-                opt=argv[2];
-        }
+        if (!uri.StartsWith(wxT("csl://")))
+            uri.Empty();
     }
 
     wxString lock=wxString::Format(wxT(".%s-%s.lock"),CSL_NAME_SHORT_STR,wxGetUserId().c_str());
@@ -2863,9 +2858,9 @@ bool CslApp::OnInit()
 
     if (m_single->IsAnotherRunning())
     {
-        if (!opt.IsEmpty())
+        if (!uri.IsEmpty())
         {
-            IPCCall(opt);
+            IpcCall(uri);
             return true;
         }
 
@@ -2886,6 +2881,8 @@ bool CslApp::OnInit()
         return false;
     }
 
+    m_engine=new CslEngine;
+
     wxInitAllImageHandlers();
 
     CslGeoIP::Init();
@@ -2894,8 +2891,8 @@ bool CslApp::OnInit()
     SetTopWindow(frame);
     frame->Show();
 
-    if (!opt.IsEmpty())
-        IPCCall(opt);
+    if (!uri.IsEmpty())
+        IpcCall(uri,frame);
 
     return true;
 }
@@ -2910,8 +2907,13 @@ int CslApp::OnRun()
 
 int CslApp::OnExit()
 {
+    if (m_engine)
+        delete m_engine;
+
+    if (m_single)
+        delete m_single;
+
     CslGeoIP::Destroy();
-    delete m_single;
 
     return 0;
 }
@@ -2922,10 +2924,19 @@ void CslApp::OnEndSession(wxCloseEvent& event)
     event.Skip();
 }
 
-void CslApp::IPCCall(const wxString& value)
+void CslApp::IpcCall(const wxString& value,wxEvtHandler *evtHandler)
 {
-    CslIpcClient m_ipc;
+    if (evtHandler)
+    {
+        CslIpcEvent evt(CslIpcEvent::IPC_COMMAND,value);
 
-    if (m_ipc.Connect(CSL_IPC_HOST,CSL_IPC_SERV,CSL_IPC_TOPIC))
-        m_ipc.GetConnection()->Poke(CSL_NAME_SHORT_STR,(wxChar*)value.c_str());
+        wxPostEvent(evtHandler,evt);
+    }
+    else
+    {
+        CslIpcClient client;
+
+        if (client.Connect(CSL_IPC_HOST,CSL_IPC_SERV,CSL_IPC_TOPIC))
+            client.GetConnection()->Poke(CSL_NAME_SHORT_STR,(wxChar*)value.c_str());
+    }
 }

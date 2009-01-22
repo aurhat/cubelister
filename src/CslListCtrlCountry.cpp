@@ -52,8 +52,8 @@ class CslCountryEntry
 
 
 CslPanelCountry::CslPanelCountry(wxWindow* parent,long listStyle) :
-        m_mode(MODE_PLAYER_SINGLE),
-        wxPanel(parent,wxID_ANY)
+        wxPanel(parent,wxID_ANY),
+        m_mode(MODE_PLAYER_SINGLE)
 {
     m_sizer=new wxFlexGridSizer(2,1,0,0);
 
@@ -259,7 +259,7 @@ void CslListCtrlCountry::UpdateEntry(const wxString& country,wxInt32 img)
     {
         item.SetId(c);
         InsertItem(item);
-        entry=new CslCountryEntry(country.IsEmpty() ? _("Unknown") : country);
+        entry=new CslCountryEntry(country.IsEmpty() ? wxString(_("Unknown")) : country);
         SetItemData(c,(long)entry);
     }
 
