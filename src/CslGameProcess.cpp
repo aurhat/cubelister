@@ -27,8 +27,8 @@ DEFINE_EVENT_TYPE(wxCSL_EVT_PROCESS)
 CslGameProcess* CslGameProcess::m_self=NULL;
 
 CslGameProcess::CslGameProcess(wxWindow *parent,CslServerInfo *info,const wxString& cmd) :
-        m_parent(parent),m_info(info),m_cmd(cmd),
-        wxProcess(parent)
+        wxProcess(parent),
+        m_parent(parent),m_info(info),m_cmd(cmd)
 {
     m_self=this;
     m_watch.Start(0);
