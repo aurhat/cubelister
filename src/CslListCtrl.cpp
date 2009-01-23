@@ -45,7 +45,10 @@ BEGIN_EVENT_TABLE(CslListCtrl,wxListCtrl)
     #endif
     EVT_MOTION(CslListCtrl::OnMouseMove)
     EVT_LEAVE_WINDOW(CslListCtrl::OnMouseLeave)
+    EVT_LIST_ITEM_SELECTED(wxID_ANY,CslListCtrl::OnItem)
+    EVT_LIST_ITEM_ACTIVATED(wxID_ANY,CslListCtrl::OnItem)
     EVT_TIMER(wxID_ANY,CslListCtrl::OnTimer)
+
 END_EVENT_TABLE()
 
 
@@ -123,9 +126,9 @@ void CslToolTip::ShowTip(const wxString& title,const wxArrayString& text,const w
     for (i=0;i<text.GetCount();i++)
     {
         if (i%2==0)
-            left << wxT("\r\n") << text.Item(i) << wxT(":");
+            left<<wxT("\r\n")<<text.Item(i)<<wxT(":");
         else
-            right << wxT("\r\n") << text.Item(i);
+            right<<wxT("\r\n")<<text.Item(i);
     }
 
     m_left->SetLabel(left);
@@ -148,6 +151,8 @@ CslListCtrl::CslListCtrl(wxWindow* parent,wxWindowID id,const wxPoint& pos,const
 {
     m_toolTip=new CslToolTip(this);
     m_timer.SetOwner(this);
+
+    Connect(wxEVT_CONTEXT_MENU,wxContextMenuEventHandler(CslListCtrl::OnContextMenu),NULL,this);
 }
 
 CslListCtrl::~CslListCtrl()
@@ -237,9 +242,19 @@ void CslListCtrl::OnMouseMove(wxMouseEvent& event)
 
 void CslListCtrl::OnMouseLeave(wxMouseEvent& event)
 {
-    if (m_timer.IsRunning())
-        m_timer.Stop();
+    StopTimer();
+    event.Skip();
+}
 
+void CslListCtrl::OnItem(wxListEvent& event)
+{
+    StopTimer();
+    event.Skip();
+}
+
+void CslListCtrl::OnContextMenu(wxContextMenuEvent& event)
+{
+    StopTimer();
     event.Skip();
 }
 
@@ -287,6 +302,12 @@ void CslListCtrl::OnTimer(wxTimerEvent& WXUNUSED(event))
 
         break;
     }
+}
+
+void CslListCtrl::StopTimer()
+{
+    if (m_timer.IsRunning())
+        m_timer.Stop();
 }
 
 wxUint32 CslListCtrl::GetCountryFlag(wxUint32 ip)

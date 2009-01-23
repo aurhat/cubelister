@@ -35,8 +35,8 @@ class CslListCtrlPlayer : public CslListCtrl
     public:
         enum
         {
-            CSL_LISTPLAYER_MICRO_SIZE, CSL_LISTPLAYER_MINI_SIZE,
-            CSL_LIST_PLAYER_DEFAULT_SIZE, CSL_LIST_PLAYER_DEFAULT_SIZE_DLG
+            SIZE_MICRO, SIZE_MINI,
+            SIZE_DEFAULT, SIZE_FULL
         };
 
         CslListCtrlPlayer(wxWindow* parent,wxWindowID id,const wxPoint& pos=wxDefaultPosition,

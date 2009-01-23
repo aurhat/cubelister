@@ -220,7 +220,7 @@ void event_ctcp_request(irc_session_t *session,const char* WXUNUSED(event),const
     if (!strcasecmp(params[0],"VERSION"))
     {
         wxString s;
-        s << wxT("VERSION ") << CSL_NAME_STR << wxT(" ") << CSL_VERSION_LONG_STR << CSL_WEBADDRFULL_STR;
+        s<<wxT("VERSION ")<<CSL_NAME_STR<<wxT(" ")<<CSL_VERSION_LONG_STR<<CSL_WEBADDRFULL_STR;
         irc_cmd_ctcp_reply(session,nick,U2A(s));
     }
 }
@@ -310,7 +310,7 @@ void event_numeric(irc_session_t *session,unsigned int event,const char *origin,
     wxUint32 i;
     wxString s,p;
 
-    s << event << wxT(": ");
+    s<<event<<wxT(": ");
 
     for (i=0;i<count;i++)
     {
@@ -318,7 +318,7 @@ void event_numeric(irc_session_t *session,unsigned int event,const char *origin,
         if (!p.CmpNoCase(context->Server->Network->Nick))
             continue;
 
-        s << p << wxT(" ");
+        s<<p<<wxT(" ");
     }
 
     CslIrcEvent evt(context->Target,CslIrcEvent::NUMERIC,s);
@@ -642,7 +642,7 @@ bool CslIrcSession::Disconnect(const wxString& message)
     wxString s;
 
     if (message.IsEmpty())
-        s << CSL_NAME_STR << wxT(" ") << CSL_VERSION_LONG_STR << CSL_WEBADDRFULL_STR;
+        s<<CSL_NAME_STR<<wxT(" ")<<CSL_VERSION_LONG_STR<<CSL_WEBADDRFULL_STR;
     else
         s=message;
 
@@ -703,9 +703,9 @@ bool CslIrcSession::LeaveChannel(const wxString& channel,const wxString& reason)
             m_channels.RemoveAt(i);
             if (chan->Connected)
             {
-                command << wxT("PART ") << channel;
+                command<<wxT("PART ")<<channel;
                 if (!reason.IsEmpty())
-                    command << wxT(" ") << reason;
+                    command<<wxT(" ")<<reason;
                 break;
             }
             else

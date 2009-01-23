@@ -37,9 +37,20 @@
 #include "CslArt.h"
 #include "CslSettings.h"
 
+
+#define MENU_SERVER_EXT_FULL_STR         _("Full")
+#define MENU_SERVER_EXT_MICRO_STR        _("Micro")
+#define MENU_SERVER_EXT_MINI_STR         _("Mini")
+#define MENU_SERVER_EXT_DEFAULT_STR      _("Default")
+#define MENU_SERVER_EXT_STR              _("Extended information")
+
 #define MENU_SERVER_CONN_STR             _("&Connect")
 #define MENU_SERVER_CONN_PW_STR          _("Connect (&Password)")
-#define MENU_SERVER_COPY_STR             _("C&opy to clipboard")
+#define MENU_SERVER_COPY_STR             _("Create CSL links")
+#define MENU_SERVER_COPY_CON_STR         _("Connect")
+#define MENU_SERVER_COPY_CONFAV_STR      _("Connect && add to favourites")
+#define MENU_SERVER_COPY_FAV_STR         _("Add to favourites")
+#define MENU_SERVER_COPY_SERVER_STR      _("C&opy to clipboard")
 #define MENU_SERVER_MAS_ADD_STR          _("&Add to favourites")
 #define MENU_SERVER_FAV_ADD_STR          _("&Add server ...")
 #define MENU_SERVER_FAV_REM_STR          _("&Remove from favourites")
@@ -64,7 +75,7 @@ enum
     MENU_SERVER_ADD = wxID_ADD,
     MENU_SERVER_REM = wxID_REMOVE,
     MENU_SERVER_DEL = wxID_DELETE,
-    MENU_SERVER_COPYTEXT = wxID_COPY,
+    MENU_SERVER_COPY_SERVER = wxID_COPY,
     //custom events/art
     MENU_SERVER_CUSTOM = wxID_HIGHEST+1,
 
@@ -73,10 +84,14 @@ enum
 
     MENU_SERVER_CONNECT,
     MENU_SERVER_CONNECT_PW,
-    MENU_SERVER_EXTENDED_MICRO,
-    MENU_SERVER_EXTENDED_MINI,
-    MENU_SERVER_EXTENDED_DEFAULT,
-    MENU_SERVER_EXTENDED_FULL,
+    MENU_SERVER_EXT_MICRO,
+    MENU_SERVER_EXT_MINI,
+    MENU_SERVER_EXT_DEFAULT,
+    MENU_SERVER_EXT_FULL,
+
+    MENU_SERVER_COPY_CON,
+    MENU_SERVER_COPY_CONFAV,
+    MENU_SERVER_COPY_FAV,
 
     MENU_SERVER_FILTER_OFF,
     MENU_SERVER_FILTER_FULL,
@@ -90,7 +105,7 @@ enum
     MENU_VIEW_SERVER_INFO,
     MENU_VIEW_PLAYER_LIST,
     MENU_VIEW_PLAYER_SEARCH,
-    MENU_VIEW_PLAYER_COUNTRY,
+    MENU_VIEW_COUNTRY,
     MENU_VIEW_FAVOURITES,
     MENU_VIEW_USER_CHAT,
     MENU_VIEW_SEARCH,

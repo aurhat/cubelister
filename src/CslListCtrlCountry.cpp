@@ -173,48 +173,6 @@ void CslListCtrlCountry::OnColumnLeftClick(wxListEvent& event)
 
 void CslListCtrlCountry::OnContextMenu(wxContextMenuEvent& event)
 {
-    /*if (!m_info)
-        return;
-
-    wxMenu menu;
-    wxMenuItem *item;
-    wxPoint point=event.GetPosition();
-
-    //from keyboard
-    if (point.x==-1 && point.y==-1)
-        point=wxGetMousePosition();
-
-    CslMenu::AddItem(&menu,MENU_SERVER_CONNECT,MENU_SERVER_CONN_STR,wxART_CONNECT);
-    if (CSL_CAP_CONNECT_PASS(m_info->GetGame().GetCapabilities()))
-        CslMenu::AddItem(&menu,MENU_SERVER_CONNECT_PW,MENU_SERVER_CONN_PW_STR,wxART_CONNECT_PW);
-
-    if (m_info)
-    {
-        menu.AppendSeparator();
-
-        wxMenu *ext=new wxMenu();
-        item=menu.AppendSubMenu(ext,_("Extended information"));
-        item->SetBitmap(GET_ART_MENU(wxART_ABOUT));
-        if (m_info->ExtInfoStatus!=CSL_EXT_STATUS_OK || !CslEngine::PingOk(*m_info,g_cslSettings->updateInterval))
-            item->Enable(false);
-        else
-        {
-            if (m_view!=CSL_LIST_PLAYER_DEFAULT_SIZE_DLG)
-            {
-                CslMenu::AddItem(ext,MENU_SERVER_EXTENDED_FULL,_("Full"),wxART_ABOUT);
-                ext->AppendSeparator();
-            }
-            if (m_view!=CSL_LISTPLAYER_MICRO_SIZE)
-                CslMenu::AddItem(ext,MENU_SERVER_EXTENDED_MICRO,_("Micro"),wxART_EXTINFO_MICRO);
-            if (m_view!=CSL_LISTPLAYER_MINI_SIZE)
-                CslMenu::AddItem(ext,MENU_SERVER_EXTENDED_MINI,_("Mini"),wxART_EXTINFO_MINI);
-            if (m_view!=CSL_LIST_PLAYER_DEFAULT_SIZE)
-                CslMenu::AddItem(ext,MENU_SERVER_EXTENDED_DEFAULT,_("Default"),wxART_EXTINFO_DEFAULT);
-        }
-    }
-
-    point=ScreenToClient(point);
-    PopupMenu(&menu,point);*/
 }
 
 void CslListCtrlCountry::OnMenu(wxCommandEvent& event)

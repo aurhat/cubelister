@@ -1,6 +1,7 @@
 
 #include "CslArt.h"
 
+#include "img/csl_16.xpm"
 #include "img/connect_16.xpm"
 #include "img/connect_pw_16.xpm"
 #include "img/filter_16.xpm"
@@ -22,7 +23,9 @@ wxBitmap CslArt::CreateBitmap(const wxArtID& id,const wxArtClient& client,const 
     {
         if (client==wxART_MENU)
         {
-            if (id==wxART_CONNECT)
+            if (id==wxART_CSL)
+                return wxBitmap(csl_16_xpm);
+            else if (id==wxART_CONNECT)
                 return wxBitmap(connect_16_xpm);
             else if (id==wxART_CONNECT_PW)
                 return wxBitmap(connect_pw_16_xpm);

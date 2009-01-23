@@ -293,15 +293,18 @@ wxString CslGameAssaultCube::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
     opts.Prepend(wxT("--home=")+configpath+wxT(" "));
 #endif //__WXMSW__
 
-    address=info->Host;
-    if (GetDefaultPort()!=info->Port)
-        address+=m_portDelimiter+wxString::Format(wxT("%d"),info->Port);
-
     bin+=wxT(" ")+opts;
 
     password=mode==CslServerInfo::CSL_CONNECT_PASS ? info->Password:
              mode==CslServerInfo::CSL_CONNECT_ADMIN_PASS ?
              info->PasswordAdmin:wxString(wxEmptyString);
+
+    address=info->Host;
+
+    // apply port on version >=1.0.0, otherwise
+    // password based connect attemps don't work
+    if (info->Port!=GetDefaultPort() || (info->Protocol>=1128 && !password.IsEmpty()))
+        address+=m_portDelimiter+wxString::Format(wxT("%d"),info->Port);
 
     configpath+=wxString(CSL_DEFAULT_INJECT_DIR_AC);
 
@@ -323,10 +326,16 @@ wxString CslGameAssaultCube::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
         file.Close();
     }
 
-    wxString script=wxString::Format(wxT("\r\n%s %s %s\r\n"),
+    // use saycommand [/connect ...] on version >=1.0.0,
+    // otherwise password bassed connect attemps don't work
+    bool say=!(password.IsEmpty() || info->Protocol<=1126);
+
+    wxString script=wxString::Format(wxT("\r\n%s%s %s \"%s\"%s\r\n"),
+                                     say ? wxT("saycommand [/") : wxEmptyString,
                                      mode==CslServerInfo::CSL_CONNECT_ADMIN_PASS ?
                                      wxT("connectadmin"):wxT("connect"),
-                                     address.c_str(),password.c_str());
+                                     address.c_str(),password.c_str(),
+                                     say ? wxT("]") : wxEmptyString);
 
     return WriteTextFile(configpath,script,wxFile::write_append)==CSL_ERROR_NONE ? bin:wxString(wxEmptyString);
 }
@@ -334,8 +343,8 @@ wxString CslGameAssaultCube::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
 wxInt32 CslGameAssaultCube::GameEnd(wxString *error)
 {
     wxString cfg,bak;
-    cfg << m_clientSettings.ConfigPath << CSL_DEFAULT_INJECT_DIR_AC << wxString(CSL_DEFAULT_INJECT_FILE_AC);
-    bak << cfg << wxT(".csl");
+    cfg<<m_clientSettings.ConfigPath<<CSL_DEFAULT_INJECT_DIR_AC<<wxString(CSL_DEFAULT_INJECT_FILE_AC);
+    bak<<cfg<<wxT(".csl");
 
     if (!::wxFileExists(bak))
         return CSL_ERROR_FILE_DONT_EXIST;

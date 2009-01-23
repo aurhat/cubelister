@@ -121,7 +121,7 @@ void CslDlgExtended::set_properties()
     m_teamLabel.Add(label_team7);
     m_teamLabel.Add(label_team8);
 
-    list_ctrl_players->ListInit(CslListCtrlPlayer::CSL_LIST_PLAYER_DEFAULT_SIZE_DLG);
+    list_ctrl_players->ListInit(CslListCtrlPlayer::SIZE_FULL);
 #ifdef __WXMSW__
     list_ctrl_players->SetMinSize(wxSize(520,270));
 #elif __WXGTK__
@@ -268,10 +268,10 @@ void CslDlgExtended::OnMenu(wxCommandEvent& event)
 {
     switch (event.GetId())
     {
-        case MENU_SERVER_EXTENDED_FULL:
-        case MENU_SERVER_EXTENDED_MICRO:
-        case MENU_SERVER_EXTENDED_MINI:
-        case MENU_SERVER_EXTENDED_DEFAULT:
+        case MENU_SERVER_EXT_FULL:
+        case MENU_SERVER_EXT_MICRO:
+        case MENU_SERVER_EXT_MINI:
+        case MENU_SERVER_EXT_DEFAULT:
             event.SetClientData(m_info);
         case MENU_SERVER_CONNECT:
         case MENU_SERVER_CONNECT_PW:
@@ -412,11 +412,11 @@ void CslDlgExtended::UpdateTeamData()
             }
 
             s.Empty();
-            s << data->Name << wxT(": ") << data->Score;
+            s<<data->Name<<wxT(": ")<<data->Score;
 
             if (CSL_SCORE_IS_VALID(data->Score2))
             {
-                s << wxT(" / ") << data->Score2;
+                s<<wxT(" / ")<<data->Score2;
                 sizer_team_score_staticbox->SetLabel(_("Team score")+wxString(wxT(" / "))+_("Flag score"));
             }
             else
@@ -451,11 +451,11 @@ void CslDlgExtended::UpdateTeamData()
                     s+=_("WINNER");
                 else
                 {
-                    s << data->Score;
+                    s<<data->Score;
                     if (m_info->GetGame().ModeHasFlags(stats.GameMode,m_info->Protocol) &&
                         CSL_SCORE_IS_VALID(data->Score2))
-                        s << wxT(" / ") << data->Score2;
-                    s << wxT(" - ") << _("WINNER");
+                        s<<wxT(" / ")<<data->Score2;
+                    s<<wxT(" - ")<<_("WINNER");
 
                 }
 

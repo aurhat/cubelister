@@ -38,6 +38,13 @@
 #define CSL_IPC_SERV wxT("49152")
 #define CSL_IPC_TOPIC wxT("CSL_IPC_CONTROL")
 
+#define CSL_URI_SCHEME_STR          wxT("csl://")
+#define CSL_URI_GAME_STR            wxT("game")
+#define CSL_URI_ACTION_STR          wxT("action")
+#define CSL_URI_ACTION_CONNECT_STR  wxT("connect")
+#define CSL_URI_ACTION_ADDFAV_STR   wxT("addtofavourites")
+
+
 class CslIpcEvent;
 
 BEGIN_DECLARE_EVENT_TYPES()

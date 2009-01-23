@@ -129,6 +129,7 @@ class CslFrame: public wxFrame
         wxString PlayerListGetCaption(CslServerInfo *info,bool selected);
         void PlayerListCreateView(CslServerInfo *info,wxUint32 view,const wxString& name=wxEmptyString);
 
+        void ToggleShow();
 #ifndef __WXMAC__
         void ToggleTrayIcon();
 #endif
@@ -168,7 +169,7 @@ class CslFrame: public wxFrame
         void OnSize(wxSizeEvent& event);
 #ifndef __WXMAC__
         void OnIconize(wxIconizeEvent& event);
-        void OnTrayIcon(wxTaskBarIconEvent& WXUNUSED(event));
+        void OnTrayIcon(wxTaskBarIconEvent& event);
 #endif
         void OnShow(wxShowEvent& event);
         void OnClose(wxCloseEvent& event);

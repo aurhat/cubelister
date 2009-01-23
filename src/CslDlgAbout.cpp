@@ -121,7 +121,7 @@ void CslDlgAbout::set_properties()
     font.SetWeight(wxFONTWEIGHT_BOLD);
     hyperlink_web->SetFont(font);
 
-    s << _("Compiled using:") << wxT(" ") << CSL_WXVERSION_STR;
+    s<<_("Compiled using:")<<wxT(" ")<<CSL_WXVERSION_STR;
 
     label_name->SetLabel(CSL_NAME_STR);
     label_version->SetLabel(CSL_VERSION_LONG_STR);

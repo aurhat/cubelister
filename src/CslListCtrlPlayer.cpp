@@ -20,8 +20,7 @@
 
 #include <wx/wupdlock.h>
 #include "CslListCtrlPlayer.h"
-#include "CslDlgConnectPass.h"
-#include "CslConnectionState.h"
+#include "CslGameConnection.h"
 #include "CslMenu.h"
 #include "CslGeoIP.h"
 
@@ -155,7 +154,7 @@ void CslListCtrlPlayer::OnItemActivated(wxListEvent& event)
     if (!m_info)
         return;
 
-    CslConnectionState::CreateConnectState(m_info);
+    CslGameConnection::Prepare(m_info);
 
     event.Skip();
 }
@@ -182,23 +181,23 @@ void CslListCtrlPlayer::OnContextMenu(wxContextMenuEvent& event)
         menu.AppendSeparator();
 
         wxMenu *ext=new wxMenu();
-        item=menu.AppendSubMenu(ext,_("Extended information"));
+        item=menu.AppendSubMenu(ext,MENU_SERVER_EXT_STR);
         item->SetBitmap(GET_ART_MENU(wxART_ABOUT));
         if (m_info->ExtInfoStatus!=CSL_EXT_STATUS_OK || !CslEngine::PingOk(*m_info,g_cslSettings->updateInterval))
             item->Enable(false);
         else
         {
-            if (m_view!=CSL_LIST_PLAYER_DEFAULT_SIZE_DLG)
+            if (m_view!=SIZE_FULL)
             {
-                CslMenu::AddItem(ext,MENU_SERVER_EXTENDED_FULL,_("Full"),wxART_ABOUT);
+                CslMenu::AddItem(ext,MENU_SERVER_EXT_FULL,MENU_SERVER_EXT_FULL_STR,wxART_ABOUT);
                 ext->AppendSeparator();
             }
-            if (m_view!=CSL_LISTPLAYER_MICRO_SIZE)
-                CslMenu::AddItem(ext,MENU_SERVER_EXTENDED_MICRO,_("Micro"),wxART_EXTINFO_MICRO);
-            if (m_view!=CSL_LISTPLAYER_MINI_SIZE)
-                CslMenu::AddItem(ext,MENU_SERVER_EXTENDED_MINI,_("Mini"),wxART_EXTINFO_MINI);
-            if (m_view!=CSL_LIST_PLAYER_DEFAULT_SIZE)
-                CslMenu::AddItem(ext,MENU_SERVER_EXTENDED_DEFAULT,_("Default"),wxART_EXTINFO_DEFAULT);
+            if (m_view!=SIZE_MICRO)
+                CslMenu::AddItem(ext,MENU_SERVER_EXT_MICRO,MENU_SERVER_EXT_MICRO_STR,wxART_EXTINFO_MICRO);
+            if (m_view!=SIZE_MINI)
+                CslMenu::AddItem(ext,MENU_SERVER_EXT_MINI,MENU_SERVER_EXT_MINI_STR,wxART_EXTINFO_MINI);
+            if (m_view!=SIZE_DEFAULT)
+                CslMenu::AddItem(ext,MENU_SERVER_EXT_DEFAULT,MENU_SERVER_EXT_DEFAULT_STR,wxART_EXTINFO_DEFAULT);
         }
     }
 
@@ -208,34 +207,26 @@ void CslListCtrlPlayer::OnContextMenu(wxContextMenuEvent& event)
 
 void CslListCtrlPlayer::OnMenu(wxCommandEvent& event)
 {
-    switch (event.GetId())
+    wxInt32 id=event.GetId();
+
+    switch (id)
     {
 
         case MENU_SERVER_CONNECT:
-            CslConnectionState::CreateConnectState(m_info);
-            event.Skip();
-            break;
-
         case MENU_SERVER_CONNECT_PW:
         {
-            wxInt32 i=CSL_CAP_CONNECT_ADMIN_PASS(m_info->GetGame().GetCapabilities());
-
-            CslConnectPassInfo pi(m_info->Password,m_info->PasswordAdmin,i!=0);
-
-            if (CslDlgConnectPass(this,&pi).ShowModal()==wxID_OK)
-            {
-                m_info->Password=pi.Password;
-                m_info->PasswordAdmin=pi.AdminPassword;
-                i=pi.Admin ? CslServerInfo::CSL_CONNECT_ADMIN_PASS:CslServerInfo::CSL_CONNECT_PASS;
-                CslConnectionState::CreateConnectState(m_info,i);
-                event.Skip();
-            }
+            wxInt32 pass=id==MENU_SERVER_CONNECT ?
+                         CslGameConnection::NO_PASS :
+                         CslGameConnection::ASK_PASS;
+            CslGameConnection::Prepare(m_info,pass);
+            event.Skip();
             break;
         }
-        case MENU_SERVER_EXTENDED_FULL:
-        case MENU_SERVER_EXTENDED_MICRO:
-        case MENU_SERVER_EXTENDED_MINI:
-        case MENU_SERVER_EXTENDED_DEFAULT:
+
+        case MENU_SERVER_EXT_FULL:
+        case MENU_SERVER_EXT_MICRO:
+        case MENU_SERVER_EXT_MINI:
+        case MENU_SERVER_EXT_DEFAULT:
             event.SetClientData(m_info);
             event.Skip();
             break;
@@ -327,7 +318,7 @@ void CslListCtrlPlayer::UpdateData()
             s=data->Name;
         SetItem(i,0,s);
 
-        if (m_view>=CSL_LISTPLAYER_MINI_SIZE)
+        if (m_view>=SIZE_MINI)
         {
             if (data->State==CSL_PLAYER_STATE_SPECTATOR)
                 s=_("Spectator");
@@ -344,7 +335,7 @@ void CslListCtrlPlayer::UpdateData()
 
             SetItem(i,4,wxString::Format(wxT("%d"),data->Teamkills));
 
-            if (m_view>=CSL_LIST_PLAYER_DEFAULT_SIZE)
+            if (m_view>=SIZE_DEFAULT)
             {
                 if (data->Ping<0)
                     s=_("no data");
@@ -418,7 +409,7 @@ void CslListCtrlPlayer::ListAdjustSize(const wxSize& size)
     if (w<0)
         return;
 
-    if (m_view>=CSL_LIST_PLAYER_DEFAULT_SIZE)
+    if (m_view>=SIZE_DEFAULT)
     {
         SetColumnWidth(0,(wxInt32)(w*0.18f));
         SetColumnWidth(1,(wxInt32)(w*0.09f));
@@ -431,7 +422,7 @@ void CslListCtrlPlayer::ListAdjustSize(const wxSize& size)
         SetColumnWidth(8,(wxInt32)(w*0.09f));
         SetColumnWidth(9,(wxInt32)(w*0.10f));
     }
-    else if (m_view==CSL_LISTPLAYER_MINI_SIZE)
+    else if (m_view==SIZE_MINI)
     {
 #ifdef __WXMSW__
         SetColumnWidth(0,(wxInt32)(w*0.44f));
@@ -524,7 +515,7 @@ void CslListCtrlPlayer::ListInit(const wxInt32 view)
     InsertColumn(0,item);
     SetColumn(0,item);
 
-    if (m_view>=CSL_LISTPLAYER_MINI_SIZE)
+    if (m_view>=SIZE_MINI)
     {
         item.SetText(_("Team"));
         InsertColumn(1,item);
@@ -542,7 +533,7 @@ void CslListCtrlPlayer::ListInit(const wxInt32 view)
         InsertColumn(4,item);
         SetColumn(4,item);
 
-        if (m_view>=CSL_LIST_PLAYER_DEFAULT_SIZE)
+        if (m_view>=SIZE_DEFAULT)
         {
             item.SetText(_("Ping"));
             InsertColumn(5,item);
@@ -571,7 +562,7 @@ void CslListCtrlPlayer::ListInit(const wxInt32 view)
 
     wxInt32 img;
 
-    if (m_view==CSL_LISTPLAYER_MICRO_SIZE)
+    if (m_view==SIZE_MICRO)
         m_sortHelper.Init(CSL_SORT_ASC,SORT_NAME);
     else
         m_sortHelper.Init(CSL_SORT_DSC,SORT_FRAGS);

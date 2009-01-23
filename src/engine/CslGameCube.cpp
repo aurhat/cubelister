@@ -120,11 +120,11 @@ wxString CslGameCube::GameStart(CslServerInfo *info,wxUint32 mode,wxString *erro
 
 #ifdef __WXMSW__
     //binary must be surrounded by quotes if the path contains spaces
-    bin << wxT("\"") << m_clientSettings.Binary << wxT("\"");
+    bin<<wxT("\"")<<m_clientSettings.Binary<<wxT("\"");
 #else
     bin.Replace(wxT(" "),wxT("\\ "));
 #endif
-    bin << wxT(" ") << opts;
+    bin<<wxT(" ")<<opts;
 
     if (mode==CslServerInfo::CSL_CONNECT_ADMIN_PASS)
         password=info->Password;

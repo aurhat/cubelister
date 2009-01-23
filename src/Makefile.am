@@ -21,12 +21,13 @@ INCLUDES = -I$(top_srcdir)/src/libGeoIP \
 cslmapcfgtool_SOURCES = CslMapCfgTool.cpp
 cslmapcfgtool_LDADD = libcslpanelmap.a \
 	$(top_builddir)/src/engine/libcsltools.a ${WX_LIBS}
-csl_SOURCES = CslArt.cpp CslConnectionState.cpp CslDlgAbout.cpp \
-	CslDlgAddMaster.cpp CslDlgAddServer.cpp CslDlgConnectPass.cpp CslDlgConnectWait.cpp \
-	CslDlgExtended.cpp CslDlgOutput.cpp CslDlgSettings.cpp CslDlgTraffic.cpp CslFrame.cpp \
+csl_SOURCES = CslArt.cpp CslDlgAbout.cpp CslDlgAddMaster.cpp \
+	CslDlgAddServer.cpp CslDlgConnectPass.cpp CslDlgConnectWait.cpp CslDlgExtended.cpp \
+	CslDlgOutput.cpp CslDlgSettings.cpp CslDlgTraffic.cpp CslFrame.cpp CslGameConnection.cpp \
 	CslGameProcess.cpp CslGeoIP.cpp CslIPC.cpp CslIRC.cpp CslListCtrl.cpp \
 	CslListCtrlCountry.cpp CslListCtrlInfo.cpp CslListCtrlPlayer.cpp CslListCtrlPlayerSearch.cpp \
 	CslListCtrlServer.cpp CslMenu.cpp CslStatusBar.cpp CslVersionCheck.cpp
 noinst_LIBRARIES = libcslpanelmap.a
 libcslpanelmap_a_SOURCES = CslPanelMap.cpp
-noinst_HEADERS = CslIRC.h CslListCtrl.h CslListCtrlPlayerSearch.h
+noinst_HEADERS = CslGameConnection.h CslIRC.h CslListCtrl.h \
+	CslListCtrlPlayerSearch.h

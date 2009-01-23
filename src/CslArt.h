@@ -11,6 +11,9 @@
 #ifndef wxART_NONE
 #define wxART_NONE             wxART_MAKE_ART_ID(wxART_NONE)
 #endif
+#ifndef wxART_CSL
+#define wxART_CSL              wxART_MAKE_ART_ID(wxART_CSL)
+#endif
 #ifndef wxART_CONNECT
 #define wxART_CONNECT          wxART_MAKE_ART_ID(wxART_CONNECT)
 #endif

@@ -81,21 +81,24 @@ class CslListCtrl : public wxListCtrl
     private:
         wxTimer m_timer;
 
-        wxUint32 m_mouseLastMove;
-
         CslToolTip *m_toolTip;
         wxString m_toolTipTitle;
         wxArrayString m_toolTipText;
 
+        wxUint32 m_mouseLastMove;
+
         bool m_flickerFree;
+
+        void StopTimer();
 
 #ifdef __WXMSW__
         void OnEraseBackground(wxEraseEvent& event);
 #endif
         void OnMouseMove(wxMouseEvent& event);
         void OnMouseLeave(wxMouseEvent& event);
+        void OnItem(wxListEvent& event);
+        void OnContextMenu(wxContextMenuEvent& event);
         void OnTimer(wxTimerEvent& event);
-
         DECLARE_EVENT_TABLE()
 
     protected:

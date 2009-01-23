@@ -37,7 +37,7 @@ class CslConnectPassInfo
         CslConnectPassInfo(const wxString& password=wxEmptyString,
                            const wxString& adminpassword=wxEmptyString,
                            const bool admin=false) :
-                Password(password),AdminPassword(adminpassword),Admin(Admin) {}
+                Password(password),AdminPassword(adminpassword),Admin(admin) {}
 
         wxString Password,AdminPassword;
         bool Admin;

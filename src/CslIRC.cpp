@@ -20,6 +20,7 @@
 
 #include <wx/tokenzr.h>
 #include "CslIRC.h"
+#include "CslIPC.h"
 #include "CslMenu.h"
 
 CslIrcEngine* CslIrcNotebook::m_engine=NULL;
@@ -321,7 +322,7 @@ void CslIrcPanel::OnCommandEvent(wxCommandEvent& event)
 
                 if (panel->m_session && panel->m_session->Connect(CslIrcContext(server,panel)))
                 {
-                    s << wxT("\0032*** ") <<  _("Connecting to server...") << wxT("\003");
+                    s<<wxT("\0032*** ")<<_("Connecting to server...")<<wxT("\003");
                     panel->AddLine(s);
                 }
             }
@@ -390,7 +391,7 @@ void CslIrcPanel::OnIrcEvent(CslIrcEvent& event)
             switch (event.Ints.Item(0))
             {
                 case LIBIRC_ERR_RESOLV:
-                    s << wxT("\0034*** ") <<  _("Couldn't resolve hostname.") << wxT("\003");
+                    s<<wxT("\0034*** ")<<_("Couldn't resolve hostname.")<<wxT("\003");
                     AddLine(s);
                     EndIrcSession();
                     break;
@@ -409,8 +410,8 @@ void CslIrcPanel::OnIrcEvent(CslIrcEvent& event)
             if (event.Strings.GetCount()>1)
             {
                 u=1;
-                s << wxT("\00313*** ") << event.Strings.Item(0) << wxT(" ") << _("changed topic to");
-                s << wxT(": ") << event.Strings.Item(1) << wxT("\003");
+                s<<wxT("\00313*** ")<<event.Strings.Item(0)<<wxT(" ")<<_("changed topic to");
+                s<<wxT(": ")<<event.Strings.Item(1)<<wxT("\003");
                 panel->AddLine(s);
             }
             else
@@ -428,7 +429,7 @@ void CslIrcPanel::OnIrcEvent(CslIrcEvent& event)
             switch (event.Ints.Item(0))
             {
                 case LIBIRC_RFC_ERR_CANNOTSENDTOCHAN:
-                    s << wxT("***\0034 ") << event.Strings.Item(0) << wxT("\003");
+                    s<<wxT("***\0034 ")<<event.Strings.Item(0)<<wxT("\003");
                     GetOrCreatePanel(event.Channel,m_session)->AddLine(s);
                     break;
 
@@ -440,7 +441,7 @@ void CslIrcPanel::OnIrcEvent(CslIrcEvent& event)
                     {
                         if (!(panel=GetActivePanel(m_session)))
                             panel=this;
-                        s << wxT("\0035*** ") << event.Channel << wxT("\003");
+                        s<<wxT("\0035*** ")<<event.Channel<<wxT("\003");
                         panel->AddLine(s);
                     }
                     break;
@@ -448,20 +449,20 @@ void CslIrcPanel::OnIrcEvent(CslIrcEvent& event)
             break;
 
         case CslIrcEvent::CONNECT:
-            s << wxT("\0033*** ") <<  _("Connection established...") << wxT("\003");
+            s<<wxT("\0033*** ")<<_("Connection established...")<<wxT("\003");
             AddLine(s);
             OnAutojoin(true);
             break;
 
         case CslIrcEvent::JOIN:
-            s << wxT("\0035*** ") <<  _("You joined channel.") << wxT("\003");
+            s<<wxT("\0035*** ")<<_("You joined channel.")<<wxT("\003");
             panel=GetOrCreatePanel(event.Channel,m_session);
             panel->AddLine(s);
             break;
 
         case CslIrcEvent::JOINED:
-            s << wxT("\0035*** ") << event.Strings.Item(0);
-            s << wxT(" ") << _("joined channel.") << wxT("\003");
+            s<<wxT("\0035*** ")<<event.Strings.Item(0);
+            s<<wxT(" ")<<_("joined channel.")<<wxT("\003");
             panel=GetOrCreatePanel(event.Channel,m_session);
             panel->AddLine(s);
             panel->AddUser(event.Strings.Item(0));
@@ -516,17 +517,17 @@ void CslIrcPanel::OnIrcEvent(CslIrcEvent& event)
             break;
 
         case CslIrcEvent::CHANMSG:
-            s << wxT("<") <<event.Strings.Item(0) << wxT("> ") << event.Strings.Item(1);
+            s<<wxT("<")<<event.Strings.Item(0)<<wxT("> ")<<event.Strings.Item(1);
             GetOrCreatePanel(event.Channel,m_session)->AddLine(s);
             break;
 
         case CslIrcEvent::PRIVMSG:
-            s << wxT("<") << event.Channel << wxT("> ") << event.Strings.Item(0);
+            s<<wxT("<")<<event.Channel<<wxT("> ")<<event.Strings.Item(0);
             GetOrCreatePanel(event.Channel,m_session)->AddLine(s);
             break;
 
         case CslIrcEvent::NOTICE:
-            s << wxT("\0035*** NOTICE (") << event.Strings.Item(0) << wxT("):\017 ") << event.Strings.Item(1);
+            s<<wxT("\0035*** NOTICE (")<<event.Strings.Item(0)<<wxT("):\017 ")<<event.Strings.Item(1);
             if (event.Strings.Item(0).IsEmpty() || !event.Channel.CmpNoCase(m_session->GetNick()))
                 AddLine(s);
             else
@@ -600,7 +601,7 @@ void CslIrcPanel::OnUserModeChange(const wxString& initiator,const wxString& tar
 
         ChangeUser(user->Nick,user->Nick,i);
 
-        msg << wxT("*** \0036") << initiator << wxT(" ") << s << wxT(" ") << user->Nick << wxT(".\003");
+        msg<<wxT("*** \0036")<<initiator<<wxT(" ")<<s<<wxT(" ")<<user->Nick<<wxT(".\003");
         AddLine(msg);
     }
 }
@@ -646,9 +647,9 @@ void CslIrcPanel::OnQuit(const wxString& nick,const wxString& reason)
     wxString s;
     CslIrcPanel *panel;
 
-    s << wxT("\0035*** ") << nick << wxT(" ") << _("left server");
+    s<<wxT("\0035*** ")<<nick<<wxT(" ")<<_("left server");
     if (!reason.IsEmpty())
-        s << wxT(" (") << reason << wxT(")\003");
+        s<<wxT(" (")<<reason<<wxT(")\003");
 
     for (i=0;i<m_parent->GetPageCount();i++)
     {
@@ -671,14 +672,14 @@ void CslIrcPanel::OnPart(const wxString& channel,const wxString& nick,
     wxString s;
     CslIrcPanel *panel;
 
-    s << wxT("\0035*** ") << nick << wxT(" ");
+    s<<wxT("\0035*** ")<<nick<<wxT(" ");
     if (initiator.IsEmpty())
-        s << _("left channel");
+        s<<_("left channel");
     else
-        s << _("got kicked by") << wxT(" ") << initiator;
+        s<<_("got kicked by")<<wxT(" ")<<initiator;
     if (!reason.IsEmpty())
-        s << wxT(" (") << reason << wxT(")");
-    s << wxT(".\003");
+        s<<wxT(" (")<<reason<<wxT(")");
+    s<<wxT(".\003");
 
     panel=GetOrCreatePanel(channel,m_session);
     panel->AddLine(s);
@@ -701,11 +702,11 @@ void CslIrcPanel::OnDisconnect(bool forced)
 
     if (!forced)
     {
-        s << wxT("\0034*** ") <<  _("Connecting lost. Reconnecting...") << wxT("\003");
+        s<<wxT("\0034*** ")<<_("Connecting lost. Reconnecting...")<<wxT("\003");
         m_rejoin=true;
     }
     else
-        s << wxT("\0032*** ") <<  _("Disconnected from server.") << wxT("\003");
+        s<<wxT("\0032*** ")<<_("Disconnected from server.")<<wxT("\003");
 
     AddLine(s);
 }
@@ -1062,7 +1063,7 @@ void CslIrcPanel::AddLine(const wxString& line,bool scroll)
     WRITEBUFFER
     lines++;
 
-    if ((i=line.Find(wxT("csl://")))!=(wxUint32)wxNOT_FOUND)
+    if ((i=line.Find(CSL_URI_SCHEME_STR))!=(wxUint32)wxNOT_FOUND)
     {
         for (j=i+6;j<len;j++)
         {
@@ -1105,7 +1106,7 @@ void CslIrcPanel::AddLine(const wxString& line,bool scroll)
             if (m_parent->GetPage(i)==this)
             {
                 buf=m_parent->GetPageText(i).BeforeFirst(wxT(' '));
-                buf << wxT(" (") << m_missedLines << wxT(")");
+                buf<<wxT(" (")<<m_missedLines<<wxT(")");
                 m_parent->SetPageText(i,buf);
                 break;
             }
@@ -1211,7 +1212,7 @@ void CslIrcPanel::HandleInput(const wxString& text)
 
             if (channel.IsEmpty())
             {
-                s << wxT("\0034*** ") << _("Channel missing.") << wxT("\003");
+                s<<wxT("\0034*** ")<<_("Channel missing.")<<wxT("\003");
                 AddLine(s,true);
                 return;
             }
@@ -1232,7 +1233,7 @@ void CslIrcPanel::HandleInput(const wxString& text)
 
             if (channel.IsEmpty())
             {
-                s << wxT("\0034*** ") << _("Channel missing.") << wxT("\003");
+                s<<wxT("\0034*** ")<<_("Channel missing.")<<wxT("\003");
                 AddLine(s,true);
                 return;
             }
@@ -1244,7 +1245,7 @@ void CslIrcPanel::HandleInput(const wxString& text)
                     m_session->LeaveChannel(channel,reason))
                 {
                     panel->RemoveUsers();
-                    s << wxT("\0035*** ") <<  _("Left channel.") << wxT("\003");
+                    s<<wxT("\0035*** ")<<_("Left channel.")<<wxT("\003");
                     panel->AddLine(s,true);
                 }
                 return;
@@ -1272,7 +1273,7 @@ void CslIrcPanel::HandleInput(const wxString& text)
 
             if (!tkz.HasMoreTokens())
             {
-                s << wxT("\0034*** ") << _("Nick missing.") << wxT("\003");
+                s<<wxT("\0034*** ")<<_("Nick missing.")<<wxT("\003");
                 AddLine(s,true);
                 return;
             }
@@ -1303,7 +1304,7 @@ void CslIrcPanel::HandleInput(const wxString& text)
             return;
         }
         else
-            s << wxT("\0034") << text << wxT(": ") << _("*** Not connected.") << wxT("\003");
+            s<<wxT("\0034")<<text<<wxT(": ")<<_("*** Not connected.")<<wxT("\003");
     }
     else if (m_session)
     {
