@@ -289,7 +289,7 @@ wxString CslGameAssaultCube::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
 #else
     bin.Replace(wxT(" "),wxT("\\ "));
     path.Replace(wxT(" "),wxT("\\ "));
-    // use Prepend() and do not use opts+= here, since --home=<path> must be before -r
+    // use Prepend() and do not use opts+= here, since --home=<path> must be before --init
     opts.Prepend(wxT("--home=")+configpath+wxT(" "));
 #endif //__WXMSW__
 

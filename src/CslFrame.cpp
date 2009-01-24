@@ -443,7 +443,7 @@ void CslFrame::SetProperties()
 
     // see wx_wxbitmap.html
 #ifdef __WXMSW__
-    SetIcon(wxICON(aa_csl_48));
+    SetIcon(wxICON(appicon));
 #else
     wxMemoryInputStream stream(csl_icon_png,sizeof(csl_icon_png));
     wxImage image(stream,wxBITMAP_TYPE_PNG);

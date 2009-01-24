@@ -339,10 +339,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CslConnectionState.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\CslDlgAbout.cpp"
 				>
 			</File>
@@ -380,6 +376,10 @@
 			</File>
 			<File
 				RelativePath=".\CslFrame.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CslGameConnection.cpp"
 				>
 			</File>
 			<File
@@ -461,10 +461,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CslConnectionState.h"
-				>
-			</File>
-			<File
 				RelativePath=".\CslDlgAbout.h"
 				>
 			</File>
@@ -510,6 +506,10 @@
 			</File>
 			<File
 				RelativePath=".\CslFrame.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CslGameConnection.h"
 				>
 			</File>
 			<File

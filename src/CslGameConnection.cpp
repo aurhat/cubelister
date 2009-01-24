@@ -67,7 +67,7 @@ bool CslGameConnection::Prepare(CslServerInfo *info,wxInt32 pass)
         return false;
     }
 
-    if (pass>NO_PASS || info->MM&CSL_SERVER_PASSWORD)
+    if (pass>NO_PASS || CSL_SERVER_IS_PASSWORD(info->MM))
     {
         if (pass==ASK_PASS || info->Password.IsEmpty())
         {
