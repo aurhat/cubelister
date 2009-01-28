@@ -219,7 +219,7 @@ void CslDlgAddMaster::OnCommandEvent(wxCommandEvent& event)
             {
                 if (!path.StartsWith(wxT("/")))
                     path=wxT("/")+path;
-                connection=CslMasterConnection(addr,path);
+                connection=CslMasterConnection(addr,path,port);
             }
             else
                 connection=CslMasterConnection(addr,port);

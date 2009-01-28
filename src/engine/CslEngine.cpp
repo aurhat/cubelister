@@ -454,8 +454,8 @@ wxInt32 CslEngine::UpdateFromMaster(CslMaster *master)
         if (!sock.Connect(addr,true))
             return -1;
 
-        sock.Write((void*)"list",4);
-        if (sock.LastCount()!=4)
+        sock.Write((void*)"list\n",5);
+        if (sock.LastCount()!=5)
             return -1;
 
         sock.Read((void*)buf,32768);
