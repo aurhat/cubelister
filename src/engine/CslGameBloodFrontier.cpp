@@ -25,7 +25,7 @@
 #include "../img/bf_24.xpm"
 #include "../img/bf_16.xpm"
 
-enum { MM_OPEN, MM_VETO, MM_LOCKED, MM_PRIVATE };
+enum { MM_OPEN, MM_VETO, MM_LOCKED, MM_PRIVATE, MM_PASSWORD };
 
 enum
 {
@@ -41,23 +41,19 @@ enum
 
 enum
 {
-    G_M_NONE    = 0,
-    G_M_TEAM    = 1<<0,
-    G_M_INSTA   = 1<<1,
-    G_M_DUEL    = 1<<2,
-    G_M_PROG    = 1<<3,
-    G_M_MULTI   = 1<<4,
-    G_M_DLMS    = 1<<5,
-    G_M_MAYHEM  = 1<<6,
-    G_M_NOITEMS = 1<<7,
-    G_M_ALL     = G_M_TEAM|G_M_INSTA|G_M_DUEL|G_M_PROG|G_M_MULTI|G_M_DLMS|G_M_MAYHEM|G_M_NOITEMS,
-    G_M_FIGHT   = G_M_TEAM|G_M_INSTA|G_M_DUEL|G_M_MULTI|G_M_DLMS|G_M_NOITEMS,
-    G_M_DUKE    = G_M_INSTA|G_M_DUEL|G_M_DLMS|G_M_NOITEMS,
-    G_M_STF     = G_M_TEAM|G_M_INSTA|G_M_PROG|G_M_MULTI|G_M_MAYHEM|G_M_NOITEMS,
-    G_M_CTF     = G_M_TEAM|G_M_INSTA|G_M_PROG|G_M_MULTI|G_M_MAYHEM|G_M_NOITEMS,
+    G_M_NONE  = 0,
+    G_M_MULTI = 1<<0,
+    G_M_TEAM  = 1<<1,
+    G_M_INSTA = 1<<2,
+    G_M_DUEL  = 1<<3,
+    G_M_LMS   = 1<<4,
+    G_M_PAINT = 1<<5,
+    G_M_DM    = G_M_INSTA|G_M_PAINT,
+    G_M_TEAMS = G_M_MULTI|G_M_TEAM|G_M_INSTA|G_M_PAINT,
+    G_M_ALL   = G_M_MULTI|G_M_TEAM|G_M_INSTA|G_M_PAINT|G_M_DUEL|G_M_LMS,
 };
 
-#define G_M_NUM     8
+#define G_M_NUM  6
 
 
 static struct
@@ -67,23 +63,21 @@ static struct
 gametype[] =
 {
     { G_DEMO,       G_M_NONE,  G_M_NONE,    wxT("Demo")    },
-    { G_LOBBY,      G_M_NONE,  G_M_NOITEMS, wxT("Lobby")   },
+    { G_LOBBY,      G_M_NONE,  G_M_NONE,    wxT("Lobby")   },
     { G_EDITMODE,   G_M_NONE,  G_M_NONE,    wxT("Editing") },
     { G_MISSION,    G_M_NONE,  G_M_NONE,    wxT("Mission") },
-    { G_DEATHMATCH, G_M_FIGHT, G_M_NONE,    wxT("DM")      },
-    { G_STF,        G_M_STF,   G_M_TEAM,    wxT("STF")     },
-    { G_CTF,        G_M_CTF,   G_M_TEAM,    wxT("CTF")     },
+    { G_DEATHMATCH, G_M_ALL,   G_M_NONE,    wxT("DM")      },
+    { G_STF,        G_M_TEAMS, G_M_TEAM,    wxT("STF")     },
+    { G_CTF,        G_M_TEAMS, G_M_TEAM,    wxT("CTF")     },
 },
 mutstype[] =
 {
-    { G_M_TEAM,    G_M_ALL,  G_M_NONE,    wxT("Team")   },
-    { G_M_INSTA,   G_M_ALL,  G_M_NOITEMS, wxT("Insta")  },
-    { G_M_DUEL,    G_M_DUKE, G_M_NONE,    wxT("Duel")   },
-    { G_M_PROG,    G_M_ALL,  G_M_NONE,    wxT("PG")     },
-    { G_M_MULTI,   G_M_ALL,  G_M_TEAM,    wxT("MS")     },
-    { G_M_DLMS,    G_M_DUKE, G_M_DUEL,    wxT("LMS")    },
-    { G_M_MAYHEM,  G_M_ALL,  G_M_NONE,    wxT("Mayhem") },
-    { G_M_NOITEMS, G_M_ALL,  G_M_NONE,    wxT("NI")     },
+    { G_M_MULTI, G_M_ALL,         G_M_TEAM|G_M_MULTI, wxT("MS")        },
+    { G_M_TEAM,  G_M_TEAMS,       G_M_TEAM,           wxT("Team")      },
+    { G_M_INSTA, G_M_ALL,         G_M_INSTA,          wxT("Instagib")  },
+    { G_M_DUEL,  G_M_DM|G_M_DUEL, G_M_DUEL,           wxT("Duel")      },
+    { G_M_LMS,   G_M_DM|G_M_LMS,  G_M_LMS,            wxT("LMS")       },
+    { G_M_PAINT, G_M_ALL,         G_M_PAINT,          wxT("Paintball") },
 };
 
 
@@ -91,7 +85,7 @@ CslBloodFrontier::CslBloodFrontier()
 {
     m_name=CSL_DEFAULT_NAME_BF;
     m_defaultMasterConnection=CslMasterConnection(CSL_DEFAULT_MASTER_BF,CSL_DEFAULT_MASTER_PORT_BF);
-    m_capabilities=CSL_CAPABILITY_EXTINFO | CSL_CAPABILITY_CUSTOM_CONFIG;
+    m_capabilities=CSL_CAPABILITY_EXTINFO | CSL_CAPABILITY_CUSTOM_CONFIG | CSL_CAPABILITY_CONNECT_PASS;
 #ifdef __WXMAC__
     m_clientSettings.ConfigPath=::wxGetHomeDir();
     m_clientSettings.ConfigPath+=wxT("/Library/Application Support/bloodfrontier");
@@ -154,8 +148,8 @@ const wxChar* CslBloodFrontier::GetWeaponName(wxInt32 n) const
 {
     static const wxChar* weapons[] =
     {
-        _("Pistol"),_("Shotgun"),_("Chaingun"),
-        _("Grenades"),_("Flamer"),_("Rifle")
+        _("Plasma"),_("Shotgun"),_("Chaingun"),_("Flamer"),
+        _("Carbine"),_("Rifle"),_("Grenade"),_("Paintgun")
     };
     return (n>=0 && (size_t)n<sizeof(weapons)/sizeof(weapons[0])) ?
            weapons[n] : _("unknown");
@@ -168,6 +162,7 @@ void CslBloodFrontier::GetPlayerstatsDescriptions(vector<wxString>& desc) const
     desc.add(_("Frags"));
     desc.add(_("Deaths"));
     desc.add(_("Teamkills"));
+    desc.add(_("Ping"));
     desc.add(_("Accuracy"));
     desc.add(_("Health"));
     desc.add(_("Spree"));
@@ -213,29 +208,41 @@ bool CslBloodFrontier::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
         info.TimeRemain=attr[3];
     if (numattr>=5)
         info.PlayersMax=attr[4];
+
     info.MM=CSL_SERVER_OPEN;
+    info.MMDescription.Empty();
+
     if (numattr>=6)
     {
-        if (attr[5]==MM_OPEN)
-            info.MMDescription+=wxT(" (O)");
-        else if (attr[5]==MM_VETO)
+        if (attr[4]==MM_PASSWORD)
         {
-            info.MMDescription+=wxT(" (V)");
-            info.MM=CSL_SERVER_VETO;
+            info.MMDescription+=wxT("PASS");
+            info.MM|=CSL_SERVER_PASSWORD;
         }
-        else if (attr[5]==MM_LOCKED)
+        else
         {
-            info.MMDescription+=wxT(" (L)");
-            info.MM=CSL_SERVER_LOCKED;
-        }
-        else if (attr[5]==MM_PRIVATE)
-        {
-            info.MMDescription+=wxT(" (P)");
-            info.MM=CSL_SERVER_PRIVATE;
+            info.MMDescription=wxString::Format(wxT("%d"),attr[5]);
+
+            if (attr[5]==MM_OPEN)
+                info.MMDescription+=wxT(" (O)");
+            else if (attr[5]==MM_VETO)
+            {
+                info.MMDescription+=wxT(" (V)");
+                info.MM=CSL_SERVER_VETO;
+            }
+            else if (attr[5]==MM_LOCKED)
+            {
+                info.MMDescription+=wxT(" (L)");
+                info.MM=CSL_SERVER_LOCKED;
+            }
+            else if (attr[5]==MM_PRIVATE)
+            {
+                info.MMDescription+=wxT(" (P)");
+                info.MM=CSL_SERVER_PRIVATE;
+            }
         }
     }
-    else
-        info.MMDescription=wxString::Format(wxT("%d"),attr[5]);
+
     getstring(text,buf);
     info.Map=A2U(text);
     getstring(text,buf);
@@ -251,11 +258,15 @@ bool CslBloodFrontier::ParsePlayerPong(wxUint32 protocol,ucharbuf& buf,CslPlayer
     char text[_MAXDEFSTR];
 
     info.ID=getint(buf);
+    if (protocol>=104)
+        info.Ping=getint(buf);
     getstring(text,buf);
     info.Name=A2U(text);
     getstring(text,buf);
     info.Team=A2U(text);
     info.Frags=getint(buf);
+    if (protocol>=104)
+        info.Flagscore=getint(buf);
     info.Deaths=getint(buf);
     info.Teamkills=getint(buf);
     if (protocol>=103)
@@ -355,14 +366,19 @@ wxString CslBloodFrontier::GameStart(CslServerInfo *info,wxUint32 mode,wxString 
 #endif //__WXMSW__
 
     address=info->Host;
-    if (GetDefaultPort()!=info->Port)
-        address+=m_portDelimiter+wxString::Format(wxT("%d"),info->Port);
+    if (GetDefaultGamePort()!=info->GamePort)
+        address+=wxString::Format(wxT(" %d"),info->GamePort);
 
 #ifdef __WXMSW__
-    opts+=wxT(" -x\"sleep 1000 [connect ")+address+wxT("]\"");
+    opts+=wxT(" -x\"connect ")+address;
+    if (mode==CslServerInfo::CSL_CONNECT_PASS)
+        opts+=wxT(" ")+info->Password;
+    opts+=wxT("\"");
 #else
     address.Replace(wxT(" "),wxT("\\ "));
-    opts+=wxT(" -xsleep\\ 1000\\ [connect\\ ")+address+wxT("]");
+    opts+=wxT(" -xconnect\\ ")+address;
+    if (mode==CslServerInfo::CSL_CONNECT_PASS)
+        opts+=wxT("\\ ")+info->Password;
 #endif
 
     bin+=wxT(" ")+opts;

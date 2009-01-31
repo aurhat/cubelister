@@ -525,8 +525,7 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
         case MENU_SERVER_COPY_CONFAV:
         case MENU_SERVER_COPY_FAV:
         {
-            wxString s1;
-            bool pass=false;
+            bool con,add,pass=false;
 
             for (i=0;i<m_selected.GetCount();i++)
             {
@@ -558,37 +557,11 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
                 if (!s.IsEmpty())
                     s<<wxT("\r\n");
 
-                s1.Empty();
+                con=id==MENU_SERVER_COPY_CON || id==MENU_SERVER_COPY_CONFAV;
+                add=id==MENU_SERVER_COPY_FAV || id==MENU_SERVER_COPY_CONFAV;
 
-                s<<CSL_URI_SCHEME_STR;
+                s<<CslIpcBase::CreateURI(*info,pass,con,add);
 
-                if (pass && !info->Password.IsEmpty())
-                {
-                    s1<<info->Password<<wxT("@");
-                    s1.Replace(wxT(" "),wxT("%20"));
-                    s<<s1;
-                    s1.Empty();
-                }
-
-                s<<info->Host;
-                if (info->GetGame().GetDefaultPort()!=info->Port)
-                    s<<wxT(":")<<info->Port;
-
-                s<<wxT("?")<<CSL_URI_GAME_STR;
-                s1<<info->GetGame().GetName();
-                s1.Replace(wxT(" "),wxT("%20"));
-                s<<wxT("=")<<s1<<wxT("&");
-                s1.Empty();
-
-                if (id==MENU_SERVER_COPY_CON || id==MENU_SERVER_COPY_CONFAV)
-                    s1<<CSL_URI_ACTION_STR<<wxT("=")<<CSL_URI_ACTION_CONNECT_STR;
-                if (id==MENU_SERVER_COPY_FAV || id==MENU_SERVER_COPY_CONFAV)
-                {
-                    if (!s1.IsEmpty())
-                        s1<<wxT("&");
-                    s1<<CSL_URI_ACTION_STR<<wxT("=")<<CSL_URI_ACTION_ADDFAV_STR;
-                }
-                s<<s1;
             }
 
             if (s.IsEmpty())
@@ -616,9 +589,9 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
                 if (ListFindItem(info,item)==wxNOT_FOUND)
                     continue;
 
-                port=info->GetGame().GetDefaultPort();
-                if (info->Port!=port)
-                    port=info->Port;
+                port=info->GetGame().GetDefaultGamePort();
+                if (info->GamePort!=port)
+                    port=info->GamePort;
                 else
                     port=0;
 

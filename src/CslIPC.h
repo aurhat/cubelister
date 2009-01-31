@@ -33,12 +33,15 @@
 #include "wx/wx.h"
 #endif
 #include <wx/ipc.h>
+#include "engine/CslGame.h"
+
 
 #define CSL_IPC_HOST wxT("localhost")
 #define CSL_IPC_SERV wxT("49152")
 #define CSL_IPC_TOPIC wxT("CSL_IPC_CONTROL")
 
 #define CSL_URI_SCHEME_STR          wxT("csl://")
+#define CSL_URI_INFOPORT_STR        wxT("infoport")
 #define CSL_URI_GAME_STR            wxT("game")
 #define CSL_URI_ACTION_STR          wxT("action")
 #define CSL_URI_ACTION_CONNECT_STR  wxT("connect")
@@ -79,7 +82,6 @@ class CslIpcEvent : public wxEvent
         wxString Request;
 };
 
-
 class CslIpcConnection : public wxConnection
 {
     public:
@@ -88,12 +90,26 @@ class CslIpcConnection : public wxConnection
     protected:
         wxEvtHandler *m_evtHandler;
 
-        virtual bool OnPoke(const wxString& topic,const wxString& item,wxChar *data,int size,wxIPCFormat format);
+        virtual bool OnPoke(const wxString& topic,const wxString& item,
+                            wxChar *data,int size,wxIPCFormat format);
         virtual bool OnDisconnect();
 };
 
 
-class CslIpcServer : public wxServer
+class CslIpcBase
+{
+    public:
+        CslIpcBase() : m_connection(NULL) {}
+        ~CslIpcBase() {}
+
+        static wxString CreateURI(const CslServerInfo& info,bool pass,bool connect,bool addfav);
+
+    protected:
+        CslIpcConnection *m_connection;
+};
+
+
+class CslIpcServer : public CslIpcBase, public wxServer
 {
     public:
         CslIpcServer(wxEvtHandler *evtHandler);
@@ -103,13 +119,12 @@ class CslIpcServer : public wxServer
 
     protected:
         wxEvtHandler *m_evtHandler;
-        CslIpcConnection *m_connection;
 
         wxConnectionBase* OnAcceptConnection(const wxString& topic);
 };
 
 
-class CslIpcClient: public wxClient
+class CslIpcClient: public CslIpcBase, public wxClient
 {
     public:
         CslIpcClient();
@@ -120,8 +135,6 @@ class CslIpcClient: public wxClient
         CslIpcConnection* GetConnection() { return m_connection; };
 
     protected:
-        CslIpcConnection *m_connection;
-
         wxConnectionBase* OnMakeConnection();
 };
 

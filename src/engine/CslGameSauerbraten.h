@@ -57,7 +57,8 @@ class CslGameSauerbraten : public CslGame
         bool ModeHasBases(wxInt32 mode,wxInt32 prot) const;
         wxInt32 ModeScoreLimit(wxInt32 mode,wxInt32 prot) const;
         wxInt32 GetBestTeam(CslTeamStats& stats,wxInt32 prot) const;
-        wxUint16 GetDefaultPort() const { return CSL_DEFAULT_PORT_SB; }
+        wxUint16 GetDefaultGamePort() const { return CSL_DEFAULT_PORT_SB; }
+        wxUint16 GetInfoPort(wxUint16 port=0) const { return port ? port+1:CSL_DEFAULT_PORT_SB+1; }
         bool ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const;
         bool ParsePlayerPong(wxUint32 protocol,ucharbuf& buf,CslPlayerStatsData& info) const;
         bool ParseTeamPong(wxUint32 protocol,ucharbuf& buf,CslTeamStatsData& info) const;

@@ -175,7 +175,7 @@ bool CslGameAssaultCube::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) con
             info.MM|=CSL_SERVER_BLACKLIST;
         }
 
-        if ((info.PasswordProtected=i&PONGFLAG_PASSWORD))
+        if (i&PONGFLAG_PASSWORD)
         {
             info.MMDescription+=wxT("/PASS");
             info.MM|=CSL_SERVER_PASSWORD;
@@ -303,8 +303,8 @@ wxString CslGameAssaultCube::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
 
     // apply port on version >=1.0.0, otherwise
     // password based connect attemps don't work
-    if (info->Port!=GetDefaultPort() || (info->Protocol>=1128 && !password.IsEmpty()))
-        address+=m_portDelimiter+wxString::Format(wxT("%d"),info->Port);
+    if (info->GamePort!=GetDefaultGamePort() || (info->Protocol>=1128 && !password.IsEmpty()))
+        address+=wxString::Format(wxT(" %d"),info->GamePort);
 
     configpath+=wxString(CSL_DEFAULT_INJECT_DIR_AC);
 

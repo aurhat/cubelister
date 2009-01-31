@@ -146,9 +146,6 @@ class CslGame
         wxUint32 GetConfigType() { return m_configType; }
         CslMasterConnection& GetDefaultMasterConnection() { return m_defaultMasterConnection; }
 
-        wxString& GetPortDelimiter() { return m_portDelimiter; }
-        void SetPortDelimiter(const wxString& delimiter) { m_portDelimiter=delimiter; }
-
         CslGameClientSettings& GetClientSettings() { return  m_clientSettings; }
 
         virtual void GetPlayerstatsDescriptions(vector<wxString>& desc) const;
@@ -157,7 +154,8 @@ class CslGame
         virtual bool ModeHasBases(wxInt32 mode,wxInt32 prot) const { return false; }
         virtual wxInt32 ModeScoreLimit(wxInt32 mode,wxInt32 prot) const { return -1; }
         virtual wxInt32 GetBestTeam(CslTeamStats& stats,wxInt32 prot) const { return -1; }
-        virtual wxUint16 GetDefaultPort() const = 0;
+        virtual wxUint16 GetDefaultGamePort() const = 0;
+        virtual wxUint16 GetInfoPort(wxUint16 gamePort=0) const = 0;
         virtual bool ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const = 0;
         virtual bool ParsePlayerPong(wxUint32 protocol,ucharbuf& buf,CslPlayerStatsData& info) const { return false; }
         virtual bool ParseTeamPong(wxUint32 protocol,ucharbuf& buf,CslTeamStatsData& info) const { return false; }
@@ -180,7 +178,6 @@ class CslGame
         wxInt32 m_gameId;
         wxUint32 m_capabilities;
         wxUint32 m_configType;
-        wxString m_portDelimiter;
 
         CslMasterConnection m_defaultMasterConnection;
         CslGameClientSettings m_clientSettings;
@@ -231,28 +228,31 @@ class CslServerInfo : public CslExtendedInfo
         enum { CSL_CONNECT_DEFAULT, CSL_CONNECT_PASS, CSL_CONNECT_ADMIN_PASS };
 
         CslServerInfo(CslGame *game=NULL,
-                      const wxString& host=wxT("localhost"),wxUint16 port=0,
+                      const wxString& host=wxT("localhost"),
+                      wxUint16 gamePort=0,wxUint16 infoPort=0,
                       wxUint32 view=CSL_VIEW_DEFAULT,wxUint32 lastSeen=0,
-                      wxUint32 playLast=0,wxUint32 playTimeLastGame=0,
+                      wxUint32 playedLast=0,wxUint32 playTimeLast=0,
                       wxUint32 playTimeTotal=0,wxUint32 connectedTimes=0,
                       const wxString& oldDescription=wxEmptyString,
-                      const wxString& password=wxEmptyString,
-                      const wxString& passwordAdmin=wxEmptyString);
+                      const wxString& pass=wxEmptyString,
+                      const wxString& passAdm=wxEmptyString);
 
         bool operator==(const CslServerInfo& info) const
         {
-            return (Host==info.Host && Port==info.Port);
+            return (Host==info.Host && GamePort==info.GamePort && InfoPort==info.InfoPort);
         }
 
-        void Create(CslGame *game,const wxString& host=wxT("localhost"),wxUint16 port=0,
-                    const wxString& pass=wxEmptyString,const wxString& admpass=wxEmptyString);
+        bool Create(CslGame *game,const wxString& host=wxT("localhost"),
+                    wxUint16 gamePort=0,wxUint16 infoPort=0,
+                    const wxString& pass=wxEmptyString,
+                    const wxString& passAdm=wxEmptyString);
         void Destroy();
         void SetLastPlayTime(wxUint32 time);
 
         void SetDescription(const wxString& description);
         wxString GetBestDescription() const;
 
-        CslGame& GetGame() { return *m_game; }
+        CslGame& GetGame() const { return *m_game; }
         const vector<wxInt32>& GetMasterIDs() const { return m_masterIDs; }
 
         void Lock(bool lock=true);
@@ -273,10 +273,9 @@ class CslServerInfo : public CslExtendedInfo
         bool HasStats() const;
 
         wxString Host,Domain;
-        wxUint16 Port;
+        wxUint16 GamePort,InfoPort;
         wxIPV4address Addr;
         bool Pingable;
-        bool PasswordProtected;
         wxString Password,PasswordAdmin;
         wxString Description,DescriptionOld;
         wxString GameMode,Map;
@@ -288,7 +287,7 @@ class CslServerInfo : public CslExtendedInfo
         wxInt32 Players,PlayersMax;
         wxUint32 View;
         wxUint32 LastSeen,PingSend,PingResp;
-        wxUint32 PlayLast,PlayTimeLastGame,PlayTimeTotal;
+        wxUint32 PlayedLast,PlayTimeLast,PlayTimeTotal;
         wxUint32 ConnectedTimes;
         bool Search;
 

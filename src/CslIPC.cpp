@@ -49,9 +49,50 @@ bool CslIpcConnection::OnDisconnect()
 }
 
 
+wxString CslIpcBase::CreateURI(const CslServerInfo& info,bool pass,bool connect,bool addfav)
+{
+    wxString s,s1;
+
+    s<<CSL_URI_SCHEME_STR;
+
+    if (pass && !info.Password.IsEmpty())
+    {
+        s1<<info.Password<<wxT("@");
+        s1.Replace(wxT(" "),wxT("%20"));
+        s<<s1;
+        s1.Empty();
+    }
+
+    s<<info.Host;
+    if (info.GetGame().GetDefaultGamePort()!=info.GamePort)
+        s<<wxT(":")<<info.GamePort;
+
+    s<<wxT("?")<<CSL_URI_GAME_STR;
+    s1<<info.GetGame().GetName();
+    s1.Replace(wxT(" "),wxT("%20"));
+    s<<wxT("=")<<s1<<wxT("&");
+    s1.Empty();
+
+    if (info.InfoPort!=info.GetGame().GetInfoPort(info.GamePort))
+        s<<CSL_URI_INFOPORT_STR<<wxT("=")<<info.InfoPort;
+
+    if (connect)
+        s1<<CSL_URI_ACTION_STR<<wxT("=")<<CSL_URI_ACTION_CONNECT_STR;
+    if (addfav)
+    {
+        if (!s1.IsEmpty())
+            s1<<wxT("&");
+        s1<<CSL_URI_ACTION_STR<<wxT("=")<<CSL_URI_ACTION_ADDFAV_STR;
+    }
+    s<<s1;
+
+    return s;
+}
+
+
 CslIpcServer::CslIpcServer(wxEvtHandler *evtHandler) :
-        wxServer(),
-        m_evtHandler(evtHandler),m_connection(NULL)
+        CslIpcBase(), wxServer(),
+        m_evtHandler(evtHandler)
 {
 }
 
@@ -82,9 +123,9 @@ void CslIpcServer::Disconnect()
 }
 
 
-CslIpcClient::CslIpcClient() : wxClient()
+CslIpcClient::CslIpcClient() :
+        CslIpcBase(), wxClient()
 {
-    m_connection=NULL;
 }
 
 CslIpcClient::~CslIpcClient()

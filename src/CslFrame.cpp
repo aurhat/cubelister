@@ -1324,7 +1324,6 @@ void CslFrame::LoadSettings()
         }
         if (config.Read(wxT("Options"),&s)) settings.Options=s;
         if (config.Read(wxT("ExpertConfig"),&val)) settings.Expert=val!=0;
-        if (config.Read(wxT("PortDelimiter"),&s)) games[i]->SetPortDelimiter(s);
         if (!settings.Binary.IsEmpty() && !::wxFileExists(settings.Binary))
             settings.Binary=wxEmptyString;
         if (!settings.GamePath.IsEmpty() && !::wxDirExists(settings.GamePath))
@@ -1411,7 +1410,6 @@ void CslFrame::SaveSettings()
         config.Write(wxT("ConfigPath"),settings.ConfigPath);
         config.Write(wxT("Options"),settings.Options);
         config.Write(wxT("ExpertConfig"),settings.Expert);
-        config.Write(wxT("PortDelimiter"),game.GetPortDelimiter());
     }
 }
 
@@ -1430,7 +1428,7 @@ bool CslFrame::LoadServers(wxUint32 *numm,wxUint32 *nums)
     vector<wxInt32> ids;
 
     wxString addr,path,pass1,pass2,description;
-    wxUint16 port=0;
+    wxUint16 port=0,iport=0;
     wxUint32 view=0;
     wxUint32 lastSeen=0;
     wxUint32 playLast=0;
@@ -1498,7 +1496,10 @@ bool CslFrame::LoadServers(wxUint32 *numm,wxUint32 *nums)
             read_server=false;
             if (config.Read(wxT("Address"),&addr))
             {
-                config.Read(wxT("Port"),&val,games[gt]->GetDefaultPort()); port=val;
+                config.Read(wxT("Port"),&val,games[gt]->GetDefaultGamePort()); port=val;
+                // use 0 as default infoport to import older servers.ini and
+                // set the appropriate infoport when creating the CslServerInfo
+                config.Read(wxT("InfoPort"),&val,0); iport=val;
                 config.Read(wxT("Password"),&pass1,wxEmptyString);
                 config.Read(wxT("AdminPassword"),&pass2,wxEmptyString);
                 config.Read(wxT("Description"),&description,wxEmptyString);
@@ -1530,8 +1531,8 @@ bool CslFrame::LoadServers(wxUint32 *numm,wxUint32 *nums)
 
             loopv(ids)
             {
-                CslServerInfo *info=new CslServerInfo(games[gt],addr,port,view,
-                                                      lastSeen,playLast,playTimeLastGame,
+                CslServerInfo *info=new CslServerInfo(games[gt],addr,port,iport ? iport:port+1,
+                                                      view,lastSeen,playLast,playTimeLastGame,
                                                       playTimeTotal,connectedTimes,
                                                       description,pass1,pass2);
 
@@ -1646,7 +1647,8 @@ void CslFrame::SaveServers()
             info=servers[j];
             config.SetPath(s+s.Format(wxT("/Server/%d"),sc++));
             config.Write(wxT("Address"),info->Host);
-            config.Write(wxT("Port"),info->Port);
+            config.Write(wxT("Port"),info->GamePort);
+            config.Write(wxT("InfoPort"),info->InfoPort);
             config.Write(wxT("Password"),info->Password);
             config.Write(wxT("AdminPassword"),info->PasswordAdmin);
             config.Write(wxT("Description"),info->DescriptionOld);
@@ -1654,8 +1656,8 @@ void CslFrame::SaveServers()
             loopvk(masters) config.Write(wxString::Format(wxT("Master%d"),k),masters[k]);
             config.Write(wxT("View"),(int)info->View);
             config.Write(wxT("LastSeen"),(int)info->LastSeen);
-            config.Write(wxT("PlayLast"),(int)info->PlayLast);
-            config.Write(wxT("PlayTimeLastGame"),(int)info->PlayTimeLastGame);
+            config.Write(wxT("PlayLast"),(int)info->PlayedLast);
+            config.Write(wxT("PlayTimeLastGame"),(int)info->PlayTimeLast);
             config.Write(wxT("PlayTimeTotal"),(int)info->PlayTimeTotal);
             config.Write(wxT("ConnectedTimes"),(int)info->ConnectedTimes);
 
@@ -2669,9 +2671,9 @@ void CslFrame::OnIPC(CslIpcEvent& event)
                 else
                 {
                     wxInt32 i;
-                    wxUint16 port;
                     wxString host,pass;
-                    CslGame *game;
+                    CslGame *game=NULL;
+                    wxUint16 port=0,iport=0;
                     bool connect=false,addfavourites=false;
 
                     wxURI uri(event.Request);
@@ -2697,7 +2699,9 @@ void CslFrame::OnIPC(CslIpcEvent& event)
                         if ((i=token.Find(wxT("=")))==wxNOT_FOUND)
                             continue;
 
-                        if (token.Mid(0,i).CmpNoCase(CSL_URI_GAME_STR)==0)
+                        if (token.Mid(0,i).CmpNoCase(CSL_URI_INFOPORT_STR)==0)
+                            iport=wxAtoi(s=token.Mid(i+1));
+                        else if (token.Mid(0,i).CmpNoCase(CSL_URI_GAME_STR)==0)
                         {
                             s=token.Mid(i+1);
                             s.Replace(wxT("%20"),wxT(" "));
@@ -2733,20 +2737,25 @@ void CslFrame::OnIPC(CslIpcEvent& event)
 
                         host=uri.GetServer();
                         if (!(port=wxAtoi(uri.GetPort())))
-                            port=game->GetDefaultPort();
+                            port=game->GetDefaultGamePort();
+                        if (!iport)
+                            iport=game->GetInfoPort();
 
-                        addr.Service(port+1);
+                        addr.Service(iport);
                         addr.Hostname(host);
                         addr.Hostname();
 
                         if (!(info=game->FindServerByAddr(addr)))
                         {
                             info=new CslServerInfo;
-                            info->Create(game,host,port,pass);
+                            info->Create(game,host,port,iport,pass);
                             info->View=CslServerInfo::CSL_VIEW_DEFAULT;
 
                             if (!game->AddServer(info))
+                            {
+                                delete info;
                                 break;
+                            }
                         }
                         else if (!pass.IsEmpty())
                             info->Password=pass;

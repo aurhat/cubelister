@@ -93,7 +93,7 @@ class CslIrcChannel
 
         bool Connected;
         wxString Name,Password;
-		wxString Topic;
+        wxString Topic;
 };
 
 
@@ -129,7 +129,7 @@ class CslIrcEvent : public wxEvent
 {
     public:
         enum
-		{
+        {
             ERR, CONNECT, NOTICE, JOIN, JOINED, NAMES, NICK, KICK,
             QUIT, PART, CHANMSG, PRIVMSG, ACTION, MODE, TOPIC, NUMERIC
         };

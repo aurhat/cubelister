@@ -84,7 +84,9 @@ void CslMaster::Init(CslGame *game,wxUint32 id)
  *  class CslGame
  */
 
-CslGame::CslGame() : m_gameId(-1),m_capabilities(0),m_configType(CSL_CONFIG_EXE),m_portDelimiter(wxT(" "))
+CslGame::CslGame() :
+        m_gameId(-1),m_capabilities(0),
+        m_configType(CSL_CONFIG_EXE)
 {
 }
 
@@ -278,24 +280,26 @@ void CslGame::GetPlayerstatsDescriptions(vector<wxString>& desc) const
  */
 
 CslServerInfo::CslServerInfo(CslGame *game,
-                             const wxString& host,wxUint16 port,
+                             const wxString& host,
+                             wxUint16 gamePort,wxUint16 infoPort,
                              wxUint32 view,wxUint32 lastSeen,
-                             wxUint32 playLast,wxUint32 playTimeLastGame,
+                             wxUint32 playedLast,wxUint32 playTimeLast,
                              wxUint32 playTimeTotal,wxUint32 connectedTimes,
                              const wxString& oldDescription,
-                             const wxString& password,const wxString& passwordAdmin)
+                             const wxString& pass,const wxString& passAdm)
 {
     m_game=game;
     Host=host;
-    Port=port ? port:game ? m_game->GetDefaultPort():0;
+    GamePort=gamePort ? gamePort:game ? game->GetDefaultGamePort():0;
+    InfoPort=infoPort ? infoPort:gamePort ? gamePort+1:0;
     if (IsIP(host))
     {
         Addr.Hostname(host);
-        Pingable=true;
+        Pingable=GamePort && InfoPort;
     }
     else
         Pingable=false;
-    Addr.Service(port ? port+1:Port+1);
+    Addr.Service(InfoPort);
     Protocol=-1;
     Ping=-1;
     TimeRemain=-2;
@@ -305,56 +309,60 @@ CslServerInfo::CslServerInfo(CslGame *game,
     PingSend=0;
     PingResp=0;
     LastSeen=lastSeen;
-    PlayLast=playLast;
-    PlayTimeLastGame=playTimeLastGame;
+    PlayedLast=playedLast;
+    PlayTimeLast=playTimeLast;
     PlayTimeTotal=playTimeTotal;
     ConnectedTimes=connectedTimes;
     DescriptionOld=oldDescription;
     MMDescription=wxEmptyString;
     MM=-1;
-    PasswordProtected=false;
-    Password=password;
-    PasswordAdmin=passwordAdmin;
+    Password=pass;
+    PasswordAdmin=passAdm;
     Search=false;
     m_lock=0;
     m_waiting=false;
 }
 
-void CslServerInfo::Create(CslGame *game,const wxString& host,wxUint16 port,
-                           const wxString& pass,const wxString& admpass)
+bool CslServerInfo::Create(CslGame *game,const wxString& host,
+                           wxUint16 gamePort,wxUint16 infoPort,
+                           const wxString& pass,
+                           const wxString& passAdmin)
 {
-    m_game=game;
+    if (!game)
+        return false;
 
+    m_game=game;
     Host=host;
-    Port=port ? port:m_game->GetDefaultPort();
-    Addr.Service(Port+1);
+
+    GamePort=gamePort ? gamePort:m_game->GetDefaultGamePort();
+    InfoPort=infoPort ? infoPort:GamePort+1;
 
     if (IsIP(host))
     {
         Addr.Hostname(host);
-        Pingable=true;
+        Pingable=GamePort && InfoPort;
     }
     else
         Pingable=false;
+    Addr.Service(InfoPort);
 
     View=CSL_VIEW_FAVOURITE;
 
     Password=pass;
-    PasswordAdmin=admpass;
+    PasswordAdmin=passAdmin;
 
+    return true;
 }
 
 void CslServerInfo::Destroy()
 {
-    //DeletePlayerStats();
-    //DeleteTeamStats();
     delete this;
 }
 
 
 void CslServerInfo::SetLastPlayTime(wxUint32 time)
 {
-    PlayTimeLastGame=time;
+    PlayTimeLast=time;
     PlayTimeTotal+=time;
 }
 
@@ -393,6 +401,6 @@ void CslServerInfo::RemoveMaster(wxInt32 id)
 
 bool CslServerInfo::HasStats() const
 {
-    return PlayLast>0 || PlayTimeLastGame>0 ||
+    return PlayedLast>0 || PlayTimeLast>0 ||
            PlayTimeTotal>0 || ConnectedTimes>0;
 }

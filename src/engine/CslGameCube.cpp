@@ -115,8 +115,8 @@ wxString CslGameCube::GameStart(CslServerInfo *info,wxUint32 mode,wxString *erro
     }
 
     address=info->Host;
-    if (GetDefaultPort()!=info->Port)
-        address+=m_portDelimiter+wxString::Format(wxT("%d"),info->Port);
+    if (GetDefaultGamePort()!=info->GamePort)
+        address+=wxString::Format(wxT(" %d"),info->GamePort);
 
 #ifdef __WXMSW__
     //binary must be surrounded by quotes if the path contains spaces

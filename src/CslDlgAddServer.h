@@ -57,9 +57,10 @@ class CslDlgAddServer: public wxDialog
         void do_layout();
         // end wxGlade
 
-        void UpdatePort();
+        void UpdatePort(wxInt32 type);
 
         void OnCommandEvent(wxCommandEvent& event);
+        void OnSpinCtrl(wxSpinEvent& event);
 
         DECLARE_EVENT_TABLE()
 
@@ -68,7 +69,8 @@ class CslDlgAddServer: public wxDialog
         wxStaticBox* sizer_address_staticbox;
         wxChoice* choice_gametype;
         wxTextCtrl* text_ctrl_address;
-        wxSpinCtrl* spin_ctrl_port;
+        wxSpinCtrl* spin_ctrl_gameport;
+        wxSpinCtrl* spin_ctrl_infoport;
         wxButton* button_add;
         wxButton* button_cancel;
         // end wxGlade

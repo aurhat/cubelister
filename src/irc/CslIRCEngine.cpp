@@ -53,13 +53,13 @@ wxColour IrcColours[16] =
 
 void irc_auto_rename_nick(irc_session_t *session)
 {
-	static int tries=0;
+    static int tries=0;
     CslIrcContext *context=(CslIrcContext*)irc_get_ctx(session);
 
     if (++tries<2)
     {
         //context->Server->Network->Nick+=wxT("'");
-		context->Server->Network->Nick=context->Server->Network->AltNick;
+        context->Server->Network->Nick=context->Server->Network->AltNick;
         irc_cmd_nick(session,U2A(context->Server->Network->AltNick));
     }
     else
@@ -280,7 +280,7 @@ void event_numeric(irc_session_t *session,unsigned int event,const char *origin,
             if (count>2)
             {
                 CslIrcEvent evt(context->Target,CslIrcEvent::TOPIC,A2U(params[1]));
-				evt.Ints.Add(event);
+                evt.Ints.Add(event);
                 evt.Strings.Add(A2U(params[2]));
                 wxPostEvent(context->EvtHandler,evt);
             }
@@ -299,7 +299,7 @@ void event_numeric(irc_session_t *session,unsigned int event,const char *origin,
             if (count>2)
             {
                 CslIrcEvent evt(context->Target,CslIrcEvent::NUMERIC,A2U(params[1]));
-				evt.Ints.Add(event);
+                evt.Ints.Add(event);
                 evt.Strings.Add(A2U(params[2]));
                 wxPostEvent(context->EvtHandler,evt);
                 return;
@@ -489,8 +489,8 @@ void CslIrcThread::LibIrcError(CslIrcContext *context,wxInt32 error)
 {
     LOG_DEBUG("libirc error (%d): \n",error,irc_strerror(errno));
 
-	wxEvtHandler *handler=context->EvtHandler;
-	CslIrcEvent evt(context->Target,CslIrcEvent::ERR);
+    wxEvtHandler *handler=context->EvtHandler;
+    CslIrcEvent evt(context->Target,CslIrcEvent::ERR);
     evt.Strings.Add(A2U(irc_strerror(error)));
     evt.Ints.Add(error);
 
@@ -555,7 +555,7 @@ void CslIrcSession::OnIrcEvent(CslIrcEvent& event)
                         m_channels.Item(i)->Connected=false;
                     if (m_state==STATE_DISCONNECTED)
                         return;
-					m_state=STATE_DISCONNECTED;
+                    m_state=STATE_DISCONNECTED;
                     break;
             }
             break;

@@ -418,7 +418,7 @@ wxInt32 CslEngine::UpdateFromMaster(CslMaster *master)
 {
     wxInt32 num=0;
     char buf[32768];
-    CslMasterConnection &connection=master->GetConnection();
+    const CslMasterConnection& connection=master->GetConnection();
 
     if (connection.GetType()==CslMasterConnection::CONNECTION_HTTP)
     {
@@ -467,32 +467,41 @@ wxInt32 CslEngine::UpdateFromMaster(CslMaster *master)
     master->UnrefServers();
 
     CslGame *game=master->GetGame();
-    char *port,*pend,*host=(char*)buf;
-    bool end=false;
+    char *p,*port,*iport,*host=(char*)buf;
+    bool parse=true;
 
-    while ((host=strstr(host,"addserver"))!=NULL)
+    while (parse && (host=strstr(host,"addserver")))
     {
-        port=NULL;
-        host=strpbrk(host,"0123456789");
-        if (!host)
+        host+=9;
+        port=iport=NULL;
+
+        if (!(host=strpbrk(host,"0123456789")))
             return num ? num:-1;
-        pend=strpbrk(host," \t\r\n");
-        if (!pend)
-            end=true;
-        else if (*pend=='\r' || *pend=='\n')
-            *pend=0;
+        if (!(p=strpbrk(host," \t\r\n")))
+            parse=false;
+        else if (*p=='\r' || *p=='\n')
+            *p=0;
         else
         {
-            port=strpbrk(pend,"0123456789");
-            *pend=0;
-            if (port)
+            if ((port=strpbrk(p,"0123456789")))
             {
-                pend=port+strspn(port,"0123456789");
-                *pend=0;
+                *p=0;
+                p=port+strspn(port,"0123456789");
+
+                if ((iport=strpbrk(p," \t\r\n")) && (*p==' ' || *p=='\t') && *p!='\r' && *p!='\n')
+                {
+                    *p=0;
+
+                    if ((iport=strpbrk(iport+1,"0123456789")))
+                        p=iport+strspn(iport,"0123456789");
+                }
+                else
+                    iport=NULL;
             }
+            *p=0;
         }
 
-        CslServerInfo *info=new CslServerInfo(game,A2U(host),port ? atoi(port):0);
+        CslServerInfo *info=new CslServerInfo(game,A2U(host),port ? atoi(port):0,iport ? atoi(iport):0);
         if (game->AddServer(info,master->GetId()))
             ResolveHost(info);
         else
@@ -500,10 +509,8 @@ wxInt32 CslEngine::UpdateFromMaster(CslMaster *master)
 
         num++;
 
-        if (end)
-            break;
-
-        host=pend+1;
+        if (parse)
+            host=p+1;
     }
 
     ResetPingSends(NULL,master);

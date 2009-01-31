@@ -136,7 +136,7 @@ void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
     const char **flag=NULL;
     char *host=strdup(U2A(info->Addr.IPAddress().c_str()));
 
-    s=wxString::Format(wxT("%s:%d"),info->Host.c_str(),info->Port);
+    s=wxString::Format(wxT("%s:%d"),info->Host.c_str(),info->GamePort);
     if (IsIP(info->Host))
     {
         if (!info->Domain.IsEmpty())
@@ -216,17 +216,17 @@ void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
         s=_("unknown");
     SetItem(ic++,1,s);
 
-    if (info->PlayLast)
+    if (info->PlayedLast)
     {
-        dt.Set((time_t)info->PlayLast);
+        dt.Set((time_t)info->PlayedLast);
         s=dt.Format();
     }
     else
         s=_("unknown");
     SetItem(ic++,1,s);
 
-    if (info->PlayTimeLastGame)
-        s=FormatSeconds(info->PlayTimeLastGame);
+    if (info->PlayTimeLast)
+        s=FormatSeconds(info->PlayTimeLast);
     else
         s=wxT("0");
     SetItem(ic++,1,s);

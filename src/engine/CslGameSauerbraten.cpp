@@ -27,7 +27,7 @@
 #include "../img/sb_16.xpm"
 
 
-enum { MM_OPEN, MM_VETO, MM_LOCKED, MM_PRIVATE };
+enum { MM_OPEN, MM_VETO, MM_LOCKED, MM_PRIVATE, MM_PASSWORD };
 
 
 CslGameSauerbraten::CslGameSauerbraten()
@@ -35,7 +35,6 @@ CslGameSauerbraten::CslGameSauerbraten()
     m_name=CSL_DEFAULT_NAME_SB;
     m_defaultMasterConnection=CslMasterConnection(CSL_DEFAULT_MASTER_SB,CSL_DEFAULT_MASTER_PATH_SB);
     m_capabilities=CSL_CAPABILITY_EXTINFO | CSL_CAPABILITY_CUSTOM_CONFIG;
-    m_portDelimiter=wxT(":");
 #ifdef __WXMAC__
     m_configType=CSL_CONFIG_DIR;
     m_clientSettings.ConfigPath=::wxGetHomeDir();
@@ -188,29 +187,38 @@ bool CslGameSauerbraten::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) con
         info.PlayersMax=attr[3];
 
     info.MM=CSL_SERVER_OPEN;
+    info.MMDescription.Empty();
+
     if (numattr>=5)
     {
-        info.MMDescription=wxString::Format(wxT("%d"),attr[4]);
-        if (attr[4]==MM_OPEN)
-            info.MMDescription+=wxT(" (O)");
-        else if (attr[4]==MM_VETO)
+        if (attr[4]==MM_PASSWORD)
         {
-            info.MMDescription+=wxT(" (V)");
-            info.MM=CSL_SERVER_VETO;
+            info.MMDescription+=wxT("PASS");
+            info.MM|=CSL_SERVER_PASSWORD;
         }
-        else if (attr[4]==MM_LOCKED)
+        else
         {
-            info.MMDescription+=wxT(" (L)");
-            info.MM=CSL_SERVER_LOCKED;
-        }
-        else if (attr[4]==MM_PRIVATE)
-        {
-            info.MMDescription+=wxT(" (P)");
-            info.MM=CSL_SERVER_PRIVATE;
+            info.MMDescription=wxString::Format(wxT("%d"),attr[4]);
+
+            if (attr[4]==MM_OPEN)
+                info.MMDescription+=wxT(" (O)");
+            else if (attr[4]==MM_VETO)
+            {
+                info.MMDescription+=wxT(" (V)");
+                info.MM=CSL_SERVER_VETO;
+            }
+            else if (attr[4]==MM_LOCKED)
+            {
+                info.MMDescription+=wxT(" (L)");
+                info.MM=CSL_SERVER_LOCKED;
+            }
+            else if (attr[4]==MM_PRIVATE)
+            {
+                info.MMDescription+=wxT(" (P)");
+                info.MM=CSL_SERVER_PRIVATE;
+            }
         }
     }
-    else
-        info.MMDescription=wxEmptyString;
 
     getstring(text,buf);
     info.Map=A2U(text);
@@ -325,15 +333,21 @@ wxString CslGameSauerbraten::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
         param=true;
 
     address=info->Host;
-    if (GetDefaultPort()!=info->Port)
-        address+=m_portDelimiter+wxString::Format(wxT("%d"),info->Port);
+    if (GetDefaultGamePort()!=info->GamePort)
+        address+=wxString::Format(wxT(":%d"),info->GamePort);
 
     if (param)
     {
 #ifdef __WXMSW__
-        opts+=wxT(" -x\"connect ")+address+wxT("\"");
+        opts+=wxT(" -x\"connect ")+address;
+        if (mode==CslServerInfo::CSL_CONNECT_PASS)
+            opts+=wxT(" ")+info->Password;
+        opts+=wxT("\"");
 #else
+        address.Replace(wxT(" "),wxT("\\ "));
         opts+=wxT(" -xconnect\\ ")+address;
+        if (mode==CslServerInfo::CSL_CONNECT_PASS)
+            opts+=wxT("\\ ")+info->Password;
 #endif
     }
     else
@@ -343,16 +357,12 @@ wxString CslGameSauerbraten::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
 #else
         opts+=wxT(" -xcsl_connect\\ =\\ 1 -l")+wxString(CSL_DEFAULT_INJECT_FIL_SB);
 #endif
-    }
-
-    bin+=wxT(" ")+opts;
-
-    if (!param)
-    {
         if (InjectConfig(address,error)!=CSL_ERROR_NONE)
             return wxEmptyString;
         m_injected=true;
     }
+
+    bin+=wxT(" ")+opts;
 
     return bin;
 }

@@ -48,7 +48,8 @@ class CslGameCube : public CslGame
         wxInt32 InjectConfig(const wxString& address,const wxString& password,wxString *error);
 
         //implementations for base class
-        wxUint16 GetDefaultPort() const { return CSL_DEFAULT_PORT_CB; }
+        wxUint16 GetDefaultGamePort() const { return CSL_DEFAULT_PORT_CB; }
+        wxUint16 GetInfoPort(wxUint16 port=0) const { return port ? port+1:CSL_DEFAULT_PORT_CB+1; }
         bool ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const;
         void SetClientSettings(const CslGameClientSettings& settings);
         wxString GameStart(CslServerInfo *info,wxUint32 mode,wxString *error);

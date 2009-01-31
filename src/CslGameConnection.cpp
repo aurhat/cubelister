@@ -154,7 +154,7 @@ bool CslGameConnection::Connect()
     m_playing=true;
 
     m_info->ConnectedTimes++;
-    m_info->PlayLast=wxDateTime::Now().GetTicks();
+    m_info->PlayedLast=wxDateTime::Now().GetTicks();
 
     return true;
 }
