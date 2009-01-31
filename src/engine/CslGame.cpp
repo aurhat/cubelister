@@ -291,7 +291,7 @@ CslServerInfo::CslServerInfo(CslGame *game,
     m_game=game;
     Host=host;
     GamePort=gamePort ? gamePort:game ? game->GetDefaultGamePort():0;
-    InfoPort=infoPort ? infoPort:gamePort ? gamePort+1:0;
+    InfoPort=infoPort ? infoPort:GamePort ? GamePort+1:0;
     if (IsIP(host))
     {
         Addr.Hostname(host);
