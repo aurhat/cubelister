@@ -357,6 +357,9 @@ wxString CslGameSauerbraten::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
 #else
         opts+=wxT(" -xcsl_connect\\ =\\ 1 -l")+wxString(CSL_DEFAULT_INJECT_FIL_SB);
 #endif
+        if (mode==CslServerInfo::CSL_CONNECT_PASS)
+            address+=wxT(" ")+info->Password;
+
         if (InjectConfig(address,error)!=CSL_ERROR_NONE)
             return wxEmptyString;
         m_injected=true;
@@ -372,7 +375,7 @@ wxInt32 CslGameSauerbraten::GameEnd(wxString *error)
     return m_injected ? InjectConfig(wxEmptyString,error):CSL_ERROR_NONE;
 }
 
-wxInt32 CslGameSauerbraten::InjectConfig(const wxString& address,wxString *error)
+wxInt32 CslGameSauerbraten::InjectConfig(const wxString& param,wxString *error)
 {
     wxString dst=m_clientSettings.ConfigPath+wxString(CSL_DEFAULT_INJECT_DIR_SB);
 
@@ -408,9 +411,8 @@ wxInt32 CslGameSauerbraten::InjectConfig(const wxString& address,wxString *error
             return CSL_ERROR_FILE_OPERATION;
     }
 
-    if (!address.IsEmpty())
-        script=wxString::Format(wxT("if (= $csl_connect 1) [ sleep 1000 [ connect %s ] ]\r\n%s\r\n"),
-                                address.c_str(),wxT("csl_connect = 0"));
+    script=wxString::Format(wxT("if (= $csl_connect 1) [ sleep 1000 [ connect %s ] ]\r\n%s\r\n"),
+                            param.c_str(),wxT("csl_connect = 0"));
 
     return WriteTextFile(cfg,script,wxFile::write);
 }

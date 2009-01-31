@@ -49,7 +49,7 @@ class CslGameSauerbraten : public CslGame
         const wxChar* GetVersionName(wxInt32 prot) const;
         const wxChar* GetModeName(wxInt32 mode,wxInt32 prot) const;
 
-        wxInt32 InjectConfig(const wxString& address,wxString *error);
+        wxInt32 InjectConfig(const wxString& param,wxString *error);
 
         //implementations for base class
         const wxChar* GetWeaponName(wxInt32 n) const;
