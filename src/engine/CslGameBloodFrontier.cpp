@@ -130,7 +130,7 @@ const wxChar* CslBloodFrontier::GetVersionName(wxInt32 prot) const
 {
     static const wxChar* versions[] =
     {
-        wxT("Alpha 2")
+        wxT("0.80")
     };
 
     wxInt32 v=CSL_LAST_PROTOCOL_BF-prot;

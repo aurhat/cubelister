@@ -288,8 +288,8 @@ void CslListCtrlPlayerSearch::CreateImageList()
     loopv(games)
     {
         const char **icon=games[i]->GetIcon(16);
-        wxBitmap bmpGame=icon ? (AdjustIconSize(icon,wxNullIcon,wxSize(20,16),wxPoint(1,0))):wxBitmap(20,16);
-        m_imageList.Add(bmpGame);
+        wxBitmap bmpGame=icon ? (AdjustIconSize(icon,wxNullIcon,wxSize(20,16),wxPoint(4,0))):wxBitmap(20,16);
+        m_imgList.Add(bmpGame);
     }
 
     m_imgList.Add(AdjustIconSize(unknown_xpm,wxNullIcon,wxSize(20,16),wxPoint(0,3)));

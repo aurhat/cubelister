@@ -2,10 +2,10 @@
 !include "MUI.nsh"
 
 ;The name of the installer
-  Name "Cube Server Lister 0.8.1"
+  Name "Cube Server Lister 0.8.2"
 
 ;The file to write
-  OutFile "CSL-Installer-v0.8.1.exe"
+  OutFile "CSL-Installer-v0.8.2.exe"
 
 ;The default installation directory
   InstallDir "$PROGRAMFILES\CSL"
@@ -67,6 +67,12 @@
     WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\CSL" "NoModify" 1
     WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\CSL" "NoRepair" 1
     WriteUninstaller "csluninstall.exe"
+
+    ; Register the URI
+    WriteRegStr HKCR "CSL" "" "URL:csl Protocol Handler"
+    WriteRegStr HKCR "CSL" "URL Protocol" ""
+    WriteRegStr HKCR "CSL\DefaultIcon" "" '"$INSTDIR\csl.exe"'
+    WriteRegStr HKCR "CSL\shell\open\command" "" '"$INSTDIR\csl.exe" "%1"'
   SectionEnd
 
 
@@ -95,19 +101,19 @@
 
   SectionGroup /e $(TITLE_Section5) SecShortcut
 
-  Section $(TITLE_Section5a)
-    ; Set output path to the installation directory again - necessary for shortcuts.
-    SetOutPath $INSTDIR
-    CreateDirectory "$SMPROGRAMS\Cube Server Lister"
-    CreateShortCut "$SMPROGRAMS\Cube Server Lister\Cube Server Lister.lnk" "$INSTDIR\csl.exe" "" "$INSTDIR\csl.exe" 0
-    CreateShortCut "$SMPROGRAMS\Cube Server Lister\Uninstall.lnk" "$INSTDIR\csluninstall.exe" "" "$INSTDIR\csluninstall.exe" 0
-  SectionEnd
+   Section $(TITLE_Section5a)
+     ; Set output path to the installation directory again - necessary for shortcuts.
+     SetOutPath $INSTDIR
+     CreateDirectory "$SMPROGRAMS\Cube Server Lister"
+     CreateShortCut "$SMPROGRAMS\Cube Server Lister\Cube Server Lister.lnk" "$INSTDIR\csl.exe" "" "$INSTDIR\csl.exe" 0
+     CreateShortCut "$SMPROGRAMS\Cube Server Lister\Uninstall.lnk" "$INSTDIR\csluninstall.exe" "" "$INSTDIR\csluninstall.exe" 0
+   SectionEnd
 
-  Section  $(TITLE_Section5b)
-    ; Set output path to the installation directory again - necessary for shortcuts.
-    SetOutPath $INSTDIR
-    CreateShortCut "$DESKTOP\Cube Server Lister.lnk" "$INSTDIR\csl.exe" "" "$INSTDIR\csl.exe" 0
-  SectionEnd
+   Section  $(TITLE_Section5b)
+     ; Set output path to the installation directory again - necessary for shortcuts.
+     SetOutPath $INSTDIR
+     CreateShortCut "$DESKTOP\Cube Server Lister.lnk" "$INSTDIR\csl.exe" "" "$INSTDIR\csl.exe" 0
+   SectionEnd
 
   SectionGroupEnd
 
@@ -162,5 +168,7 @@ Section "Uninstall"
   Delete "$DESKTOP\Cube Server Lister.lnk"
   ; Remove directories used
   RMDir "$SMPROGRAMS\Cube Server Lister"
+  ; Remove URI handler
+  DeleteRegKey HKCR "CSL"
 
 SectionEnd
