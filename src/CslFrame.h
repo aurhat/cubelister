@@ -33,12 +33,8 @@
 #include "wx/wx.h"
 #endif
 #include <wx/aui/aui.h>
-#include <wx/snglinst.h>
 #include <wx/taskbar.h>
-#include <wx/image.h>
-#include <wx/imaglist.h>
 #include <wx/treectrl.h>
-#include "engine/CslEngine.h"
 #include "CslVersionCheck.h"
 #include "CslMenu.h"
 #include "CslDlgExtended.h"
@@ -180,39 +176,6 @@ class CslFrame: public wxFrame
         void OnVersionCheck(wxCommandEvent& event);
         void OnEndProcess(wxCommandEvent& event);
         void OnIPC(CslIpcEvent& event);
-
-        DECLARE_EVENT_TABLE()
-};
-
-
-class CslApp: public wxApp
-{
-    public:
-        enum
-        {
-            CSL_SHUTDOWN_NONE = 0,
-            CSL_SHUTDOWN_NORMAL,
-            CSL_SHUTDOWN_FORCE
-        };
-
-        CslEngine* GetCslEngine() { return m_engine; }
-        void Shutdown(wxInt32 val) { m_shutdown=val; }
-        wxInt32 Shutdown() { return m_shutdown; }
-
-    private:
-        CslEngine *m_engine;
-
-        wxSingleInstanceChecker *m_single;
-        wxLocale m_locale;
-        wxInt32 m_shutdown;
-
-        virtual bool OnInit();
-        virtual int OnRun();
-        virtual int OnExit();
-
-        void IpcCall(const wxString& value,wxEvtHandler *evtHandler=NULL);
-
-        void OnEndSession(wxCloseEvent& event);
 
         DECLARE_EVENT_TABLE()
 };

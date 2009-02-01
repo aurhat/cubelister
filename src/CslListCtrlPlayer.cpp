@@ -154,8 +154,7 @@ void CslListCtrlPlayer::OnItemActivated(wxListEvent& event)
     if (!m_info)
         return;
 
-    CslGameConnection::Prepare(m_info);
-
+    event.SetClientData((void*)m_info);
     event.Skip();
 }
 
@@ -214,14 +213,9 @@ void CslListCtrlPlayer::OnMenu(wxCommandEvent& event)
 
         case MENU_SERVER_CONNECT:
         case MENU_SERVER_CONNECT_PW:
-        {
-            wxInt32 pass=id==MENU_SERVER_CONNECT ?
-                         CslGameConnection::NO_PASS :
-                         CslGameConnection::ASK_PASS;
-            CslGameConnection::Prepare(m_info,pass);
+            event.SetClientData((void*)m_info);
             event.Skip();
             break;
-        }
 
         case MENU_SERVER_EXT_FULL:
         case MENU_SERVER_EXT_MICRO:

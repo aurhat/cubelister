@@ -118,7 +118,7 @@ class CslListCtrlServer : public CslListCtrl
                           const wxString& name=wxListCtrlNameStr);
         ~CslListCtrlServer();
 
-        void ListInit(CslEngine *engine,CslListCtrlServer *sibling);
+        void ListInit(CslListCtrlServer *sibling);
         wxUint32 ListUpdate(vector<CslServerInfo*>& servers);
         void ListClear();
         void ListSort(wxInt32 column=-1);
@@ -138,7 +138,6 @@ class CslListCtrlServer : public CslListCtrl
     private:
         wxInt32 m_id;
         CslGame *m_game;
-        CslEngine *m_engine;
 
         bool m_masterSelected;
 
@@ -155,7 +154,7 @@ class CslListCtrlServer : public CslListCtrl
         wxInt32 *m_filterFlags;
         wxInt32 m_filterVersion;
 
-        wxImageList m_imageList;
+        wxImageList m_imgList;
 
         CslListSortHelper m_sortHelper;
 
@@ -187,7 +186,7 @@ class CslListCtrlServer : public CslListCtrl
         wxSize GetImageListSize()
         {
             wxInt32 x,y;
-            if (m_imageList.GetSize(0,x,y))
+            if (m_imgList.GetSize(0,x,y))
                 return wxSize(x,y);
             return wxDefaultSize;
         }

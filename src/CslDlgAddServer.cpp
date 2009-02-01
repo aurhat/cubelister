@@ -19,6 +19,8 @@
  ***************************************************************************/
 
 #include "CslDlgAddServer.h"
+#include "CslApp.h"
+
 
 enum
 {
@@ -41,7 +43,7 @@ END_EVENT_TABLE()
 CslDlgAddServer::CslDlgAddServer(wxWindow* parent,int id,const wxString& title,
                                  const wxPoint& pos,const wxSize& size,long style):
         wxDialog(parent, id, title, pos, size, style),
-        m_engine(NULL),m_info(NULL)
+        m_info(NULL)
 {
     // begin wxGlade: CslDlgAddServer::CslDlgAddServer
     sizer_address_staticbox = new wxStaticBox(this, -1, wxEmptyString);
@@ -114,13 +116,12 @@ void CslDlgAddServer::do_layout()
     CentreOnParent();
 }
 
-void CslDlgAddServer::InitDlg(CslEngine *engine,CslServerInfo *info)
+void CslDlgAddServer::InitDlg(CslServerInfo *info)
 {
-    m_engine=engine;
     m_info=info;
 
     choice_gametype->Clear();
-    vector<CslGame*>& games=engine->GetGames();
+    vector<CslGame*>& games=::wxGetApp().GetCslEngine()->GetGames();
     loopv(games) choice_gametype->Append(games[i]->GetName(),(void*)games[i]->GetId());
     choice_gametype->SetSelection(0);
     UpdatePort(SPIN_CTRL_GAMEPORT);
@@ -129,7 +130,7 @@ void CslDlgAddServer::InitDlg(CslEngine *engine,CslServerInfo *info)
 void CslDlgAddServer::UpdatePort(wxInt32 type)
 {
     wxInt32 gameID=(wxInt32)(long)choice_gametype->GetClientData(choice_gametype->GetSelection());
-    vector<CslGame*>& games=m_engine->GetGames();
+    vector<CslGame*>& games=::wxGetApp().GetCslEngine()->GetGames();
 
     loopv(games)
     {
@@ -145,9 +146,6 @@ void CslDlgAddServer::UpdatePort(wxInt32 type)
 
 void CslDlgAddServer::OnCommandEvent(wxCommandEvent& event)
 {
-    if (!m_engine)
-        return;
-
     switch (event.GetId())
     {
         case CHOICE_CTRL_GAMETYPE:
@@ -179,7 +177,7 @@ void CslDlgAddServer::OnCommandEvent(wxCommandEvent& event)
 
             wxInt32 gameID=(wxInt32)(long)choice_gametype->GetClientData(choice_gametype->GetSelection());
 
-            vector<CslGame*>& games=m_engine->GetGames();
+            vector<CslGame*>& games=::wxGetApp().GetCslEngine()->GetGames();
             loopv(games)
             {
                 if (games[i]->GetId()==gameID)
@@ -187,7 +185,7 @@ void CslDlgAddServer::OnCommandEvent(wxCommandEvent& event)
                     m_info->Create(games[i],host,gameport,infoport);
                     if (games[i]->AddServer(m_info))
                     {
-                        m_engine->ResolveHost(m_info);
+                        ::wxGetApp().GetCslEngine()->ResolveHost(m_info);
                         EndModal(wxID_OK);
                         return;
                     }

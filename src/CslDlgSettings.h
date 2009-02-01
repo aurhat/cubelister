@@ -75,7 +75,7 @@ class CslDlgSettings : public wxDialog
     public:
         // begin wxGlade: CslDlgSettings::ids
         // end wxGlade
-        CslDlgSettings(CslEngine *engine,wxWindow* parent,int id=wxID_ANY,
+        CslDlgSettings(wxWindow* parent,int id=wxID_ANY,
                        const wxString& title=wxEmptyString,const wxPoint& pos=wxDefaultPosition,
                        const wxSize& size=wxDefaultSize,long style=wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
 
@@ -85,7 +85,6 @@ class CslDlgSettings : public wxDialog
         void do_layout();
         // end wxGlade
 
-        CslEngine *m_engine;
         CslSettings m_settings;
 
         void OnSpinCtrl(wxSpinEvent& event);

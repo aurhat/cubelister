@@ -20,6 +20,7 @@
 
 #include <wx/wupdlock.h>
 #include <wx/clipbrd.h>
+#include "CslApp.h"
 #include "engine/CslTools.h"
 #include "CslDlgAddServer.h"
 #include "CslDlgOutput.h"
@@ -89,7 +90,7 @@ CslListCtrlServer::CslListCtrlServer(wxWindow* parent,wxWindowID id,const wxPoin
                                      const wxSize& size,long style,
                                      const wxValidator& validator, const wxString& name) :
         CslListCtrl(parent,id,pos,size,style,validator,name),
-        m_id(id),m_engine(NULL),m_masterSelected(false),
+        m_id(id),m_masterSelected(false),
         m_sibling(NULL),m_dontUpdateInfo(false),m_dontRemoveOnDeselect(false),
 #ifdef __WXMSW__
         m_dontAdjustSize(false),
@@ -168,8 +169,7 @@ void CslListCtrlServer::OnItemActivated(wxListEvent& event)
 
     item.SetId(event.GetIndex());
     CslListServerData *server=(CslListServerData*)GetItemData(item);
-    CslGameConnection::Prepare(server->Info);
-
+    event.SetClientData((void*)server->Info);
     event.Skip();
 }
 
@@ -253,18 +253,18 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
     }
 
     if (m_id==CSL_LIST_MASTER && selected)
-        CslMenu::AddItem(&menu,MENU_SERVER_ADD,MENU_SERVER_MAS_ADD_STR,wxART_ADD_BOOKMARK);
+        CslMenu::AddItem(&menu,MENU_ADD,MENU_SERVER_FAV_ADD_STR,wxART_ADD_BOOKMARK);
 
     else if (m_id==CSL_LIST_FAVOURITE)
     {
-        CslMenu::AddItem(&menu,MENU_SERVER_ADD,MENU_SERVER_FAV_ADD_STR,wxART_ADD_BOOKMARK);
+        CslMenu::AddItem(&menu,MENU_ADD,MENU_SERVER_ADD_STR,wxART_ADD_BOOKMARK);
         if (selected)
-            CslMenu::AddItem(&menu,MENU_SERVER_REM,MENU_SERVER_FAV_REM_STR,wxART_DEL_BOOKMARK);
+            CslMenu::AddItem(&menu,MENU_REM,MENU_SERVER_FAV_REM_STR,wxART_DEL_BOOKMARK);
     }
 
     if (selected>0)
     {
-        CslMenu::AddItem(&menu,MENU_SERVER_DEL,selected>1 ?
+        CslMenu::AddItem(&menu,MENU_DEL,selected>1 ?
                          MENU_SERVER_DELM_STR:MENU_SERVER_DEL_STR,wxART_DELETE);
         menu.AppendSeparator();
 
@@ -273,7 +273,7 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
         CslMenu::AddItem(sub,MENU_SERVER_COPY_CON,MENU_SERVER_COPY_CON_STR,wxART_CSL);
         CslMenu::AddItem(sub,MENU_SERVER_COPY_FAV,MENU_SERVER_COPY_FAV_STR,wxART_CSL);
         CslMenu::AddItem(sub,MENU_SERVER_COPY_CONFAV,MENU_SERVER_COPY_CONFAV_STR,wxART_CSL);
-        CslMenu::AddItem(&menu,MENU_SERVER_COPY_SERVER,MENU_SERVER_COPY_SERVER_STR,wxART_COPY);
+        CslMenu::AddItem(&menu,MENU_COPY,MENU_SERVER_COPY_SERVER_STR,wxART_COPY);
         menu.AppendSeparator();
 
         filter=(wxMenu*)1;
@@ -424,7 +424,7 @@ void CslListCtrlServer::ListDeleteServers()
         else if (m_id==CSL_LIST_FAVOURITE)
             m_sibling->RemoveServer(NULL,info,-1);
 
-        wxCommandEvent event(wxEVT_COMMAND_MENU_SELECTED,MENU_SERVER_DEL);
+        wxCommandEvent event(wxEVT_COMMAND_MENU_SELECTED,MENU_DEL);
         event.SetClientData((void*)info);
         wxPostEvent(m_parent,event);
     }
@@ -445,14 +445,9 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
     {
         case MENU_SERVER_CONNECT:
         case MENU_SERVER_CONNECT_PW:
-        {
-            wxInt32 pass=id==MENU_SERVER_CONNECT ?
-                         CslGameConnection::NO_PASS :
-                         CslGameConnection::ASK_PASS;
-            CslGameConnection::Prepare(m_selected.Item(0)->Info,pass);
+            event.SetClientData((void*)m_selected.Item(0)->Info);
             event.Skip();
             break;
-        }
 
         case MENU_SERVER_EXT_MICRO:
         case MENU_SERVER_EXT_MINI:
@@ -465,7 +460,7 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
             break;
         }
 
-        case MENU_SERVER_ADD:
+        case MENU_ADD:
         {
             switch (m_id)
             {
@@ -495,7 +490,7 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
                 {
                     CslDlgAddServer dlg(wxTheApp->GetTopWindow());
                     info=new CslServerInfo;
-                    dlg.InitDlg(m_engine,info);
+                    dlg.InitDlg(info);
                     if (dlg.ShowModal()!=wxID_OK)
                     {
                         delete info;
@@ -509,13 +504,13 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
             break;
         }
 
-        case MENU_SERVER_REM:
+        case MENU_REM:
         {
             ListRemoveServers();
             break;
         }
 
-        case MENU_SERVER_DEL:
+        case MENU_DEL:
         {
             ListDeleteServers();
             break;
@@ -564,10 +559,7 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
 
             }
 
-            if (s.IsEmpty())
-                break;
-
-            if (wxTheClipboard->Open())
+            if (!s.IsEmpty() && wxTheClipboard->Open())
             {
                 wxTheClipboard->SetData(new wxTextDataObject(s));
                 wxTheClipboard->Close();
@@ -575,7 +567,7 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
             break;
         }
 
-        case MENU_SERVER_COPY_SERVER:
+        case MENU_COPY:
         {
             wxString s1;
             wxUint16 port;
@@ -683,10 +675,9 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
     }
 }
 
-void CslListCtrlServer::ListInit(CslEngine *engine,CslListCtrlServer *sibling)
+void CslListCtrlServer::ListInit(CslListCtrlServer *sibling)
 //CslDlgExtended *extendedDlg);
 {
-    m_engine=engine;
     m_sibling=sibling;
     m_filterFlags=m_id==CSL_LIST_MASTER ? &g_cslSettings->filterMaster:&g_cslSettings->filterFavourites;
     m_filterVersion=-1;
@@ -764,35 +755,35 @@ void CslListCtrlServer::ListCreateGameBitmaps()
 
 #ifdef __WXMSW__
     width=18;
-    m_imageList.Create(18,16,true);
+    m_imgList.Create(18,16,true);
 
     wxIcon icon;
-    m_imageList.Add(AdjustIconSize(green_list_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
-    m_imageList.Add(AdjustIconSize(yellow_list_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
-    m_imageList.Add(AdjustIconSize(red_list_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
-    m_imageList.Add(AdjustIconSize(grey_list_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
-    m_imageList.Add(AdjustIconSize(green_ext_list_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
-    m_imageList.Add(AdjustIconSize(yellow_ext_list_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
-    m_imageList.Add(AdjustIconSize(red_ext_list_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
-    m_imageList.Add(AdjustIconSize(sortasc_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
-    m_imageList.Add(AdjustIconSize(sortdsc_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
-    m_imageList.Add(AdjustIconSize(sortasclight_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
-    m_imageList.Add(AdjustIconSize(sortdsclight_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
+    m_imgList.Add(AdjustIconSize(green_list_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
+    m_imgList.Add(AdjustIconSize(yellow_list_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
+    m_imgList.Add(AdjustIconSize(red_list_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
+    m_imgList.Add(AdjustIconSize(grey_list_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
+    m_imgList.Add(AdjustIconSize(green_ext_list_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
+    m_imgList.Add(AdjustIconSize(yellow_ext_list_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
+    m_imgList.Add(AdjustIconSize(red_ext_list_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
+    m_imgList.Add(AdjustIconSize(sortasc_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
+    m_imgList.Add(AdjustIconSize(sortdsc_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
+    m_imgList.Add(AdjustIconSize(sortasclight_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
+    m_imgList.Add(AdjustIconSize(sortdsclight_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
 #else
     width=16;
-    m_imageList.Create(16,16,true);
+    m_imgList.Create(16,16,true);
 
-    m_imageList.Add(wxBitmap(green_list_16_xpm));
-    m_imageList.Add(wxBitmap(yellow_list_16_xpm));
-    m_imageList.Add(wxBitmap(red_list_16_xpm));
-    m_imageList.Add(wxBitmap(grey_list_16_xpm));
-    m_imageList.Add(wxBitmap(green_ext_list_16_xpm));
-    m_imageList.Add(wxBitmap(yellow_ext_list_16_xpm));
-    m_imageList.Add(wxBitmap(red_ext_list_16_xpm));
-    m_imageList.Add(wxBitmap(sortasc_16_xpm));
-    m_imageList.Add(wxBitmap(sortdsc_16_xpm));
-    m_imageList.Add(wxBitmap(sortasclight_16_xpm));
-    m_imageList.Add(wxBitmap(sortdsclight_16_xpm));
+    m_imgList.Add(wxBitmap(green_list_16_xpm));
+    m_imgList.Add(wxBitmap(yellow_list_16_xpm));
+    m_imgList.Add(wxBitmap(red_list_16_xpm));
+    m_imgList.Add(wxBitmap(grey_list_16_xpm));
+    m_imgList.Add(wxBitmap(green_ext_list_16_xpm));
+    m_imgList.Add(wxBitmap(yellow_ext_list_16_xpm));
+    m_imgList.Add(wxBitmap(red_ext_list_16_xpm));
+    m_imgList.Add(wxBitmap(sortasc_16_xpm));
+    m_imgList.Add(wxBitmap(sortdsc_16_xpm));
+    m_imgList.Add(wxBitmap(sortasclight_16_xpm));
+    m_imgList.Add(wxBitmap(sortdsclight_16_xpm));
 #endif
 
     //now create the icons for favourites list
@@ -806,7 +797,7 @@ void CslListCtrlServer::ListCreateGameBitmaps()
 
         wxMemoryDC dc;
 
-        vector<CslGame*>& games=m_engine->GetGames();
+        vector<CslGame*>& games=::wxGetApp().GetCslEngine()->GetGames();
         loopv(games)
         {
             const char **icon=games[i]->GetIcon(16);
@@ -815,7 +806,7 @@ void CslListCtrlServer::ListCreateGameBitmaps()
 #else
             wxBitmap bmpGame=icon ? wxBitmap(icon):wxBitmap(16,width);
 #endif
-            m_imageList.Add(bmpGame);
+            m_imgList.Add(bmpGame);
 
             wxBitmap bmp(width,16);
             dc.SelectObject(bmp);
@@ -830,11 +821,11 @@ void CslListCtrlServer::ListCreateGameBitmaps()
             dc.SelectObject(wxNullBitmap);
             bmp.SetMask(new wxMask(bmp,magicColour));
 
-            m_imageList.Add(bmp);
+            m_imgList.Add(bmp);
         }
     }
 
-    SetImageList(&m_imageList,wxIMAGE_LIST_SMALL);
+    SetImageList(&m_imgList,wxIMAGE_LIST_SMALL);
 }
 
 void CslListCtrlServer::Highlight(wxInt32 type,bool high,bool sort,CslServerInfo *info,wxListItem *item)
@@ -892,7 +883,6 @@ void CslListCtrlServer::Highlight(wxInt32 type,bool high,bool sort,CslServerInfo
     if (sort)
     {
         ListSort();
-
 #ifndef __WXMSW__
         //removes flicker after sorting
         wxIdleEvent idle;
@@ -1299,6 +1289,17 @@ wxUint32 CslListCtrlServer::ListSearch(const wxString& search)
         CslServerInfo *info=m_servers.Item(i)->Info;
         if (ListUpdateServer(info))
             c++;
+    }
+
+    if (c)
+    {
+        ListSort();
+
+#ifndef __WXMSW__
+        //removes flicker after sorting
+        wxIdleEvent idle;
+        wxTheApp->SendIdleEvents(this,idle);
+#endif
     }
 
     return c;

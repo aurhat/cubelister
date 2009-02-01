@@ -27,9 +27,9 @@ CslMenu::CslMenu(wxMenuBar *menuBar)
 {
     m_menuBar=menuBar;
 
-    EnableMenuItem(MENU_MASTER_ADD,false);
-    EnableMenuItem(MENU_MASTER_DEL,false);
-    EnableMenuItem(MENU_MASTER_UPDATE,false);
+    EnableMenuItem(MENU_ADD,false);
+    EnableMenuItem(MENU_DEL,false);
+    EnableMenuItem(MENU_UPDATE,false);
 
     CheckMenuItem(MENU_VIEW_SEARCH,g_cslSettings->showSearch);
     CheckMenuItem(MENU_VIEW_AUTO_SORT,g_cslSettings->autoSortColumns);

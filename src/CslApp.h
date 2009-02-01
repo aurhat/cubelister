@@ -18,11 +18,11 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef CSLDLGADDSERVER_H
-#define CSLDLGADDSERVER_H
+#ifndef CSLAPP_H
+#define CSLAPP_H
 
 /**
- @author Glen Masgai <mimosius@gmx.de>
+    @author Glen Masgai <mimosius@gmx.de>
 */
 
 #include "wx/wxprec.h"
@@ -32,52 +32,42 @@
 #ifndef WX_PRECOMP
 #include "wx/wx.h"
 #endif
-#include <wx/image.h>
-#include "engine/CslGame.h"
-// begin wxGlade: ::dependencies
-#include <wx/spinctrl.h>
-// end wxGlade
+#include <wx/snglinst.h>
+#include "engine/CslEngine.h"
 
 
-class CslDlgAddServer: public wxDialog
+class CslApp: public wxApp
 {
     public:
-        // begin wxGlade: CslDlgAddServer::ids
-        // end wxGlade
+        enum
+        {
+            CSL_SHUTDOWN_NONE = 0,
+            CSL_SHUTDOWN_NORMAL,
+            CSL_SHUTDOWN_FORCE
+        };
 
-        CslDlgAddServer(wxWindow* parent,const wxInt32 id=wxID_ANY,const wxString& title=wxEmptyString,
-                        const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize,
-                        long style=wxDEFAULT_DIALOG_STYLE);
-
-        void InitDlg(CslServerInfo *info);
+        CslEngine* GetCslEngine() { return m_engine; }
+        void Shutdown(wxInt32 val) { m_shutdown=val; }
+        wxInt32 Shutdown() { return m_shutdown; }
 
     private:
-        // begin wxGlade: CslDlgAddServer::methods
-        void set_properties();
-        void do_layout();
-        // end wxGlade
+        CslEngine *m_engine;
 
-        void UpdatePort(wxInt32 type);
+        wxSingleInstanceChecker *m_single;
+        wxLocale m_locale;
+        wxInt32 m_shutdown;
 
-        void OnCommandEvent(wxCommandEvent& event);
-        void OnSpinCtrl(wxSpinEvent& event);
+        virtual bool OnInit();
+        virtual int OnRun();
+        virtual int OnExit();
+
+        void IpcCall(const wxString& value,wxEvtHandler *evtHandler=NULL);
+
+        void OnEndSession(wxCloseEvent& event);
 
         DECLARE_EVENT_TABLE()
+};
 
-    protected:
-        // begin wxGlade: CslDlgAddServer::attributes
-        wxStaticBox* sizer_address_staticbox;
-        wxChoice* choice_gametype;
-        wxTextCtrl* text_ctrl_address;
-        wxSpinCtrl* spin_ctrl_gameport;
-        wxSpinCtrl* spin_ctrl_infoport;
-        wxButton* button_add;
-        wxButton* button_cancel;
-        // end wxGlade
+DECLARE_APP(CslApp);
 
-        CslServerInfo *m_info;
-
-}; // wxGlade: end class
-
-
-#endif // CSLDLGADDSERVER_H
+#endif

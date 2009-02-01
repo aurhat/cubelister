@@ -118,10 +118,10 @@ extern wxUint32 GetTicks();
 extern wxString GetHttpAgent();
 extern wxInt32 WriteTextFile(const wxString& filename,const wxString& data,const wxFile::OpenMode mode);
 
-#ifdef __WXMSW__
+
 wxBitmap AdjustIconSize(const char **data,const wxIcon& icon,
                         const wxSize& size,const wxPoint& origin);
-#endif
+
 
 enum { CSL_SORT_ASC = 0, CSL_SORT_DSC };
 enum { CSL_LIST_SORT_INT = 0, CSL_LIST_SORT_UINT, CSL_LIST_SORT_STRING };

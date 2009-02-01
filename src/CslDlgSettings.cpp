@@ -21,7 +21,8 @@
 #include <wx/colordlg.h>
 #include <wx/imaglist.h>
 #include "CslDlgSettings.h"
-#include "engine/CslEngine.h"
+#include "CslApp.h"
+#include "engine/CslGame.h"
 #include "engine/CslTools.h"
 
 
@@ -238,10 +239,10 @@ void CslGamePage::OnCommandEvent(wxCommandEvent& event)
 }
 
 
-CslDlgSettings::CslDlgSettings(CslEngine *engine,wxWindow* parent,int id,const wxString& title,
+CslDlgSettings::CslDlgSettings(wxWindow* parent,int id,const wxString& title,
                                const wxPoint& pos,const wxSize& size,long style):
         wxDialog(parent,id,title,pos,size,style),
-        m_engine(engine), m_settings(*g_cslSettings)
+        m_settings(*g_cslSettings)
 {
     // begin wxGlade: CslDlgSettings::CslDlgSettings
     notebook_settings = new wxNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0);
@@ -379,7 +380,7 @@ void CslDlgSettings::do_layout()
     wxImageList *imgList=new wxImageList(24,24,true);
     notebook_games->AssignImageList(imgList);
 
-    vector<CslGame*>& games=m_engine->GetGames();
+    vector<CslGame*>& games=::wxGetApp().GetCslEngine()->GetGames();
     loopv(games)
     {
         CslGame *game=games[i];

@@ -28,8 +28,21 @@
 #include "CslListCtrl.h"
 #include "engine/CslGame.h"
 
+class CslPlayerSearchEntry
+{
+    public:
+        CslPlayerSearchEntry(CslServerInfo *info,const wxString& name) :
+                Info(info),PlayerName(name)
+        {
+            GameID=info ? info->GetGame().GetId():0;
+        }
 
-WX_DEFINE_ARRAY_PTR(CslServerInfo*,t_aCslListServer);
+        wxInt32 GameID;
+        CslServerInfo *Info;
+        wxString PlayerName;
+};
+
+WX_DEFINE_ARRAY_PTR(CslPlayerSearchEntry*,t_aCslPlayerSearchEntry);
 
 class CslListCtrlPlayerSearch : public CslListCtrl
 {
@@ -42,15 +55,19 @@ class CslListCtrlPlayerSearch : public CslListCtrl
 
         void ListClear();
         void AddResult(CslServerInfo *info,CslPlayerStatsData *player);
+        void RemoveServer(CslServerInfo *info);
 
     private:
-        t_aCslListServer m_servers;
+        t_aCslPlayerSearchEntry m_entries;
+        CslPlayerSearchEntry *m_selected;
+        wxImageList m_imgList;
 
         void ListInit();
         void ListAdjustSize(const wxSize& size=wxDefaultSize);
 
         void OnSize(wxSizeEvent& event);
-        void OnItemActivated(wxListEvent& event);
+        void OnItem(wxListEvent& event);
+        void OnItemDeselected(wxListEvent& event);
         void OnContextMenu(wxContextMenuEvent& event);
         void OnMenu(wxCommandEvent& event);
 
@@ -58,6 +75,9 @@ class CslListCtrlPlayerSearch : public CslListCtrl
 
     protected:
         void GetToolTipText(wxInt32 row,wxString& title,wxArrayString& text);
+
+        wxUint32 GetCountryFlag(wxUint32 ip);
+        void CreateImageList();
 };
 
 #endif //CSLLISTCTRLPLAYERSEARCH_H

@@ -19,6 +19,9 @@
  ***************************************************************************/
 
 #include "CslDlgAddMaster.h"
+#include "CslApp.h"
+#include "engine/CslGame.h"
+
 
 BEGIN_EVENT_TABLE(CslDlgAddMaster,wxDialog)
     EVT_TEXT(wxID_ANY,CslDlgAddMaster::OnCommandEvent)
@@ -40,7 +43,7 @@ CslDlgAddMaster::CslDlgAddMaster(wxWindow* parent,const wxInt32 id,
                                  const wxString& title,const wxPoint& pos,
                                  const wxSize& size,long style):
         wxDialog(parent, id, title, pos, size, style),
-        m_engine(NULL),m_gameID(NULL)
+        m_gameID(NULL)
 {
     // begin wxGlade: CslDlgAddMaster::CslDlgAddMaster
     sizer_address_staticbox = new wxStaticBox(this, -1, wxEmptyString);
@@ -124,17 +127,16 @@ void CslDlgAddMaster::do_layout()
     CentreOnParent();
 }
 
-void CslDlgAddMaster::InitDlg(CslEngine *engine,wxInt32 *gameID)
+void CslDlgAddMaster::InitDlg(wxInt32 *gameID)
 {
     wxInt32 id=-1;
 
-    m_engine=engine;
     m_gameID=gameID;
 
     choice_gametype->Clear();
     choice_mastertype->Clear();
 
-    vector<CslGame*>& games=engine->GetGames();
+    vector<CslGame*>& games=::wxGetApp().GetCslEngine()->GetGames();
     loopv(games)
     {
         choice_gametype->Append(games[i]->GetName(),(void*)games[i]->GetId());
@@ -158,9 +160,6 @@ bool CslDlgAddMaster::IsValid()
 
 void CslDlgAddMaster::OnCommandEvent(wxCommandEvent& event)
 {
-    if (!m_engine)
-        return;
-
     switch (event.GetId())
     {
         case CHOICE_CTRL_MASTERTYPE:
@@ -193,7 +192,7 @@ void CslDlgAddMaster::OnCommandEvent(wxCommandEvent& event)
             wxInt32 gameID=(wxInt32)(long)choice_gametype->GetClientData(choice_gametype->GetSelection());
             wxInt32 type=(wxInt32)(long)choice_mastertype->GetClientData(choice_mastertype->GetSelection());
             CslGame *game=NULL;
-            vector<CslGame*>& games=m_engine->GetGames();
+            vector<CslGame*>& games=::wxGetApp().GetCslEngine()->GetGames();
 
             loopv(games)
             {

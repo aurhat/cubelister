@@ -51,8 +51,8 @@
 #define MENU_SERVER_COPY_CONFAV_STR      _("Connect && add to favourites")
 #define MENU_SERVER_COPY_FAV_STR         _("Add to favourites")
 #define MENU_SERVER_COPY_SERVER_STR      _("C&opy to clipboard")
-#define MENU_SERVER_MAS_ADD_STR          _("&Add to favourites")
-#define MENU_SERVER_FAV_ADD_STR          _("&Add server ...")
+#define MENU_SERVER_ADD_STR              _("&Add server ...")
+#define MENU_SERVER_FAV_ADD_STR          _("&Add to favourites")
 #define MENU_SERVER_FAV_REM_STR          _("&Remove from favourites")
 #define MENU_SERVER_DEL_STR              _("&Delete server")
 #define MENU_SERVER_DELM_STR             _("&Delete servers")
@@ -62,22 +62,19 @@
 #define MENU_SERVER_FILTER_FULL_STR      _("Full")
 #define MENU_SERVER_FILTER_EMPTY_STR     _("Empty")
 #define MENU_SERVER_FILTER_NONEMPTY_STR  _("Not empty")
-#define MENU_SERVER_FILTER_MM2_STR       _("Mastermode 2")
-#define MENU_SERVER_FILTER_MM3_STR       _("Mastermode 3")
+#define MENU_SERVER_FILTER_MM2_STR       _("Locked")
+#define MENU_SERVER_FILTER_MM3_STR       _("Restricted")
 #define MENU_SERVER_FILTER_VER_STR       _("Version")
 
 enum
 {
-    MENU_MASTER_ADD = wxID_ADD,
-    MENU_MASTER_DEL = wxID_REMOVE,
-    MENU_MASTER_UPDATE = wxID_REFRESH,
-
-    MENU_SERVER_ADD = wxID_ADD,
-    MENU_SERVER_REM = wxID_REMOVE,
-    MENU_SERVER_DEL = wxID_DELETE,
-    MENU_SERVER_COPY_SERVER = wxID_COPY,
+    MENU_ADD = wxID_ADD,
+    MENU_REM = wxID_REMOVE,
+    MENU_DEL = wxID_DELETE,
+    MENU_COPY = wxID_COPY,
+    MENU_UPDATE = wxID_REFRESH,
     //custom events/art
-    MENU_SERVER_CUSTOM = wxID_HIGHEST+1,
+    MENU_CUSTOM = wxID_HIGHEST+1,
 
     MENU_GAME_SERVER_COUNTRY,
     MENU_GAME_PLAYER_COUNTRY,

@@ -30,7 +30,7 @@
 // begin wxGlade: ::dependencies
 #include <wx/spinctrl.h>
 // end wxGlade
-#include "engine/CslEngine.h"
+
 
 class CslDlgAddMaster: public wxDialog
 {
@@ -41,7 +41,7 @@ class CslDlgAddMaster: public wxDialog
                         const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize,
                         long style=wxDEFAULT_DIALOG_STYLE);
 
-        void InitDlg(CslEngine *engine,wxInt32 *gameID);
+        void InitDlg(wxInt32 *gameID);
 
     private:
         // begin wxGlade: CslDlgAddMaster::methods
@@ -65,7 +65,6 @@ class CslDlgAddMaster: public wxDialog
         wxButton* button_cancel;
         // end wxGlade
 
-        CslEngine *m_engine;
         wxInt32 *m_gameID;
 
         bool IsValid();

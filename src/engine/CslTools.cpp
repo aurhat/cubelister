@@ -291,7 +291,6 @@ wxUint32 GetTicks()
     return ticks;
 }
 
-#ifdef __WXMSW__
 wxBitmap AdjustIconSize(const char **data,const wxIcon& icon,
                         const wxSize& size,const wxPoint& origin)
 {
@@ -304,7 +303,6 @@ wxBitmap AdjustIconSize(const char **data,const wxIcon& icon,
     image.Resize(size,origin);
     return wxBitmap(image);
 }
-#endif
 
 wxString GetHttpAgent()
 {
