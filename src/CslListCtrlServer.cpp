@@ -269,7 +269,8 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
         menu.AppendSeparator();
 
         sub=new wxMenu();
-        menu.AppendSubMenu(sub,MENU_SERVER_COPY_STR);
+        item=menu.AppendSubMenu(sub,MENU_SERVER_COPY_STR);
+        item->SetBitmap(GET_ART_MENU(wxART_CSL));
         CslMenu::AddItem(sub,MENU_SERVER_COPY_CON,MENU_SERVER_COPY_CON_STR,wxART_CSL);
         CslMenu::AddItem(sub,MENU_SERVER_COPY_FAV,MENU_SERVER_COPY_FAV_STR,wxART_CSL);
         CslMenu::AddItem(sub,MENU_SERVER_COPY_CONFAV,MENU_SERVER_COPY_CONFAV_STR,wxART_CSL);

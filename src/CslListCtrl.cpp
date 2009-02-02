@@ -28,21 +28,23 @@
 
 
 BEGIN_EVENT_TABLE(CslToolTip,wxFrame)
-    #ifdef __WXMSW__
+#ifdef __WXMSW__
     EVT_ERASE_BACKGROUND(CslToolTip::OnEraseBackground)
-    #else
+#else
     EVT_PAINT(CslToolTip::OnPaint)
-    #endif
+#endif
     EVT_LEFT_DOWN(CslToolTip::OnMouse)
     EVT_RIGHT_DOWN(CslToolTip::OnMouse)
+#ifndef __WXMAC__
     EVT_LEAVE_WINDOW(CslToolTip::OnMouse)
+#endif
 END_EVENT_TABLE()
 
 
 BEGIN_EVENT_TABLE(CslListCtrl,wxListCtrl)
-    #ifdef __WXMSW__
+#ifdef __WXMSW__
     EVT_ERASE_BACKGROUND(CslListCtrl::OnEraseBackground)
-    #endif
+#endif
     EVT_MOTION(CslListCtrl::OnMouseMove)
     EVT_LEAVE_WINDOW(CslListCtrl::OnMouseLeave)
     EVT_LIST_ITEM_SELECTED(wxID_ANY,CslListCtrl::OnItem)
@@ -54,13 +56,17 @@ END_EVENT_TABLE()
 
 CslToolTip::CslToolTip(wxWindow *parent) :
         wxFrame(parent,wxID_ANY,wxEmptyString,wxDefaultPosition,wxDefaultSize,
-                wxNO_BORDER|wxSTAY_ON_TOP|wxFRAME_SHAPED|wxFRAME_TOOL_WINDOW)
+                wxNO_BORDER|wxSTAY_ON_TOP|wxFRAME_TOOL_WINDOW)
 {
     m_sizer=new wxBoxSizer(wxVERTICAL);
     m_title=new wxStaticText(this,wxID_ANY,wxEmptyString);
     m_sizer->Add(m_title,0,wxALIGN_CENTER_HORIZONTAL|wxTOP,6);
     wxBoxSizer *box=new wxBoxSizer(wxHORIZONTAL);
-    m_sizer->Add(box,1,wxEXPAND|wxLEFT|wxRIGHT,4);
+#ifdef __WXMAC__
+    m_sizer->Add(box,1,wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL,4);
+#else
+    m_sizer->Add(box,1,wxEXPAND|wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL,4);
+#endif
     m_left=new wxStaticText(this,wxID_ANY,wxEmptyString);
     m_right=new wxStaticText(this,wxID_ANY,wxEmptyString);
     box->Add(m_left,0,wxEXPAND|wxBOTTOM|wxLEFT|wxRIGHT,6);
@@ -93,20 +99,27 @@ void CslToolTip::OnPaint(wxPaintEvent& event)
     wxInt32 w=0,h=0;
     GetClientSize(&w,&h);
 
+#ifdef __WXMAC__
+    dc.SetPen(*wxTRANSPARENT_PEN);
+#else
     wxPen pen(wxSystemSettings::GetColour(wxSYS_COLOUR_INFOTEXT));
     dc.SetPen(pen);
+#endif
 
     wxBrush brush(wxSystemSettings::GetColour(wxSYS_COLOUR_INFOBK));
     dc.SetBrush(brush);
 
     dc.Clear();
+#ifdef __WXMAC__
+    dc.DrawRectangle(0,0,w,h);
+#else
     dc.DrawRoundedRectangle(0,0,w,h,4.0);
+#endif
 }
 
 void CslToolTip::OnMouse(wxMouseEvent& event)
 {
     Hide();
-
     event.Skip();
 }
 
@@ -126,18 +139,44 @@ void CslToolTip::ShowTip(const wxString& title,const wxArrayString& text,const w
     for (i=0;i<text.GetCount();i++)
     {
         if (i%2==0)
-            left<<wxT("\r\n")<<text.Item(i)<<wxT(":");
+            left<<wxT("\n")<<text.Item(i);
         else
-            right<<wxT("\r\n")<<text.Item(i);
+            right<<wxT("\n")<<text.Item(i);
     }
-
+    
     m_left->SetLabel(left);
     m_right->SetLabel(right);
     m_title->SetLabel(title);
+    
+#ifdef __WXMAC__
+    {
+        wxClientDC dc(m_left);
+        const wxSize& size=dc.GetMultiLineTextExtent(left);
+        m_left->SetClientSize(size);
+    }
+    {
+        wxClientDC dc(m_right);
+        const wxSize& size=dc.GetMultiLineTextExtent(right);
+        m_right->SetClientSize(size);
+    }
+#endif
 
     m_sizer->SetSizeHints(this);
 
+#ifdef __WXMAC__
+    wxPoint pos=position;
+    const wxRect& client=GetRect();
+    const wxRect& screen=::wxGetClientDisplayRect();
+
+    if (pos.x+client.width>screen.GetTopRight().x)
+        pos.x-=client.width;
+    if (pos.y+client.height>screen.GetBottomRight().y)
+        pos.y-=client.height;
+
+    Move(pos);
+#else
     Move(position);
+#endif
     Show();
 }
 
@@ -263,7 +302,7 @@ void CslListCtrl::OnTimer(wxTimerEvent& WXUNUSED(event))
     wxRect rect;
     wxListItem item;
     wxInt32 i,offset=0;
-#ifndef __WXMSW__
+#ifdef __WXGTK__
     bool first=true;
 #endif
     wxPoint spos=wxGetMousePosition();
@@ -277,7 +316,7 @@ void CslListCtrl::OnTimer(wxTimerEvent& WXUNUSED(event))
         item.SetId(i);
         GetItemRect(item,rect,wxLIST_RECT_BOUNDS);
 
-#ifndef __WXMSW__
+#ifdef __WXGTK__
         if (first)
         {
             offset=rect.y;

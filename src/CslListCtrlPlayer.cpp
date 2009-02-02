@@ -75,12 +75,11 @@ CslPanelPlayer::CslPanelPlayer(wxWindow* parent,long listStyle)
 
 void CslPanelPlayer::OnSize(wxSizeEvent& event)
 {
-    const wxSize& size=event.GetSize();
+    wxSize size=event.GetSize();
 
     m_label->SetLabel(GetLabelText());
     m_label->Wrap(size.x-4);
 #ifdef __WXMAC__
-    wxSize size=event.GetSize();
     size.y-=m_label->GetBestSize().y+4;
     m_listCtrl->SetSize(size);
 #endif //__WXMAC__

@@ -174,8 +174,8 @@ CslIrcPanel::CslIrcPanel(CslIrcNotebook* parent,CslIrcSession *session,
     //disable undo, otherwise it's eating all the ram
     text_ctrl_chat->BeginSuppressUndo();
 #else
+#ifndef __WXGTK__
     //set some colour here otherwise further calls to SetDefaultStyle() don't work
-#ifdef __WXMSW__
     text_ctrl_chat->SetDefaultStyle(GetForegroundColour());
 #endif
 #endif
@@ -279,7 +279,6 @@ void CslIrcPanel::OnSize(wxSizeEvent& event)
     {
         if (!m_channel.Topic.IsEmpty())
         {
-            LOG_DEBUG("size: %d - label: %s\n",size.x,U2A(m_channel.Topic));
             static_topic->SetLabel(m_channel.Topic);
             static_topic->Wrap(size.x-4);
             grid_sizer_chat->Layout();
@@ -1313,7 +1312,7 @@ void CslIrcPanel::HandleInput(const wxString& text)
             s=text;
             TextToFormat(s);
             m_session->SendTextMessage(m_channel.Name,s);
-            s=wxT("<")+m_session->GetNick()+wxT("> \0033")+s+wxT("\003");
+            s=wxT("<")+m_session->GetNick()+wxT(">\0033 ")+s+wxT("\003");
         }
     }
 

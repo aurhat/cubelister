@@ -20,7 +20,6 @@
 
 #include <wx/mstream.h>
 #include <wx/fileconf.h>
-#include <wx/sysopt.h>
 #include <wx/wupdlock.h>
 #include <wx/uri.h>
 #include <wx/tokenzr.h>
@@ -41,7 +40,9 @@
 #ifndef __WXMSW__
 #include "csl_icon_png.h"
 #endif
+#ifndef __WXMAC__
 #include "img/csl_24.xpm"
+#endif
 #include "img/master_24.xpm"
 #include "img/close_14.xpm"
 #include "img/close_high_14.xpm"
@@ -124,7 +125,9 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
         wxFrame(parent, id, title, pos, size, wxDEFAULT_FRAME_STYLE)
 {
     m_oldSelectedInfo=NULL;
+#ifndef __WXMAC__
     m_tbIcon=NULL;
+#endif
 
     m_engine=::wxGetApp().GetCslEngine();
     if (m_engine->Init(this,CSL_UPDATE_INTERVAL_MIN,1000/CSL_TIMER_SHOT))
@@ -281,8 +284,10 @@ CslFrame::~CslFrame()
 
     delete m_menu;
 
+#ifndef __WXMAC__
     if (m_tbIcon)
         delete m_tbIcon;
+#endif
 
     if (m_versionCheckThread)
     {
@@ -2041,10 +2046,12 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             CslDlgSettings *dlg=new CslDlgSettings(this);
             if (dlg->ShowModal()!=wxID_OK)
                 break;
-            ToggleTrayIcon();
             m_timerUpdate=g_cslSettings->updateInterval/CSL_TIMER_SHOT;
             m_engine->SetUpdateInterval(g_cslSettings->updateInterval);
             SaveSettings();
+#ifndef __WXMAC__
+            ToggleTrayIcon();
+#endif
             break;
         }
 
@@ -2520,11 +2527,11 @@ void CslFrame::OnClose(wxCloseEvent& event)
         return;
     }
 
-#ifndef __WXMAC__
     LOG_DEBUG("\n");
 
     if (::wxGetApp().Shutdown()!=CslApp::CSL_SHUTDOWN_FORCE)
     {
+#ifndef __WXMAC__
         if (g_cslSettings->systray&CSL_USE_SYSTRAY &&
             g_cslSettings->systray&CSL_SYSTRAY_CLOSE &&
             ::wxGetApp().Shutdown()!=CslApp::CSL_SHUTDOWN_NORMAL)
