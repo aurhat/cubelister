@@ -47,6 +47,7 @@ class CslListCtrlPlayer : public CslListCtrl
         void ListInit(const wxInt32 view);
         void ListAdjustSize(const wxSize& size=wxDefaultSize);
         void UpdateData();
+        void EnableEntries(bool enable);
 
         void ServerInfo(CslServerInfo *info);
         CslServerInfo* ServerInfo() { return m_info; }
@@ -94,6 +95,7 @@ class CslPanelPlayer : public wxPanel
         CslServerInfo* ServerInfo() { return m_listCtrl->ServerInfo(); }
         void ServerInfo(CslServerInfo *info) { m_listCtrl->ServerInfo(info); }
         void UpdateData();
+        void CheckServerStatus();
 
     private:
         void OnSize(wxSizeEvent& event);

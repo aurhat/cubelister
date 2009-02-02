@@ -145,20 +145,6 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
     network=new CslIrcNetwork(wxT("GameSurge"),user,user+wxT("^1"));
     network->AddServer(new CslIrcServer(network,wxT("irc.eu.gamesurge.net"),6667));
     network->AddAutoChannel(new CslIrcChannel(wxT("#cubelister")));
-    //network->AddAutoChannel(new CslIrcChannel(wxT("#tc-intern"),wxT("gr4ndch4mp$")));
-    /*network->AddAutoChannel(new CslIrcChannel(wxT("#tc-server")));
-    network->AddAutoChannel(new CslIrcChannel(wxT("#psl-server")));
-    network->AddAutoChannel(new CslIrcChannel(wxT("#cubelister2")));
-    network->AddAutoChannel(new CslIrcChannel(wxT("#cubelister3")));
-    network->AddAutoChannel(new CslIrcChannel(wxT("#cubelister4")));
-    network->AddAutoChannel(new CslIrcChannel(wxT("#cubelister5")));
-    network->AddAutoChannel(new CslIrcChannel(wxT("#cubelister6")));
-    network->AddAutoChannel(new CslIrcChannel(wxT("#cubelister7")));
-    network->AddAutoChannel(new CslIrcChannel(wxT("#cubelister8")));
-    network->AddAutoChannel(new CslIrcChannel(wxT("#cubelister9")));
-    network->AddAutoChannel(new CslIrcChannel(wxT("#cubelister10")));
-    network->AddAutoChannel(new CslIrcChannel(wxT("#cubelister11")));
-    network->AddAutoChannel(new CslIrcChannel(wxT("#cubelister12")));*/
     g_CslIrcNetworks.Add(network);
     network=new CslIrcNetwork(wxT("Quakenet"),user,user+wxT("^1"));
     network->AddServer(new CslIrcServer(network,wxT("xs4all.nl.quakenet.org"),6667));
@@ -1838,6 +1824,11 @@ void CslFrame::OnTimer(wxTimerEvent& event)
                     s+=s.Format(wxT(" (%d Players)"),list_ctrl_master->GetPlayerCount());
                     tree_ctrl_games->SetItemText(item,s);
                 }
+            }
+
+            loopv(m_playerInfos)
+            {
+                m_playerInfos[i]->CheckServerStatus();
             }
         }
 

@@ -131,6 +131,27 @@ void CslPanelPlayer::UpdateData()
     m_sizer->Layout();
 }
 
+void CslPanelPlayer::CheckServerStatus()
+{
+    CslServerInfo *info;
+
+    if (!(info=m_listCtrl->ServerInfo()))
+        return;
+
+    bool enable=CslEngine::PingOk(*info,g_cslSettings->updateInterval);
+
+    if (!enable && IsEnabled())
+    {
+        m_listCtrl->EnableEntries(false);
+        Disable();
+    }
+    else if (enable && !IsEnabled())
+    {
+        Enable();
+        m_listCtrl->EnableEntries(true);
+    }
+}
+
 
 wxSize CslListCtrlPlayer::BestSizeMicro(140,350);
 wxSize CslListCtrlPlayer::BestSizeMini(280,350);
@@ -391,6 +412,31 @@ void CslListCtrlPlayer::UpdateData()
     wxIdleEvent idle;
     wxTheApp->SendIdleEvents(this,idle);
 #endif
+}
+
+void CslListCtrlPlayer::EnableEntries(bool enable)
+{
+    //fixes flickering if scrollbar is shown
+    wxWindowUpdateLocker lock(this);
+
+    if (!m_info)
+    {
+        DeleteAllItems();
+        return;
+    }
+
+    wxInt32 i;
+    wxListItem item;
+
+    for (i=0;i<GetItemCount();i++)
+    {
+        item.SetId(i);
+
+        if (enable)
+            SetItemTextColour(item,wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
+        else
+            SetItemTextColour(item,wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
+    }
 }
 
 void CslListCtrlPlayer::ListAdjustSize(const wxSize& size)

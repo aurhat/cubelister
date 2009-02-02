@@ -1126,7 +1126,7 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
             SetItem(i,1,info->DescriptionOld);
     }
 
-    wxColour colour(GetTextColour());
+    wxColour colour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
 
     if (!CslEngine::PingOk(*info,g_cslSettings->updateInterval))
         colour=g_cslSettings->colServerOff;
