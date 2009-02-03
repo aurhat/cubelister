@@ -327,7 +327,7 @@ void CslFrame::CreateMainMenu()
                      wxART_NONE,wxITEM_CHECK);
     CslMenu::AddItem(menu,MENU_VIEW_PLAYER_SEARCH,_("Show player search result"),
                      wxART_NONE,wxITEM_CHECK);
-    CslMenu::AddItem(menu,MENU_VIEW_COUNTRY,_("Show countrey list"),
+    CslMenu::AddItem(menu,MENU_VIEW_COUNTRY,_("Show country list"),
                      wxART_NONE,wxITEM_CHECK);
     CslMenu::AddItem(menu,MENU_VIEW_FAVOURITES,_("Show favourites"),
                      wxART_NONE,wxITEM_CHECK);
@@ -510,10 +510,10 @@ void CslFrame::DoLayout()
                      MinSize(240,20).BestSize(CslListCtrlPlayer::BestSizeMini).FloatingSize(280,200));
     m_AuiMgr.AddPane(list_ctrl_player_search,wxAuiPaneInfo().Name(wxT("search")).
                      Left().Layer(2).Position(0).
-                     MinSize(240,20).BestSize(CslListCtrlPlayer::BestSizeMini).FloatingSize(280,200));
+                     MinSize(240,80).BestSize(240,150).FloatingSize(240,150));
     m_AuiMgr.AddPane(pane_country,wxAuiPaneInfo().Name(wxT("country")).
                      Left().Layer(2).Position(1).
-                     MinSize(240,20).BestSize(CslListCtrlPlayer::BestSizeMini).FloatingSize(280,200));
+                     MinSize(240,80).BestSize(240,150).FloatingSize(240,150));
     m_AuiMgr.AddPane(notebook_irc,wxAuiPaneInfo().Name(wxT("irc")).
                      Left().Layer(0).Position(0).Row(3).Direction(3).
                      MinSize(240,20).BestSize(360,200).FloatingSize(360,200));
