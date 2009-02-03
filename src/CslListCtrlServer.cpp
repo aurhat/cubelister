@@ -146,7 +146,7 @@ void CslListCtrlServer::OnKeyDown(wxKeyEvent &event)
             SetItemState(i,wxLIST_STATE_SELECTED,wxLIST_STATE_SELECTED);
         m_dontUpdateInfo=false;
     }
-    else if (code==WXK_DELETE || code == WXK_NUMPAD_DELETE)
+    else if (code==WXK_DELETE || code==WXK_NUMPAD_DELETE)
     {
         //TODO multiple events?
         if (event.ShiftDown())

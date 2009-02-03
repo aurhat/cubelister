@@ -26,8 +26,8 @@ csl_SOURCES = CslApp.cpp CslArt.cpp CslDlgAbout.cpp CslDlgAddMaster.cpp \
 	CslDlgOutput.cpp CslDlgSettings.cpp CslDlgTraffic.cpp CslFrame.cpp CslGameConnection.cpp \
 	CslGameProcess.cpp CslGeoIP.cpp CslIPC.cpp CslIRC.cpp CslListCtrl.cpp \
 	CslListCtrlCountry.cpp CslListCtrlInfo.cpp CslListCtrlPlayer.cpp CslListCtrlPlayerSearch.cpp \
-	CslListCtrlServer.cpp CslMenu.cpp CslStatusBar.cpp CslVersionCheck.cpp
+	CslListCtrlServer.cpp CslMenu.cpp CslStatusBar.cpp CslToolTip.cpp CslVersionCheck.cpp
 noinst_LIBRARIES = libcslpanelmap.a
 libcslpanelmap_a_SOURCES = CslPanelMap.cpp
 noinst_HEADERS = CslApp.h CslGameConnection.h CslIRC.h CslListCtrl.h \
-	CslListCtrlPlayerSearch.h
+	CslListCtrlPlayerSearch.h CslToolTip.h

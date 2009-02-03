@@ -140,14 +140,14 @@ void CslPanelPlayer::CheckServerStatus()
 
     bool enable=CslEngine::PingOk(*info,g_cslSettings->updateInterval);
 
-    if (!enable && IsEnabled())
+    if (!enable && m_label->IsEnabled())
     {
         m_listCtrl->EnableEntries(false);
-        Disable();
+        m_label->Disable();
     }
-    else if (enable && !IsEnabled())
+    else if (enable && !m_label->IsEnabled())
     {
-        Enable();
+        m_label->Enable();
         m_listCtrl->EnableEntries(true);
     }
 }

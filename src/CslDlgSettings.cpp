@@ -357,6 +357,7 @@ void CslDlgSettings::set_properties()
     SetButtonColour(button_colour_mm2,button_ok,m_settings.colServerMM2);
     SetButtonColour(button_colour_mm3,button_ok,m_settings.colServerMM3);
 
+#ifndef __WXMAC__
     if (g_cslSettings->systray&CSL_USE_SYSTRAY)
     {
         checkbox_systray->SetValue(true);
@@ -368,6 +369,7 @@ void CslDlgSettings::set_properties()
         checkbox_systray_close->Enable(false);
     }
     checkbox_systray_close->SetValue((g_cslSettings->systray&CSL_SYSTRAY_CLOSE)!=0);
+#endif
 
     checkbox_game_output->SetValue(m_settings.autoSaveOutput);
     dirpicker_game_output->SetPath(m_settings.gameOutputPath);
@@ -415,7 +417,7 @@ void CslDlgSettings::do_layout()
     wxStaticBoxSizer* sizer_threshold = new wxStaticBoxSizer(sizer_threshold_staticbox, wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_threshold = new wxFlexGridSizer(1, 5, 0, 0);
     wxStaticBoxSizer* sizer_times = new wxStaticBoxSizer(sizer_times_staticbox, wxHORIZONTAL);
-    wxFlexGridSizer* grid_sizer_times = new wxFlexGridSizer(6, 3, 0, 0);
+    wxFlexGridSizer* grid_sizer_times = new wxFlexGridSizer(5, 3, 0, 0);
     wxFlexGridSizer* grid_sizer_server_cleanup = new wxFlexGridSizer(1, 2, 0, 0);
     wxFlexGridSizer* grid_sizer_pane_colours = new wxFlexGridSizer(1, 1, 0, 0);
     wxStaticBoxSizer* sizer_colours = new wxStaticBoxSizer(sizer_colours_staticbox, wxHORIZONTAL);
@@ -468,9 +470,6 @@ void CslDlgSettings::do_layout()
     grid_sizer_server_cleanup->Add(checkbox_server_cleanup_favourites, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_server_cleanup->Add(checkbox_server_cleanup_stats, 0, wxALL, 4);
     grid_sizer_times->Add(grid_sizer_server_cleanup, 1, wxALIGN_CENTER_VERTICAL, 0);
-    grid_sizer_times->Add(40, 16, 0, 0, 0);
-    grid_sizer_times->Add(40, 16, 0, 0, 0);
-    grid_sizer_times->Add(40, 16, 0, 0, 0);
     wxStaticText* label_tooltip_delay = new wxStaticText(notebook_pane_other, wxID_ANY, _("Tooltip delay (milliseconds)"));
     grid_sizer_times->Add(label_tooltip_delay, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_times->Add(spin_ctrl_tooltip_delay, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
@@ -574,6 +573,10 @@ void CslDlgSettings::do_layout()
 #ifdef __WXMSW__
     const wxSize& best=notebook_settings->GetBestSize();
     notebook_settings->SetMinSize(wxSize(best.x,best.y+16));
+#endif
+#ifdef __WXMAC__
+    grid_sizer_pane_other->Hide(sizer_systray);
+    Layout();
 #endif
 
     grid_sizer_main->SetSizeHints(this);

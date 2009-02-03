@@ -103,6 +103,8 @@ class CslFrame: public wxFrame
         CslDlgExtended *m_extendedDlg;
         CslDlgTraffic *m_trafficDlg;
 
+        CslToolTip *m_toolTip;
+
         CslVersionCheckThread *m_versionCheckThread;
 
         vector<CslPanelPlayer*> m_playerInfos;

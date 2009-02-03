@@ -18,11 +18,11 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef CSLLISTCTRL_H
-#define CSLLISTCTRL_H
+#ifndef CSLTOOLTIP_H
+#define CSLTOOLTIP_H
 
 /**
-    @author Glen Masgai <mimosius@gmx.de>
+	@author Glen Masgai <mimosius@gmx.de>
 */
 
 #include <wx/wxprec.h>
@@ -32,51 +32,67 @@
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
 #endif
-#include <wx/listctrl.h>
-#include <wx/imaglist.h>
-#include "CslToolTip.h"
 
+class CslToolTipEvent;
 
-enum
+BEGIN_DECLARE_EVENT_TYPES()
+DECLARE_EVENT_TYPE(wxCSL_EVT_TOOLTIP,wxID_ANY)
+END_DECLARE_EVENT_TYPES()
+
+typedef void (wxEvtHandler::*CslToolTipEventFunction)(CslToolTipEvent&);
+
+#define CSL_EVT_TOOLTIP(id,fn) \
+    DECLARE_EVENT_TABLE_ENTRY( \
+                               wxCSL_EVT_TOOLTIP,id,wxID_ANY, \
+                               (wxObjectEventFunction)(wxEventFunction) \
+                               wxStaticCastEvent(CslToolTipEventFunction,&fn), \
+                               (wxObject*)NULL \
+                             ),
+
+class CslToolTipEvent : public wxEvent
 {
-    CSL_LIST_IMG_SORT_ASC = 0,
-    CSL_LIST_IMG_SORT_DSC,
-    CSL_LIST_IMG_UNKNOWN
+    public:
+        CslToolTipEvent() :
+                wxEvent(wxID_ANY,wxCSL_EVT_TOOLTIP) {}
+
+        virtual wxEvent* Clone() const
+        {
+            return new CslToolTipEvent(*this);
+        }
+
+        wxPoint Pos;
+        wxString Title;
+        wxArrayString Text;
 };
 
 
-class CslListCtrl : public wxListCtrl
+class CslToolTip : public wxFrame
 {
     public:
-        CslListCtrl(wxWindow* parent,wxWindowID id,const wxPoint& pos=wxDefaultPosition,
-                    const wxSize& size=wxDefaultSize,long style=wxLC_ICON,
-                    const wxValidator& validator=wxDefaultValidator,
-                    const wxString& name=wxListCtrlNameStr);
-        ~CslListCtrl();
+        CslToolTip(wxWindow *parent);
+        ~CslToolTip();
 
-        wxUint32 GetCountryFlag(wxUint32 ip);
-        static void CreateCountryFlagImageList();
+        static void InitTip(wxEvtHandler *handler);
+        static void ResetTip();
 
     private:
-        wxUint32 m_mouseLastMove;
+        static CslToolTip *m_self;
+        wxEvtHandler *m_current;
+        wxTimer m_timer;
+        wxBoxSizer *m_sizer;
+        wxStaticText *m_title,*m_left,*m_right;
 
-        bool m_flickerFree;
+        void ShowTip(const wxString& title,const wxArrayString& text,const wxPoint& position);
 
 #ifdef __WXMSW__
         void OnEraseBackground(wxEraseEvent& event);
+#else
+        void OnPaint(wxPaintEvent& event);
 #endif
-        void OnMouseMove(wxMouseEvent& event);
-        void OnItem(wxListEvent& event);
-        void OnContextMenu(wxContextMenuEvent& event);
-        void OnToolTip(CslToolTipEvent& event);
-        DECLARE_EVENT_TABLE()
+        void OnTimer(wxTimerEvent& event);
+        void OnMouse(wxMouseEvent& event);
 
-    protected:
-        static wxImageList ListImageList;
-
-        void FlickerFree(bool val) { m_flickerFree=val; }
-        virtual void GetToolTipText(wxInt32 row,wxString& title,wxArrayString& text) {}
-        virtual wxSize GetImageListSize() { return wxDefaultSize; }
+        DECLARE_EVENT_TABLE();
 };
 
-#endif //CSLLISTCTRL_H
+#endif //CSLTOOLTIP_H

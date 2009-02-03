@@ -184,6 +184,8 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
     list_ctrl_info->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeypress),NULL,this);
     tree_ctrl_games->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeypress),NULL,this);
     text_ctrl_search->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeypress),NULL,this);
+    list_ctrl_player_search->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeypress),NULL,this);
+    list
 #endif
 
     tree_ctrl_games->SetImageList(&m_imgListTree);
@@ -265,6 +267,8 @@ CslFrame::~CslFrame()
         SaveServers();
         m_engine->DeInit();
     }
+
+    delete m_toolTip;
 
     delete g_cslSettings;
 
@@ -393,6 +397,8 @@ void CslFrame::CreateControls()
     CslStatusBar *statusBar=new CslStatusBar(this);
     SetStatusBar(statusBar);
     CslStatusBar::InitBar(statusBar);
+
+    m_toolTip=new CslToolTip(this);
 }
 
 void CslFrame::SetProperties()
@@ -2497,6 +2503,8 @@ void CslFrame::OnShow(wxShowEvent& event)
         list_ctrl_master->ListAdjustSize(list_ctrl_master->GetClientSize());
         list_ctrl_favourites->ListAdjustSize(list_ctrl_favourites->GetClientSize());
     }
+    else
+        CslToolTip::ResetTip();
 
     event.Skip();
 }
