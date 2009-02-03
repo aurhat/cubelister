@@ -1,6 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2007 -2009 by Glen Masgai                               *
- *   mimosius@gmx.de                                                       *
+ *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -22,7 +22,7 @@
 #define CSLAPP_H
 
 /**
-    @author Glen Masgai <mimosius@gmx.de>
+    @author Glen Masgai <mimosius@users.sourceforge.net>
 */
 
 #include "wx/wxprec.h"

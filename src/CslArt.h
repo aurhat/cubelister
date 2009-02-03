@@ -3,7 +3,7 @@
 #define CSLART_H
 
 /**
-    @author Glen Masgai <mimosius@gmx.de>
+    @author Glen Masgai <mimosius@users.sourceforge.net>
 */
 
 #include <wx/artprov.h>
