@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Glen Masgai                                     *
+ *   Copyright (C) 2007 -2009 by Glen Masgai                               *
  *   mimosius@gmx.de                                                       *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -975,7 +975,7 @@ bool CslListCtrlServer::ListFilterItemMatches(CslServerInfo *info)
     return false;
 }
 
-void CslListCtrlServer::GetToolTipText(wxInt32 row,wxString& title,wxArrayString& text)
+void CslListCtrlServer::GetToolTipText(wxInt32 row,CslToolTipEvent& event)
 {
     if (row<GetItemCount())
     {
@@ -996,12 +996,12 @@ void CslListCtrlServer::GetToolTipText(wxInt32 row,wxString& title,wxArrayString
 
             if (!s.IsEmpty())
             {
-                text.Add(column.GetText());
-                text.Add(s);
+                event.Text.Add(column.GetText());
+                event.Text.Add(s);
             }
         }
 
-        title=_("Server information");
+        event.Title=_("Server information");
     }
 }
 

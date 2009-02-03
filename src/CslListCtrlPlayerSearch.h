@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Glen Masgai                                     *
+ *   Copyright (C) 2007 -2009 by Glen Masgai                               *
  *   mimosius@gmx.de                                                       *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -74,7 +74,7 @@ class CslListCtrlPlayerSearch : public CslListCtrl
         DECLARE_EVENT_TABLE()
 
     protected:
-        void GetToolTipText(wxInt32 row,wxString& title,wxArrayString& text);
+        void GetToolTipText(wxInt32 row,CslToolTipEvent& event);
 
         wxUint32 GetCountryFlag(wxUint32 ip);
         void CreateImageList();

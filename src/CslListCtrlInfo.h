@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Glen Masgai                                     *
+ *   Copyright (C) 2007 -2009 by Glen Masgai                               *
  *   mimosius@gmx.de                                                       *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -49,7 +49,7 @@ class CslListCtrlInfo : public CslListCtrl
 
     protected:
         void AdjustSize(wxSize size);
-        void GetToolTipText(wxInt32 row,wxString& title,wxArrayString& text);
+        void GetToolTipText(wxInt32 row,CslToolTipEvent& event);
 };
 
 #endif // CSLLISTCTRLINFO_H

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Glen Masgai                                     *
+ *   Copyright (C) 2007 -2009 by Glen Masgai                               *
  *   mimosius@gmx.de                                                       *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -95,7 +95,7 @@ void CslListCtrlInfo::AdjustSize(wxSize size)
     SetColumnWidth(1,(wxInt32)(w*0.64));
 }
 
-void CslListCtrlInfo::GetToolTipText(wxInt32 WXUNUSED(row),wxString& title,wxArrayString& text)
+void CslListCtrlInfo::GetToolTipText(wxInt32 WXUNUSED(row),CslToolTipEvent& event)
 {
     wxInt32 i;
     wxString attr,val;
@@ -117,11 +117,11 @@ void CslListCtrlInfo::GetToolTipText(wxInt32 WXUNUSED(row),wxString& title,wxArr
         GetItem(item);
         attr=item.GetText();
 
-        text.Add(attr);
-        text.Add(val);
+        event.Text.Add(attr);
+        event.Text.Add(val);
     }
 
-    title=_("Server information");
+    event.Title=_("Server information");
 }
 
 void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)

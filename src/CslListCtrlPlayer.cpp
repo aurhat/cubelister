@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Glen Masgai                                     *
+ *   Copyright (C) 2007 -2009 by Glen Masgai                               *
  *   mimosius@gmx.de                                                       *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -250,7 +250,7 @@ void CslListCtrlPlayer::OnMenu(wxCommandEvent& event)
     }
 }
 
-void CslListCtrlPlayer::GetToolTipText(wxInt32 row,wxString& title,wxArrayString& text)
+void CslListCtrlPlayer::GetToolTipText(wxInt32 row,CslToolTipEvent& event)
 {
     if (row<GetItemCount())
     {
@@ -272,23 +272,23 @@ void CslListCtrlPlayer::GetToolTipText(wxInt32 row,wxString& title,wxArrayString
 
             if (!s.IsEmpty())
             {
-                text.Add(column.GetText());
-                text.Add(s);
+                event.Text.Add(column.GetText());
+                event.Text.Add(s);
             }
         }
 
         CslPlayerStatsData *data=(CslPlayerStatsData*)GetItemData(item);
 
         c=CslGeoIP::GetCountryNameByIPnum(data->IP);
-        text.Add(_("Country"));
-        text.Add(c ? (A2U(c)).c_str() : CslGeoIP::IsOk() ?
+        event.Text.Add(_("Country"));
+        event.Text.Add(c ? (A2U(c)).c_str() : CslGeoIP::IsOk() ?
                  _("Unknown") : _("GeoIP database not found"));
 
-        text.Add(wxT("ID / IP"));
-        text.Add(wxString::Format(wxT("%d / %d.%d.%d.x"),data->ID,
+        event.Text.Add(wxT("ID / IP"));
+        event.Text.Add(wxString::Format(wxT("%d / %d.%d.%d.x"),data->ID,
                                   data->IP>>24,data->IP>>16&0xff,data->IP>>8&0xff));
 
-        title=_("Player information");
+        event.Title=_("Player information");
     }
 }
 

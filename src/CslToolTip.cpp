@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Glen Masgai                                     *
+ *   Copyright (C) 2007 -2009 by Glen Masgai                               *
  *   mimosius@gmx.de                                                       *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -51,13 +51,9 @@ CslToolTip::CslToolTip(wxWindow *parent) :
 
     m_sizer=new wxBoxSizer(wxVERTICAL);
     m_title=new wxStaticText(this,wxID_ANY,wxEmptyString);
-    m_sizer->Add(m_title,0,wxALIGN_CENTER_HORIZONTAL|wxTOP,6);
+    m_sizer->Add(m_title,0,wxTOP|wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL,6);
     wxBoxSizer *box=new wxBoxSizer(wxHORIZONTAL);
-#ifdef __WXMAC__
     m_sizer->Add(box,1,wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL,4);
-#else
-    m_sizer->Add(box,1,wxEXPAND|wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL,4);
-#endif
     m_left=new wxStaticText(this,wxID_ANY,wxEmptyString);
     m_right=new wxStaticText(this,wxID_ANY,wxEmptyString);
     box->Add(m_left,0,wxEXPAND|wxBOTTOM|wxLEFT|wxRIGHT,6);
@@ -155,6 +151,11 @@ void CslToolTip::ShowTip(const wxString& title,const wxArrayString& text,const w
     m_left->SetLabel(left);
     m_right->SetLabel(right);
     m_title->SetLabel(title);
+
+    if (title.IsEmpty() && m_title->IsShown())
+        m_sizer->Hide(m_title);
+    else if (!title.IsEmpty() && !m_title->IsShown())
+        m_sizer->Show(m_title);
 
 #ifdef __WXMAC__
     {

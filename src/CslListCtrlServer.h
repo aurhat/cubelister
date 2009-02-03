@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Glen Masgai                                     *
+ *   Copyright (C) 2007 -2009 by Glen Masgai                               *
  *   mimosius@gmx.de                                                       *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -182,7 +182,7 @@ class CslListCtrlServer : public CslListCtrl
         bool ListSearchItemMatches(CslServerInfo *info);
         bool ListFilterItemMatches(CslServerInfo *info);
 
-        void GetToolTipText(wxInt32 row,wxString& title,wxArrayString& text);
+        void GetToolTipText(wxInt32 row,CslToolTipEvent& event);
         wxSize GetImageListSize()
         {
             wxInt32 x,y;

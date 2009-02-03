@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Glen Masgai                                     *
+ *   Copyright (C) 2007 -2009 by Glen Masgai                               *
  *   mimosius@gmx.de                                                       *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -226,8 +226,34 @@ void CslListCtrlPlayerSearch::OnMenu(wxCommandEvent& event)
     event.SetEventObject(this);
 }
 
-void CslListCtrlPlayerSearch::GetToolTipText(wxInt32 row,wxString& title,wxArrayString& text)
+void CslListCtrlPlayerSearch::GetToolTipText(wxInt32 row,CslToolTipEvent& event)
 {
+    if (row<GetItemCount())
+    {
+        wxInt32 i;
+        wxListItem item,column;
+
+        column.SetMask(wxLIST_MASK_TEXT);
+        item.SetMask(wxLIST_MASK_TEXT);
+        item.SetId(row);
+
+        for (i=0;i<GetColumnCount();i++)
+        {
+            item.SetColumn(i);
+            GetItem(item);
+            GetColumn(i,column);
+
+            const wxString& s=item.GetText();
+
+            if (!s.IsEmpty())
+            {
+                event.Text.Add(column.GetText());
+                event.Text.Add(s);
+            }
+        }
+
+        event.Title=_("Player search result");
+    }
 }
 
 void CslListCtrlPlayerSearch::ListClear()
