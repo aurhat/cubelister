@@ -106,7 +106,7 @@ void CslToolTip::OnPaint(wxPaintEvent& event)
 #ifdef __WXMAC__
     dc.DrawRectangle(0,0,w,h);
 #else
-    dc.DrawRoundedRectangle(0,0,w,h,4.0);
+    dc.DrawRoundedRectangle(0,0,w,h,3.0);
 #endif
 }
 
@@ -123,7 +123,15 @@ void CslToolTip::OnTimer(wxTimerEvent& WXUNUSED(event))
 
 void CslToolTip::OnMouse(wxMouseEvent& event)
 {
+#ifdef __WXMSW__
+	const wxPoint& pos=event.GetPosition();
+	const wxEventType& type=event.GetEventType();
+
+	if (pos.x<0 || pos.y<0 || type==wxEVT_LEFT_DOWN || type==wxEVT_RIGHT_DOWN)
+		Hide();
+#else
     Hide();
+#endif
     event.Skip();
 }
 
@@ -172,15 +180,15 @@ void CslToolTip::ShowTip(const wxString& title,const wxArrayString& text,const w
 
     m_sizer->SetSizeHints(this);
 
-#ifdef __WXMAC__
+#ifndef __WXGTK__
     wxPoint pos=position;
     const wxRect& client=GetRect();
     const wxRect& screen=::wxGetClientDisplayRect();
 
-    if (pos.x+client.width>screen.GetTopRight().x)
-        pos.x-=client.width;
-    if (pos.y+client.height>screen.GetBottomRight().y)
-        pos.y-=client.height;
+    if (pos.x+client.width>screen.width)
+		pos.x-=(pos.x+client.width-screen.width);
+    if (pos.y+client.height>screen.height)
+        pos.y-=(pos.y+client.height-screen.height);
 
     Move(pos);
 #else

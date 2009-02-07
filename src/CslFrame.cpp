@@ -185,7 +185,6 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
     tree_ctrl_games->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeypress),NULL,this);
     text_ctrl_search->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeypress),NULL,this);
     list_ctrl_player_search->Connect(wxEVT_CHAR,wxKeyEventHandler(CslFrame::OnKeypress),NULL,this);
-    list
 #endif
 
     tree_ctrl_games->SetImageList(&m_imgListTree);

@@ -443,6 +443,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CslToolTip.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CslVersionCheck.cpp"
 				>
 			</File>
@@ -582,6 +586,10 @@
 			</File>
 			<File
 				RelativePath=".\CslStatusBar.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CslToolTip.h"
 				>
 			</File>
 			<File
