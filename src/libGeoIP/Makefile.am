@@ -1,3 +1,4 @@
+
 if with_internal_geoip
 AM_CFLAGS = -DGEOIPDATADIR=\""$(GEOIPDATADIR)\"" 
 noinst_HEADERS = GeoIP.h

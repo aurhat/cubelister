@@ -25,6 +25,9 @@
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
 #endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif //HAVE_CONFIG_H
 #include "CslGeoIP.h"
 #include "engine/CslTools.h"
 

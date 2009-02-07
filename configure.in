@@ -1,5 +1,7 @@
-AC_INIT(configure.in)
+AC_INIT(src)
 AM_INIT_AUTOMAKE(csl, 0.8.1)
+
+AC_CONFIG_HEADER([src/config.h])
 
 DEFAULT_FLAGS="-fsigned-char -Wall -fno-strict-aliasing"
 CFLAGS="$CFLAGS $DEFAULT_FLAGS"
@@ -11,6 +13,8 @@ AC_PROG_CC
 AM_PROG_LIBTOOL
 AC_PROG_INTLTOOL
 AC_PROG_RANLIB
+
+AC_CHECK_FUNCS([gethostbyname_r localtime_r socket inet_ntoa])
 
 GETTEXT_PACKAGE=csl
 AC_SUBST(GETTEXT_PACKAGE)
@@ -86,7 +90,7 @@ AC_ARG_WITH(geoip-datadir,
     if test "$withval" != "yes" -a "$withval" != ""; then
         internal_geoip_db="no"
         GEOIPDATADIR=$withval
-    AC_DEFINE(CSL_EXTERNAL_GEOIP_DATABASE)
+        AC_DEFINE([CSL_EXTERNAL_GEOIP_DATABASE],[1],[use external GeoIP database])
     fi
 ])
 AM_CONDITIONAL(with_internal_geoipdatabase,test "x$internal_geoip_db" = "xyes")
@@ -100,13 +104,6 @@ AC_ARG_WITH(cslmapcfgtool,
  [cslmapcfgtool=$withval]
 )
 AM_CONDITIONAL(build_cslmapcfgtool,test "x$cslmapcfgtool" = "xyes")
-
-dnl if test "$host_os" = "mingw32" -o "$host_os" = "cygwin"; then
-dnl  CSL_FLAGS_INCLUDE="src/img/flags/win"
-dnl else
-dnl  CSL_FLAGS_INCLUDE="src/img/flags"
-dnl fi
-dnl AC_SUBST(CSL_FLAGS_INCLUDE)
 
 CXXFLAGS="$CXXFLAGS $WX_CXXFLAGS"
 AC_SUBST(WX_LIBS)

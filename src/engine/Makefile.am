@@ -1,3 +1,4 @@
+
 AM_CXXFLAGS = -DLOCALEDIR=\"$(localedir)\" -DDATADIR=\"$(datadir)/csl\"
 
 METASOURCES = AUTO

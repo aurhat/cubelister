@@ -4,5 +4,6 @@ all:
 	aclocal
 	libtoolize --automake --force --copy
 	intltoolize --force --copy
+	autoheader
 	automake -a -c
 	autoconf
