@@ -53,7 +53,7 @@ static const wxColour team_colours[] =
 
 CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
                                const wxPoint& pos, const wxSize& size, long style):
-        wxDialog(parent, id, title, pos, size, style)
+        wxDialog(parent,id,title,pos,size,style)
 {
     m_info=NULL;
     m_update=true;
@@ -217,7 +217,6 @@ void CslDlgExtended::do_layout()
     m_sizerMapLabel=sizer_map_label;
 
     grid_sizer_main->SetSizeHints(this);
-    //CentreOnScreen();
 }
 
 void CslDlgExtended::OnClose(wxCloseEvent& event)
@@ -583,7 +582,7 @@ void CslDlgExtended::ShowPanelMap(const bool show)
         Thaw();
 }
 
-void CslDlgExtended::DoShow(CslServerInfo *info,bool show)
+void CslDlgExtended::DoShow(CslServerInfo *info)
 {
     wxString s;
 
@@ -596,17 +595,15 @@ void CslDlgExtended::DoShow(CslServerInfo *info,bool show)
     m_info=info;
     list_ctrl_players->ServerInfo(info);
 
-    if (show)
-        RecalcMinSize(true);
-    else if (IsShown())
+    if (!info && IsShown())
+    {
         Hide();
-
-    if (!info)
         return;
+    }
 
     UpdatePlayerData();
     UpdateTeamData();
-
+        
     label_server->SetLabel(m_info->GetBestDescription());
     label_mode->SetLabel(m_info->GameMode);
     if (m_info->TimeRemain>0)
@@ -618,8 +615,14 @@ void CslDlgExtended::DoShow(CslServerInfo *info,bool show)
     s=wxString(_("CSL - Extended info"))+wxString(wxT(": "))+m_info->GetBestDescription();
     SetTitle(s);
 
-    if (IsShown())
-        return;
+    RecalcMinSize(true);
 
+    if (IsShown())
+    {
+        Raise();
+        return;
+    }
+
+    CentreOnParent();
     Show();
 }

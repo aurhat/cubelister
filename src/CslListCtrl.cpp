@@ -150,10 +150,11 @@ void CslListCtrl::OnToolTip(CslToolTipEvent& event)
 #ifdef __WXGTK__
     bool first=true;
 #endif
-    wxPoint spos=wxGetMousePosition();
-    wxPoint wpos=ScreenToClient(spos);
+    const wxPoint& spos=wxGetMousePosition();
+    const wxPoint& wpos=ScreenToClient(spos);
+    const wxSize& size=GetClientSize();
 
-    if (wpos!=wxDefaultPosition)
+    if (wpos.x>=0 && wpos.y>=0 && wpos.x<=size.x && wpos.y<=size.y)
     {
         for (i=GetTopItem();i<GetItemCount();i++)
         {

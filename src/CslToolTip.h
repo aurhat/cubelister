@@ -82,7 +82,7 @@ class CslToolTip : public wxFrame
         wxBoxSizer *m_sizer;
         wxStaticText *m_title,*m_left,*m_right;
 
-        void ShowTip(const wxString& title,const wxArrayString& text,const wxPoint& position);
+        void ShowTip(CslToolTipEvent& event);
 
 #ifdef __WXMSW__
         void OnEraseBackground(wxEraseEvent& event);
@@ -90,7 +90,8 @@ class CslToolTip : public wxFrame
         void OnPaint(wxPaintEvent& event);
 #endif
         void OnTimer(wxTimerEvent& event);
-        void OnMouse(wxMouseEvent& event);
+        void OnMouseLeave(wxMouseEvent& event);
+        void OnMouseButton(wxMouseEvent& event);
 
         DECLARE_EVENT_TABLE();
 };

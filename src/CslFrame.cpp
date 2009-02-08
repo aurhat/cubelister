@@ -2099,7 +2099,7 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
                 if (m_extendedDlg->GetInfo()==info)
                 {
                     info->PingExt(false);
-                    m_extendedDlg->DoShow(NULL,false);
+                    m_extendedDlg->DoShow(NULL);
                 }
 
                 list_ctrl_player_search->RemoveServer(info);

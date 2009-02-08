@@ -30,11 +30,11 @@ BEGIN_EVENT_TABLE(CslToolTip,wxFrame)
     #else
     EVT_PAINT(CslToolTip::OnPaint)
     #endif
-    EVT_LEFT_DOWN(CslToolTip::OnMouse)
-    EVT_RIGHT_DOWN(CslToolTip::OnMouse)
-    #ifndef __WXMAC__
-    EVT_LEAVE_WINDOW(CslToolTip::OnMouse)
-    #endif
+    EVT_LEAVE_WINDOW(CslToolTip::OnMouseLeave)
+    EVT_LEFT_DOWN(CslToolTip::OnMouseButton)
+    EVT_RIGHT_DOWN(CslToolTip::OnMouseButton)
+    EVT_MIDDLE_DOWN(CslToolTip::OnMouseButton)
+    EVT_MOUSEWHEEL(CslToolTip::OnMouseButton)
     EVT_TIMER(wxID_ANY,CslToolTip::OnTimer)
 END_EVENT_TABLE()
 
@@ -43,7 +43,7 @@ CslToolTip *CslToolTip::m_self=NULL;
 
 CslToolTip::CslToolTip(wxWindow *parent) :
         wxFrame(parent,wxID_ANY,wxEmptyString,wxDefaultPosition,wxDefaultSize,
-                wxNO_BORDER|wxFRAME_TOOL_WINDOW),
+                wxNO_BORDER|wxSTAY_ON_TOP|wxFRAME_TOOL_WINDOW),
         m_current(NULL)
 {
     m_self=this;
@@ -65,12 +65,18 @@ CslToolTip::CslToolTip(wxWindow *parent) :
     m_left->SetFont(font);
     m_title->SetFont(font);
 
-    m_title->Connect(wxEVT_LEFT_DOWN,wxMouseEventHandler(CslToolTip::OnMouse),NULL,this);
-    m_left->Connect(wxEVT_LEFT_DOWN,wxMouseEventHandler(CslToolTip::OnMouse),NULL,this);
-    m_right->Connect(wxEVT_LEFT_DOWN,wxMouseEventHandler(CslToolTip::OnMouse),NULL,this);
-    m_title->Connect(wxEVT_RIGHT_DOWN,wxMouseEventHandler(CslToolTip::OnMouse),NULL,this);
-    m_left->Connect(wxEVT_RIGHT_DOWN,wxMouseEventHandler(CslToolTip::OnMouse),NULL,this);
-    m_right->Connect(wxEVT_RIGHT_DOWN,wxMouseEventHandler(CslToolTip::OnMouse),NULL,this);
+    m_title->Connect(wxEVT_LEFT_DOWN,wxMouseEventHandler(CslToolTip::OnMouseButton),NULL,this);
+    m_left->Connect(wxEVT_LEFT_DOWN,wxMouseEventHandler(CslToolTip::OnMouseButton),NULL,this);
+    m_right->Connect(wxEVT_LEFT_DOWN,wxMouseEventHandler(CslToolTip::OnMouseButton),NULL,this);
+    m_title->Connect(wxEVT_RIGHT_DOWN,wxMouseEventHandler(CslToolTip::OnMouseButton),NULL,this);
+    m_left->Connect(wxEVT_RIGHT_DOWN,wxMouseEventHandler(CslToolTip::OnMouseButton),NULL,this);
+    m_right->Connect(wxEVT_RIGHT_DOWN,wxMouseEventHandler(CslToolTip::OnMouseButton),NULL,this);
+    m_title->Connect(wxEVT_MIDDLE_DOWN,wxMouseEventHandler(CslToolTip::OnMouseButton),NULL,this);
+    m_left->Connect(wxEVT_MIDDLE_DOWN,wxMouseEventHandler(CslToolTip::OnMouseButton),NULL,this);
+    m_right->Connect(wxEVT_MIDDLE_DOWN,wxMouseEventHandler(CslToolTip::OnMouseButton),NULL,this);
+    m_title->Connect(wxEVT_MOUSEWHEEL,wxMouseEventHandler(CslToolTip::OnMouseButton),NULL,this);
+    m_left->Connect(wxEVT_MOUSEWHEEL,wxMouseEventHandler(CslToolTip::OnMouseButton),NULL,this);
+    m_right->Connect(wxEVT_MOUSEWHEEL,wxMouseEventHandler(CslToolTip::OnMouseButton),NULL,this);
 }
 
 CslToolTip::~CslToolTip()
@@ -118,24 +124,28 @@ void CslToolTip::OnTimer(wxTimerEvent& WXUNUSED(event))
     CslToolTipEvent evt;
 
     if (m_current->ProcessEvent(evt))
-        ShowTip(evt.Title,evt.Text,evt.Pos);
+        ShowTip(evt);
 }
 
-void CslToolTip::OnMouse(wxMouseEvent& event)
+void CslToolTip::OnMouseLeave(wxMouseEvent& event)
 {
-#ifdef __WXMSW__
 	const wxPoint& pos=event.GetPosition();
-	const wxEventType& type=event.GetEventType();
+    const wxSize& size=GetClientSize();
 
-	if (pos.x<0 || pos.y<0 || type==wxEVT_LEFT_DOWN || type==wxEVT_RIGHT_DOWN)
-		Hide();
-#else
-    Hide();
-#endif
+	if (pos.x>=size.x || pos.y>=size.y || pos.x<=0 || pos.y<=0)
+        Hide();
+
     event.Skip();
 }
 
-void CslToolTip::ShowTip(const wxString& title,const wxArrayString& text,const wxPoint& position)
+void CslToolTip::OnMouseButton(wxMouseEvent& event)
+{
+    Hide();
+    
+    event.Skip();
+}
+
+void CslToolTip::ShowTip(CslToolTipEvent& event)
 {
     wxUint32 i;
     wxString left,right;
@@ -148,21 +158,25 @@ void CslToolTip::ShowTip(const wxString& title,const wxArrayString& text,const w
     m_title->SetBackgroundColour(bg);
 #endif
 
-    for (i=0;i<text.GetCount();i++)
+    event.Title.Replace(wxT("&"),wxT("&&"));
+
+    for (i=0;i<event.Text.GetCount();i++)
     {
+        event.Text.Item(i).Replace(wxT("&"),wxT("&&"));
+
         if (i%2==0)
-            left<<wxT("\n")<<text.Item(i);
+            left<<wxT("\n")<<event.Text.Item(i);
         else
-            right<<wxT("\n")<<text.Item(i);
+            right<<wxT("\n")<<event.Text.Item(i);
     }
 
     m_left->SetLabel(left);
     m_right->SetLabel(right);
-    m_title->SetLabel(title);
+    m_title->SetLabel(event.Title);
 
-    if (title.IsEmpty() && m_title->IsShown())
+    if (event.Title.IsEmpty() && m_title->IsShown())
         m_sizer->Hide(m_title);
-    else if (!title.IsEmpty() && !m_title->IsShown())
+    else if (!event.Title.IsEmpty() && !m_title->IsShown())
         m_sizer->Show(m_title);
 
 #ifdef __WXMAC__
@@ -181,19 +195,16 @@ void CslToolTip::ShowTip(const wxString& title,const wxArrayString& text,const w
     m_sizer->SetSizeHints(this);
 
 #ifndef __WXGTK__
-    wxPoint pos=position;
     const wxRect& client=GetRect();
     const wxRect& screen=::wxGetClientDisplayRect();
 
-    if (pos.x+client.width>screen.width)
-		pos.x-=(pos.x+client.width-screen.width);
-    if (pos.y+client.height>screen.height)
-        pos.y-=(pos.y+client.height-screen.height);
-
-    Move(pos);
-#else
-    Move(position);
+    if (event.Pos.x+client.width>screen.width)
+		event.Pos.x-=(event.Pos.x+client.width-screen.width);
+    if (event.Pos.y+client.height>screen.height)
+        event.Pos.y-=(event.Pos.y+client.height-screen.height);
 #endif
+
+    Move(event.Pos);
     Show();
 }
 
