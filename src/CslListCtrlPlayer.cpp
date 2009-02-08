@@ -102,14 +102,14 @@ wxString CslPanelPlayer::GetLabelText()
 
     wxString s;
 
-    if (info)
-        if (!info->GameMode.IsEmpty())
-            s+=info->GameMode+_(" on ");
+    if (!info->GameMode.IsEmpty())
+        s+=info->GameMode+_(" on ");
     if (!info->Map.IsEmpty())
         s+=info->Map+wxT(" ");
     if (info->TimeRemain>0)
         s+=wxString::Format(wxT("(< %d %s)"),info->TimeRemain,info->TimeRemain==1 ?
                             _("Minute"):_("Minutes"))+wxT(" ");
+    s.Replace(wxT("&"),wxT("&&"));
 
     return s;
 }
@@ -282,11 +282,11 @@ void CslListCtrlPlayer::GetToolTipText(wxInt32 row,CslToolTipEvent& event)
         c=CslGeoIP::GetCountryNameByIPnum(data->IP);
         event.Text.Add(_("Country"));
         event.Text.Add(c ? (A2U(c)).c_str() : CslGeoIP::IsOk() ?
-                 _("Unknown") : _("GeoIP database not found"));
+                       _("Unknown") : _("GeoIP database not found"));
 
         event.Text.Add(wxT("ID / IP"));
         event.Text.Add(wxString::Format(wxT("%d / %d.%d.%d.x"),data->ID,
-                                  data->IP>>24,data->IP>>16&0xff,data->IP>>8&0xff));
+                                        data->IP>>24,data->IP>>16&0xff,data->IP>>8&0xff));
 
         event.Title=_("Player information");
     }

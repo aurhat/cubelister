@@ -41,16 +41,6 @@ BEGIN_EVENT_TABLE(CslListCtrlCountry,CslListCtrl)
 END_EVENT_TABLE()
 
 
-class CslCountryEntry
-{
-    public:
-        CslCountryEntry(const wxString& country) : Country(country),Count(1) {}
-
-        wxString Country;
-        wxUint32 Count;
-};
-
-
 CslPanelCountry::CslPanelCountry(wxWindow* parent,long listStyle) :
         wxPanel(parent,wxID_ANY),
         m_mode(MODE_PLAYER_SINGLE)
@@ -129,6 +119,7 @@ CslListCtrlCountry::CslListCtrlCountry(wxWindow* parent,wxWindowID id,const wxPo
 
 CslListCtrlCountry::~CslListCtrlCountry()
 {
+    WX_CLEAR_ARRAY(m_entries);
 }
 
 void CslListCtrlCountry::ListInit()
@@ -181,15 +172,8 @@ void CslListCtrlCountry::OnMenu(wxCommandEvent& event)
 
 void CslListCtrlCountry::ListClear()
 {
-    for (wxInt32 i=GetItemCount()-1;i>=0;i--)
-    {
-        CslCountryEntry *entry=(CslCountryEntry*)GetItemData(i);
-
-        if (entry)
-            delete entry;
-    }
-
     DeleteAllItems();
+    WX_CLEAR_ARRAY(m_entries);
 }
 
 void CslListCtrlCountry::UpdateEntry(const wxString& country,wxInt32 img)
@@ -218,6 +202,7 @@ void CslListCtrlCountry::UpdateEntry(const wxString& country,wxInt32 img)
         item.SetId(c);
         InsertItem(item);
         entry=new CslCountryEntry(country.IsEmpty() ? wxString(_("Unknown")) : country);
+        m_entries.Add(entry);
         SetItemData(c,(long)entry);
     }
 

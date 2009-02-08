@@ -118,6 +118,7 @@ class CslDlgExtended: public wxDialog
         void ClearTeamScoreLabel(const wxUint32 start,const wxUint32 end);
         void RecalcMinSize(bool reLayout,wxInt32 decWidth=-1);
         void ShowPanelMap(const bool show);
+        void SetLabel(wxStaticText *label,const wxString& text);
 
         static int wxCALLBACK ListSortCompareFunc(long item1,long item2,long data);
 }; // wxGlade: end class

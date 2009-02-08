@@ -32,65 +32,65 @@
 #include "engine/CslTools.h"
 
 
-GeoIP *s_geoIP=NULL;
+GeoIP *CslGeoIP::m_geoIP=NULL;
 
 bool CslGeoIP::Init()
 {
-    if (s_geoIP)
+    if (m_geoIP)
     {
-        wxASSERT_MSG(!s_geoIP,wxT("GeoIP already initialised!"));
+        wxASSERT_MSG(!m_geoIP,wxT("GeoIP already initialised!"));
         return false;
     }
 #ifdef CSL_EXTERNAL_GEOIP_DATABASE
-    s_geoIP=GeoIP_open_type(GEOIP_COUNTRY_EDITION,GEOIP_MEMORY_CACHE);
+    m_geoIP=GeoIP_open_type(GEOIP_COUNTRY_EDITION,GEOIP_MEMORY_CACHE);
 #else
     wxString path=DATAPATH+wxString(wxT("/GeoIP.dat"));
-    s_geoIP=GeoIP_open(U2A(path),GEOIP_MEMORY_CACHE);
+    m_geoIP=GeoIP_open(U2A(path),GEOIP_MEMORY_CACHE);
 #ifdef __WXGTK__
-    if (!s_geoIP)
+    if (!m_geoIP)
     {
         path=::g_basePath+wxT("/data/GeoIP.dat");
-        s_geoIP=GeoIP_open(U2A(path),GEOIP_MEMORY_CACHE);
+        m_geoIP=GeoIP_open(U2A(path),GEOIP_MEMORY_CACHE);
     }
 #endif //__WXGTK__
 #endif //CSL_EXTERNAL_GEOIP_DATABASE
 
-    return s_geoIP!=NULL;
+    return m_geoIP!=NULL;
 }
 
 void CslGeoIP::Destroy()
 {
-    if (!s_geoIP)
+    if (!m_geoIP)
     {
-        wxASSERT_MSG(!s_geoIP,wxT("GeoIP not initialised!"));
+        wxASSERT_MSG(!m_geoIP,wxT("GeoIP not initialised!"));
         return;
     }
 
-    GeoIP_delete(s_geoIP);
-    s_geoIP=NULL;
+    GeoIP_delete(m_geoIP);
+    m_geoIP=NULL;
 }
 
 bool CslGeoIP::IsOk()
 {
-    return s_geoIP!=NULL;
+    return m_geoIP!=NULL;
 }
 
 const char* CslGeoIP::GetCountryCodeByAddr(const char *host)
 {
-    return s_geoIP ? GeoIP_country_code_by_addr(s_geoIP,host):NULL;
+    return m_geoIP ? GeoIP_country_code_by_addr(m_geoIP,host):NULL;
 }
 
 const char* CslGeoIP::GetCountryCodeByIPnum(const unsigned long ipnum)
 {
-    return s_geoIP ? GeoIP_country_code_by_ipnum(s_geoIP,ipnum):NULL;
+    return m_geoIP ? GeoIP_country_code_by_ipnum(m_geoIP,ipnum):NULL;
 }
 
 const char* CslGeoIP::GetCountryNameByAddr(const char *host)
 {
-    return s_geoIP ? GeoIP_country_name_by_addr(s_geoIP,host):NULL;
+    return m_geoIP ? GeoIP_country_name_by_addr(m_geoIP,host):NULL;
 }
 
 const char* CslGeoIP::GetCountryNameByIPnum(const unsigned long ipnum)
 {
-    return s_geoIP ? GeoIP_country_name_by_ipnum(s_geoIP,ipnum):NULL;
+    return m_geoIP ? GeoIP_country_name_by_ipnum(m_geoIP,ipnum):NULL;
 }

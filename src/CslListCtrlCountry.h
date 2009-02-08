@@ -31,6 +31,19 @@
 
 class CslListCtrlCountry;
 
+
+class CslCountryEntry
+{
+    public:
+        CslCountryEntry(const wxString& country) : Country(country),Count(1) {}
+
+        wxString Country;
+        wxUint32 Count;
+};
+
+WX_DEFINE_ARRAY_PTR(CslCountryEntry*,t_aCslCountryEntry);
+
+
 class CslPanelCountry : public wxPanel
 {
     public:
@@ -55,6 +68,7 @@ class CslPanelCountry : public wxPanel
         wxGauge *m_gauge;
 };
 
+
 class CslListCtrlCountry : public CslListCtrl
 {
     public:
@@ -70,6 +84,7 @@ class CslListCtrlCountry : public CslListCtrl
 
     private:
         CslListSortHelper m_sortHelper;
+        t_aCslCountryEntry m_entries;
 
         void ListInit();
 

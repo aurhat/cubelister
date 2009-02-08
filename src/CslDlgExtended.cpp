@@ -305,9 +305,9 @@ void CslDlgExtended::UpdateMap()
         if (m_mapInfo.LoadMapData(m_info->Map,m_info->GetGame().GetName(),m_info->Protocol))
         {
             if (m_mapInfo.m_mapNameFull.IsEmpty())
-                label_map->SetLabel(m_mapInfo.m_mapName);
+                SetLabel(label_map,m_mapInfo.m_mapName);
             else
-                label_map->SetLabel(m_mapInfo.m_mapNameFull);
+                SetLabel(label_map,m_mapInfo.m_mapNameFull);
             if (m_mapInfo.m_author.IsEmpty())
             {
                 label_author->SetLabel(wxEmptyString);
@@ -316,7 +316,7 @@ void CslDlgExtended::UpdateMap()
             else
             {
                 label_author_prefix->SetLabel(_("by"));
-                label_author->SetLabel(m_mapInfo.m_author);
+                SetLabel(label_author,m_mapInfo.m_author);
             }
 
             panel_map->SetMap(m_mapInfo.m_bitmap,checkbox_map->IsChecked());
@@ -327,7 +327,7 @@ void CslDlgExtended::UpdateMap()
             panel_map->SetOk(false);
             ShowPanelMap(false);
 
-            label_map->SetLabel(m_info->Map);
+            SetLabel(label_map,m_info->Map);
             label_author->SetLabel(wxEmptyString);
             label_author_prefix->SetLabel(wxEmptyString);
         }
@@ -489,7 +489,7 @@ void CslDlgExtended::UpdateTeamData()
     if (s.IsEmpty())
         s=_("Time is up");
     label_remaining->SetLabel(s);
-    label_mode->SetLabel(m_info->GameMode);
+    SetLabel(label_map,m_info->GameMode);
 
     RecalcMinSize(true);
 }
@@ -603,9 +603,9 @@ void CslDlgExtended::DoShow(CslServerInfo *info)
 
     UpdatePlayerData();
     UpdateTeamData();
-        
-    label_server->SetLabel(m_info->GetBestDescription());
-    label_mode->SetLabel(m_info->GameMode);
+
+    SetLabel(label_server,m_info->GetBestDescription());
+    SetLabel(label_mode,m_info->GameMode);
     if (m_info->TimeRemain>0)
         s=FormatSeconds(m_info->TimeRemain*60,true,true);
     else
@@ -625,4 +625,12 @@ void CslDlgExtended::DoShow(CslServerInfo *info)
 
     CentreOnParent();
     Show();
+}
+
+void CslDlgExtended::SetLabel(wxStaticText *label,const wxString& text)
+{
+    wxString s=text;
+
+    s.Replace(wxT("&"),wxT("&&"));
+    label->SetLabel(s);
 }

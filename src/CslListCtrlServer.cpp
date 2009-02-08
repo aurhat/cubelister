@@ -102,10 +102,7 @@ CslListCtrlServer::CslListCtrlServer(wxWindow* parent,wxWindowID id,const wxPoin
 
 CslListCtrlServer::~CslListCtrlServer()
 {
-// avoids an assertion
-#ifndef __WXMAC__
-    ListClear();
-#endif
+    WX_CLEAR_ARRAY(m_servers);
 }
 
 #ifdef __WXMSW__
