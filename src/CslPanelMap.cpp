@@ -24,7 +24,9 @@
 
 BEGIN_EVENT_TABLE(CslPanelMap, wxPanel)
     EVT_PAINT(CslPanelMap::OnPaint)
+#ifdef __WXMSW__
     EVT_ERASE_BACKGROUND(CslPanelMap::OnErase)
+#endif
 END_EVENT_TABLE()
 
 
@@ -54,13 +56,13 @@ bool CslMapInfo::GetMapConfigVersions(wxFileConfig& config,t_aInt32& array)
     return array.GetCount()>0;
 }
 
-bool CslMapInfo::LoadMapConfig(wxFileConfig& config,const wxInt32 protVersion)
+bool CslMapInfo::LoadMapConfig(wxFileConfig& config,const wxInt32 protocol)
 {
     long int val;
     wxInt32 x,y;
     wxUint32 i=0;
 
-    config.SetPath(wxString::Format(wxT("/%d"),protVersion));
+    config.SetPath(wxString::Format(wxT("/%d"),protocol));
     if (!config.Read(wxT("Mapname"),&m_mapNameFull))
         return false;
     if (!config.Read(wxT("Author"),&m_author))
@@ -79,60 +81,91 @@ bool CslMapInfo::LoadMapConfig(wxFileConfig& config,const wxInt32 protVersion)
         i++;
     }
 
-    m_version=protVersion;
+    m_version=protocol;
 
     return true;
 }
 
-bool CslMapInfo::LoadMapData(const wxString& mapName,const wxString& gameName,
-                             const wxInt32 protVersion)
+bool CslMapInfo::LoadMapImage(const wxString& map,const wxString& path)
 {
-    wxString path=DATAPATH+wxString(PATHDIV)+wxString(wxT("maps"))+
-                  wxString(PATHDIV)+gameName+wxString(PATHDIV);
-#ifdef __WXGTK__
     if (!::wxDirExists(path))
-        path=g_basePath+wxT("/data/maps/")+gameName+PATHDIV;
-#endif
-    Reset(mapName);
+        return false;
 
-    if (::wxFileExists(path+mapName+wxString(wxT(".cfg"))))
+    bool ok=false;
+    wxString file=path+map;
+
+    Reset(map);
+
+    if (::wxFileExists(file+wxT(".jpg")))
     {
-        wxFileInputStream stream(path+mapName+wxString(wxT(".cfg")));
-        if (!stream.IsOk())
-            return false;
-
-        wxFileConfig config(stream);
-
-        wxInt32 version;
-        t_aInt32 versions;
-
-        if (!GetMapConfigVersions(config,versions))
-            return false;
-
-        if (versions.Index(protVersion)==wxNOT_FOUND)
-            version=versions.Last();
-        else
-            version=protVersion;
-
-        if (!LoadMapConfig(config,version))
-            return false;
-
-        path+=wxString::Format(wxT("%d/"),version)+mapName+wxString(wxT(".png"));
-        if (::wxFileExists(path))
-        {
-            if (!m_bitmap.LoadFile(path,wxBITMAP_TYPE_PNG))
-                return false;
-        }
-        else
-            return false;
-
-        if (m_bases.GetCount())
-            m_basesOk=true;
-
-        return true;
+        if (m_bitmap.LoadFile(file+wxT(".jpg"),wxBITMAP_TYPE_JPEG))
+            ok=true;
+    }
+    else if (::wxFileExists(file+wxT(".png")))
+    {
+        if (!m_bitmap.LoadFile(file+wxT(".png"),wxBITMAP_TYPE_PNG))
+            ok=true;
     }
 
-    return false;
+    if (!ok || m_bitmap.GetHeight()>400 || m_bitmap.GetHeight()>300)
+    {
+        Reset();
+        return false;
+    }
+
+    return true;
+}
+
+bool CslMapInfo::LoadMapData(const wxString& map,const wxString& game,const wxInt32 protocol)
+{
+    wxString path;
+
+    path<<DATAPATH<<PATHDIV<<wxT("maps")<<PATHDIV<<game<<PATHDIV;
+
+#ifdef __WXGTK__
+    if (!::wxDirExists(path))
+        path=g_basePath+wxT("/data/maps/")+game+PATHDIV;
+#endif
+    Reset(map);
+
+    wxString file=path+map+wxT(".cfg");
+
+    if (!::wxFileExists(file))
+        return false;
+
+    wxFileInputStream stream(file);
+    if (!stream.IsOk())
+        return false;
+
+    wxFileConfig config(stream);
+
+    wxInt32 version;
+    t_aInt32 versions;
+
+    if (!GetMapConfigVersions(config,versions))
+        return false;
+
+    if (versions.Index(protocol)==wxNOT_FOUND)
+        version=versions.Last();
+    else
+        version=protocol;
+
+    if (!LoadMapConfig(config,version))
+        return false;
+
+    file=path+wxString::Format(wxT("%d/"),version)+map+wxT(".png");
+    if (::wxFileExists(file))
+    {
+        if (!m_bitmap.LoadFile(file,wxBITMAP_TYPE_PNG))
+            return false;
+    }
+    else
+        return false;
+
+    if (m_bases.GetCount())
+        m_basesOk=true;
+
+    return true;
 }
 
 
@@ -181,8 +214,9 @@ void CslPanelMap::OnPaint(wxPaintEvent& event)
     wxPaintDC dc(this);
     PrepareDC(dc);
 
-    memDC.SelectObject(m_bitmap);
+    memDC.SelectObjectAsSource(m_bitmap);
     dc.Blit(origin.x,origin.y,m_bitmap.GetWidth(),m_bitmap.GetHeight(),&memDC,0,0);
+    memDC.SelectObjectAsSource(wxNullBitmap);
 
     for (i=0;i<m_bases.GetCount();i++)
     {

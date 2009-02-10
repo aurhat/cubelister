@@ -121,7 +121,7 @@ void CslToolTip::OnTimer(wxTimerEvent& WXUNUSED(event))
     if (!m_current)
         return;
 
-    CslToolTipEvent evt;
+    CslToolTipEvent evt(::wxGetMousePosition());
 
     if (m_current->ProcessEvent(evt))
         ShowTip(evt);
@@ -129,11 +129,16 @@ void CslToolTip::OnTimer(wxTimerEvent& WXUNUSED(event))
 
 void CslToolTip::OnMouseLeave(wxMouseEvent& event)
 {
-	const wxPoint& pos=event.GetPosition();
-    const wxSize& size=GetClientSize();
+    if (event.GetEventObject()==this)
+    {
+        const wxSize& size=GetClientSize();
+        const wxPoint& pos=event.GetPosition();
 
-	if (pos.x>=size.x || pos.y>=size.y || pos.x<=0 || pos.y<=0)
-        Hide();
+        if (pos.x>=size.x || pos.y>=size.y || pos.x<=0 || pos.y<=0)
+            Hide();
+    }
+    else if (!IsShown())
+        ResetTip();
 
     event.Skip();
 }
@@ -141,7 +146,7 @@ void CslToolTip::OnMouseLeave(wxMouseEvent& event)
 void CslToolTip::OnMouseButton(wxMouseEvent& event)
 {
     Hide();
-    
+
     event.Skip();
 }
 
@@ -179,7 +184,7 @@ void CslToolTip::ShowTip(CslToolTipEvent& event)
     else if (!event.Title.IsEmpty() && !m_title->IsShown())
         m_sizer->Show(m_title);
 
-#ifdef __WXMAC__
+#ifndef __WXMSW__ //necessary on wxMAC and wxGTK < 2.8.9
     {
         wxClientDC dc(m_left);
         const wxSize& size=dc.GetMultiLineTextExtent(left);
@@ -199,7 +204,7 @@ void CslToolTip::ShowTip(CslToolTipEvent& event)
     const wxRect& screen=::wxGetClientDisplayRect();
 
     if (event.Pos.x+client.width>screen.width)
-		event.Pos.x-=(event.Pos.x+client.width-screen.width);
+        event.Pos.x-=(event.Pos.x+client.width-screen.width);
     if (event.Pos.y+client.height>screen.height)
         event.Pos.y-=(event.Pos.y+client.height-screen.height);
 #endif
@@ -218,6 +223,7 @@ void CslToolTip::InitTip(wxEvtHandler *handler)
     if (handler)
     {
         m_self->m_current=handler;
+        m_self->m_current->Connect(wxEVT_LEAVE_WINDOW,wxMouseEventHandler(CslToolTip::OnMouseLeave),NULL,m_self);
         m_self->m_timer.Start(g_cslSettings->tooltipDelay,wxTIMER_ONE_SHOT);
     }
 }
@@ -227,7 +233,11 @@ void CslToolTip::ResetTip()
     if (!m_self)
         return;
 
-    m_self->m_current=NULL;
+    if (m_self->m_current)
+    {
+        m_self->m_current->Disconnect(wxEVT_LEAVE_WINDOW,wxMouseEventHandler(CslToolTip::OnMouseLeave),NULL,m_self);
+        m_self->m_current=NULL;
+    }
 
     if (m_self->IsShown())
         m_self->Hide();

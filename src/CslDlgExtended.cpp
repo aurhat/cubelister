@@ -23,6 +23,7 @@
 #include "CslSettings.h"
 #include "CslMenu.h"
 
+
 BEGIN_EVENT_TABLE(CslDlgExtended, wxDialog)
     EVT_CLOSE(CslDlgExtended::OnClose)
     EVT_SIZE(CslDlgExtended::OnSize)
@@ -42,7 +43,6 @@ enum
 
 enum { CHECK_UPDATE = wxID_HIGHEST+1, CHECK_MAP };
 
-#define CSL_EXT_REFRESH_INTERVAL  g_cslSettings->m_updateInterval/1000
 
 static const wxColour team_colours[] =
 {
@@ -302,7 +302,28 @@ void CslDlgExtended::UpdateMap()
 
     if (m_mapInfo.m_mapName!=m_info->Map)
     {
+        bool show=false;
+
         if (m_mapInfo.LoadMapData(m_info->Map,m_info->GetGame().GetName(),m_info->Protocol))
+            show=true;
+        else
+        {
+            wxArrayString paths;
+
+            if (m_info->GetGame().GetMapImagePaths(paths))
+            {
+                for (wxUint32 i=0;i<paths.GetCount();i++)
+                {
+                    if (m_mapInfo.LoadMapImage(m_info->Map,paths.Item(i)))
+                    {
+                        show=true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (show)
         {
             if (m_mapInfo.m_mapNameFull.IsEmpty())
                 SetLabel(label_map,m_mapInfo.m_mapName);
@@ -336,10 +357,7 @@ void CslDlgExtended::UpdateMap()
 
 void CslDlgExtended::ClearTeamScoreLabel(const wxUint32 start,const wxUint32 end)
 {
-    wxUint32 i=start;
-    wxUint32 j=end;
-
-    for (;i<j;i++)
+    for (wxUint32 i=start;i<end;i++)
     {
         m_teamLabel.Item(i)->SetLabel(wxT(""));
         m_teamLabel.Item(i)->SetFont(m_labelFont);
@@ -376,7 +394,6 @@ void CslDlgExtended::UpdateTeamData()
 
     UpdateMap();
     m_mapInfo.ResetBasesColour();
-
 
     if (!m_info->Players)
     {
@@ -489,7 +506,7 @@ void CslDlgExtended::UpdateTeamData()
     if (s.IsEmpty())
         s=_("Time is up");
     label_remaining->SetLabel(s);
-    SetLabel(label_map,m_info->GameMode);
+    SetLabel(label_mode,m_info->GameMode);
 
     RecalcMinSize(true);
 }

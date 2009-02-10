@@ -417,6 +417,24 @@ wxInt32 CslGameSauerbraten::InjectConfig(const wxString& param,wxString *error)
     return WriteTextFile(cfg,script,wxFile::write);
 }
 
+bool CslGameSauerbraten::GetMapImagePaths(wxArrayString& paths) const
+{
+    wxInt32 pos;
+    wxString path;
+
+    if (!m_clientSettings.GamePath.IsEmpty())
+    {
+        path<<m_clientSettings.GamePath<<wxT("packages")<<PATHDIV<<wxT("base")<<PATHDIV;
+        paths.Add(path);
+    }
+
+    if ((pos=m_clientSettings.Options.Find(wxT("-k")))!=wxNOT_FOUND)
+    {
+    }
+
+    return !paths.IsEmpty();
+}
+
 const char** CslGameSauerbraten::GetIcon(wxInt32 size) const
 {
     switch (size)

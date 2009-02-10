@@ -132,7 +132,7 @@ class CslSettings
         wxInt32 filterMaster,filterFavourites;
         wxInt32 waitServerFull;
         wxInt32 pinggood,pingbad;
-        wxString gameOutputPath;
+        wxString gameOutputPath,screenOutputPath;
         wxUint32 cleanupServers;
         bool cleanupServersKeepFav,cleanupServersKeepStats;
         bool autoSaveOutput;

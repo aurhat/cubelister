@@ -141,9 +141,9 @@ void CslListCtrlCountry::ListInit()
     InsertColumn(1,item);
     SetColumn(1,item);
 
-    m_sortHelper.Init(CSL_SORT_DSC,SORT_COUNT);
+    m_sortHelper.Init(CslListSortHelper::SORT_DSC,SORT_COUNT);
     item.SetImage(CSL_LIST_IMG_SORT_DSC);
-    SetColumn(m_sortHelper.m_sortType,item);
+    SetColumn(m_sortHelper.Type,item);
 }
 
 void CslListCtrlCountry::ListAdjustSize(const wxSize& size)
@@ -265,7 +265,7 @@ void CslListCtrlCountry::ListSort(const wxInt32 column)
     wxInt32 col;
 
     if (column==-1)
-        col=m_sortHelper.m_sortType;
+        col=m_sortHelper.Type;
     else
     {
         col=column;
@@ -275,22 +275,22 @@ void CslListCtrlCountry::ListSort(const wxInt32 column)
         if (item.GetImage()==-1 || item.GetImage()==CSL_LIST_IMG_SORT_DSC)
         {
             img=CSL_LIST_IMG_SORT_ASC;
-            m_sortHelper.m_sortMode=CSL_SORT_ASC;
+            m_sortHelper.Mode=CslListSortHelper::SORT_ASC;
         }
         else
         {
             img=CSL_LIST_IMG_SORT_DSC;
-            m_sortHelper.m_sortMode=CSL_SORT_DSC;
+            m_sortHelper.Mode=CslListSortHelper::SORT_DSC;
         }
 
         item.Clear();
         item.SetImage(-1);
-        SetColumn(m_sortHelper.m_sortType,item);
+        SetColumn(m_sortHelper.Type,item);
 
         item.SetImage(img);
         SetColumn(col,item);
 
-        m_sortHelper.m_sortType=col;
+        m_sortHelper.Type=col;
     }
 
     if (GetItemCount()>0)
@@ -301,8 +301,8 @@ int wxCALLBACK CslListCtrlCountry::ListSortCompareFunc(long item1,long item2,lon
 {
     CslCountryEntry *entry1=(CslCountryEntry*)item1;
     CslCountryEntry *entry2=(CslCountryEntry*)item2;
-    wxInt32 sortMode=((CslListSortHelper*)data)->m_sortMode;
-    wxInt32 sortType=((CslListSortHelper*)data)->m_sortType;
+    wxInt32 sortMode=((CslListSortHelper*)data)->Mode;
+    wxInt32 sortType=((CslListSortHelper*)data)->Type;
 
     wxInt32 type;
     wxUint32 vui1=0,vui2=0;
@@ -311,13 +311,13 @@ int wxCALLBACK CslListCtrlCountry::ListSortCompareFunc(long item1,long item2,lon
     switch (sortType)
     {
         case SORT_NAME:
-            type=CSL_LIST_SORT_STRING;
+            type=CslListSortHelper::SORT_STRING;
             vs1=entry1->Country;
             vs2=entry2->Country;
             break;
 
         case SORT_COUNT:
-            type=CSL_LIST_SORT_UINT;
+            type=CslListSortHelper::SORT_UINT;
             vui1=entry1->Count;
             vui2=entry2->Count;
             break;
@@ -326,23 +326,23 @@ int wxCALLBACK CslListCtrlCountry::ListSortCompareFunc(long item1,long item2,lon
             return 0;
     }
 
-    if (type==CSL_LIST_SORT_UINT)
+    if (type==CslListSortHelper::SORT_UINT)
     {
         if (vui1==vui2)
             return 0;
         if (vui1<vui2)
-            return sortMode==CSL_SORT_ASC ? -1 : 1;
+            return sortMode==CslListSortHelper::SORT_ASC ? -1 : 1;
         else
-            return sortMode==CSL_SORT_ASC ? 1 : -1;
+            return sortMode==CslListSortHelper::SORT_ASC ? 1 : -1;
     }
-    else if (type==CSL_LIST_SORT_STRING)
+    else if (type==CslListSortHelper::SORT_STRING)
     {
         if (vs1==vs2)
             return 0;
         if (vs1.CmpNoCase(vs2)<0)
-            return sortMode==CSL_SORT_ASC ? -1 : 1;
+            return sortMode==CslListSortHelper::SORT_ASC ? -1 : 1;
         else
-            return sortMode==CSL_SORT_ASC ? 1 : -1;
+            return sortMode==CslListSortHelper::SORT_ASC ? 1 : -1;
     }
 
     return 0;

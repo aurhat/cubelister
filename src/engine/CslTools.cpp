@@ -104,6 +104,17 @@ void StripColours(char *src,wxInt32 *len,wxInt32 count)
     *len=l;
 }
 
+void FixFilename(wxString& name)
+{
+    wxUint32 i,j;
+    wxString exclude=wxT("\\/:*?\"<>| ");
+
+    for (i=0;i<name.Length();i++)
+        for (j=0;j<exclude.Length();j++)
+            if (name.GetChar(i)==exclude.GetChar(j))
+                name.SetChar(i,wxT('_'));
+}
+
 bool IsIP(const wxString& s)
 {
     const wxChar* dot=wxT(".");
@@ -302,6 +313,24 @@ wxBitmap AdjustIconSize(const char **data,const wxIcon& icon,
     wxImage image=bitmap.ConvertToImage();
     image.Resize(size,origin);
     return wxBitmap(image);
+}
+
+bool BitmapFromWindow(wxWindow *window,wxBitmap& bitmap)
+{
+    bool ret;
+    wxMemoryDC mdc;
+    wxClientDC cdc(window);
+    const wxSize& size=window->GetClientSize();
+
+    window->Raise();
+    wxTheApp->Yield();
+
+    bitmap.Create(size.x,size.y);
+    mdc.SelectObject(bitmap);
+    ret=mdc.Blit(0,0,size.x,size.y,&cdc,0,0);
+    mdc.SelectObject(wxNullBitmap);
+
+    return ret;
 }
 
 wxString GetHttpAgent()

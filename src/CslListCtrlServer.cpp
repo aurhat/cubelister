@@ -728,7 +728,7 @@ void CslListCtrlServer::ListInit(CslListCtrlServer *sibling)
     InsertColumn(8,item);
     SetColumn(8,item);
 
-    m_sortHelper.Init(CSL_SORT_DSC,SORT_PLAYER);
+    m_sortHelper.Init(CslListSortHelper::SORT_DSC,SORT_PLAYER);
     ToggleSortArrow();
 }
 
@@ -1329,13 +1329,13 @@ void CslListCtrlServer::ToggleSortArrow()
 
     if (g_cslSettings->autoSortColumns)
     {
-        if (m_sortHelper.m_sortMode==CSL_SORT_ASC)
+        if (m_sortHelper.Mode==CslListSortHelper::SORT_ASC)
             img=LIST_IMG_SORT_ASC;
         else
             img=LIST_IMG_SORT_DSC;
     }
     item.SetImage(img);
-    SetColumn(m_sortHelper.m_sortType,item);
+    SetColumn(m_sortHelper.Type,item);
 }
 
 void CslListCtrlServer::ListSort(wxInt32 column)
@@ -1344,7 +1344,7 @@ void CslListCtrlServer::ListSort(wxInt32 column)
     wxInt32 img;
 
     if (column==-1)
-        column=m_sortHelper.m_sortType;
+        column=m_sortHelper.Type;
     else
     {
         item.SetMask(wxLIST_MASK_IMAGE);
@@ -1355,22 +1355,22 @@ void CslListCtrlServer::ListSort(wxInt32 column)
             item.GetImage()==LIST_IMG_SORT_DSC_LIGHT)
         {
             g_cslSettings->autoSortColumns ? img=LIST_IMG_SORT_ASC : img=LIST_IMG_SORT_ASC_LIGHT;
-            m_sortHelper.m_sortMode=CSL_SORT_ASC;
+            m_sortHelper.Mode=CslListSortHelper::SORT_ASC;
         }
         else
         {
             g_cslSettings->autoSortColumns ? img=LIST_IMG_SORT_DSC : img=LIST_IMG_SORT_DSC_LIGHT;
-            m_sortHelper.m_sortMode=CSL_SORT_DSC;
+            m_sortHelper.Mode=CslListSortHelper::SORT_DSC;
         }
 
         item.Clear();
         item.SetImage(-1);
-        SetColumn(m_sortHelper.m_sortType,item);
+        SetColumn(m_sortHelper.Type,item);
 
         item.SetImage(img);
         SetColumn(column,item);
 
-        m_sortHelper.m_sortType=column;
+        m_sortHelper.Type=column;
     }
 
     if (!GetItemCount())
@@ -1412,7 +1412,7 @@ int wxCALLBACK CslListCtrlServer::ListSortCompareFunc(long item1,long item2,long
     bool ping2Ok=CslEngine::PingOk(*info2->Info,g_cslSettings->updateInterval);
     bool high1=info1->HighLight&CSL_HIGHLIGHT_FOUND_SERVER || info1->HighLight&CSL_HIGHLIGHT_FOUND_PLAYER;
     bool high2=info2->HighLight&CSL_HIGHLIGHT_FOUND_SERVER || info2->HighLight&CSL_HIGHLIGHT_FOUND_PLAYER;
-    wxInt32 sortType=((CslListSortHelper*)data)->m_sortType;
+    wxInt32 sortType=((CslListSortHelper*)data)->Type;
 
     if ((high1 || high2) && !(high1 && high2))
         return high1 ? -1:1;
@@ -1428,7 +1428,7 @@ int wxCALLBACK CslListCtrlServer::ListSortCompareFunc(long item1,long item2,long
     }
 
     wxInt32 type;
-    wxInt32 sortMode=((CslListSortHelper*)data)->m_sortMode;
+    wxInt32 sortMode=((CslListSortHelper*)data)->Mode;
     wxInt32 vi1=0,vi2=0;
     wxUint32 vui1=0,vui2=0;
     wxString vs1=wxEmptyString,vs2=wxEmptyString;
@@ -1437,18 +1437,18 @@ int wxCALLBACK CslListCtrlServer::ListSortCompareFunc(long item1,long item2,long
     {
         case SORT_HOST:
         {
-            type=CSL_LIST_SORT_STRING;
+            type=CslListSortHelper::SORT_STRING;
             vs1=info1->Host;
             vs2=info2->Host;
             bool isip1=IsIP(vs1);
             bool isip2=IsIP(vs2);
             if (isip1&&!isip2)
-                return sortMode==CSL_SORT_ASC ? -1 : 1;
+                return sortMode==CslListSortHelper::SORT_ASC ? -1 : 1;
             else if (!isip1&&isip2)
-                return sortMode==CSL_SORT_ASC ? 1 : -1;
+                return sortMode==CslListSortHelper::SORT_ASC ? 1 : -1;
             else if (isip1&&isip2)
             {
-                type=CSL_LIST_SORT_UINT;
+                type=CslListSortHelper::SORT_UINT;
                 vui1=IP2Int(vs1);
                 vui2=IP2Int(vs2);
             }
@@ -1456,49 +1456,49 @@ int wxCALLBACK CslListCtrlServer::ListSortCompareFunc(long item1,long item2,long
         }
 
         case SORT_DESCRIPTION:
-            type=CSL_LIST_SORT_STRING;
+            type=CslListSortHelper::SORT_STRING;
             vs1=info1->Description;
             vs2=info2->Description;
             break;
 
         case SORT_PING:
-            type=CSL_LIST_SORT_UINT;
+            type=CslListSortHelper::SORT_UINT;
             vui1=info1->Ping;
             vui2=info2->Ping;
             break;
 
         case SORT_VER:
-            type=CSL_LIST_SORT_INT;
+            type=CslListSortHelper::SORT_INT;
             vi1=info1->Protocol;
             vi2=info2->Protocol;
             break;
 
         case SORT_MODE:
-            type=CSL_LIST_SORT_STRING;
+            type=CslListSortHelper::SORT_STRING;
             vs1=info1->GameMode;
             vs2=info2->GameMode;
             break;
 
         case SORT_MAP:
-            type=CSL_LIST_SORT_STRING;
+            type=CslListSortHelper::SORT_STRING;
             vs1=info1->Map;
             vs2=info2->Map;
             break;
 
         case SORT_TIME:
-            type=CSL_LIST_SORT_UINT;
+            type=CslListSortHelper::SORT_UINT;
             vui1=info1->TimeRemain;
             vui2=info2->TimeRemain;
             break;
 
         case SORT_PLAYER:
-            type=CSL_LIST_SORT_INT;
+            type=CslListSortHelper::SORT_INT;
             vi1=info1->Players;
             vi2=info2->Players;
             break;
 
         case SORT_MM:
-            type=CSL_LIST_SORT_INT;
+            type=CslListSortHelper::SORT_INT;
             vi1=info1->MM;
             vi2=info2->MM;
             break;
@@ -1507,32 +1507,32 @@ int wxCALLBACK CslListCtrlServer::ListSortCompareFunc(long item1,long item2,long
             return 0;
     }
 
-    if (type==CSL_LIST_SORT_INT)
+    if (type==CslListSortHelper::SORT_INT)
     {
         if (vi1==vi2)
             return 0;
         if (vi1<vi2)
-            return sortMode==CSL_SORT_ASC ? -1 : 1;
+            return sortMode==CslListSortHelper::SORT_ASC ? -1 : 1;
         else
-            return sortMode==CSL_SORT_ASC ? 1 : -1;
+            return sortMode==CslListSortHelper::SORT_ASC ? 1 : -1;
     }
-    else if (type==CSL_LIST_SORT_UINT)
+    else if (type==CslListSortHelper::SORT_UINT)
     {
         if (vui1==vui2)
             return 0;
         if (vui1<vui2)
-            return sortMode==CSL_SORT_ASC ? -1 : 1;
+            return sortMode==CslListSortHelper::SORT_ASC ? -1 : 1;
         else
-            return sortMode==CSL_SORT_ASC ? 1 : -1;
+            return sortMode==CslListSortHelper::SORT_ASC ? 1 : -1;
     }
-    else if (type==CSL_LIST_SORT_STRING)
+    else if (type==CslListSortHelper::SORT_STRING)
     {
         if (vs1==vs2)
             return 0;
         if (vs1.CmpNoCase(vs2)<0)
-            return sortMode==CSL_SORT_ASC ? -1 : 1;
+            return sortMode==CslListSortHelper::SORT_ASC ? -1 : 1;
         else
-            return sortMode==CSL_SORT_ASC ? 1 : -1;
+            return sortMode==CslListSortHelper::SORT_ASC ? 1 : -1;
     }
 
     return 0;

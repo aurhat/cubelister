@@ -163,6 +163,7 @@ class CslGame
         virtual void SetClientSettings(const CslGameClientSettings& settings) { m_clientSettings=settings; }
         virtual wxString GameStart(CslServerInfo *info,wxUint32 mode,wxString *error) = 0;
         virtual wxInt32 GameEnd(wxString *error=NULL) = 0;
+        virtual bool GetMapImagePaths(wxArrayString& paths) const { return false; }
         virtual const char** GetIcon(wxInt32 size) const { return NULL; }
         //hooks for workarounds or special handling
         virtual void ProcessOutput(char *data,wxInt32 *len) const {}

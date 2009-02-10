@@ -54,6 +54,7 @@ class CslListCtrl : public wxListCtrl
                     const wxString& name=wxListCtrlNameStr);
         ~CslListCtrl();
 
+        void CreateScreenShot();
         wxUint32 GetCountryFlag(wxUint32 ip);
         static void CreateCountryFlagImageList();
 
@@ -69,12 +70,15 @@ class CslListCtrl : public wxListCtrl
         void OnItem(wxListEvent& event);
         void OnContextMenu(wxContextMenuEvent& event);
         void OnToolTip(CslToolTipEvent& event);
+
         DECLARE_EVENT_TABLE()
 
     protected:
         static wxImageList ListImageList;
 
         void FlickerFree(bool val) { m_flickerFree=val; }
+        virtual wxWindow *GetScreenShotWindow() { return this; }
+        virtual wxString GetScreenShotFileName();
         virtual void GetToolTipText(wxInt32 row,CslToolTipEvent& event) {}
         virtual wxSize GetImageListSize() { return wxDefaultSize; }
 };

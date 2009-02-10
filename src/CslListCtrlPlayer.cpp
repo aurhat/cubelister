@@ -195,30 +195,31 @@ void CslListCtrlPlayer::OnContextMenu(wxContextMenuEvent& event)
     if (CSL_CAP_CONNECT_PASS(m_info->GetGame().GetCapabilities()))
         CslMenu::AddItem(&menu,MENU_SERVER_CONNECT_PW,MENU_SERVER_CONN_PW_STR,wxART_CONNECT_PW);
 
-    if (m_info)
-    {
-        menu.AppendSeparator();
+    menu.AppendSeparator();
 
-        wxMenu *ext=new wxMenu();
-        item=menu.AppendSubMenu(ext,MENU_SERVER_EXT_STR);
-        item->SetBitmap(GET_ART_MENU(wxART_ABOUT));
-        if (m_info->ExtInfoStatus!=CSL_EXT_STATUS_OK || !CslEngine::PingOk(*m_info,g_cslSettings->updateInterval))
-            item->Enable(false);
-        else
+    wxMenu *ext=new wxMenu();
+    item=menu.AppendSubMenu(ext,MENU_SERVER_EXT_STR);
+    item->SetBitmap(GET_ART_MENU(wxART_ABOUT));
+    if (m_info->ExtInfoStatus!=CSL_EXT_STATUS_OK || !CslEngine::PingOk(*m_info,g_cslSettings->updateInterval))
+        item->Enable(false);
+    else
+    {
+        if (m_view!=SIZE_FULL)
         {
-            if (m_view!=SIZE_FULL)
-            {
-                CslMenu::AddItem(ext,MENU_SERVER_EXT_FULL,MENU_SERVER_EXT_FULL_STR,wxART_ABOUT);
-                ext->AppendSeparator();
-            }
-            if (m_view!=SIZE_MICRO)
-                CslMenu::AddItem(ext,MENU_SERVER_EXT_MICRO,MENU_SERVER_EXT_MICRO_STR,wxART_EXTINFO_MICRO);
-            if (m_view!=SIZE_MINI)
-                CslMenu::AddItem(ext,MENU_SERVER_EXT_MINI,MENU_SERVER_EXT_MINI_STR,wxART_EXTINFO_MINI);
-            if (m_view!=SIZE_DEFAULT)
-                CslMenu::AddItem(ext,MENU_SERVER_EXT_DEFAULT,MENU_SERVER_EXT_DEFAULT_STR,wxART_EXTINFO_DEFAULT);
+            CslMenu::AddItem(ext,MENU_SERVER_EXT_FULL,MENU_SERVER_EXT_FULL_STR,wxART_ABOUT);
+            ext->AppendSeparator();
         }
+        if (m_view!=SIZE_MICRO)
+            CslMenu::AddItem(ext,MENU_SERVER_EXT_MICRO,MENU_SERVER_EXT_MICRO_STR,wxART_EXTINFO_MICRO);
+        if (m_view!=SIZE_MINI)
+            CslMenu::AddItem(ext,MENU_SERVER_EXT_MINI,MENU_SERVER_EXT_MINI_STR,wxART_EXTINFO_MINI);
+        if (m_view!=SIZE_DEFAULT)
+            CslMenu::AddItem(ext,MENU_SERVER_EXT_DEFAULT,MENU_SERVER_EXT_DEFAULT_STR,wxART_EXTINFO_DEFAULT);
     }
+
+    menu.AppendSeparator();
+
+    CslMenu::AddItem(&menu,MENU_SAVE,MENU_SERVER_SAVEIMG_STR,wxART_FILE_SAVE_AS);
 
     point=ScreenToClient(point);
     PopupMenu(&menu,point);
@@ -243,6 +244,10 @@ void CslListCtrlPlayer::OnMenu(wxCommandEvent& event)
         case MENU_SERVER_EXT_DEFAULT:
             event.SetClientData(m_info);
             event.Skip();
+            break;
+
+        case MENU_SAVE:
+            CreateScreenShot();
             break;
 
         default:
@@ -290,6 +295,27 @@ void CslListCtrlPlayer::GetToolTipText(wxInt32 row,CslToolTipEvent& event)
 
         event.Title=_("Player information");
     }
+}
+
+wxString CslListCtrlPlayer::GetScreenShotFileName()
+{
+    wxString s;
+
+    s<<m_info->GetBestDescription()<<wxT("-")<<m_info->GameMode<<wxT("-")<<m_info->Map;
+    FixFilename(s);
+    s<<wxT("-")<<wxDateTime::Now().Format(wxT("%Y%m%d_%H%M%S"))<<wxT(".png");
+
+    return s;
+}
+
+wxSize CslListCtrlPlayer::GetImageListSize()
+{
+    wxInt32 x,y;
+
+    if (ListImageList.GetSize(0,x,y))
+        return wxSize(x,y);
+
+    return wxDefaultSize;
 }
 
 void CslListCtrlPlayer::UpdateData()
@@ -484,7 +510,7 @@ void CslListCtrlPlayer::ListSort(const wxInt32 column)
     wxInt32 col;
 
     if (column==-1)
-        col=m_sortHelper.m_sortType;
+        col=m_sortHelper.Type;
     else
     {
         col=column;
@@ -494,22 +520,22 @@ void CslListCtrlPlayer::ListSort(const wxInt32 column)
         if (item.GetImage()==-1 || item.GetImage()==CSL_LIST_IMG_SORT_DSC)
         {
             img=CSL_LIST_IMG_SORT_ASC;
-            m_sortHelper.m_sortMode=CSL_SORT_ASC;
+            m_sortHelper.Mode=CslListSortHelper::SORT_ASC;
         }
         else
         {
             img=CSL_LIST_IMG_SORT_DSC;
-            m_sortHelper.m_sortMode=CSL_SORT_DSC;
+            m_sortHelper.Mode=CslListSortHelper::SORT_DSC;
         }
 
         item.Clear();
         item.SetImage(-1);
-        SetColumn(m_sortHelper.m_sortType,item);
+        SetColumn(m_sortHelper.Type,item);
 
         item.SetImage(img);
         SetColumn(col,item);
 
-        m_sortHelper.m_sortType=col;
+        m_sortHelper.Type=col;
     }
 
     if (GetItemCount()>0)
@@ -602,25 +628,25 @@ void CslListCtrlPlayer::ListInit(const wxInt32 view)
     wxInt32 img;
 
     if (m_view==SIZE_MICRO)
-        m_sortHelper.Init(CSL_SORT_ASC,SORT_NAME);
+        m_sortHelper.Init(CslListSortHelper::SORT_ASC,SORT_NAME);
     else
-        m_sortHelper.Init(CSL_SORT_DSC,SORT_FRAGS);
+        m_sortHelper.Init(CslListSortHelper::SORT_DSC,SORT_FRAGS);
 
-    if (m_sortHelper.m_sortMode==CSL_SORT_ASC)
+    if (m_sortHelper.Mode==CslListSortHelper::SORT_ASC)
         img=CSL_LIST_IMG_SORT_ASC;
     else
         img=CSL_LIST_IMG_SORT_DSC;
 
     item.SetImage(img);
-    SetColumn(m_sortHelper.m_sortType,item);
+    SetColumn(m_sortHelper.Type,item);
 }
 
 int wxCALLBACK CslListCtrlPlayer::ListSortCompareFunc(long item1,long item2,long data)
 {
     CslPlayerStatsData *stats1=(CslPlayerStatsData*)item1;
     CslPlayerStatsData *stats2=(CslPlayerStatsData*)item2;
-    wxInt32 sortMode=((CslListSortHelper*)data)->m_sortMode;
-    wxInt32 sortType=((CslListSortHelper*)data)->m_sortType;
+    wxInt32 sortMode=((CslListSortHelper*)data)->Mode;
+    wxInt32 sortType=((CslListSortHelper*)data)->Type;
 
     if (sortType!=SORT_NAME)
     {
@@ -638,55 +664,55 @@ int wxCALLBACK CslListCtrlPlayer::ListSortCompareFunc(long item1,long item2,long
     switch (sortType)
     {
         case SORT_NAME:
-            type=CSL_LIST_SORT_STRING;
+            type=CslListSortHelper::SORT_STRING;
             vs1=stats1->Name;
             vs2=stats2->Name;
             break;
 
         case SORT_TEAM:
-            type=CSL_LIST_SORT_STRING;
+            type=CslListSortHelper::SORT_STRING;
             vs1=stats1->Team;
             vs2=stats2->Team;
             break;
 
         case SORT_FRAGS:
-            type=CSL_LIST_SORT_INT;
+            type=CslListSortHelper::SORT_INT;
             vi1=stats1->Frags;
             vi2=stats2->Frags;
             break;
 
         case SORT_DEATHS:
-            type=CSL_LIST_SORT_INT;
+            type=CslListSortHelper::SORT_INT;
             vi1=stats1->Deaths;
             vi2=stats2->Deaths;
             break;
 
         case SORT_TEAMKILLS:
-            type=CSL_LIST_SORT_INT;
+            type=CslListSortHelper::SORT_INT;
             vi1=stats1->Teamkills;
             vi2=stats2->Teamkills;
             break;
 
         case SORT_ACCURACY:
-            type=CSL_LIST_SORT_INT;
+            type=CslListSortHelper::SORT_INT;
             vi1=stats1->Accuracy;
             vi2=stats2->Accuracy;
             break;
 
         case SORT_HEALTH:
-            type=CSL_LIST_SORT_INT;
+            type=CslListSortHelper::SORT_INT;
             vi1=stats1->Health;
             vi2=stats2->Health;
             break;
 
         case SORT_ARMOUR:
-            type=CSL_LIST_SORT_INT;
+            type=CslListSortHelper::SORT_INT;
             vi1=stats1->Armour;
             vi2=stats2->Armour;
             break;
 
         case SORT_WEAPON:
-            type=CSL_LIST_SORT_INT;
+            type=CslListSortHelper::SORT_INT;
             vi1=stats1->Weapon;
             vi2=stats2->Weapon;
             break;
@@ -695,32 +721,32 @@ int wxCALLBACK CslListCtrlPlayer::ListSortCompareFunc(long item1,long item2,long
             return 0;
     }
 
-    if (type==CSL_LIST_SORT_INT)
+    if (type==CslListSortHelper::SORT_INT)
     {
         if (vi1==vi2)
             return 0;
         if (vi1<vi2)
-            return sortMode==CSL_SORT_ASC ? -1 : 1;
+            return sortMode==CslListSortHelper::SORT_ASC ? -1 : 1;
         else
-            return sortMode==CSL_SORT_ASC ? 1 : -1;
+            return sortMode==CslListSortHelper::SORT_ASC ? 1 : -1;
     }
-    else if (type==CSL_LIST_SORT_UINT)
+    else if (type==CslListSortHelper::SORT_UINT)
     {
         if (vui1==vui2)
             return 0;
         if (vui1<vui2)
-            return sortMode==CSL_SORT_ASC ? -1 : 1;
+            return sortMode==CslListSortHelper::SORT_ASC ? -1 : 1;
         else
-            return sortMode==CSL_SORT_ASC ? 1 : -1;
+            return sortMode==CslListSortHelper::SORT_ASC ? 1 : -1;
     }
-    else if (type==CSL_LIST_SORT_STRING)
+    else if (type==CslListSortHelper::SORT_STRING)
     {
         if (vs1==vs2)
             return 0;
         if (vs1.CmpNoCase(vs2)<0)
-            return sortMode==CSL_SORT_ASC ? -1 : 1;
+            return sortMode==CslListSortHelper::SORT_ASC ? -1 : 1;
         else
-            return sortMode==CSL_SORT_ASC ? 1 : -1;
+            return sortMode==CslListSortHelper::SORT_ASC ? 1 : -1;
     }
 
     return 0;

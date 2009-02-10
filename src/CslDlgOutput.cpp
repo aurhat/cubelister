@@ -518,28 +518,16 @@ void CslDlgOutput::Reset(const wxString& title)
 
 }
 
-void CslDlgOutput::FixFilename(wxString *name)
-{
-    wxUint32 i,j;
-    wxString exclude=wxT("\\/:*?\"<>| ");
-
-    for (i=0;i<name->Length();i++)
-        for (j=0;j<exclude.Length();j++)
-            if (name->GetChar(i)==exclude.GetChar(j))
-                name->SetChar(i,wxT('_'));
-}
-
 void CslDlgOutput::SaveFile(const wxString& path)
 {
     wxString filename;
-    wxDateTime now=wxDateTime::Now();
 
     if (!path.IsEmpty())
     {
         filename=m_self->m_title+wxT("-");
-        m_self->FixFilename(&filename);
+        FixFilename(filename);
     }
-    filename+=now.Format(wxT("%Y%m%d_%H%M%S"));
+    filename+=wxDateTime::Now().Format(wxT("%Y%m%d_%H%M%S"));
 
     if (path.IsEmpty() && m_self->checkbox_conv_filter->GetValue())
         filename+=wxT("-conversation");
@@ -553,7 +541,7 @@ void CslDlgOutput::SaveFile(const wxString& path)
                          CSL_OUTPUT_EXTENSION,wxSAVE|wxOVERWRITE_PROMPT);
         // wxGTK: hmm, doesn't work in the ctor?!
         if (wxDirExists(g_cslSettings->gameOutputPath))
-            dlg.SetPath(g_cslSettings->gameOutputPath+wxT("/")+filename);
+            dlg.SetPath(g_cslSettings->gameOutputPath+PATHDIV+filename);
         if (dlg.ShowModal()!=wxID_OK)
             return;
 
@@ -568,6 +556,6 @@ void CslDlgOutput::SaveFile(const wxString& path)
         filename=pathname+filename;
     }
 
-    const wxString &out=path.IsEmpty() ? m_self->text_ctrl_output->GetValue():m_self->m_text;
+    const wxString& out=path.IsEmpty() ? m_self->text_ctrl_output->GetValue():m_self->m_text;
     WriteTextFile(filename,out,wxFile::write);
 }

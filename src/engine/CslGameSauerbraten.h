@@ -65,6 +65,7 @@ class CslGameSauerbraten : public CslGame
         void SetClientSettings(const CslGameClientSettings& settings);
         wxString GameStart(CslServerInfo *info,wxUint32 mode,wxString *error);
         wxInt32 GameEnd(wxString *error=NULL);
+        bool GetMapImagePaths(wxArrayString& paths) const;
         const char** GetIcon(wxInt32 size) const;
 };
 

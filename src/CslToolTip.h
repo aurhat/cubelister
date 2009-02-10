@@ -52,8 +52,8 @@ typedef void (wxEvtHandler::*CslToolTipEventFunction)(CslToolTipEvent&);
 class CslToolTipEvent : public wxEvent
 {
     public:
-        CslToolTipEvent() :
-                wxEvent(wxID_ANY,wxCSL_EVT_TOOLTIP) {}
+        CslToolTipEvent(const wxPoint& pos) :
+                wxEvent(wxID_ANY,wxCSL_EVT_TOOLTIP), Pos(pos) {}
 
         virtual wxEvent* Clone() const
         {

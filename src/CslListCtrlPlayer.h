@@ -73,13 +73,9 @@ class CslListCtrlPlayer : public CslListCtrl
         void ListSort(const wxInt32 column);
 
         void GetToolTipText(wxInt32 row,CslToolTipEvent& event);
-        wxSize GetImageListSize()
-        {
-            wxInt32 x,y;
-            if (ListImageList.GetSize(0,x,y))
-                return wxSize(x,y);
-            return wxDefaultSize;
-        }
+        wxString GetScreenShotFileName();
+        wxWindow *GetScreenShotWindow() { return GetParent(); }
+        wxSize GetImageListSize();
 
 
         static int wxCALLBACK ListSortCompareFunc(long item1,long item2,long data);

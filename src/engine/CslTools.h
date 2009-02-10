@@ -29,6 +29,7 @@
 #include <wx/stdpaths.h>
 #include <wx/stopwatch.h>
 #include <wx/bitmap.h>
+#include <wx/window.h>
 
 // since WX > 2.8.4 the listctrl items
 // get deselected when sorting (only wxGTK ?)
@@ -110,11 +111,13 @@ enum
 extern wxString g_basePath;
 
 extern void StripColours(char *src,wxInt32 *len,wxInt32 count);
+extern void FixFilename(wxString& name);
 extern bool IsIP(const wxString& s);
 extern wxUint32 IP2Int(const wxString& s);
 extern wxString FormatBytes(wxUint64 size);
 extern wxString FormatSeconds(wxUint32 time,bool space=false,bool full=false);
 extern wxUint32 GetTicks();
+extern bool BitmapFromWindow(wxWindow *window,wxBitmap& bitmap);
 extern wxString GetHttpAgent();
 extern wxInt32 WriteTextFile(const wxString& filename,const wxString& data,const wxFile::OpenMode mode);
 
@@ -122,21 +125,20 @@ extern wxInt32 WriteTextFile(const wxString& filename,const wxString& data,const
 wxBitmap AdjustIconSize(const char **data,const wxIcon& icon,
                         const wxSize& size,const wxPoint& origin);
 
-
-enum { CSL_SORT_ASC = 0, CSL_SORT_DSC };
-enum { CSL_LIST_SORT_INT = 0, CSL_LIST_SORT_UINT, CSL_LIST_SORT_STRING };
-
 class CslListSortHelper
 {
     public:
+        enum { SORT_ASC = 0, SORT_DSC };
+        enum { SORT_INT = 0, SORT_UINT, SORT_STRING };
+
         void Init(wxUint32 mode,wxUint32 type)
         {
-            m_sortMode=mode;
-            m_sortType=type;
+            Mode=mode;
+            Type=type;
         }
 
-        wxInt32 m_sortMode;
-        wxInt32 m_sortType;
+        wxInt32 Mode;
+        wxInt32 Type;
 };
 
 #endif // CSLTOOLS_H

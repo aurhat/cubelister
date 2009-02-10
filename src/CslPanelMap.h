@@ -75,9 +75,9 @@ class CslMapInfo
         }
 
         bool GetMapConfigVersions(wxFileConfig& config,t_aInt32& array);
-        bool LoadMapConfig(wxFileConfig& config,const wxInt32 protVersion);
-        bool LoadMapData(const wxString& mapName,const wxString& gameName,
-                         const wxInt32 protVersion);
+        bool LoadMapConfig(wxFileConfig& config,const wxInt32 protocol);
+        bool LoadMapImage(const wxString& map,const wxString& path);
+        bool LoadMapData(const wxString& map,const wxString& game,const wxInt32 protocol);
         void Reset(const wxString& mapName=wxEmptyString,const wxInt32 version=-1)
         {
             m_version=version;
@@ -142,7 +142,9 @@ class CslPanelMap : public wxPanel
         bool m_background;
 
         void OnPaint(wxPaintEvent& event);
+#ifdef __WXMSW__
         void OnErase(wxEraseEvent& event) { if (m_background) event.Skip(); }
+#endif
 
         DECLARE_EVENT_TABLE();
 

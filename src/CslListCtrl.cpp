@@ -40,6 +40,7 @@ END_EVENT_TABLE()
 
 wxImageList CslListCtrl::ListImageList;
 
+
 CslListCtrl::CslListCtrl(wxWindow* parent,wxWindowID id,const wxPoint& pos,const wxSize& size,
                          long style,const wxValidator& validator,const wxString& name) :
         wxListCtrl(parent,id,pos,size,style,validator,name),
@@ -150,11 +151,10 @@ void CslListCtrl::OnToolTip(CslToolTipEvent& event)
 #ifdef __WXGTK__
     bool first=true;
 #endif
-    const wxPoint& spos=wxGetMousePosition();
-    const wxPoint& wpos=ScreenToClient(spos);
     const wxSize& size=GetClientSize();
+    const wxPoint& pos=ScreenToClient(event.Pos);
 
-    if (wpos.x>=0 && wpos.y>=0 && wpos.x<=size.x && wpos.y<=size.y)
+    if (pos.x>=0 && pos.y>=0 && pos.x<=size.x && pos.y<=size.y)
     {
         for (i=GetTopItem();i<GetItemCount();i++)
         {
@@ -170,7 +170,7 @@ void CslListCtrl::OnToolTip(CslToolTipEvent& event)
 #endif
             rect.y-=offset;
 
-            if (!rect.Contains(wpos))
+            if (!rect.Contains(pos))
                 continue;
 
             wxString title;
@@ -179,14 +179,45 @@ void CslListCtrl::OnToolTip(CslToolTipEvent& event)
             GetToolTipText(i,event);
 
             if (!event.Text.IsEmpty())
-            {
-                event.Pos=spos;
                 return;
-            }
         }
     }
 
     event.Skip();
+}
+
+void CslListCtrl::CreateScreenShot()
+{
+    wxString file;
+    wxBitmap bitmap;
+    wxWindow *window=GetScreenShotWindow();
+
+    if (!BitmapFromWindow(window,bitmap))
+    {
+        wxMessageBox(_("Error creating the screenshot!"),
+                     _("Error"),wxOK|wxICON_ERROR,window);
+        return;
+    }
+
+    file=GetScreenShotFileName();
+
+    wxFileDialog dlg(window,_("Save screenshot"),wxEmptyString,file,
+                     _("Png files (*.png)|*.png"),wxSAVE|wxOVERWRITE_PROMPT);
+    // wxGTK: hmm, doesn't work in the ctor?!
+    if (wxDirExists(g_cslSettings->screenOutputPath))
+        dlg.SetPath(g_cslSettings->screenOutputPath+PATHDIV+file);
+    if (dlg.ShowModal()!=wxID_OK)
+        return;
+
+    file=dlg.GetPath();
+    g_cslSettings->screenOutputPath=::wxPathOnly(file);
+
+    bitmap.SaveFile(file,wxBITMAP_TYPE_PNG);
+}
+
+wxString CslListCtrl::GetScreenShotFileName()
+{
+    return wxDateTime::Now().Format(wxT("%Y%m%d_%H%M%S"))+wxT(".png");
 }
 
 wxUint32 CslListCtrl::GetCountryFlag(wxUint32 ip)

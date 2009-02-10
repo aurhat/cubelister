@@ -38,7 +38,7 @@
 #include "CslSettings.h"
 
 
-#define MENU_SERVER_EXT_FULL_STR         _("Full")
+#define MENU_SERVER_EXT_FULL_STR         _("Full ...")
 #define MENU_SERVER_EXT_MICRO_STR        _("Micro")
 #define MENU_SERVER_EXT_MINI_STR         _("Mini")
 #define MENU_SERVER_EXT_DEFAULT_STR      _("Default")
@@ -46,16 +46,17 @@
 
 #define MENU_SERVER_CONN_STR             _("&Connect")
 #define MENU_SERVER_CONN_PW_STR          _("Connect (&Password)")
-#define MENU_SERVER_COPY_STR             _("Create CSL links")
-#define MENU_SERVER_COPY_CON_STR         _("Connect")
-#define MENU_SERVER_COPY_CONFAV_STR      _("Connect && add to favourites")
-#define MENU_SERVER_COPY_FAV_STR         _("Add to favourites")
+#define MENU_SERVER_COPY_STR             _("Create CS&L links")
+#define MENU_SERVER_COPY_CON_STR         _("Connec&t")
+#define MENU_SERVER_COPY_CONFAV_STR      _("Connect && &add to favourites")
+#define MENU_SERVER_COPY_FAV_STR         _("Add to &favourites")
 #define MENU_SERVER_COPY_SERVER_STR      _("C&opy to clipboard")
 #define MENU_SERVER_ADD_STR              _("&Add server ...")
 #define MENU_SERVER_FAV_ADD_STR          _("&Add to favourites")
 #define MENU_SERVER_FAV_REM_STR          _("&Remove from favourites")
 #define MENU_SERVER_DEL_STR              _("&Delete server")
 #define MENU_SERVER_DELM_STR             _("&Delete servers")
+#define MENU_SERVER_SAVEIMG_STR          _("&Save as image ...")
 
 #define MENU_SERVER_FILTER_STR           _("Filter")
 #define MENU_SERVER_FILTER_OFF_STR       _("Offline")
@@ -72,6 +73,7 @@ enum
     MENU_REM = wxID_REMOVE,
     MENU_DEL = wxID_DELETE,
     MENU_COPY = wxID_COPY,
+    MENU_SAVE = wxID_SAVEAS,
     MENU_UPDATE = wxID_REFRESH,
     //custom events/art
     MENU_CUSTOM = wxID_HIGHEST+1,
