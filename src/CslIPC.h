@@ -37,7 +37,11 @@
 
 
 #define CSL_IPC_HOST wxT("localhost")
-#define CSL_IPC_SERV wxT("49152")
+#ifdef __WXMSW__
+#define CSL_IPC_SERV wxT("CSL_IPC")
+#else
+#define CSL_IPC_SERV wxString(CSL_USER_DATADIR+wxT("sock"))
+#endif
 #define CSL_IPC_TOPIC wxT("CSL_IPC_CONTROL")
 
 #define CSL_URI_SCHEME_STR          wxT("csl://")

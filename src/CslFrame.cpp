@@ -215,16 +215,15 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
             TreeAddGame(game,icon ? i+1:-1,select);
         }
 
+        CslMenu::EnableMenuItem(MENU_ADD);
+
         m_ipcServer=new CslIpcServer(this);
         if (!m_ipcServer->Create(CSL_IPC_SERV))
         {
+            LOG_DEBUG("couldn't create IPC server socket\n");
             delete m_ipcServer;
             m_ipcServer=NULL;
         }
-
-        CslMenu::EnableMenuItem(MENU_ADD);
-
-        //tree_ctrl_games->ExpandAll();
 
         m_timerUpdate=g_cslSettings->updateInterval/CSL_TIMER_SHOT;
         m_timerCount=0;
@@ -1191,9 +1190,7 @@ void CslFrame::LoadSettings()
 {
     g_cslSettings=new CslSettings;
 
-    wxString file=wxStandardPaths().GetUserDataDir()+PATHDIV+wxT("settings.ini");
-
-    if (!::wxFileExists(file))
+    if (!::wxFileExists(CSL_SETTINGS_FILE))
         return;
 
     long int val;
@@ -1203,7 +1200,8 @@ void CslFrame::LoadSettings()
     wxUint32 version;
     wxString s;
 
-    wxFileConfig config(wxEmptyString,wxEmptyString,file,wxEmptyString,wxCONFIG_USE_LOCAL_FILE);
+    wxFileConfig config(wxEmptyString,wxEmptyString,CSL_SETTINGS_FILE,
+                        wxEmptyString,wxCONFIG_USE_LOCAL_FILE);
 
     config.SetPath(wxT("/Version"));
     config.Read(wxT("Version"),&val,0); version=val;
@@ -1325,12 +1323,12 @@ void CslFrame::LoadSettings()
 
 void CslFrame::SaveSettings()
 {
-    wxString dir=wxStandardPaths().GetUserDataDir();
+    wxString dir=::wxPathOnly(CSL_SETTINGS_FILE);
 
-    if (!::wxDirExists(dir))
+    if (!::wxDirExists(::wxPathOnly(dir)))
         ::wxMkdir(dir,0700);
 
-    wxFileConfig config(wxEmptyString,wxEmptyString,dir+PATHDIV+wxT("settings.ini"),
+    wxFileConfig config(wxEmptyString,wxEmptyString,CSL_SETTINGS_FILE,
                         wxEmptyString,wxCONFIG_USE_LOCAL_FILE);
     config.SetUmask(0077);
     config.DeleteAll();
@@ -1407,9 +1405,7 @@ void CslFrame::SaveSettings()
 
 bool CslFrame::LoadServers(wxUint32 *numm,wxUint32 *nums)
 {
-    wxString file=wxStandardPaths().GetUserDataDir()+PATHDIV+wxT("servers.ini");
-
-    if (!::wxFileExists(file))
+    if (!::wxFileExists(CSL_SERVERS_FILE))
         return false;
 
     long int val;
@@ -1429,7 +1425,8 @@ bool CslFrame::LoadServers(wxUint32 *numm,wxUint32 *nums)
     wxUint32 connectedTimes=0;
     wxInt32 gt;
 
-    wxFileConfig config(wxEmptyString,wxEmptyString,file,wxEmptyString,wxCONFIG_USE_LOCAL_FILE);
+    wxFileConfig config(wxEmptyString,wxEmptyString,CSL_SERVERS_FILE,
+                        wxEmptyString,wxCONFIG_USE_LOCAL_FILE);
 
     vector<CslGame*>& games=m_engine->GetGames();
 
@@ -1583,13 +1580,13 @@ bool CslFrame::LoadServers(wxUint32 *numm,wxUint32 *nums)
 
 void CslFrame::SaveServers()
 {
-    wxString s=wxStandardPaths().GetUserDataDir();
+    wxString s=::wxPathOnly(CSL_SERVERS_FILE);
 
     if (!::wxDirExists(s))
         if (!::wxMkdir(s,0700))
             return;
 
-    wxFileConfig config(wxEmptyString,wxEmptyString,s+PATHDIV+wxT("servers.ini"),
+    wxFileConfig config(wxEmptyString,wxEmptyString,CSL_SERVERS_FILE,
                         wxEmptyString,wxCONFIG_USE_LOCAL_FILE);
     config.SetUmask(0077);
     config.DeleteAll();

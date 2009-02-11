@@ -85,6 +85,8 @@
 #define PATHDIVA wxT('/')
 #endif
 
+#define CSL_USER_DATADIR wxString(wxStandardPaths().GetUserDataDir()+PATHDIV)
+
 #ifdef __WXDEBUG__
 void Debug_Printf(const char *file,int line,const char *func,const char *fmt,...);
 #define LOG_DEBUG(...) Debug_Printf(__FILE__,__LINE__,__FUNCTION__,## __VA_ARGS__);

@@ -155,8 +155,8 @@ void CslToolTip::ShowTip(CslToolTipEvent& event)
     wxUint32 i;
     wxString left,right;
 
-    //set the default tooltip bg colour otherwise it's the default window bg colour
 #ifdef __WXMSW__
+    //set the default tooltip bg colour otherwise it's the default window bg colour
     const wxColour& bg=wxSystemSettings::GetColour(wxSYS_COLOUR_INFOBK);
     m_left->SetBackgroundColour(bg);
     m_right->SetBackgroundColour(bg);
@@ -184,7 +184,7 @@ void CslToolTip::ShowTip(CslToolTipEvent& event)
     else if (!event.Title.IsEmpty() && !m_title->IsShown())
         m_sizer->Show(m_title);
 
-#ifndef __WXMSW__ //necessary on wxMAC and wxGTK < 2.8.9
+#ifdef __WXMAC__
     {
         wxClientDC dc(m_left);
         const wxSize& size=dc.GetMultiLineTextExtent(left);
@@ -197,9 +197,10 @@ void CslToolTip::ShowTip(CslToolTipEvent& event)
     }
 #endif
 
-    m_sizer->SetSizeHints(this);
+    m_sizer->Fit(this);
 
 #ifndef __WXGTK__
+    // ensure the tip is fully shown on the screen
     const wxRect& client=GetRect();
     const wxRect& screen=::wxGetClientDisplayRect();
 
