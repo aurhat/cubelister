@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 -2009 by Glen Masgai                               *
+ *   Copyright (C) 2007-2009 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -92,9 +92,9 @@ class CslUDPPacket
         void SetSize(const wxUint32 size) { m_size=size; }
         void SetAddr(const wxIPV4address& addr) { m_addr=addr; }
 
-        void* Data() { return m_data; }
-        wxUint32 Size() { return m_size; }
-        wxIPV4address& Address() { return m_addr; }
+        void* Data() const { return m_data; }
+        wxUint32 Size() const { return m_size; }
+        const wxIPV4address& Address() const { return m_addr; }
 
     private:
         wxUint32 m_size;
@@ -115,6 +115,7 @@ class CslUDP : public wxEvtHandler
         bool SendPing(CslUDPPacket *packet);
         static wxUint32 GetTraffic(wxUint32 type,bool overhead=false);
         static wxUint32 GetPacketCount(wxUint32 type);
+        const wxString GetSocketError(wxInt32 code) const;
 
     private:
         wxEvtHandler *m_evtHandler;

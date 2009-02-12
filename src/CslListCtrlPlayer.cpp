@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 -2009 by Glen Masgai                               *
+ *   Copyright (C) 2007-2009 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -287,7 +287,7 @@ void CslListCtrlPlayer::GetToolTipText(wxInt32 row,CslToolTipEvent& event)
         c=CslGeoIP::GetCountryNameByIPnum(data->IP);
         event.Text.Add(_("Country"));
         event.Text.Add(c ? (A2U(c)).c_str() : CslGeoIP::IsOk() ?
-                       _("Unknown") : _("GeoIP database not found"));
+                       T2C(_("Unknown")) : T2C(_("GeoIP database not found")));
 
         event.Text.Add(wxT("ID / IP"));
         event.Text.Add(wxString::Format(wxT("%d / %d.%d.%d.x"),data->ID,

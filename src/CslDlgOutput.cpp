@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 -2009 by Glen Masgai                               *
+ *   Copyright (C) 2007-2009 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -214,8 +214,13 @@ void CslDlgOutput::OnCommandEvent(wxCommandEvent& event)
         {
             if (wxDirExists(g_cslSettings->gameOutputPath))
                 s=g_cslSettings->gameOutputPath;
-            wxFileDialog dlg(this,_("Open log file"),s,wxEmptyString,
-                             CSL_OUTPUT_EXTENSION,wxOPEN|wxFILE_MUST_EXIST);
+            wxFileDialog dlg(this,_("Open log file"),s,wxEmptyString,CSL_OUTPUT_EXTENSION,
+#if wxCHECK_VERSION(2,9,0)
+                             wxFD_OPEN|wxFD_FILE_MUST_EXIST
+#else
+                             wxOPEN|wxFILE_MUST_EXIST
+#endif
+                            );
             if (dlg.ShowModal()!=wxID_OK)
                 break;
 
@@ -537,8 +542,13 @@ void CslDlgOutput::SaveFile(const wxString& path)
 
     if (path.IsEmpty())
     {
-        wxFileDialog dlg(m_self,_("Save log file"),wxEmptyString,filename,
-                         CSL_OUTPUT_EXTENSION,wxSAVE|wxOVERWRITE_PROMPT);
+        wxFileDialog dlg(m_self,_("Save log file"),wxEmptyString,filename,CSL_OUTPUT_EXTENSION,
+#if wxCHECK_VERSION(2,9,0)
+                         wxFD_SAVE|wxFD_OVERWRITE_PROMPT
+#else
+                         wxSAVE|wxOVERWRITE_PROMPT
+#endif
+                        );
         // wxGTK: hmm, doesn't work in the ctor?!
         if (wxDirExists(g_cslSettings->gameOutputPath))
             dlg.SetPath(g_cslSettings->gameOutputPath+PATHDIV+filename);

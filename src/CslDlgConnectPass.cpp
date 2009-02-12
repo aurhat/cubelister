@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 -2009 by Glen Masgai                               *
+ *   Copyright (C) 2007-2009 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *

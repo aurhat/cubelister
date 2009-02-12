@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 -2009 by Glen Masgai                               *
+ *   Copyright (C) 2007-2009 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -83,7 +83,7 @@ const wxChar* CslGameSauerbraten::GetModeName(wxInt32 mode,wxInt32 prot) const
             wxT("insta assassin"),wxT("ctf"),wxT("insta ctf")
         };
         return (mode>=0 && (size_t)mode<sizeof(modes)/sizeof(modes[0])) ?
-               modes[mode] : _("unknown");
+               modes[mode] : T2C(_("unknown"));
     }
     else
     {
@@ -94,7 +94,7 @@ const wxChar* CslGameSauerbraten::GetModeName(wxInt32 mode,wxInt32 prot) const
             wxT("capture"),wxT("regen capture"),wxT("ctf"),wxT("insta ctf")
         };
         return (mode>=0 && (size_t)mode<sizeof(modes)/sizeof(modes[0])) ?
-               modes[mode] : _("unknown");
+               modes[mode] : T2C(_("unknown"));
     }
 
     return _("unknown");
@@ -109,7 +109,7 @@ const wxChar* CslGameSauerbraten::GetWeaponName(wxInt32 n) const
         _("Iceball"),_("Slimeball"),_("Bite")
     };
     return (n>=0 && (size_t)n<sizeof(weapons)/sizeof(weapons[0])) ?
-           weapons[n] : _("unknown");
+           weapons[n] : T2C(_("unknown"));
 }
 
 bool CslGameSauerbraten::ModeHasFlags(wxInt32 mode,wxInt32 prot) const

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 -2009 by Glen Masgai                               *
+ *   Copyright (C) 2007-2009 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -2480,7 +2480,12 @@ void CslFrame::OnSize(wxSizeEvent& event)
 #ifndef __WXMAC__
 void CslFrame::OnIconize(wxIconizeEvent& event)
 {
-    if (g_cslSettings->systray&CSL_USE_SYSTRAY && event.Iconized())
+#if wxCHECK_VERSION(2,9,0)
+    bool iconized=event.IsIconized();
+#else
+    bool iconized=event.Iconized();
+#endif
+    if (g_cslSettings->systray&CSL_USE_SYSTRAY && iconized)
         Hide();
 
     event.Skip();
@@ -2494,7 +2499,11 @@ void CslFrame::OnTrayIcon(wxTaskBarIconEvent& WXUNUSED(event))
 
 void CslFrame::OnShow(wxShowEvent& event)
 {
+#if wxCHECK_VERSION(2,9,0)
+    if (event.IsShown())
+#else
     if (event.GetShow())
+#endif
     {
         list_ctrl_master->ListAdjustSize(list_ctrl_master->GetClientSize());
         list_ctrl_favourites->ListAdjustSize(list_ctrl_favourites->GetClientSize());

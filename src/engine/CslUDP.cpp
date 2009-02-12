@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 -2009 by Glen Masgai                               *
+ *   Copyright (C) 2007-2009 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -86,7 +86,7 @@ void CslUDP::OnSocketEvent(wxSocketEvent& event)
     {
         packet->FreeData();
 #ifndef __WXMSW__
-        LOG_DEBUG("Error reading on UDP socket\n");
+        LOG_DEBUG("Error receiving packet: %s\n",U2A(GetSocketError(m_socket->LastError())));
 #endif
     }
 
@@ -103,18 +103,16 @@ void CslUDP::OnSocketEvent(wxSocketEvent& event)
 
 bool CslUDP::SendPing(CslUDPPacket *packet)
 {
-    void *data=packet->Data();
-    wxUint32 size=packet->Size();
-    wxIPV4address addr=packet->Address();
+    wxInt32 size=packet->Size();
+
+    m_socket->SendTo(packet->Address(),packet->Data(),size);
 
     packet->SetSize(0);
     delete packet;
 
-    m_socket->SendTo(addr,data,size);
-
     if (m_socket->Error())
     {
-        LOG_DEBUG("Error send\n");
+        LOG_DEBUG("Error sending packet: %s\n",U2A(GetSocketError(m_socket->LastError())));
         return false;
     }
 
@@ -155,4 +153,35 @@ wxUint32 CslUDP::GetTraffic(wxUint32 type,bool overhead)
     }
 
     return bytes+packets*(overhead ? CSL_UDP_OVERHEAD:0);
+}
+
+const wxString CslUDP::GetSocketError(wxInt32 code) const
+{
+    switch (code)
+    {
+        case wxSOCKET_NOERROR:
+            return wxT("No error happened");
+        case wxSOCKET_INVOP:
+            return wxT("Invalid operation");
+        case wxSOCKET_IOERR:
+            return wxT("Input/Output error");
+        case wxSOCKET_INVADDR:
+            return wxT("Invalid address passed to wxSocket");
+        case wxSOCKET_INVSOCK:
+            return wxT("Invalid socket(uninitialized)");
+        case wxSOCKET_NOHOST:
+            return wxT("No corresponding host");
+        case wxSOCKET_INVPORT:
+            return wxT("Invalid port");
+        case wxSOCKET_WOULDBLOCK:
+            return wxT("The socket is non-blocking and the operation would block");
+        case wxSOCKET_TIMEDOUT:
+            return wxT("The timeout for this operation expired");
+        case wxSOCKET_MEMERR:
+            return wxT("Memory exhausted");
+        default:
+            break;
+    }
+
+    return wxEmptyString;
 }

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 -2009 by Glen Masgai                               *
+ *   Copyright (C) 2007-2009 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -49,7 +49,7 @@ const wxChar* CslGameCube::GetModeName(wxInt32 mode) const
     };
 
     return (mode>=0 && (size_t)mode<sizeof(modes)/sizeof(modes[0])) ?
-           modes[mode] : _("unknown");
+           modes[mode] : T2C(_("unknown"));
 }
 
 bool CslGameCube::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const

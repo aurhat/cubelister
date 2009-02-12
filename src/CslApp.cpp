@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 -2009 by Glen Masgai                               *
+ *   Copyright (C) 2007-2009 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -137,8 +137,11 @@ void CslApp::IpcCall(const wxString& value,wxEvtHandler *evtHandler)
         CslIpcClient client;
 
         if (client.Connect(CSL_IPC_HOST,CSL_IPC_SERV,CSL_IPC_TOPIC))
+#if wxCHECK_VERSION(2,9,0)
+            client.GetConnection()->Poke(CSL_NAME_SHORT_STR,value.c_str());
+#else
             client.GetConnection()->Poke(CSL_NAME_SHORT_STR,(wxChar*)value.c_str());
+#endif
+
     }
 }
-
-

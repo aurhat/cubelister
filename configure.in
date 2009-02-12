@@ -63,7 +63,7 @@ dnl Check for minimum wx version
 vers=`echo $wxversion | $AWK 'BEGIN { FS = "."; } { printf "% d", ($1 * 1000 + $2) * 1000 + $3;}'`
 if test -n "$vers" && test "$vers" -ge 2008000; then
     WX_CXXFLAGS="`$WXCONFIG --cxxflags | sed -e 's/-fno-exceptions//'`"
-    WX_LIBS="`$WXCONFIG --libs`"
+    WX_LIBS="`$WXCONFIG --libs adv,aui,base,core,html,net,richtext,xml`"
 else
     AC_MSG_ERROR([wxWidgets 2.8.0 or newer is required])
 fi

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 -2009 by Glen Masgai                               *
+ *   Copyright (C) 2007-2009 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -457,8 +457,14 @@ void CslMapCfgTool::SaveConfig()
 {
     wxString path=m_cfgPath;
 
-    wxFileDialog dlg(this,_("Save config"),wxEmptyString,m_fileName+wxT(".cfg"),
-                     _("Config files (*.cfg)|*.cfg"),wxSAVE|wxOVERWRITE_PROMPT);
+    wxFileDialog dlg(this,_("Save config"),wxEmptyString,
+                     m_fileName+wxT(".cfg"),_("Config files (*.cfg)|*.cfg"),
+#if wxCHECK_VERSION(2,9,0)
+                     wxFD_SAVE|wxFD_OVERWRITE_PROMPT
+#else
+                     wxSAVE|wxOVERWRITE_PROMPT
+#endif
+                    );
     // wxGTK: hmm, doesn't work in the ctor?!
     if (path.IsEmpty())
         path=m_pngPath;

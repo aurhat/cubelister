@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 -2009 by Glen Masgai                               *
+ *   Copyright (C) 2007-2009 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -85,7 +85,7 @@ const wxChar* CslGameAssaultCube::GetModeName(wxInt32 mode) const
     };
 
     return (mode>=0 && (size_t)mode<sizeof(modes)/sizeof(modes[0])) ?
-           modes[mode] : _("unknown");
+           modes[mode] : T2C(_("unknown"));
 }
 
 const wxChar* CslGameAssaultCube::GetWeaponName(wxInt32 n) const
@@ -97,7 +97,7 @@ const wxChar* CslGameAssaultCube::GetWeaponName(wxInt32 n) const
     };
 
     return (n>=0 && (size_t)n<sizeof(weapons)/sizeof(weapons[0])) ?
-           weapons[n] : _("unknown");
+           weapons[n] : T2C(_("unknown"));
 }
 
 wxInt32 CslGameAssaultCube::GetBestTeam(CslTeamStats& stats,wxInt32 prot) const

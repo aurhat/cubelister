@@ -1,6 +1,6 @@
 
 /***************************************************************************
- *   Copyright (C) 2007 -2009 by Glen Masgai                               *
+ *   Copyright (C) 2007-2009 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -52,7 +52,7 @@ wxMenuItem& CslMenu::AddItem(wxMenu *menu,const wxInt32 id,
     wxMenuItem *item=new wxMenuItem(menu,id,text,help,kind);
 
     wxOperatingSystemId os=wxPlatformInfo().GetOperatingSystemId();
-    if (id>wxID_HIGHEST || (os&wxOS_WINDOWS) || (os&wxOS_MAC))
+    if (art!=wxART_NONE && (id>wxID_HIGHEST || (os&wxOS_WINDOWS) || (os&wxOS_MAC)))
         item->SetBitmap(GET_ART_MENU(art));
 
     menu->Append(item);

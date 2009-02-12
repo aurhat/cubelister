@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 -2009 by Glen Masgai                               *
+ *   Copyright (C) 2007-2009 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -201,8 +201,13 @@ void CslListCtrl::CreateScreenShot()
 
     file=GetScreenShotFileName();
 
-    wxFileDialog dlg(window,_("Save screenshot"),wxEmptyString,file,
-                     _("Png files (*.png)|*.png"),wxSAVE|wxOVERWRITE_PROMPT);
+    wxFileDialog dlg(window,_("Save screenshot"),wxEmptyString,file,_("Png files (*.png)|*.png"),
+#if wxCHECK_VERSION(2,9,0)
+                         wxFD_SAVE|wxFD_OVERWRITE_PROMPT
+#else
+                         wxSAVE|wxOVERWRITE_PROMPT
+#endif
+                    );
     // wxGTK: hmm, doesn't work in the ctor?!
     if (wxDirExists(g_cslSettings->screenOutputPath))
         dlg.SetPath(g_cslSettings->screenOutputPath+PATHDIV+file);

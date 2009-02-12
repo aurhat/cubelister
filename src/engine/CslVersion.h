@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 -2009 by Glen Masgai                               *
+ *   Copyright (C) 2007-2009 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -28,8 +28,8 @@
 #define __CSL_NAME_STR          "Cube Server Lister (CSL)"
 #define __CSL_NAME_SHORT_STR    "csl"
 
-#define __CSL_VERSION           0,8,1,73
-#define __CSL_VERSION_STR       "0.8.1.73"
+#define __CSL_VERSION           0,8,1,74
+#define __CSL_VERSION_STR       "0.8.1.74"
 #define __CSL_VERSION_ADD_STR   ""
 
 #define __CSL_COPYRIGHT_STR     "(C) 2007-2009, Glen Masgai <mimosius@users.sourceforge.net>"

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 -2009 by Glen Masgai                               *
+ *   Copyright (C) 2007-2009 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -152,7 +152,7 @@ const wxChar* CslBloodFrontier::GetWeaponName(wxInt32 n) const
         _("Carbine"),_("Rifle"),_("Grenade"),_("Paintgun")
     };
     return (n>=0 && (size_t)n<sizeof(weapons)/sizeof(weapons[0])) ?
-           weapons[n] : _("unknown");
+           weapons[n] : T2C(_("unknown"));
 }
 
 void CslBloodFrontier::GetPlayerstatsDescriptions(vector<wxString>& desc) const
