@@ -94,6 +94,11 @@ void CslPanelCountry::Reset(wxUint32 mode,wxUint32 count)
         m_gauge->Show();
         m_gauge->SetRange(count);
         m_gauge->SetValue(0);
+#ifdef __WXMAC__
+        wxSize size=GetSize();
+        size.y-=m_gauge->GetBestSize().y+4;
+        m_listCtrl->SetSize(size);
+#endif
     }
 
     m_sizer->Layout();
@@ -301,48 +306,24 @@ int wxCALLBACK CslListCtrlCountry::ListSortCompareFunc(long item1,long item2,lon
 {
     CslCountryEntry *entry1=(CslCountryEntry*)item1;
     CslCountryEntry *entry2=(CslCountryEntry*)item2;
-    wxInt32 sortMode=((CslListSortHelper*)data)->Mode;
-    wxInt32 sortType=((CslListSortHelper*)data)->Type;
+    wxInt32 mode=((CslListSortHelper*)data)->Mode;
+    wxInt32 type=((CslListSortHelper*)data)->Type;
 
-    wxInt32 type;
-    wxUint32 vui1=0,vui2=0;
-    wxString vs1=wxEmptyString,vs2=wxEmptyString;
-
-    switch (sortType)
+    if (type==SORT_COUNT)
     {
-        case SORT_NAME:
-            type=CslListSortHelper::SORT_STRING;
-            vs1=entry1->Country;
-            vs2=entry2->Country;
-            break;
-
-        case SORT_COUNT:
-            type=CslListSortHelper::SORT_UINT;
-            vui1=entry1->Count;
-            vui2=entry2->Count;
-            break;
-
-        default:
-            return 0;
-    }
-
-    if (type==CslListSortHelper::SORT_UINT)
-    {
-        if (vui1==vui2)
-            return 0;
-        if (vui1<vui2)
-            return sortMode==CslListSortHelper::SORT_ASC ? -1 : 1;
+        if (entry1->Count==entry2->Count)
+            return entry1->Country.CmpNoCase(entry2->Country)<0 ? -1 : 1;
+        if (entry1->Count<entry2->Count)
+            return mode==CslListSortHelper::SORT_ASC ? -1 : 1;
         else
-            return sortMode==CslListSortHelper::SORT_ASC ? 1 : -1;
+            return mode==CslListSortHelper::SORT_ASC ? 1 : -1;
     }
-    else if (type==CslListSortHelper::SORT_STRING)
+    else if (type==SORT_NAME)
     {
-        if (vs1==vs2)
-            return 0;
-        if (vs1.CmpNoCase(vs2)<0)
-            return sortMode==CslListSortHelper::SORT_ASC ? -1 : 1;
+        if (entry1->Country.CmpNoCase(entry2->Country)<0)
+            return mode==CslListSortHelper::SORT_ASC ? -1 : 1;
         else
-            return sortMode==CslListSortHelper::SORT_ASC ? 1 : -1;
+            return mode==CslListSortHelper::SORT_ASC ? 1 : -1;
     }
 
     return 0;

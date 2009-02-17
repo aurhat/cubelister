@@ -576,7 +576,7 @@ void CslDlgSettings::do_layout()
 #endif
 #ifdef __WXMAC__
     grid_sizer_pane_other->Hide(sizer_systray);
-    Layout();
+    grid_sizer_pane_other->Layout();
 #endif
 
     grid_sizer_main->SetSizeHints(this);

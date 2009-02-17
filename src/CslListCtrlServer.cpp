@@ -285,7 +285,8 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
     if (filter)
     {
         filter=new wxMenu();
-        item=menu.AppendSubMenu(filter,MENU_SERVER_FILTER_STR,wxART_FILTER);
+        item=menu.AppendSubMenu(filter,MENU_SERVER_FILTER_STR);
+        item->SetBitmap(GET_ART_MENU(wxART_FILTER));
     }
     else
         filter=&menu;

@@ -637,6 +637,7 @@ void CslListCtrlPlayer::ListInit(const wxInt32 view)
     else
         img=CSL_LIST_IMG_SORT_DSC;
 
+    GetColumn(m_sortHelper.Type,item);
     item.SetImage(img);
     SetColumn(m_sortHelper.Type,item);
 }
