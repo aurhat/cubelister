@@ -40,19 +40,18 @@ class CslGameConnection
     public:
         enum { NO_PASS, USE_PASS, ASK_PASS };
 
-        static void Reset();
+        static void Reset(CslServerInfo *info=NULL);
         static void CountDown();
         static bool Prepare(CslServerInfo *info,wxInt32 pass=NO_PASS);
         static bool Connect();
         static bool IsPlaying() { return m_playing; }
-        static bool IsWaiting() { return m_waitTime>0; }
-        static wxInt32 GetWaitTime() { return m_waitTime; }
+        static bool IsWaiting() { return m_info ? m_info->ConnectWait>0:false; }
         static CslServerInfo* GetInfo() { return m_info; }
 
     private:
-        static bool m_playing;
-        static wxInt32 m_waitTime,m_connectMode;
+        static bool m_locked,m_playing;
         static CslServerInfo *m_info;
+        static wxString m_cmd;
 };
 
 #endif //CSLGAMECONNECTION_H

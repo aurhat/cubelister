@@ -331,7 +331,7 @@ void CslBloodFrontier::SetClientSettings(const CslGameClientSettings& settings)
     m_clientSettings=set;
 }
 
-wxString CslBloodFrontier::GameStart(CslServerInfo *info,wxUint32 mode,wxString *error)
+wxString CslBloodFrontier::GameStart(CslServerInfo *info,wxUint32 mode,wxString& error)
 {
     wxString address,path;
     wxString bin=m_clientSettings.Binary;
@@ -339,17 +339,17 @@ wxString CslBloodFrontier::GameStart(CslServerInfo *info,wxUint32 mode,wxString 
 
     if (m_clientSettings.Binary.IsEmpty() || !::wxFileExists(m_clientSettings.Binary))
     {
-        *error=_("Client binary for game Blood Frontier not found!\nCheck your settings.");
+        error=_("Client binary for game Blood Frontier not found!\nCheck your settings.");
         return wxEmptyString;
     }
     if (m_clientSettings.GamePath.IsEmpty() || !::wxDirExists(m_clientSettings.GamePath))
     {
-        *error=_("Game path for game Blood Frontier not found!\nCheck your settings.");
+        error=_("Game path for game Blood Frontier not found!\nCheck your settings.");
         return wxEmptyString;
     }
     if (m_clientSettings.ConfigPath.IsEmpty() || !::wxDirExists(m_clientSettings.ConfigPath))
     {
-        *error=_("Config path for game Blood Frontier not found!\nCheck your settings.");
+        error=_("Config path for game Blood Frontier not found!\nCheck your settings.");
         return wxEmptyString;
     }
 
@@ -386,7 +386,7 @@ wxString CslBloodFrontier::GameStart(CslServerInfo *info,wxUint32 mode,wxString 
     return bin;
 }
 
-wxInt32 CslBloodFrontier::GameEnd(wxString *error)
+wxInt32 CslBloodFrontier::GameEnd(wxString& error)
 {
     return CSL_ERROR_NONE;
 }

@@ -97,7 +97,7 @@ void CslGameCube::SetClientSettings(const CslGameClientSettings& settings)
     m_clientSettings=set;
 }
 
-wxString CslGameCube::GameStart(CslServerInfo *info,wxUint32 mode,wxString *error)
+wxString CslGameCube::GameStart(CslServerInfo *info,wxUint32 mode,wxString& error)
 {
     wxString address,password;
     wxString bin=m_clientSettings.Binary;
@@ -105,12 +105,12 @@ wxString CslGameCube::GameStart(CslServerInfo *info,wxUint32 mode,wxString *erro
 
     if (m_clientSettings.Binary.IsEmpty() || !::wxFileExists(m_clientSettings.Binary))
     {
-        *error=_("Client binary for game Cube not found!\nCheck your settings.");
+        error=_("Client binary for game Cube not found!\nCheck your settings.");
         return wxEmptyString;
     }
     if (m_clientSettings.GamePath.IsEmpty() || !::wxDirExists(m_clientSettings.GamePath))
     {
-        *error=_("Game path for game Cube not found!\nCheck your settings.");
+        error=_("Game path for game Cube not found!\nCheck your settings.");
         return wxEmptyString;
     }
 
@@ -132,7 +132,7 @@ wxString CslGameCube::GameStart(CslServerInfo *info,wxUint32 mode,wxString *erro
     return InjectConfig(address,password,error)==CSL_ERROR_NONE ? bin:wxString(wxEmptyString);
 }
 
-wxInt32 CslGameCube::GameEnd(wxString *error)
+wxInt32 CslGameCube::GameEnd(wxString& error)
 {
     wxString cfg=m_clientSettings.GamePath+CSL_DEFAULT_INJECT_FILE_CB;
     wxString bak=cfg+wxT(".csl");
@@ -145,7 +145,7 @@ wxInt32 CslGameCube::GameEnd(wxString *error)
     return CSL_ERROR_NONE;
 }
 
-wxInt32 CslGameCube::InjectConfig(const wxString& address,const wxString& password,wxString *error)
+wxInt32 CslGameCube::InjectConfig(const wxString& address,const wxString& password,wxString& error)
 {
     char *buf;
     wxFile file;

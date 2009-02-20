@@ -389,8 +389,6 @@ void CslListCtrlServer::ListDeleteServers()
             if (skipStats!=wxNO)
                 continue;
         }
-        if (CslGameConnection::IsWaiting() && CslGameConnection::GetInfo()==info)
-            CslGameConnection::Reset();
     }
 
     for (i=m_selected.GetCount()-1;i>=0;i--)
@@ -1432,17 +1430,17 @@ int wxCALLBACK CslListCtrlServer::ListSortCompareFunc(long item1,long item2,long
     wxInt32 sortMode=((CslListSortHelper*)data)->Mode;
     wxInt32 vi1=0,vi2=0;
     wxUint32 vui1=0,vui2=0;
-    wxString vs1=wxEmptyString,vs2=wxEmptyString;
+    wxString *vs1=NULL,*vs2=NULL;
 
     switch (sortType)
     {
         case SORT_HOST:
         {
             type=CslListSortHelper::SORT_STRING;
-            vs1=info1->Host;
-            vs2=info2->Host;
-            bool isip1=IsIP(vs1);
-            bool isip2=IsIP(vs2);
+            vs1=&info1->Host;
+            vs2=&info2->Host;
+            bool isip1=IsIP(*vs1);
+            bool isip2=IsIP(*vs2);
             if (isip1&&!isip2)
                 return sortMode==CslListSortHelper::SORT_ASC ? -1 : 1;
             else if (!isip1&&isip2)
@@ -1450,16 +1448,16 @@ int wxCALLBACK CslListCtrlServer::ListSortCompareFunc(long item1,long item2,long
             else if (isip1&&isip2)
             {
                 type=CslListSortHelper::SORT_UINT;
-                vui1=IP2Int(vs1);
-                vui2=IP2Int(vs2);
+                vui1=IP2Int(*vs1);
+                vui2=IP2Int(*vs2);
             }
             break;
         }
 
         case SORT_DESCRIPTION:
             type=CslListSortHelper::SORT_STRING;
-            vs1=info1->Description;
-            vs2=info2->Description;
+            vs1=&info1->Description;
+            vs2=&info2->Description;
             break;
 
         case SORT_PING:
@@ -1476,14 +1474,14 @@ int wxCALLBACK CslListCtrlServer::ListSortCompareFunc(long item1,long item2,long
 
         case SORT_MODE:
             type=CslListSortHelper::SORT_STRING;
-            vs1=info1->GameMode;
-            vs2=info2->GameMode;
+            vs1=&info1->GameMode;
+            vs2=&info2->GameMode;
             break;
 
         case SORT_MAP:
             type=CslListSortHelper::SORT_STRING;
-            vs1=info1->Map;
-            vs2=info2->Map;
+            vs1=&info1->Map;
+            vs2=&info2->Map;
             break;
 
         case SORT_TIME:
@@ -1528,9 +1526,9 @@ int wxCALLBACK CslListCtrlServer::ListSortCompareFunc(long item1,long item2,long
     }
     else if (type==CslListSortHelper::SORT_STRING)
     {
-        if (vs1==vs2)
+        if (*vs1==*vs2)
             return 0;
-        if (vs1.CmpNoCase(vs2)<0)
+        if (vs1->CmpNoCase(*vs2)<0)
             return sortMode==CslListSortHelper::SORT_ASC ? -1 : 1;
         else
             return sortMode==CslListSortHelper::SORT_ASC ? 1 : -1;

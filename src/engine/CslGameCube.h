@@ -45,15 +45,15 @@ class CslGameCube : public CslGame
     private:
         const wxChar* GetModeName(wxInt32 mode) const;
 
-        wxInt32 InjectConfig(const wxString& address,const wxString& password,wxString *error);
+        wxInt32 InjectConfig(const wxString& address,const wxString& password,wxString& error);
 
         //implementations for base class
         wxUint16 GetDefaultGamePort() const { return CSL_DEFAULT_PORT_CB; }
         wxUint16 GetInfoPort(wxUint16 port=0) const { return port ? port+1:CSL_DEFAULT_PORT_CB+1; }
         bool ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const;
         void SetClientSettings(const CslGameClientSettings& settings);
-        wxString GameStart(CslServerInfo *info,wxUint32 mode,wxString *error);
-        wxInt32 GameEnd(wxString *error=NULL);
+        wxString GameStart(CslServerInfo *info,wxUint32 mode,wxString& error);
+        wxInt32 GameEnd(wxString& error);
         const char** GetIcon(wxInt32 size) const;
         void ProcessOutput(char *data,wxInt32 *len) const;
         bool ReturnOk(wxInt32 code) const { return code==0 || code==1; }

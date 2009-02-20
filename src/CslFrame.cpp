@@ -31,7 +31,6 @@
 #include "CslDlgConnectWait.h"
 #include "CslDlgGeneric.h"
 #include "CslGameProcess.h"
-#include "CslGameConnection.h"
 #include "engine/CslTools.h"
 #include "engine/CslGameSauerbraten.h"
 #include "engine/CslGameAssaultCube.h"
@@ -251,7 +250,10 @@ CslFrame::~CslFrame()
         m_timer.Stop();
 
     if (CslGameConnection::IsPlaying())
-        CslGameConnection::GetInfo()->GetGame().GameEnd();
+    {
+        wxString error;
+        CslGameConnection::GetInfo()->GetGame().GameEnd(error);
+    }
 
     if (m_ipcServer)
     {
@@ -1166,24 +1168,30 @@ void CslFrame::UpdateMaster()
     m_timer.Start(CSL_TIMER_SHOT);
 }
 
-void CslFrame::ConnectToServer()
+void CslFrame::ConnectToServer(CslServerInfo *info,wxInt32 pass)
 {
-    CslServerInfo *info;
+    if (info)
+    {
+        CslServerInfo *old=CslGameConnection::GetInfo();
 
-    if (!(info=CslGameConnection::GetInfo()))
+        if (old && CslGameConnection::IsWaiting())
+        {
+            list_ctrl_master->Highlight(CSL_HIGHLIGHT_LOCKED,false,false,old);
+            list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_LOCKED,false,false,old);
+        }
+
+        if (!CslGameConnection::Prepare(info,pass))
+            return;
+    }
+    else if (!(info=CslGameConnection::GetInfo()))
         return;
-
-    CslDlgOutput::Reset(info->GetBestDescription());
 
     if (!CslGameConnection::Connect())
         return;
 
-    if (CslGameConnection::IsPlaying())
-    {
-        list_ctrl_info->UpdateInfo(info);
-        list_ctrl_master->Highlight(CSL_HIGHLIGHT_LOCKED,true,false,info);
-        list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_LOCKED,true,false,info);
-    }
+    list_ctrl_info->UpdateInfo(info);
+    list_ctrl_master->Highlight(CSL_HIGHLIGHT_LOCKED,true,false,info);
+    list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_LOCKED,true,false,info);
 }
 
 void CslFrame::LoadSettings()
@@ -1866,11 +1874,9 @@ void CslFrame::OnTimer(wxTimerEvent& event)
     }
     else if (waiting)
     {
-        CslServerInfo *info=CslGameConnection::GetInfo();
+        ConnectToServer();
 
-        if (info->Players!=info->PlayersMax)
-            ConnectToServer();
-        else if (m_timerCount%4==0)
+        if (CslGameConnection::IsWaiting() && m_timerCount%4==0)
             CslGameConnection::CountDown();
 
         CslStatusBar::Light(LIGHT_RED);
@@ -1932,10 +1938,7 @@ void CslFrame::OnListItemActivated(wxListEvent& event)
     CslServerInfo *info=(CslServerInfo*)event.GetClientData();
 
     if (info)
-    {
-        CslGameConnection::Prepare(info);
-        ConnectToServer();
-    }
+        ConnectToServer(info);
 }
 
 void CslFrame::OnTreeSelChanged(wxTreeEvent& event)
@@ -2391,8 +2394,7 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
                 wxInt32 pass=id==MENU_SERVER_CONNECT ?
                              CslGameConnection::NO_PASS :
                              CslGameConnection::ASK_PASS;
-                CslGameConnection::Prepare(info,pass);
-                ConnectToServer();
+                ConnectToServer(info,pass);
             }
             break;
         }
@@ -2446,11 +2448,19 @@ void CslFrame::OnKeypress(wxKeyEvent& event)
     if (event.GetKeyCode()==WXK_ESCAPE)
     {
         if (CslGameConnection::IsWaiting())
+        {
+            CslServerInfo *info=CslGameConnection::GetInfo();
+
+            list_ctrl_master->Highlight(CSL_HIGHLIGHT_LOCKED,false,false,info);
+            list_ctrl_favourites->Highlight(CSL_HIGHLIGHT_LOCKED,false,false,info);
+
             CslGameConnection::Reset();
+        }
         else if (wxWindow::FindFocus()==text_ctrl_search)
         {
             text_ctrl_search->Clear();
             text_ctrl_search->SetFocus();
+
             wxCommandEvent evt(wxEVT_COMMAND_TEXT_UPDATED,CSL_TEXT_SEARCH);
             wxPostEvent(this,evt);
         }
@@ -2683,8 +2693,6 @@ void CslFrame::OnEndProcess(wxCommandEvent& event)
 {
     CslServerInfo *info=(CslServerInfo*)event.GetClientData();
 
-    info->Lock(false);
-    info->GetGame().GameEnd();
     CslGameConnection::Reset();
 
     list_ctrl_master->Highlight(CSL_HIGHLIGHT_LOCKED,false,false,info);
@@ -2713,6 +2721,7 @@ void CslFrame::OnIPC(CslIpcEvent& event)
                 else
                 {
                     wxInt32 i;
+                    wxString s,token;
                     wxString host,pass;
                     CslGame *game=NULL;
                     wxUint16 port=0,iport=0;
@@ -2735,14 +2744,13 @@ void CslFrame::OnIPC(CslIpcEvent& event)
 
                     while (tkz.HasMoreTokens())
                     {
-                        wxString s;
-                        wxString token=tkz.GetNextToken();
+                        token=tkz.GetNextToken();
 
                         if ((i=token.Find(wxT("=")))==wxNOT_FOUND)
                             continue;
 
                         if (token.Mid(0,i).CmpNoCase(CSL_URI_INFOPORT_STR)==0)
-                            iport=wxAtoi(s=token.Mid(i+1));
+                            iport=wxAtoi(token.Mid(i+1));
                         else if (token.Mid(0,i).CmpNoCase(CSL_URI_GAME_STR)==0)
                         {
                             s=token.Mid(i+1);
@@ -2781,7 +2789,7 @@ void CslFrame::OnIPC(CslIpcEvent& event)
                         if (!(port=wxAtoi(uri.GetPort())))
                             port=game->GetDefaultGamePort();
                         if (!iport)
-                            iport=game->GetInfoPort();
+                            iport=game->GetInfoPort(port);
 
                         addr.Service(iport);
                         addr.Hostname(host);
@@ -2811,10 +2819,10 @@ void CslFrame::OnIPC(CslIpcEvent& event)
                             }
                         }
 
-                        i=pass.IsEmpty() ? CslGameConnection::NO_PASS : CslGameConnection::USE_PASS;
-
-                        if (connect && CslGameConnection::Prepare(info,i))
-                            ConnectToServer();
+                        if (connect)
+                            ConnectToServer(info,pass.IsEmpty() ?
+                                            CslGameConnection::NO_PASS :
+                                            CslGameConnection::USE_PASS);
                     }
                     else
                         error=_("Invalid URI: Unknown action.");

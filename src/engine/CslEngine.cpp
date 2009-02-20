@@ -217,10 +217,10 @@ bool CslEngine::Ping(CslServerInfo *info,bool force)
     wxUint32 ticks=GetTicks();
     wxUint32 interval=m_updateInterval;
 
-    if (info->IsWaiting())
+    if (info->ConnectWait>0)
     {
         interval=CSL_UPDATE_INTERVAL_WAIT;
-        LOG_DEBUG("iswaiting\n");
+        LOG_DEBUG("is waiting\n");
     }
 
     //LOG_DEBUG("%s - ticks:%li, pingsend:%li, diff:%li\n",U2A(info.GetBestDescription()),

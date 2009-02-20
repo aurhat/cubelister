@@ -258,7 +258,7 @@ void CslGameAssaultCube::SetClientSettings(const CslGameClientSettings& settings
     m_clientSettings=set;
 }
 
-wxString CslGameAssaultCube::GameStart(CslServerInfo *info,wxUint32 mode,wxString *error)
+wxString CslGameAssaultCube::GameStart(CslServerInfo *info,wxUint32 mode,wxString& error)
 {
     wxString address,password,path;
     wxString bin=m_clientSettings.Binary;
@@ -267,17 +267,17 @@ wxString CslGameAssaultCube::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
 
     if (m_clientSettings.Binary.IsEmpty() || !::wxFileExists(m_clientSettings.Binary))
     {
-        *error=_("Client binary for game AssaultCube not found!\nCheck your settings.");
+        error=_("Client binary for game AssaultCube not found!\nCheck your settings.");
         return wxEmptyString;
     }
     if (m_clientSettings.GamePath.IsEmpty() || !::wxDirExists(m_clientSettings.GamePath))
     {
-        *error=_("Game path for game AssaultCube not found!\nCheck your settings.");
+        error=_("Game path for game AssaultCube not found!\nCheck your settings.");
         return wxEmptyString;
     }
     if (m_clientSettings.ConfigPath.IsEmpty() || !::wxDirExists(m_clientSettings.ConfigPath))
     {
-        *error=_("Config path for game AssaultCube not found!\nCheck your settings.");
+        error=_("Config path for game AssaultCube not found!\nCheck your settings.");
         return wxEmptyString;
     }
 
@@ -340,7 +340,7 @@ wxString CslGameAssaultCube::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
     return WriteTextFile(configpath,script,wxFile::write_append)==CSL_ERROR_NONE ? bin:wxString(wxEmptyString);
 }
 
-wxInt32 CslGameAssaultCube::GameEnd(wxString *error)
+wxInt32 CslGameAssaultCube::GameEnd(wxString& error)
 {
     wxString cfg,bak;
     cfg<<m_clientSettings.ConfigPath<<CSL_DEFAULT_INJECT_DIR_AC<<wxString(CSL_DEFAULT_INJECT_FILE_AC);

@@ -161,8 +161,8 @@ class CslGame
         virtual bool ParseTeamPong(wxUint32 protocol,ucharbuf& buf,CslTeamStatsData& info) const { return false; }
         virtual bool ValidateClientSettings(CslGameClientSettings *settings=NULL,wxString *msg=NULL) { return true; }
         virtual void SetClientSettings(const CslGameClientSettings& settings) { m_clientSettings=settings; }
-        virtual wxString GameStart(CslServerInfo *info,wxUint32 mode,wxString *error) = 0;
-        virtual wxInt32 GameEnd(wxString *error=NULL) = 0;
+        virtual wxString GameStart(CslServerInfo *info,wxUint32 mode,wxString& error) = 0;
+        virtual wxInt32 GameEnd(wxString& error) = 0;
         virtual bool GetMapImagePaths(wxArrayString& paths) const { return false; }
         virtual const char** GetIcon(wxInt32 size) const { return NULL; }
         //hooks for workarounds or special handling
@@ -268,9 +268,6 @@ class CslServerInfo : public CslExtendedInfo
         bool IsDefault() const { return (View&CSL_VIEW_DEFAULT)>0; }
         bool IsFavourite() const { return (View&CSL_VIEW_FAVOURITE)>0; }
 
-        void SetWaiting(bool wait=true) { m_waiting=wait; }
-        bool IsWaiting() { return m_waiting; }
-
         bool HasStats() const;
 
         wxString Host,Domain;
@@ -290,6 +287,7 @@ class CslServerInfo : public CslExtendedInfo
         wxUint32 LastSeen,PingSend,PingResp;
         wxUint32 PlayedLast,PlayTimeLast,PlayTimeTotal;
         wxUint32 ConnectedTimes;
+        wxInt32 ConnectWait;
         bool Search;
 
     private:
@@ -297,7 +295,6 @@ class CslServerInfo : public CslExtendedInfo
         vector<wxInt32> m_masterIDs;
 
         wxInt32 m_lock;
-        bool m_waiting;
 
         void AddMaster(wxInt32 id);
         void RemoveMaster(wxInt32 id);

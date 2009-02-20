@@ -660,20 +660,20 @@ int wxCALLBACK CslListCtrlPlayer::ListSortCompareFunc(long item1,long item2,long
     wxInt32 type;
     wxInt32 vi1=0,vi2=0;
     wxUint32 vui1=0,vui2=0;
-    wxString vs1=wxEmptyString,vs2=wxEmptyString;
+    wxString *vs1=NULL,*vs2=NULL;
 
     switch (sortType)
     {
         case SORT_NAME:
             type=CslListSortHelper::SORT_STRING;
-            vs1=stats1->Name;
-            vs2=stats2->Name;
+            vs1=&stats1->Name;
+            vs2=&stats2->Name;
             break;
 
         case SORT_TEAM:
             type=CslListSortHelper::SORT_STRING;
-            vs1=stats1->Team;
-            vs2=stats2->Team;
+            vs1=&stats1->Team;
+            vs2=&stats2->Team;
             break;
 
         case SORT_FRAGS:
@@ -742,9 +742,9 @@ int wxCALLBACK CslListCtrlPlayer::ListSortCompareFunc(long item1,long item2,long
     }
     else if (type==CslListSortHelper::SORT_STRING)
     {
-        if (vs1==vs2)
+        if (*vs1==*vs2)
             return 0;
-        if (vs1.CmpNoCase(vs2)<0)
+        if (vs1->CmpNoCase(*vs2)<0)
             return sortMode==CslListSortHelper::SORT_ASC ? -1 : 1;
         else
             return sortMode==CslListSortHelper::SORT_ASC ? 1 : -1;

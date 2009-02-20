@@ -313,6 +313,7 @@ CslServerInfo::CslServerInfo(CslGame *game,
     PlayTimeLast=playTimeLast;
     PlayTimeTotal=playTimeTotal;
     ConnectedTimes=connectedTimes;
+    ConnectWait=0;
     DescriptionOld=oldDescription;
     MMDescription=wxEmptyString;
     MM=-1;
@@ -320,7 +321,6 @@ CslServerInfo::CslServerInfo(CslGame *game,
     PasswordAdmin=passAdm;
     Search=false;
     m_lock=0;
-    m_waiting=false;
 }
 
 bool CslServerInfo::Create(CslGame *game,const wxString& host,

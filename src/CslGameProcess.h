@@ -53,14 +53,13 @@ END_DECLARE_EVENT_TYPES()
 class CslGameProcess : public wxProcess
 {
     public:
-        CslGameProcess(wxWindow *parent,CslServerInfo *info,const wxString& cmd);
+        CslGameProcess(CslServerInfo *info,const wxString& cmd);
 
         static void ProcessInputStream();
         static void ProcessErrorStream();
 
     protected:
         static CslGameProcess *m_self;
-        wxWindow *m_parent;
         CslServerInfo *m_info;
         wxString m_cmd;
         bool m_clear;

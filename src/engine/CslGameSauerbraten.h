@@ -49,7 +49,7 @@ class CslGameSauerbraten : public CslGame
         const wxChar* GetVersionName(wxInt32 prot) const;
         const wxChar* GetModeName(wxInt32 mode,wxInt32 prot) const;
 
-        wxInt32 InjectConfig(const wxString& param,wxString *error);
+        wxInt32 InjectConfig(const wxString& param,wxString& error);
 
         //implementations for base class
         const wxChar* GetWeaponName(wxInt32 n) const;
@@ -63,8 +63,8 @@ class CslGameSauerbraten : public CslGame
         bool ParsePlayerPong(wxUint32 protocol,ucharbuf& buf,CslPlayerStatsData& info) const;
         bool ParseTeamPong(wxUint32 protocol,ucharbuf& buf,CslTeamStatsData& info) const;
         void SetClientSettings(const CslGameClientSettings& settings);
-        wxString GameStart(CslServerInfo *info,wxUint32 mode,wxString *error);
-        wxInt32 GameEnd(wxString *error=NULL);
+        wxString GameStart(CslServerInfo *info,wxUint32 mode,wxString& error);
+        wxInt32 GameEnd(wxString& error);
         bool GetMapImagePaths(wxArrayString& paths) const;
         const char** GetIcon(wxInt32 size) const;
 };

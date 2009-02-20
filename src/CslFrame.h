@@ -47,6 +47,7 @@
 #include "CslListCtrlPlayer.h"
 #include "CslListCtrlCountry.h"
 #include "CslListCtrlPlayerSearch.h"
+#include "CslGameConnection.h"
 #include "CslIPC.h"
 #include "CslIRC.h"
 
@@ -146,7 +147,7 @@ class CslFrame: public wxFrame
         CslMaster *TreeGetSelectedMaster(wxTreeItemId *item=NULL);
 
         void UpdateMaster();
-        void ConnectToServer();
+        void ConnectToServer(CslServerInfo *info=NULL,wxInt32 pass=CslGameConnection::NO_PASS);
 
         void LoadSettings();
         void SaveSettings();

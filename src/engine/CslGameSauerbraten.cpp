@@ -289,7 +289,7 @@ void CslGameSauerbraten::SetClientSettings(const CslGameClientSettings& settings
     m_clientSettings=set;
 }
 
-wxString CslGameSauerbraten::GameStart(CslServerInfo *info,wxUint32 mode,wxString *error)
+wxString CslGameSauerbraten::GameStart(CslServerInfo *info,wxUint32 mode,wxString& error)
 {
     wxString address,path;
     wxString bin=m_clientSettings.Binary;
@@ -298,17 +298,17 @@ wxString CslGameSauerbraten::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
 
     if (m_clientSettings.Binary.IsEmpty() || !::wxFileExists(m_clientSettings.Binary))
     {
-        *error=_("Client binary for game Sauerbraten not found!\nCheck your settings.");
+        error=_("Client binary for game Sauerbraten not found!\nCheck your settings.");
         return wxEmptyString;
     }
     if (m_clientSettings.GamePath.IsEmpty() || !::wxDirExists(m_clientSettings.GamePath))
     {
-        *error=_("Game path for game Sauerbraten not found!\nCheck your settings.");
+        error=_("Game path for game Sauerbraten not found!\nCheck your settings.");
         return wxEmptyString;
     }
     if (m_clientSettings.ConfigPath.IsEmpty() || !::wxDirExists(m_clientSettings.ConfigPath))
     {
-        *error=_("Config path for game Sauerbraten not found!\nCheck your settings.");
+        error=_("Config path for game Sauerbraten not found!\nCheck your settings.");
         return wxEmptyString;
     }
 
@@ -370,12 +370,12 @@ wxString CslGameSauerbraten::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
     return bin;
 }
 
-wxInt32 CslGameSauerbraten::GameEnd(wxString *error)
+wxInt32 CslGameSauerbraten::GameEnd(wxString& error)
 {
     return m_injected ? InjectConfig(wxEmptyString,error):CSL_ERROR_NONE;
 }
 
-wxInt32 CslGameSauerbraten::InjectConfig(const wxString& param,wxString *error)
+wxInt32 CslGameSauerbraten::InjectConfig(const wxString& param,wxString& error)
 {
     wxString dst=m_clientSettings.ConfigPath+wxString(CSL_DEFAULT_INJECT_DIR_SB);
 
@@ -401,7 +401,7 @@ wxInt32 CslGameSauerbraten::InjectConfig(const wxString& param,wxString *error)
 #endif
             if (!::wxFileExists(src))
             {
-                *error=wxString::Format(_("Couldn't find \"%s\""),map.c_str());
+                error=wxString::Format(_("Couldn't find \"%s\""),map.c_str());
                 return CSL_ERROR_FILE_DONT_EXIST;
             }
 #ifdef __WXGTK__

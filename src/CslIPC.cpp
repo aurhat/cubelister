@@ -74,7 +74,7 @@ wxString CslIpcBase::CreateURI(const CslServerInfo& info,bool pass,bool connect,
     s1.Empty();
 
     if (info.InfoPort!=info.GetGame().GetInfoPort(info.GamePort))
-        s<<CSL_URI_INFOPORT_STR<<wxT("=")<<info.InfoPort;
+        s<<CSL_URI_INFOPORT_STR<<wxT("=")<<info.InfoPort<<wxT("&");
 
     if (connect)
         s1<<CSL_URI_ACTION_STR<<wxT("=")<<CSL_URI_ACTION_CONNECT_STR;

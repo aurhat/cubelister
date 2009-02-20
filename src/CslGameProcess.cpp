@@ -26,13 +26,12 @@ DEFINE_EVENT_TYPE(wxCSL_EVT_PROCESS)
 
 CslGameProcess* CslGameProcess::m_self=NULL;
 
-CslGameProcess::CslGameProcess(wxWindow *parent,CslServerInfo *info,const wxString& cmd) :
-        wxProcess(parent),
-        m_parent(parent),m_info(info),m_cmd(cmd)
+CslGameProcess::CslGameProcess(CslServerInfo *info,const wxString& cmd) :
+        wxProcess(wxPROCESS_REDIRECT),
+        m_info(info),m_cmd(cmd)
 {
     m_self=this;
     m_watch.Start(0);
-    Redirect();
 }
 
 void CslGameProcess::OnTerminate(int pid,int code)
@@ -45,8 +44,8 @@ void CslGameProcess::OnTerminate(int pid,int code)
 
     // Cube returns with 1 - weird
     if (!m_info->GetGame().ReturnOk(code))
-        wxMessageBox(wxString::Format(_("%s returned with code: %d"),
-                                      m_cmd.c_str(),code),_("Error"),wxICON_ERROR,m_parent);
+        wxMessageBox(wxString::Format(_("%s returned with code: %d"),m_cmd.c_str(),code),
+                     _("Error"),wxICON_ERROR,wxTheApp->GetTopWindow());
 
     ProcessInputStream();
     ProcessErrorStream();
@@ -56,7 +55,7 @@ void CslGameProcess::OnTerminate(int pid,int code)
 
     wxCommandEvent evt(wxCSL_EVT_PROCESS);
     evt.SetClientData(m_info);
-    wxPostEvent(m_parent,evt);
+    wxPostEvent(wxTheApp->GetTopWindow(),evt);
 
     m_self=NULL;
 
