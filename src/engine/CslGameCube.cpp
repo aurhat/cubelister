@@ -55,10 +55,10 @@ const wxChar* CslGameCube::GetModeName(wxInt32 mode) const
 bool CslGameCube::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
 {
     char text[_MAXDEFSTR];
-    wxInt32 l;
+    wxUint32 l;
 
     //weird hack
-    for (l=0;l<buf.maxlength();l++)
+    for (l=0;l<(wxUint32)buf.maxlength();l++)
         *buf.at(l)^=0x61;
 
     wxInt32 prot=getint(buf);
@@ -230,7 +230,7 @@ const char** CslGameCube::GetIcon(wxInt32 size) const
     return NULL;
 }
 
-void CslGameCube::ProcessOutput(char *data,wxInt32 *len) const
+void CslGameCube::ProcessOutput(char *data,wxUint32 *len) const
 {
     FixString(data,len,0,true);
 }

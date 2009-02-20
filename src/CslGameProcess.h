@@ -50,19 +50,24 @@ END_DECLARE_EVENT_TYPES()
                              ),
 
 
+#define CSL_PROCESS_BUFFER_SIZE  2048
+
+
 class CslGameProcess : public wxProcess
 {
     public:
+        enum { INPUT_STREAM, ERROR_STREAM };
+
         CslGameProcess(CslServerInfo *info,const wxString& cmd);
 
-        static void ProcessInputStream();
+        static void ProcessOutput(wxInt32 type);
         static void ProcessErrorStream();
 
     protected:
         static CslGameProcess *m_self;
+        char m_buffer[CSL_PROCESS_BUFFER_SIZE];
         CslServerInfo *m_info;
         wxString m_cmd;
-        bool m_clear;
         wxStopWatch m_watch;
 
         virtual void OnTerminate(int pid,int code);

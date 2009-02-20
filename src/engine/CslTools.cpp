@@ -50,10 +50,10 @@ void Debug_Printf(const char *file,int line,const char *func,const char *fmt,...
 }
 #endif
 
-void FixString(char *src,wxInt32 *len,wxInt32 count,bool keepnl)
+void FixString(char *src,wxUint32 *len,wxUint32 count,bool keepnl)
 {
     char *dst=src;
-    wxInt32 c,l=0;
+    wxUint32 c,l=0;
 
     for (c=*src;c && *len>0;c=*(++src))
     {

@@ -1867,8 +1867,8 @@ void CslFrame::OnTimer(wxTimerEvent& event)
 
     if (playing && m_timerCount%2==0)
     {
-        CslGameProcess::ProcessInputStream();
-        CslGameProcess::ProcessErrorStream();
+        CslGameProcess::ProcessOutput(CslGameProcess::INPUT_STREAM);
+        CslGameProcess::ProcessOutput(CslGameProcess::ERROR_STREAM);
 
         CslStatusBar::Light(LIGHT_YELLOW);
     }

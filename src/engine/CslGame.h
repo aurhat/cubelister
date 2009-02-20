@@ -166,7 +166,7 @@ class CslGame
         virtual bool GetMapImagePaths(wxArrayString& paths) const { return false; }
         virtual const char** GetIcon(wxInt32 size) const { return NULL; }
         //hooks for workarounds or special handling
-        virtual void ProcessOutput(char *data,wxInt32 *len) const {}
+        virtual void ProcessOutput(char *data,wxUint32 *len) const {}
         virtual bool ReturnOk(wxInt32 code) const { return code==0; }
 
     private:

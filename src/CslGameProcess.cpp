@@ -20,6 +20,7 @@
 
 #include "CslGameProcess.h"
 #include "CslDlgOutput.h"
+#include "CslToolTip.h"
 #include "CslSettings.h"
 
 DEFINE_EVENT_TYPE(wxCSL_EVT_PROCESS)
@@ -31,6 +32,10 @@ CslGameProcess::CslGameProcess(CslServerInfo *info,const wxString& cmd) :
         m_info(info),m_cmd(cmd)
 {
     m_self=this;
+
+    CslToolTip::ResetTip();
+    CslDlgOutput::Reset(m_info->GetBestDescription());
+
     m_watch.Start(0);
 }
 
@@ -47,8 +52,8 @@ void CslGameProcess::OnTerminate(int pid,int code)
         wxMessageBox(wxString::Format(_("%s returned with code: %d"),m_cmd.c_str(),code),
                      _("Error"),wxICON_ERROR,wxTheApp->GetTopWindow());
 
-    ProcessInputStream();
-    ProcessErrorStream();
+    ProcessOutput(INPUT_STREAM);
+    ProcessOutput(ERROR_STREAM);
 
     if (g_cslSettings->autoSaveOutput && !g_cslSettings->gameOutputPath.IsEmpty())
         CslDlgOutput::SaveFile(g_cslSettings->gameOutputPath);
@@ -62,53 +67,36 @@ void CslGameProcess::OnTerminate(int pid,int code)
     delete this;
 }
 
-void CslGameProcess::ProcessInputStream()
+void CslGameProcess::ProcessOutput(wxInt32 type)
 {
     if (!m_self)
         return;
 
-    wxInputStream *stream=m_self->GetInputStream();
+    wxInputStream *stream;
+
+    if (type==INPUT_STREAM)
+        stream=m_self->GetInputStream();
+    else if (type==ERROR_STREAM)
+        stream=m_self->GetErrorStream();
+    else
+        return;
+
     if (!stream)
         return;
 
     while (stream->CanRead())
     {
-        char buf[1025];
-        stream->Read((void*)buf,1024);
-        wxInt32 last=(wxInt32)stream->LastRead();
-        if (last<=0)
+        stream->Read((void*)m_self->m_buffer,CSL_PROCESS_BUFFER_SIZE-1);
+
+        wxUint32 last=stream->LastRead();
+        if (!last)
             break;
-        buf[last]=0;
+
+        m_self->m_buffer[last]=0;
+
         //Cube has color codes in it's output
-        m_self->m_info->GetGame().ProcessOutput(buf,&last);
-        CslDlgOutput::AddOutput(buf,last);
+        m_self->m_info->GetGame().ProcessOutput(m_self->m_buffer,&last);
+        CslDlgOutput::AddOutput(m_self->m_buffer,last);
         //LOG_DEBUG("%s",buf);
     }
 }
-
-void CslGameProcess::ProcessErrorStream()
-{
-    if (!m_self)
-        return;
-
-    wxInputStream *stream=m_self->GetErrorStream();
-    if (!stream)
-        return;
-
-    while (stream->CanRead())
-    {
-        char buf[1025];
-        stream->Read((void*)buf,1024);
-
-        wxInt32 last=(wxInt32)stream->LastRead();
-        if (last<=0)
-            break;
-        buf[last]=0;
-        /*
-        //Cube has color codes in it's output
-        m_self->m_info->GetGame().ProcessOutput(buf,&last);
-        CslDlgOutput::AddOutput(buf,last);
-        */
-    }
-}
-

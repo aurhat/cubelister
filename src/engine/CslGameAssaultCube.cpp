@@ -132,7 +132,7 @@ wxInt32 CslGameAssaultCube::GetBestTeam(CslTeamStats& stats,wxInt32 prot) const
 bool CslGameAssaultCube::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
 {
     char text[_MAXDEFSTR];
-    wxInt32 i;
+    wxUint32 i;
 
     info.Protocol=getint(buf);
     info.Version=GetVersionName(info.Protocol);

@@ -21,11 +21,9 @@
 #include "CslGameConnection.h"
 #include "CslDlgConnectPass.h"
 #include "CslDlgConnectWait.h"
-#include "CslDlgOutput.h"
 #include "CslStatusBar.h"
 #include "CslSettings.h"
 #include "CslGameProcess.h"
-#include "CslToolTip.h"
 #include "engine/CslTools.h"
 
 
@@ -167,11 +165,6 @@ bool CslGameConnection::Connect()
         m_info->Lock();
     }
 
-    m_info->ConnectWait=0;
-
-    CslToolTip::ResetTip();
-    CslDlgOutput::Reset(m_info->GetBestDescription());
-
     CslGameProcess *process=new CslGameProcess(m_info,m_cmd);
     if (!::wxExecute(m_cmd,wxEXEC_ASYNC,process))
     {
@@ -182,12 +175,13 @@ bool CslGameConnection::Connect()
 
     m_playing=true;
 
+    m_info->ConnectWait=0;
+    m_info->ConnectedTimes++;
+    m_info->PlayedLast=wxDateTime::Now().GetTicks();
+
     CslStatusBar::SetText(1,wxString::Format(_("Connected to: '%s (%s)'"),
                           m_info->GetBestDescription().c_str(),
                           m_info->GetGame().GetName().c_str()));
-
-    m_info->ConnectedTimes++;
-    m_info->PlayedLast=wxDateTime::Now().GetTicks();
 
     return true;
 }

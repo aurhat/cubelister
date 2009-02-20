@@ -190,7 +190,7 @@ wxInt32 CslBloodFrontier::GetBestTeam(CslTeamStats& stats,wxInt32 prot) const
 bool CslBloodFrontier::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
 {
     char text[_MAXDEFSTR];
-    wxInt32 l,numattr;
+    wxUint32 l,numattr;
     vector<int>attr;
     attr.setsize(0);
 
