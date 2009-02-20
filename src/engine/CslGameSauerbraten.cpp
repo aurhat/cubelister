@@ -224,7 +224,7 @@ bool CslGameSauerbraten::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) con
     info.Map=A2U(text);
     getstring(text,buf);
     l=(wxInt32)strlen(text);
-    StripColours(text,&l,1);
+    FixString(text,&l,1);
     info.SetDescription(A2U(text));
 
     return !buf.overread();

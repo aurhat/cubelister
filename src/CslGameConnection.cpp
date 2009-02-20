@@ -25,6 +25,7 @@
 #include "CslStatusBar.h"
 #include "CslSettings.h"
 #include "CslGameProcess.h"
+#include "CslToolTip.h"
 #include "engine/CslTools.h"
 
 
@@ -147,18 +148,17 @@ bool CslGameConnection::Connect()
 
         CslDlgConnectWait *dlg=new CslDlgConnectWait(wxTheApp->GetTopWindow(),&time);
 
-        switch (dlg->ShowModal())
+        if (dlg->ShowModal()==wxID_OK)
         {
-            case wxID_OK:
-                m_locked=true;
-                m_info->Lock();
-                m_info->ConnectWait=time;
-                return true;
-
-            case wxID_CANCEL:
-            default:
-                Reset();
-                return false;
+            m_locked=true;
+            m_info->Lock();
+            m_info->ConnectWait=time;
+            return true;
+        }
+        else
+        {
+            Reset();
+            return false;
         }
     }
     else if (!m_locked)
@@ -169,6 +169,7 @@ bool CslGameConnection::Connect()
 
     m_info->ConnectWait=0;
 
+    CslToolTip::ResetTip();
     CslDlgOutput::Reset(m_info->GetBestDescription());
 
     CslGameProcess *process=new CslGameProcess(m_info,m_cmd);

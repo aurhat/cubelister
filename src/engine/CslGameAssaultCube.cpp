@@ -146,7 +146,7 @@ bool CslGameAssaultCube::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) con
     info.Map=A2U(text);
     getstring(text,buf);
     i=(wxInt32)strlen(text);
-    StripColours(text,&i,1);
+    FixString(text,&i,1);
     info.SetDescription(A2U(text));
     info.PlayersMax=getint(buf);
 

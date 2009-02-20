@@ -50,35 +50,7 @@ void Debug_Printf(const char *file,int line,const char *func,const char *fmt,...
 }
 #endif
 
-char* StripColours2(char *s,wxUint32 *l,wxUint32 count)
-{
-    wxUint32 i=0;
-
-    if (!*l)
-        return NULL;
-
-    while (i<*l)
-    {
-        if (s[i]==0xc)
-        {
-            *l-=count;
-            memmove((void*)&s[i],(void*)&s[i+count],*l-i);
-        }
-        else if (s[i]=='\r' || s[i]=='\n')
-        {
-            *l-=1;
-            memmove((void*)&s[i],(void*)&s[i+count],*l-i);
-        }
-        else
-            i++;
-    }
-
-    s[*l]=0;
-
-    return s;
-}
-
-void StripColours(char *src,wxInt32 *len,wxInt32 count)
+void FixString(char *src,wxInt32 *len,wxInt32 count,bool keepnl)
 {
     char *dst=src;
     wxInt32 c,l=0;
@@ -89,10 +61,8 @@ void StripColours(char *src,wxInt32 *len,wxInt32 count)
         {
             src+=count;
             *len-=count+1;
-            continue;
         }
-
-        if (isprint(c))
+        else if (isprint(c) || (keepnl && (c=='\r' || c=='\n')))
         {
             *dst++=c;
             (*len)--;

@@ -118,7 +118,7 @@ enum
 
 extern wxString g_basePath;
 
-extern void StripColours(char *src,wxInt32 *len,wxInt32 count);
+extern void FixString(char *src,wxInt32 *len,wxInt32 count,bool keepnl=false);
 extern void FixFilename(wxString& name);
 extern bool IsIP(const wxString& s);
 extern wxUint32 IP2Int(const wxString& s);

@@ -2529,12 +2529,12 @@ void CslFrame::OnClose(wxCloseEvent& event)
     if (event.GetEventObject()==m_extendedDlg)
     {
     }
-    if (event.GetEventObject()==m_outputDlg)
+    else if (event.GetEventObject()==m_outputDlg)
     {
         CslMenu::CheckMenuItem(MENU_VIEW_OUTPUT,false);
         return;
     }
-    if (event.GetEventObject()==m_trafficDlg)
+    else if (event.GetEventObject()==m_trafficDlg)
     {
         m_trafficDlg->Destroy();
         m_trafficDlg=NULL;
