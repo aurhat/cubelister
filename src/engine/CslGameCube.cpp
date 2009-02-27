@@ -69,7 +69,12 @@ bool CslGameCube::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
     info.MM=CSL_SERVER_OPEN;
     info.MMDescription=wxEmptyString;
     info.GameMode=GetModeName(getint(buf));
-    info.Players=getint(buf);
+    l=getint(buf);
+    if (info.HasRegisteredEvent(CslServerEvents::EVENT_EMPTY) && info.Players>0 && !l)
+        info.SetEvents(CslServerEvents::EVENT_EMPTY);
+    else if (info.HasRegisteredEvent(CslServerEvents::EVENT_NOT_EMPTY) && !info.Players && l>0)
+        info.SetEvents(CslServerEvents::EVENT_NOT_EMPTY);
+    info.Players=l;
     info.TimeRemain=getint(buf);
     getstring(text,buf);
     info.Map=A2U(text);

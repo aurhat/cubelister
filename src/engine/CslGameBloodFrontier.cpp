@@ -189,12 +189,18 @@ wxInt32 CslBloodFrontier::GetBestTeam(CslTeamStats& stats,wxInt32 prot) const
 
 bool CslBloodFrontier::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
 {
-    char text[_MAXDEFSTR];
-    wxUint32 l,numattr;
     vector<int>attr;
-    attr.setsize(0);
+    wxUint32 l,numattr;
+    char text[_MAXDEFSTR];
+    bool wasfull=info.IsFull();
 
-    info.Players=getint(buf);
+    l=getint(buf);
+    if (info.HasRegisteredEvent(CslServerEvents::EVENT_EMPTY) && info.Players>0 && !l)
+        info.SetEvents(CslServerEvents::EVENT_EMPTY);
+    else if (info.HasRegisteredEvent(CslServerEvents::EVENT_NOT_EMPTY) && !info.Players && l>0)
+        info.SetEvents(CslServerEvents::EVENT_NOT_EMPTY);
+    info.Players=l;
+
     numattr=getint(buf);
     loopj(numattr) attr.add(getint(buf));
     if (numattr>=1)
@@ -207,8 +213,16 @@ bool CslBloodFrontier::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
     if (numattr>=4)
         info.TimeRemain=attr[3];
     if (numattr>=5)
+    {
         info.PlayersMax=attr[4];
 
+        if (info.HasRegisteredEvent(CslServerEvents::EVENT_FULL) && !wasfull && info.IsFull())
+            info.SetEvents(CslServerEvents::EVENT_FULL);
+        else if (info.HasRegisteredEvent(CslServerEvents::EVENT_NOT_FULL) && wasfull && !info.IsFull())
+            info.SetEvents(CslServerEvents::EVENT_NOT_FULL);
+    }
+
+    l=info.MM;
     info.MM=CSL_SERVER_OPEN;
     info.MMDescription.Empty();
 
@@ -232,11 +246,17 @@ bool CslBloodFrontier::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
             }
             else if (attr[5]==MM_LOCKED)
             {
+                if (info.HasRegisteredEvent(CslServerEvents::EVENT_LOCKED) &&
+                    CSL_MM_IS_VALID(l) && !CSL_SERVER_IS_LOCKED(l))
+                    info.SetEvents(CslServerEvents::EVENT_LOCKED);
                 info.MMDescription+=wxT(" (L)");
                 info.MM=CSL_SERVER_LOCKED;
             }
             else if (attr[5]==MM_PRIVATE)
             {
+                if (info.HasRegisteredEvent(CslServerEvents::EVENT_PRIVATE) &&
+                    CSL_MM_IS_VALID(l) && !CSL_SERVER_IS_PRIVATE(l))
+                    info.SetEvents(CslServerEvents::EVENT_PRIVATE);
                 info.MMDescription+=wxT(" (P)");
                 info.MM=CSL_SERVER_PRIVATE;
             }

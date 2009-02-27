@@ -27,60 +27,87 @@
 #include "engine/CslTools.h"
 
 
-bool            CslGameConnection::m_locked=false;
-bool            CslGameConnection::m_playing=false;
-CslServerInfo*  CslGameConnection::m_info=NULL;
-wxString        CslGameConnection::m_cmd=wxEmptyString;
+CslGameConnection::CslGameConnection()
+{
+    m_locked=false;
+    m_playing=false;
+    m_info=NULL;
+}
 
+CslGameConnection::~CslGameConnection()
+{
+    Reset();
+}
+
+CslGameConnection& CslGameConnection::GetInstance()
+{
+    static CslGameConnection connection;
+
+    return connection;
+}
 
 void CslGameConnection::Reset(CslServerInfo *info)
 {
-    if (m_info)
+    CslGameConnection& self=GetInstance();
+
+    if (self.m_info)
     {
         wxString s;
 
-        m_info->GetGame().GameEnd(s);
-        m_info->ConnectWait=0;
+        self.m_info->GetGame().GameEnd(s);
+        self.m_info->ConnectWait=0;
 
-        if (m_locked)
-            m_info->Lock(false);
+        if (self.m_locked)
+            self.m_info->Lock(false);
 
         s.Empty();
 
-        if (m_playing)
+        if (self.m_playing)
         {
             s=wxString::Format(_("Last played on: '%s (%s)'"),
-                               m_info->GetBestDescription().c_str(),
-                               m_info->GetGame().GetName().c_str());
+                               self.m_info->GetBestDescription().c_str(),
+                               self.m_info->GetGame().GetName().c_str());
 
-            if (m_info->PlayTimeLast>0)
-                s<<wxT(" - ")<<_("Play time:")<<wxT(" ")<<FormatSeconds(m_info->PlayTimeLast).c_str();
+            if (self.m_info->PlayTimeLast>0)
+            {
+                s<<wxT(" - ")<<_("Play time:")<<wxT(" ");
+                s<<FormatSeconds(self.m_info->PlayTimeLast).c_str();
+            }
         }
 
         CslStatusBar::SetText(1,s);
     }
 
-    m_locked=false;
-    m_playing=false;
-    m_info=info;
-    m_cmd.Empty();
+    self.m_locked=false;
+    self.m_playing=false;
+    self.m_info=info;
+    self.m_cmd.Empty();
 }
 
-void CslGameConnection::CountDown()
+bool CslGameConnection::CountDown()
 {
-    if (--m_info->ConnectWait>0)
+    CslGameConnection& self=GetInstance();
+
+    if (--self.m_info->ConnectWait>0)
+    {
         CslStatusBar::SetText(1,wxString::Format(_("Waiting %s for a free slot on '%s (%s)' " \
                               _L_"(press ESC to abort or join another server)"),
-                              FormatSeconds(m_info->ConnectWait,true,true).c_str(),
-                              m_info->GetBestDescription().c_str(),m_info->GetGame().GetName().c_str()));
+                              FormatSeconds(self.m_info->ConnectWait,true,true).c_str(),
+                              self.m_info->GetBestDescription().c_str(),
+                              self.m_info->GetGame().GetName().c_str()));
+        return true;
+    }
     else
         Reset();
+
+    return false;
 }
 
 bool CslGameConnection::Prepare(CslServerInfo *info,wxInt32 pass)
 {
     wxString error;
     wxInt32 mode=CslServerInfo::CSL_CONNECT_DEFAULT;
+    CslGameConnection& self=GetInstance();
 
     if (IsPlaying())
     {
@@ -91,13 +118,13 @@ bool CslGameConnection::Prepare(CslServerInfo *info,wxInt32 pass)
 
     Reset(info);
 
-    if (pass>NO_PASS || CSL_SERVER_IS_PASSWORD(m_info->MM))
+    if (pass>NO_PASS || CSL_SERVER_IS_PASSWORD(self.m_info->MM))
     {
-        if (pass==ASK_PASS || m_info->Password.IsEmpty())
+        if (pass==ASK_PASS || info->Password.IsEmpty())
         {
-            bool admin=CSL_CAP_CONNECT_ADMIN_PASS(m_info->GetGame().GetCapabilities());
+            bool admin=CSL_CAP_CONNECT_ADMIN_PASS(info->GetGame().GetCapabilities());
 
-            CslConnectPassInfo pi(m_info->Password,m_info->PasswordAdmin,admin);
+            CslConnectPassInfo pi(info->Password,info->PasswordAdmin,admin);
 
             if (CslDlgConnectPass(wxTheApp->GetTopWindow(),&pi).ShowModal()!=wxID_OK)
             {
@@ -105,8 +132,8 @@ bool CslGameConnection::Prepare(CslServerInfo *info,wxInt32 pass)
                 return false;
             }
 
-            m_info->Password=pi.Password;
-            m_info->PasswordAdmin=pi.AdminPassword;
+            info->Password=pi.Password;
+            info->PasswordAdmin=pi.AdminPassword;
             mode=pi.Admin ? CslServerInfo::CSL_CONNECT_ADMIN_PASS:
                  CslServerInfo::CSL_CONNECT_PASS;
         }
@@ -116,9 +143,9 @@ bool CslGameConnection::Prepare(CslServerInfo *info,wxInt32 pass)
     else
         mode=CslServerInfo::CSL_CONNECT_DEFAULT;
 
-    m_cmd=m_info->GetGame().GameStart(m_info,mode,error);
+    self.m_cmd=info->GetGame().GameStart(info,mode,error);
 
-    if (m_cmd.IsEmpty())
+    if (self.m_cmd.IsEmpty())
     {
         if (!error.IsEmpty())
             wxMessageBox(error,_("Error"),wxICON_ERROR,wxTheApp->GetTopWindow());
@@ -126,7 +153,7 @@ bool CslGameConnection::Prepare(CslServerInfo *info,wxInt32 pass)
         return false;
     }
 
-    if (!::wxSetWorkingDirectory(m_info->GetGame().GetClientSettings().GamePath))
+    if (!::wxSetWorkingDirectory(info->GetGame().GetClientSettings().GamePath))
     {
         Reset();
         return false;
@@ -137,7 +164,10 @@ bool CslGameConnection::Prepare(CslServerInfo *info,wxInt32 pass)
 
 bool CslGameConnection::Connect()
 {
-    if (m_info->Players>0 && m_info->PlayersMax>0 && m_info->Players>=m_info->PlayersMax)
+    CslGameConnection& self=GetInstance();
+
+    if (self.m_info->Players>0 && self.m_info->PlayersMax>0 &&
+        self.m_info->Players>=self.m_info->PlayersMax)
     {
         if (IsWaiting())
             return true;
@@ -145,13 +175,18 @@ bool CslGameConnection::Connect()
         wxInt32 time=g_cslSettings->waitServerFull;
 
         CslDlgConnectWait *dlg=new CslDlgConnectWait(wxTheApp->GetTopWindow(),&time);
+        wxInt32 ret=dlg->ShowModal();
 
-        if (dlg->ShowModal()==wxID_OK)
+        if (ret!=wxID_CANCEL)
         {
-            m_locked=true;
-            m_info->Lock();
-            m_info->ConnectWait=time;
-            return true;
+            self.m_locked=true;
+            self.m_info->Lock();
+
+            if (ret==wxID_OK)
+            {
+                self.m_info->ConnectWait=time;
+                return true;
+            }
         }
         else
         {
@@ -159,29 +194,30 @@ bool CslGameConnection::Connect()
             return false;
         }
     }
-    else if (!m_locked)
+    else if (!self.m_locked)
     {
-        m_locked=true;
-        m_info->Lock();
+        self.m_locked=true;
+        self.m_info->Lock();
     }
 
-    CslGameProcess *process=new CslGameProcess(m_info,m_cmd);
-    if (!::wxExecute(m_cmd,wxEXEC_ASYNC,process))
+    CslGameProcess *process=new CslGameProcess(self.m_info,self.m_cmd);
+    if (!::wxExecute(self.m_cmd,wxEXEC_ASYNC,process))
     {
-        wxMessageBox(_("Failed to start: ")+m_cmd,_("Error"),wxICON_ERROR,wxTheApp->GetTopWindow());
+        wxMessageBox(_("Failed to start: ")+self.m_cmd,_("Error"),
+                     wxICON_ERROR,wxTheApp->GetTopWindow());
         Reset();
         return false;
     }
 
-    m_playing=true;
+    self.m_playing=true;
 
-    m_info->ConnectWait=0;
-    m_info->ConnectedTimes++;
-    m_info->PlayedLast=wxDateTime::Now().GetTicks();
+    self.m_info->ConnectWait=0;
+    self.m_info->ConnectedTimes++;
+    self.m_info->PlayedLast=wxDateTime::Now().GetTicks();
 
     CslStatusBar::SetText(1,wxString::Format(_("Connected to: '%s (%s)'"),
-                          m_info->GetBestDescription().c_str(),
-                          m_info->GetGame().GetName().c_str()));
+                          self.m_info->GetBestDescription().c_str(),
+                          self.m_info->GetGame().GetName().c_str()));
 
     return true;
 }

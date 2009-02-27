@@ -214,14 +214,15 @@ bool CslEngine::Ping(CslServerInfo *info,bool force)
     if (!info->Pingable)
         return false;
 
-    wxUint32 ticks=GetTicks();
-    wxUint32 interval=m_updateInterval;
+    wxUint32 interval,ticks=GetTicks();
 
     if (info->ConnectWait>0)
     {
         interval=CSL_UPDATE_INTERVAL_WAIT;
         LOG_DEBUG("is waiting\n");
     }
+    else
+        interval=m_updateInterval;
 
     //LOG_DEBUG("%s - ticks:%li, pingsend:%li, diff:%li\n",U2A(info.GetBestDescription()),
     //          ticks,info.PingSend,ticks-info.PingSend);
@@ -320,7 +321,6 @@ bool CslEngine::PingExTeamInfo(CslServerInfo *info,bool force)
 wxUint32 CslEngine::PingServers(CslGame *game,bool force)
 {
     wxUint32 c=0;
-    CslServerInfo *info;
 
     {
         const vector<CslServerInfo*>& servers=game->GetServers();
@@ -354,14 +354,15 @@ wxUint32 CslEngine::PingServers(CslGame *game,bool force)
         }
     }
 
-    vector<CslServerInfo*> servers;
-    GetFavourites(servers);
-
-    loopvk(servers)
     {
-        info=servers[k];
-        if (info->IsFavourite() && Ping(info))
-            c++;
+        vector<CslServerInfo*> servers;
+        GetFavourites(servers);
+
+        loopv(servers)
+        {
+            if (Ping(servers[i]))
+                c++;
+        }
     }
 #if 0
 #ifdef __WXDEBUG__
@@ -374,8 +375,8 @@ wxUint32 CslEngine::PingServers(CslGame *game,bool force)
 
 bool CslEngine::PingEx(CslServerInfo *info,bool force)
 {
-    wxInt32 diff=GetTicks()-info->PlayerStats.m_lastPing;
-    wxInt32 delay=info->Search ? (min(info->Ping,m_updateInterval)/1000+1)*1000:m_updateInterval;
+    wxUint32 diff=GetTicks()-info->PlayerStats.m_lastPing;
+    wxUint32 delay=info->Search ? (min(info->Ping,m_updateInterval)/1000+1)*1000:m_updateInterval;
 
     if (!force && diff<delay)
         return false;
@@ -533,6 +534,7 @@ void CslEngine::ParseDefaultPong(CslServerInfo *info,ucharbuf& buf,wxUint32 now)
     info->PingResp=GetTicks();
     info->Ping=info->PingResp-info->PingSend;
     info->LastSeen=now;
+    info->ClearEvents();
 
     if (!info->GetGame().ParseDefaultPong(buf,*info))
         info->Ping=-1;

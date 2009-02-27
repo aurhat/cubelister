@@ -20,6 +20,7 @@
 
 #include <wx/wupdlock.h>
 #include "CslListCtrlCountry.h"
+#include "CslMenu.h"
 #include "CslGeoIP.h"
 #include "engine/CslTools.h"
 
@@ -169,10 +170,24 @@ void CslListCtrlCountry::OnColumnLeftClick(wxListEvent& event)
 
 void CslListCtrlCountry::OnContextMenu(wxContextMenuEvent& event)
 {
+    if (m_entries.IsEmpty())
+        return;
+
+    wxMenu menu;
+    wxPoint point=event.GetPosition();
+
+    CSL_MENU_CREATE_SAVEIMAGE(menu)
+
+    //from keyboard
+    if (point==wxDefaultPosition)
+        point=wxGetMousePosition();
+    point=ScreenToClient(point);
+    PopupMenu(&menu,point);
 }
 
 void CslListCtrlCountry::OnMenu(wxCommandEvent& event)
 {
+    CSL_MENU_EVENT_SKIP_SAVEIMAGE(event.GetId())
 }
 
 void CslListCtrlCountry::ListClear()

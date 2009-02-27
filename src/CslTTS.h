@@ -18,33 +18,47 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef CSLGEOIP_H
-#define CSLGEOIP_H
+#ifndef CSLTTS_H
+#define CSLTTS_H
 
 /**
-    @author Glen Masgai <mimosius@users.sourceforge.net>
+    @author Glen Masgai <mimosius@gmx.de>
 */
 
-#include <GeoIP.h>
+#include "wx/wxprec.h"
+#ifdef __BORLANDC__
+#pragma hdrstop
+#endif
+#ifndef WX_PRECOMP
+#include "wx/wx.h"
+#endif
 
-class CslGeoIP
+class CslTTS
 {
     private:
-        CslGeoIP();
-        CslGeoIP(const CslGeoIP& geoip) {}
-        ~CslGeoIP();
+        CslTTS();
+        CslTTS(const CslTTS& tts) {}
+        ~CslTTS();
 
-        static CslGeoIP& GetInstance();
+        static CslTTS& GetInstance();
+
+        static void SetVolume(wxInt32 volume);
 
     public:
+        static bool Init(const wxString& lang=wxEmptyString);
+        static bool DeInit();
         static bool IsOk();
-        static const char* GetCountryCodeByAddr(const char *host);
-        static const char* GetCountryCodeByIPnum(const unsigned long ipnum);
-        static const char* GetCountryNameByAddr(const char *host);
-        static const char* GetCountryNameByIPnum(const unsigned long ipnum);
+
+        static void Say(const wxString& text);
 
     private:
-        GeoIP *m_geoIP;
+        bool m_ok;
+        wxInt32 m_volume;
+        wxString m_lang;
+
+#ifdef HAVE_LIBSPEECHD_H
+        SPDConnection *m_spd;
+#endif //HAVE_LIBSPEECHD_H
 };
 
 #endif

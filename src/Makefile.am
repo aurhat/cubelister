@@ -15,7 +15,7 @@ AM_CPPFLAGS =  $(all_includes)
 csl_LDFLAGS = $(all_libraries)
 csl_LDADD = libcslpanelmap.a $(top_builddir)/src/engine/libcslengine.a $(top_builddir)/src/engine/libcsltools.a \
 	$(top_builddir)/src/irc/libcslirc.a $(top_builddir)/src/irc/libircclient/src/libircclient.a ${GEOIP_LIBS} \
-	${WX_LIBS}
+	${WX_LIBS} ${SPEECHD_LIBS}
 INCLUDES = -I$(top_srcdir)/src/libGeoIP \
 	-I$(top_srcdir)/src/irc/libircclient/include -I$(top_srcdir)/src/img/flags
 cslmapcfgtool_SOURCES = CslMapCfgTool.cpp
@@ -26,8 +26,9 @@ csl_SOURCES = CslApp.cpp CslArt.cpp CslDlgAbout.cpp CslDlgAddMaster.cpp \
 	CslDlgOutput.cpp CslDlgSettings.cpp CslDlgTraffic.cpp CslFrame.cpp CslGameConnection.cpp \
 	CslGameProcess.cpp CslGeoIP.cpp CslIPC.cpp CslIRC.cpp CslListCtrl.cpp \
 	CslListCtrlCountry.cpp CslListCtrlInfo.cpp CslListCtrlPlayer.cpp CslListCtrlPlayerSearch.cpp \
-	CslListCtrlServer.cpp CslMenu.cpp CslStatusBar.cpp CslToolTip.cpp CslVersionCheck.cpp
+	CslListCtrlServer.cpp CslMenu.cpp CslStatusBar.cpp CslTTS.cpp CslToolTip.cpp \
+	CslVersionCheck.cpp
 noinst_LIBRARIES = libcslpanelmap.a
 libcslpanelmap_a_SOURCES = CslPanelMap.cpp
 noinst_HEADERS = CslApp.h CslGameConnection.h CslIRC.h CslListCtrl.h \
-	CslListCtrlPlayerSearch.h CslToolTip.h
+	CslListCtrlPlayerSearch.h CslTTS.h CslToolTip.h

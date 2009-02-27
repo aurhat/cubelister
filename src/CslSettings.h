@@ -68,6 +68,8 @@
 #define CSL_TOOLTIP_DELAY_MAX   10000
 #define CSL_TOOLTIP_DELAY_STEP  500
 
+#define CSL_TTS_VOLUME_DEFAULT  75
+
 #define CSL_PING_GOOD_STD  200
 #define CSL_PING_BAD_STD   400
 
@@ -85,6 +87,8 @@ class CslSettings
                 layout(CSL_AUI_DEFAULT_LAYOUT),
                 systray(0),
                 tooltipDelay(CSL_TOOLTIP_DELAY_STD),
+                tts(true),
+                ttsVolume(CSL_TTS_VOLUME_DEFAULT),
                 updateInterval(CSL_UPDATE_INTERVAL_MIN),
                 dontUpdatePlaying(true),
                 showSearch(true),
@@ -129,6 +133,8 @@ class CslSettings
         wxInt32 systray;
         wxStringList layouts;
         wxInt32 tooltipDelay;
+        bool tts;
+        wxInt32 ttsVolume;
         wxInt32 updateInterval;
         bool dontUpdatePlaying;
         bool showSearch;

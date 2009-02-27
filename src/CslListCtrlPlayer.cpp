@@ -184,43 +184,20 @@ void CslListCtrlPlayer::OnContextMenu(wxContextMenuEvent& event)
         return;
 
     wxMenu menu;
-    wxMenuItem *item;
     wxPoint point=event.GetPosition();
+
+    CSL_MENU_CREATE_CONNECT(menu,m_info)
+    CSL_MENU_CREATE_EXTINFO(menu,m_info,m_view);
+    menu.AppendSeparator();
+    CSL_MENU_CREATE_URICOPY(menu)
+    menu.AppendSeparator();
+    CSL_MENU_CREATE_NOTIFY(menu,m_info)
+    menu.AppendSeparator();
+    CSL_MENU_CREATE_SAVEIMAGE(menu)
 
     //from keyboard
     if (point.x==-1 && point.y==-1)
         point=wxGetMousePosition();
-
-    CslMenu::AddItem(&menu,MENU_SERVER_CONNECT,MENU_SERVER_CONN_STR,wxART_CONNECT);
-    if (CSL_CAP_CONNECT_PASS(m_info->GetGame().GetCapabilities()))
-        CslMenu::AddItem(&menu,MENU_SERVER_CONNECT_PW,MENU_SERVER_CONN_PW_STR,wxART_CONNECT_PW);
-
-    menu.AppendSeparator();
-
-    wxMenu *ext=new wxMenu();
-    item=menu.AppendSubMenu(ext,MENU_SERVER_EXT_STR);
-    item->SetBitmap(GET_ART_MENU(wxART_ABOUT));
-    if (m_info->ExtInfoStatus!=CSL_EXT_STATUS_OK || !CslEngine::PingOk(*m_info,g_cslSettings->updateInterval))
-        item->Enable(false);
-    else
-    {
-        if (m_view!=SIZE_FULL)
-        {
-            CslMenu::AddItem(ext,MENU_SERVER_EXT_FULL,MENU_SERVER_EXT_FULL_STR,wxART_ABOUT);
-            ext->AppendSeparator();
-        }
-        if (m_view!=SIZE_MICRO)
-            CslMenu::AddItem(ext,MENU_SERVER_EXT_MICRO,MENU_SERVER_EXT_MICRO_STR,wxART_EXTINFO_MICRO);
-        if (m_view!=SIZE_MINI)
-            CslMenu::AddItem(ext,MENU_SERVER_EXT_MINI,MENU_SERVER_EXT_MINI_STR,wxART_EXTINFO_MINI);
-        if (m_view!=SIZE_DEFAULT)
-            CslMenu::AddItem(ext,MENU_SERVER_EXT_DEFAULT,MENU_SERVER_EXT_DEFAULT_STR,wxART_EXTINFO_DEFAULT);
-    }
-
-    menu.AppendSeparator();
-
-    CslMenu::AddItem(&menu,MENU_SAVE,MENU_SERVER_SAVEIMG_STR,wxART_FILE_SAVE_AS);
-
     point=ScreenToClient(point);
     PopupMenu(&menu,point);
 }
@@ -229,29 +206,18 @@ void CslListCtrlPlayer::OnMenu(wxCommandEvent& event)
 {
     wxInt32 id=event.GetId();
 
-    switch (id)
+    CSL_MENU_EVENT_SKIP_CONNECT(id,m_info)
+    CSL_MENU_EVENT_SKIP_EXTINFO(id,m_info)
+    CSL_MENU_EVENT_SKIP_NOTIFY(id,m_info)
+    CSL_MENU_EVENT_SKIP_SAVEIMAGE(id)
+
+    if (CSL_MENU_EVENT_IS_URICOPY(id))
     {
-
-        case MENU_SERVER_CONNECT:
-        case MENU_SERVER_CONNECT_PW:
-            event.SetClientData((void*)m_info);
-            event.Skip();
-            break;
-
-        case MENU_SERVER_EXT_FULL:
-        case MENU_SERVER_EXT_MICRO:
-        case MENU_SERVER_EXT_MINI:
-        case MENU_SERVER_EXT_DEFAULT:
-            event.SetClientData(m_info);
-            event.Skip();
-            break;
-
-        case MENU_SAVE:
-            CreateScreenShot();
-            break;
-
-        default:
-            break;
+        VoidPointerArray *servers=new VoidPointerArray;
+        servers->Add((void*)m_info);
+        event.SetClientData((void*)servers);
+        event.Skip();
+        return;
     }
 }
 

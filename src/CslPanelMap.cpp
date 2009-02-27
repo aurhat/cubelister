@@ -24,9 +24,9 @@
 
 BEGIN_EVENT_TABLE(CslPanelMap, wxPanel)
     EVT_PAINT(CslPanelMap::OnPaint)
-#ifdef __WXMSW__
+    #ifdef __WXMSW__
     EVT_ERASE_BACKGROUND(CslPanelMap::OnErase)
-#endif
+    #endif
 END_EVENT_TABLE()
 
 

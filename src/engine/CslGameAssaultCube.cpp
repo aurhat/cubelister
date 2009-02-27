@@ -131,14 +131,22 @@ wxInt32 CslGameAssaultCube::GetBestTeam(CslTeamStats& stats,wxInt32 prot) const
 
 bool CslGameAssaultCube::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
 {
+    wxUint32 i,l;
     char text[_MAXDEFSTR];
-    wxUint32 i;
+    bool wasfull=info.IsFull();
 
     info.Protocol=getint(buf);
     info.Version=GetVersionName(info.Protocol);
     wxInt32 mode=getint(buf);
     info.GameMode=GetModeName(mode);
-    info.Players=getint(buf);
+
+    i=getint(buf);
+    if (info.HasRegisteredEvent(CslServerEvents::EVENT_EMPTY) && info.Players>0 && !i)
+        info.SetEvents(CslServerEvents::EVENT_EMPTY);
+    else if (info.HasRegisteredEvent(CslServerEvents::EVENT_NOT_EMPTY) && !info.Players && i>0)
+        info.SetEvents(CslServerEvents::EVENT_NOT_EMPTY);
+    info.Players=i;
+
     info.TimeRemain=getint(buf);
     if (info.Protocol<1126) // <=0.93
         info.TimeRemain++;
@@ -148,8 +156,14 @@ bool CslGameAssaultCube::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) con
     i=(wxInt32)strlen(text);
     FixString(text,&i,1);
     info.SetDescription(A2U(text));
-    info.PlayersMax=getint(buf);
 
+    info.PlayersMax=getint(buf);
+    if (info.HasRegisteredEvent(CslServerEvents::EVENT_FULL) && !wasfull && info.IsFull())
+        info.SetEvents(CslServerEvents::EVENT_FULL);
+    else if (info.HasRegisteredEvent(CslServerEvents::EVENT_NOT_FULL) && wasfull && !info.IsFull())
+        info.SetEvents(CslServerEvents::EVENT_NOT_FULL);
+
+    l=info.MM;
     info.MMDescription.Empty();
     info.MM=CSL_SERVER_OPEN;
 
@@ -159,6 +173,9 @@ bool CslGameAssaultCube::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) con
 
         if (i&PONGFLAG_MASTERMODE)
         {
+            if (info.HasRegisteredEvent(CslServerEvents::EVENT_PRIVATE) &&
+                CSL_MM_IS_VALID(l) && !CSL_SERVER_IS_PRIVATE(l))
+                info.SetEvents(CslServerEvents::EVENT_PRIVATE);
             info.MMDescription=wxT("P");
             info.MM=CSL_SERVER_PRIVATE;
         }

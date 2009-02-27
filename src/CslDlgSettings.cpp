@@ -21,6 +21,7 @@
 #include <wx/colordlg.h>
 #include <wx/imaglist.h>
 #include "CslDlgSettings.h"
+#include "CslTTS.h"
 #include "CslApp.h"
 #include "engine/CslGame.h"
 #include "engine/CslTools.h"
@@ -54,14 +55,15 @@ enum
     BUTTON_COLOUR_MM3,
 
     SPIN_CLEANUP_SERVERS,
+
     SPIN_TOOLTIP_DELAY,
 
     SPIN_PING_GOOD,
     SPIN_PING_BAD,
 
     CHECK_SYSTRAY,
-    RADIO_SYSTRAY_ALWAYS,
-    RADIO_SYSTRAY_MINIMIZE,
+
+    CHECK_TTS,
 
     CHECK_GAME_OUTPUT,
 
@@ -253,6 +255,7 @@ CslDlgSettings::CslDlgSettings(wxWindow* parent,int id,const wxString& title,
     sizer_times_staticbox = new wxStaticBox(notebook_pane_other, -1, _("Times && Intervals"));
     sizer_threshold_staticbox = new wxStaticBox(notebook_pane_other, -1, _("Ping thresholds"));
     sizer_systray_staticbox = new wxStaticBox(notebook_pane_other, -1, _("System tray"));
+    sizer_tts_staticbox = new wxStaticBox(notebook_pane_other, -1, _("Text to speech"));
     sizer_output_staticbox = new wxStaticBox(notebook_pane_other, -1, _("Game output"));
     sizer_network_staticbox = new wxStaticBox(notebook_pane_irc, -1, _("Networks"));
     sizer_1_staticbox = new wxStaticBox(notebook_pane_irc, -1, _("Server"));
@@ -274,10 +277,12 @@ CslDlgSettings::CslDlgSettings(wxWindow* parent,int id,const wxString& title,
     checkbox_server_cleanup_favourites = new wxCheckBox(notebook_pane_other, wxID_ANY, _("Keep favourites"));
     checkbox_server_cleanup_stats = new wxCheckBox(notebook_pane_other, wxID_ANY, _("Keep servers with statistics"));
     spin_ctrl_tooltip_delay = new wxSpinCtrl(notebook_pane_other, SPIN_TOOLTIP_DELAY, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_AUTO_URL, 0, 100);
-    spin_ctrl_ping_good = new wxSpinCtrl(notebook_pane_other, SPIN_PING_GOOD, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100);
-    spin_ctrl_ping_bad = new wxSpinCtrl(notebook_pane_other, SPIN_PING_BAD, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100);
+    spin_ctrl_ping_good = new wxSpinCtrl(notebook_pane_other, SPIN_PING_GOOD, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_AUTO_URL, 0, 100);
+    spin_ctrl_ping_bad = new wxSpinCtrl(notebook_pane_other, SPIN_PING_BAD, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_AUTO_URL, 0, 100);
     checkbox_systray = new wxCheckBox(notebook_pane_other, CHECK_SYSTRAY, _("Use system tray icon"));
     checkbox_systray_close = new wxCheckBox(notebook_pane_other, wxID_ANY, _("Minimise on close button"));
+    checkbox_tts = new wxCheckBox(notebook_pane_other, CHECK_TTS, _("Enable text to speech"));
+    spin_ctrl_tts_volume = new wxSpinCtrl(notebook_pane_other, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_AUTO_URL, 1, 100);
     checkbox_game_output = new wxCheckBox(notebook_pane_other, CHECK_GAME_OUTPUT, _("Auto &save game output to:"));
     dirpicker_game_output = new wxDirPickerCtrl(notebook_pane_other, wxID_ANY, m_settings.gameOutputPath, _("Select game output path"), wxDefaultPosition, wxDefaultSize, wxDIRP_DEFAULT_STYLE|wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST);
     tree_ctrl_network = new wxTreeCtrl(notebook_pane_irc, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_HAS_BUTTONS|wxTR_NO_LINES|wxTR_LINES_AT_ROOT|wxTR_DEFAULT_STYLE|wxSUNKEN_BORDER);
@@ -371,6 +376,11 @@ void CslDlgSettings::set_properties()
     checkbox_systray_close->SetValue((g_cslSettings->systray&CSL_SYSTRAY_CLOSE)!=0);
 #endif
 
+    checkbox_tts->SetValue(g_cslSettings->tts);
+    spin_ctrl_tts_volume->SetValue(g_cslSettings->ttsVolume);
+    checkbox_tts->Enable(CslTTS::IsOk());
+    spin_ctrl_tts_volume->Enable(CslTTS::IsOk() && g_cslSettings->tts);
+
     checkbox_game_output->SetValue(m_settings.autoSaveOutput);
     dirpicker_game_output->SetPath(m_settings.gameOutputPath);
     dirpicker_game_output->Enable(m_settings.autoSaveOutput);
@@ -409,9 +419,11 @@ void CslDlgSettings::do_layout()
     wxStaticBoxSizer* sizer_1 = new wxStaticBoxSizer(sizer_1_staticbox, wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_2 = new wxFlexGridSizer(2, 4, 0, 0);
     wxStaticBoxSizer* sizer_network = new wxStaticBoxSizer(sizer_network_staticbox, wxHORIZONTAL);
-    wxFlexGridSizer* grid_sizer_pane_other = new wxFlexGridSizer(4, 1, 0, 0);
+    wxFlexGridSizer* grid_sizer_pane_other = new wxFlexGridSizer(5, 1, 0, 0);
     wxStaticBoxSizer* sizer_output = new wxStaticBoxSizer(sizer_output_staticbox, wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_output = new wxFlexGridSizer(1, 2, 0, 0);
+    wxStaticBoxSizer* sizer_tts = new wxStaticBoxSizer(sizer_tts_staticbox, wxHORIZONTAL);
+    wxFlexGridSizer* grid_sizer_tts = new wxFlexGridSizer(1, 3, 0, 0);
     wxStaticBoxSizer* sizer_systray = new wxStaticBoxSizer(sizer_systray_staticbox, wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_systray = new wxFlexGridSizer(1, 3, 0, 0);
     wxStaticBoxSizer* sizer_threshold = new wxStaticBoxSizer(sizer_threshold_staticbox, wxHORIZONTAL);
@@ -495,6 +507,14 @@ void CslDlgSettings::do_layout()
     grid_sizer_systray->AddGrowableCol(2);
     sizer_systray->Add(grid_sizer_systray, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 0);
     grid_sizer_pane_other->Add(sizer_systray, 1, wxALL|wxEXPAND, 4);
+    grid_sizer_tts->Add(checkbox_tts, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    wxStaticText* label_tts_volume = new wxStaticText(notebook_pane_other, wxID_ANY, _("Volume"));
+    grid_sizer_tts->Add(label_tts_volume, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_tts->Add(spin_ctrl_tts_volume, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_tts->AddGrowableCol(0);
+    grid_sizer_tts->AddGrowableCol(1);
+    sizer_tts->Add(grid_sizer_tts, 1, wxEXPAND, 0);
+    grid_sizer_pane_other->Add(sizer_tts, 1, wxALL|wxEXPAND, 4);
     grid_sizer_output->Add(checkbox_game_output, 0, wxALL, 4);
     grid_sizer_output->Add(dirpicker_game_output, 1, wxEXPAND, 0);
     grid_sizer_output->AddGrowableCol(1);
@@ -687,8 +707,13 @@ void CslDlgSettings::OnCommandEvent(wxCommandEvent& event)
             SetButtonColour(colButton,button_ok,*colour);
             break;
 
+#ifndef __WXMAC__
         case CHECK_SYSTRAY:
             checkbox_systray_close->Enable(event.IsChecked());
+            break;
+#endif
+        case CHECK_TTS:
+            spin_ctrl_tts_volume->Enable(event.IsChecked());
             break;
 
         case CHECK_GAME_OUTPUT:
@@ -711,8 +736,12 @@ void CslDlgSettings::OnCommandEvent(wxCommandEvent& event)
             m_settings.tooltipDelay=spin_ctrl_tooltip_delay->GetValue();
             m_settings.pinggood=spin_ctrl_ping_good->GetValue();
             m_settings.pingbad=spin_ctrl_ping_bad->GetValue();
-            m_settings.systray=checkbox_systray->GetValue() ? CSL_USE_SYSTRAY : 0;
+#ifndef __WXMAC__
+            m_settings.systray=checkbox_systray->IsChecked() ? CSL_USE_SYSTRAY : 0;
             m_settings.systray|=checkbox_systray_close->GetValue() ? CSL_SYSTRAY_CLOSE : 0;
+#endif
+            m_settings.tts=checkbox_tts->IsChecked();
+            m_settings.ttsVolume=spin_ctrl_tts_volume->GetValue();
             m_settings.gameOutputPath=dirpicker_game_output->GetPath();
             m_settings.autoSaveOutput=checkbox_game_output->IsChecked();
 

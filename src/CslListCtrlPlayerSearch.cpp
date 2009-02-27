@@ -18,15 +18,14 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <wx/clipbrd.h>
 #include "CslListCtrlPlayerSearch.h"
+#include "CslListCtrlPlayer.h"
+#include "CslGameConnection.h"
+#include "engine/CslTools.h"
 #include "CslApp.h"
 #include "CslGeoIP.h"
 #include "CslFlags.h"
 #include "CslMenu.h"
-#include "CslIPC.h"
-#include "CslGameConnection.h"
-#include "engine/CslTools.h"
 
 
 BEGIN_EVENT_TABLE(CslListCtrlPlayerSearch,CslListCtrl)
@@ -114,116 +113,70 @@ void CslListCtrlPlayerSearch::OnItemDeselected(wxListEvent& event)
 
 void CslListCtrlPlayerSearch::OnContextMenu(wxContextMenuEvent& event)
 {
-    if (!m_selected || !m_selected->Info)
+    if (!GetItemCount())
         return;
 
-    wxMenu menu,*sub;
-    wxMenuItem *item;
-    CslServerInfo *info=m_selected->Info;
+    wxMenu menu;
     wxPoint point=event.GetPosition();
+
+    if (m_selected && m_selected->Info)
+    {
+        CslServerInfo *info=m_selected->Info;
+
+        CSL_MENU_CREATE_CONNECT(menu,info)
+        CSL_MENU_CREATE_EXTINFO(menu,info,-1)
+        menu.AppendSeparator();
+        CslMenu::AddItem(&menu,MENU_ADD,MENU_SERVER_FAV_ADD_STR,wxART_ADD_BOOKMARK).Enable(!info->IsFavourite());
+        menu.AppendSeparator();
+        CSL_MENU_CREATE_URICOPY(menu)
+        menu.AppendSeparator();
+        CSL_MENU_CREATE_NOTIFY(menu,info)
+        menu.AppendSeparator();
+    }
+
+    CSL_MENU_CREATE_SAVEIMAGE(menu)
 
     //from keyboard
     if (point==wxDefaultPosition)
         point=wxGetMousePosition();
-
-    wxUint32 caps=info->GetGame().GetCapabilities();
-
-    CslMenu::AddItem(&menu,MENU_SERVER_CONNECT,MENU_SERVER_CONN_STR,wxART_CONNECT);
-    if (CSL_CAP_CONNECT_PASS(caps))
-        CslMenu::AddItem(&menu,MENU_SERVER_CONNECT_PW,MENU_SERVER_CONN_PW_STR,wxART_CONNECT_PW);
-
-    sub=new wxMenu();
-    item=menu.AppendSubMenu(sub,MENU_SERVER_EXT_STR);
-    item->SetBitmap(GET_ART_MENU(wxART_ABOUT));
-    if (info->ExtInfoStatus!=CSL_EXT_STATUS_OK || !CslEngine::PingOk(*info,g_cslSettings->updateInterval))
-        item->Enable(false);
-    else
-    {
-        CslMenu::AddItem(sub,MENU_SERVER_EXT_FULL,MENU_SERVER_EXT_FULL_STR,wxART_ABOUT);
-        sub->AppendSeparator();
-        CslMenu::AddItem(sub,MENU_SERVER_EXT_MICRO,MENU_SERVER_EXT_MICRO_STR,wxART_EXTINFO_MICRO);
-        CslMenu::AddItem(sub,MENU_SERVER_EXT_MINI,MENU_SERVER_EXT_MINI_STR,wxART_EXTINFO_MINI);
-        CslMenu::AddItem(sub,MENU_SERVER_EXT_DEFAULT,MENU_SERVER_EXT_DEFAULT_STR,wxART_EXTINFO_DEFAULT);
-    }
-
-    menu.AppendSeparator();
-
-    if (CslGameConnection::IsPlaying())
-    {
-        menu.Enable(MENU_SERVER_CONNECT,false);
-        if (CSL_CAP_CONNECT_PASS(caps))
-            menu.Enable(MENU_SERVER_CONNECT_PW,false);
-    }
-
-    CslMenu::AddItem(&menu,MENU_ADD,MENU_SERVER_FAV_ADD_STR,wxART_ADD_BOOKMARK).Enable(!info->IsFavourite());
-
-    menu.AppendSeparator();
-
-    sub=new wxMenu();
-    item=menu.AppendSubMenu(sub,MENU_SERVER_COPY_STR);
-    item->SetBitmap(GET_ART_MENU(wxART_CSL));
-    CslMenu::AddItem(sub,MENU_SERVER_COPY_CON,MENU_SERVER_COPY_CON_STR,wxART_CSL);
-    CslMenu::AddItem(sub,MENU_SERVER_COPY_FAV,MENU_SERVER_COPY_FAV_STR,wxART_CSL);
-    CslMenu::AddItem(sub,MENU_SERVER_COPY_CONFAV,MENU_SERVER_COPY_CONFAV_STR,wxART_CSL);
-
     point=ScreenToClient(point);
     PopupMenu(&menu,point);
 }
 
 void CslListCtrlPlayerSearch::OnMenu(wxCommandEvent& event)
 {
-    wxInt32 id;
     CslServerInfo *info;
+    wxInt32 id=event.GetId();
 
     if (!(info=m_selected->Info))
         return;
 
-    switch ((id=event.GetId()))
+    event.SetEventObject(this);
+
+    CSL_MENU_EVENT_SKIP_CONNECT(id,info)
+    CSL_MENU_EVENT_SKIP_EXTINFO(id,info)
+    CSL_MENU_EVENT_SKIP_NOTIFY(id,info)
+    CSL_MENU_EVENT_SKIP_SAVEIMAGE(id)
+
+    if (CSL_MENU_EVENT_IS_URICOPY(id))
     {
+        VoidPointerArray *servers=new VoidPointerArray;
+        servers->Add((void*)info);
+        event.SetClientData((void*)servers);
+        event.Skip();
+        return;
+    }
 
-        case MENU_SERVER_CONNECT:
-        case MENU_SERVER_CONNECT_PW:
-
-        case MENU_SERVER_EXT_FULL:
-        case MENU_SERVER_EXT_MICRO:
-        case MENU_SERVER_EXT_MINI:
-        case MENU_SERVER_EXT_DEFAULT:
-
+    switch (id)
+    {
         case MENU_ADD:
             event.SetClientData((void*)info);
             event.Skip();
             break;
 
-        case MENU_SERVER_COPY_CON:
-        case MENU_SERVER_COPY_CONFAV:
-        case MENU_SERVER_COPY_FAV:
-        {
-            wxString s;
-            bool con,add,pass=false;;
-
-            if (!info->Password.IsEmpty())
-            {
-                pass=wxMessageBox(_("Copy server passwords too?"),_("Warning"),
-                                  wxYES_NO|wxICON_WARNING,wxTheApp->GetTopWindow())==wxYES;
-            }
-
-            con=id==MENU_SERVER_COPY_CON || id==MENU_SERVER_COPY_CONFAV;
-            add=id==MENU_SERVER_COPY_FAV || id==MENU_SERVER_COPY_CONFAV;
-            s=CslIpcBase::CreateURI(*info,pass,con,add);
-
-            if (!s.IsEmpty() && wxTheClipboard->Open())
-            {
-                wxTheClipboard->SetData(new wxTextDataObject(s));
-                wxTheClipboard->Close();
-            }
-            break;
-        }
-
         default:
             break;
     }
-
-    event.SetEventObject(this);
 }
 
 void CslListCtrlPlayerSearch::GetToolTipText(wxInt32 row,CslToolTipEvent& event)

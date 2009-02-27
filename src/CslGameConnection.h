@@ -37,21 +37,28 @@
 
 class CslGameConnection
 {
+    private:
+        CslGameConnection();
+        ~CslGameConnection();
+        CslGameConnection(const CslGameConnection& connection) {}
+
+        static CslGameConnection& GetInstance();
+
     public:
         enum { NO_PASS, USE_PASS, ASK_PASS };
 
         static void Reset(CslServerInfo *info=NULL);
-        static void CountDown();
+        static bool CountDown();
         static bool Prepare(CslServerInfo *info,wxInt32 pass=NO_PASS);
         static bool Connect();
-        static bool IsPlaying() { return m_playing; }
-        static bool IsWaiting() { return m_info ? m_info->ConnectWait>0:false; }
-        static CslServerInfo* GetInfo() { return m_info; }
+        static bool IsPlaying() { return GetInstance().m_playing; }
+        static bool IsWaiting() { return GetInstance().m_info ? GetInstance().m_info->ConnectWait>0:false; }
+        static CslServerInfo* GetInfo() { return GetInstance().m_info; }
 
     private:
-        static bool m_locked,m_playing;
-        static CslServerInfo *m_info;
-        static wxString m_cmd;
+        bool m_locked,m_playing;
+        CslServerInfo *m_info;
+        wxString m_cmd;
 };
 
 #endif //CSLGAMECONNECTION_H

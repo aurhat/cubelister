@@ -22,6 +22,7 @@
 #include "CslSettings.h"
 #include "CslGeoIP.h"
 #include "CslFlags.h"
+#include "CslMenu.h"
 #include "engine/CslTools.h"
 #include "img/sortasc_18_12.xpm"
 #include "img/sortdsc_18_12.xpm"
@@ -32,6 +33,7 @@ BEGIN_EVENT_TABLE(CslListCtrl,wxListCtrl)
     EVT_ERASE_BACKGROUND(CslListCtrl::OnEraseBackground)
     #endif
     EVT_MOTION(CslListCtrl::OnMouseMove)
+    EVT_MENU(wxID_ANY,CslListCtrl::OnMenu)
     EVT_LIST_ITEM_SELECTED(wxID_ANY,CslListCtrl::OnItem)
     EVT_LIST_ITEM_ACTIVATED(wxID_ANY,CslListCtrl::OnItem)
     CSL_EVT_TOOLTIP(wxID_ANY,CslListCtrl::OnToolTip)
@@ -131,6 +133,13 @@ void CslListCtrl::OnMouseMove(wxMouseEvent& event)
     CslToolTip::InitTip(this);
 }
 
+void CslListCtrl::OnMenu(wxCommandEvent& event)
+{
+    if (event.GetId()==MENU_SAVEIMAGE)
+        CreateScreenShot();
+    event.Skip();
+}
+
 void CslListCtrl::OnItem(wxListEvent& event)
 {
     CslToolTip::ResetTip();
@@ -203,9 +212,9 @@ void CslListCtrl::CreateScreenShot()
 
     wxFileDialog dlg(window,_("Save screenshot"),wxEmptyString,file,_("Png files (*.png)|*.png"),
 #if wxCHECK_VERSION(2,9,0)
-                         wxFD_SAVE|wxFD_OVERWRITE_PROMPT
+                     wxFD_SAVE|wxFD_OVERWRITE_PROMPT
 #else
-                         wxSAVE|wxOVERWRITE_PROMPT
+                     wxSAVE|wxOVERWRITE_PROMPT
 #endif
                     );
     // wxGTK: hmm, doesn't work in the ctor?!

@@ -25,12 +25,12 @@
 #include "CslDlgAddServer.h"
 #include "CslDlgOutput.h"
 #include "CslListCtrlServer.h"
+#include "CslListCtrlPlayer.h"
 #include "CslStatusBar.h"
 #include "CslArt.h"
 #include "CslMenu.h"
 #include "CslGameConnection.h"
 #include "CslSettings.h"
-#include "CslIPC.h"
 
 #include "img/ext_green_8.xpm"
 #include "img/sortasc_16.xpm"
@@ -205,8 +205,8 @@ void CslListCtrlServer::OnItemDeselected(wxListEvent& event)
 void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
 {
     wxInt32 selected;
-    wxMenu menu,*sub,*filter=NULL;
     wxMenuItem *item;
+    wxMenu menu,*filter=NULL;
     CslServerInfo *info=NULL;
     wxPoint point=event.GetPosition();
 
@@ -219,34 +219,9 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
 
     if (selected==1)
     {
-        wxUint32 caps=info->GetGame().GetCapabilities();
-
-        CslMenu::AddItem(&menu,MENU_SERVER_CONNECT,MENU_SERVER_CONN_STR,wxART_CONNECT);
-        if (CSL_CAP_CONNECT_PASS(caps))
-            CslMenu::AddItem(&menu,MENU_SERVER_CONNECT_PW,MENU_SERVER_CONN_PW_STR,wxART_CONNECT_PW);
-
-        sub=new wxMenu();
-        item=menu.AppendSubMenu(sub,MENU_SERVER_EXT_STR);
-        item->SetBitmap(GET_ART_MENU(wxART_ABOUT));
-        if (info->ExtInfoStatus!=CSL_EXT_STATUS_OK || !CslEngine::PingOk(*info,g_cslSettings->updateInterval))
-            item->Enable(false);
-        else
-        {
-            CslMenu::AddItem(sub,MENU_SERVER_EXT_FULL,MENU_SERVER_EXT_FULL_STR,wxART_ABOUT);
-            sub->AppendSeparator();
-            CslMenu::AddItem(sub,MENU_SERVER_EXT_MICRO,MENU_SERVER_EXT_MICRO_STR,wxART_EXTINFO_MICRO);
-            CslMenu::AddItem(sub,MENU_SERVER_EXT_MINI,MENU_SERVER_EXT_MINI_STR,wxART_EXTINFO_MINI);
-            CslMenu::AddItem(sub,MENU_SERVER_EXT_DEFAULT,MENU_SERVER_EXT_DEFAULT_STR,wxART_EXTINFO_DEFAULT);
-        }
-
+        CSL_MENU_CREATE_CONNECT(menu,info)
+        CSL_MENU_CREATE_EXTINFO(menu,info,-1)
         menu.AppendSeparator();
-
-        if (CslGameConnection::IsPlaying())
-        {
-            menu.Enable(MENU_SERVER_CONNECT,false);
-            if (CSL_CAP_CONNECT_PASS(caps))
-                menu.Enable(MENU_SERVER_CONNECT_PW,false);
-        }
     }
 
     if (m_id==CSL_LIST_MASTER && selected)
@@ -264,22 +239,15 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
         CslMenu::AddItem(&menu,MENU_DEL,selected>1 ?
                          MENU_SERVER_DELM_STR:MENU_SERVER_DEL_STR,wxART_DELETE);
         menu.AppendSeparator();
-
-        sub=new wxMenu();
-        item=menu.AppendSubMenu(sub,MENU_SERVER_COPY_STR);
-        item->SetBitmap(GET_ART_MENU(wxART_CSL));
-        CslMenu::AddItem(sub,MENU_SERVER_COPY_CON,MENU_SERVER_COPY_CON_STR,wxART_CSL);
-        CslMenu::AddItem(sub,MENU_SERVER_COPY_FAV,MENU_SERVER_COPY_FAV_STR,wxART_CSL);
-        CslMenu::AddItem(sub,MENU_SERVER_COPY_CONFAV,MENU_SERVER_COPY_CONFAV_STR,wxART_CSL);
+        CSL_MENU_CREATE_URICOPY(menu)
         CslMenu::AddItem(&menu,MENU_COPY,MENU_SERVER_COPY_SERVER_STR,wxART_COPY);
         menu.AppendSeparator();
-
         filter=(wxMenu*)1;
     }
     else if (m_id==CSL_LIST_FAVOURITE)
     {
-        filter=(wxMenu*)1;
         menu.AppendSeparator();
+        filter=(wxMenu*)1;
     }
 
     if (filter)
@@ -320,6 +288,12 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
         item->Check(m_filterVersion>-1);
     }
 
+    if (selected==1)
+    {
+        menu.AppendSeparator();
+        CSL_MENU_CREATE_NOTIFY(menu,info)
+    }
+
     point=ScreenToClient(point);
     PopupMenu(&menu,point);
 }
@@ -342,14 +316,8 @@ void CslListCtrlServer::ListRemoveServers()
         m_selected.RemoveAt(i);
         m_servers.Remove(ls);
 
-        switch (m_id)
-        {
-            case CSL_LIST_FAVOURITE:
-                info->RemoveFavourite();
-                break;
-            default:
-                break;
-        }
+        if (m_id==CSL_LIST_FAVOURITE)
+            info->RemoveFavourite();
     }
 }
 
@@ -434,69 +402,70 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
     wxListItem item;
     wxString s;
     wxUint32 i=0;
-    wxInt32 c=0;
+    wxInt32 c=0,id=event.GetId();
 
-    wxInt32 id=event.GetId();
+    CSL_MENU_EVENT_SKIP_CONNECT(id,m_selected.Item(0)->Info)
+    CSL_MENU_EVENT_SKIP_EXTINFO(id,m_selected.Item(0)->Info)
+    CSL_MENU_EVENT_SKIP_NOTIFY(id,m_selected.Item(0)->Info)
+
+    if (CSL_MENU_EVENT_IS_URICOPY(id))
+    {
+        VoidPointerArray *servers=new VoidPointerArray;
+
+        for (i=0;i<m_selected.GetCount();i++)
+        {
+            info=m_selected.Item(i)->Info;
+
+            if (ListFindItem(info,item)==wxNOT_FOUND)
+                continue;
+
+            servers->Add((void*)info);
+        }
+
+        event.SetClientData((void*)servers);
+        event.Skip();
+        return;
+    }
 
     switch (id)
     {
-        case MENU_SERVER_CONNECT:
-        case MENU_SERVER_CONNECT_PW:
-            event.SetClientData((void*)m_selected.Item(0)->Info);
-            event.Skip();
-            break;
-
-        case MENU_SERVER_EXT_MICRO:
-        case MENU_SERVER_EXT_MINI:
-        case MENU_SERVER_EXT_DEFAULT:
-        case MENU_SERVER_EXT_FULL:
-        {
-            info=m_selected.Item(0)->Info;
-            event.SetClientData((void*)info);
-            event.Skip();
-            break;
-        }
-
         case MENU_ADD:
         {
-            switch (m_id)
+            if (m_id==CSL_LIST_MASTER)
             {
-                case CSL_LIST_MASTER:
+                bool sort=false;
+                for (i=0;i<m_selected.GetCount();i++)
                 {
-                    bool sort=false;
-                    for (i=0;i<m_selected.GetCount();i++)
-                    {
-                        info=m_selected.Item(i)->Info;
+                    info=m_selected.Item(i)->Info;
 
-                        if (ListFindItem(info,item)==wxNOT_FOUND)
-                            continue;
-                        info->SetFavourite();
-                        sort=true;
-                        m_sibling->ListUpdateServer(info);
-                        /*if (!info->IsDefault())
-                        {
-                            item.SetId(c);
-                            DeleteItem(item);
-                        }*/
-                    }
-                    if (sort)
-                        m_sibling->ListSort();
-                    break;
-                }
-                case CSL_LIST_FAVOURITE:
-                {
-                    CslDlgAddServer dlg(wxTheApp->GetTopWindow());
-                    info=new CslServerInfo;
-                    dlg.InitDlg(info);
-                    if (dlg.ShowModal()!=wxID_OK)
+                    if (ListFindItem(info,item)==wxNOT_FOUND)
+                        continue;
+                    info->SetFavourite();
+                    sort=true;
+                    m_sibling->ListUpdateServer(info);
+                    /*if (!info->IsDefault())
                     {
-                        delete info;
-                        break;
-                    }
-                    ListUpdateServer(info);
-                    ListSort();
+                        item.SetId(c);
+                        DeleteItem(item);
+                    }*/
+                }
+                if (sort)
+                    m_sibling->ListSort();
+                break;
+            }
+            if (m_id==CSL_LIST_FAVOURITE)
+            {
+                CslDlgAddServer dlg(wxTheApp->GetTopWindow());
+                info=new CslServerInfo;
+                dlg.InitDlg(info);
+                if (dlg.ShowModal()!=wxID_OK)
+                {
+                    delete info;
                     break;
                 }
+                ListUpdateServer(info);
+                ListSort();
+                break;
             }
             break;
         }
@@ -510,57 +479,6 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
         case MENU_DEL:
         {
             ListDeleteServers();
-            break;
-        }
-
-        case MENU_SERVER_COPY_CON:
-        case MENU_SERVER_COPY_CONFAV:
-        case MENU_SERVER_COPY_FAV:
-        {
-            bool con,add,pass=false;
-
-            for (i=0;i<m_selected.GetCount();i++)
-            {
-                info=m_selected.Item(i)->Info;
-
-                if (ListFindItem(info,item)==wxNOT_FOUND)
-                    continue;
-
-                if (!info->Password.IsEmpty())
-                {
-                    pass=true;
-                    break;
-                }
-            }
-
-            if (pass)
-            {
-                pass=wxMessageBox(_("Copy server passwords too?"),_("Warning"),
-                                  wxYES_NO|wxICON_WARNING,wxTheApp->GetTopWindow())==wxYES;
-            }
-
-            for (i=0;i<m_selected.GetCount();i++)
-            {
-                info=m_selected.Item(i)->Info;
-
-                if (ListFindItem(info,item)==wxNOT_FOUND)
-                    continue;
-
-                if (!s.IsEmpty())
-                    s<<wxT("\r\n");
-
-                con=id==MENU_SERVER_COPY_CON || id==MENU_SERVER_COPY_CONFAV;
-                add=id==MENU_SERVER_COPY_FAV || id==MENU_SERVER_COPY_CONFAV;
-
-                s<<CslIpcBase::CreateURI(*info,pass,con,add);
-
-            }
-
-            if (!s.IsEmpty() && wxTheClipboard->Open())
-            {
-                wxTheClipboard->SetData(new wxTextDataObject(s));
-                wxTheClipboard->Close();
-            }
             break;
         }
 
@@ -657,18 +575,15 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
                 }
                 *m_filterFlags&=~i;
             }
+
+            ListFilter();
+            event.SetClientData((void*)m_id);
+            event.Skip();
             break;
         }
 
         default:
             break;
-    }
-
-    if (id>=MENU_SERVER_FILTER_OFF && id<=MENU_SERVER_FILTER_VER)
-    {
-        ListFilter();
-        event.SetClientData((void*)m_id);
-        event.Skip();
     }
 }
 
@@ -1132,7 +1047,7 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
         colour=g_cslSettings->colServerMM3;
     else
     {
-        if (info->Players>0 && info->Players>=info->PlayersMax && info->PlayersMax>-1)
+        if (info->IsFull())
             colour=g_cslSettings->colServerFull;
         else if (CSL_SERVER_IS_PRIVATE(info->MM))
             colour=g_cslSettings->colServerMM3;

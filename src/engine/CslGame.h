@@ -50,6 +50,7 @@ enum
     CSL_SERVER_BAN       = 1<<9,
     CSL_SERVER_BLACKLIST = 1<<10,
 };
+#define CSL_MM_IS_VALID(x)          ((wxInt32)x!=-1)
 #define CSL_SERVER_IS_OPEN(x)       ((x&0xff)==0)
 #define CSL_SERVER_IS_VETO(x)       ((x&0xff)==1)
 #define CSL_SERVER_IS_LOCKED(x)     ((x&0xff)==2)
@@ -218,8 +219,39 @@ class CslMaster
         void AddServer(CslServerInfo *info);
 };
 
+class CslServerEvents
+{
+   public:
+        enum
+        {
+            EVENT_NONE      = 0,
+            EVENT_ONLINE    = 1<<0,
+            EVENT_OFFLINE   = 1<<1,
+            EVENT_FULL      = 1<<2,
+            EVENT_NOT_FULL  = 1<<3,
+            EVENT_EMPTY     = 1<<4,
+            EVENT_NOT_EMPTY = 1<<5,
+            EVENT_LOCKED    = 1<<6,
+            EVENT_PRIVATE   = 1<<7
+        };
 
-class CslServerInfo : public CslExtendedInfo
+        CslServerEvents() : m_flags(EVENT_NONE),m_events(EVENT_NONE) {}
+
+        void RegisterEvents(wxUint32 flags) { m_flags|=flags; }
+        void UnRegisterEvents(wxUint32 flags) { m_flags&=~flags; }
+        bool HasRegisteredEvent(wxUint32 flag) const { return (m_flags&flag)!=0; }
+        wxUint32 GetRegisteredEvents() const { return m_flags; }
+
+        void ClearEvents() { m_events=EVENT_NONE; }
+        void SetEvents(wxUint32 flags) { m_events|=flags; }
+        bool HasEvents() const { return m_events!=EVENT_NONE; }
+        bool HasEvent(wxUint32 flag) const { return (m_events&flag)!=0; }
+
+    private:
+        wxUint32 m_flags,m_events;
+};
+
+class CslServerInfo : public CslExtendedInfo, public CslServerEvents
 {
         friend class CslGame;
         friend class CslMaster;
@@ -269,6 +301,8 @@ class CslServerInfo : public CslExtendedInfo
         bool IsFavourite() const { return (View&CSL_VIEW_FAVOURITE)>0; }
 
         bool HasStats() const;
+
+        bool IsFull() const { return Players>0 && PlayersMax>0 && Players>=PlayersMax; }
 
         wxString Host,Domain;
         wxUint16 GamePort,InfoPort;

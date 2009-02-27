@@ -36,6 +36,16 @@
 #include <wx/imaglist.h>
 #include "CslToolTip.h"
 
+// since wx>2.8.4 the list control items are getting deselected on wxGZK
+// this happens too on wxMAC (maybe because of the generic list control?)
+#if defined(__WXGTK__) || defined(__WXMAC__)
+#ifndef CSL_USE_WX_LIST_DESELECT_WORKAROUND
+#if wxVERSION_NUMBER > 2804 || defined(__WXMAC__)
+#define CSL_USE_WX_LIST_DESELECT_WORKAROUND
+#endif
+#endif
+#endif
+
 
 enum
 {
@@ -67,6 +77,7 @@ class CslListCtrl : public wxListCtrl
         void OnEraseBackground(wxEraseEvent& event);
 #endif
         void OnMouseMove(wxMouseEvent& event);
+        void OnMenu(wxCommandEvent& event);
         void OnItem(wxListEvent& event);
         void OnContextMenu(wxContextMenuEvent& event);
         void OnToolTip(CslToolTipEvent& event);

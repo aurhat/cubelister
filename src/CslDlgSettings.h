@@ -100,6 +100,7 @@ class CslDlgSettings : public wxDialog
         wxStaticBox* sizer_1_staticbox;
         wxStaticBox* sizer_network_staticbox;
         wxStaticBox* sizer_output_staticbox;
+        wxStaticBox* sizer_tts_staticbox;
         wxStaticBox* sizer_systray_staticbox;
         wxStaticBox* sizer_threshold_staticbox;
         wxStaticBox* sizer_times_staticbox;
@@ -125,6 +126,8 @@ class CslDlgSettings : public wxDialog
         wxSpinCtrl* spin_ctrl_ping_bad;
         wxCheckBox* checkbox_systray;
         wxCheckBox* checkbox_systray_close;
+        wxCheckBox* checkbox_tts;
+        wxSpinCtrl* spin_ctrl_tts_volume;
         wxCheckBox* checkbox_game_output;
         wxDirPickerCtrl* dirpicker_game_output;
         wxPanel* notebook_pane_other;

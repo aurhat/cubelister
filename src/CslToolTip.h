@@ -72,15 +72,18 @@ class CslToolTip : public wxFrame
         CslToolTip(wxWindow *parent);
         ~CslToolTip();
 
-        static void InitTip(wxEvtHandler *handler);
+        static void InitTip(wxEvtHandler *handler,wxUint32 delay=0);
         static void ResetTip();
+        static bool IsMain() { return (m_self && m_self->m_current==m_self->m_parent) ? true:false; }
 
     private:
         static CslToolTip *m_self;
+        wxWindow *m_parent;
         wxEvtHandler *m_current;
-        wxTimer m_timer;
         wxBoxSizer *m_sizer;
+        wxFlexGridSizer *m_box;
         wxStaticText *m_title,*m_left,*m_right;
+        wxTimer m_timer;
 
         void ShowTip(CslToolTipEvent& event);
 

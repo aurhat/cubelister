@@ -1,5 +1,5 @@
 AC_INIT(src)
-AM_INIT_AUTOMAKE(csl, 0.8.1)
+AM_INIT_AUTOMAKE(csl, 0.8.2)
 
 AC_CONFIG_HEADER([src/config.h])
 
@@ -68,12 +68,18 @@ else
     AC_MSG_ERROR([wxWidgets 2.8.0 or newer is required])
 fi
 
+dnl speech-dispatcher
+use_speechd="yes"
+AC_ARG_ENABLE(speech-dispatcher,[  --disable-speech-dispatcher  disable speech-dispatcher],use_speechd=$enableval)
+if test "x$use_speechd" = "xyes"; then
+ AC_CHECK_HEADERS(libspeechd.h,AC_DEFINE([HAVE_LIBSPEECHD_H],[],Define to 1 if you have the <libspeechd.h> header file.)
+                               SPEECHD_LIBS="-lspeechd",use_speechd="no")
+fi
+AC_SUBST(SPEECHD_LIBS)
+
 dnl GeoIP
 internal_geoip="yes"
-AC_CHECK_HEADERS(GeoIP.h,
-    AC_CHECK_LIB(GeoIP, GeoIP_new,[
-         internal_geoip="no"]))
-
+AC_CHECK_HEADERS(GeoIP.h,AC_CHECK_LIB(GeoIP,GeoIP_new,[internal_geoip="no"]))
 if test "x$internal_geoip" = "xyes"; then
  GEOIP_LIBS="libGeoIP/libGeoIP.a"
 else
@@ -120,11 +126,13 @@ echo --------------------------------------
 echo $PACKAGE $VERSION
 
 echo
-echo wxWidgets version............. : $wxversion
+echo wxWidgets version........... : $wxversion
 echo
-echo Need internal libGeoIP........ : $internal_geoip
-echo Need internal GeoIP database.. : $internal_geoip_db
+echo Speech-dispatcher support... : $use_speechd
 echo
-echo Build map config tool......... : $cslmapcfgtool
+echo Need internal libGeoIP...... : $internal_geoip
+echo Need internal GeoIP database : $internal_geoip_db
+echo
+echo Build map config tool....... : $cslmapcfgtool
 echo --------------------------------------
 echo

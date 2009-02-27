@@ -32,8 +32,8 @@ END_EVENT_TABLE()
 
 CslListCtrlInfo::CslListCtrlInfo(wxWindow* parent,wxWindowID id,const wxPoint& pos,
                                  const wxSize& size,long style,
-                                 const wxValidator& validator, const wxString& name)
-        : CslListCtrl(parent,id,pos,size,style,validator,name)
+                                 const wxValidator& validator, const wxString& name) :
+        CslListCtrl(parent,id,pos,size,style,validator,name)
 {
     FlickerFree(false);
 
@@ -79,20 +79,23 @@ CslListCtrlInfo::CslListCtrlInfo(wxWindow* parent,wxWindowID id,const wxPoint& p
 
 void CslListCtrlInfo::OnSize(wxSizeEvent& event)
 {
-    AdjustSize(event.GetSize());
-    event.Skip();
+    if (event.GetEventObject())
+    {
+        AdjustSize(event.GetSize());
+
+        wxSizeEvent evt;
+        wxPostEvent(this,evt);
+
+        event.Skip();
+    }
+    else
+        ((wxScrolledWindow*)m_mainWin)->SetScrollbars(0,0,0,0);
 }
 
 void CslListCtrlInfo::AdjustSize(wxSize size)
 {
-#if 0 //#ifndef __WXMSW__
-    wxInt32 w=size.x-4;
-#else
-    wxInt32 w=size.x;
-#endif // __WXMSW__
-
-    SetColumnWidth(0,(wxInt32)(w*0.35));
-    SetColumnWidth(1,(wxInt32)(w*0.64));
+    SetColumnWidth(0,(wxInt32)(size.x*0.35));
+    SetColumnWidth(1,(wxInt32)(size.x*0.65));
 }
 
 void CslListCtrlInfo::GetToolTipText(wxInt32 WXUNUSED(row),CslToolTipEvent& event)

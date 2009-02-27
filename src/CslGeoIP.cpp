@@ -32,15 +32,8 @@
 #include "engine/CslTools.h"
 
 
-GeoIP *CslGeoIP::m_geoIP=NULL;
-
-bool CslGeoIP::Init()
+CslGeoIP::CslGeoIP()
 {
-    if (m_geoIP)
-    {
-        wxASSERT_MSG(!m_geoIP,wxT("GeoIP already initialised!"));
-        return false;
-    }
 #ifdef CSL_EXTERNAL_GEOIP_DATABASE
     m_geoIP=GeoIP_open_type(GEOIP_COUNTRY_EDITION,GEOIP_MEMORY_CACHE);
 #else
@@ -54,43 +47,49 @@ bool CslGeoIP::Init()
     }
 #endif //__WXGTK__
 #endif //CSL_EXTERNAL_GEOIP_DATABASE
-
-    return m_geoIP!=NULL;
 }
 
-void CslGeoIP::Destroy()
+CslGeoIP::~CslGeoIP()
 {
     if (!m_geoIP)
-    {
-        wxASSERT_MSG(!m_geoIP,wxT("GeoIP not initialised!"));
         return;
-    }
 
     GeoIP_delete(m_geoIP);
     m_geoIP=NULL;
 }
 
+CslGeoIP& CslGeoIP::GetInstance()
+{
+    static CslGeoIP geoIP;
+
+    return geoIP;
+}
+
 bool CslGeoIP::IsOk()
 {
-    return m_geoIP!=NULL;
+    return GetInstance().m_geoIP!=NULL;
 }
 
 const char* CslGeoIP::GetCountryCodeByAddr(const char *host)
 {
-    return m_geoIP ? GeoIP_country_code_by_addr(m_geoIP,host):NULL;
+    CslGeoIP& self=GetInstance();
+    return self.m_geoIP ? GeoIP_country_code_by_addr(self.m_geoIP,host):NULL;
 }
 
 const char* CslGeoIP::GetCountryCodeByIPnum(const unsigned long ipnum)
 {
-    return m_geoIP ? GeoIP_country_code_by_ipnum(m_geoIP,ipnum):NULL;
+    CslGeoIP& self=GetInstance();
+    return self.m_geoIP ? GeoIP_country_code_by_ipnum(self.m_geoIP,ipnum):NULL;
 }
 
 const char* CslGeoIP::GetCountryNameByAddr(const char *host)
 {
-    return m_geoIP ? GeoIP_country_name_by_addr(m_geoIP,host):NULL;
+    CslGeoIP& self=GetInstance();
+    return self.m_geoIP ? GeoIP_country_name_by_addr(self.m_geoIP,host):NULL;
 }
 
 const char* CslGeoIP::GetCountryNameByIPnum(const unsigned long ipnum)
 {
-    return m_geoIP ? GeoIP_country_name_by_ipnum(m_geoIP,ipnum):NULL;
+    CslGeoIP& self=GetInstance();
+    return self.m_geoIP ? GeoIP_country_name_by_ipnum(self.m_geoIP,ipnum):NULL;
 }

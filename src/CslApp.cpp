@@ -22,8 +22,6 @@
 #include "CslApp.h"
 #include "CslFrame.h"
 #include "CslIPC.h"
-#include "CslGeoIP.h"
-
 IMPLEMENT_APP(CslApp)
 
 
@@ -46,7 +44,8 @@ bool CslApp::OnInit()
 #ifdef __WXGTK__
     m_locale.AddCatalogLookupPathPrefix(g_basePath+wxString(wxT("/lang")));
 #endif
-    m_locale.AddCatalog(CSL_NAME_SHORT_STR);
+    if (m_locale.AddCatalog(CSL_NAME_SHORT_STR))
+        m_lang=m_locale.GetCanonicalName();
 
 #ifdef __WXMAC__
     wxSystemOptions::SetOption(wxT("mac.listctrl.always_use_generic"),1);
@@ -82,8 +81,6 @@ bool CslApp::OnInit()
 
     wxInitAllImageHandlers();
 
-    CslGeoIP::Init();
-
     CslFrame* frame=new CslFrame(NULL,wxID_ANY,wxEmptyString,wxDefaultPosition);
     SetTopWindow(frame);
     frame->Show();
@@ -109,8 +106,6 @@ int CslApp::OnExit()
 
     if (m_single)
         delete m_single;
-
-    CslGeoIP::Destroy();
 
     return 0;
 }

@@ -48,6 +48,7 @@
 #include "CslListCtrlCountry.h"
 #include "CslListCtrlPlayerSearch.h"
 #include "CslGameConnection.h"
+#include "CslTTS.h"
 #include "CslIPC.h"
 #include "CslIRC.h"
 
@@ -105,6 +106,7 @@ class CslFrame: public wxFrame
         CslDlgTraffic *m_trafficDlg;
 
         CslToolTip *m_toolTip;
+        wxString m_toolTipTitle,m_toolTipTextLeft,m_toolTipTextRight;
 
         CslVersionCheckThread *m_versionCheckThread;
 
@@ -144,7 +146,7 @@ class CslFrame: public wxFrame
         void TreeRemoveMaster();
         void TreeAddGame(CslGame *game,wxInt32 img,bool focus=false);
         CslGame* TreeGetSelectedGame(wxTreeItemId *item=NULL);
-        CslMaster *TreeGetSelectedMaster(wxTreeItemId *item=NULL);
+        CslMaster* TreeGetSelectedMaster(wxTreeItemId *item=NULL);
 
         void UpdateMaster();
         void ConnectToServer(CslServerInfo *info=NULL,wxInt32 pass=CslGameConnection::NO_PASS);
@@ -176,6 +178,7 @@ class CslFrame: public wxFrame
         void OnMouseEnter(wxMouseEvent& event);
         void OnMouseLeave(wxMouseEvent& event);
         void OnMouseLeftDown(wxMouseEvent& event);
+        void OnToolTip(CslToolTipEvent& event);
         void OnVersionCheck(wxCommandEvent& event);
         void OnEndProcess(wxCommandEvent& event);
         void OnIPC(CslIpcEvent& event);

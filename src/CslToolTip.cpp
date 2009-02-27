@@ -21,7 +21,6 @@
 #include "CslToolTip.h"
 #include "CslSettings.h"
 
-
 DEFINE_EVENT_TYPE(wxCSL_EVT_TOOLTIP)
 
 BEGIN_EVENT_TABLE(CslToolTip,wxFrame)
@@ -44,7 +43,7 @@ CslToolTip *CslToolTip::m_self=NULL;
 CslToolTip::CslToolTip(wxWindow *parent) :
         wxFrame(parent,wxID_ANY,wxEmptyString,wxDefaultPosition,wxDefaultSize,
                 wxNO_BORDER|wxSTAY_ON_TOP|wxFRAME_TOOL_WINDOW),
-        m_current(NULL)
+        m_parent(parent),m_current(NULL)
 {
     m_self=this;
     m_timer.SetOwner(this);
@@ -52,12 +51,14 @@ CslToolTip::CslToolTip(wxWindow *parent) :
     m_sizer=new wxBoxSizer(wxVERTICAL);
     m_title=new wxStaticText(this,wxID_ANY,wxEmptyString);
     m_sizer->Add(m_title,0,wxTOP|wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL,6);
-    wxBoxSizer *box=new wxBoxSizer(wxHORIZONTAL);
-    m_sizer->Add(box,1,wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL,4);
+    m_box=new wxFlexGridSizer(1,2,0,0);
+    m_box->AddGrowableCol(0);
+    m_box->AddGrowableCol(1);
+    m_sizer->Add(m_box,1,wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL,4);
     m_left=new wxStaticText(this,wxID_ANY,wxEmptyString);
     m_right=new wxStaticText(this,wxID_ANY,wxEmptyString);
-    box->Add(m_left,0,wxEXPAND|wxBOTTOM|wxLEFT|wxRIGHT,6);
-    box->Add(m_right,1,wxEXPAND|wxBOTTOM|wxLEFT|wxRIGHT,6);
+    m_box->Add(m_left,0,wxEXPAND|wxBOTTOM|wxLEFT,6);
+    m_box->Add(m_right,1,wxEXPAND|wxBOTTOM|wxRIGHT,6);
     SetSizer(m_sizer);
 
     wxFont font=m_title->GetFont();
@@ -112,7 +113,7 @@ void CslToolTip::OnPaint(wxPaintEvent& event)
 #ifdef __WXMAC__
     dc.DrawRectangle(0,0,w,h);
 #else
-    dc.DrawRoundedRectangle(0,0,w,h,3.0);
+    dc.DrawRoundedRectangle(0,0,w,h,2.0);
 #endif
 }
 
@@ -120,6 +121,12 @@ void CslToolTip::OnTimer(wxTimerEvent& WXUNUSED(event))
 {
     if (!m_current)
         return;
+
+    if (IsMain() && IsShown())
+    {
+        Hide();
+        return;
+    }
 
     CslToolTipEvent evt(::wxGetMousePosition());
 
@@ -184,6 +191,13 @@ void CslToolTip::ShowTip(CslToolTipEvent& event)
     else if (!event.Title.IsEmpty() && !m_title->IsShown())
         m_sizer->Show(m_title);
 
+
+    {
+        wxClientDC dc(this);
+        wxInt32 gap=dc.GetTextExtent(wxT(" ")).x;
+        m_box->SetHGap(IsMain() ? gap:gap*4);
+    }
+
 #ifdef __WXMAC__
     {
         wxClientDC dc(m_left);
@@ -212,21 +226,25 @@ void CslToolTip::ShowTip(CslToolTipEvent& event)
 
     Move(event.Pos);
     Show();
+
+    if (IsMain())
+        m_timer.Start(10000,wxTIMER_ONE_SHOT);
 }
 
-void CslToolTip::InitTip(wxEvtHandler *handler)
+void CslToolTip::InitTip(wxEvtHandler *handler,wxUint32 delay)
 {
     if (!m_self)
         return;
 
+    if (IsMain() && handler!=m_self->m_parent && m_self->IsShown())
+        return;
+
     ResetTip();
 
-    if (handler)
-    {
-        m_self->m_current=handler;
-        m_self->m_current->Connect(wxEVT_LEAVE_WINDOW,wxMouseEventHandler(CslToolTip::OnMouseLeave),NULL,m_self);
-        m_self->m_timer.Start(g_cslSettings->tooltipDelay,wxTIMER_ONE_SHOT);
-    }
+    m_self->m_current=handler;
+    m_self->m_current->Connect(wxEVT_LEAVE_WINDOW,wxMouseEventHandler(CslToolTip::OnMouseLeave),NULL,m_self);
+
+    m_self->m_timer.Start(delay ? delay:g_cslSettings->tooltipDelay,wxTIMER_ONE_SHOT);
 }
 
 void CslToolTip::ResetTip()
