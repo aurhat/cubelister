@@ -447,6 +447,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CslTTS.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CslVersionCheck.cpp"
 				>
 			</File>
@@ -590,6 +594,10 @@
 			</File>
 			<File
 				RelativePath=".\CslToolTip.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CslTTS.h"
 				>
 			</File>
 			<File

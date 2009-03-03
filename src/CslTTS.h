@@ -38,7 +38,6 @@ class CslTTS
     private:
         CslTTS();
         CslTTS(const CslTTS& tts) {}
-        ~CslTTS();
 
         static CslTTS& GetInstance();
 
@@ -56,9 +55,14 @@ class CslTTS
         wxInt32 m_volume;
         wxString m_lang;
 
-#ifdef HAVE_LIBSPEECHD_H
+#ifdef _CSL_DECLARE_TTS_VARS_
+#ifdef __WXMSW__
+		ISpVoice *m_voice;
+#elif __WXMAC__
+#elif HAVE_LIBSPEECHD_H
         SPDConnection *m_spd;
-#endif //HAVE_LIBSPEECHD_H
+#endif //__WXMSW__
+#endif //_DECLARE_TTS_VARS_
 };
 
 #endif

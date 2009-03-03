@@ -265,6 +265,8 @@ CslFrame::~CslFrame()
         m_ipcServer=NULL;
     }
 
+	CslTTS::DeInit();
+
     if (m_engine->IsOk())
     {
         SaveSettings();

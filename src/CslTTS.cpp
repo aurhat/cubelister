@@ -18,12 +18,25 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifdef HAVE_CONFIG_H
+#include "wx/wxprec.h"
+#ifdef __BORLANDC__
+#pragma hdrstop
+#endif
+#ifndef WX_PRECOMP
+#include "wx/wx.h"
+#endif
+
+#ifdef __WXMSW__
+#define _CSL_DECLARE_TTS_VARS_
+#include <sapi.h>
+#elif __WXMAC__
+#elif HAVE_CONFIG_H
 #include "config.h"
 #ifdef HAVE_LIBSPEECHD_H
+#define _CSL_DECLARE_TTS_VARS_
 #include <libspeechd.h>
 #endif //HAVE_LIBSPEECHD_H
-#endif //HAVE_CONFIG_H
+#endif //__WXMSW__
 
 #include "CslTTS.h"
 #include "CslSettings.h"
@@ -35,15 +48,13 @@ CslTTS::CslTTS()
 {
     m_ok=false;
     m_volume=0;
-#ifdef HAVE_LIBSPEECHD_H
+#ifdef __WXMSW__
+	m_voice=NULL;
+#elif __WXMAC__
+#elif HAVE_LIBSPEECHD_H
     m_spd=NULL;
-#endif //HAVE_LIBSPEECHD_H
+#endif //__WXMSW__
 
-}
-
-CslTTS::~CslTTS()
-{
-    DeInit();
 }
 
 CslTTS& CslTTS::GetInstance()
@@ -60,7 +71,13 @@ bool CslTTS::Init(const wxString& lang)
     if (self.m_ok)
         return false;
 
-#ifdef HAVE_LIBSPEECHD_H
+#ifdef __WXMSW__
+	if (CoCreateInstance(CLSID_SpVoice,NULL,CLSCTX_ALL,IID_ISpVoice,(void**)&self.m_voice)<0)
+		self.m_voice=NULL;
+	else
+		self.m_ok=true;
+#elif __WXMAC__
+#elif HAVE_LIBSPEECHD_H
     if ((self.m_spd=spd_open(__CSL_NAME_SHORT_STR,NULL,NULL,SPD_MODE_THREADED)))
     {
         if (spd_set_punctuation(self.m_spd,SPD_PUNCT_NONE))
@@ -83,7 +100,7 @@ bool CslTTS::Init(const wxString& lang)
     }
 
     self.m_ok=true;
-#endif //HAVE_LIBSPEECHD_H
+#endif //__WXMSW__
 
     return self.m_ok;
 }
@@ -95,13 +112,20 @@ bool CslTTS::DeInit()
     if (!self.m_ok)
         return false;
 
-#ifdef HAVE_LIBSPEECHD_H
+#ifdef __WXMSW__
+	if (self.m_voice)
+	{
+		self.m_voice->Release();
+	    self.m_voice=NULL;
+	}
+#elif __WXMAC__
+#elif HAVE_LIBSPEECHD_H
     if (self.m_spd)
     {
         spd_close(self.m_spd);
         self.m_spd=NULL;
     }
-#endif //HAVE_LIBSPEECHD_H
+#endif //__WXMSW__
 
     self.m_ok=false;
 
@@ -123,7 +147,11 @@ void CslTTS::Say(const wxString& text)
     if (self.m_volume!=g_cslSettings->ttsVolume)
         SetVolume(g_cslSettings->ttsVolume);
 
-#ifdef HAVE_LIBSPEECHD_H
+#ifdef __WXMSW__
+	if (self.m_voice)
+		self.m_voice->Speak(text.wc_str(wxConvLocal),SPF_ASYNC,NULL);
+#elif __WXMAC__
+#elif HAVE_LIBSPEECHD_H
     if (self.m_spd)
     {
         if (spd_say(self.m_spd,SPD_MESSAGE,U2A(text))<=0)
@@ -132,7 +160,7 @@ void CslTTS::Say(const wxString& text)
                 Init(self.m_lang);
         }
     }
-#endif //HAVE_LIBSPEECHD_H
+#endif //__WXMSW__
 }
 
 void CslTTS::SetVolume(wxInt32 volume)
@@ -144,8 +172,12 @@ void CslTTS::SetVolume(wxInt32 volume)
 
     self.m_volume=volume;
 
-#ifdef HAVE_LIBSPEECHD_H
+#ifdef __WXMSW__
+	if (self.m_voice)
+		self.m_voice->SetVolume(volume);
+#elif __WXMAC__
+#elif HAVE_LIBSPEECHD_H
     if (self.m_spd)
         spd_set_volume(self.m_spd,self.m_volume*2-100);
-#endif //HAVE_LIBSPEECHD_H
+#endif //__WXMSW__
 }
