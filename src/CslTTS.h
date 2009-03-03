@@ -56,10 +56,10 @@ class CslTTS
         wxString m_lang;
 
 #ifdef _CSL_DECLARE_TTS_VARS_
-#ifdef __WXMSW__
-		ISpVoice *m_voice;
-#elif __WXMAC__
-#elif HAVE_LIBSPEECHD_H
+#if defined(__WXMSW__)
+        ISpVoice *m_voice;
+#elif defined(__WXMAC__)
+#elif defined(HAVE_LIBSPEECHD_H)
         SPDConnection *m_spd;
 #endif //__WXMSW__
 #endif //_DECLARE_TTS_VARS_
