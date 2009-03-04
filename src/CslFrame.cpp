@@ -1965,7 +1965,6 @@ void CslFrame::OnListItemSelected(wxListEvent& event)
     if (!info)
         return;
 
-    //CslTTS::Say(info->GetBestDescription());
     list_ctrl_info->UpdateInfo(info);
 
     if (m_oldSelectedInfo)
@@ -2529,7 +2528,7 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             }
             else if (CSL_MENU_EVENT_IS_NOTIFY(id))
             {
-                wxUint32 flags=-1;
+                wxUint32 flags=(wxUint32)-1;
                 CslServerInfo *info=(CslServerInfo*)event.GetClientData();
 
                 if (id==MENU_SERVER_NOTIFY_RESET)

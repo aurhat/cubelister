@@ -33,7 +33,11 @@
 #include "wx/wx.h"
 #endif
 
+#ifdef __WXMAC__
+class CslTTS : public wxEvtHandler
+#else
 class CslTTS
+#endif
 {
     private:
         CslTTS();
@@ -42,6 +46,13 @@ class CslTTS
         static CslTTS& GetInstance();
 
         static void SetVolume(wxInt32 volume);
+
+#if defined (__WXMAC__) && defined (_CSL_DECLARE_TTS_VARS_)
+        void Process(const wxString& text=wxEmptyString);
+        static void OnProcessed(SpeechChannel channel,void *data);
+
+        void OnIdle(wxIdleEvent &event);
+#endif
 
     public:
         static bool Init(const wxString& lang=wxEmptyString);
@@ -59,6 +70,7 @@ class CslTTS
 #if defined(__WXMSW__)
         ISpVoice *m_voice;
 #elif defined(__WXMAC__)
+        SpeechChannel m_channel;
 #elif defined(HAVE_LIBSPEECHD_H)
         SPDConnection *m_spd;
 #endif //__WXMSW__

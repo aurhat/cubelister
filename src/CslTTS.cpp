@@ -30,6 +30,9 @@
 #define _CSL_DECLARE_TTS_VARS_
 #include <sapi.h>
 #elif defined(__WXMAC__)
+#define _CSL_DECLARE_TTS_VARS_
+#include <wx/thread.h>
+#include <Carbon/Carbon.h>
 #elif defined(HAVE_CONFIG_H)
 #include "config.h"
 #ifdef HAVE_LIBSPEECHD_H
@@ -77,6 +80,15 @@ bool CslTTS::Init(const wxString& lang)
     else
         self.m_ok=true;
 #elif defined(__WXMAC__)
+    self.m_ok=true;
+
+	if (NewSpeechChannel(NULL,&self.m_channel)==noErr)
+    {
+	    SetSpeechInfo(self.m_channel,soSpeechDoneCallBack,(void*)OnProcessed);
+        self.Connect(wxEVT_IDLE,wxIdleEventHandler(CslTTS::OnIdle),NULL,&self);
+    }
+    else
+        DeInit();
 #elif defined(HAVE_LIBSPEECHD_H)
     if ((self.m_spd=spd_open(__CSL_NAME_SHORT_STR,NULL,NULL,SPD_MODE_THREADED)))
     {
@@ -119,6 +131,11 @@ bool CslTTS::DeInit()
         self.m_voice=NULL;
     }
 #elif defined(__WXMAC__)
+    if (self.m_channel)
+    {
+       	DisposeSpeechChannel(self.m_channel);
+        self.m_channel=NULL;
+    }
 #elif defined(HAVE_LIBSPEECHD_H)
     if (self.m_spd)
     {
@@ -141,7 +158,7 @@ void CslTTS::Say(const wxString& text)
 {
     CslTTS& self=GetInstance();
 
-    if (!self.m_ok || !g_cslSettings->tts)
+    if (!self.m_ok || !g_cslSettings->tts || text.IsEmpty())
         return;
 
     if (self.m_volume!=g_cslSettings->ttsVolume)
@@ -151,6 +168,7 @@ void CslTTS::Say(const wxString& text)
     if (self.m_voice)
         self.m_voice->Speak(text.wc_str(wxConvLocal),SPF_ASYNC,NULL);
 #elif defined(__WXMAC__)
+	self.Process(text);
 #elif defined(HAVE_LIBSPEECHD_H)
     if (self.m_spd)
     {
@@ -176,8 +194,45 @@ void CslTTS::SetVolume(wxInt32 volume)
     if (self.m_voice)
         self.m_voice->SetVolume(volume);
 #elif defined(__WXMAC__)
+	Fixed vol=FixRatio(self.m_volume,100);
+	SetSpeechInfo(self.m_channel,soVolume,&vol);
 #elif defined(HAVE_LIBSPEECHD_H)
     if (self.m_spd)
         spd_set_volume(self.m_spd,self.m_volume*2-100);
 #endif //__WXMSW__
 }
+
+#ifdef __WXMAC__
+void CslTTS::Process(const wxString& text)
+{
+	static wxArrayString messages;
+
+    if (text.IsEmpty())
+    {
+        if (messages.IsEmpty())
+            return;
+    }
+    else
+    {
+        messages.Add(text);
+
+        if (SpeechBusy())
+            return;
+    }
+
+    const wxString& msg=messages.Item(0);
+   	SpeakText(m_channel,U2A(msg),msg.Length());
+    messages.RemoveAt(0);
+}
+
+void CslTTS::OnProcessed(SpeechChannel channel,void *data)
+{
+    wxIdleEvent evt;
+    wxPostEvent(&GetInstance(),evt);
+}
+
+void CslTTS::OnIdle(wxIdleEvent& WXUNUSED(event))
+{
+    Process();
+}
+#endif

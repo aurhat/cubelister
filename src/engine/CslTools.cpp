@@ -303,6 +303,24 @@ bool BitmapFromWindow(wxWindow *window,wxBitmap& bitmap)
     return ret;
 }
 
+void RegisterEventsRecursively(wxInt32 id,wxWindow *parent,wxEvtHandler *handler,
+                               wxEventType type,wxObjectEventFunction function)
+{
+    if (parent)
+    {
+        parent->Connect(id,type,function,NULL,handler);
+ 
+        wxWindowListNode *node=parent->GetChildren().GetFirst();
+    
+        while (node)
+        {
+            wxWindow* child=node->GetData();
+            RegisterEventsRecursively(id,child,handler,type,function);     
+            node=node->GetNext();
+        }
+    }
+}
+
 wxString GetHttpAgent()
 {
     wxPlatformInfo pinfo;

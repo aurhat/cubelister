@@ -20,6 +20,7 @@
 
 #include "CslToolTip.h"
 #include "CslSettings.h"
+#include "engine/CslTools.h"
 
 DEFINE_EVENT_TYPE(wxCSL_EVT_TOOLTIP)
 
@@ -30,15 +31,12 @@ BEGIN_EVENT_TABLE(CslToolTip,wxFrame)
     EVT_PAINT(CslToolTip::OnPaint)
     #endif
     EVT_LEAVE_WINDOW(CslToolTip::OnMouseLeave)
-    EVT_LEFT_DOWN(CslToolTip::OnMouseButton)
-    EVT_RIGHT_DOWN(CslToolTip::OnMouseButton)
-    EVT_MIDDLE_DOWN(CslToolTip::OnMouseButton)
-    EVT_MOUSEWHEEL(CslToolTip::OnMouseButton)
     EVT_TIMER(wxID_ANY,CslToolTip::OnTimer)
 END_EVENT_TABLE()
 
 
 CslToolTip *CslToolTip::m_self=NULL;
+
 
 CslToolTip::CslToolTip(wxWindow *parent) :
         wxFrame(parent,wxID_ANY,wxEmptyString,wxDefaultPosition,wxDefaultSize,
@@ -66,18 +64,10 @@ CslToolTip::CslToolTip(wxWindow *parent) :
     m_left->SetFont(font);
     m_title->SetFont(font);
 
-    m_title->Connect(wxEVT_LEFT_DOWN,wxMouseEventHandler(CslToolTip::OnMouseButton),NULL,this);
-    m_left->Connect(wxEVT_LEFT_DOWN,wxMouseEventHandler(CslToolTip::OnMouseButton),NULL,this);
-    m_right->Connect(wxEVT_LEFT_DOWN,wxMouseEventHandler(CslToolTip::OnMouseButton),NULL,this);
-    m_title->Connect(wxEVT_RIGHT_DOWN,wxMouseEventHandler(CslToolTip::OnMouseButton),NULL,this);
-    m_left->Connect(wxEVT_RIGHT_DOWN,wxMouseEventHandler(CslToolTip::OnMouseButton),NULL,this);
-    m_right->Connect(wxEVT_RIGHT_DOWN,wxMouseEventHandler(CslToolTip::OnMouseButton),NULL,this);
-    m_title->Connect(wxEVT_MIDDLE_DOWN,wxMouseEventHandler(CslToolTip::OnMouseButton),NULL,this);
-    m_left->Connect(wxEVT_MIDDLE_DOWN,wxMouseEventHandler(CslToolTip::OnMouseButton),NULL,this);
-    m_right->Connect(wxEVT_MIDDLE_DOWN,wxMouseEventHandler(CslToolTip::OnMouseButton),NULL,this);
-    m_title->Connect(wxEVT_MOUSEWHEEL,wxMouseEventHandler(CslToolTip::OnMouseButton),NULL,this);
-    m_left->Connect(wxEVT_MOUSEWHEEL,wxMouseEventHandler(CslToolTip::OnMouseButton),NULL,this);
-    m_right->Connect(wxEVT_MOUSEWHEEL,wxMouseEventHandler(CslToolTip::OnMouseButton),NULL,this);
+    RegisterEventsRecursively(wxID_ANY,this,this,wxEVT_LEFT_DOWN,wxMouseEventHandler(CslToolTip::OnMouseButton));
+    RegisterEventsRecursively(wxID_ANY,this,this,wxEVT_RIGHT_DOWN,wxMouseEventHandler(CslToolTip::OnMouseButton));
+    RegisterEventsRecursively(wxID_ANY,this,this,wxEVT_MIDDLE_DOWN,wxMouseEventHandler(CslToolTip::OnMouseButton));
+    RegisterEventsRecursively(wxID_ANY,this,this,wxEVT_MOUSEWHEEL,wxMouseEventHandler(CslToolTip::OnMouseButton));
 }
 
 CslToolTip::~CslToolTip()
@@ -94,7 +84,6 @@ void CslToolTip::OnEraseBackground(wxEraseEvent& event)
 void CslToolTip::OnPaint(wxPaintEvent& event)
 {
     wxPaintDC dc(this);
-    PrepareDC(dc);
 #endif
     wxInt32 w=0,h=0;
     GetClientSize(&w,&h);

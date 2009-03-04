@@ -119,6 +119,14 @@ void CslApp::OnEndSession(wxCloseEvent& event)
     event.Skip();
 }
 
+int CslApp::FilterEvent(wxEvent& event)
+{
+    if (event.GetEventType()==wxEVT_KEY_DOWN)
+        CslToolTip::ResetTip();
+ 
+    return -1;
+}
+
 void CslApp::IpcCall(const wxString& value,wxEvtHandler *evtHandler)
 {
     if (evtHandler)

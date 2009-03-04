@@ -55,6 +55,7 @@
 		9EE7482D0F3618A3006D6C8E /* libircclient.c in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7482C0F3618A3006D6C8E /* libircclient.c */; };
 		9EE7487E0F36219C006D6C8E /* CslVersionCheck.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7487C0F36219C006D6C8E /* CslVersionCheck.cpp */; };
 		9EE88C640F375CF000B549BE /* libwx_mac_static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EE88C540F375BA000B549BE /* libwx_mac_static.a */; };
+		9EEA7A120F5EAD8C00A54722 /* CslTTS.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EEA7A100F5EAD8C00A54722 /* CslTTS.cpp */; };
 		9EECE2860E1655C700B03192 /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EECE2850E1655C700B03192 /* QuickTime.framework */; };
 		9EF31B870CE0C99900156B63 /* CslDlgAbout.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EF31B7E0CE0C99900156B63 /* CslDlgAbout.cpp */; };
 		9EF31B890CE0C99900156B63 /* CslGeoIP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EF31B820CE0C99900156B63 /* CslGeoIP.cpp */; };
@@ -170,6 +171,8 @@
 		9EE7487C0F36219C006D6C8E /* CslVersionCheck.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslVersionCheck.cpp; path = ../src/CslVersionCheck.cpp; sourceTree = SOURCE_ROOT; };
 		9EE7487D0F36219C006D6C8E /* CslVersionCheck.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslVersionCheck.h; path = ../src/CslVersionCheck.h; sourceTree = SOURCE_ROOT; };
 		9EE88C4D0F375BA000B549BE /* wxWindows.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = wxWindows.xcodeproj; path = ../../../Toolkits/wxMac/src/wxWindows.xcodeproj; sourceTree = SOURCE_ROOT; };
+		9EEA7A100F5EAD8C00A54722 /* CslTTS.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslTTS.cpp; path = ../src/CslTTS.cpp; sourceTree = SOURCE_ROOT; };
+		9EEA7A110F5EAD8C00A54722 /* CslTTS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslTTS.h; path = ../src/CslTTS.h; sourceTree = SOURCE_ROOT; };
 		9EECE2850E1655C700B03192 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /Developer/SDKs/MacOSX10.4u.sdk/System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
 		9EF31B7C0CE0C99900156B63 /* csl_icon_png.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = csl_icon_png.h; path = ../src/csl_icon_png.h; sourceTree = SOURCE_ROOT; };
 		9EF31B7D0CE0C99900156B63 /* csl_logo_png.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = csl_logo_png.h; path = ../src/csl_logo_png.h; sourceTree = SOURCE_ROOT; };
@@ -206,9 +209,57 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		9ECC30FD0CA1A8F500578B5E /* Sources */ = {
+		9ECC31360CA1A96D00578B5E /* External Frameworks and Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				9EECE2850E1655C700B03192 /* QuickTime.framework */,
+				9ECC2F800CA172A500578B5E /* AppKit.framework */,
+				9ECC32980CA1AA3400578B5E /* OpenGL.framework */,
+				9ECC32960CA1A9EC00578B5E /* AGL.framework */,
+				9ECC2F7B0CA1724E00578B5E /* Carbon.framework */,
+				9ECC2F7D0CA1726200578B5E /* System.framework */,
+				9ECC2F860CA172E500578B5E /* WebKit.framework */,
+				9ECC2F830CA172BC00578B5E /* IOKit.framework */,
+			);
+			name = "External Frameworks and Libraries";
+			sourceTree = "<group>";
+		};
+		9ED9D43A0CA161B500B0FC71 = {
+			isa = PBXGroup;
+			children = (
+				9EE88C4D0F375BA000B549BE /* wxWindows.xcodeproj */,
+				9EDC68A90CA1C2A4002A4C4B /* Resources */,
+				9ECC31360CA1A96D00578B5E /* External Frameworks and Libraries */,
+				9EDD44A70F4A999800BD4083 /* Sources */,
+				9ED9D44B0CA161E000B0FC71 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		9ED9D44B0CA161E000B0FC71 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9ED9D44A0CA161E000B0FC71 /* csl.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		9EDC68A90CA1C2A4002A4C4B /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				9E3B1E480CCE2BA800E6D4A2 /* maps */,
+				9E015AE00CA569950029BEEF /* csl_mac.icns */,
+				9ECC329A0CA1AA6800578B5E /* csl_start_sb.ogz */,
+				9ECC329B0CA1AA6800578B5E /* GeoIP.dat */,
+				9ED9D44D0CA161E000B0FC71 /* csl-Info.plist */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		9EDD44A70F4A999800BD4083 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				9EEA7A100F5EAD8C00A54722 /* CslTTS.cpp */,
+				9EEA7A110F5EAD8C00A54722 /* CslTTS.h */,
 				9EF936340F3E1C6F00E5E1AE /* CslToolTip.cpp */,
 				9EF936350F3E1C6F00E5E1AE /* CslToolTip.h */,
 				9EE7487C0F36219C006D6C8E /* CslVersionCheck.cpp */,
@@ -299,52 +350,6 @@
 				9ED9D46F0CA1622F00B0FC71 /* CslStatusBar.h */,
 			);
 			name = Sources;
-			sourceTree = "<group>";
-		};
-		9ECC31360CA1A96D00578B5E /* External Frameworks and Libraries */ = {
-			isa = PBXGroup;
-			children = (
-				9EECE2850E1655C700B03192 /* QuickTime.framework */,
-				9ECC2F800CA172A500578B5E /* AppKit.framework */,
-				9ECC32980CA1AA3400578B5E /* OpenGL.framework */,
-				9ECC32960CA1A9EC00578B5E /* AGL.framework */,
-				9ECC2F7B0CA1724E00578B5E /* Carbon.framework */,
-				9ECC2F7D0CA1726200578B5E /* System.framework */,
-				9ECC2F860CA172E500578B5E /* WebKit.framework */,
-				9ECC2F830CA172BC00578B5E /* IOKit.framework */,
-			);
-			name = "External Frameworks and Libraries";
-			sourceTree = "<group>";
-		};
-		9ED9D43A0CA161B500B0FC71 = {
-			isa = PBXGroup;
-			children = (
-				9EE88C4D0F375BA000B549BE /* wxWindows.xcodeproj */,
-				9EDC68A90CA1C2A4002A4C4B /* Resources */,
-				9ECC31360CA1A96D00578B5E /* External Frameworks and Libraries */,
-				9ECC30FD0CA1A8F500578B5E /* Sources */,
-				9ED9D44B0CA161E000B0FC71 /* Products */,
-			);
-			sourceTree = "<group>";
-		};
-		9ED9D44B0CA161E000B0FC71 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				9ED9D44A0CA161E000B0FC71 /* csl.app */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		9EDC68A90CA1C2A4002A4C4B /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				9E3B1E480CCE2BA800E6D4A2 /* maps */,
-				9E015AE00CA569950029BEEF /* csl_mac.icns */,
-				9ECC329A0CA1AA6800578B5E /* csl_start_sb.ogz */,
-				9ECC329B0CA1AA6800578B5E /* GeoIP.dat */,
-				9ED9D44D0CA161E000B0FC71 /* csl-Info.plist */,
-			);
-			name = Resources;
 			sourceTree = "<group>";
 		};
 		9EE88C4E0F375BA000B549BE /* Products */ = {
@@ -493,6 +498,7 @@
 				9EE7482D0F3618A3006D6C8E /* libircclient.c in Sources */,
 				9EE7487E0F36219C006D6C8E /* CslVersionCheck.cpp in Sources */,
 				9EF936360F3E1C6F00E5E1AE /* CslToolTip.cpp in Sources */,
+				9EEA7A120F5EAD8C00A54722 /* CslTTS.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

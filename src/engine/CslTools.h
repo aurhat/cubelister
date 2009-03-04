@@ -118,6 +118,8 @@ extern wxString FormatBytes(wxUint64 size);
 extern wxString FormatSeconds(wxUint32 time,bool space=false,bool full=false);
 extern wxUint32 GetTicks();
 extern bool BitmapFromWindow(wxWindow *window,wxBitmap& bitmap);
+extern void RegisterEventsRecursively(wxInt32 id,wxWindow *parent,wxEvtHandler *handler,
+                                      wxEventType type,wxObjectEventFunction function);
 extern wxString GetHttpAgent();
 extern wxInt32 WriteTextFile(const wxString& filename,const wxString& data,const wxFile::OpenMode mode);
 

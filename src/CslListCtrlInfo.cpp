@@ -90,11 +90,17 @@ void CslListCtrlInfo::OnSize(wxSizeEvent& event)
         event.Skip();
     }
     else
+    {
+#ifdef __WXGTK__
         ((wxScrolledWindow*)m_mainWin)->SetScrollbars(0,0,0,0);
+#else
+        ((wxScrolledWindow*)m_genericImpl->m_mainWin)->SetScrollbars(0,0,0,0);
+#endif //__WXGTK__
+    }
 #else
     AdjustSize(event.GetSize());
     event.Skip();
-#endif
+#endif //__WXMSW__
 }
 
 void CslListCtrlInfo::AdjustSize(wxSize size)
