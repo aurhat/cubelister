@@ -1788,34 +1788,34 @@ void CslFrame::OnPong(wxCommandEvent& event)
             wxString s;
 
             if (packet->Info->HasEvent(CslServerEvents::EVENT_EMPTY))
-                s<<wxT(" ")<<_("empty");
+                s<<wxT(" ")<<wxT("empty");
             if (packet->Info->HasEvent(CslServerEvents::EVENT_NOT_EMPTY))
-                s<<TT_SPACER<<_("not empty anymore");
+                s<<TT_SPACER<<wxT("not empty anymore");
 
             if (packet->Info->HasEvent(CslServerEvents::EVENT_FULL))
-                s<<TT_SPACER<<_("full");
+                s<<TT_SPACER<<wxT("full");
             if (packet->Info->HasEvent(CslServerEvents::EVENT_NOT_FULL))
-                s<<TT_SPACER<<_("not full anymore");
+                s<<TT_SPACER<<wxT("not full anymore");
 
             if (packet->Info->HasEvent(CslServerEvents::EVENT_LOCKED))
-                s<<TT_SPACER<<_("in locked mode");
+                s<<TT_SPACER<<wxT("in locked mode");
             if (packet->Info->HasEvent(CslServerEvents::EVENT_PRIVATE))
-                s<<TT_SPACER<<_("in private mode");
+                s<<TT_SPACER<<wxT("in private mode");
 
             if (!s.IsEmpty())
             {
                 wxInt32 i=s.Find(wxT(','),true);
 
-                m_toolTipTextRight=_("is now");
+                m_toolTipTextRight=wxT("is now");
 
                 if (i==wxNOT_FOUND)
                     m_toolTipTextRight<<s;
                 else
-                    m_toolTipTextRight<<s.Left(i)<<wxT(" ")<<_("and")<<s.Mid(i+1);
+                    m_toolTipTextRight<<s.Left(i)<<wxT(" ")<<wxT("and")<<s.Mid(i+1);
 
                 m_toolTipTextRight<<wxT(".");
                 m_toolTipTextLeft=packet->Info->GetBestDescription();
-                m_toolTipTitle=_("CSL server notification");
+                m_toolTipTitle=wxT("CSL server notification");
 
                 if (!CslGameConnection::IsPlaying())
                     CslToolTip::InitTip(this,500);

@@ -100,10 +100,12 @@ bool CslTTS::Init(const wxString& lang)
         {
             LOG_DEBUG("Failed to set spelling mode.\n");
         }
+#if 0 //disable for now
         if (!lang.IsEmpty() && spd_set_language(self.m_spd,U2A(lang)))
         {
             LOG_DEBUG("Failed to set language \"%s\"\n",U2A(lang));
         }
+#endif
     }
     else
     {
