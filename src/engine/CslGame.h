@@ -105,9 +105,9 @@ class CslGameClientSettings
     public:
         CslGameClientSettings() : Expert(false) {}
         CslGameClientSettings(const wxString& binary,const wxString& path,const wxString& configpath,
-                              const wxString& options,bool priv) :
+                              const wxString& options,bool expert) :
                 Binary(binary),GamePath(path),ConfigPath(configpath),
-                Options(options),Expert(priv) {}
+                Options(options),Expert(expert) {}
 
         wxString Binary,GamePath,ConfigPath,Options;
         bool Expert;

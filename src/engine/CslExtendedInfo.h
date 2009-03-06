@@ -82,6 +82,11 @@ class CslPlayerStatsData
                 Privileges(CSL_PLAYER_STATE_UNKNOWN),State(CSL_PLAYER_PRIV_UNKNOWN),
                 Ping(-1),IP(0),Ok(false) {}
 
+        bool operator==(const CslPlayerStatsData& data) const
+        {
+            return data.ID==ID && data.IP==IP;
+        }
+
         wxString Name,Team;
         wxInt32 Frags,Flagscore,Deaths,Teamkills,Accuracy;
         wxInt32 Health,Armour,Weapon;

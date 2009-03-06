@@ -114,6 +114,7 @@ extern void FixString(char *src,wxUint32 *len,wxUint32 count,bool keepnl=false);
 extern void FixFilename(wxString& name);
 extern bool IsIP(const wxString& s);
 extern wxUint32 IP2Int(const wxString& s);
+extern wxString Int2IP(wxUint32 ip);
 extern wxString FormatBytes(wxUint64 size);
 extern wxString FormatSeconds(wxUint32 time,bool space=false,bool full=false);
 extern wxUint32 GetTicks();
@@ -126,21 +127,5 @@ extern wxInt32 WriteTextFile(const wxString& filename,const wxString& data,const
 
 wxBitmap AdjustIconSize(const char **data,const wxIcon& icon,
                         const wxSize& size,const wxPoint& origin);
-
-class CslListSortHelper
-{
-    public:
-        enum { SORT_ASC = 0, SORT_DSC };
-        enum { SORT_INT = 0, SORT_UINT, SORT_STRING };
-
-        void Init(wxUint32 mode,wxUint32 type)
-        {
-            Mode=mode;
-            Type=type;
-        }
-
-        wxInt32 Mode;
-        wxInt32 Type;
-};
 
 #endif // CSLTOOLS_H

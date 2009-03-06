@@ -52,7 +52,7 @@
 
 enum
 {
-    CSL_BUTTON_SEARCH_CLOSE = MENU_END + 1,
+    CSL_BUTTON_SEARCH_CLOSE = MENU_CUSTOM_END+1,
     CSL_TEXT_SEARCH,
     CSL_BUTTON_SEARCH,
     CSL_RADIO_SEARCH_SERVER,
@@ -140,6 +140,16 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
     }
 
     LoadSettings();
+
+    if (!LoadLocators())
+    {
+        CslGeoIP::AddService(wxT("GeoIPTool"),
+                             wxT("http://geoiptool.com/"),
+                             wxT("?IP="));
+        CslGeoIP::AddService(wxT("MaxMind (Demo)"),
+                             wxT("http://www.maxmind.com/"),
+                             wxT("app/locate_ip?ips="));
+    }
 
     CslTTS::Init(wxGetApp().GetLanguage());
 
@@ -273,6 +283,8 @@ CslFrame::~CslFrame()
         SaveServers();
         m_engine->DeInit();
     }
+
+    SaveLocators();
 
     delete m_toolTip;
 
@@ -1697,6 +1709,70 @@ void CslFrame::SaveServers()
     }
 }
 
+wxUint32 CslFrame::LoadLocators()
+{
+    if (!::wxFileExists(CSL_LOCATORS_FILE))
+        return 0;
+
+    long int val;
+    wxUint32 version,i=0;
+    wxString Name,Host,Path;
+
+    wxFileConfig config(wxEmptyString,wxEmptyString,CSL_LOCATORS_FILE,
+                        wxEmptyString,wxCONFIG_USE_LOCAL_FILE);
+
+    config.SetPath(wxT("/Version"));
+    config.Read(wxT("Version"),&val,0); version=val;
+
+    while (true)
+    {
+        config.SetPath(wxString::Format(wxT("/%d"),i++));
+
+        if (config.Read(wxT("Name"),&Name) &&
+            config.Read(wxT("Host"),&Host) &&
+            config.Read(wxT("Path"),&Path))
+            CslGeoIP::AddService(Name,Host,Path);
+        else
+            break;
+    }
+
+    return i;
+}
+
+void CslFrame::SaveLocators()
+{
+    wxString s=::wxPathOnly(CSL_LOCATORS_FILE);
+
+    if (!::wxDirExists(s))
+        if (!::wxMkdir(s,0700))
+            return;
+
+    wxFileConfig config(wxEmptyString,wxEmptyString,CSL_LOCATORS_FILE,
+                        wxEmptyString,wxCONFIG_USE_LOCAL_FILE);
+    config.SetUmask(0077);
+    config.DeleteAll();
+
+    wxUint32 i;
+    CslGeoIPService *service;
+    const CslGeoIPServices& services=CslGeoIP::GetServices();
+
+    if (services.IsEmpty())
+        return;
+
+    config.SetPath(wxT("/Version"));
+    config.Write(wxT("Version"),CSL_LOCATORCONFIG_VERSION);
+
+    for (i=0;i<services.GetCount();i++)
+    {
+        service=services.Item(i);
+
+        config.SetPath(wxString::Format(wxT("/%d"),i));
+        config.Write(wxT("Name"),service->Name);
+        config.Write(wxT("Host"),service->Host);
+        config.Write(wxT("Path"),service->Path);
+    }
+}
+
 void CslFrame::OnPong(wxCommandEvent& event)
 {
     CslPongPacket *packet=(CslPongPacket*)event.GetClientData();
@@ -2543,6 +2619,13 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
                     info->RegisterEvents(flags);
                 else
                     info->UnRegisterEvents(flags);
+            }
+            else if (CSL_MENU_EVENT_IS_LOCATION(id))
+            {
+                wxString *ip=(wxString*)event.GetClientData();
+                CslGeoIPService *service=CslGeoIP::GetServices().Item(id-MENU_SERVER_LOCATION);
+                ::wxLaunchDefaultBrowser(service->Host+service->Path+*ip,wxBROWSER_NEW_WINDOW);
+                delete ip;
             }
             else if (CSL_MENU_EVENT_IS_FILTER(id))
                 SetListCaption((wxInt32)(long)event.GetClientData());

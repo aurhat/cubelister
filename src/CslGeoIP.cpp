@@ -56,6 +56,8 @@ CslGeoIP::~CslGeoIP()
 
     GeoIP_delete(m_geoIP);
     m_geoIP=NULL;
+
+    WX_CLEAR_ARRAY(m_services);
 }
 
 CslGeoIP& CslGeoIP::GetInstance()
@@ -92,4 +94,14 @@ const char* CslGeoIP::GetCountryNameByIPnum(const unsigned long ipnum)
 {
     CslGeoIP& self=GetInstance();
     return self.m_geoIP ? GeoIP_country_name_by_ipnum(self.m_geoIP,ipnum):NULL;
+}
+
+void CslGeoIP::AddService(const wxString& name,const wxString& host,const wxString& path)
+{
+    GetInstance().m_services.Add(new CslGeoIPService(name,host,path));
+}
+
+const CslGeoIPServices& CslGeoIP::GetServices()
+{
+    return GetInstance().m_services;
 }

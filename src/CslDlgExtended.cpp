@@ -22,7 +22,7 @@
 #include "CslDlgExtended.h"
 #include "CslSettings.h"
 #include "CslMenu.h"
-
+#include "engine/CslTools.h"
 
 BEGIN_EVENT_TABLE(CslDlgExtended, wxDialog)
     EVT_CLOSE(CslDlgExtended::OnClose)

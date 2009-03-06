@@ -143,8 +143,7 @@ class CslListCtrlServer : public CslListCtrl
 
         CslListCtrlServer *m_sibling;
 
-        bool m_dontUpdateInfo;  // don't update info list on ctrl+a
-        bool m_dontRemoveOnDeselect;
+        bool m_processSelectEvent;
 #ifdef __WXMSW__
         bool m_dontAdjustSize;
 #endif
@@ -178,7 +177,7 @@ class CslListCtrlServer : public CslListCtrl
     protected:
         void ListCreateGameBitmaps();
         wxInt32 ListFindItem(CslServerInfo *info,wxListItem& item);
-        void ListDeleteItem(wxListItem *item);
+        void ListDeleteItem(wxListItem& item);
         bool ListSearchItemMatches(CslServerInfo *info);
         bool ListFilterItemMatches(CslServerInfo *info);
 

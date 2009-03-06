@@ -1,11 +1,13 @@
 
 #include "CslArt.h"
 
+#include "img/about_16.xpm"
 #include "img/csl_16.xpm"
 #include "img/connect_16.xpm"
 #include "img/connect_pw_16.xpm"
 #include "img/filter_16.xpm"
-#include "img/about_16.xpm"
+#include "img/geo_16.xpm"
+#include "img/notification_16.xpm"
 #include "img/extinfo_micro_16.xpm"
 #include "img/extinfo_mini_16.xpm"
 #include "img/extinfo_default_16.xpm"
@@ -23,7 +25,9 @@ wxBitmap CslArt::CreateBitmap(const wxArtID& id,const wxArtClient& client,const 
     {
         if (client==wxART_MENU)
         {
-            if (id==wxART_CSL)
+            if (id==wxART_ABOUT)
+                return wxBitmap(about_16_xpm);
+            else if (id==wxART_CSL)
                 return wxBitmap(csl_16_xpm);
             else if (id==wxART_CONNECT)
                 return wxBitmap(connect_16_xpm);
@@ -31,8 +35,10 @@ wxBitmap CslArt::CreateBitmap(const wxArtID& id,const wxArtClient& client,const 
                 return wxBitmap(connect_pw_16_xpm);
             else if (id==wxART_FILTER)
                 return wxBitmap(filter_16_xpm);
-            else if (id==wxART_ABOUT)
-                return wxBitmap(about_16_xpm);
+            else if (id==wxART_GEO)
+                return wxBitmap(geo_16_xpm);
+            else if (id==wxART_NOTIFICATION)
+                return wxBitmap(notification_16_xpm);
             else if (id==wxART_EXTINFO_MICRO)
                 return wxBitmap(extinfo_micro_16_xpm);
             else if (id==wxART_EXTINFO_MINI)

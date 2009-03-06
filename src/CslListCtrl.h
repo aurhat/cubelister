@@ -55,6 +55,23 @@ enum
 };
 
 
+class CslListSortHelper
+{
+    public:
+        enum { SORT_ASC = 0, SORT_DSC };
+        enum { SORT_INT = 0, SORT_UINT, SORT_STRING };
+
+        void Init(wxUint32 mode,wxUint32 type)
+        {
+            Mode=mode;
+            Type=type;
+        }
+
+        wxInt32 Mode;
+        wxInt32 Type;
+};
+
+
 class CslListCtrl : public wxListCtrl
 {
     public:

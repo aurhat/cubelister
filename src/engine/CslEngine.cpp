@@ -728,6 +728,8 @@ void CslEngine::ParsePong(CslServerInfo *info,CslUDPPacket& packet,wxUint32 now)
 
                 if (info->GetGame().ParsePlayerPong(info->ExtInfoVersion,p,*data))
                 {
+                    data->IP=0;
+
                     if (exVersion>=103)
                     {
                         p.get((unsigned char*)&data->IP,3);

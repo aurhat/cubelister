@@ -29,6 +29,7 @@
 #include "CslStatusBar.h"
 #include "CslArt.h"
 #include "CslMenu.h"
+#include "CslGeoIP.h"
 #include "CslGameConnection.h"
 #include "CslSettings.h"
 
@@ -90,8 +91,8 @@ CslListCtrlServer::CslListCtrlServer(wxWindow* parent,wxWindowID id,const wxPoin
                                      const wxSize& size,long style,
                                      const wxValidator& validator, const wxString& name) :
         CslListCtrl(parent,id,pos,size,style,validator,name),
-        m_id(id),m_masterSelected(false),
-        m_sibling(NULL),m_dontUpdateInfo(false),m_dontRemoveOnDeselect(false),
+        m_id(id),m_masterSelected(false),m_sibling(NULL),
+        m_processSelectEvent(true),
 #ifdef __WXMSW__
         m_dontAdjustSize(false),
 #endif
@@ -133,15 +134,31 @@ void CslListCtrlServer::OnSize(wxSizeEvent& event)
 
 void CslListCtrlServer::OnKeyDown(wxKeyEvent &event)
 {
-    wxInt32 i;
     wxInt32 code=event.GetKeyCode();
 
     if (event.ControlDown() && code=='A')
     {
-        m_dontUpdateInfo=true;
+        wxInt32 i;
+        wxListItem item;
+
+        m_processSelectEvent=false;
+
+        item.SetMask(wxLIST_MASK_DATA);
+
+        m_selected.Empty();
+
         for (i=0;i<GetItemCount();i++)
+        {
+            item.SetId(i);
+            GetItem(item);
+
+            CslListServerData *server=(CslListServerData*)GetItemData(item);
+            m_selected.Add(server);
+
             SetItemState(i,wxLIST_STATE_SELECTED,wxLIST_STATE_SELECTED);
-        m_dontUpdateInfo=false;
+        }
+
+        m_processSelectEvent=true;
     }
     else if (code==WXK_DELETE || code==WXK_NUMPAD_DELETE)
     {
@@ -172,6 +189,9 @@ void CslListCtrlServer::OnItemActivated(wxListEvent& event)
 
 void CslListCtrlServer::OnItemSelected(wxListEvent& event)
 {
+    if (!m_processSelectEvent)
+        return;
+
     wxListItem item;
     item.SetId(event.GetIndex());
     GetItem(item);
@@ -179,27 +199,25 @@ void CslListCtrlServer::OnItemSelected(wxListEvent& event)
     CslListServerData *server=(CslListServerData*)GetItemData(item);
     m_selected.Add(server);
 
-    if (m_dontUpdateInfo)
-        return;
-
     event.SetClientData((void*)server->Info);
     event.Skip();
 }
 
 void CslListCtrlServer::OnItemDeselected(wxListEvent& event)
 {
-    if (m_dontRemoveOnDeselect)
+    if (!m_processSelectEvent)
         return;
 
+    wxInt32 i;
     wxListItem item;
+
     item.SetId(event.GetIndex());
     GetItem(item);
 
     CslListServerData *server=(CslListServerData*)GetItemData(item);
-    if (m_selected.Index(server)!=wxNOT_FOUND)
-        m_selected.Remove(server);
 
-    event.Skip();
+    if ((i=m_selected.Index(server))!=wxNOT_FOUND)
+        m_selected.RemoveAt(i);
 }
 
 void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
@@ -292,6 +310,8 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
     {
         menu.AppendSeparator();
         CSL_MENU_CREATE_NOTIFY(menu,info)
+        menu.AppendSeparator();
+        CSL_MENU_CREATE_LOCATION(menu)
     }
 
     point=ScreenToClient(point);
@@ -312,7 +332,7 @@ void CslListCtrlServer::ListRemoveServers()
         if (ListFindItem(info,item)==wxNOT_FOUND)
             continue;
 
-        ListDeleteItem(&item);
+        ListDeleteItem(item);
         m_selected.RemoveAt(i);
         m_servers.Remove(ls);
 
@@ -406,6 +426,7 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
 
     CSL_MENU_EVENT_SKIP_CONNECT(id,m_selected.Item(0)->Info)
     CSL_MENU_EVENT_SKIP_EXTINFO(id,m_selected.Item(0)->Info)
+    CSL_MENU_EVENT_SKIP_LOCATION(id,new wxString(m_selected.Item(0)->Info->Host))
     CSL_MENU_EVENT_SKIP_NOTIFY(id,m_selected.Item(0)->Info)
 
     if (CSL_MENU_EVENT_IS_URICOPY(id))
@@ -598,7 +619,7 @@ void CslListCtrlServer::ListInit(CslListCtrlServer *sibling)
 
     wxListItem item;
 
-    item.SetMask(wxLIST_MASK_TEXT|wxLIST_MASK_FORMAT);
+    item.SetMask(wxLIST_MASK_FORMAT);
     item.SetImage(-1);
 
     item.SetAlign(wxLIST_FORMAT_LEFT);
@@ -793,14 +814,7 @@ void CslListCtrlServer::Highlight(wxInt32 type,bool high,bool sort,CslServerInfo
     }
 
     if (sort)
-    {
         ListSort();
-#ifndef __WXMSW__
-        //removes flicker after sorting
-        wxIdleEvent idle;
-        wxTheApp->SendIdleEvents(this,idle);
-#endif
-    }
 }
 
 wxUint32 CslListCtrlServer::GetPlayerCount()
@@ -817,13 +831,13 @@ wxUint32 CslListCtrlServer::GetPlayerCount()
 
 wxInt32 CslListCtrlServer::ListFindItem(CslServerInfo *info,wxListItem& item)
 {
-    wxInt32 i;
+    wxInt32 i,j=GetItemCount();
 
-    for (i=0;i<GetItemCount();i++)
+    for (i=0;i<j;i++)
     {
         item.SetId(i);
-        CslServerInfo *infoCmp=((CslListServerData*)GetItemData(item))->Info;
-        if (info==infoCmp)
+
+        if (info==((CslListServerData*)GetItemData(item))->Info)
             return i;
     }
 
@@ -953,7 +967,7 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
     found=m_filterFlags||m_filterVersion>-1 ? ListFilterItemMatches(info) : false;
     if (found && j!=wxNOT_FOUND)
     {
-        ListDeleteItem(&item);
+        ListDeleteItem(item);
         wxInt32 pos=m_selected.Index(infoCmp);
         if (pos!=wxNOT_FOUND)
             m_selected.RemoveAt(pos);
@@ -1065,7 +1079,6 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
     found=m_searchString.IsEmpty() ? false : ListSearchItemMatches(info);
     Highlight(CSL_HIGHLIGHT_FOUND_SERVER,found,false,info,&item);
 
-    item.SetMask(wxLIST_MASK_TEXT|wxLIST_MASK_IMAGE|wxLIST_MASK_DATA);
     if (m_id==CSL_LIST_MASTER)
     {
         if (!CslEngine::PingOk(*info,g_cslSettings->updateInterval))
@@ -1099,11 +1112,11 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
     return found;
 }
 
-void CslListCtrlServer::ListDeleteItem(wxListItem *item)
+void CslListCtrlServer::ListDeleteItem(wxListItem& item)
 {
-    m_dontRemoveOnDeselect=true;
-    DeleteItem(*item);
-    m_dontRemoveOnDeselect=false;
+    m_processSelectEvent=false;
+    DeleteItem(item);
+    m_processSelectEvent=true;
 }
 
 void CslListCtrlServer::RemoveServer(CslListServerData *server,CslServerInfo *info,wxInt32 selId)
@@ -1112,7 +1125,7 @@ void CslListCtrlServer::RemoveServer(CslListServerData *server,CslServerInfo *in
     wxListItem item;
 
     if (ListFindItem(info,item)!=wxNOT_FOUND)
-        ListDeleteItem(&item);
+        ListDeleteItem(item);
 
     if (!server)
     {
@@ -1170,12 +1183,6 @@ wxUint32 CslListCtrlServer::ListUpdate(vector<CslServerInfo*>& servers)
 
     ListSort();
 
-#ifndef __WXMSW__
-    //removes flicker after sorting
-    wxIdleEvent idle;
-    wxTheApp->SendIdleEvents(this,idle);
-#endif
-
     return c;
 }
 
@@ -1204,15 +1211,7 @@ wxUint32 CslListCtrlServer::ListSearch(const wxString& search)
     }
 
     if (c)
-    {
         ListSort();
-
-#ifndef __WXMSW__
-        //removes flicker after sorting
-        wxIdleEvent idle;
-        wxTheApp->SendIdleEvents(this,idle);
-#endif
-    }
 
     return c;
 }
@@ -1290,31 +1289,28 @@ void CslListCtrlServer::ListSort(wxInt32 column)
     if (!GetItemCount())
         return;
 
-    m_dontUpdateInfo=true;
-#ifdef CSL_USE_WX_LIST_DESELECT_WORKAROUND
-    CslServerInfo **selected=new CslServerInfo*[GetItemCount()];
-    wxInt32 i,j;
-
-    /*for (i=0;i<GetItemCount();i++)
-        if (GetItemState(i,wxLIST_STATE_SELECTED) & wxLIST_STATE_SELECTED)
-            selected[c++]=(CslServerInfo*)((CslListServerData*)GetItemData(i))->Info;*/
-    for (i=0;i<(wxInt32)m_selected.GetCount();i++)
-        selected[i]=m_selected.Item(i)->Info;
-#endif
+    m_processSelectEvent=false;
 
     SortItems(ListSortCompareFunc,(long)&m_sortHelper);
 
 #ifdef CSL_USE_WX_LIST_DESELECT_WORKAROUND
-    while (i>=0)
+    wxInt32 i,j;
+
+    for (i=0;i<(wxInt32)m_selected.GetCount();i++)
     {
-        if ((j=ListFindItem(selected[i--],item))==wxNOT_FOUND)
+        if ((j=ListFindItem(m_selected.Item(i)->Info,item))==wxNOT_FOUND)
             continue;
         SetItemState(j,wxLIST_STATE_SELECTED,wxLIST_STATE_SELECTED);
     }
-
-    delete[] selected;
 #endif
-    m_dontUpdateInfo=false;
+
+    m_processSelectEvent=true;
+
+#ifndef __WXMSW__
+    //removes flicker after sorting
+    wxIdleEvent idle;
+    wxTheApp->SendIdleEvents(this,idle);
+#endif
 }
 
 int wxCALLBACK CslListCtrlServer::ListSortCompareFunc(long item1,long item2,long data)

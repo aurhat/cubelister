@@ -82,9 +82,9 @@ bool CslTTS::Init(const wxString& lang)
 #elif defined(__WXMAC__)
     self.m_ok=true;
 
-	if (NewSpeechChannel(NULL,&self.m_channel)==noErr)
+    if (NewSpeechChannel(NULL,&self.m_channel)==noErr)
     {
-	    SetSpeechInfo(self.m_channel,soSpeechDoneCallBack,(void*)OnProcessed);
+        SetSpeechInfo(self.m_channel,soSpeechDoneCallBack,(void*)OnProcessed);
         self.Connect(wxEVT_IDLE,wxIdleEventHandler(CslTTS::OnIdle),NULL,&self);
     }
     else
@@ -133,7 +133,7 @@ bool CslTTS::DeInit()
 #elif defined(__WXMAC__)
     if (self.m_channel)
     {
-       	DisposeSpeechChannel(self.m_channel);
+        DisposeSpeechChannel(self.m_channel);
         self.m_channel=NULL;
     }
 #elif defined(HAVE_LIBSPEECHD_H)
@@ -168,7 +168,7 @@ void CslTTS::Say(const wxString& text)
     if (self.m_voice)
         self.m_voice->Speak(text.wc_str(wxConvLocal),SPF_ASYNC,NULL);
 #elif defined(__WXMAC__)
-	self.Process(text);
+    self.Process(text);
 #elif defined(HAVE_LIBSPEECHD_H)
     if (self.m_spd)
     {
@@ -194,8 +194,8 @@ void CslTTS::SetVolume(wxInt32 volume)
     if (self.m_voice)
         self.m_voice->SetVolume(volume);
 #elif defined(__WXMAC__)
-	Fixed vol=FixRatio(self.m_volume,100);
-	SetSpeechInfo(self.m_channel,soVolume,&vol);
+    Fixed vol=FixRatio(self.m_volume,100);
+    SetSpeechInfo(self.m_channel,soVolume,&vol);
 #elif defined(HAVE_LIBSPEECHD_H)
     if (self.m_spd)
         spd_set_volume(self.m_spd,self.m_volume*2-100);
@@ -205,7 +205,7 @@ void CslTTS::SetVolume(wxInt32 volume)
 #ifdef __WXMAC__
 void CslTTS::Process(const wxString& text)
 {
-	static wxArrayString messages;
+    static wxArrayString messages;
 
     if (text.IsEmpty())
     {
@@ -221,7 +221,7 @@ void CslTTS::Process(const wxString& text)
     }
 
     const wxString& msg=messages.Item(0);
-   	SpeakText(m_channel,U2A(msg),msg.Length());
+    SpeakText(m_channel,U2A(msg),msg.Length());
     messages.RemoveAt(0);
 }
 

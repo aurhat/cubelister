@@ -27,8 +27,9 @@
 
 #include "CslListCtrl.h"
 #include "engine/CslGame.h"
-#include "engine/CslTools.h"
 
+
+WX_DEFINE_ARRAY_PTR(CslPlayerStatsData*,t_aCslPlayerStatsData);
 
 class CslListCtrlPlayer : public CslListCtrl
 {
@@ -44,10 +45,13 @@ class CslListCtrlPlayer : public CslListCtrl
                           const wxValidator& validator=wxDefaultValidator,
                           const wxString& name=wxListCtrlNameStr);
 
+        ~CslListCtrlPlayer();
+
         void ListInit(const wxInt32 view);
         void ListAdjustSize(const wxSize& size=wxDefaultSize);
         void UpdateData();
         void EnableEntries(bool enable);
+        void ListClear();
 
         void ServerInfo(CslServerInfo *info);
         CslServerInfo* ServerInfo() { return m_info; }
@@ -62,7 +66,12 @@ class CslListCtrlPlayer : public CslListCtrl
 
         CslListSortHelper m_sortHelper;
 
+        bool m_processSelectEvent;
+        t_aCslPlayerStatsData m_selected;
+
         void OnColumnLeftClick(wxListEvent& event);
+        void OnItemSelected(wxListEvent& event);
+        void OnItemDeselected(wxListEvent& event);
         void OnItemActivated(wxListEvent& event);
         void OnContextMenu(wxContextMenuEvent& event);
         void OnMenu(wxCommandEvent& event);
@@ -70,6 +79,7 @@ class CslListCtrlPlayer : public CslListCtrl
         DECLARE_EVENT_TABLE()
 
     protected:
+        wxInt32 ListFindItem(CslPlayerStatsData *data,wxListItem& item);
         void ListSort(const wxInt32 column);
 
         void GetToolTipText(wxInt32 row,CslToolTipEvent& event);

@@ -155,6 +155,8 @@ class CslFrame: public wxFrame
         void SaveSettings();
         bool LoadServers(wxUint32 *numm=NULL,wxUint32 *nums=NULL);
         void SaveServers();
+        wxUint32 LoadLocators();
+        void SaveLocators();
 
     private:
         void OnPong(wxCommandEvent& event);

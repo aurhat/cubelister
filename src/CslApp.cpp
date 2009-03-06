@@ -123,7 +123,7 @@ int CslApp::FilterEvent(wxEvent& event)
 {
     if (event.GetEventType()==wxEVT_KEY_DOWN)
         CslToolTip::ResetTip();
- 
+
     return -1;
 }
 

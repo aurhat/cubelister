@@ -36,9 +36,11 @@
 
 #define CSL_SETTINGS_FILE  wxString(CSL_USER_DATADIR+wxT("settings.ini"))
 #define CSL_SERVERS_FILE   wxString(CSL_USER_DATADIR+wxT("servers.ini"))
+#define CSL_LOCATORS_FILE  wxString(CSL_USER_DATADIR+wxT("locators.ini"))
 
-#define  CSL_CONFIG_VERSION        1
-#define  CSL_SERVERCONFIG_VERSION  1
+#define  CSL_CONFIG_VERSION         1
+#define  CSL_SERVERCONFIG_VERSION   1
+#define  CSL_LOCATORCONFIG_VERSION  1
 
 #define CSL_FRAME_MIN_WIDTH  800
 #define CSL_FRAME_MIN_HEIGHT 600

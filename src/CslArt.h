@@ -26,6 +26,12 @@
 #ifndef wxART_FILTER
 #define wxART_FILTER           wxART_MAKE_ART_ID(wxART_FILTER)
 #endif
+#ifndef wxART_GEO
+#define wxART_GEO              wxART_MAKE_ART_ID(wxART_GEO)
+#endif
+#ifndef wxART_NOTIFICATION
+#define wxART_NOTIFICATION     wxART_MAKE_ART_ID(wxART_NOTIFICATION)
+#endif
 #ifndef wxART_SETTINGS
 #define wxART_SETTINGS         wxART_MAKE_ART_ID(wxART_SETTINGS)
 #endif

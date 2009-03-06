@@ -38,11 +38,11 @@
 #include "CslSettings.h"
 
 
-#define MENU_SERVER_EXT_FULL_STR         _("Full ...")
-#define MENU_SERVER_EXT_MICRO_STR        _("Micro")
-#define MENU_SERVER_EXT_MINI_STR         _("Mini")
-#define MENU_SERVER_EXT_DEFAULT_STR      _("Default")
-#define MENU_SERVER_EXT_STR              _("Extended information")
+#define MENU_SERVER_EXT_FULL_STR          _("Full ...")
+#define MENU_SERVER_EXT_MICRO_STR         _("Micro")
+#define MENU_SERVER_EXT_MINI_STR          _("Mini")
+#define MENU_SERVER_EXT_DEFAULT_STR       _("Default")
+#define MENU_SERVER_EXT_STR               _("Extended information")
 
 #define MENU_SERVER_CONN_STR              _("&Connect")
 #define MENU_SERVER_CONN_PW_STR           _("Connect (&Password)")
@@ -56,6 +56,7 @@
 #define MENU_SERVER_FAV_REM_STR           _("&Remove from favourites")
 #define MENU_SERVER_DEL_STR               _("&Delete server")
 #define MENU_SERVER_DELM_STR              _("&Delete servers")
+#define MENU_SERVER_LOCATION_STR          _("Location")
 #define MENU_SERVER_SAVEIMG_STR           _("&Save as image ...")
 
 #define MENU_SERVER_NOTIFY_STR            _("Notifications")
@@ -88,7 +89,7 @@ enum
     MENU_UPDATE = wxID_REFRESH,
     MENU_SAVEIMAGE = wxID_SAVEAS,
     //custom events/art
-    MENU_CUSTOM = wxID_HIGHEST+1,
+    MENU_CUSTOM_START = wxID_HIGHEST+1,
 
     MENU_GAME_SERVER_COUNTRY,
     MENU_GAME_PLAYER_COUNTRY,
@@ -136,7 +137,9 @@ enum
     MENU_VIEW_AUTO_SORT,
     MENU_VIEW_RELAYOUT,
 
-    MENU_END
+    MENU_SERVER_LOCATION,
+
+    MENU_CUSTOM_END=wxID_HIGHEST+100
 };
 
 
@@ -200,7 +203,7 @@ enum
         wxMenu *_sub=new wxMenu; \
         \
         _item=_menu.AppendSubMenu(_sub,MENU_SERVER_NOTIFY_STR); \
-        /*FIXME _item->SetBitmap(GET_ART_MENU(wxART_CSL));*/ \
+        _item->SetBitmap(GET_ART_MENU(wxART_NOTIFICATION)); \
         /* \
         _item=&CslMenu::AddItem(_sub,MENU_SERVER_NOTIFY_ONLINE, \
         MENU_SERVER_NOTIFY_ONLINE_STR,wxART_NONE,wxITEM_CHECK); \
@@ -231,6 +234,19 @@ enum
         _item=&CslMenu::AddItem(_sub,MENU_SERVER_NOTIFY_RESET,MENU_SERVER_NOTIFY_RESET_STR); \
     }
 
+#define CSL_MENU_CREATE_LOCATION(_menu) \
+    { \
+        wxMenuItem *_item; \
+        wxMenu *_sub=new wxMenu; \
+        \
+        _item=_menu.AppendSubMenu(_sub,MENU_SERVER_LOCATION_STR); \
+        _item->SetBitmap(GET_ART_MENU(wxART_GEO)); \
+        \
+        const CslGeoIPServices& _services=CslGeoIP::GetServices(); \
+        for (wxUint32 _i=0;_i<_services.GetCount();_i++) \
+            CslMenu::AddItem(_sub,MENU_SERVER_LOCATION+_i,_services[_i]->Name,wxART_GEO); \
+    }
+
 #define CSL_MENU_CREATE_SAVEIMAGE(_menu) \
     CslMenu::AddItem(&_menu,MENU_SAVEIMAGE,MENU_SERVER_SAVEIMG_STR,wxART_FILE_SAVE_AS);
 
@@ -240,6 +256,8 @@ enum
 #define CSL_MENU_EVENT_IS_URICOPY(_id)   (_id>=MENU_SERVER_COPY_CON && _id<=MENU_SERVER_COPY_FAV)
 #define CSL_MENU_EVENT_IS_NOTIFY(_id)    (_id>=MENU_SERVER_NOTIFY_RESET && _id<=MENU_SERVER_NOTIFY_PRIVATE)
 #define CSL_MENU_EVENT_IS_FILTER(_id)    (_id>=MENU_SERVER_FILTER_OFF && _id<=MENU_SERVER_FILTER_VER)
+#define CSL_MENU_EVENT_IS_LOCATION(_id)  (_id>=MENU_SERVER_LOCATION && \
+                                          _id<(wxInt32)(MENU_SERVER_LOCATION+CslGeoIP::GetServices().GetCount()))
 #define CSL_MENU_EVENT_IS_SAVEIMAGE(_id) (_id==MENU_SAVEIMAGE)
 
 
@@ -263,6 +281,14 @@ enum
     if (CSL_MENU_EVENT_IS_NOTIFY(_id)) \
     { \
         event.SetClientData(_info); \
+        event.Skip(); \
+        return; \
+    }
+
+#define CSL_MENU_EVENT_SKIP_LOCATION(_id,_ip) \
+    if (CSL_MENU_EVENT_IS_LOCATION(_id)) \
+    { \
+        event.SetClientData((void*)_ip); \
         event.Skip(); \
         return; \
     }

@@ -23,6 +23,7 @@
 #include "CslGameConnection.h"
 #include "CslMenu.h"
 #include "CslGeoIP.h"
+#include "engine/CslTools.h"
 
 #define CSL_COLOUR_MASTER    wxColour(64,255,128)
 #define CSL_COLOUR_ADMIN     wxColour(255,128,0)
@@ -48,6 +49,8 @@ END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(CslListCtrlPlayer,CslListCtrl)
     EVT_LIST_COL_CLICK(wxID_ANY,CslListCtrlPlayer::OnColumnLeftClick)
+    EVT_LIST_ITEM_SELECTED(wxID_ANY,CslListCtrlPlayer::OnItemSelected)
+    EVT_LIST_ITEM_DESELECTED(wxID_ANY,CslListCtrlPlayer::OnItemDeselected)
     EVT_LIST_ITEM_ACTIVATED(wxID_ANY,CslListCtrlPlayer::OnItemActivated)
     EVT_CONTEXT_MENU(CslListCtrlPlayer::OnContextMenu)
     EVT_MENU(wxID_ANY,CslListCtrlPlayer::OnMenu)
@@ -160,13 +163,55 @@ CslListCtrlPlayer::CslListCtrlPlayer(wxWindow* parent,wxWindowID id,const wxPoin
                                      const wxSize& size,long style,
                                      const wxValidator& validator,const wxString& name) :
         CslListCtrl(parent,id,pos,size,style,validator,name),
-        m_view(-1),m_info(NULL)
+        m_view(-1),m_info(NULL),m_processSelectEvent(true)
 {
+}
+
+CslListCtrlPlayer::~CslListCtrlPlayer()
+{
+    WX_CLEAR_ARRAY(m_selected);
 }
 
 void CslListCtrlPlayer::OnColumnLeftClick(wxListEvent& event)
 {
     ListSort(event.GetColumn());
+}
+
+void CslListCtrlPlayer::OnItemSelected(wxListEvent& event)
+{
+    if (!m_processSelectEvent)
+        return;
+
+    wxListItem item;
+
+    item.SetId(event.GetIndex());
+    GetItem(item);
+
+    CslPlayerStatsData *data=(CslPlayerStatsData*)GetItemData(item);
+    m_selected.Add(new CslPlayerStatsData(*data));
+}
+
+void CslListCtrlPlayer::OnItemDeselected(wxListEvent& event)
+{
+    if (!m_processSelectEvent)
+        return;
+
+    wxUint32 i;
+    wxListItem item;
+
+    item.SetId(event.GetIndex());
+    GetItem(item);
+
+    CslPlayerStatsData *data=(CslPlayerStatsData*)GetItemData(item);
+
+    for (i=0;i<m_selected.GetCount();i++)
+    {
+        if (*m_selected.Item(i)==*data)
+        {
+            m_selected.RemoveAt(i);
+            break;
+        }
+    }
 }
 
 void CslListCtrlPlayer::OnItemActivated(wxListEvent& event)
@@ -193,6 +238,11 @@ void CslListCtrlPlayer::OnContextMenu(wxContextMenuEvent& event)
     menu.AppendSeparator();
     CSL_MENU_CREATE_NOTIFY(menu,m_info)
     menu.AppendSeparator();
+    if (m_selected.GetCount()==1)
+    {
+        CSL_MENU_CREATE_LOCATION(menu)
+        menu.AppendSeparator();
+    }
     CSL_MENU_CREATE_SAVEIMAGE(menu)
 
     //from keyboard
@@ -211,13 +261,17 @@ void CslListCtrlPlayer::OnMenu(wxCommandEvent& event)
     CSL_MENU_EVENT_SKIP_NOTIFY(id,m_info)
     CSL_MENU_EVENT_SKIP_SAVEIMAGE(id)
 
-    if (CSL_MENU_EVENT_IS_URICOPY(id))
+    if (CSL_MENU_EVENT_IS_LOCATION(id))
+    {
+        event.SetClientData((void*)new wxString(Int2IP(m_selected.Item(0)->IP)));
+        event.Skip();
+    }
+    else if (CSL_MENU_EVENT_IS_URICOPY(id))
     {
         VoidPointerArray *servers=new VoidPointerArray;
         servers->Add((void*)m_info);
         event.SetClientData((void*)servers);
         event.Skip();
-        return;
     }
 }
 
@@ -291,7 +345,7 @@ void CslListCtrlPlayer::UpdateData()
 
     if (!m_info)
     {
-        DeleteAllItems();
+        ListClear();
         return;
     }
 
@@ -302,7 +356,6 @@ void CslListCtrlPlayer::UpdateData()
     const CslPlayerStats& stats=m_info->PlayerStats;
 
     j=GetItemCount()-1;
-    item.SetMask(wxLIST_MASK_TEXT|wxLIST_MASK_DATA);
 
     for (i=0;i<stats.m_stats.length();i++)
     {
@@ -397,13 +450,16 @@ void CslListCtrlPlayer::UpdateData()
         j--;
     }
 
-    ListSort(-1);
+    if ((i=m_selected.GetCount()))
+    {
+        while (i>0)
+        {
+            if ((j=ListFindItem(m_selected.Item(--i),item))==wxNOT_FOUND)
+                m_selected.RemoveAt(i);
+        }
+    }
 
-#ifndef __WXMSW__
-    //removes flicker on autosort for wxGTK and wxMAC
-    wxIdleEvent idle;
-    wxTheApp->SendIdleEvents(this,idle);
-#endif
+    ListSort(-1);
 }
 
 void CslListCtrlPlayer::EnableEntries(bool enable)
@@ -413,7 +469,7 @@ void CslListCtrlPlayer::EnableEntries(bool enable)
 
     if (!m_info)
     {
-        DeleteAllItems();
+        ListClear();
         return;
     }
 
@@ -429,6 +485,12 @@ void CslListCtrlPlayer::EnableEntries(bool enable)
         else
             SetItemTextColour(item,wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
     }
+}
+
+void CslListCtrlPlayer::ListClear()
+{
+    DeleteAllItems();
+    WX_CLEAR_ARRAY(m_selected);
 }
 
 void CslListCtrlPlayer::ListAdjustSize(const wxSize& size)
@@ -469,11 +531,25 @@ void CslListCtrlPlayer::ListAdjustSize(const wxSize& size)
         SetColumnWidth(0,(wxInt32)(w*1.0f));
 }
 
+wxInt32 CslListCtrlPlayer::ListFindItem(CslPlayerStatsData *data,wxListItem& item)
+{
+    wxInt32 i,j=GetItemCount();
+
+    for (i=0;i<j;i++)
+    {
+        item.SetId(i);
+
+        if (*data==*(CslPlayerStatsData*)GetItemData(item))
+            return i;
+    }
+
+    return wxNOT_FOUND;
+}
+
 void CslListCtrlPlayer::ListSort(const wxInt32 column)
 {
     wxListItem item;
-    wxInt32 img;
-    wxInt32 col;
+    wxInt32 img,col;
 
     if (column==-1)
         col=m_sortHelper.Type;
@@ -504,14 +580,38 @@ void CslListCtrlPlayer::ListSort(const wxInt32 column)
         m_sortHelper.Type=col;
     }
 
-    if (GetItemCount()>0)
-        SortItems(ListSortCompareFunc,(long)&m_sortHelper);
+    if (!GetItemCount())
+        return;
+
+    m_processSelectEvent=false;
+
+    SortItems(ListSortCompareFunc,(long)&m_sortHelper);
+
+#ifdef CSL_USE_WX_LIST_DESELECT_WORKAROUND
+    wxInt32 i,j;
+
+    for (i=0;i<(wxInt32)m_selected.GetCount();i++)
+    {
+        if ((j=ListFindItem(m_selected.Item(i),item))==wxNOT_FOUND)
+            continue;
+        SetItemState(j,wxLIST_STATE_SELECTED,wxLIST_STATE_SELECTED);
+    }
+#endif
+
+    m_processSelectEvent=true;
+
+#ifndef __WXMSW__
+    //removes flicker on autosort for wxGTK and wxMAC
+    wxIdleEvent idle;
+    wxTheApp->SendIdleEvents(this,idle);
+#endif
 }
 
 void CslListCtrlPlayer::ServerInfo(CslServerInfo *info)
 {
     m_info=info;
-    DeleteAllItems();
+
+    ListClear();
 
     if (!info)
         return;
@@ -538,7 +638,7 @@ void CslListCtrlPlayer::ListInit(const wxInt32 view)
 
     SetImageList(&ListImageList,wxIMAGE_LIST_SMALL);
 
-    item.SetMask(wxLIST_MASK_TEXT|wxLIST_MASK_FORMAT);
+    item.SetMask(wxLIST_MASK_FORMAT);
     item.SetImage(-1);
 
     item.SetAlign(wxLIST_FORMAT_LEFT);

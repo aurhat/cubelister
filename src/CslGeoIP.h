@@ -25,7 +25,26 @@
     @author Glen Masgai <mimosius@users.sourceforge.net>
 */
 
+#include "wx/wxprec.h"
+#ifdef __BORLANDC__
+#pragma hdrstop
+#endif
+#ifndef WX_PRECOMP
+#include "wx/wx.h"
+#endif
 #include <GeoIP.h>
+
+
+class CslGeoIPService
+{
+    public:
+        CslGeoIPService(const wxString& name,const wxString& host,const wxString& path) :
+                Name(name),Host(host),Path(path) {}
+
+        wxString Name,Host,Path;
+};
+
+WX_DEFINE_ARRAY_PTR(CslGeoIPService*,CslGeoIPServices);
 
 class CslGeoIP
 {
@@ -43,8 +62,13 @@ class CslGeoIP
         static const char* GetCountryNameByAddr(const char *host);
         static const char* GetCountryNameByIPnum(const unsigned long ipnum);
 
+        static void AddService(const wxString& name,const wxString& host,const wxString& path);
+        static const CslGeoIPServices& GetServices();
+
+
     private:
         GeoIP *m_geoIP;
+        CslGeoIPServices m_services;
 };
 
 #endif

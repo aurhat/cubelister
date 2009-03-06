@@ -120,6 +120,11 @@ wxUint32 IP2Int(const wxString& s)
     return ip;
 }
 
+wxString Int2IP(wxUint32 ip)
+{
+    return wxString::Format(wxT("%d.%d.%d.%d"),ip>>24,ip>>16&0xff,ip>>8&0xff,ip&0xff);
+}
+
 wxString FormatBytes(wxUint64 size)
 {
     if (size>0x100000)
@@ -309,13 +314,13 @@ void RegisterEventsRecursively(wxInt32 id,wxWindow *parent,wxEvtHandler *handler
     if (parent)
     {
         parent->Connect(id,type,function,NULL,handler);
- 
+
         wxWindowListNode *node=parent->GetChildren().GetFirst();
-    
+
         while (node)
         {
             wxWindow* child=node->GetData();
-            RegisterEventsRecursively(id,child,handler,type,function);     
+            RegisterEventsRecursively(id,child,handler,type,function);
             node=node->GetNext();
         }
     }
