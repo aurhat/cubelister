@@ -31,15 +31,11 @@
 class CslPlayerSearchEntry
 {
     public:
-        CslPlayerSearchEntry(CslServerInfo *info,const wxString& name) :
-                Info(info),PlayerName(name)
-        {
-            GameID=info ? info->GetGame().GetId():0;
-        }
+        CslPlayerSearchEntry(CslServerInfo *info,const CslPlayerStatsData& player) :
+                Info(info),Player(player) {}
 
-        wxInt32 GameID;
         CslServerInfo *Info;
-        wxString PlayerName;
+        CslPlayerStatsData Player;
 };
 
 WX_DEFINE_ARRAY_PTR(CslPlayerSearchEntry*,t_aCslPlayerSearchEntry);

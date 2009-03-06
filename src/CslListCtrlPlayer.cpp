@@ -202,13 +202,16 @@ void CslListCtrlPlayer::OnItemDeselected(wxListEvent& event)
     item.SetId(event.GetIndex());
     GetItem(item);
 
-    CslPlayerStatsData *data=(CslPlayerStatsData*)GetItemData(item);
+    CslPlayerStatsData *data,*idata=(CslPlayerStatsData*)GetItemData(item);
 
     for (i=0;i<m_selected.GetCount();i++)
     {
-        if (*m_selected.Item(i)==*data)
+        data=m_selected.Item(i);
+
+        if (*data==*idata)
         {
             m_selected.RemoveAt(i);
+            delete data;
             break;
         }
     }
@@ -454,8 +457,13 @@ void CslListCtrlPlayer::UpdateData()
     {
         while (i>0)
         {
-            if ((j=ListFindItem(m_selected.Item(--i),item))==wxNOT_FOUND)
+            data=m_selected.Item(--i);
+
+            if ((j=ListFindItem(data,item))==wxNOT_FOUND)
+            {
                 m_selected.RemoveAt(i);
+                delete data;
+            }
         }
     }
 

@@ -80,7 +80,7 @@ class CslPlayerStatsData
                 Frags(0),Flagscore(0),Deaths(0),Teamkills(0),Accuracy(0),
                 Health(-1),Armour(-1),Weapon(-1),ID(-1),
                 Privileges(CSL_PLAYER_STATE_UNKNOWN),State(CSL_PLAYER_PRIV_UNKNOWN),
-                Ping(-1),IP(0),Ok(false) {}
+                Ping(-1),IP((wxUint32)-1),Ok(false) {}
 
         bool operator==(const CslPlayerStatsData& data) const
         {

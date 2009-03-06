@@ -126,11 +126,16 @@ void CslListCtrlPlayerSearch::OnContextMenu(wxContextMenuEvent& event)
         CSL_MENU_CREATE_CONNECT(menu,info)
         CSL_MENU_CREATE_EXTINFO(menu,info,-1)
         menu.AppendSeparator();
-        CslMenu::AddItem(&menu,MENU_ADD,MENU_SERVER_FAV_ADD_STR,wxART_ADD_BOOKMARK).Enable(!info->IsFavourite());
-        menu.AppendSeparator();
+        if (!info->IsFavourite())
+        {
+            CslMenu::AddItem(&menu,MENU_ADD,MENU_SERVER_FAV_ADD_STR,wxART_ADD_BOOKMARK);
+            menu.AppendSeparator();
+        }
         CSL_MENU_CREATE_URICOPY(menu)
         menu.AppendSeparator();
         CSL_MENU_CREATE_NOTIFY(menu,info)
+        menu.AppendSeparator();
+        CSL_MENU_CREATE_LOCATION(menu)
         menu.AppendSeparator();
     }
 
@@ -158,7 +163,13 @@ void CslListCtrlPlayerSearch::OnMenu(wxCommandEvent& event)
     CSL_MENU_EVENT_SKIP_NOTIFY(id,info)
     CSL_MENU_EVENT_SKIP_SAVEIMAGE(id)
 
-    if (CSL_MENU_EVENT_IS_URICOPY(id))
+    if (CSL_MENU_EVENT_IS_LOCATION(id))
+    {
+        event.SetClientData((void*)new wxString(Int2IP(m_selected->Player.IP)));
+        event.Skip();
+        return;
+    }
+    else if (CSL_MENU_EVENT_IS_URICOPY(id))
     {
         VoidPointerArray *servers=new VoidPointerArray;
         servers->Add((void*)info);
@@ -226,7 +237,7 @@ void CslListCtrlPlayerSearch::AddResult(CslServerInfo *info,CslPlayerStatsData *
     SetItem(i,0,player->Name,GetCountryFlag(player->IP));
     SetItem(i,1,info->GetBestDescription(),info->GetGame().GetId()-1);
 
-    m_entries.Add(new CslPlayerSearchEntry(info,player->Name));
+    m_entries.Add(new CslPlayerSearchEntry(info,*player));
     SetItemData(i,(long)m_entries.Last());
 }
 
