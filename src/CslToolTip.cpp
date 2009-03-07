@@ -44,10 +44,16 @@ CslToolTip::~CslToolTip()
 #ifdef __WXMSW__
 void CslToolTip::OnEraseBackground(wxEraseEvent& event)
 {
+	if (!m_frame)
+		return;
+
     wxDC& dc=*event.GetDC();
 #else
 void CslToolTip::OnPaint(wxPaintEvent& event)
 {
+	if (!m_frame)
+		return;
+
     wxPaintDC dc(m_frame);
 #endif
     wxInt32 w=0,h=0;
@@ -201,7 +207,7 @@ void CslToolTip::CreateFrame()
 
     m_frame->Connect(wxEVT_LEAVE_WINDOW,wxMouseEventHandler(CslToolTip::OnMouseLeave),NULL,this);
 #ifdef __WXMSW__
-    m_frame->Connect(wxEVT_ERASE_BACKGROUND,wxPaintEventHandler(CslToolTip::OnEraseBackground),NULL,this);
+    m_frame->Connect(wxEVT_ERASE_BACKGROUND,wxEraseEventHandler(CslToolTip::OnEraseBackground),NULL,this);
 #else
     m_frame->Connect(wxEVT_PAINT,wxPaintEventHandler(CslToolTip::OnPaint),NULL,this);
 #endif

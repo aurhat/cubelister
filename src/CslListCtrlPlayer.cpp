@@ -372,6 +372,18 @@ void CslListCtrlPlayer::UpdateData()
         item.SetId(i);
         if (i>j)
             InsertItem(item);
+#ifndef CSL_USE_WX_LIST_DESELECT_WORKAROUND
+		else
+		{
+			m_processSelectEvent=false;
+
+		    SetItemState(i,~(wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED),
+                         wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
+
+			m_processSelectEvent=true;
+		}
+#endif //CSL_USE_WX_LIST_DESELECT_WORKAROUND
+
         SetItemData(i,(long)data);
 
         if (data->Name.IsEmpty())
@@ -595,7 +607,6 @@ void CslListCtrlPlayer::ListSort(const wxInt32 column)
 
     SortItems(ListSortCompareFunc,(long)&m_sortHelper);
 
-#ifdef CSL_USE_WX_LIST_DESELECT_WORKAROUND
     wxInt32 i,j;
 
     for (i=0;i<(wxInt32)m_selected.GetCount();i++)
@@ -604,7 +615,6 @@ void CslListCtrlPlayer::ListSort(const wxInt32 column)
             continue;
         SetItemState(j,wxLIST_STATE_SELECTED,wxLIST_STATE_SELECTED);
     }
-#endif
 
     m_processSelectEvent=true;
 
