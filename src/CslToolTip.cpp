@@ -184,12 +184,12 @@ void CslToolTip::CreateFrame()
 #ifdef __WXMAC__
     {
         wxClientDC dc(left);
-        const wxSize& size=dc.GetMultiLineTextExtent(left);
+        const wxSize& size=dc.GetMultiLineTextExtent(l);
         left->SetClientSize(size);
     }
     {
         wxClientDC dc(right);
-        const wxSize& size=dc.GetMultiLineTextExtent(right);
+        const wxSize& size=dc.GetMultiLineTextExtent(r);
         right->SetClientSize(size);
     }
 #endif

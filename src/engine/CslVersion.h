@@ -28,8 +28,8 @@
 #define __CSL_NAME_STR          "Cube Server Lister (CSL)"
 #define __CSL_NAME_SHORT_STR    "csl"
 
-#define __CSL_VERSION           0,8,1,75
-#define __CSL_VERSION_STR       "0.8.1.75"
+#define __CSL_VERSION           0,8,1,76
+#define __CSL_VERSION_STR       "0.8.1.76"
 #define __CSL_VERSION_ADD_STR   ""
 
 #define __CSL_COPYRIGHT_STR     "(C) 2007-2009, Glen Masgai <mimosius@users.sourceforge.net>"
