@@ -24,56 +24,21 @@
 
 DEFINE_EVENT_TYPE(wxCSL_EVT_TOOLTIP)
 
-BEGIN_EVENT_TABLE(CslToolTip,wxFrame)
-    #ifdef __WXMSW__
-    EVT_ERASE_BACKGROUND(CslToolTip::OnEraseBackground)
-    #else
-    EVT_PAINT(CslToolTip::OnPaint)
-    #endif
-    EVT_LEAVE_WINDOW(CslToolTip::OnMouseLeave)
+
+BEGIN_EVENT_TABLE(CslToolTip,wxEvtHandler)
     EVT_TIMER(wxID_ANY,CslToolTip::OnTimer)
 END_EVENT_TABLE()
 
 
-CslToolTip *CslToolTip::m_self=NULL;
-
-
-CslToolTip::CslToolTip(wxWindow *parent) :
-        wxFrame(parent,wxID_ANY,wxEmptyString,wxDefaultPosition,wxDefaultSize,
-                wxNO_BORDER|wxSTAY_ON_TOP|wxFRAME_TOOL_WINDOW),
-        m_parent(parent),m_current(NULL)
+CslToolTip::CslToolTip() :
+        m_top(false),m_frame(NULL),m_parent(NULL)
 {
-    m_self=this;
     m_timer.SetOwner(this);
-
-    m_sizer=new wxBoxSizer(wxVERTICAL);
-    m_title=new wxStaticText(this,wxID_ANY,wxEmptyString);
-    m_sizer->Add(m_title,0,wxTOP|wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL,6);
-    m_box=new wxFlexGridSizer(1,2,0,0);
-    m_box->AddGrowableCol(0);
-    m_box->AddGrowableCol(1);
-    m_sizer->Add(m_box,1,wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL,4);
-    m_left=new wxStaticText(this,wxID_ANY,wxEmptyString);
-    m_right=new wxStaticText(this,wxID_ANY,wxEmptyString);
-    m_box->Add(m_left,0,wxEXPAND|wxBOTTOM|wxLEFT,6);
-    m_box->Add(m_right,1,wxEXPAND|wxBOTTOM|wxRIGHT,6);
-    SetSizer(m_sizer);
-
-    wxFont font=m_title->GetFont();
-    font.SetWeight(wxFONTWEIGHT_BOLD);
-    m_left->SetFont(font);
-    m_title->SetFont(font);
-
-    RegisterEventsRecursively(wxID_ANY,this,this,wxEVT_LEFT_DOWN,wxMouseEventHandler(CslToolTip::OnMouseButton));
-    RegisterEventsRecursively(wxID_ANY,this,this,wxEVT_RIGHT_DOWN,wxMouseEventHandler(CslToolTip::OnMouseButton));
-    RegisterEventsRecursively(wxID_ANY,this,this,wxEVT_MIDDLE_DOWN,wxMouseEventHandler(CslToolTip::OnMouseButton));
-    RegisterEventsRecursively(wxID_ANY,this,this,wxEVT_MOUSEWHEEL,wxMouseEventHandler(CslToolTip::OnMouseButton));
 }
 
 CslToolTip::~CslToolTip()
 {
     ResetTip();
-    m_self=NULL;
 }
 
 #ifdef __WXMSW__
@@ -83,20 +48,17 @@ void CslToolTip::OnEraseBackground(wxEraseEvent& event)
 #else
 void CslToolTip::OnPaint(wxPaintEvent& event)
 {
-    wxPaintDC dc(this);
+    wxPaintDC dc(m_frame);
 #endif
     wxInt32 w=0,h=0;
-    GetClientSize(&w,&h);
+    m_frame->GetClientSize(&w,&h);
 
 #ifdef __WXMAC__
     dc.SetPen(*wxTRANSPARENT_PEN);
 #else
-    wxPen pen(wxSystemSettings::GetColour(wxSYS_COLOUR_INFOTEXT));
-    dc.SetPen(pen);
+    dc.SetPen(wxPen(SYSCOLOUR(wxSYS_COLOUR_INFOTEXT)));
 #endif
-
-    wxBrush brush(wxSystemSettings::GetColour(wxSYS_COLOUR_INFOBK));
-    dc.SetBrush(brush);
+    dc.SetBrush(wxBrush(SYSCOLOUR(wxSYS_COLOUR_INFOBK)));
 
     dc.Clear();
 #ifdef __WXMAC__
@@ -108,56 +70,85 @@ void CslToolTip::OnPaint(wxPaintEvent& event)
 
 void CslToolTip::OnTimer(wxTimerEvent& WXUNUSED(event))
 {
-    if (!m_current)
+    if (!m_parent)
         return;
 
-    if (IsMain() && IsShown())
+    if (m_top)
     {
-        Hide();
+        ResetTip();
         return;
     }
 
-    CslToolTipEvent evt(::wxGetMousePosition());
-
-    if (m_current->ProcessEvent(evt))
-        ShowTip(evt);
+    CreateFrame();
 }
 
 void CslToolTip::OnMouseLeave(wxMouseEvent& event)
 {
-    if (event.GetEventObject()==this)
+    if (m_frame && event.GetEventObject()==m_frame)
     {
-        const wxSize& size=GetClientSize();
+        const wxSize& size=m_frame->GetClientSize();
         const wxPoint& pos=event.GetPosition();
 
         if (pos.x>=size.x || pos.y>=size.y || pos.x<=0 || pos.y<=0)
-            Hide();
+            ResetTip();
     }
-    else if (!IsShown())
-        ResetTip();
 
     event.Skip();
 }
 
 void CslToolTip::OnMouseButton(wxMouseEvent& event)
 {
-    Hide();
+    ResetTip();
 
     event.Skip();
 }
 
-void CslToolTip::ShowTip(CslToolTipEvent& event)
+CslToolTip& CslToolTip::GetInstance()
 {
-    wxUint32 i;
-    wxString left,right;
+    static CslToolTip tip;
+
+    return tip;
+}
+
+void CslToolTip::CreateFrame()
+{
+    CslToolTipEvent event(::wxGetMousePosition());
+
+    if (!m_parent->ProcessEvent(event))
+        return;
+
+    m_frame=new wxFrame(m_parent,wxID_ANY,wxEmptyString,wxDefaultPosition,wxDefaultSize,
+                        wxNO_BORDER|wxFRAME_TOOL_WINDOW|(m_top ? wxSTAY_ON_TOP:wxFRAME_FLOAT_ON_PARENT));
+
+    wxStaticText *title=new wxStaticText(m_frame,wxID_ANY,wxEmptyString);
+    wxStaticText *left=new wxStaticText(m_frame,wxID_ANY,wxEmptyString);
+    wxStaticText *right=new wxStaticText(m_frame,wxID_ANY,wxEmptyString);
+    wxBoxSizer *box=new wxBoxSizer(wxVERTICAL);
+    wxFlexGridSizer *grid=new wxFlexGridSizer(1,2,0,0);
+    box->Add(title,0,wxTOP|wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL,6);
+    box->Add(grid,1,wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL,4);
+    grid->Add(left,0,wxEXPAND|wxBOTTOM|wxLEFT,6);
+    grid->Add(right,1,wxEXPAND|wxBOTTOM|wxRIGHT,6);
+    grid->AddGrowableCol(0);
+    grid->AddGrowableCol(1);
+
+    m_frame->SetSizer(box);
+
+    wxFont font=title->GetFont();
+    font.SetWeight(wxFONTWEIGHT_BOLD);
+    left->SetFont(font);
+    title->SetFont(font);
 
 #ifdef __WXMSW__
     //set the default tooltip bg colour otherwise it's the default window bg colour
     const wxColour& bg=wxSystemSettings::GetColour(wxSYS_COLOUR_INFOBK);
-    m_left->SetBackgroundColour(bg);
-    m_right->SetBackgroundColour(bg);
-    m_title->SetBackgroundColour(bg);
+    left->SetBackgroundColour(bg);
+    right->SetBackgroundColour(bg);
+    title->SetBackgroundColour(bg);
 #endif
+
+    wxUint32 i;
+    wxString l,r;
 
     event.Title.Replace(wxT("&"),wxT("&&"));
 
@@ -166,45 +157,58 @@ void CslToolTip::ShowTip(CslToolTipEvent& event)
         event.Text.Item(i).Replace(wxT("&"),wxT("&&"));
 
         if (i%2==0)
-            left<<wxT("\n")<<event.Text.Item(i);
+            l<<wxT("\n")<<event.Text.Item(i);
         else
-            right<<wxT("\n")<<event.Text.Item(i);
+            r<<wxT("\n")<<event.Text.Item(i);
     }
 
-    m_left->SetLabel(left);
-    m_right->SetLabel(right);
-    m_title->SetLabel(event.Title);
+    left->SetLabel(l);
+    right->SetLabel(r);
+    title->SetLabel(event.Title);
 
-    if (event.Title.IsEmpty() && m_title->IsShown())
-        m_sizer->Hide(m_title);
-    else if (!event.Title.IsEmpty() && !m_title->IsShown())
-        m_sizer->Show(m_title);
-
+    if (event.Title.IsEmpty())
+        box->Hide(title);
 
     {
-        wxClientDC dc(this);
+        wxClientDC dc(m_frame);
         wxInt32 gap=dc.GetTextExtent(wxT(" ")).x;
-        m_box->SetHGap(IsMain() ? gap:gap*4);
+        grid->SetHGap(m_top ? gap:gap*4);
     }
 
 #ifdef __WXMAC__
     {
-        wxClientDC dc(m_left);
+        wxClientDC dc(left);
         const wxSize& size=dc.GetMultiLineTextExtent(left);
-        m_left->SetClientSize(size);
+        left->SetClientSize(size);
     }
     {
-        wxClientDC dc(m_right);
+        wxClientDC dc(right);
         const wxSize& size=dc.GetMultiLineTextExtent(right);
-        m_right->SetClientSize(size);
+        right->SetClientSize(size);
     }
 #endif
 
-    m_sizer->Fit(this);
+    box->Fit(m_frame);
+
+    RegisterEventsRecursively(wxID_ANY,m_frame,this,wxEVT_LEFT_DOWN,
+                              wxMouseEventHandler(CslToolTip::OnMouseButton));
+    RegisterEventsRecursively(wxID_ANY,m_frame,this,wxEVT_RIGHT_DOWN,
+                              wxMouseEventHandler(CslToolTip::OnMouseButton));
+    RegisterEventsRecursively(wxID_ANY,m_frame,this,wxEVT_MIDDLE_DOWN,
+                              wxMouseEventHandler(CslToolTip::OnMouseButton));
+    RegisterEventsRecursively(wxID_ANY,m_frame,this,wxEVT_MOUSEWHEEL,
+                              wxMouseEventHandler(CslToolTip::OnMouseButton));
+
+    m_frame->Connect(wxEVT_LEAVE_WINDOW,wxMouseEventHandler(CslToolTip::OnMouseLeave),NULL,this);
+#ifdef __WXMSW__
+    m_frame->Connect(wxEVT_ERASE_BACKGROUND,wxPaintEventHandler(CslToolTip::OnEraseBackground),NULL,this);
+#else
+    m_frame->Connect(wxEVT_PAINT,wxPaintEventHandler(CslToolTip::OnPaint),NULL,this);
+#endif
 
 #ifndef __WXGTK__
     // ensure the tip is fully shown on the screen
-    const wxRect& client=GetRect();
+    const wxRect& client=m_frame->GetRect();
     const wxRect& screen=::wxGetClientDisplayRect();
 
     if (event.Pos.x+client.width>screen.width)
@@ -213,42 +217,46 @@ void CslToolTip::ShowTip(CslToolTipEvent& event)
         event.Pos.y-=(event.Pos.y+client.height-screen.height);
 #endif
 
-    Move(event.Pos);
-    Show();
+    m_frame->Move(event.Pos);
+    m_frame->Show();
 
-    if (IsMain())
+    if (m_top)
         m_timer.Start(10000,wxTIMER_ONE_SHOT);
 }
 
-void CslToolTip::InitTip(wxEvtHandler *handler,wxUint32 delay)
+void CslToolTip::InitTip(wxWindow *window,bool top)
 {
-    if (!m_self)
-        return;
+    CslToolTip& self=GetInstance();
 
-    if (IsMain() && handler!=m_self->m_parent && m_self->IsShown())
+    if (self.m_frame && self.m_top && !top)
         return;
 
     ResetTip();
 
-    m_self->m_current=handler;
-    m_self->m_current->Connect(wxEVT_LEAVE_WINDOW,wxMouseEventHandler(CslToolTip::OnMouseLeave),NULL,m_self);
+    self.m_top=top;
+    self.m_parent=window;
 
-    m_self->m_timer.Start(delay ? delay:g_cslSettings->tooltipDelay,wxTIMER_ONE_SHOT);
+    if (top)
+        self.CreateFrame();
+    else
+        self.m_timer.Start(g_cslSettings->tooltipDelay,wxTIMER_ONE_SHOT);
 }
 
 void CslToolTip::ResetTip()
 {
-    if (!m_self)
+    CslToolTip& self=GetInstance();
+
+    if (!self.m_parent)
         return;
 
-    if (m_self->m_current)
+    self.m_parent=NULL;
+
+    if (self.m_frame)
     {
-        m_self->m_current->Disconnect(wxEVT_LEAVE_WINDOW,wxMouseEventHandler(CslToolTip::OnMouseLeave),NULL,m_self);
-        m_self->m_current=NULL;
+        self.m_frame->Destroy();
+        self.m_frame=NULL;
     }
 
-    if (m_self->IsShown())
-        m_self->Hide();
-    if (m_self->m_timer.IsRunning())
-        m_self->m_timer.Stop();
+    if (self.m_timer.IsRunning())
+        self.m_timer.Stop();
 }

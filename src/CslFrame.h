@@ -105,7 +105,6 @@ class CslFrame: public wxFrame
         CslDlgExtended *m_extendedDlg;
         CslDlgTraffic *m_trafficDlg;
 
-        CslToolTip *m_toolTip;
         wxString m_toolTipTitle,m_toolTipTextLeft,m_toolTipTextRight;
 
         CslVersionCheckThread *m_versionCheckThread;

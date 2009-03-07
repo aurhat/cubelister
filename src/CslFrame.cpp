@@ -286,7 +286,7 @@ CslFrame::~CslFrame()
 
     SaveLocators();
 
-    delete m_toolTip;
+    CslToolTip::ResetTip();
 
     delete g_cslSettings;
 
@@ -415,8 +415,6 @@ void CslFrame::CreateControls()
     CslStatusBar *statusBar=new CslStatusBar(this);
     SetStatusBar(statusBar);
     CslStatusBar::InitBar(statusBar);
-
-    m_toolTip=new CslToolTip(this);
 }
 
 void CslFrame::SetProperties()
@@ -1818,7 +1816,7 @@ void CslFrame::OnPong(wxCommandEvent& event)
                 m_toolTipTitle=wxT("CSL server notification");
 
                 if (!CslGameConnection::IsPlaying())
-                    CslToolTip::InitTip(this,500);
+                    CslToolTip::InitTip(this,true);
 
                 CslTTS::Say(m_toolTipTitle+wxT(". ")+m_toolTipTextLeft+wxT(" ")+m_toolTipTextRight);
             }

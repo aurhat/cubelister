@@ -66,26 +66,25 @@ class CslToolTipEvent : public wxEvent
 };
 
 
-class CslToolTip : public wxFrame
+class CslToolTip : public wxEvtHandler
 {
-    public:
-        CslToolTip(wxWindow *parent);
+    private:
+        CslToolTip();
         ~CslToolTip();
 
-        static void InitTip(wxEvtHandler *handler,wxUint32 delay=0);
+    public:
+        static void InitTip(wxWindow *window,bool top=false);
         static void ResetTip();
-        static bool IsMain() { return (m_self && m_self->m_current==m_self->m_parent) ? true:false; }
 
     private:
-        static CslToolTip *m_self;
+        bool m_top;
+        wxFrame *m_frame;
         wxWindow *m_parent;
-        wxEvtHandler *m_current;
-        wxBoxSizer *m_sizer;
-        wxFlexGridSizer *m_box;
-        wxStaticText *m_title,*m_left,*m_right;
         wxTimer m_timer;
 
-        void ShowTip(CslToolTipEvent& event);
+        static CslToolTip& GetInstance();
+
+        void CreateFrame();
 
 #ifdef __WXMSW__
         void OnEraseBackground(wxEraseEvent& event);
