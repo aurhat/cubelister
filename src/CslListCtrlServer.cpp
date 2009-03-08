@@ -858,21 +858,9 @@ bool CslListCtrlServer::ListSearchItemMatches(CslServerInfo *info)
             return true;
         else
         {
-            s=wxString(info->Version.Lower());
+            s=info->Map.Lower();
             if (s.Find(m_searchString)!=wxNOT_FOUND)
                 return true;
-            else
-            {
-                s=info->GameMode.Lower();
-                if (s.Find(m_searchString)!=wxNOT_FOUND)
-                    return true;
-                else
-                {
-                    s=info->Map.Lower();
-                    if (s.Find(m_searchString)!=wxNOT_FOUND)
-                        return true;
-                }
-            }
         }
     }
 
