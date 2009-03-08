@@ -257,11 +257,15 @@ bool CslGameSauerbraten::ParsePlayerPong(wxUint32 protocol,ucharbuf& buf,CslPlay
     char text[_MAXDEFSTR];
 
     info.ID=getint(buf);
+    if (protocol>=104)
+        info.Ping=getint(buf);
     getstring(text,buf);
     info.Name=A2U(text);
     getstring(text,buf);
     info.Team=A2U(text);
     info.Frags=getint(buf);
+    if (protocol>=104)
+        info.Flagscore=getint(buf);
     info.Deaths=getint(buf);
     info.Teamkills=getint(buf);
     if (protocol>=103)
