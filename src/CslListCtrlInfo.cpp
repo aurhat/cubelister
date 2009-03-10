@@ -44,6 +44,7 @@ CslListCtrlInfo::CslListCtrlInfo(wxWindow* parent,wxWindowID id,const wxPoint& p
 #else
     m_imgList.Create(18,12,true);
     m_imgList.Add(wxBitmap(info_18_12_xpm));
+    m_imgList.Add(wxBitmap(local_xpm));
     m_imgList.Add(wxBitmap(unknown_xpm));
 #endif
 
@@ -143,24 +144,24 @@ void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
     if (!info)
         return;
 
-    wxDateTime dt;
     wxString s;
+    wxDateTime dt;
     wxInt32 i,ic=0;
-    const char *country;
-    const char **flag=NULL;
-    char *host=strdup(U2A(info->Addr.IPAddress().c_str()));
+    const char *country,**flag=NULL;
 
     s=wxString::Format(wxT("%s:%d"),info->Host.c_str(),info->GamePort);
     if (IsIP(info->Host))
     {
         if (!info->Domain.IsEmpty())
-            s+=wxT(" (")+info->Domain+wxT(")");
+            s<<wxT(" (")<<info->Domain+wxT(")");
     }
     SetItem(ic++,1,s);
 
     if (CslGeoIP::IsOk())
     {
-        country=CslGeoIP::GetCountryCodeByAddr(host);
+        country=CslGeoIP::GetCountryCodeByAddr(U2A(info->Addr.IPAddress()));
+
+        s.Empty();
 
         if (country)
         {
@@ -176,18 +177,24 @@ void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
             }
 
             s=A2U(country);
-            country=CslGeoIP::GetCountryNameByAddr(host);
+            country=CslGeoIP::GetCountryNameByAddr(U2A(info->Addr.IPAddress()));
 
             if (country)
-                s+=wxT(" (")+A2U(country)+wxT(")");
+                s<<wxT(" (")<<A2U(country)<<wxT(")");
         }
         else
-            s=wxEmptyString;
+        {
+            if (IsLocalIP(info->Addr.IPAddress()))
+            {
+                flag=local_xpm;
+                s=_("local network");
+            }
+            else
+                s=_("unknown country");
+        }
     }
     else
         s=_("GeoIP database not found.");
-
-    free(host);
 
     if (!flag)
         flag=unknown_xpm;

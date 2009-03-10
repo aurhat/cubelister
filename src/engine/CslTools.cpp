@@ -96,6 +96,33 @@ bool IsIP(const wxString& s)
     return regex.Matches(s);
 }
 
+bool IsLocalIP(const wxString& s)
+{
+    if (s.Left(2)==wxT("0.") ||
+        s.Left(3)==wxT("10.") ||
+        s.Left(3)==wxT("127") ||
+        s.Left(7)==wxT("192.168") ||
+        s.Left(7)==wxT("169.254"))
+        return true;
+
+    if (s.Left(3)==wxT("172"))
+    {
+        wxString m=s.Mid(4);
+        wxInt32 pos=m.Find(wxT("."));
+
+        if (pos<0)
+           return false;
+
+        long l;
+        m.Left(pos).ToLong(&l);
+
+        if (l>=16 && l<=31)
+            return true;
+    }
+
+    return false;
+}
+
 wxUint32 IP2Int(const wxString& s)
 {
     long unsigned int ul;

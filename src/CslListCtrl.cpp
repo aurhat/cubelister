@@ -234,21 +234,29 @@ wxString CslListCtrl::GetScreenShotFileName()
     return wxDateTime::Now().Format(wxT("%Y%m%d_%H%M%S"))+wxT(".png");
 }
 
-wxUint32 CslListCtrl::GetCountryFlag(wxUint32 ip)
+wxUint32 CslListCtrl::GetCountryFlag(wxUint32 ip,wxUint32 start)
 {
     wxInt32 i;
     const char *country;
 
-    if (ip && (country=CslGeoIP::GetCountryCodeByIPnum(ip)))
+    if (ip && ip!=(wxUint32)-1)
     {
-        for (i=sizeof(codes)/sizeof(codes[0])-1;i>=0;i--)
+        if (!(country=CslGeoIP::GetCountryCodeByIPnum(ip)))
         {
-            if (!strcasecmp(country,codes[i]))
-                return CSL_LIST_IMG_UNKNOWN+i+1;
+            if (IsLocalIP(Int2IP(ip)))
+                return start;
+        }
+        else
+        {
+            for (i=sizeof(codes)/sizeof(codes[0])-1;i>=0;i--)
+            {
+                if (!strcasecmp(country,codes[i]))
+                    return start+i+2;
+            }
         }
     }
 
-    return CSL_LIST_IMG_UNKNOWN;
+    return start+1;
 }
 
 void CslListCtrl::CreateCountryFlagImageList()
@@ -257,6 +265,7 @@ void CslListCtrl::CreateCountryFlagImageList()
     ListImageList.Create(20,14,true);
     ListImageList.Add(AdjustIconSize(sortasc_18_12_xpm,wxNullIcon,wxSize(20,14),wxPoint(0,0)));
     ListImageList.Add(AdjustIconSize(sortdsc_18_12_xpm,wxNullIcon,wxSize(20,14),wxPoint(0,0)));
+    ListImageList.Add(AdjustIconSize(local_xpm,wxNullIcon,wxSize(20,14),wxPoint(0,2)));
     ListImageList.Add(AdjustIconSize(unknown_xpm,wxNullIcon,wxSize(20,14),wxPoint(0,2)));
 
     wxInt32 i,c=sizeof(codes)/sizeof(codes[0])-1;
@@ -266,6 +275,7 @@ void CslListCtrl::CreateCountryFlagImageList()
     ListImageList.Create(18,12,true);
     ListImageList.Add(wxBitmap(sortasc_18_12_xpm));
     ListImageList.Add(wxBitmap(sortdsc_18_12_xpm));
+    ListImageList.Add(wxBitmap(local_xpm));
     ListImageList.Add(wxBitmap(unknown_xpm));
 
     wxInt32 i,c=sizeof(codes)/sizeof(codes[0])-1;

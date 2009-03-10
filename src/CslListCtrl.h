@@ -51,7 +51,8 @@ enum
 {
     CSL_LIST_IMG_SORT_ASC = 0,
     CSL_LIST_IMG_SORT_DSC,
-    CSL_LIST_IMG_UNKNOWN
+
+    CSL_LIST_IMG_FLAG_START,
 };
 
 
@@ -82,7 +83,6 @@ class CslListCtrl : public wxListCtrl
         ~CslListCtrl();
 
         void CreateScreenShot();
-        wxUint32 GetCountryFlag(wxUint32 ip);
         static void CreateCountryFlagImageList();
 
     private:
@@ -105,6 +105,8 @@ class CslListCtrl : public wxListCtrl
         static wxImageList ListImageList;
 
         void FlickerFree(bool val) { m_flickerFree=val; }
+        wxUint32 GetCountryFlag(wxUint32 ip,wxUint32 start=CSL_LIST_IMG_FLAG_START);
+
         virtual wxWindow *GetScreenShotWindow() { return this; }
         virtual wxString GetScreenShotFileName();
         virtual void GetToolTipText(wxInt32 row,CslToolTipEvent& event) {}

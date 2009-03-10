@@ -91,7 +91,8 @@ const wxChar* CslGameSauerbraten::GetModeName(wxInt32 mode,wxInt32 prot) const
         {
             wxT("ffa"),wxT("coop edit"),wxT("teamplay"),wxT("instagib"),wxT("instagib team"),
             wxT("efficiency"),wxT("efficiency team"),wxT("tactics"),wxT("tactics team"),
-            wxT("capture"),wxT("regen capture"),wxT("ctf"),wxT("insta ctf")
+            wxT("capture"),wxT("regen capture"),wxT("ctf"),wxT("insta ctf"),
+            wxT("protect"),wxT("insta protect")
         };
         return (mode>=0 && (size_t)mode<sizeof(modes)/sizeof(modes[0])) ?
                modes[mode] : T2C(_("unknown"));
@@ -117,7 +118,7 @@ bool CslGameSauerbraten::ModeHasFlags(wxInt32 mode,wxInt32 prot) const
     if (prot<257)
         return mode>16 && mode<19;
     else
-        return mode>10 && mode<13;
+        return mode>10 && mode<15;
 
     return false;
 }

@@ -310,7 +310,8 @@ void CslListCtrlPlayer::GetToolTipText(wxInt32 row,CslToolTipEvent& event)
         c=CslGeoIP::GetCountryNameByIPnum(data->IP);
         event.Text.Add(_("Country"));
         event.Text.Add(c ? (A2U(c)).c_str() : CslGeoIP::IsOk() ?
-                       T2C(_("Unknown")) : T2C(_("GeoIP database not found")));
+                       IsLocalIP(Int2IP(data->IP)) ? T2C(_("local network")) :
+                       T2C(_("unknown country")) : T2C(_("GeoIP database not found.")));
 
         event.Text.Add(wxT("ID / IP"));
         event.Text.Add(wxString::Format(wxT("%d / %d.%d.%d.x"),data->ID,
@@ -373,15 +374,15 @@ void CslListCtrlPlayer::UpdateData()
         if (i>j)
             InsertItem(item);
 #ifndef CSL_USE_WX_LIST_DESELECT_WORKAROUND
-		else
-		{
-			m_processSelectEvent=false;
+        else
+        {
+            m_processSelectEvent=false;
 
-		    SetItemState(i,~(wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED),
+            SetItemState(i,~(wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED),
                          wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
 
-			m_processSelectEvent=true;
-		}
+            m_processSelectEvent=true;
+        }
 #endif //CSL_USE_WX_LIST_DESELECT_WORKAROUND
 
         SetItemData(i,(long)data);

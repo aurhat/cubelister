@@ -113,6 +113,7 @@ extern wxString g_basePath;
 extern void FixString(char *src,wxUint32 *len,wxUint32 count,bool keepnl=false);
 extern void FixFilename(wxString& name);
 extern bool IsIP(const wxString& s);
+extern bool IsLocalIP(const wxString& s);
 extern wxUint32 IP2Int(const wxString& s);
 extern wxString Int2IP(wxUint32 ip);
 extern wxString FormatBytes(wxUint64 size);

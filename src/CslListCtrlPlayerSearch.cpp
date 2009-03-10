@@ -230,11 +230,12 @@ void CslListCtrlPlayerSearch::AddResult(CslServerInfo *info,CslPlayerStatsData *
 {
     wxListItem item;
     wxInt32 i=GetItemCount();
+    wxUint32 img=::wxGetApp().GetCslEngine()->GetGames().length();
 
     item.SetId(i);
     item.SetMask(wxLIST_MASK_TEXT|wxLIST_MASK_DATA);
     InsertItem(item);
-    SetItem(i,0,player->Name,GetCountryFlag(player->IP));
+    SetItem(i,0,player->Name,GetCountryFlag(player->IP,img));
     SetItem(i,1,info->GetBestDescription(),info->GetGame().GetId()-1);
 
     m_entries.Add(new CslPlayerSearchEntry(info,*player));
@@ -253,23 +254,6 @@ void CslListCtrlPlayerSearch::RemoveServer(CslServerInfo *info)
     }
 }
 
-wxUint32 CslListCtrlPlayerSearch::GetCountryFlag(wxUint32 ip)
-{
-    wxInt32 i;
-    const char *country;
-
-    if (ip && (country=CslGeoIP::GetCountryCodeByIPnum(ip)))
-    {
-        for (i=sizeof(codes)/sizeof(codes[0])-1;i>=0;i--)
-        {
-            if (!strcasecmp(country,codes[i]))
-                return ::wxGetApp().GetCslEngine()->GetGames().length()+i+1;
-        }
-    }
-
-    return ::wxGetApp().GetCslEngine()->GetGames().length();
-}
-
 void CslListCtrlPlayerSearch::CreateImageList()
 {
 #ifdef __WXMSW__
@@ -283,6 +267,7 @@ void CslListCtrlPlayerSearch::CreateImageList()
         m_imgList.Add(bmpGame);
     }
 
+    m_imgList.Add(AdjustIconSize(local_xpm,wxNullIcon,wxSize(20,16),wxPoint(0,3)));
     m_imgList.Add(AdjustIconSize(unknown_xpm,wxNullIcon,wxSize(20,16),wxPoint(0,3)));
     wxInt32 i,c=sizeof(codes)/sizeof(codes[0])-1;
     for (i=0;i<c;i++)
@@ -298,6 +283,7 @@ void CslListCtrlPlayerSearch::CreateImageList()
         m_imgList.Add(bmpGame);
     }
 
+    m_imgList.Add(AdjustIconSize(local_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,2)));
     m_imgList.Add(AdjustIconSize(unknown_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,2)));
     wxInt32 i,c=sizeof(codes)/sizeof(codes[0])-1;
     for (i=0;i<c;i++)

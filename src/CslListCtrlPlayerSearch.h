@@ -72,7 +72,6 @@ class CslListCtrlPlayerSearch : public CslListCtrl
     protected:
         void GetToolTipText(wxInt32 row,CslToolTipEvent& event);
 
-        wxUint32 GetCountryFlag(wxUint32 ip);
         void CreateImageList();
 };
 
