@@ -319,27 +319,21 @@ void CslListCtrlCountry::ListSort(const wxInt32 column)
 
 int wxCALLBACK CslListCtrlCountry::ListSortCompareFunc(long item1,long item2,long data)
 {
-    CslCountryEntry *entry1=(CslCountryEntry*)item1;
-    CslCountryEntry *entry2=(CslCountryEntry*)item2;
-    wxInt32 mode=((CslListSortHelper*)data)->Mode;
-    wxInt32 type=((CslListSortHelper*)data)->Type;
+    CslCountryEntry *data1=(CslCountryEntry*)item1;
+    CslCountryEntry *data2=(CslCountryEntry*)item2;
+    CslListSortHelper *helper=(CslListSortHelper*)data;
 
-    if (type==SORT_COUNT)
+    wxInt32 mode=helper->Mode;
+
+    if (helper->Type==SORT_COUNT)
     {
-        if (entry1->Count==entry2->Count)
-            return entry1->Country.CmpNoCase(entry2->Country)<0 ? -1 : 1;
-        if (entry1->Count<entry2->Count)
-            return mode==CslListSortHelper::SORT_ASC ? -1 : 1;
+        wxInt32 ret=0;
+
+        if ((ret=helper->Cmp(data1->Count,data2->Count)))
+            return ret;
         else
-            return mode==CslListSortHelper::SORT_ASC ? 1 : -1;
-    }
-    else if (type==SORT_NAME)
-    {
-        if (entry1->Country.CmpNoCase(entry2->Country)<0)
-            return mode==CslListSortHelper::SORT_ASC ? -1 : 1;
-        else
-            return mode==CslListSortHelper::SORT_ASC ? 1 : -1;
+            mode=CslListSortHelper::SORT_ASC;
     }
 
-    return 0;
+    return helper->Cmp(data1->Country,data2->Country,mode);
 }

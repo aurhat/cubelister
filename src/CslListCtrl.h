@@ -60,12 +60,20 @@ class CslListSortHelper
 {
     public:
         enum { SORT_ASC = 0, SORT_DSC };
-        enum { SORT_INT = 0, SORT_UINT, SORT_STRING };
 
         void Init(wxUint32 mode,wxUint32 type)
         {
             Mode=mode;
             Type=type;
+        }
+
+        template<typename _T>
+        wxInt32 Cmp(const _T& first,const _T& second,wxInt32 mode=-1) const
+        {
+            wxInt32 m=mode<0 ? Mode:mode;
+
+            return first<second ? m==SORT_ASC ? -1:1 :
+                   first==second ? 0 : m==SORT_ASC ? 1:-1;
         }
 
         wxInt32 Mode;

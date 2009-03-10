@@ -729,111 +729,79 @@ void CslListCtrlPlayer::ListInit(const wxInt32 view)
 
 int wxCALLBACK CslListCtrlPlayer::ListSortCompareFunc(long item1,long item2,long data)
 {
-    CslPlayerStatsData *stats1=(CslPlayerStatsData*)item1;
-    CslPlayerStatsData *stats2=(CslPlayerStatsData*)item2;
-    wxInt32 sortMode=((CslListSortHelper*)data)->Mode;
-    wxInt32 sortType=((CslListSortHelper*)data)->Type;
+    CslPlayerStatsData *data1=(CslPlayerStatsData*)item1;
+    CslPlayerStatsData *data2=(CslPlayerStatsData*)item2;
+    CslListSortHelper *helper=(CslListSortHelper*)data;
 
-    if (sortType!=SORT_NAME)
+    wxInt32 ret=0;
+
+    if (helper->Type!=SORT_NAME)
     {
-        if (stats1->State==CSL_PLAYER_STATE_SPECTATOR)
+        if (data1->State==CSL_PLAYER_STATE_SPECTATOR)
             return 1;
-        if (stats2->State==CSL_PLAYER_STATE_SPECTATOR)
+        if (data2->State==CSL_PLAYER_STATE_SPECTATOR)
             return -1;
     }
 
-    wxInt32 type;
-    wxInt32 vi1=0,vi2=0;
-    wxUint32 vui1=0,vui2=0;
-    wxString *vs1=NULL,*vs2=NULL;
+#define LIST_SORT_FRAGS(_data1,_data2,_mode) \
+    if (!(ret=helper->Cmp(_data1->Frags,_data2->Frags,_mode))) \
+    { \
+        if (!(ret=helper->Cmp(_data1->Accuracy,_data2->Accuracy, \
+                            CslListSortHelper::SORT_DSC))) \
+        { \
+            if (!(ret=helper->Cmp(_data1->Deaths,_data2->Deaths, \
+                                  CslListSortHelper::SORT_ASC))) \
+            { \
+                ret=helper->Cmp(_data1->Teamkills,_data2->Teamkills, \
+                                CslListSortHelper::SORT_ASC); \
+            } \
+        } \
+    }
 
-    switch (sortType)
+    switch (helper->Type)
     {
         case SORT_NAME:
-            type=CslListSortHelper::SORT_STRING;
-            vs1=&stats1->Name;
-            vs2=&stats2->Name;
+            ret=helper->Cmp(data1->Name,data2->Name);
             break;
 
         case SORT_TEAM:
-            type=CslListSortHelper::SORT_STRING;
-            vs1=&stats1->Team;
-            vs2=&stats2->Team;
+            ret=helper->Cmp(data1->Team,data2->Team);
             break;
 
         case SORT_FRAGS:
-            type=CslListSortHelper::SORT_INT;
-            vi1=stats1->Frags;
-            vi2=stats2->Frags;
+            LIST_SORT_FRAGS(data1,data2,helper->Mode);
             break;
 
         case SORT_DEATHS:
-            type=CslListSortHelper::SORT_INT;
-            vi1=stats1->Deaths;
-            vi2=stats2->Deaths;
+            ret=helper->Cmp(data1->Deaths,data2->Deaths);
             break;
 
         case SORT_TEAMKILLS:
-            type=CslListSortHelper::SORT_INT;
-            vi1=stats1->Teamkills;
-            vi2=stats2->Teamkills;
+            ret=helper->Cmp(data1->Teamkills,data2->Teamkills);
             break;
 
         case SORT_ACCURACY:
-            type=CslListSortHelper::SORT_INT;
-            vi1=stats1->Accuracy;
-            vi2=stats2->Accuracy;
+            ret=helper->Cmp(data1->Accuracy,data2->Accuracy);
             break;
 
         case SORT_HEALTH:
-            type=CslListSortHelper::SORT_INT;
-            vi1=stats1->Health;
-            vi2=stats2->Health;
+            ret=helper->Cmp(data1->Health,data2->Health);
             break;
 
         case SORT_ARMOUR:
-            type=CslListSortHelper::SORT_INT;
-            vi1=stats1->Armour;
-            vi2=stats2->Armour;
+            ret=helper->Cmp(data1->Armour,data2->Armour);
             break;
 
         case SORT_WEAPON:
-            type=CslListSortHelper::SORT_INT;
-            vi1=stats1->Weapon;
-            vi2=stats2->Weapon;
+            ret=helper->Cmp(data1->Weapon,data2->Weapon);
             break;
 
         default:
-            return 0;
+            break;
     }
 
-    if (type==CslListSortHelper::SORT_INT)
-    {
-        if (vi1==vi2)
-            return 0;
-        if (vi1<vi2)
-            return sortMode==CslListSortHelper::SORT_ASC ? -1 : 1;
-        else
-            return sortMode==CslListSortHelper::SORT_ASC ? 1 : -1;
-    }
-    else if (type==CslListSortHelper::SORT_UINT)
-    {
-        if (vui1==vui2)
-            return 0;
-        if (vui1<vui2)
-            return sortMode==CslListSortHelper::SORT_ASC ? -1 : 1;
-        else
-            return sortMode==CslListSortHelper::SORT_ASC ? 1 : -1;
-    }
-    else if (type==CslListSortHelper::SORT_STRING)
-    {
-        if (*vs1==*vs2)
-            return 0;
-        if (vs1->CmpNoCase(*vs2)<0)
-            return sortMode==CslListSortHelper::SORT_ASC ? -1 : 1;
-        else
-            return sortMode==CslListSortHelper::SORT_ASC ? 1 : -1;
-    }
+    if (!ret && helper->Type!=SORT_FRAGS)
+        LIST_SORT_FRAGS(data1,data2,CslListSortHelper::SORT_DSC);
 
-    return 0;
+    return ret;
 }

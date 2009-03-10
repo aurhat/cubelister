@@ -326,9 +326,9 @@ void CslDlgExtended::UpdateMap()
         if (show)
         {
             if (m_mapInfo.m_mapNameFull.IsEmpty())
-                SetLabel(label_map,m_mapInfo.m_mapName);
+                SetFixedLabelText(label_map,m_mapInfo.m_mapName);
             else
-                SetLabel(label_map,m_mapInfo.m_mapNameFull);
+                SetFixedLabelText(label_map,m_mapInfo.m_mapNameFull);
             if (m_mapInfo.m_author.IsEmpty())
             {
                 label_author->SetLabel(wxEmptyString);
@@ -337,7 +337,7 @@ void CslDlgExtended::UpdateMap()
             else
             {
                 label_author_prefix->SetLabel(_("by"));
-                SetLabel(label_author,m_mapInfo.m_author);
+                SetFixedLabelText(label_author,m_mapInfo.m_author);
             }
 
             panel_map->SetMap(m_mapInfo.m_bitmap,checkbox_map->IsChecked());
@@ -348,7 +348,7 @@ void CslDlgExtended::UpdateMap()
             panel_map->SetOk(false);
             ShowPanelMap(false);
 
-            SetLabel(label_map,m_info->Map);
+            SetFixedLabelText(label_map,m_info->Map);
             label_author->SetLabel(wxEmptyString);
             label_author_prefix->SetLabel(wxEmptyString);
         }
@@ -506,7 +506,7 @@ void CslDlgExtended::UpdateTeamData()
     if (s.IsEmpty())
         s=_("Time is up");
     label_remaining->SetLabel(s);
-    SetLabel(label_mode,m_info->GameMode);
+    SetFixedLabelText(label_mode,m_info->GameMode);
 
     RecalcMinSize(true);
 }
@@ -621,8 +621,8 @@ void CslDlgExtended::DoShow(CslServerInfo *info)
     UpdatePlayerData();
     UpdateTeamData();
 
-    SetLabel(label_server,m_info->GetBestDescription());
-    SetLabel(label_mode,m_info->GameMode);
+    SetFixedLabelText(label_server,m_info->GetBestDescription());
+    SetFixedLabelText(label_mode,m_info->GameMode);
     if (m_info->TimeRemain>0)
         s=FormatSeconds(m_info->TimeRemain*60,true,true);
     else
@@ -644,7 +644,7 @@ void CslDlgExtended::DoShow(CslServerInfo *info)
     Show();
 }
 
-void CslDlgExtended::SetLabel(wxStaticText *label,const wxString& text)
+void CslDlgExtended::SetFixedLabelText(wxStaticText *label,const wxString& text)
 {
     wxString s=text;
 

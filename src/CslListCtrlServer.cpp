@@ -1303,19 +1303,20 @@ void CslListCtrlServer::ListSort(wxInt32 column)
 
 int wxCALLBACK CslListCtrlServer::ListSortCompareFunc(long item1,long item2,long data)
 {
-    CslListServerData *info1=(CslListServerData*)item1;
-    CslListServerData *info2=(CslListServerData*)item2;
+    CslListServerData *data1=(CslListServerData*)item1;
+    CslListServerData *data2=(CslListServerData*)item2;
+    CslListSortHelper *helper=(CslListSortHelper*)data;
 
-    bool ping1Ok=CslEngine::PingOk(*info1->Info,g_cslSettings->updateInterval);
-    bool ping2Ok=CslEngine::PingOk(*info2->Info,g_cslSettings->updateInterval);
-    bool high1=info1->HighLight&CSL_HIGHLIGHT_FOUND_SERVER || info1->HighLight&CSL_HIGHLIGHT_FOUND_PLAYER;
-    bool high2=info2->HighLight&CSL_HIGHLIGHT_FOUND_SERVER || info2->HighLight&CSL_HIGHLIGHT_FOUND_PLAYER;
-    wxInt32 sortType=((CslListSortHelper*)data)->Type;
+    bool high1=data1->HighLight&CSL_HIGHLIGHT_FOUND_SERVER || data1->HighLight&CSL_HIGHLIGHT_FOUND_PLAYER;
+    bool high2=data2->HighLight&CSL_HIGHLIGHT_FOUND_SERVER || data2->HighLight&CSL_HIGHLIGHT_FOUND_PLAYER;
 
     if ((high1 || high2) && !(high1 && high2))
         return high1 ? -1:1;
 
-    if (sortType!=SORT_HOST)
+    bool ping1Ok=CslEngine::PingOk(*data1->Info,g_cslSettings->updateInterval);
+    bool ping2Ok=CslEngine::PingOk(*data2->Info,g_cslSettings->updateInterval);
+
+    if (helper->Type!=SORT_HOST)
     {
         if (!ping1Ok && !ping2Ok)
             return 0;
@@ -1325,113 +1326,78 @@ int wxCALLBACK CslListCtrlServer::ListSortCompareFunc(long item1,long item2,long
             return -1;
     }
 
-    wxInt32 type;
-    wxInt32 sortMode=((CslListSortHelper*)data)->Mode;
-    wxInt32 vi1=0,vi2=0;
-    wxUint32 vui1=0,vui2=0;
-    wxString *vs1=NULL,*vs2=NULL;
+    wxInt32 ret=0;
 
-    switch (sortType)
+#define LIST_SORT_PLAYER(_data1,_data2,_mode) \
+    if (!(ret=helper->Cmp(_data1->Players,_data2->Players,_mode)) && _data1->Players>0) \
+    { \
+        ret=helper->Cmp(_data1->PlayersMax-_data1->Players, \
+                        _data2->PlayersMax-_data2->Players, \
+                        CslListSortHelper::SORT_DSC); \
+    }
+
+    switch (helper->Type)
     {
         case SORT_HOST:
         {
-            type=CslListSortHelper::SORT_STRING;
-            vs1=&info1->Host;
-            vs2=&info2->Host;
-            bool isip1=IsIP(*vs1);
-            bool isip2=IsIP(*vs2);
-            if (isip1&&!isip2)
-                return sortMode==CslListSortHelper::SORT_ASC ? -1 : 1;
-            else if (!isip1&&isip2)
-                return sortMode==CslListSortHelper::SORT_ASC ? 1 : -1;
-            else if (isip1&&isip2)
-            {
-                type=CslListSortHelper::SORT_UINT;
-                vui1=IP2Int(*vs1);
-                vui2=IP2Int(*vs2);
-            }
+            bool isip1=IsIP(data1->Host);
+            bool isip2=IsIP(data2->Host);
+            if (isip1 && !isip2)
+                ret=helper->Mode==CslListSortHelper::SORT_ASC ? -1 : 1;
+            else if (!isip1 && isip2)
+                ret=helper->Mode==CslListSortHelper::SORT_ASC ? 1 : -1;
+            else if (isip1 && isip2)
+                ret=helper->Cmp(IP2Int(data1->Host),IP2Int(data2->Host));
             break;
         }
 
         case SORT_DESCRIPTION:
-            type=CslListSortHelper::SORT_STRING;
-            vs1=&info1->Description;
-            vs2=&info2->Description;
+            ret=helper->Cmp(data1->Description,data2->Description);
             break;
 
         case SORT_PING:
-            type=CslListSortHelper::SORT_UINT;
-            vui1=info1->Ping;
-            vui2=info2->Ping;
+            ret=helper->Cmp(data1->Ping,data2->Ping);
             break;
 
         case SORT_VER:
-            type=CslListSortHelper::SORT_INT;
-            vi1=info1->Protocol;
-            vi2=info2->Protocol;
+            ret=helper->Cmp(data1->Protocol,data2->Protocol);
             break;
 
         case SORT_MODE:
-            type=CslListSortHelper::SORT_STRING;
-            vs1=&info1->GameMode;
-            vs2=&info2->GameMode;
+            ret=helper->Cmp(data1->GameMode,data2->GameMode);
             break;
 
         case SORT_MAP:
-            type=CslListSortHelper::SORT_STRING;
-            vs1=&info1->Map;
-            vs2=&info2->Map;
+            ret=helper->Cmp(data1->Map,data2->Map);
             break;
 
         case SORT_TIME:
-            type=CslListSortHelper::SORT_UINT;
-            vui1=info1->TimeRemain;
-            vui2=info2->TimeRemain;
+            ret=helper->Cmp(data1->TimeRemain,data2->TimeRemain);
             break;
 
         case SORT_PLAYER:
-            type=CslListSortHelper::SORT_INT;
-            vi1=info1->Players;
-            vi2=info2->Players;
+            LIST_SORT_PLAYER(data1,data2,helper->Mode)
             break;
 
         case SORT_MM:
-            type=CslListSortHelper::SORT_INT;
-            vi1=info1->MM;
-            vi2=info2->MM;
+            ret=helper->Cmp(data1->MM,data2->MM);
             break;
 
         default:
-            return 0;
+            break;
     }
 
-    if (type==CslListSortHelper::SORT_INT)
+    if (!ret)
     {
-        if (vi1==vi2)
-            return 0;
-        if (vi1<vi2)
-            return sortMode==CslListSortHelper::SORT_ASC ? -1 : 1;
-        else
-            return sortMode==CslListSortHelper::SORT_ASC ? 1 : -1;
-    }
-    else if (type==CslListSortHelper::SORT_UINT)
-    {
-        if (vui1==vui2)
-            return 0;
-        if (vui1<vui2)
-            return sortMode==CslListSortHelper::SORT_ASC ? -1 : 1;
-        else
-            return sortMode==CslListSortHelper::SORT_ASC ? 1 : -1;
-    }
-    else if (type==CslListSortHelper::SORT_STRING)
-    {
-        if (*vs1==*vs2)
-            return 0;
-        if (vs1->CmpNoCase(*vs2)<0)
-            return sortMode==CslListSortHelper::SORT_ASC ? -1 : 1;
-        else
-            return sortMode==CslListSortHelper::SORT_ASC ? 1 : -1;
+        if (helper->Type!=SORT_PLAYER)
+            LIST_SORT_PLAYER(data1,data2,CslListSortHelper::SORT_DSC);
+
+        if (!ret && !(ret=helper->Cmp(data1->Info->ConnectedTimes,
+                                      data2->Info->ConnectedTimes,
+                                      CslListSortHelper::SORT_DSC)))
+            ret=helper->Cmp(data1->Info->Uptime,data2->Info->Uptime,
+                            CslListSortHelper::SORT_DSC);
     }
 
-    return 0;
+    return ret;
 }
