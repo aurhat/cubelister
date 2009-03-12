@@ -21,7 +21,6 @@
 #include <wx/protocol/http.h>
 #include "CslVersionCheck.h"
 #include "engine/CslTools.h"
-#include "engine/cube_tools.h"
 
 
 DEFINE_EVENT_TYPE(wxCSL_EVT_VERSIONCHECK)
@@ -51,7 +50,7 @@ wxThread::ExitCode CslVersionCheckThread::Entry()
         {
             if (code==200)
             {
-                size_t size=min(data->GetSize(),15);
+                size_t size=min(data->GetSize(),(size_t)15);
                 if (size)
                 {
                     char buf[16]={0};

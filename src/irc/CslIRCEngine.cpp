@@ -20,9 +20,7 @@
 
 #include <wx/tokenzr.h>
 #include "CslIRCEngine.h"
-#include "engine/cube_tools.h"
 #include "engine/CslVersion.h"
-
 #define IRC_MAX_RENAME_TRIES  5
 
 CslIrcNetworks g_CslIrcNetworks;
@@ -140,12 +138,12 @@ void event_kick(irc_session_t *session,const char* WXUNUSED(event),
     CslIrcContext *context=(CslIrcContext*)irc_get_ctx(session);
     CslIrcEvent evt(context->Target,CslIrcEvent::KICK,A2U(params[0]));
 
-    evt.Strings.Add(A2U(origin));
-
+    evt.AddCharData(origin);
     if (count>1)
     {
-        evt.Strings.Add(A2U(params[1]));
-        evt.Strings.Add(A2U(params[2]));
+        evt.AddCharData(params[1]);
+        if (count>2)
+            evt.AddCharData(params[2]);
     }
 
     wxPostEvent(context->EvtHandler,evt);
@@ -157,7 +155,7 @@ void event_quit(irc_session_t *session,const char* WXUNUSED(event),
     CslIrcContext *context=(CslIrcContext*)irc_get_ctx(session);
     CslIrcEvent evt(context->Target,CslIrcEvent::QUIT,A2U(origin));
     if (count>0)
-        evt.Strings.Add(A2U(params[0]));
+        evt.AddCharData(params[0]);
     wxPostEvent(context->EvtHandler,evt);
 }
 
@@ -166,9 +164,9 @@ void event_part(irc_session_t *session,const char* WXUNUSED(event),
 {
     CslIrcContext *context=(CslIrcContext*)irc_get_ctx(session);
     CslIrcEvent evt(context->Target,CslIrcEvent::PART,A2U(params[0]));
-    evt.Strings.Add(A2U(origin));
+    evt.AddCharData(origin);
     if (count>1)
-        evt.Strings.Add(A2U(params[1]));
+        evt.AddCharData(params[1]);
     wxPostEvent(context->EvtHandler,evt);
 }
 
@@ -180,8 +178,8 @@ void event_chanmsg(irc_session_t *session,const char* WXUNUSED(event),
 
     CslIrcContext *context=(CslIrcContext*)irc_get_ctx(session);
     CslIrcEvent evt(context->Target,CslIrcEvent::CHANMSG,A2U(params[0]));
-    evt.Strings.Add(A2U(origin));
-    evt.Strings.Add(A2U(params[1]));
+    evt.AddCharData(origin);
+    evt.AddCharData(params[1]);
     wxPostEvent(context->EvtHandler,evt);
 }
 
@@ -193,7 +191,7 @@ void event_privmsg(irc_session_t *session,const char* WXUNUSED(event),
 
     CslIrcContext *context=(CslIrcContext*)irc_get_ctx(session);
     CslIrcEvent evt(context->Target,CslIrcEvent::PRIVMSG,A2U(origin));
-    evt.Strings.Add(A2U(params[1]));
+    evt.AddCharData(params[1]);
     wxPostEvent(context->EvtHandler,evt);
 }
 
@@ -205,8 +203,9 @@ void event_notice(irc_session_t *session,const char* WXUNUSED(event),
 
     CslIrcContext *context=(CslIrcContext*)irc_get_ctx(session);
     CslIrcEvent evt(context->Target,CslIrcEvent::NOTICE,A2U(params[0]));
-    evt.Strings.Add(A2U(origin));
-    evt.Strings.Add(A2U(params[1]));
+    evt.AddCharData(origin);
+    if (count>1)
+        evt.AddCharData(params[1]);
     wxPostEvent(context->EvtHandler,evt);
 }
 
@@ -233,8 +232,8 @@ void event_ctcp_action(irc_session_t *session,const char* WXUNUSED(event),const 
 
     CslIrcContext *context=(CslIrcContext*)irc_get_ctx(session);
     CslIrcEvent evt(context->Target,CslIrcEvent::ACTION,A2U(params[0]));
-    evt.Strings.Add(A2U(origin));
-    evt.Strings.Add(A2U(params[1]));
+    evt.AddCharData(origin);
+    evt.AddCharData(params[1]);
     wxPostEvent(context->EvtHandler,evt);
 }
 
@@ -246,9 +245,9 @@ void event_mode(irc_session_t *session,const char* WXUNUSED(event),const char *o
 
     CslIrcContext *context=(CslIrcContext*)irc_get_ctx(session);
     CslIrcEvent evt(context->Target,CslIrcEvent::MODE,A2U(params[0]));
-    evt.Strings.Add(A2U(origin));
-    evt.Strings.Add(A2U(params[2]));
-    evt.Strings.Add(A2U(params[1]));
+    evt.AddCharData(origin);
+    evt.AddCharData(params[2]);
+    evt.AddCharData(params[1]);
     wxPostEvent(context->EvtHandler,evt);
 }
 
@@ -260,8 +259,8 @@ void event_topic(irc_session_t *session,const char* WXUNUSED(event),const char *
 
     CslIrcContext *context=(CslIrcContext*)irc_get_ctx(session);
     CslIrcEvent evt(context->Target,CslIrcEvent::TOPIC,A2U(params[0]));
-    evt.Strings.Add(A2U(origin));
-    evt.Strings.Add(A2U(params[1]));
+    evt.AddCharData(origin);
+    evt.AddCharData(params[1]);
     wxPostEvent(context->EvtHandler,evt);
 }
 
@@ -281,7 +280,7 @@ void event_numeric(irc_session_t *session,unsigned int event,const char *origin,
             {
                 CslIrcEvent evt(context->Target,CslIrcEvent::TOPIC,A2U(params[1]));
                 evt.Ints.Add(event);
-                evt.Strings.Add(A2U(params[2]));
+                evt.AddCharData(params[2]);
                 wxPostEvent(context->EvtHandler,evt);
             }
             return;
@@ -300,7 +299,7 @@ void event_numeric(irc_session_t *session,unsigned int event,const char *origin,
             {
                 CslIrcEvent evt(context->Target,CslIrcEvent::NUMERIC,A2U(params[1]));
                 evt.Ints.Add(event);
-                evt.Strings.Add(A2U(params[2]));
+                evt.AddCharData(params[2]);
                 wxPostEvent(context->EvtHandler,evt);
                 return;
             }
@@ -350,8 +349,7 @@ wxThread::ExitCode CslIrcThread::Entry()
     struct timeval timeout;
     fd_set readSet,writeSet;
     CslIrcContext *context=NULL;
-    wxUint32 count,pos=0;
-    wxInt32 termcount=10;
+    wxInt32 pos=0,count=0,termcount=10;
 
     m_mutex.Lock();
 
@@ -539,6 +537,22 @@ CslIrcSession::~CslIrcSession()
 
 void CslIrcSession::OnIrcEvent(CslIrcEvent& event)
 {
+    CslIrcChannel *channel;
+
+    //convert to channel specific char encodings here
+    if (event.CharData.GetCount())
+    {
+        CslCharEncoding *encoding;
+
+        if ((channel=FindChannel(event.Channel)))
+            encoding=&channel->Encoding;
+        else
+            encoding=&CslDefaultCharEncoding;
+
+        for (wxUint32 i=0;i<event.CharData.GetCount();i++)
+            event.Strings.Add(encoding->ToLocal(event.CharData.Item(i)));
+    }
+
     switch (event.Type)
     {
         case CslIrcEvent::ERR:
@@ -566,16 +580,11 @@ void CslIrcSession::OnIrcEvent(CslIrcEvent& event)
             break;
 
         case CslIrcEvent::JOIN:
-            for (wxUint32 i=0;i<m_channels.GetCount();i++)
-            {
-                if (m_channels.Item(i)->Name==event.Channel)
-                {
-                    m_channels.Item(i)->Connected=true;
-                    break;
-                }
-            }
+        {
+            if ((channel=FindChannel(event.Channel)))
+                channel->Connected=true;
             break;
-
+        }
     }
 
     event.Skip();
@@ -655,63 +664,69 @@ bool CslIrcSession::Disconnect(const wxString& message)
     return true;
 }
 
+bool CslIrcSession::ConvertToChannelEncoding(const wxString& name,const wxString& text,
+        wxCharBuffer& buffer)
+{
+    CslIrcChannel *channel;
+
+    if ((channel=FindChannel(name)))
+    {
+        buffer=channel->Encoding.ToServer(text);
+        return true;
+    }
+
+    return false;
+}
+
 bool CslIrcSession::SendTextMessage(const wxString& channel,const wxString& text)
 {
     if (m_state!=STATE_CONNECTED)
         return false;
 
-    return irc_cmd_msg(m_context.Session,U2A(channel),U2A(text))==0;
+    wxCharBuffer buffer;
+    if (ConvertToChannelEncoding(channel,text,buffer))
+        return irc_cmd_msg(m_context.Session,U2A(channel),buffer)==0;
+
+    return false;
 }
 
-bool CslIrcSession::JoinChannel(const wxString& channel,const wxString& password)
+bool CslIrcSession::JoinChannel(const wxString& name,const wxString& password)
 {
     if (m_state!=STATE_CONNECTED)
         return false;
 
-    bool add=true;
+    CslIrcChannel *channel;
 
-    for (wxUint32 i=0;i<m_channels.GetCount();i++)
+    if ((channel=FindChannel(name)))
     {
-        CslIrcChannel *chan=m_channels.Item(i);
-        if (chan->Name==channel)
-        {
-            add=false;
-            if (chan->Connected)
-                return false;
-            else
-                break;
-        }
+        if (channel->Connected)
+            return false;
     }
-    if (add)
-        m_channels.Add(new CslIrcChannel(channel,password));
+    else
+        m_channels.Add(new CslIrcChannel(name,password));
 
-    return irc_cmd_join(m_context.Session,U2A(channel),U2A(password))==0;
+    return irc_cmd_join(m_context.Session,U2A(name),U2A(password))==0;
 }
 
-bool CslIrcSession::LeaveChannel(const wxString& channel,const wxString& reason)
+bool CslIrcSession::LeaveChannel(const wxString& name,const wxString& reason)
 {
     if (!CslIrcEngine::GetThread() || m_state!=STATE_CONNECTED)
         return false;
 
-    wxString command;
+    CslIrcChannel *channel=FindChannel(name);
 
-    for (wxUint32 i=0;i<m_channels.GetCount();i++)
-    {
-        CslIrcChannel *chan=m_channels.Item(i);
-        if (chan->Name==channel)
-        {
-            m_channels.RemoveAt(i);
-            if (chan->Connected)
-            {
-                command<<wxT("PART ")<<channel;
-                if (!reason.IsEmpty())
-                    command<<wxT(" ")<<reason;
-                break;
-            }
-            else
-                return false;
-        }
-    }
+    if (!channel)
+        return false;
+
+    m_channels.Remove(channel);
+
+    if (!channel->Connected)
+        return false;
+
+    wxString command=wxT("PART ")+channel->Name;
+
+    if (!reason.IsEmpty())
+        command<<wxT(" ")<<reason;
 
     return SendRawCommand(command);
 }
@@ -735,7 +750,11 @@ bool CslIrcSession::SendCtcpAction(const wxString& channel,const wxString& text)
     if (!CslIrcEngine::GetThread() || m_state!=STATE_CONNECTED)
         return false;
 
-    return irc_cmd_me(m_context.Session,U2A(channel),U2A(text))==0;
+    wxCharBuffer buffer;
+    if (ConvertToChannelEncoding(channel,text,buffer))
+        return irc_cmd_me(m_context.Session,U2A(channel),buffer)==0;
+
+    return false;
 }
 
 bool CslIrcSession::SendRawCommand(const wxString& command)
@@ -744,6 +763,28 @@ bool CslIrcSession::SendRawCommand(const wxString& command)
         return false;
 
     return irc_send_raw(m_context.Session,U2A(command))==0;
+}
+
+CslIrcChannel* CslIrcSession::FindChannel(const wxString& name)
+{
+    for (wxUint32 i=0;i<m_channels.GetCount();i++)
+    {
+        if (*m_channels.Item(i)==name)
+            return m_channels.Item(i);
+    }
+
+    return NULL;
+}
+
+CslIrcChannel* CslIrcSession::FindChannel(const CslIrcChannel& channel)
+{
+    for (wxUint32 i=0;i<m_channels.GetCount();i++)
+    {
+        if (*m_channels.Item(i)==channel)
+            return m_channels.Item(i);
+    }
+
+    return NULL;
 }
 
 

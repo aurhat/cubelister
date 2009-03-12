@@ -30,6 +30,8 @@
 #include <wx/stopwatch.h>
 #include <wx/bitmap.h>
 #include <wx/window.h>
+#include "CslCharEncoding.h"
+#include "cube_tools.h"
 
 #ifdef _MSC_VER
 #ifdef UNICODE
@@ -59,8 +61,11 @@
 #define LOCALEPATH wxString(wxT(LOCALEDIR))+wxString(PATHDIV)
 #endif //DATADIR
 
-#define A2U(PSZA_CHART) wxString(wxConvertMB2WX(PSZA_CHART))
-#define U2A(PSZT_CHART) (char*)(const char*)wxConvertWX2MB(PSZT_CHART)
+extern CslCharEncoding CslDefaultCharEncoding;
+//#define A2U(PSZA_CHART) wxString(wxConvertMB2WX(PSZA_CHART))
+//#define U2A(PSZT_CHART) (char*)(const char*)wxConvertWX2MB(PSZT_CHART)
+#define A2U(PSZA_CHART) CslDefaultCharEncoding.ToLocal(PSZA_CHART)
+#define U2A(PSZT_CHART) (const char*)CslDefaultCharEncoding.ToServer(PSZT_CHART)
 
 #if wxCHECK_VERSION(2,9,0)
 #define T2C(x) x.c_str()

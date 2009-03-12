@@ -70,7 +70,6 @@ class CslIrcPanel: public wxPanel
 {
     public:
         enum { TYPE_NONE, TYPE_SESSION, TYPE_CHANNEL, TYPE_PRIVATE };
-        enum { CHOICE_CONNECTION = wxID_HIGHEST+1000, TEXT_CTRL_INPUT, MENU_TAB };
 
         CslIrcPanel(CslIrcNotebook* parent,CslIrcSession *session=NULL,
                     wxInt32 type=TYPE_NONE,const wxString& channel=wxEmptyString);
@@ -139,6 +138,7 @@ class CslIrcPanel: public wxPanel
         void OnListCtrlActivated(wxListEvent& event);
         void OnSize(wxSizeEvent& event);
         void OnCommandEvent(wxCommandEvent& event);
+        void OnContextMenu(wxContextMenuEvent& event);
         void OnSplitter(wxSplitterEvent& event);
         void OnTimer(wxTimerEvent& event);
         void OnIrcEvent(CslIrcEvent& event);

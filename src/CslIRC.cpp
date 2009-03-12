@@ -80,10 +80,20 @@ BEGIN_EVENT_TABLE(CslIrcPanel,wxPanel)
     EVT_LIST_ITEM_ACTIVATED(wxID_ANY,CslIrcPanel::OnListCtrlActivated)
     EVT_CHOICE(wxID_ANY,CslIrcPanel::OnCommandEvent)
     EVT_TEXT_ENTER(wxID_ANY,CslIrcPanel::OnCommandEvent)
+    EVT_CONTEXT_MENU(CslIrcPanel::OnContextMenu)
     EVT_SPLITTER_SASH_POS_CHANGED(wxID_ANY,CslIrcPanel::OnSplitter)
     EVT_TIMER(wxID_ANY,CslIrcPanel::OnTimer)
     CSL_EVT_IRC(wxID_ANY,CslIrcPanel::OnIrcEvent)
 END_EVENT_TABLE()
+
+enum
+{
+    CHOICE_CONNECTION = wxID_HIGHEST+1000,
+    TEXT_CTRL_INPUT,
+    MENU_ENCODING_START,
+    MENU_ENCODING_END = MENU_ENCODING_START+CSL_NUM_CHAR_ENCODINGS,
+    MENU_TAB
+};
 
 CslIrcPanel::CslIrcPanel(CslIrcNotebook* parent,CslIrcSession *session,
                          wxInt32 type,const wxString& channel) :
@@ -339,7 +349,15 @@ void CslIrcPanel::OnCommandEvent(wxCommandEvent& event)
 
         default:
         {
-            if (id>=MENU_TAB)
+            if (id>=MENU_ENCODING_START && id<MENU_ENCODING_END)
+            {
+                wxString s=CslCharEncodings[id-MENU_ENCODING_START].Encoding;
+                CslIrcChannel *channel=m_session->FindChannel(m_channel);
+                if (channel)
+                    channel->Encoding.SetEncoding(s);
+                m_channel.Encoding.SetEncoding(s);
+            }
+            else if (id>=MENU_TAB)
             {
                 wxInt32 pos;
                 wxString s,u;
@@ -365,6 +383,36 @@ void CslIrcPanel::OnCommandEvent(wxCommandEvent& event)
             }
         }
     }
+}
+
+void CslIrcPanel::OnContextMenu(wxContextMenuEvent& event)
+{
+    wxUint32 i;
+    wxString s;
+    wxMenu menu,*sub;
+    wxMenuItem *item;
+    wxPoint point=event.GetPosition();
+
+    //from keyboard
+    if (point==wxDefaultPosition)
+        point=wxGetMousePosition();
+
+
+    sub=new wxMenu;
+    item=menu.AppendSubMenu(sub,_("Character encodings"));
+
+    for (i=0;i<CSL_NUM_CHAR_ENCODINGS;i++)
+    {
+        s.Empty();
+        s<<CslCharEncodings[i].Name<<wxT(" (")<<CslCharEncodings[i].Encoding<<wxT(")");
+        CslMenu::AddItem(sub,MENU_ENCODING_START+i,s,wxART_NONE,wxITEM_CHECK);
+    }
+
+    i=m_channel.Encoding.GetEncodingId();
+    CslMenu::CheckItem(*sub,MENU_ENCODING_START+i);
+
+    point=ScreenToClient(point);
+    PopupMenu(&menu,point);
 }
 
 void CslIrcPanel::OnSplitter(wxSplitterEvent& WXUNUSED(event))

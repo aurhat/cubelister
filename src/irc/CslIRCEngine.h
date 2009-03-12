@@ -39,10 +39,10 @@
 
 extern wxColour IrcColours[16];
 
+class CslIrcEvent;
 class CslIrcChannel;
 class CslIrcServer;
 class CslIrcNetwork;
-class CslIrcEvent;
 class CslIrcContext;
 class CslIrcSession;
 class CslIrcEngine;
@@ -71,6 +71,65 @@ typedef void (wxEvtHandler::*CslIrcEventEventFunction)(CslIrcEvent&);
 
 extern CslIrcNetworks g_CslIrcNetworks;
 
+WX_DEFINE_ARRAY_PTR(char*,CharPointerArray);
+
+class CslIrcEvent : public wxEvent
+{
+    public:
+        enum
+        {
+            ERR, CONNECT, NOTICE, JOIN, JOINED, NAMES, NICK, KICK,
+            QUIT, PART, CHANMSG, PRIVMSG, ACTION, MODE, TOPIC, NUMERIC
+        };
+
+        CslIrcEvent(wxEvtHandler *target,wxInt32 type=-1,
+                    const wxString& channel=wxEmptyString) :
+                wxEvent(wxID_ANY,wxCSL_EVT_IRC),
+                Target(target),Type(type),Channel(channel) {}
+
+        ~CslIrcEvent()
+        {
+            char *data;
+            for (wxUint32 i=0;i<CharData.GetCount();i++)
+            {
+                if ((data=CharData.Item(i)))
+                    free(data);
+            }
+            CharData.Empty();
+        }
+
+        virtual wxEvent* Clone() const
+        {
+            return new CslIrcEvent(*this);
+        }
+
+        void AddCharData(const char *data)
+        {
+            CharData.Add(strdup(data ? data:""));
+        }
+
+        wxEvtHandler *Target;
+        wxInt32 Type;
+        wxString Channel;
+        wxArrayInt Ints;
+        wxArrayString Strings;
+        CharPointerArray CharData;
+
+    private:
+        CslIrcEvent(const CslIrcEvent& event) : wxEvent(wxID_ANY,wxCSL_EVT_IRC)
+        {
+            Target=event.Target;
+            Type=event.Type;
+            Channel=event.Channel;
+            Ints=event.Ints;
+            Strings=event.Strings;
+
+            for (wxUint32 i=0;i<event.CharData.GetCount();i++)
+                AddCharData(event.CharData.Item(i));
+        }
+};
+
+
 class CslIrcUser
 {
     public:
@@ -91,9 +150,19 @@ class CslIrcChannel
                       const wxString& password=wxEmptyString) :
                 Connected(false),Name(name),Password(password) {}
 
+        bool operator==(const CslIrcChannel& channel)
+        {
+            return Name.CmpNoCase(channel.Name)==0;
+        }
+        bool operator==(const wxString& name)
+        {
+            return Name.CmpNoCase(name)==0;
+        }
+
         bool Connected;
         wxString Name,Password;
         wxString Topic;
+        CslCharEncoding Encoding;
 };
 
 
@@ -125,32 +194,6 @@ class CslIrcNetwork
         void AddAutoChannel(CslIrcChannel *channel) { AutoChannels.Add(channel); }
 };
 
-class CslIrcEvent : public wxEvent
-{
-    public:
-        enum
-        {
-            ERR, CONNECT, NOTICE, JOIN, JOINED, NAMES, NICK, KICK,
-            QUIT, PART, CHANMSG, PRIVMSG, ACTION, MODE, TOPIC, NUMERIC
-        };
-
-        CslIrcEvent(wxEvtHandler *target,wxInt32 type=-1,
-                    const wxString& channel=wxEmptyString) :
-                wxEvent(wxID_ANY,wxCSL_EVT_IRC),
-                Target(target),Type(type),Channel(channel) {}
-
-        virtual wxEvent* Clone() const
-        {
-            return new CslIrcEvent(*this);
-        }
-
-        wxEvtHandler *Target;
-        wxInt32 Type;
-        wxString Channel;
-        wxArrayInt Ints;
-        wxArrayString Strings;
-};
-
 
 class CslIrcContext
 {
@@ -178,8 +221,6 @@ class CslIrcThread : public wxThread
         CslIrcThread();
         ~CslIrcThread();
 
-        virtual ExitCode Entry();
-
         bool Connect(const CslIrcContext& context);
         bool Disconnect(const CslIrcContext& context);
         void Terminate();
@@ -195,6 +236,8 @@ class CslIrcThread : public wxThread
         CslIrcContext* FindContext(const CslIrcContext& context);
         bool RemoveContext(CslIrcContext *context);
         void LibIrcError(CslIrcContext *context,wxInt32 error);
+
+        virtual wxThread::ExitCode Entry();
 };
 
 
@@ -209,8 +252,8 @@ class CslIrcSession : public wxEvtHandler
         bool Disconnect(const wxString& message=wxEmptyString);
 
         bool SendTextMessage(const wxString& channel,const wxString& text);
-        bool JoinChannel(const wxString& channel,const wxString& password);
-        bool LeaveChannel(const wxString& channel,const wxString& reason=wxEmptyString);
+        bool JoinChannel(const wxString& name,const wxString& password);
+        bool LeaveChannel(const wxString& name,const wxString& reason=wxEmptyString);
         bool ChangeNick(const wxString& nick);
         bool SendCtcpAction(const wxString& channel,const wxString& text);
         bool SendRawCommand(const wxString& command);
@@ -219,6 +262,11 @@ class CslIrcSession : public wxEvtHandler
         wxString GetNick() { return m_context.Server->Network->Nick; }
         CslIrcChannels GetChannels() { return m_channels; }
         const CslIrcContext& GetContext() const { return m_context; }
+
+        CslIrcChannel* FindChannel(const wxString& name);
+        CslIrcChannel* FindChannel(const CslIrcChannel& channel);
+        bool ConvertToChannelEncoding(const wxString& name,const wxString& text,
+                                      wxCharBuffer& buffer);
 
     private:
         wxInt32 m_state;

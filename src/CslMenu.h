@@ -306,8 +306,10 @@ class CslMenu
     public:
         CslMenu(wxMenuBar *menuBar);
 
-        static void EnableMenuItem(const wxInt32 id,const bool enable=true);
-        static void CheckMenuItem(const wxInt32 id,const bool check=true);
+        static void EnableItem(wxInt32 id,bool enable=true);
+        static void CheckItem(wxInt32 id,bool check=true);
+        static void CheckItem(wxMenu& menu,wxInt32 id,bool check=true);
+
         static wxMenuItem& AddItem(wxMenu *menu,const wxInt32 id,
                                    const wxString& text,
                                    const wxArtID& art=wxART_NONE,

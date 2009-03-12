@@ -89,9 +89,7 @@ class CslResolverThread : public wxThread
             m_condition=new wxCondition(m_mutex);
             m_ok=Create()==wxTHREAD_NO_ERROR;
         }
-        ~CslResolverThread() { delete m_condition; }
-
-        virtual ExitCode Entry();
+        virtual ~CslResolverThread() { delete m_condition; }
 
         bool IsOk() { return m_ok; }
         void AddPacket(CslResolverPacket *packet);
@@ -107,6 +105,9 @@ class CslResolverThread : public wxThread
         wxCriticalSection m_section;
         vector<CslResolverPacket*> m_packets;
         wxIPV4address m_addr;
+
+    protected:
+        virtual wxThread::ExitCode Entry();
 };
 
 

@@ -228,7 +228,7 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
             TreeAddGame(game,icon ? i+1:-1,select);
         }
 
-        CslMenu::EnableMenuItem(MENU_ADD);
+        CslMenu::EnableItem(MENU_ADD);
 
         m_ipcServer=new CslIpcServer(this);
         if (!m_ipcServer->Create(CSL_IPC_SERV))
@@ -545,13 +545,13 @@ void CslFrame::DoLayout()
     if (pane->IsOk())
     {
         pane->Caption(CSL_CAPTION_GAMES);
-        CslMenu::CheckMenuItem(MENU_VIEW_GAMES,pane->IsShown());
+        CslMenu::CheckItem(MENU_VIEW_GAMES,pane->IsShown());
     }
     pane=&m_AuiMgr.GetPane(list_ctrl_info);
     if (pane->IsOk())
     {
         pane->Caption(CSL_CAPTION_SERVER_INFO);
-        CslMenu::CheckMenuItem(MENU_VIEW_SERVER_INFO,pane->IsShown());
+        CslMenu::CheckItem(MENU_VIEW_SERVER_INFO,pane->IsShown());
     }
     pane=&m_AuiMgr.GetPane(list_ctrl_master);
     if (pane->IsOk())
@@ -560,31 +560,31 @@ void CslFrame::DoLayout()
     if (pane->IsOk())
     {
         pane->Caption(CSL_CAPTION_FAVOURITE_LIST_SERVERS);
-        CslMenu::CheckMenuItem(MENU_VIEW_FAVOURITES,pane->IsShown());
+        CslMenu::CheckItem(MENU_VIEW_FAVOURITES,pane->IsShown());
     }
     pane=&m_AuiMgr.GetPane(player_info);
     if (pane->IsOk())
     {
         pane->Caption(CSL_CAPTION_PLAYERS_SELECTED);
-        CslMenu::CheckMenuItem(MENU_VIEW_PLAYER_LIST,pane->IsShown());
+        CslMenu::CheckItem(MENU_VIEW_PLAYER_LIST,pane->IsShown());
     }
     pane=&m_AuiMgr.GetPane(list_ctrl_player_search);
     if (pane->IsOk())
     {
         pane->Caption(CSL_CAPTION_PLAYER_SEARCH);
-        CslMenu::CheckMenuItem(MENU_VIEW_PLAYER_SEARCH,pane->IsShown());
+        CslMenu::CheckItem(MENU_VIEW_PLAYER_SEARCH,pane->IsShown());
     }
     pane=&m_AuiMgr.GetPane(pane_country);
     if (pane->IsOk())
     {
         pane->Caption(CSL_CAPTION_PLAYER_COUNTRY);
-        CslMenu::CheckMenuItem(MENU_VIEW_COUNTRY,pane->IsShown());
+        CslMenu::CheckItem(MENU_VIEW_COUNTRY,pane->IsShown());
     }
     pane=&m_AuiMgr.GetPane(notebook_irc);
     if (pane->IsOk())
     {
         pane->Caption(CSL_CAPTION_IRC);
-        CslMenu::CheckMenuItem(MENU_VIEW_USER_CHAT,pane->IsShown());
+        CslMenu::CheckItem(MENU_VIEW_USER_CHAT,pane->IsShown());
     }
 
     SetListCaption(CslListCtrlServer::CSL_LIST_MASTER);
@@ -785,7 +785,7 @@ void CslFrame::TogglePane(wxInt32 id,bool forceShow)
         return;
 
     pane->Show(!shown);
-    CslMenu::CheckMenuItem(id,!shown);
+    CslMenu::CheckItem(id,!shown);
 
     m_AuiMgr.Update();
 }
@@ -1112,7 +1112,7 @@ void CslFrame::UpdateMaster()
 
     m_timer.Stop();
 
-    CslMenu::EnableMenuItem(MENU_UPDATE,false);
+    CslMenu::EnableItem(MENU_UPDATE,false);
     tree_ctrl_games->Enable(false);
 
     CslGame *game=master->GetGame();
@@ -1177,7 +1177,7 @@ void CslFrame::UpdateMaster()
         SetStatusText(wxString::Format(_("Got %d servers from master"),num),1);
     }
 
-    CslMenu::EnableMenuItem(MENU_UPDATE);
+    CslMenu::EnableItem(MENU_UPDATE);
     tree_ctrl_games->Enable();
 
     m_timerInit=true;
@@ -2110,8 +2110,8 @@ void CslFrame::OnTreeSelChanged(wxTreeEvent& event)
 
     if (!game)
     {
-        CslMenu::EnableMenuItem(MENU_DEL);
-        CslMenu::EnableMenuItem(MENU_UPDATE);
+        CslMenu::EnableItem(MENU_DEL);
+        CslMenu::EnableItem(MENU_UPDATE);
 
         servers=&master->GetServers();
 
@@ -2125,8 +2125,8 @@ void CslFrame::OnTreeSelChanged(wxTreeEvent& event)
     }
     else
     {
-        CslMenu::EnableMenuItem(MENU_DEL,false);
-        CslMenu::EnableMenuItem(MENU_UPDATE,false);
+        CslMenu::EnableItem(MENU_DEL,false);
+        CslMenu::EnableItem(MENU_UPDATE,false);
         servers=&game->GetServers();
     }
 
@@ -2155,13 +2155,13 @@ void CslFrame::OnTreeRightClick(wxTreeEvent& event)
     if (master)
     {
         bool b=master->GetGame()->GetDefaultMasterConnection()==master->GetConnection();
-        CslMenu::EnableMenuItem(MENU_DEL,!b);
-        CslMenu::EnableMenuItem(MENU_UPDATE);
+        CslMenu::EnableItem(MENU_DEL,!b);
+        CslMenu::EnableItem(MENU_UPDATE);
     }
     else
     {
-        CslMenu::EnableMenuItem(MENU_DEL,false);
-        CslMenu::EnableMenuItem(MENU_UPDATE,false);
+        CslMenu::EnableItem(MENU_DEL,false);
+        CslMenu::EnableItem(MENU_UPDATE,false);
     }
 
     PopupMenu(menuMaster);
@@ -2387,7 +2387,7 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
 
         case CSL_BUTTON_SEARCH_CLOSE:
             g_cslSettings->showSearch=false;
-            CslMenu::CheckMenuItem(MENU_VIEW_SEARCH,false);
+            CslMenu::CheckItem(MENU_VIEW_SEARCH,false);
             ToggleSearchBar();
             break;
 
@@ -2727,7 +2727,7 @@ void CslFrame::OnClose(wxCloseEvent& event)
     }
     else if (event.GetEventObject()==m_outputDlg)
     {
-        CslMenu::CheckMenuItem(MENU_VIEW_OUTPUT,false);
+        CslMenu::CheckItem(MENU_VIEW_OUTPUT,false);
         return;
     }
     else if (event.GetEventObject()==m_trafficDlg)
@@ -2779,7 +2779,7 @@ void CslFrame::OnPaneClose(wxAuiManagerEvent& event)
                     info->PingExt(false);
                 if (i==0)
                 {
-                    CslMenu::CheckMenuItem(MENU_VIEW_PLAYER_LIST,false);
+                    CslMenu::CheckItem(MENU_VIEW_PLAYER_LIST,false);
                     m_playerInfos[i]->ServerInfo(NULL);
                 }
                 else
@@ -2789,19 +2789,19 @@ void CslFrame::OnPaneClose(wxAuiManagerEvent& event)
         }
     }
     else if (event.pane->name==wxT("games"))
-        CslMenu::CheckMenuItem(MENU_VIEW_GAMES,false);
+        CslMenu::CheckItem(MENU_VIEW_GAMES,false);
     else if (event.pane->name==wxT("info"))
-        CslMenu::CheckMenuItem(MENU_VIEW_SERVER_INFO,false);
+        CslMenu::CheckItem(MENU_VIEW_SERVER_INFO,false);
     else if (event.pane->name==wxT("playerlist"))
-        CslMenu::CheckMenuItem(MENU_VIEW_PLAYER_LIST,false);
+        CslMenu::CheckItem(MENU_VIEW_PLAYER_LIST,false);
     else if (event.pane->name==wxT("search"))
-        CslMenu::CheckMenuItem(MENU_VIEW_PLAYER_SEARCH,false);
+        CslMenu::CheckItem(MENU_VIEW_PLAYER_SEARCH,false);
     else if (event.pane->name==wxT("country"))
-        CslMenu::CheckMenuItem(MENU_VIEW_COUNTRY,false);
+        CslMenu::CheckItem(MENU_VIEW_COUNTRY,false);
     else if (event.pane->name==wxT("irc"))
-        CslMenu::CheckMenuItem(MENU_VIEW_USER_CHAT,false);
+        CslMenu::CheckItem(MENU_VIEW_USER_CHAT,false);
     else if (event.pane->name==wxT("favlist"))
-        CslMenu::CheckMenuItem(MENU_VIEW_FAVOURITES,false);
+        CslMenu::CheckItem(MENU_VIEW_FAVOURITES,false);
 }
 
 void CslFrame::OnMouseEnter(wxMouseEvent& event)

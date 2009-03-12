@@ -948,7 +948,7 @@ void CslEngine::CheckResends()
             {
                 if (info->Ping>m_updateInterval ||
                     stats.m_lastPong<stats.m_lastPing ||
-                    GetTicks()-stats.m_lastPong<min((wxUint32)info->Ping*2,500))
+                    GetTicks()-stats.m_lastPong<(wxUint32)min(info->Ping*2,500))
                     continue;
 
 #ifdef __WXDEBUG__

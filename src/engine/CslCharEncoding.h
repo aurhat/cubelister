@@ -18,48 +18,59 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef CSLVERSIONCHECK_H
-#define CSLVERSIONCHECK_H
+#ifndef CSLCHARENCODING_H
+#define CSLCHARENCODING_H
 
-/**
-    @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
-
-#include <wx/wxprec.h>
+#include "wx/wxprec.h"
 #ifdef __BORLANDC__
 #pragma hdrstop
-#endif
+#endif // __BORLANDC__
 #ifndef WX_PRECOMP
-#include <wx/wx.h>
-#endif
-#include "engine/CslVersion.h"
+#include "wx/wx.h"
+#endif // WX_PRECOMP
 
+/**
+ @author Glen Masgai <mimosius@users.sourceforge.net>
+*/
 
-BEGIN_DECLARE_EVENT_TYPES()
-DECLARE_EVENT_TYPE(wxCSL_EVT_VERSIONCHECK,wxID_ANY)
-END_DECLARE_EVENT_TYPES()
-
-#define CSL_EVT_VERSIONCHECK(id,fn) \
-    DECLARE_EVENT_TABLE_ENTRY( \
-                               wxCSL_EVT_VERSIONCHECK,id,wxID_ANY, \
-                               (wxObjectEventFunction)(wxEventFunction) \
-                               wxStaticCastEvent(wxCommandEventFunction,&fn), \
-                               (wxObject*)NULL \
-                             ),
-
-
-class CslVersionCheckThread : public wxThread
+#define CSL_NUM_CHAR_ENCODINGS (sizeof(CslCharEncodings)/sizeof(CslCharEncodings[0]))
+static struct { const wxChar *Encoding,*Name; } CslCharEncodings[] =
 {
-    public:
-        CslVersionCheckThread(wxEvtHandler *evtHandler);
-
-        bool IsOk() { return m_ok; }
-
-    protected:
-        bool m_ok;
-        wxEvtHandler *m_evtHandler;
-
-        virtual ExitCode Entry();
+    { wxT("UTF-8"),       _("Default")           },
+    { wxT("ISO-8859-2"),  _("Central European ") },
+    { wxT("ISO-8859-3"),  _("Central European ") },
+    { wxT("cp 1250"),     _("Central European ") },
+    { wxT("cp 1251"),     _("Cyrillic") },
+    { wxT("ISO-8859-5"),  _("Cyrillic") },
+    { wxT("koi8-r"),      _("Cyrillic") },
+    { wxT("koi8-u"),      _("Cyrillic") },
+    { wxT("ISO-8859-1"),  _("Western European ") },
+    { wxT("ISO-8859-15"), _("Western European ") },
+    { wxT("cp 1252"),     _("Western European ") },
 };
 
-#endif //CSLVERSIONCHECK_H
+
+class CslCharEncoding
+{
+    public:
+        CslCharEncoding(bool utf8=true,const wxString& name=wxEmptyString);
+        ~CslCharEncoding();
+
+        bool SetEncoding(const wxString& name);
+        const wxString& GetEncoding() const { return m_name; }
+        wxUint32 GetEncodingId() const;
+
+        wxString ToLocal(const char *data);
+        wxCharBuffer ToServer(const wxString& str);
+
+    private:
+        bool m_utf8;
+        wxUint32 id;
+        wxString m_name;
+        wxCSConv *m_conv;
+
+    protected:
+        wxChar* ConvToLocalBuffer(const char *data,wxMBConv& conv);
+};
+
+#endif //CSLCHARENCODING_H

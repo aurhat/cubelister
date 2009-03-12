@@ -27,22 +27,30 @@ CslMenu::CslMenu(wxMenuBar *menuBar)
 {
     m_menuBar=menuBar;
 
-    EnableMenuItem(MENU_ADD,false);
-    EnableMenuItem(MENU_DEL,false);
-    EnableMenuItem(MENU_UPDATE,false);
+    EnableItem(MENU_ADD,false);
+    EnableItem(MENU_DEL,false);
+    EnableItem(MENU_UPDATE,false);
 
-    CheckMenuItem(MENU_VIEW_SEARCH,g_cslSettings->showSearch);
-    CheckMenuItem(MENU_VIEW_AUTO_SORT,g_cslSettings->autoSortColumns);
+    EnableItem(MENU_VIEW_SEARCH,g_cslSettings->showSearch);
+    EnableItem(MENU_VIEW_AUTO_SORT,g_cslSettings->autoSortColumns);
 }
 
-void CslMenu::EnableMenuItem(const wxInt32 id,const bool enable)
+void CslMenu::EnableItem(wxInt32 id,bool enable)
 {
     m_menuBar->Enable(id,enable);
 }
 
-void CslMenu::CheckMenuItem(const wxInt32 id,const bool check)
+void CslMenu::CheckItem(wxInt32 id,bool check)
 {
     m_menuBar->Check(id,check);
+}
+
+void CslMenu::CheckItem(wxMenu& menu,wxInt32 id,bool check)
+{
+    wxMenuItem *item;
+
+    if ((item=menu.FindItem(id)))
+        item->Check(check);
 }
 
 wxMenuItem& CslMenu::AddItem(wxMenu *menu,const wxInt32 id,
