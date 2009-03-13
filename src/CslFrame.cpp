@@ -1224,8 +1224,8 @@ void CslFrame::LoadSettings()
     wxUint32 version;
     wxString s;
 
-    wxFileConfig config(wxEmptyString,wxEmptyString,CSL_SETTINGS_FILE,
-                        wxEmptyString,wxCONFIG_USE_LOCAL_FILE);
+    wxFileConfig config(wxT(""),wxT(""),CSL_SETTINGS_FILE,wxT(""),
+                        wxCONFIG_USE_LOCAL_FILE,*wxConvCurrent);
 
     config.SetPath(wxT("/Version"));
     config.Read(wxT("Version"),&val,0); version=val;
@@ -1358,8 +1358,8 @@ void CslFrame::SaveSettings()
     if (!::wxDirExists(::wxPathOnly(dir)))
         ::wxMkdir(dir,0700);
 
-    wxFileConfig config(wxEmptyString,wxEmptyString,CSL_SETTINGS_FILE,
-                        wxEmptyString,wxCONFIG_USE_LOCAL_FILE);
+    wxFileConfig config(wxT(""),wxT(""),CSL_SETTINGS_FILE,wxT(""),
+                        wxCONFIG_USE_LOCAL_FILE,*wxConvCurrent);
     config.SetUmask(0077);
     config.DeleteAll();
 
@@ -1458,8 +1458,8 @@ bool CslFrame::LoadServers(wxUint32 *numm,wxUint32 *nums)
     wxUint32 connectedTimes=0;
     wxInt32 gt;
 
-    wxFileConfig config(wxEmptyString,wxEmptyString,CSL_SERVERS_FILE,
-                        wxEmptyString,wxCONFIG_USE_LOCAL_FILE);
+    wxFileConfig config(wxT(""),wxT(""),CSL_SERVERS_FILE,wxT(""),
+                        wxCONFIG_USE_LOCAL_FILE,*wxConvCurrent);
 
     vector<CslGame*>& games=m_engine->GetGames();
 
@@ -1622,8 +1622,8 @@ void CslFrame::SaveServers()
         if (!::wxMkdir(s,0700))
             return;
 
-    wxFileConfig config(wxEmptyString,wxEmptyString,CSL_SERVERS_FILE,
-                        wxEmptyString,wxCONFIG_USE_LOCAL_FILE);
+    wxFileConfig config(wxT(""),wxT(""),CSL_SERVERS_FILE,wxT(""),
+                        wxCONFIG_USE_LOCAL_FILE,*wxConvCurrent);
     config.SetUmask(0077);
     config.DeleteAll();
 
@@ -1716,8 +1716,8 @@ wxUint32 CslFrame::LoadLocators()
     wxUint32 version,i=0;
     wxString Name,Host,Path;
 
-    wxFileConfig config(wxEmptyString,wxEmptyString,CSL_LOCATORS_FILE,
-                        wxEmptyString,wxCONFIG_USE_LOCAL_FILE);
+    wxFileConfig config(wxT(""),wxT(""),CSL_LOCATORS_FILE,wxT(""),
+                        wxCONFIG_USE_LOCAL_FILE,*wxConvCurrent);
 
     config.SetPath(wxT("/Version"));
     config.Read(wxT("Version"),&val,0); version=val;
@@ -1745,8 +1745,8 @@ void CslFrame::SaveLocators()
         if (!::wxMkdir(s,0700))
             return;
 
-    wxFileConfig config(wxEmptyString,wxEmptyString,CSL_LOCATORS_FILE,
-                        wxEmptyString,wxCONFIG_USE_LOCAL_FILE);
+    wxFileConfig config(wxT(""),wxT(""),CSL_LOCATORS_FILE,wxT(""),
+                        wxCONFIG_USE_LOCAL_FILE,*wxConvCurrent);
     config.SetUmask(0077);
     config.DeleteAll();
 

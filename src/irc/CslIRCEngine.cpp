@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <errno.h>
 #include <wx/tokenzr.h>
 #include "CslIRCEngine.h"
 #include "engine/CslVersion.h"
@@ -325,8 +326,6 @@ void event_numeric(irc_session_t *session,unsigned int event,const char *origin,
     wxPostEvent(context->EvtHandler,evt);
 }
 
-
-#include <errno.h>
 
 CslIrcThread::CslIrcThread() :
         wxThread(wxTHREAD_JOINABLE),m_condition(NULL),m_terminate(false),m_ok(false)

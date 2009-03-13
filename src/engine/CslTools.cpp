@@ -127,7 +127,7 @@ wxUint32 IP2Int(const wxString& s)
 {
     wxString m;
     long unsigned int ul;
-    wxUint32 i=0,ip=0,l=s.Len(),mult=0x1000000;
+    wxUint32 i=0,ip=0,l=(wxUint32)s.Len(),mult=0x1000000;
 
     for (;i<=l;i++)
     {

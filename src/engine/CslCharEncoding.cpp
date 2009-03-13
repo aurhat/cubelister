@@ -20,8 +20,6 @@
 
 #include "CslTools.h"
 
-#define CSL_CHAR_ENCODING_DEBUG  (__WXDEBUG__ && 1)
-
 CslCharEncoding CslDefaultCharEncoding;
 
 
@@ -87,7 +85,7 @@ wxString CslCharEncoding::ToLocal(const char *data)
             delete[] buffer;
             return s;
         }
-#if CSL_CHAR_ENCODING_DEBUG
+#ifdef __WXDEBUG__
         fprintf(stderr,"Invalid UTF-8 sequence: %s\n",data);
 #endif
     }
@@ -101,7 +99,7 @@ wxString CslCharEncoding::ToLocal(const char *data)
             delete[] buffer;
             return s;
         }
-#if CSL_CHAR_ENCODING_DEBUG
+#ifdef __WXDEBUG__
         fprintf(stderr,"Invalid %s sequence: %s\n",U2A(m_name),data);
 #endif
     }
@@ -114,7 +112,7 @@ wxString CslCharEncoding::ToLocal(const char *data)
         delete[] buffer;
         return s;
     }
-#if CSL_CHAR_ENCODING_DEBUG
+#ifdef __WXDEBUG__
     fprintf(stderr,"Invalid ISO-8859-15 sequence: %s\n",data);
 #endif
 
@@ -137,7 +135,7 @@ wxCharBuffer CslCharEncoding::ToServer(const wxString& str)
 #endif
         if (buffer)
             return buffer;
-#if CSL_CHAR_ENCODING_DEBUG
+#ifdef __WXDEBUG__
         fprintf(stderr,"Conversion failed.\n");
 #endif
     }
@@ -154,7 +152,7 @@ wxCharBuffer CslCharEncoding::ToServer(const wxString& str)
 #endif
         if (buffer)
             return buffer;
-#if CSL_CHAR_ENCODING_DEBUG
+#ifdef __WXDEBUG__
         fprintf(stderr,"Conversion to UTF-8 failed.\n");
 #endif
     }
