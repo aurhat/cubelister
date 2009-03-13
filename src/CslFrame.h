@@ -83,12 +83,10 @@ class CslFrame: public wxFrame
         wxBitmapButton *button_search_clear;
         wxGauge *gauge_search;
         wxRadioButton *radio_search_server,*radio_search_player;
-        wxMenuBar *menubar;
         wxMenu *menuMaster;
 
         wxString m_defaultLayout;
 
-        CslMenu *m_menu;
         wxImageList m_imgListTree;
         wxImageList m_imgListButton;
         wxTreeItemId m_treeGamesRoot;

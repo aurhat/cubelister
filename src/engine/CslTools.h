@@ -61,18 +61,6 @@
 #define LOCALEPATH wxString(wxT(LOCALEDIR))+wxString(PATHDIV)
 #endif //DATADIR
 
-extern CslCharEncoding CslDefaultCharEncoding;
-//#define A2U(PSZA_CHART) wxString(wxConvertMB2WX(PSZA_CHART))
-//#define U2A(PSZT_CHART) (char*)(const char*)wxConvertWX2MB(PSZT_CHART)
-#define A2U(PSZA_CHART) CslDefaultCharEncoding.ToLocal(PSZA_CHART)
-#define U2A(PSZT_CHART) (const char*)CslDefaultCharEncoding.ToServer(PSZT_CHART)
-
-#if wxCHECK_VERSION(2,9,0)
-#define T2C(x) x.c_str()
-#else
-#define T2C(x) x
-#endif
-
 #define COLOUR2INT(col) ((col.Red()<<16)|(col.Green()<<8)|col.Blue())
 #define INT2COLOUR(int) wxColour((int>>16)&0xFF,(int>>8)&0xFF,int&0xFF)
 

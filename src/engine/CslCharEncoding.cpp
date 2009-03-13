@@ -37,10 +37,10 @@ CslCharEncoding::~CslCharEncoding()
 
 bool CslCharEncoding::SetEncoding(const wxString& name)
 {
+    m_name.Empty();
+
     if (m_conv)
     {
-        m_name.Empty();
-
         delete m_conv;
         m_conv=NULL;
     }
@@ -85,23 +85,19 @@ wxString CslCharEncoding::ToLocal(const char *data)
             delete[] buffer;
             return s;
         }
-#ifdef __WXDEBUG__
-        fprintf(stderr,"Invalid UTF-8 sequence: %s\n",data);
-#endif
+        LOG_DEBUG("Invalid UTF-8 sequence: %s\n",data);
     }
 
     if (m_conv)
     {
-        LOG_DEBUG("trying '%s'\n",U2A(m_name));
+        LOG_DEBUG("trying '%s'\n",m_name.mb_str(wxConvLocal));
         if ((buffer=ConvToLocalBuffer(data,*m_conv)))
         {
             s=buffer;
             delete[] buffer;
             return s;
         }
-#ifdef __WXDEBUG__
-        fprintf(stderr,"Invalid %s sequence: %s\n",U2A(m_name),data);
-#endif
+        LOG_DEBUG("Invalid %s sequence: %s\n",m_name.mb_str(wxConvLocal),data);
     }
 
     wxCSConv conv(wxT("ISO-8859-15"));
@@ -112,9 +108,7 @@ wxString CslCharEncoding::ToLocal(const char *data)
         delete[] buffer;
         return s;
     }
-#ifdef __WXDEBUG__
-    fprintf(stderr,"Invalid ISO-8859-15 sequence: %s\n",data);
-#endif
+    LOG_DEBUG("Invalid ISO-8859-15 sequence: %s\n",data);
 
     return wxConvCurrent->cMB2WX(data);
 }
@@ -135,9 +129,8 @@ wxCharBuffer CslCharEncoding::ToServer(const wxString& str)
 #endif
         if (buffer)
             return buffer;
-#ifdef __WXDEBUG__
-        fprintf(stderr,"Conversion failed.\n");
-#endif
+
+        LOG_DEBUG("Conversion to %s failed.\n",m_name.mb_str(wxConvLocal));
     }
 
     if (m_utf8)
@@ -152,9 +145,8 @@ wxCharBuffer CslCharEncoding::ToServer(const wxString& str)
 #endif
         if (buffer)
             return buffer;
-#ifdef __WXDEBUG__
-        fprintf(stderr,"Conversion to UTF-8 failed.\n");
-#endif
+
+        LOG_DEBUG("Conversion to UTF-8 failed.\n");
     }
 
     if (!(buffer=wxConvCurrent->cWX2MB(str)))

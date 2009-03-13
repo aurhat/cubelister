@@ -21,28 +21,45 @@
 
 #include "CslMenu.h"
 
-wxMenuBar* CslMenu::m_menuBar=NULL;
 
-CslMenu::CslMenu(wxMenuBar *menuBar)
+CslMenu::CslMenu() : m_mainMenu(NULL)
 {
-    m_menuBar=menuBar;
+}
 
-    EnableItem(MENU_ADD,false);
-    EnableItem(MENU_DEL,false);
-    EnableItem(MENU_UPDATE,false);
+CslMenu& CslMenu::GetInstance()
+{
+    static CslMenu menu;
+    return menu;
+}
 
-    EnableItem(MENU_VIEW_SEARCH,g_cslSettings->showSearch);
-    EnableItem(MENU_VIEW_AUTO_SORT,g_cslSettings->autoSortColumns);
+void CslMenu::SetMainMenu(wxMenuBar *menu)
+{
+    CslMenu& self=GetInstance();
+    self.m_mainMenu=menu;
 }
 
 void CslMenu::EnableItem(wxInt32 id,bool enable)
 {
-    m_menuBar->Enable(id,enable);
+    CslMenu& self=GetInstance();
+
+    if (self.m_mainMenu)
+        self.m_mainMenu->Enable(id,enable);
+}
+
+void CslMenu::EnableItem(wxMenu& menu,wxInt32 id,bool enable)
+{
+    wxMenuItem *item;
+
+    if ((item=menu.FindItem(id)))
+        item->Enable(enable);
 }
 
 void CslMenu::CheckItem(wxInt32 id,bool check)
 {
-    m_menuBar->Check(id,check);
+    CslMenu& self=GetInstance();
+
+    if (self.m_mainMenu)
+        self.m_mainMenu->Check(id,check);
 }
 
 void CslMenu::CheckItem(wxMenu& menu,wxInt32 id,bool check)

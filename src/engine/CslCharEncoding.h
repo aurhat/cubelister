@@ -33,6 +33,21 @@
  @author Glen Masgai <mimosius@users.sourceforge.net>
 */
 
+class CslCharEncoding;
+
+extern CslCharEncoding CslDefaultCharEncoding;
+//#define A2U(PSZA_CHART) wxString(wxConvertMB2WX(PSZA_CHART))
+//#define U2A(PSZT_CHART) (char*)(const char*)wxConvertWX2MB(PSZT_CHART)
+#define A2U(PSZA_CHART) CslDefaultCharEncoding.ToLocal(PSZA_CHART)
+#define U2A(PSZT_CHART) (const char*)CslDefaultCharEncoding.ToServer(PSZT_CHART)
+
+#if wxCHECK_VERSION(2,9,0)
+#define T2C(x) x.c_str()
+#else
+#define T2C(x) x
+#endif
+
+
 #define CSL_NUM_CHAR_ENCODINGS (sizeof(CslCharEncodings)/sizeof(CslCharEncodings[0]))
 static struct { const wxChar *Encoding,*Name; } CslCharEncodings[] =
 {
@@ -40,10 +55,12 @@ static struct { const wxChar *Encoding,*Name; } CslCharEncodings[] =
     { wxT("ISO-8859-2"),  _("Central European ") },
     { wxT("ISO-8859-3"),  _("Central European ") },
     { wxT("cp 1250"),     _("Central European ") },
-    { wxT("cp 1251"),     _("Cyrillic") },
-    { wxT("ISO-8859-5"),  _("Cyrillic") },
-    { wxT("koi8-r"),      _("Cyrillic") },
-    { wxT("koi8-u"),      _("Cyrillic") },
+    { wxT("cp 1251"),     _("Cyrillic")          },
+    { wxT("ISO-8859-5"),  _("Cyrillic")          },
+    { wxT("koi8-r"),      _("Cyrillic")          },
+    { wxT("koi8-u"),      _("Cyrillic")          },
+    { wxT("cp 1254"),     _("Turkish")           },
+    { wxT("ISO-8859-9"),  _("Turkish")           },
     { wxT("ISO-8859-1"),  _("Western European ") },
     { wxT("ISO-8859-15"), _("Western European ") },
     { wxT("cp 1252"),     _("Western European ") },

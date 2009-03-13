@@ -290,8 +290,6 @@ CslFrame::~CslFrame()
 
     delete g_cslSettings;
 
-    delete m_menu;
-
 #ifndef __WXMAC__
     if (m_tbIcon)
         delete m_tbIcon;
@@ -309,8 +307,8 @@ CslFrame::~CslFrame()
 void CslFrame::CreateMainMenu()
 {
     wxMenu *menu;
+    wxMenuBar *menubar=new wxMenuBar();
 
-    menubar=new wxMenuBar();
     // Do not add the File menu on wxMAC, since Preferences and Exit are
     // getting moved to the "Mac menu" so the File menu is empty then.
     // Add Prefernces and Exit to any other menu.
@@ -370,7 +368,14 @@ void CslFrame::CreateMainMenu()
 #endif
 
     SetMenuBar(menubar);
-    m_menu=new CslMenu(menubar);
+
+    CslMenu::SetMainMenu(menubar);
+
+    CslMenu::EnableItem(MENU_ADD,false);
+    CslMenu::EnableItem(MENU_DEL,false);
+    CslMenu::EnableItem(MENU_UPDATE,false);
+    CslMenu::EnableItem(MENU_VIEW_SEARCH,g_cslSettings->showSearch);
+    CslMenu::EnableItem(MENU_VIEW_AUTO_SORT,g_cslSettings->autoSortColumns);
 }
 
 void CslFrame::CreateControls()

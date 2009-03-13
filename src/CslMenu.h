@@ -257,7 +257,7 @@ enum
 #define CSL_MENU_EVENT_IS_NOTIFY(_id)    (_id>=MENU_SERVER_NOTIFY_RESET && _id<=MENU_SERVER_NOTIFY_PRIVATE)
 #define CSL_MENU_EVENT_IS_FILTER(_id)    (_id>=MENU_SERVER_FILTER_OFF && _id<=MENU_SERVER_FILTER_VER)
 #define CSL_MENU_EVENT_IS_LOCATION(_id)  (_id>=MENU_SERVER_LOCATION && \
-                                          _id<(wxInt32)(MENU_SERVER_LOCATION+CslGeoIP::GetServices().GetCount()))
+        _id<(wxInt32)(MENU_SERVER_LOCATION+CslGeoIP::GetServices().GetCount()))
 #define CSL_MENU_EVENT_IS_SAVEIMAGE(_id) (_id==MENU_SAVEIMAGE)
 
 
@@ -304,9 +304,9 @@ enum
 class CslMenu
 {
     public:
-        CslMenu(wxMenuBar *menuBar);
-
+        static void SetMainMenu(wxMenuBar *menu);
         static void EnableItem(wxInt32 id,bool enable=true);
+        static void EnableItem(wxMenu& menu,wxInt32 id,bool enable=true);
         static void CheckItem(wxInt32 id,bool check=true);
         static void CheckItem(wxMenu& menu,wxInt32 id,bool check=true);
 
@@ -315,8 +315,13 @@ class CslMenu
                                    const wxArtID& art=wxART_NONE,
                                    const wxItemKind kind=wxITEM_NORMAL,
                                    const wxString& help=wxEmptyString);
-    protected:
-        static wxMenuBar *m_menuBar;
+
+    private:
+        CslMenu();
+        CslMenu(const CslMenu& menu) {}
+        static CslMenu& GetInstance();
+
+        wxMenuBar *m_mainMenu;
 };
 
 
