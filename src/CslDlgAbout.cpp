@@ -153,6 +153,13 @@ void CslDlgAbout::set_properties()
                      _L_"  Dutch: 'ZuurKool'\n\n"
                  ))+
         wxString(_(
+                     "Testing and support:\n"
+                 ))+
+        wxString(wxT(
+                     "  }TC{ clan\n"
+                     _L_"  'grenadier'\n\n"
+                 ))+
+        wxString(_(
                      "Previous extended info server patches:\n"
                  ))+
         wxString(wxT(

@@ -351,7 +351,7 @@ wxString CslGameSauerbraten::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
     opts.Prepend(wxT("-q")+path+wxT(" "));
 #endif //__WXMSW__
 
-    if (info->MM==MM_PRIVATE)
+    if (info->Protocol>=257 || info->MM==MM_PRIVATE)
         param=true;
     else if (info->MM!=MM_LOCKED &&
              (info->Map.IsEmpty() ||
