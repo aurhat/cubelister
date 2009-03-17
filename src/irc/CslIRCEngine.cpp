@@ -725,7 +725,7 @@ bool CslIrcSession::LeaveChannel(const wxString& name,const wxString& reason)
     wxString command=wxT("PART ")+channel->Name;
 
     if (!reason.IsEmpty())
-        command<<wxT(" ")<<reason;
+        command<<wxT(" :")<<reason;
 
     return SendRawCommand(command);
 }

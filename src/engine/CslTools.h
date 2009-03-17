@@ -25,11 +25,16 @@
     @author Glen Masgai <mimosius@users.sourceforge.net>
 */
 
+#include <wx/wxprec.h>
+#ifdef __BORLANDC__
+#pragma hdrstop
+#endif
+#ifndef WX_PRECOMP
+#include <wx/wx.h>
+#endif
 #include <wx/file.h>
 #include <wx/stdpaths.h>
 #include <wx/stopwatch.h>
-#include <wx/bitmap.h>
-#include <wx/window.h>
 #include "CslCharEncoding.h"
 #include "cube_tools.h"
 

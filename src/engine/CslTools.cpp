@@ -18,13 +18,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <wx/wxprec.h>
-#ifdef __BORLANDC__
-#pragma hdrstop
-#endif
-#ifndef WX_PRECOMP
-#include <wx/wx.h>
-#endif
 #include <wx/platinfo.h>
 #include <wx/regex.h>
 #include "CslVersion.h"

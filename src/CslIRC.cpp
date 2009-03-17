@@ -351,8 +351,12 @@ void CslIrcPanel::OnCommandEvent(wxCommandEvent& event)
         {
             if (id>=MENU_ENCODING_START && id<MENU_ENCODING_END)
             {
+                if (!m_session)
+                    break;
+
                 wxString s=CslCharEncodings[id-MENU_ENCODING_START].Encoding;
                 CslIrcChannel *channel=m_session->FindChannel(m_channel);
+
                 if (channel)
                     channel->Encoding.SetEncoding(s);
                 m_channel.Encoding.SetEncoding(s);
@@ -396,7 +400,6 @@ void CslIrcPanel::OnContextMenu(wxContextMenuEvent& event)
     //from keyboard
     if (point==wxDefaultPosition)
         point=wxGetMousePosition();
-
 
     sub=new wxMenu;
     item=menu.AppendSubMenu(sub,_("Character encodings"));
@@ -1033,7 +1036,6 @@ void CslIrcPanel::AddLine(const wxString& line,bool scroll)
             if (f<0)
             {
                 fg=-1;
-                wxColour colour=basic.GetTextColour();
                 attr.SetTextColour(basic.GetTextColour());
             }
             else
@@ -1276,7 +1278,7 @@ void CslIrcPanel::HandleInput(const wxString& text)
 
             tkz.GetNextToken();
             channel=tkz.GetNextToken();
-            reason=tkz.GetNextToken();
+            reason=tkz.GetString();
 
             if (channel.IsEmpty())
             {
@@ -1304,7 +1306,7 @@ void CslIrcPanel::HandleInput(const wxString& text)
             wxStringTokenizer tkz(text,wxT(" \t"));
 
             tkz.GetNextToken();
-            reason=tkz.GetNextToken();
+            reason=tkz.GetString();
 
             if (m_session)
             {
