@@ -18,18 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <wx/wxprec.h>
-#ifdef __BORLANDC__
-#pragma hdrstop
-#endif
-#ifndef WX_PRECOMP
-#include <wx/wx.h>
-#endif
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif //HAVE_CONFIG_H
+#include "Csl.h"
 #include "CslGeoIP.h"
-#include "engine/CslTools.h"
 
 
 CslGeoIP::CslGeoIP()

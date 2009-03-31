@@ -18,11 +18,11 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <wx/wupdlock.h>
-#include "CslListCtrlCountry.h"
+#include "Csl.h"
+#include "engine/CslGame.h"
 #include "CslMenu.h"
 #include "CslGeoIP.h"
-#include "engine/CslTools.h"
+#include "CslListCtrlCountry.h"
 
 enum
 {

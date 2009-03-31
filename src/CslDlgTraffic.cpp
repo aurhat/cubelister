@@ -18,13 +18,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "CslDlgTraffic.h"
+#include "Csl.h"
 #include "engine/CslEngine.h"
-#include "engine/CslTools.h"
-
-// begin wxGlade: ::extracode
-
-// end wxGlade
+#include "CslDlgTraffic.h"
 
 
 BEGIN_EVENT_TABLE(CslDlgTraffic,wxDialog)

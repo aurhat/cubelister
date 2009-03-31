@@ -26,7 +26,7 @@
 */
 
 #include "CslListCtrl.h"
-#include "engine/CslGame.h"
+
 
 class CslPlayerSearchEntry
 {

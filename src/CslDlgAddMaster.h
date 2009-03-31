@@ -25,12 +25,6 @@
  @author Glen Masgai <mimosius@users.sourceforge.net>
 */
 
-#include <wx/wx.h>
-#include <wx/image.h>
-// begin wxGlade: ::dependencies
-#include <wx/spinctrl.h>
-// end wxGlade
-
 
 class CslDlgAddMaster: public wxDialog
 {

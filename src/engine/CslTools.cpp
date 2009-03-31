@@ -18,10 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <wx/platinfo.h>
-#include <wx/regex.h>
-#include "CslVersion.h"
-#include "CslTools.h"
+#include "Csl.h"
 
 wxString g_basePath;
 
@@ -70,7 +67,7 @@ void FixString(char *src,wxUint32 *len,wxUint32 count,bool keepnl)
 void FixFilename(wxString& name)
 {
     wxUint32 i,j;
-    wxString exclude=wxT("\\/:*?\"<>| ");
+    static wxString exclude=wxT("\\/:*?\"<>| ");
 
     for (i=0;i<name.Length();i++)
         for (j=0;j<exclude.Length();j++)
@@ -80,9 +77,9 @@ void FixFilename(wxString& name)
 
 bool IsIP(const wxString& s)
 {
-    const wxChar* dot=wxT(".");
-    wxString digit=wxT("0*[0-9]{1,3}");
-    wxString exp=wxT("^")+digit+dot+digit+dot+digit+dot+digit+wxT("$");
+    static const wxChar* dot=wxT(".");
+    static const wxString digit=wxT("0*[0-9]{1,3}");
+    static const wxString exp=wxT("^")+digit+dot+digit+dot+digit+dot+digit+wxT("$");
     wxRegEx regex;
 
     regex.Compile(exp);

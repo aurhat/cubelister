@@ -6,8 +6,6 @@
     @author Glen Masgai <mimosius@users.sourceforge.net>
 */
 
-#include <wx/artprov.h>
-
 #ifndef wxART_NONE
 #define wxART_NONE             wxART_MAKE_ART_ID(wxART_NONE)
 #endif

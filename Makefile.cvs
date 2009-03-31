@@ -5,5 +5,5 @@ all:
 	libtoolize --automake --force --copy
 	intltoolize --force --copy
 	autoheader
-	automake -a -c
+	automake -a -c -Wno-portability
 	autoconf

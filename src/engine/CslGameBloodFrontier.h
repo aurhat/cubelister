@@ -18,8 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef CslBloodFrontier_H
-#define CslBloodFrontier_H
+#ifndef CSLBLOODFRONTIER_H
+#define CSLBLOODFRONTIER_H
 
 /**
  @author Glen Masgai <mimosius@users.sourceforge.net>
@@ -62,4 +62,4 @@ class CslBloodFrontier : public CslGame
         const char** GetIcon(wxInt32 size) const;
 };
 
-#endif //CslBloodFrontier_H
+#endif //CSLBLOODFRONTIER_H

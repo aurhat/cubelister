@@ -18,13 +18,11 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <wx/colordlg.h>
-#include <wx/imaglist.h>
-#include "CslDlgSettings.h"
-#include "CslTTS.h"
+#include "Csl.h"
+#include "engine/CslEngine.h"
 #include "CslApp.h"
-#include "engine/CslGame.h"
-#include "engine/CslTools.h"
+#include "CslTTS.h"
+#include "CslDlgSettings.h"
 
 
 BEGIN_EVENT_TABLE(CslGamePage,wxPanel)

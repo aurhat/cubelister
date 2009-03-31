@@ -26,8 +26,6 @@
 */
 
 #include "CslListCtrl.h"
-#include "engine/CslTools.h"
-#include "engine/CslGame.h"
 
 class CslListCtrlCountry;
 

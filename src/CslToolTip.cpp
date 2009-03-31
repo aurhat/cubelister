@@ -18,9 +18,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "CslToolTip.h"
+#include "Csl.h"
 #include "CslSettings.h"
-#include "engine/CslTools.h"
+#include "CslToolTip.h"
 
 DEFINE_EVENT_TYPE(wxCSL_EVT_TOOLTIP)
 
@@ -44,15 +44,15 @@ CslToolTip::~CslToolTip()
 #ifdef __WXMSW__
 void CslToolTip::OnEraseBackground(wxEraseEvent& event)
 {
-	if (!m_frame)
-		return;
+    if (!m_frame)
+        return;
 
     wxDC& dc=*event.GetDC();
 #else
 void CslToolTip::OnPaint(wxPaintEvent& event)
 {
-	if (!m_frame)
-		return;
+    if (!m_frame)
+        return;
 
     wxPaintDC dc(m_frame);
 #endif

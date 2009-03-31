@@ -18,9 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <wx/protocol/http.h>
+#include "Csl.h"
 #include "CslVersionCheck.h"
-#include "engine/CslTools.h"
 
 
 DEFINE_EVENT_TYPE(wxCSL_EVT_VERSIONCHECK)

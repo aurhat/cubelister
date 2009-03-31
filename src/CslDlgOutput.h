@@ -21,17 +21,6 @@
 #ifndef CSLDLGOUTPUT_H
 #define CSLDLGOUTPUT_H
 
-#include "wx/wxprec.h"
-#ifdef __BORLANDC__
-#pragma hdrstop
-#endif
-#ifndef WX_PRECOMP
-#include "wx/wx.h"
-#endif
-#include <wx/image.h>
-
-// begin wxGlade: ::dependencies
-// end wxGlade
 
 WX_DEFINE_ARRAY_INT(wxUint32, t_aUint);
 

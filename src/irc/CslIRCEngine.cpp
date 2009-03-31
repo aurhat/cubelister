@@ -18,10 +18,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <errno.h>
-#include <wx/tokenzr.h>
+#include "Csl.h"
 #include "CslIRCEngine.h"
-#include "engine/CslVersion.h"
+#include <errno.h>
 #define IRC_MAX_RENAME_TRIES  5
 
 CslIrcNetworks g_CslIrcNetworks;

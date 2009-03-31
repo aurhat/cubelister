@@ -18,12 +18,13 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <wx/wupdlock.h>
-#include "CslListCtrlPlayer.h"
-#include "CslGameConnection.h"
+#include "Csl.h"
+#include "engine/CslEngine.h"
 #include "CslMenu.h"
 #include "CslGeoIP.h"
-#include "engine/CslTools.h"
+#include "CslSettings.h"
+#include "CslGameConnection.h"
+#include "CslListCtrlPlayer.h"
 
 #define CSL_COLOUR_MASTER    wxColour(64,255,128)
 #define CSL_COLOUR_ADMIN     wxColour(255,128,0)
@@ -747,7 +748,7 @@ int wxCALLBACK CslListCtrlPlayer::ListSortCompareFunc(long item1,long item2,long
     if (!(ret=helper->Cmp(_data1->Frags,_data2->Frags,_mode))) \
     { \
         if (!(ret=helper->Cmp(_data1->Accuracy,_data2->Accuracy, \
-                            CslListSortHelper::SORT_DSC))) \
+                              CslListSortHelper::SORT_DSC))) \
         { \
             if (!(ret=helper->Cmp(_data1->Deaths,_data2->Deaths, \
                                   CslListSortHelper::SORT_ASC))) \

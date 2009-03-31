@@ -25,19 +25,6 @@
  @author Glen Masgai <mimosius@users.sourceforge.net>
 */
 
-#include "wx/wxprec.h"
-#ifdef __BORLANDC__
-#pragma hdrstop
-#endif
-#ifndef WX_PRECOMP
-#include "wx/wx.h"
-#endif
-#include <wx/image.h>
-#include "engine/CslGame.h"
-// begin wxGlade: ::dependencies
-#include <wx/spinctrl.h>
-// end wxGlade
-
 
 class CslDlgAddServer: public wxDialog
 {

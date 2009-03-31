@@ -1,5 +1,5 @@
 
-SUBDIRS = engine libGeoIP irc
+SUBDIRS = pch engine irc libGeoIP
 
 bin_PROGRAMS = csl
 if build_cslmapcfgtool
@@ -16,8 +16,8 @@ csl_LDFLAGS = $(all_libraries)
 csl_LDADD = libcslpanelmap.a $(top_builddir)/src/engine/libcslengine.a $(top_builddir)/src/engine/libcsltools.a \
 	$(top_builddir)/src/irc/libcslirc.a $(top_builddir)/src/irc/libircclient/src/libircclient.a ${GEOIP_LIBS} \
 	${WX_LIBS} ${SPEECHD_LIBS}
-INCLUDES = -I$(top_srcdir)/src/libGeoIP \
-	-I$(top_srcdir)/src/irc/libircclient/include -I$(top_srcdir)/src/img/flags
+INCLUDES = -I$(top_srcdir)/src/irc/libircclient/include \
+	-I$(top_srcdir)/src/libGeoIP -I$(top_builddir)/src/pch -I$(top_srcdir)/src/img/flags
 cslmapcfgtool_SOURCES = CslMapCfgTool.cpp
 cslmapcfgtool_LDADD = libcslpanelmap.a \
 	$(top_builddir)/src/engine/libcsltools.a ${WX_LIBS}

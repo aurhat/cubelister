@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "Csl.h"
+#include "engine/CslGame.h"
 #include "CslIPC.h"
 
 DEFINE_EVENT_TYPE(wxCSL_EVT_IPC)

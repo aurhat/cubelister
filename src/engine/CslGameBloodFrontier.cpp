@@ -18,9 +18,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "Csl.h"
 #include "CslEngine.h"
 #include "CslGameBloodFrontier.h"
-#include "CslTools.h"
 
 #include "../img/bf_24.xpm"
 #include "../img/bf_16.xpm"

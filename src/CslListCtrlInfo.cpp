@@ -18,11 +18,12 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "CslListCtrlInfo.h"
-#include "engine/CslTools.h"
+#include "Csl.h"
+#include "engine/CslGame.h"
 #include "CslSettings.h"
 #include "CslFlags.h"
 #include "CslGeoIP.h"
+#include "CslListCtrlInfo.h"
 #include "img/info_18_12.xpm"
 
 BEGIN_EVENT_TABLE(CslListCtrlInfo,CslListCtrl)

@@ -25,7 +25,6 @@
  @author Glen Masgai <mimosius@users.sourceforge.net>
 */
 
-#include <wx/sckaddr.h>
 #include "CslExtendedInfo.h"
 
 #define CSL_DEFAULT_MASTER_WEB_PORT   80

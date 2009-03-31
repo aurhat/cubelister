@@ -25,16 +25,6 @@
  @author Glen Masgai <mimosius@users.sourceforge.net>
 */
 
-#include "wx/wxprec.h"
-#ifdef __BORLANDC__
-#pragma hdrstop
-#endif
-#ifndef WX_PRECOMP
-#include "wx/wx.h"
-#endif
-#include <wx/aui/aui.h>
-#include <wx/taskbar.h>
-#include <wx/treectrl.h>
 #include "CslVersionCheck.h"
 #include "CslMenu.h"
 #include "CslDlgExtended.h"

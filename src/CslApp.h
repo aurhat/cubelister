@@ -25,17 +25,6 @@
     @author Glen Masgai <mimosius@users.sourceforge.net>
 */
 
-#include "wx/wxprec.h"
-#ifdef __BORLANDC__
-#pragma hdrstop
-#endif
-#ifndef WX_PRECOMP
-#include "wx/wx.h"
-#endif
-#include <wx/snglinst.h>
-#include "engine/CslEngine.h"
-
-
 class CslApp: public wxApp
 {
     public:

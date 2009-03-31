@@ -25,22 +25,6 @@
     @author Glen Masgai <mimosius@users.sourceforge.net>
 */
 
-#include <wx/wxprec.h>
-#ifdef __BORLANDC__
-#pragma hdrstop
-#endif
-#ifndef WX_PRECOMP
-#include <wx/wx.h>
-#endif
-
-
-// begin wxGlade: ::dependencies
-// end wxGlade
-
-// begin wxGlade: ::extracode
-
-// end wxGlade
-
 
 class CslDlgTraffic: public wxDialog
 {

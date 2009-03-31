@@ -26,16 +26,7 @@
  @author Glen Masgai <mimosius@users.sourceforge.net>
 */
 
-#include "wx/wxprec.h"
-#ifdef __BORLANDC__
-#pragma hdrstop
-#endif
-#ifndef WX_PRECOMP
-#include "wx/wx.h"
-#endif
-#include <wx/platinfo.h>
 #include "CslArt.h"
-#include "CslSettings.h"
 
 
 #define MENU_SERVER_EXT_FULL_STR          _("Full ...")

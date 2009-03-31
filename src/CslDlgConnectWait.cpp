@@ -18,8 +18,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "CslDlgConnectWait.h"
+#include "Csl.h"
 #include "CslSettings.h"
+#include "CslDlgConnectWait.h"
 
 BEGIN_EVENT_TABLE(CslDlgConnectWait,wxDialog)
     EVT_BUTTON(wxID_ANY,CslDlgConnectWait::OnButton)

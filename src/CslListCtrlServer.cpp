@@ -18,20 +18,20 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <wx/wupdlock.h>
-#include <wx/clipbrd.h>
+#include "Csl.h"
+#include "engine/CslEngine.h"
 #include "CslApp.h"
-#include "engine/CslTools.h"
 #include "CslDlgAddServer.h"
 #include "CslDlgOutput.h"
-#include "CslListCtrlServer.h"
-#include "CslListCtrlPlayer.h"
 #include "CslStatusBar.h"
 #include "CslArt.h"
 #include "CslMenu.h"
 #include "CslGeoIP.h"
-#include "CslGameConnection.h"
 #include "CslSettings.h"
+#include "CslStatusBar.h"
+#include "CslGameConnection.h"
+#include "CslListCtrlPlayer.h"
+#include "CslListCtrlServer.h"
 
 #include "img/ext_green_8.xpm"
 #include "img/sortasc_16.xpm"

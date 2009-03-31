@@ -3,6 +3,8 @@
 #ifndef CUBE_TOOLS_H
 #define CUBE_TOOLS_H
 
+#include <stdlib.h>
+
 typedef unsigned char uchar;
 typedef unsigned short ushort;
 typedef unsigned int uint;

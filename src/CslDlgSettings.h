@@ -25,21 +25,6 @@
  @author Glen Masgai <mimosius@users.sourceforge.net>
 */
 
-#include "wx/wxprec.h"
-#ifdef __BORLANDC__
-#pragma hdrstop
-#endif
-#ifndef WX_PRECOMP
-#include "wx/wx.h"
-#endif
-#include <wx/image.h>
-// begin wxGlade: ::dependencies
-#include <wx/notebook.h>
-#include <wx/treectrl.h>
-#include <wx/spinctrl.h>
-// end wxGlade
-#include <wx/listbook.h>
-#include <wx/filepicker.h>
 #include "CslSettings.h"
 
 

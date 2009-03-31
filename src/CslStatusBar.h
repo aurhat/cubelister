@@ -25,16 +25,6 @@
  @author Glen Masgai <mimosius@users.sourceforge.net>
 */
 
-#include "wx/wxprec.h"
-#ifdef __BORLANDC__
-#pragma hdrstop
-#endif
-#ifndef WX_PRECOMP
-#include "wx/wx.h"
-#endif
-#include <wx/statusbr.h>
-#include <wx/statbmp.h>
-
 
 enum { LIGHT_GREEN = 0, LIGHT_GREY, LIGHT_RED, LIGHT_YELLOW };
 

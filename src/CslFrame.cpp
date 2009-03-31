@@ -18,25 +18,20 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <wx/uri.h>
-#include <wx/mstream.h>
-#include <wx/fileconf.h>
-#include <wx/wupdlock.h>
-#include <wx/clipbrd.h>
-#include <wx/tokenzr.h>
+#include "Csl.h"
+#include "engine/CslEngine.h"
+#include "engine/CslGameSauerbraten.h"
+#include "engine/CslGameAssaultCube.h"
+#include "engine/CslGameBloodFrontier.h"
+#include "engine/CslGameCube.h"
 #include "CslApp.h"
 #include "CslGeoIP.h"
-#include "CslFrame.h"
 #include "CslDlgAbout.h"
 #include "CslDlgAddMaster.h"
 #include "CslDlgConnectWait.h"
 #include "CslDlgGeneric.h"
 #include "CslGameProcess.h"
-#include "engine/CslTools.h"
-#include "engine/CslGameSauerbraten.h"
-#include "engine/CslGameAssaultCube.h"
-#include "engine/CslGameBloodFrontier.h"
-#include "engine/CslGameCube.h"
+#include "CslFrame.h"
 #ifndef __WXMSW__
 #include "csl_icon_png.h"
 #endif

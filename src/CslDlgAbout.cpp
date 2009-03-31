@@ -18,9 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <wx/mstream.h>
-#include "engine/CslTools.h"
-#include "engine/CslVersion.h"
+#include "Csl.h"
 #include "CslDlgAbout.h"
 #include "CslLicense.h"
 #include "csl_logo_png.h"

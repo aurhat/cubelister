@@ -25,17 +25,6 @@
  @author Glen Masgai <mimosius@users.sourceforge.net>
 */
 
-#include <wx/wx.h>
-#include <wx/image.h>
-// begin wxGlade: ::dependencies
-#include <wx/statline.h>
-// end wxGlade
-#include "CslPanelMap.h"
-
-// begin wxGlade: ::extracode
-
-// end wxGlade
-
 
 class CslMapToolPanelMap : public CslPanelMap
 {

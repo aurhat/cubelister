@@ -18,9 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <wx/wfstream.h>
+#include "Csl.h"
 #include "CslPanelMap.h"
-#include "engine/CslTools.h"
 
 BEGIN_EVENT_TABLE(CslPanelMap, wxPanel)
     EVT_PAINT(CslPanelMap::OnPaint)

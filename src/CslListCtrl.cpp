@@ -18,12 +18,12 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "CslListCtrl.h"
+#include "Csl.h"
 #include "CslSettings.h"
 #include "CslGeoIP.h"
 #include "CslFlags.h"
 #include "CslMenu.h"
-#include "engine/CslTools.h"
+#include "CslListCtrl.h"
 #include "img/sortasc_18_12.xpm"
 #include "img/sortdsc_18_12.xpm"
 
@@ -114,7 +114,7 @@ void CslListCtrl::OnEraseBackground(wxEraseEvent& event)
     else
         event.Skip();
 }
-#endif
+#endif //__WXMSW__
 
 void CslListCtrl::OnMouseMove(wxMouseEvent& event)
 {

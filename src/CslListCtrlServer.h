@@ -25,9 +25,7 @@
  @author Glen Masgai <mimosius@users.sourceforge.net>
 */
 
-#include "engine/CslEngine.h"
 #include "CslListCtrl.h"
-#include "CslStatusBar.h"
 
 
 #define CSL_HIGHLIGHT_FOUND_SERVER   1<<0

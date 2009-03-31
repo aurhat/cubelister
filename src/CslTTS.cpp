@@ -18,23 +18,15 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "wx/wxprec.h"
-#ifdef __BORLANDC__
-#pragma hdrstop
-#endif
-#ifndef WX_PRECOMP
-#include "wx/wx.h"
-#endif
+#include "Csl.h"
 
 #if defined(__WXMSW__)
 #define _CSL_DECLARE_TTS_VARS_
 #include <sapi.h>
 #elif defined(__WXMAC__)
 #define _CSL_DECLARE_TTS_VARS_
-#include <wx/thread.h>
 #include <Carbon/Carbon.h>
 #elif defined(HAVE_CONFIG_H)
-#include "config.h"
 #ifdef HAVE_LIBSPEECHD_H
 #define _CSL_DECLARE_TTS_VARS_
 #include <libspeechd.h>
@@ -43,8 +35,6 @@
 
 #include "CslTTS.h"
 #include "CslSettings.h"
-#include "engine/CslTools.h"
-#include "engine/CslVersion.h"
 
 
 CslTTS::CslTTS()

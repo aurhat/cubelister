@@ -21,16 +21,8 @@
 #ifndef CSLIRCENGINE_H
 #define CSLIRCENGINE_H
 
-#include "wx/wxprec.h"
-#ifdef __BORLANDC__
-#pragma hdrstop
-#endif // __BORLANDC__
-#ifndef WX_PRECOMP
-#include "wx/wx.h"
-#endif // WX_PRECOMP
 #include <libircclient.h>
 #include <libirc_rfcnumeric.h>
-#include "engine/CslTools.h"
 
 /**
  @author Glen Masgai <mimosius@users.sourceforge.net>

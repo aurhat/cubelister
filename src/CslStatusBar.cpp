@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "Csl.h"
 #include "CslStatusBar.h"
 
 #include "img/green_16.xpm"

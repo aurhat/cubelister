@@ -18,9 +18,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "CslDlgAddMaster.h"
+#include "Csl.h"
+#include "engine/CslEngine.h"
 #include "CslApp.h"
-#include "engine/CslGame.h"
+#include "CslDlgAddMaster.h"
 
 
 BEGIN_EVENT_TABLE(CslDlgAddMaster,wxDialog)

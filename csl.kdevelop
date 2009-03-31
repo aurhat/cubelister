@@ -57,14 +57,14 @@
         <f77compiler>kdevg77options</f77compiler>
         <cxxflags>-O0 -g3 -pg</cxxflags>
         <envvars/>
-        <topsourcedir></topsourcedir>
-        <cppflags></cppflags>
-        <ldflags></ldflags>
-        <ccompilerbinary></ccompilerbinary>
-        <cxxcompilerbinary></cxxcompilerbinary>
-        <f77compilerbinary></f77compilerbinary>
+        <topsourcedir/>
+        <cppflags/>
+        <ldflags/>
+        <ccompilerbinary/>
+        <cxxcompilerbinary/>
+        <f77compilerbinary/>
         <cflags>-O0 -g3 -pg</cflags>
-        <f77flags></f77flags>
+        <f77flags/>
       </debug-unicode>
       <debug>
         <configargs>--with-wx-config=wx-config-2.8d</configargs>
@@ -138,18 +138,18 @@
         <envvars/>
         <configargs>--with-wx-config=wx-config-3.0d</configargs>
         <builddir>debug-3</builddir>
-        <topsourcedir></topsourcedir>
-        <cppflags></cppflags>
-        <ldflags></ldflags>
+        <topsourcedir/>
+        <cppflags/>
+        <ldflags/>
         <ccompiler>kdevgccoptions</ccompiler>
         <cxxcompiler>kdevgppoptions</cxxcompiler>
         <f77compiler>kdevg77options</f77compiler>
-        <ccompilerbinary></ccompilerbinary>
-        <cxxcompilerbinary></cxxcompilerbinary>
-        <f77compilerbinary></f77compilerbinary>
+        <ccompilerbinary/>
+        <cxxcompilerbinary/>
+        <f77compilerbinary/>
         <cflags>-O0 -g3 -pg</cflags>
         <cxxflags>-O0 -g3 -pg</cxxflags>
-        <f77flags></f77flags>
+        <f77flags/>
       </debug-3>
     </configurations>
     <configurations>

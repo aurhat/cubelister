@@ -25,16 +25,6 @@
     @author Glen Masgai <mimosius@users.sourceforge.net>
 */
 
-#include <wx/wxprec.h>
-#ifdef __BORLANDC__
-#pragma hdrstop
-#endif
-#ifndef WX_PRECOMP
-#include <wx/wx.h>
-#endif
-#include <wx/process.h>
-#include "engine/CslGame.h"
-
 
 BEGIN_DECLARE_EVENT_TYPES()
 DECLARE_EVENT_TYPE(wxCSL_EVT_PROCESS,wxID_ANY)

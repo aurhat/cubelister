@@ -18,11 +18,11 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <wx/wupdlock.h>
-#include "CslDlgExtended.h"
-#include "CslSettings.h"
+#include "Csl.h"
+#include "engine/CslGame.h"
 #include "CslMenu.h"
-#include "engine/CslTools.h"
+#include "CslSettings.h"
+#include "CslDlgExtended.h"
 
 BEGIN_EVENT_TABLE(CslDlgExtended, wxDialog)
     EVT_CLOSE(CslDlgExtended::OnClose)

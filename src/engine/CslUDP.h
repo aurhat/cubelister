@@ -25,16 +25,6 @@
  @author Glen Masgai <mimosius@users.sourceforge.net>
 */
 
-#include "wx/wxprec.h"
-#ifdef __BORLANDC__
-#pragma hdrstop
-#endif
-#ifndef WX_PRECOMP
-#include "wx/wx.h"
-#endif
-#include <wx/socket.h>
-#include <wx/sckaddr.h>
-
 #define CSL_MAX_PACKET_SIZE 1400
 #define CSL_UDP_OVERHEAD 42
 

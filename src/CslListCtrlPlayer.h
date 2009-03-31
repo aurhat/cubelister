@@ -26,7 +26,6 @@
 */
 
 #include "CslListCtrl.h"
-#include "engine/CslGame.h"
 
 
 WX_DEFINE_ARRAY_PTR(CslPlayerStatsData*,t_aCslPlayerStatsData);

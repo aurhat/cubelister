@@ -18,13 +18,14 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "CslGameConnection.h"
+#include "Csl.h"
+#include "engine/CslGame.h"
 #include "CslDlgConnectPass.h"
 #include "CslDlgConnectWait.h"
 #include "CslStatusBar.h"
 #include "CslSettings.h"
 #include "CslGameProcess.h"
-#include "engine/CslTools.h"
+#include "CslGameConnection.h"
 
 
 CslGameConnection::CslGameConnection()

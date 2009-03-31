@@ -24,23 +24,12 @@
 //allows stroken text but the memory usage nearly explodes
 //#define CSL_USE_RICHTEXT
 
-#include "wx/wxprec.h"
-#ifdef __BORLANDC__
-#pragma hdrstop
-#endif //__BORLANDC__
-#ifndef WX_PRECOMP
-#include "wx/wx.h"
-#endif //WX_PRECOMP
-#include <wx/listctrl.h>
-#include <wx/aui/aui.h>
-#include <wx/splitter.h>
 #ifdef CSL_USE_RICHTEXT
 #include <wx/richtext/richtextctrl.h>
 #else
 #include <wx/richtext/richtextbuffer.h>
 #endif //CSL_USE_RICHTEXT
 #include "irc/CslIRCEngine.h"
-#include "engine/CslTools.h"
 
 /**
  @author Glen Masgai <mimosius@users.sourceforge.net>

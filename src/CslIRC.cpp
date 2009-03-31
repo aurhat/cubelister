@@ -18,10 +18,11 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <wx/tokenzr.h>
-#include "CslIRC.h"
-#include "CslIPC.h"
+#include "Csl.h"
+#include "engine/CslGame.h"
 #include "CslMenu.h"
+#include "CslIPC.h"
+#include "CslIRC.h"
 
 CslIrcEngine* CslIrcNotebook::m_engine=NULL;
 

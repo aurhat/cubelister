@@ -18,11 +18,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <wx/file.h>
-#include <wx/wupdlock.h>
-#include "CslDlgOutput.h"
+#include "Csl.h"
 #include "CslSettings.h"
-#include "engine/CslTools.h"
+#include "CslDlgOutput.h"
 
 #define CSL_OUTPUT_EXTENSION  _("Text files (*.txt)|*.txt")
 

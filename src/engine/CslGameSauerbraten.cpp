@@ -18,10 +18,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <wx/filename.h>
+#include "Csl.h"
 #include "CslEngine.h"
 #include "CslGameSauerbraten.h"
-#include "CslTools.h"
 
 #include "../img/sb_24.xpm"
 #include "../img/sb_16.xpm"

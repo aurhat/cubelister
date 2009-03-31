@@ -25,13 +25,6 @@
     @author Glen Masgai <mimosius@gmx.de>
 */
 
-#include "wx/wxprec.h"
-#ifdef __BORLANDC__
-#pragma hdrstop
-#endif
-#ifndef WX_PRECOMP
-#include "wx/wx.h"
-#endif
 
 #ifdef __WXMAC__
 class CslTTS : public wxEvtHandler

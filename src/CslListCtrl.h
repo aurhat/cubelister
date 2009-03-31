@@ -25,15 +25,6 @@
     @author Glen Masgai <mimosius@users.sourceforge.net>
 */
 
-#include <wx/wxprec.h>
-#ifdef __BORLANDC__
-#pragma hdrstop
-#endif
-#ifndef WX_PRECOMP
-#include <wx/wx.h>
-#endif
-#include <wx/listctrl.h>
-#include <wx/imaglist.h>
 #include "CslToolTip.h"
 
 // since wx>2.8.4 the list control items are getting deselected on wxGZK
@@ -72,7 +63,7 @@ class CslListSortHelper
         {
             wxInt32 m=mode<0 ? Mode:mode;
 
-            return first<second ? m==SORT_ASC ? -1:1 :
+        return first<second ? m==SORT_ASC ? -1:1 :
                    first==second ? 0 : m==SORT_ASC ? 1:-1;
         }
 
@@ -115,7 +106,7 @@ class CslListCtrl : public wxListCtrl
         void FlickerFree(bool val) { m_flickerFree=val; }
         wxUint32 GetCountryFlag(wxUint32 ip,wxUint32 start=CSL_LIST_IMG_FLAG_START);
 
-        virtual wxWindow *GetScreenShotWindow() { return this; }
+        virtual wxWindow* GetScreenShotWindow() { return this; }
         virtual wxString GetScreenShotFileName();
         virtual void GetToolTipText(wxInt32 row,CslToolTipEvent& event) {}
         virtual wxSize GetImageListSize() { return wxDefaultSize; }

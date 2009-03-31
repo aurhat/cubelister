@@ -25,9 +25,7 @@
  @author Glen Masgai <mimosius@users.sourceforge.net>
 */
 
-
 #include "CslListCtrl.h"
-#include "engine/CslGame.h"
 
 
 class CslListCtrlInfo : public CslListCtrl

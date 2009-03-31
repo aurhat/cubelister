@@ -21,14 +21,6 @@
 #ifndef CSLCHARENCODING_H
 #define CSLCHARENCODING_H
 
-#include "wx/wxprec.h"
-#ifdef __BORLANDC__
-#pragma hdrstop
-#endif // __BORLANDC__
-#ifndef WX_PRECOMP
-#include "wx/wx.h"
-#endif // WX_PRECOMP
-
 /**
  @author Glen Masgai <mimosius@users.sourceforge.net>
 */
@@ -51,19 +43,19 @@ extern CslCharEncoding CslDefaultCharEncoding;
 #define CSL_NUM_CHAR_ENCODINGS (sizeof(CslCharEncodings)/sizeof(CslCharEncodings[0]))
 static struct { const wxChar *Encoding,*Name; } CslCharEncodings[] =
 {
-    { wxT("UTF-8"),       _("Default")           },
-    { wxT("ISO-8859-2"),  _("Central European ") },
-    { wxT("ISO-8859-3"),  _("Central European ") },
-    { wxT("cp 1250"),     _("Central European ") },
-    { wxT("cp 1251"),     _("Cyrillic")          },
-    { wxT("ISO-8859-5"),  _("Cyrillic")          },
-    { wxT("koi8-r"),      _("Cyrillic")          },
-    { wxT("koi8-u"),      _("Cyrillic")          },
-    { wxT("cp 1254"),     _("Turkish")           },
-    { wxT("ISO-8859-9"),  _("Turkish")           },
-    { wxT("ISO-8859-1"),  _("Western European ") },
-    { wxT("ISO-8859-15"), _("Western European ") },
-    { wxT("cp 1252"),     _("Western European ") },
+    { wxT("UTF-8"),       _("Default")          },
+    { wxT("ISO-8859-2"),  _("Central European") },
+    { wxT("ISO-8859-3"),  _("Central European") },
+    { wxT("cp 1250"),     _("Central European") },
+    { wxT("cp 1251"),     _("Cyrillic")         },
+    { wxT("ISO-8859-5"),  _("Cyrillic")         },
+    { wxT("koi8-r"),      _("Cyrillic")         },
+    { wxT("koi8-u"),      _("Cyrillic")         },
+    { wxT("cp 1254"),     _("Turkish")          },
+    { wxT("ISO-8859-9"),  _("Turkish")          },
+    { wxT("ISO-8859-1"),  _("Western European") },
+    { wxT("ISO-8859-15"), _("Western European") },
+    { wxT("cp 1252"),     _("Western European") },
 };
 
 

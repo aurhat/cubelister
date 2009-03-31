@@ -18,10 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <wx/protocol/http.h>
-#include <wx/sckstrm.h>
+#include "Csl.h"
 #include "CslEngine.h"
-#include "CslTools.h"
 
 
 BEGIN_DECLARE_EVENT_TYPES()

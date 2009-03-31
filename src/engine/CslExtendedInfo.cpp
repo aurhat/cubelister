@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "Csl.h"
 #include "CslExtendedInfo.h"
 
 CslPlayerStats::CslPlayerStats() : m_status(CSL_STATS_NEED_IDS),

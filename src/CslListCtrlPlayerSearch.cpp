@@ -18,14 +18,16 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "CslListCtrlPlayerSearch.h"
-#include "CslListCtrlPlayer.h"
-#include "CslGameConnection.h"
-#include "engine/CslTools.h"
+#include "Csl.h"
+#include "engine/CslEngine.h"
 #include "CslApp.h"
 #include "CslGeoIP.h"
 #include "CslFlags.h"
 #include "CslMenu.h"
+#include "CslSettings.h"
+#include "CslGameConnection.h"
+#include "CslListCtrlPlayer.h"
+#include "CslListCtrlPlayerSearch.h"
 
 
 BEGIN_EVENT_TABLE(CslListCtrlPlayerSearch,CslListCtrl)
