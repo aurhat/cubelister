@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2004 Georgy Yunaev tim@krasnogorsk.ru
+ * Copyright (C) 2004-2009 Georgy Yunaev gyunaev@ulduzsoft.com
  *
  * This library is free software; you can redistribute it and/or modify it 
  * under the terms of the GNU Lesser General Public License as published by 
@@ -10,8 +10,6 @@
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public 
  * License for more details.
- *
- * $Id: portable.c 60 2004-11-08 15:50:45Z gyunaev $
  */
 
 
@@ -42,8 +40,9 @@
 		#endif
 	#endif 
 #else
+	#include <winsock2.h>
+	#include <ws2tcpip.h>
 	#include <windows.h>
-	#include <winsock.h>
 	#include <time.h>
 	#include <stdio.h>
 	#include <stdarg.h>

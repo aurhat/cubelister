@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2004 Georgy Yunaev tim@krasnogorsk.ru
+ * Copyright (C) 2004-2009 Georgy Yunaev gyunaev@ulduzsoft.com
  *
  * This library is free software; you can redistribute it and/or modify it 
  * under the terms of the GNU Lesser General Public License as published by 
@@ -10,8 +10,6 @@
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public 
  * License for more details.
- *
- * $Id: sockets.c 53 2004-10-17 11:16:03Z gyunaev $
  */
 
 /*
@@ -28,8 +26,9 @@
 	typedef int				socket_t;
 
 #else
+	#include <winsock2.h>
+	#include <ws2tcpip.h>
 	#include <windows.h>
-	#include <winsock.h>
 
 	#define IS_SOCKET_ERROR(a)	((a)==SOCKET_ERROR)
 
@@ -37,7 +36,6 @@
 	#define EINPROGRESS		WSAEINPROGRESS
 	#define EINTR			WSAEINTR
 
-	typedef unsigned int	socklen_t;
 	typedef SOCKET			socket_t;
 
 #endif
@@ -59,7 +57,7 @@ static int socket_error()
 
 static int socket_create (int domain, int type, socket_t * sock)
 {
-	*sock = socket (PF_INET, SOCK_STREAM, 0);
+	*sock = socket (domain, type, 0);
 	return IS_SOCKET_ERROR(*sock) ? 1 : 0;
 }
 

@@ -21,13 +21,20 @@
 #ifndef CSLIRCENGINE_H
 #define CSLIRCENGINE_H
 
-#include <libircclient.h>
-#include <libirc_rfcnumeric.h>
-
 /**
  @author Glen Masgai <mimosius@users.sourceforge.net>
 */
 
+#ifdef __WXMSW__
+#ifndef _WINSOCK2API_
+#define _WINSOCK2API_
+#endif //_WINSOCK2API_
+#ifndef _WS2TCPIP_H_
+#define _WS2TCPIP_H_
+#endif //_WS2TCPIP_H_
+#endif //__WXMSW__
+
+#include <libircclient.h>
 
 extern wxColour IrcColours[16];
 

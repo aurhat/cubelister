@@ -3,6 +3,7 @@ EXPORTS
 	irc_create_session
 	irc_destroy_session
 	irc_connect
+	irc_connect6
 	irc_disconnect
 	irc_run
 	irc_add_select_descriptors
@@ -43,4 +44,4 @@ EXPORTS
 	irc_cmd_whois
 	irc_color_strip_from_mirc
 	irc_color_convert_from_mirc
-	irc_color_convert_to_mirc functions
+	irc_color_convert_to_mirc

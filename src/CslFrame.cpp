@@ -151,7 +151,7 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
     wxString user=::wxGetUserId()+wxT("|CSL");
     CslIrcNetwork *network;
     network=new CslIrcNetwork(wxT("GameSurge"),user,user+wxT("^1"));
-    network->AddServer(new CslIrcServer(network,wxT("irc.eu.gamesurge.net"),6667));
+    network->AddServer(new CslIrcServer(network,wxT("irc.gamesurge.net"),6667));
     network->AddAutoChannel(new CslIrcChannel(wxT("#cubelister")));
     g_CslIrcNetworks.Add(network);
     network=new CslIrcNetwork(wxT("Quakenet"),user,user+wxT("^1"));

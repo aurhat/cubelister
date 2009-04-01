@@ -502,7 +502,7 @@ void CslMapCfgTool::AddVersion()
     CslMapInfo *info;
     wxUint32 i,c,h;
     wxInt32 version=::wxGetNumberFromUser(_("Enter new version number"),_("Version: "),
-                                          _("New version number"),256,0,9999,this);
+                                          _("New version number"),257,0,9999,this);
     if (version==-1)
         return;
 

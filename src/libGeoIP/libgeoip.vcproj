@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="panelmap"
-	ProjectGUID="{873EC02B-2792-47FD-B7F0-E5F199A11F56}"
-	RootNamespace="panelmap"
+	Name="libgeoip"
+	ProjectGUID="{87286ED5-C3A4-4C08-A9DF-E573E7742A4E}"
+	RootNamespace="libgeoip"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -40,15 +40,12 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\pch"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
+				AdditionalIncludeDirectories="../include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="Csl.h"
-				PrecompiledHeaderFile="$(OutDir)\Csl_lib.pch"
-				ProgramDataBaseFileName="$(OutDir)\vc80.pdb"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
@@ -106,13 +103,10 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=".\pch"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
+				AdditionalIncludeDirectories="../include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE"
 				RuntimeLibrary="0"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="Csl.h"
-				PrecompiledHeaderFile="$(OutDir)\Csl_lib.pch"
-				ProgramDataBaseFileName="$(OutDir)\vc80.pdb"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -150,7 +144,7 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="1"
+			CharacterSet="2"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -170,14 +164,16 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\pch"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
+				AdditionalIncludeDirectories="../include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="Csl.h"
-				PrecompiledHeaderFile="$(OutDir)\Csl_lib.pch"
+				UsePrecompiledHeader="0"
+				PrecompiledHeaderThrough=""
+				PrecompiledHeaderFile=""
+				AssemblerListingLocation=""
+				ObjectFile="$(IntDir)\"
 				ProgramDataBaseFileName="$(OutDir)\vc80.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
@@ -216,7 +212,7 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="1"
+			CharacterSet="2"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -236,13 +232,10 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=".\pch"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
+				AdditionalIncludeDirectories="../include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE"
 				RuntimeLibrary="0"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="Csl.h"
-				PrecompiledHeaderFile="$(OutDir)\Csl_lib.pch"
-				ProgramDataBaseFileName="$(OutDir)\vc80.pdb"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -285,7 +278,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\CslPanelMap.cpp"
+				RelativePath=".\GeoIP.c"
 				>
 			</File>
 		</Filter>
@@ -295,7 +288,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\CslPanelMap.h"
+				RelativePath=".\GeoIP.h"
 				>
 			</File>
 		</Filter>

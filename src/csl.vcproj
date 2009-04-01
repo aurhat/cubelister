@@ -40,12 +40,15 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;libGeoIP;img/flags;irc/libircclient/include"
+				AdditionalIncludeDirectories=".\pch;.\libGeoIP;.\img\flags;.\irc\libircclient\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				UsePrecompiledHeader="0"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="Csl.h"
+				PrecompiledHeaderFile="$(OutDir)\Csl.pch"
+				ProgramDataBaseFileName="$(OutDir)\vc80.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
@@ -118,10 +121,13 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=".;libGeoIP;img/flags;irc/libircclient/include"
+				AdditionalIncludeDirectories=".\pch;.\libGeoIP;.\img\flags;.\irc\libircclient\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE"
 				RuntimeLibrary="0"
-				UsePrecompiledHeader="0"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="Csl.h"
+				PrecompiledHeaderFile="$(OutDir)\Csl.pch"
+				ProgramDataBaseFileName="$(OutDir)\vc80.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -195,12 +201,15 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;libGeoIP;img/flags;irc/libircclient/include"
+				AdditionalIncludeDirectories=".\pch;.\libGeoIP;.\img\flags;.\irc\libircclient\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				UsePrecompiledHeader="0"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="Csl.h"
+				PrecompiledHeaderFile="$(OutDir)\Csl.pch"
+				ProgramDataBaseFileName="$(OutDir)\vc80.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
@@ -273,10 +282,13 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=".;libGeoIP;img/flags;irc/libircclient/include"
+				AdditionalIncludeDirectories=".\pch;.\libGeoIP;.\img\flags;.\irc\libircclient\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE"
 				RuntimeLibrary="0"
-				UsePrecompiledHeader="0"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="Csl.h"
+				PrecompiledHeaderFile="$(OutDir)\Csl.pch"
+				ProgramDataBaseFileName="$(OutDir)\vc80.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -455,8 +467,40 @@
 				>
 			</File>
 			<File
-				RelativePath=".\libGeoIP\GeoIP.c"
+				RelativePath=".\pch\pch.cpp"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Unicode-Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Unicode-Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
 			</File>
 		</Filter>
 		<Filter
@@ -530,10 +574,6 @@
 			</File>
 			<File
 				RelativePath=".\CslGameProcess.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CslGeoIP.h"
 				>
 			</File>
 			<File

@@ -21,6 +21,7 @@
 #include "Csl.h"
 #include "CslIRCEngine.h"
 #include <errno.h>
+
 #define IRC_MAX_RENAME_TRIES  5
 
 CslIrcNetworks g_CslIrcNetworks;
@@ -227,7 +228,7 @@ void event_ctcp_request(irc_session_t *session,const char* WXUNUSED(event),const
 void event_ctcp_action(irc_session_t *session,const char* WXUNUSED(event),const char *origin,
                        const char **params,unsigned int count)
 {
-    if (count<2) //we don't have the patched version of libircclient
+    if (count<2)
         return;
 
     CslIrcContext *context=(CslIrcContext*)irc_get_ctx(session);

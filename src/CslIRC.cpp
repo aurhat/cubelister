@@ -441,6 +441,12 @@ void CslIrcPanel::OnIrcEvent(CslIrcEvent& event)
         case CslIrcEvent::ERR:
             switch (event.Ints.Item(0))
             {
+                case LIBIRC_ERR_SOCKET:
+                case LIBIRC_ERR_CONNECT:
+                    s<<wxT("\0034*** ")<<_("Couldn't connect.")<<wxT("\003");
+                    AddLine(s);
+                    OnDisconnect();
+					break;
                 case LIBIRC_ERR_RESOLV:
                     s<<wxT("\0034*** ")<<_("Couldn't resolve hostname.")<<wxT("\003");
                     AddLine(s);

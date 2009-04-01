@@ -6,8 +6,8 @@ CLEANFILES = Csl.h.gch
 noinst_HEADERS = Csl.h
 
 if ENABLE_PCH
-noinst_PROGRAMS = pch
-pch_SOURCES = pch.cpp
+noinst_PROGRAMS = dummy
+dummy_SOURCES = dummy.cpp
 
 noinst_DATA = Csl.h.gch
 

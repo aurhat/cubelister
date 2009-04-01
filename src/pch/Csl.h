@@ -43,6 +43,7 @@
 #include <wx/filepicker.h>
 #include <wx/spinctrl.h>
 #include <wx/listbook.h>
+#include <wx/listctrl.h>
 #include <wx/notebook.h>
 #include <wx/treectrl.h>
 #include <wx/imaglist.h>

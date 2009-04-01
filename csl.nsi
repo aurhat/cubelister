@@ -2,10 +2,10 @@
 !include "MUI.nsh"
 
 ;The name of the installer
-  Name "Cube Server Lister 0.8.2"
+  Name "Cube Server Lister 0.8.1.76"
 
 ;The file to write
-  OutFile "CSL-Installer-v0.8.2.exe"
+  OutFile "CSL-Installer-v0.8.1.76.exe"
 
 ;The default installation directory
   InstallDir "$PROGRAMFILES\CSL"
