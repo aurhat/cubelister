@@ -9,8 +9,9 @@
 /* Begin PBXBuildFile section */
 		9E015AE10CA569950029BEEF /* csl_mac.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9E015AE00CA569950029BEEF /* csl_mac.icns */; };
 		9E3B1E520CCE2BA800E6D4A2 /* maps in Resources */ = {isa = PBXBuildFile; fileRef = 9E3B1E480CCE2BA800E6D4A2 /* maps */; };
-		9E3F16110CA1693800C3C8C9 /* GeoIP.c in Sources */ = {isa = PBXBuildFile; fileRef = 9E3F160F0CA1693800C3C8C9 /* GeoIP.c */; };
 		9E73FA100CA6EED200CA71BC /* CslMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E73FA0F0CA6EED200CA71BC /* CslMenu.cpp */; };
+		9EB2BDC60F84D5490087A964 /* GeoIP.c in Sources */ = {isa = PBXBuildFile; fileRef = 9E3F160F0CA1693800C3C8C9 /* GeoIP.c */; settings = {COMPILER_FLAGS = "-DHAVE_GETTIMEOFDAY"; }; };
+		9EB2BDF50F84D90B0087A964 /* CslCharEncoding.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EB2BDF30F84D90B0087A964 /* CslCharEncoding.cpp */; };
 		9ECC2F7C0CA1724E00578B5E /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9ECC2F7B0CA1724E00578B5E /* Carbon.framework */; };
 		9ECC2F7E0CA1726200578B5E /* System.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9ECC2F7D0CA1726200578B5E /* System.framework */; };
 		9ECC2F810CA172A500578B5E /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9ECC2F800CA172A500578B5E /* AppKit.framework */; };
@@ -87,6 +88,9 @@
 		9E3F160F0CA1693800C3C8C9 /* GeoIP.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = GeoIP.c; path = ../src/libGeoIP/GeoIP.c; sourceTree = SOURCE_ROOT; };
 		9E3F16100CA1693800C3C8C9 /* GeoIP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GeoIP.h; path = ../src/libGeoIP/GeoIP.h; sourceTree = SOURCE_ROOT; };
 		9E73FA0F0CA6EED200CA71BC /* CslMenu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslMenu.cpp; path = ../src/CslMenu.cpp; sourceTree = SOURCE_ROOT; };
+		9EB2BDEB0F84D6D10087A964 /* Csl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Csl.h; path = ../src/pch/Csl.h; sourceTree = SOURCE_ROOT; };
+		9EB2BDF30F84D90B0087A964 /* CslCharEncoding.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslCharEncoding.cpp; path = ../src/engine/CslCharEncoding.cpp; sourceTree = SOURCE_ROOT; };
+		9EB2BDF40F84D90B0087A964 /* CslCharEncoding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslCharEncoding.h; path = ../src/engine/CslCharEncoding.h; sourceTree = SOURCE_ROOT; };
 		9ECC2F7B0CA1724E00578B5E /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		9ECC2F7D0CA1726200578B5E /* System.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = System.framework; path = /System/Library/Frameworks/System.framework; sourceTree = "<absolute>"; };
 		9ECC2F800CA172A500578B5E /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
@@ -258,6 +262,9 @@
 		9EDD44A70F4A999800BD4083 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				9EB2BDF30F84D90B0087A964 /* CslCharEncoding.cpp */,
+				9EB2BDF40F84D90B0087A964 /* CslCharEncoding.h */,
+				9EB2BDEB0F84D6D10087A964 /* Csl.h */,
 				9EEA7A100F5EAD8C00A54722 /* CslTTS.cpp */,
 				9EEA7A110F5EAD8C00A54722 /* CslTTS.h */,
 				9EF936340F3E1C6F00E5E1AE /* CslToolTip.cpp */,
@@ -457,7 +464,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9E3F16110CA1693800C3C8C9 /* GeoIP.c in Sources */,
 				9ED9D4760CA1622F00B0FC71 /* CslArt.cpp in Sources */,
 				9ED9D4770CA1622F00B0FC71 /* CslDlgAddMaster.cpp in Sources */,
 				9ED9D4780CA1622F00B0FC71 /* CslDlgAddServer.cpp in Sources */,
@@ -499,6 +505,8 @@
 				9EE7487E0F36219C006D6C8E /* CslVersionCheck.cpp in Sources */,
 				9EF936360F3E1C6F00E5E1AE /* CslToolTip.cpp in Sources */,
 				9EEA7A120F5EAD8C00A54722 /* CslTTS.cpp in Sources */,
+				9EB2BDC60F84D5490087A964 /* GeoIP.c in Sources */,
+				9EB2BDF50F84D90B0087A964 /* CslCharEncoding.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -514,8 +522,6 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = ../../wxMac/include/wx/wxprec.h;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					NO_GCC_PRAGMA,
 					__WXMAC__,
@@ -527,19 +533,12 @@
 					MACOS_CLASSIC,
 					"__WXDEBUG__=1",
 				);
-				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "GEOIPDATADIR=\"\\\"data\\\"\"";
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				GCC_USE_GCC3_PFE_SUPPORT = NO;
 				GCC_VERSION_i386 = 4.0;
 				GCC_VERSION_ppc = 3.3;
-				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GENERATE_PKGINFO_FILE = YES;
-				HEADER_SEARCH_PATHS = ../src/img/flags;
-				INSTALL_PATH = "$(HOME)/Applications";
-				MACH_O_TYPE = mh_execute;
 				MACOSX_DEPLOYMENT_TARGET_i386 = 10.4;
 				MACOSX_DEPLOYMENT_TARGET_ppc = 10.3;
-				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-liconv",
 					"-lz",
@@ -547,7 +546,6 @@
 				PRODUCT_NAME = csl;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				STRIP_INSTALLED_PRODUCT = NO;
-				WRAPPER_EXTENSION = app;
 			};
 			name = Development;
 		};
@@ -561,11 +559,8 @@
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
-				GCC_PREFIX_HEADER = ../../wxMac/include/wx/wxprec.h;
-				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "GEOIPDATADIR=\"\\\"data\\\"\"";
 				GCC_VERSION_i386 = 4.0;
 				GCC_VERSION_ppc = 3.3;
-				HEADER_SEARCH_PATHS = ../src/img/flags;
 				INFOPLIST_FILE = Info.plist;
 				MACH_O_TYPE = mh_execute;
 				MACOSX_DEPLOYMENT_TARGET_i386 = 10.4;
@@ -582,30 +577,29 @@
 		9ED9D44F0CA161E000B0FC71 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SYSTEM_DEVELOPER_DIR)/SDKs/MacOSX10.4u.sdk/System/Library/Frameworks\"";
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G4;
-				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PFE_FILE_C_DIALECTS = "c++";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
-				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "GEOIPDATADIR=\"\\\"../Resources/\\\"\"";
-				HEADER_SEARCH_PATHS = "";
+				GCC_PREFIX_HEADER = ../src/pch/Csl.h;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					NO_GCC_PRAGMA,
+					__WXMAC__,
+					"wxUSE_BASE=1",
+					"_FILE_OFFSET_BITS=64",
+					_LARGE_FILES,
+					"__WXMAC_XCODE__=1",
+					"WX_PRECOMP=1",
+					MACOS_CLASSIC,
+					"__WXDEBUG__=1",
+					"$(GCC_PREPROCESSOR_DEFINITIONS_QUOTED_1)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_1 = "GEOIPDATADIR=\"\\\"../Resources/\\\"\"";
 				INFOPLIST_FILE = "csl-Info.plist";
-				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_2)",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../../../Toolkits/wxMac/src/build/Deployment\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/../../../Toolkits/wxMac/src/build/Development\"";
-				MACOSX_DEPLOYMENT_TARGET = "";
 				OTHER_CFLAGS = (
 					"-D__WXDEBUG__",
 					"-D__WXMAC__",
@@ -626,35 +620,23 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = csl;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
-				SKIP_INSTALL = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited) \"$(SRCROOT)/../../../Toolkits/wxMac/include\" ../src ../src/img/flags ../src/irc/libircclient/include";
+				USER_HEADER_SEARCH_PATHS = "$(inherited) \"$(SRCROOT)/../../../Toolkits/wxMac/include\" ../src ../src/pch ../src/img/flags ../src/irc/libircclient/include";
 				WARNING_CFLAGS = "-Wall";
-				WRAPPER_EXTENSION = app;
-				ZERO_LINK = NO;
 			};
 			name = Development;
 		};
 		9ED9D4500CA161E000B0FC71 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					i386,
-					ppc,
-				);
-				COPY_PHASE_STRIP = YES;
 				DEPLOYMENT_POSTPROCESSING = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
 				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SYSTEM_DEVELOPER_DIR)/SDKs/MacOSX10.4u.sdk/System/Library/Frameworks\"";
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G4;
-				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PFE_FILE_C_DIALECTS = "c++";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				GCC_PREFIX_HEADER = ../src/pch/Csl.h;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					NO_GCC_PRAGMA,
 					__WXMAC__,
@@ -666,18 +648,16 @@
 					"__WXMAC_XCODE__=1",
 					"WX_PRECOMP=1",
 					MACOS_CLASSIC,
+					"$(GCC_PREPROCESSOR_DEFINITIONS_QUOTED_1)",
 				);
-				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "GEOIPDATADIR=\"\\\"../Resources/\\\"\"";
-				HEADER_SEARCH_PATHS = "";
+				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_1 = "GEOIPDATADIR=\"\\\"../Resources/\\\"\"";
 				INFOPLIST_FILE = "csl-Info.plist";
-				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../../../Toolkits/wxMac/src/build/Deployment\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/../../../Toolkits/wxMac/src/build/Development\"";
-				MACOSX_DEPLOYMENT_TARGET = "";
 				OTHER_CFLAGS = (
 					"-D__WXMAC__",
 					"-D_FILE_OFFSET_BITS=64",
@@ -696,12 +676,10 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = csl;
-				SKIP_INSTALL = YES;
-				STRIP_STYLE = debugging;
-				USER_HEADER_SEARCH_PATHS = "$(inherited) \"$(SRCROOT)/../../../Toolkits/wxMac/include\" ../src ../src/img/flags ../src/irc/libircclient/include";
+				SEPARATE_STRIP = YES;
+				USER_HEADER_SEARCH_PATHS = "$(inherited) \"$(SRCROOT)/../../../Toolkits/wxMac/include\" ../src ../src/pch ../src/img/flags ../src/irc/libircclient/include";
 				WARNING_CFLAGS = "-Wall";
 				WRAPPER_EXTENSION = app;
-				ZERO_LINK = NO;
 			};
 			name = Deployment;
 		};

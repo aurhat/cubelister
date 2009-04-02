@@ -61,6 +61,9 @@
 #include <wx/clipbrd.h>
 #include <wx/uri.h>
 #include <wx/numdlg.h>
+#ifdef __WXMAC__
+#include <wx/sysopt.h>
+#endif //__WXMAC__
 
 #include "../engine/CslTools.h"
 #include "../engine/CslVersion.h"

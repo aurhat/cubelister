@@ -90,14 +90,15 @@ wxString CslCharEncoding::ToLocal(const char *data)
 
     if (m_conv)
     {
-        LOG_DEBUG("trying '%s'\n",m_name.mb_str(wxConvLocal));
+        LOG_DEBUG("trying '%s'\n",(const char*)m_name.mb_str(wxConvLocal));
         if ((buffer=ConvToLocalBuffer(data,*m_conv)))
         {
             s=buffer;
             delete[] buffer;
             return s;
         }
-        LOG_DEBUG("Invalid %s sequence: %s\n",m_name.mb_str(wxConvLocal),data);
+        LOG_DEBUG("Invalid %s sequence: %s\n",
+                  (const char*)m_name.mb_str(wxConvLocal),data);
     }
 
     wxCSConv conv(wxT("ISO-8859-15"));
@@ -130,7 +131,8 @@ wxCharBuffer CslCharEncoding::ToServer(const wxString& str)
         if (buffer)
             return buffer;
 
-        LOG_DEBUG("Conversion to %s failed.\n",m_name.mb_str(wxConvLocal));
+        LOG_DEBUG("Conversion to %s failed.\n",
+                  (const char*)m_name.mb_str(wxConvLocal));
     }
 
     if (m_utf8)
