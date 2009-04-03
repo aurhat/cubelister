@@ -299,6 +299,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="wxbase28u.lib wxbase28u_net.lib wxmsw28u_adv.lib wxmsw28u_core.lib wxregexu.lib wxtiff.lib wxjpeg.lib wxpng.lib wxzlib.lib wxexpat.lib comctl32.lib rpcrt4.lib wsock32.lib"
+				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -343,12 +344,20 @@
 				RelativePath=".\CslMapCfgTool.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\pch\pch.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Headerdateien"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\pch\Csl.h"
+				>
+			</File>
 			<File
 				RelativePath=".\CslMapCfgTool.h"
 				>

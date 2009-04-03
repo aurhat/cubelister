@@ -509,6 +509,10 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\pch\Csl.h"
+				>
+			</File>
+			<File
 				RelativePath=".\csl_logo_png.h"
 				>
 			</File>
@@ -577,6 +581,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CslGeoIP.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CslIPC.h"
 				>
 			</File>
@@ -642,10 +650,6 @@
 			</File>
 			<File
 				RelativePath=".\CslVersionCheck.h"
-				>
-			</File>
-			<File
-				RelativePath=".\libGeoIP\GeoIP.h"
 				>
 			</File>
 		</Filter>
