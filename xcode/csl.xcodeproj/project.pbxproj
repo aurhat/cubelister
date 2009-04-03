@@ -8,9 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		9E015AE10CA569950029BEEF /* csl_mac.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9E015AE00CA569950029BEEF /* csl_mac.icns */; };
+		9E374D6F0F868D0E0024ED42 /* GeoIPInternal.c in Sources */ = {isa = PBXBuildFile; fileRef = 9E374D6E0F868D0E0024ED42 /* GeoIPInternal.c */; };
+		9E374D860F8690020024ED42 /* pbsetup.sh in Resources */ = {isa = PBXBuildFile; fileRef = 9E374D850F8690020024ED42 /* pbsetup.sh */; };
 		9E3B1E520CCE2BA800E6D4A2 /* maps in Resources */ = {isa = PBXBuildFile; fileRef = 9E3B1E480CCE2BA800E6D4A2 /* maps */; };
 		9E73FA100CA6EED200CA71BC /* CslMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E73FA0F0CA6EED200CA71BC /* CslMenu.cpp */; };
-		9EB2BDC60F84D5490087A964 /* GeoIP.c in Sources */ = {isa = PBXBuildFile; fileRef = 9E3F160F0CA1693800C3C8C9 /* GeoIP.c */; settings = {COMPILER_FLAGS = "-DHAVE_GETTIMEOFDAY"; }; };
 		9EB2BDF50F84D90B0087A964 /* CslCharEncoding.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EB2BDF30F84D90B0087A964 /* CslCharEncoding.cpp */; };
 		9ECC2F7C0CA1724E00578B5E /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9ECC2F7B0CA1724E00578B5E /* Carbon.framework */; };
 		9ECC2F7E0CA1726200578B5E /* System.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9ECC2F7D0CA1726200578B5E /* System.framework */; };
@@ -84,9 +85,9 @@
 
 /* Begin PBXFileReference section */
 		9E015AE00CA569950029BEEF /* csl_mac.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = csl_mac.icns; path = ../src/img/csl_mac.icns; sourceTree = SOURCE_ROOT; };
+		9E374D6E0F868D0E0024ED42 /* GeoIPInternal.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = GeoIPInternal.c; path = ../src/libGeoIP/GeoIPInternal.c; sourceTree = SOURCE_ROOT; };
+		9E374D850F8690020024ED42 /* pbsetup.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = pbsetup.sh; sourceTree = "<group>"; };
 		9E3B1E480CCE2BA800E6D4A2 /* maps */ = {isa = PBXFileReference; lastKnownFileType = folder; name = maps; path = ../data/maps; sourceTree = SOURCE_ROOT; };
-		9E3F160F0CA1693800C3C8C9 /* GeoIP.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = GeoIP.c; path = ../src/libGeoIP/GeoIP.c; sourceTree = SOURCE_ROOT; };
-		9E3F16100CA1693800C3C8C9 /* GeoIP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GeoIP.h; path = ../src/libGeoIP/GeoIP.h; sourceTree = SOURCE_ROOT; };
 		9E73FA0F0CA6EED200CA71BC /* CslMenu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslMenu.cpp; path = ../src/CslMenu.cpp; sourceTree = SOURCE_ROOT; };
 		9EB2BDEB0F84D6D10087A964 /* Csl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Csl.h; path = ../src/pch/Csl.h; sourceTree = SOURCE_ROOT; };
 		9EB2BDF30F84D90B0087A964 /* CslCharEncoding.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslCharEncoding.cpp; path = ../src/engine/CslCharEncoding.cpp; sourceTree = SOURCE_ROOT; };
@@ -213,6 +214,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		9E374D870F8690100024ED42 /* Scripts */ = {
+			isa = PBXGroup;
+			children = (
+				9E374D850F8690020024ED42 /* pbsetup.sh */,
+			);
+			name = Scripts;
+			sourceTree = "<group>";
+		};
 		9ECC31360CA1A96D00578B5E /* External Frameworks and Libraries */ = {
 			isa = PBXGroup;
 			children = (
@@ -234,6 +243,7 @@
 				9EE88C4D0F375BA000B549BE /* wxWindows.xcodeproj */,
 				9EDC68A90CA1C2A4002A4C4B /* Resources */,
 				9ECC31360CA1A96D00578B5E /* External Frameworks and Libraries */,
+				9E374D870F8690100024ED42 /* Scripts */,
 				9EDD44A70F4A999800BD4083 /* Sources */,
 				9ED9D44B0CA161E000B0FC71 /* Products */,
 			);
@@ -262,6 +272,7 @@
 		9EDD44A70F4A999800BD4083 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				9E374D6E0F868D0E0024ED42 /* GeoIPInternal.c */,
 				9EB2BDF30F84D90B0087A964 /* CslCharEncoding.cpp */,
 				9EB2BDF40F84D90B0087A964 /* CslCharEncoding.h */,
 				9EB2BDEB0F84D6D10087A964 /* Csl.h */,
@@ -324,8 +335,6 @@
 				9EF31B840CE0C99900156B63 /* CslLicense.h */,
 				9EF31B850CE0C99900156B63 /* CslPanelMap.cpp */,
 				9EF31B860CE0C99900156B63 /* CslPanelMap.h */,
-				9E3F160F0CA1693800C3C8C9 /* GeoIP.c */,
-				9E3F16100CA1693800C3C8C9 /* GeoIP.h */,
 				9ED9D4520CA1622F00B0FC71 /* CslArt.cpp */,
 				9ED9D4530CA1622F00B0FC71 /* CslArt.h */,
 				9ED9D4540CA1622F00B0FC71 /* CslDlgAddMaster.cpp */,
@@ -375,10 +384,10 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9ED9D44E0CA161E000B0FC71 /* Build configuration list for PBXNativeTarget "csl" */;
 			buildPhases = (
+				9EF936480F3E1C7B00E5E1AE /* ShellScript */,
 				9ED9D4460CA161E000B0FC71 /* Resources */,
 				9ED9D4470CA161E000B0FC71 /* Sources */,
 				9ED9D4480CA161E000B0FC71 /* Frameworks */,
-				9EF936480F3E1C7B00E5E1AE /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -438,6 +447,7 @@
 				9ECC329D0CA1AA6800578B5E /* GeoIP.dat in Resources */,
 				9E015AE10CA569950029BEEF /* csl_mac.icns in Resources */,
 				9E3B1E520CCE2BA800E6D4A2 /* maps in Resources */,
+				9E374D860F8690020024ED42 /* pbsetup.sh in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -505,8 +515,8 @@
 				9EE7487E0F36219C006D6C8E /* CslVersionCheck.cpp in Sources */,
 				9EF936360F3E1C6F00E5E1AE /* CslToolTip.cpp in Sources */,
 				9EEA7A120F5EAD8C00A54722 /* CslTTS.cpp in Sources */,
-				9EB2BDC60F84D5490087A964 /* GeoIP.c in Sources */,
 				9EB2BDF50F84D90B0087A964 /* CslCharEncoding.cpp in Sources */,
+				9E374D6F0F868D0E0024ED42 /* GeoIPInternal.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -587,12 +597,9 @@
 					"_FILE_OFFSET_BITS=64",
 					_LARGE_FILES,
 					"__WXMAC_XCODE__=1",
-					"WX_PRECOMP=1",
 					MACOS_CLASSIC,
 					"__WXDEBUG__=1",
-					"$(GCC_PREPROCESSOR_DEFINITIONS_QUOTED_1)",
 				);
-				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_1 = "GEOIPDATADIR=\"\\\"../Resources/\\\"\"";
 				INFOPLIST_FILE = "csl-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -640,17 +647,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					NO_GCC_PRAGMA,
 					__WXMAC__,
-					wxUSE_BANO_GCC_PRAGMA,
-					__WXMAC__,
 					"wxUSE_BASE=1",
 					"_FILE_OFFSET_BITS=64",
 					_LARGE_FILES,
 					"__WXMAC_XCODE__=1",
-					"WX_PRECOMP=1",
 					MACOS_CLASSIC,
-					"$(GCC_PREPROCESSOR_DEFINITIONS_QUOTED_1)",
 				);
-				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_1 = "GEOIPDATADIR=\"\\\"../Resources/\\\"\"";
 				INFOPLIST_FILE = "csl-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
