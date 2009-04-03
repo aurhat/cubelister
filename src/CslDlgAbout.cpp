@@ -19,9 +19,9 @@
  ***************************************************************************/
 
 #include "Csl.h"
-#include "CslDlgAbout.h"
 #include "CslLicense.h"
 #include "csl_logo_png.h"
+#include "CslDlgAbout.h"
 
 // begin wxGlade: ::extracode
 
@@ -156,6 +156,35 @@ void CslDlgAbout::set_properties()
         wxString(wxT(
                      "  }TC{ clan\n"
                      _L_"  'grenadier'\n\n"
+                 ))+
+        wxString(_(
+                     "Cube & Cube2 Engine Developers:\n"
+                 ))+
+        wxString(_(
+                     "  Wouter 'Aardappel' van Oortmerssen\n"
+                     _L_"  Lee 'Eihrul' Salzman\n\n"
+                 ))+
+        wxString(_(
+                     "Game developers:\n"
+                 ))+
+        wxString(_(
+                     "  Cube2 - Sauerbraten:\n"
+                     _L_"    Wouter 'Aardappel' van Oortmerssen\n"
+                     _L_"    Lee 'Eihrul' Salzman\n"
+                     _L_"    Mike 'Gilt' Dysart\n"
+                     _L_"    Robert 'a-baby-rabbit' Pointon\n"
+                     _L_"    John 'geartropper' Siar\n\n"
+                     "  AssaultCube:\n"
+                     _L_"    Adrian 'driAn' Henke\n"
+                     _L_"    Markus 'makke' Bekel\n"
+                     _L_"    Lee 'Eihrul' Salzman\n"
+                     _L_"    'ac_stef'\n"
+                     _L_"    ... and others\n\n"
+                     "  Blood Frontier:\n"
+                     _L_"    Anthony 'Acord' Cord\n"
+                     _L_"    Quinton 'Quin' Reeves\n"
+                     _L_"    Lee 'Eihrul' Salzman\n"
+                     _L_"    ... and others\n\n"
                  ))+
         wxString(_(
                      "Previous extended info server patches:\n"
