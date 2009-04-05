@@ -781,6 +781,10 @@ int wxCALLBACK CslListCtrlPlayer::ListSortCompareFunc(long item1,long item2,long
             ret=helper->Cmp(data1->Teamkills,data2->Teamkills);
             break;
 
+        case SORT_PING:
+            ret=helper->Cmp(data1->Ping,data2->Ping);
+            break;
+
         case SORT_ACCURACY:
             ret=helper->Cmp(data1->Accuracy,data2->Accuracy);
             break;

@@ -446,7 +446,7 @@ void CslIrcPanel::OnIrcEvent(CslIrcEvent& event)
                     s<<wxT("\0034*** ")<<_("Couldn't connect.")<<wxT("\003");
                     AddLine(s);
                     OnDisconnect();
-					break;
+                    break;
                 case LIBIRC_ERR_RESOLV:
                     s<<wxT("\0034*** ")<<_("Couldn't resolve hostname.")<<wxT("\003");
                     AddLine(s);
@@ -973,10 +973,10 @@ void CslIrcPanel::AddLine(const wxString& line,bool scroll)
 {
     wxChar c;
     wxFont font;
-    wxString buf;
+    wxString buf,text;
     wxTextAttrEx attr,basic;
+    wxUint32 i,j,len;
     wxInt32 fg=-1,bg=-1;
-    wxUint32 i,j,len=line.Length();
     wxDateTime now=wxDateTime::Now();
     bool bold=false,italic=false,strike=false,underline=false;
     static wxUint32 lines=0;
@@ -1007,7 +1007,8 @@ void CslIrcPanel::AddLine(const wxString& line,bool scroll)
     if (m_textLength)
         buf=wxT("\n");
 
-    buf+=wxString::Format(wxT("[%-2.2d:%-2.2d] "),now.GetHour(),now.GetMinute());
+    text=wxString::Format(wxT("\0032[%-2.2d:%-2.2d]\003 "),now.GetHour(),now.GetMinute())+line;
+    len=text.length();
 
 #define WRITEBUFFER \
     if (!buf.IsEmpty()) \
@@ -1019,7 +1020,7 @@ void CslIrcPanel::AddLine(const wxString& line,bool scroll)
 
     for (i=0;i<len;i++)
     {
-        c=line.GetChar(i);
+        c=text.GetChar(i);
 
         if (c==wxT('\x02')) //bold
         {
@@ -1038,7 +1039,7 @@ void CslIrcPanel::AddLine(const wxString& line,bool scroll)
             wxUint32 l;
             wxInt32 f,b;
 
-            GetIRCColour(U2A(line.Mid(i+1,5)),f,b,l);
+            GetIRCColour(U2A(text.Mid(i+1,5)),f,b,l);
 
             if (f<0)
             {
@@ -1119,11 +1120,11 @@ void CslIrcPanel::AddLine(const wxString& line,bool scroll)
     WRITEBUFFER
     lines++;
 
-    if ((i=line.Find(CSL_URI_SCHEME_STR))!=(wxUint32)wxNOT_FOUND)
+    if ((i=text.Find(CSL_URI_SCHEME_STR))!=(wxUint32)wxNOT_FOUND)
     {
         for (j=i+6;j<len;j++)
         {
-            if (line.GetChar(j)==wxT(' '))
+            if (text.GetChar(j)==wxT(' '))
                 break;
         }
 
