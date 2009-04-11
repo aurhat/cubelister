@@ -33,7 +33,7 @@ CslGameSauerbraten::CslGameSauerbraten()
 {
     m_name=CSL_DEFAULT_NAME_SB;
     m_defaultMasterConnection=CslMasterConnection(CSL_DEFAULT_MASTER_SB,CSL_DEFAULT_MASTER_PORT_SB);
-    m_capabilities=CSL_CAPABILITY_EXTINFO | CSL_CAPABILITY_CUSTOM_CONFIG;
+    m_capabilities=CSL_CAPABILITY_EXTINFO | CSL_CAPABILITY_CUSTOM_CONFIG | CSL_CAPABILITY_CONNECT_PASS;
 #ifdef __WXMAC__
     m_configType=CSL_CONFIG_DIR;
     m_clientSettings.ConfigPath=::wxGetHomeDir();
@@ -364,8 +364,8 @@ wxString CslGameSauerbraten::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
         param=true;
 
     address=info->Host;
-    if (GetDefaultGamePort()!=info->GamePort)
-        address+=wxString::Format(wxT(":%d"),info->GamePort);
+    if (GetDefaultGamePort()!=info->GamePort || mode==CslServerInfo::CSL_CONNECT_PASS)
+        address+=wxString::Format(wxT(" %d"),info->GamePort);
 
     if (param)
     {
