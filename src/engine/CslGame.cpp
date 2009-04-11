@@ -315,7 +315,7 @@ CslServerInfo::CslServerInfo(CslGame *game,
     ConnectWait=0;
     DescriptionOld=oldDescription;
     MMDescription=wxEmptyString;
-    MM=-1;
+    MM=-2;
     Password=pass;
     PasswordAdmin=passAdm;
     Search=false;

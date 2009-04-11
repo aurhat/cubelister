@@ -66,7 +66,7 @@ class CslListServerData
             GameMode.Empty();
             Map.Empty();
             MMDescription.Empty();
-            MM=-1;
+            MM=-2;
             Protocol=-1;
             Ping=-1;
             TimeRemain=-2;

@@ -26,7 +26,7 @@
 #include "../img/sb_16.xpm"
 
 
-enum { MM_OPEN, MM_VETO, MM_LOCKED, MM_PRIVATE, MM_PASSWORD };
+enum { MM_AUTH = -1, MM_OPEN, MM_VETO, MM_LOCKED, MM_PRIVATE, MM_PASSWORD };
 
 
 CslGameSauerbraten::CslGameSauerbraten()
@@ -206,7 +206,12 @@ bool CslGameSauerbraten::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) con
 
     if (numattr>=5)
     {
-        if (attr[4]==MM_PASSWORD)
+        if (attr[4]==MM_AUTH)
+        {
+            info.MMDescription+=wxT("0 (O/AUTH)");
+            info.MM=MM_AUTH;
+        }
+        else if (attr[4]==MM_PASSWORD)
         {
             info.MMDescription+=wxT("PASS");
             info.MM|=CSL_SERVER_PASSWORD;
