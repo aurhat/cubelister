@@ -32,7 +32,7 @@ enum { MM_OPEN, MM_VETO, MM_LOCKED, MM_PRIVATE, MM_PASSWORD };
 CslGameSauerbraten::CslGameSauerbraten()
 {
     m_name=CSL_DEFAULT_NAME_SB;
-    m_defaultMasterConnection=CslMasterConnection(CSL_DEFAULT_MASTER_SB,CSL_DEFAULT_MASTER_PATH_SB);
+    m_defaultMasterConnection=CslMasterConnection(CSL_DEFAULT_MASTER_SB,CSL_DEFAULT_MASTER_PORT_SB);
     m_capabilities=CSL_CAPABILITY_EXTINFO | CSL_CAPABILITY_CUSTOM_CONFIG;
 #ifdef __WXMAC__
     m_configType=CSL_CONFIG_DIR;

@@ -39,7 +39,7 @@ wxColour IrcColours[16] =
     wxColour(127,  0,  0),
     wxColour(160,  0,160),
     wxColour(255,128,  0),
-    wxColour(255,240,  0),
+    wxColour(255,190,  0),
     wxColour(0,  250,  0),
     wxColour(0,  128,128),
     wxColour(0,  255,255),

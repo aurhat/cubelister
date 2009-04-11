@@ -31,7 +31,7 @@
 #define CSL_DEFAULT_PORT_SB           28785
 
 #define CSL_DEFAULT_MASTER_SB         wxT("sauerbraten.org")
-#define CSL_DEFAULT_MASTER_PATH_SB    wxT("/masterserver/retrieve.do?item=list")
+#define CSL_DEFAULT_MASTER_PORT_SB    28787
 
 #define CSL_DEFAULT_INJECT_DIR_SB     wxT("packages/base/")
 #define CSL_DEFAULT_INJECT_FIL_SB     wxT("csl_start_sb")
