@@ -2,10 +2,10 @@
 !include "MUI.nsh"
 
 ;The name of the installer
-  Name "Cube Server Lister 0.8.1.76"
+  Name "Cube Server Lister 0.8.1.77"
 
 ;The file to write
-  OutFile "CSL-Installer-v0.8.1.76.exe"
+  OutFile "CSL-Installer-v0.8.1.77.exe"
 
 ;The default installation directory
   InstallDir "$PROGRAMFILES\CSL"
@@ -54,7 +54,7 @@
     SectionIn RO
     ; Set output path to the installation directory.
     SetOutPath $INSTDIR
-    File release\csl.exe
+    File unicode-release\csl.exe
     SetOutPath $INSTDIR\data
     File data\GeoIP.dat
     File data\csl_start_sb.ogz
@@ -78,7 +78,7 @@
 
   Section $(TITLE_Section2) SecMapCfgTool
     SetOutPath $INSTDIR
-    File release\cslmapcfgtool.exe
+    File unicode-release\cslmapcfgtool.exe
   SectionEnd
 
 
