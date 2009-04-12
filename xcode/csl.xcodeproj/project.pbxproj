@@ -600,6 +600,7 @@
 					MACOS_CLASSIC,
 					"__WXDEBUG__=1",
 				);
+				GCC_USE_GCC3_PFE_SUPPORT = YES;
 				INFOPLIST_FILE = "csl-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -653,6 +654,7 @@
 					"__WXMAC_XCODE__=1",
 					MACOS_CLASSIC,
 				);
+				GCC_USE_GCC3_PFE_SUPPORT = YES;
 				INFOPLIST_FILE = "csl-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",

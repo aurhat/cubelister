@@ -164,7 +164,7 @@ bool CslEngine::Init(wxEvtHandler *handler,wxInt32 interval,wxInt32 pingsPerSeco
 void CslEngine::DeInit()
 {
     SetNextHandler(NULL);
-    loopv(m_games) delete m_games[i];
+    loopvrev(m_games) delete m_games.remove(i);
     m_ok=false;
 }
 
