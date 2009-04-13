@@ -1225,7 +1225,7 @@ void CslFrame::LoadSettings()
     wxString s;
 
     wxFileConfig config(wxT(""),wxT(""),CSL_SETTINGS_FILE,wxT(""),
-                        wxCONFIG_USE_LOCAL_FILE,*wxConvCurrent);
+                        wxCONFIG_USE_LOCAL_FILE,wxConvLocal);
 
     config.SetPath(wxT("/Version"));
     config.Read(wxT("Version"),&val,0); version=val;
@@ -1359,7 +1359,7 @@ void CslFrame::SaveSettings()
         ::wxMkdir(dir,0700);
 
     wxFileConfig config(wxT(""),wxT(""),CSL_SETTINGS_FILE,wxT(""),
-                        wxCONFIG_USE_LOCAL_FILE,*wxConvCurrent);
+                        wxCONFIG_USE_LOCAL_FILE,wxConvLocal);
     config.SetUmask(0077);
     config.DeleteAll();
 
@@ -1459,7 +1459,7 @@ bool CslFrame::LoadServers(wxUint32 *numm,wxUint32 *nums)
     wxInt32 gt;
 
     wxFileConfig config(wxT(""),wxT(""),CSL_SERVERS_FILE,wxT(""),
-                        wxCONFIG_USE_LOCAL_FILE,*wxConvCurrent);
+                        wxCONFIG_USE_LOCAL_FILE,wxConvLocal);
 
     vector<CslGame*>& games=m_engine->GetGames();
 
@@ -1623,7 +1623,7 @@ void CslFrame::SaveServers()
             return;
 
     wxFileConfig config(wxT(""),wxT(""),CSL_SERVERS_FILE,wxT(""),
-                        wxCONFIG_USE_LOCAL_FILE,*wxConvCurrent);
+                        wxCONFIG_USE_LOCAL_FILE,wxConvLocal);
     config.SetUmask(0077);
     config.DeleteAll();
 
@@ -1717,7 +1717,7 @@ wxUint32 CslFrame::LoadLocators()
     wxString Name,Host,Path;
 
     wxFileConfig config(wxT(""),wxT(""),CSL_LOCATORS_FILE,wxT(""),
-                        wxCONFIG_USE_LOCAL_FILE,*wxConvCurrent);
+                        wxCONFIG_USE_LOCAL_FILE,wxConvLocal);
 
     config.SetPath(wxT("/Version"));
     config.Read(wxT("Version"),&val,0); version=val;
@@ -1746,7 +1746,7 @@ void CslFrame::SaveLocators()
             return;
 
     wxFileConfig config(wxT(""),wxT(""),CSL_LOCATORS_FILE,wxT(""),
-                        wxCONFIG_USE_LOCAL_FILE,*wxConvCurrent);
+                        wxCONFIG_USE_LOCAL_FILE,wxConvLocal);
     config.SetUmask(0077);
     config.DeleteAll();
 

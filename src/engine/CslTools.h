@@ -98,23 +98,20 @@ enum
 
 extern wxString g_basePath;
 
-extern void FixString(char *src,wxUint32 *len,wxUint32 count,bool keepnl=false);
-extern void FixFilename(wxString& name);
-extern bool IsIP(const wxString& s);
-extern bool IsLocalIP(const wxString& s);
-extern wxUint32 IP2Int(const wxString& s);
-inline wxString Int2IP(wxUint32 ip)
-{
-    return wxString::Format(wxT("%d.%d.%d.%d"),ip>>24,ip>>16&0xff,ip>>8&0xff,ip&0xff);
-}
-extern wxString FormatBytes(wxUint64 size);
-extern wxString FormatSeconds(wxUint32 time,bool space=false,bool full=false);
-extern wxUint32 GetTicks();
-extern bool BitmapFromWindow(wxWindow *window,wxBitmap& bitmap);
-extern void RegisterEventsRecursively(wxInt32 id,wxWindow *parent,wxEvtHandler *handler,
+void FixString(char *src,wxUint32 *len,wxUint32 count,bool keepnl=false);
+void FixFilename(wxString& name);
+bool IsIP(const wxString& s);
+bool IsLocalIP(const wxString& s);
+wxUint32 IP2Int(const wxString& s);
+wxString Int2IP(wxUint32 ip);
+wxString FormatBytes(wxUint64 size);
+wxString FormatSeconds(wxUint32 time,bool space=false,bool full=false);
+wxUint32 GetTicks();
+bool BitmapFromWindow(wxWindow *window,wxBitmap& bitmap);
+void RegisterEventsRecursively(wxInt32 id,wxWindow *parent,wxEvtHandler *handler,
                                           wxEventType type,wxObjectEventFunction function);
-extern wxString GetHttpAgent();
-extern wxInt32 WriteTextFile(const wxString& filename,const wxString& data,const wxFile::OpenMode mode);
+wxString GetHttpAgent();
+wxInt32 WriteTextFile(const wxString& filename,const wxString& data,const wxFile::OpenMode mode);
 
 
 wxBitmap AdjustIconSize(const char **data,const wxIcon& icon,

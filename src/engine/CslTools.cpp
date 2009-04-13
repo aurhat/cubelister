@@ -137,6 +137,11 @@ wxUint32 IP2Int(const wxString& s)
     return ip;
 }
 
+wxString Int2IP(wxUint32 ip)
+{
+    return wxString::Format(wxT("%d.%d.%d.%d"),ip>>24,ip>>16&0xff,ip>>8&0xff,ip&0xff);
+}
+
 wxString FormatBytes(wxUint64 size)
 {
     if (size>0x100000)

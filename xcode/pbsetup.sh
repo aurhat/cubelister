@@ -12,7 +12,7 @@ fi
 # Copy config.h.mac to config,h if it doesn't exist
 #
 #if [ ! -f "${1}/../src/config.h" ]; then
-    cp "${1}/config.h.xcode" "${1}/../src/config.h"
+    cp -a "${1}/config.h.xcode" "${1}/../src/config.h"
     if [ ! -f "${1}/../src/config.h" ]; then
         echo "${0}:${LINENO}: error: unable to create setup file \"${1}/../config.h\""
         exit 1
