@@ -26,7 +26,7 @@
 */
 
 #define CSL_DEFAULT_NAME_BF           wxT("Blood Frontier")
-#define CSL_LAST_PROTOCOL_BF          149
+#define CSL_LAST_PROTOCOL_BF          157
 
 #define CSL_DEFAULT_PORT_BF           28795
 

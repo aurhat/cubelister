@@ -34,6 +34,8 @@ enum
     PONGFLAG_NUM        = 1<<7
 };
 
+enum { CS_ALIVE, CS_DEAD, CS_SPAWNING, CS_LAGGED, CS_EDITING, CS_SPECTATE };
+
 
 CslGameAssaultCube::CslGameAssaultCube()
 {
@@ -225,7 +227,16 @@ bool CslGameAssaultCube::ParsePlayerPong(wxUint32 protocol,ucharbuf& buf,CslPlay
     info.Armour=getint(buf);
     info.Weapon=getint(buf);
     info.Privileges=getint(buf);
-    info.State=getint(buf);
+    switch (getint(buf))
+    {
+        case CS_ALIVE:     info.State=CSL_PLAYER_STATE_ALIVE; break;
+        case CS_DEAD:      info.State=CSL_PLAYER_STATE_DEAD; break;
+        case CS_SPAWNING:  info.State=CSL_PLAYER_STATE_SPAWNING; break;
+        case CS_LAGGED:    info.State=CSL_PLAYER_STATE_LAGGED; break;
+        case CS_EDITING:   info.State=CSL_PLAYER_STATE_EDITING; break;
+        case CS_SPECTATE:  info.State=CSL_PLAYER_STATE_SPECTATOR; break;
+        default:           info.State=CSL_PLAYER_STATE_UNKNOWN; break;
+    }
 
     return !buf.overread();
 }

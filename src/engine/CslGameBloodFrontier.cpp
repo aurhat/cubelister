@@ -26,6 +26,7 @@
 #include "../img/bf_16.xpm"
 
 enum { MM_OPEN, MM_VETO, MM_LOCKED, MM_PRIVATE, MM_PASSWORD };
+enum { CS_ALIVE, CS_DEAD, CS_SPAWNING, CS_EDITING, CS_SPECTATOR, CS_WAITING };
 
 enum
 {
@@ -48,12 +49,13 @@ enum
     G_M_DUEL  = 1<<3,
     G_M_LMS   = 1<<4,
     G_M_PAINT = 1<<5,
-    G_M_DM    = G_M_INSTA|G_M_PAINT,
-    G_M_TEAMS = G_M_MULTI|G_M_TEAM|G_M_INSTA|G_M_PAINT,
-    G_M_ALL   = G_M_MULTI|G_M_TEAM|G_M_INSTA|G_M_PAINT|G_M_DUEL|G_M_LMS,
+    G_M_VAMP  = 1<<6,
+    G_M_DM    = G_M_INSTA|G_M_PAINT|G_M_VAMP,
+    G_M_TEAMS = G_M_MULTI|G_M_TEAM|G_M_INSTA|G_M_PAINT|G_M_VAMP,
+    G_M_ALL   = G_M_MULTI|G_M_TEAM|G_M_INSTA|G_M_PAINT|G_M_VAMP|G_M_DUEL|G_M_LMS,
 };
 
-#define G_M_NUM  6
+#define G_M_NUM  7
 
 
 static struct
@@ -72,12 +74,13 @@ gametype[] =
 },
 mutstype[] =
 {
-    { G_M_MULTI, G_M_ALL,         G_M_TEAM|G_M_MULTI, wxT("MS")        },
+    { G_M_MULTI, G_M_ALL,         G_M_TEAM|G_M_MULTI, wxT("Multi")     },
     { G_M_TEAM,  G_M_TEAMS,       G_M_TEAM,           wxT("Team")      },
-    { G_M_INSTA, G_M_ALL,         G_M_INSTA,          wxT("Instagib")  },
+    { G_M_INSTA, G_M_ALL,         G_M_INSTA,          wxT("Insta")     },
     { G_M_DUEL,  G_M_DM|G_M_DUEL, G_M_DUEL,           wxT("Duel")      },
     { G_M_LMS,   G_M_DM|G_M_LMS,  G_M_LMS,            wxT("LMS")       },
     { G_M_PAINT, G_M_ALL,         G_M_PAINT,          wxT("Paintball") },
+    { G_M_VAMP,  G_M_ALL,         G_M_VAMP,           wxT("Vampire")   },
 };
 
 
@@ -107,8 +110,8 @@ wxString CslBloodFrontier::GetModeName(wxInt32 n,wxInt32 m) const
 
     if (gametype[n].mutators && m)
     {
-        mode+=wxT(" (");
         wxString addition;
+
         loopi(G_M_NUM)
         {
             if ((gametype[n].mutators & mutstype[i].type) &&
@@ -120,7 +123,9 @@ wxString CslBloodFrontier::GetModeName(wxInt32 n,wxInt32 m) const
                 addition+=wxString(mutstype[i].name);
             }
         }
-        mode+=addition+wxT(")");
+
+        if (!addition.IsEmpty())
+            mode<<wxT(" (")<<addition<<wxT(")");
     }
 
     return mode;
@@ -130,7 +135,7 @@ const wxChar* CslBloodFrontier::GetVersionName(wxInt32 prot) const
 {
     static const wxChar* versions[] =
     {
-        wxT("0.80")
+        wxT("Beta1")
     };
 
     wxInt32 v=CSL_LAST_PROTOCOL_BF-prot;
@@ -295,7 +300,16 @@ bool CslBloodFrontier::ParsePlayerPong(wxUint32 protocol,ucharbuf& buf,CslPlayer
     info.Armour=getint(buf);
     info.Weapon=getint(buf);
     info.Privileges=getint(buf);
-    info.State=getint(buf);
+    switch (getint(buf))
+    {
+        case CS_ALIVE:     info.State=CSL_PLAYER_STATE_ALIVE; break;
+        case CS_DEAD:      info.State=CSL_PLAYER_STATE_DEAD; break;
+        case CS_SPAWNING:  info.State=CSL_PLAYER_STATE_SPAWNING; break;
+        case CS_EDITING:   info.State=CSL_PLAYER_STATE_EDITING; break;
+        case CS_SPECTATOR: info.State=CSL_PLAYER_STATE_SPECTATOR; break;
+        case CS_WAITING:   info.State=CSL_PLAYER_STATE_WAITING; break;
+        default:           info.State=CSL_PLAYER_STATE_UNKNOWN; break;
+    }
 
     return !buf.overread();
 }
