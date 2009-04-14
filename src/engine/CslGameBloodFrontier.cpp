@@ -233,7 +233,7 @@ bool CslBloodFrontier::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
 
     if (numattr>=6)
     {
-        if (attr[4]==MM_PASSWORD)
+        if (attr[5]==MM_PASSWORD)
         {
             info.MMDescription+=wxT("PASS");
             info.MM|=CSL_SERVER_PASSWORD;
