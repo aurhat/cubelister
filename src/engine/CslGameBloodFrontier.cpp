@@ -401,7 +401,7 @@ wxString CslBloodFrontier::GameStart(CslServerInfo *info,wxUint32 mode,wxString&
 
     address=info->Host;
     if (GetDefaultGamePort()!=info->GamePort || mode==CslServerInfo::CSL_CONNECT_PASS)
-        address+=wxString::Format(wxT(" %d"),info->GamePort);
+        address+=wxString::Format(wxT(" %d %d"),info->GamePort,info->InfoPort);
 
 #ifdef __WXMSW__
     opts+=wxT(" -x\"connect ")+address;
