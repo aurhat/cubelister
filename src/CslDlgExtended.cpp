@@ -459,7 +459,7 @@ void CslDlgExtended::UpdateTeamData()
             font.SetWeight(wxFONTWEIGHT_BOLD);
             m_teamLabel.Item(h)->SetFont(font);
 
-            if (data->Score==limit || stats.TimeRemain==0)
+            if ((limit>=0 && data->Score==limit) || stats.TimeRemain==0)
             {
                 s=data->Name;
                 s+=wxT(": ");

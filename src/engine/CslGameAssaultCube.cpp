@@ -81,7 +81,7 @@ const wxChar* CslGameAssaultCube::GetModeName(wxInt32 mode) const
         wxT("team deathmatch"),wxT("coopedit"),wxT("deathmatch"),wxT("survivor"),
         wxT("team survivor"),wxT("ctf"),wxT("pistol frenzy"),wxT("bot team deathmatch"),
         wxT("bot deathmatch"),wxT("last swiss standing"),wxT("one shot,one kill"),
-        wxT("team one shot,one kill"),wxT("bot one shot,one skill"),
+        wxT("team one shot,one kill"),wxT("bot one shot,one kill"),
         wxT("hunt the flag"),wxT("team keep the flag"),wxT("keep the flag")
     };
 
@@ -94,7 +94,7 @@ const wxChar* CslGameAssaultCube::GetWeaponName(wxInt32 n) const
     static const wxChar* weapons[] =
     {
         _("Knife"),_("Pistol"),_("Shotgun"),_("Subgun"),
-        _("Sniper"),_("Assault"),_("Grenade"),_("Pistol (auto)")
+        _("Sniper"),_("Assault"),_("Grenade"),_("Akimbo")
     };
 
     return (n>=0 && (size_t)n<sizeof(weapons)/sizeof(weapons[0])) ?
