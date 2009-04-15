@@ -1343,6 +1343,8 @@ void CslFrame::LoadSettings()
                 settings.ConfigPath=s;
         }
         if (config.Read(wxT("Options"),&s)) settings.Options=s;
+        if (config.Read(wxT("PreScript"),&s)) settings.PreScript=s;
+        if (config.Read(wxT("PostScript"),&s)) settings.PostScript=s;
         if (config.Read(wxT("ExpertConfig"),&val)) settings.Expert=val!=0;
         if (!settings.Binary.IsEmpty() && !::wxFileExists(settings.Binary))
             settings.Binary=wxEmptyString;
@@ -1430,6 +1432,9 @@ void CslFrame::SaveSettings()
         config.Write(wxT("Binary"),settings.Binary);
         config.Write(wxT("GamePath"),settings.GamePath);
         config.Write(wxT("ConfigPath"),settings.ConfigPath);
+        config.Write(wxT("Options"),settings.Options);
+        config.Write(wxT("PreScript"),settings.PreScript);
+        config.Write(wxT("PostScript"),settings.PostScript);
         config.Write(wxT("Options"),settings.Options);
         config.Write(wxT("ExpertConfig"),settings.Expert);
     }

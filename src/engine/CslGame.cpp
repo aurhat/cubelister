@@ -242,6 +242,16 @@ CslServerInfo* CslGame::FindServerByAddr(const wxIPV4address& addr)
     return NULL;
 }
 
+wxString& CslGame::ProcessScript(const CslServerInfo& info,wxString& script)
+{
+    script.Replace(wxT("#csl_server_host#"),info.Host);
+    script.Replace(wxT("#csl_server_port#"),wxString::Format(wxT("%d"),info.GamePort));
+    script.Replace(wxT("#csl_server_pass#"),info.Password);
+    script.Replace(wxT("#csl_server_adminpass#"),info.PasswordAdmin);
+
+    return script;
+}
+
 void CslGame::GetFavourites(vector <CslServerInfo*>& servers)
 {
     loopv(m_servers)

@@ -43,8 +43,9 @@ class CslGamePage : public wxPanel
         DECLARE_EVENT_TABLE()
 
     protected:
-        wxStaticText* label_exe,*label_gamepath,*label_cfgpath,*label_expert;
-        wxTextCtrl *text_ctrl_options;
+        wxStaticText *label_exe,*label_gamepath,*label_cfgpath;
+        wxStaticText *label_pre_script,*label_post_script,*label_expert;
+        wxTextCtrl *text_ctrl_options,*text_ctrl_pre_script,*text_ctrl_post_script;
         wxCheckBox *checkbox_expert;
         wxFlexGridSizer *sizer;
         wxFilePickerCtrl *filepicker;

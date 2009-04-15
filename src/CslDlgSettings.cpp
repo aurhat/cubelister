@@ -91,7 +91,7 @@ CslGamePage::CslGamePage(wxWindow *parent,CslGame *game) :
 #else
     dpickBorder=4;
 #endif
-    sizer=new wxFlexGridSizer(5,2,0,0);
+    sizer=new wxFlexGridSizer(6,2,0,0);
 
     label_exe=new wxStaticText(this,wxID_ANY,_("Game executable:"));
     sizer->Add(label_exe,0,wxLEFT|wxALIGN_CENTER_VERTICAL,8);
@@ -128,7 +128,21 @@ CslGamePage::CslGamePage(wxWindow *parent,CslGame *game) :
     sizer->Add(text_ctrl_options,0,wxALL|wxEXPAND,4);
     text_ctrl_options->SetValue(settings.Options);
 
-    label_expert = new wxStaticText(this,wxID_ANY,_("Configuration:"));
+    label_pre_script=new wxStaticText(this,wxID_ANY,_("Pre connect script:"));
+    sizer->Add(label_pre_script,0,wxLEFT|wxALIGN_CENTER_VERTICAL,8);
+
+    text_ctrl_pre_script=new wxTextCtrl(this,wxID_ANY,wxEmptyString);
+    sizer->Add(text_ctrl_pre_script,0,wxALL|wxEXPAND,4);
+    text_ctrl_pre_script->SetValue(settings.PreScript);
+
+    label_post_script=new wxStaticText(this,wxID_ANY,_("Post connect script:"));
+    sizer->Add(label_post_script,0,wxLEFT|wxALIGN_CENTER_VERTICAL,8);
+
+    text_ctrl_post_script=new wxTextCtrl(this,wxID_ANY,wxEmptyString);
+    sizer->Add(text_ctrl_post_script,0,wxALL|wxEXPAND,4);
+    text_ctrl_post_script->SetValue(settings.PostScript);
+
+    label_expert=new wxStaticText(this,wxID_ANY,_("Configuration:"));
     sizer->Add(label_expert,0,wxLEFT|wxALIGN_CENTER_VERTICAL,8);
 
     checkbox_expert=new wxCheckBox(this,CHECK_GAME_EXPERT,_("Expert configuration"));
@@ -159,7 +173,10 @@ bool CslGamePage::SaveSettings(wxString *message)
         configpath+=PATHDIV;
 
     CslGameClientSettings settings(filepicker->GetPath(),gamepath,configpath,
-                                   text_ctrl_options->GetValue(),checkbox_expert->GetValue());
+                                   text_ctrl_options->GetValue(),
+                                   text_ctrl_pre_script->GetValue(),
+                                   text_ctrl_post_script->GetValue(),
+                                   checkbox_expert->GetValue());
 
     if (!m_game->ValidateClientSettings(&settings,message))
         return false;
@@ -183,6 +200,11 @@ void CslGamePage::ToggleView(bool expertView)
     {
         label_cfgpath->Show(expert);
         dirpickercfg->Show(expert);
+
+        label_pre_script->Show(expert);
+        label_post_script->Show(expert);
+        text_ctrl_pre_script->Show(expert);
+        text_ctrl_post_script->Show(expert);
     }
 
     if (m_game->GetConfigType()==CslGame::CSL_CONFIG_DIR)

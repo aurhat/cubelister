@@ -104,11 +104,13 @@ class CslGameClientSettings
     public:
         CslGameClientSettings() : Expert(false) {}
         CslGameClientSettings(const wxString& binary,const wxString& path,const wxString& configpath,
-                              const wxString& options,bool expert) :
+                              const wxString& options,const wxString& preScript,const wxString& postScript,
+                              bool expert) :
                 Binary(binary),GamePath(path),ConfigPath(configpath),
-                Options(options),Expert(expert) {}
+                Options(options),PreScript(preScript),PostScript(postScript),
+                Expert(expert) {}
 
-        wxString Binary,GamePath,ConfigPath,Options;
+        wxString Binary,GamePath,ConfigPath,Options,PreScript,PostScript;
         bool Expert;
 };
 
@@ -139,6 +141,7 @@ class CslGame
         void GetExtServers(vector <CslServerInfo*>& servers,bool all=false);
         CslServerInfo* FindServerByAddr(const wxString host,wxUint16 port);
         CslServerInfo* FindServerByAddr(const wxIPV4address& addr);
+        wxString& ProcessScript(const CslServerInfo& info,wxString& script);
 
         wxInt32 GetId() { return m_gameId; }
         wxString GetName() { return m_name; }

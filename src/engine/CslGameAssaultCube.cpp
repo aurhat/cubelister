@@ -291,6 +291,8 @@ wxString CslGameAssaultCube::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
     wxString bin=m_clientSettings.Binary;
     wxString configpath=m_clientSettings.ConfigPath;
     wxString opts=m_clientSettings.Options;
+    wxString preScript=m_clientSettings.PreScript;
+    wxString postScript=m_clientSettings.PostScript;
 
     if (m_clientSettings.Binary.IsEmpty() || !::wxFileExists(m_clientSettings.Binary))
     {
@@ -353,16 +355,23 @@ wxString CslGameAssaultCube::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
         file.Close();
     }
 
+    if (!preScript.IsEmpty())
+        ProcessScript(*info,preScript);
+    if (!postScript.IsEmpty())
+        ProcessScript(*info,postScript);
+
     // use saycommand [/connect ...] on version >=1.0.0,
     // otherwise password bassed connect attemps don't work
     bool say=!(password.IsEmpty() || info->Protocol<=1126);
 
-    wxString script=wxString::Format(wxT("\r\n%s%s %s \"%s\"%s\r\n"),
-                                     say ? wxT("saycommand [/") : wxEmptyString,
+    wxString script=wxString::Format(wxT("\r\n%s\r\n%s%s %s \"%s\"%s\r\n%s\r\n"),
+                                     preScript.IsEmpty() ? wxT("") : preScript.c_str(),
+                                     say ? wxT("saycommand [/") : wxT(""),
                                      mode==CslServerInfo::CSL_CONNECT_ADMIN_PASS ?
                                      wxT("connectadmin"):wxT("connect"),
                                      address.c_str(),password.c_str(),
-                                     say ? wxT("]") : wxEmptyString);
+                                     say ? wxT("]") : wxT(""),
+                                     postScript.IsEmpty() ? wxT("") : postScript.c_str());
 
     return WriteTextFile(configpath,script,wxFile::write_append)==CSL_ERROR_NONE ? bin:wxString(wxEmptyString);
 }
