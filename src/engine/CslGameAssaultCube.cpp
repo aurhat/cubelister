@@ -355,10 +355,8 @@ wxString CslGameAssaultCube::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
         file.Close();
     }
 
-    if (!preScript.IsEmpty())
-        ProcessScript(*info,preScript);
-    if (!postScript.IsEmpty())
-        ProcessScript(*info,postScript);
+    ProcessScript(*info,mode,preScript);
+    ProcessScript(*info,mode,postScript);
 
     // use saycommand [/connect ...] on version >=1.0.0,
     // otherwise password bassed connect attemps don't work

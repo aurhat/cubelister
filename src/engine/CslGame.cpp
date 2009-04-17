@@ -242,12 +242,18 @@ CslServerInfo* CslGame::FindServerByAddr(const wxIPV4address& addr)
     return NULL;
 }
 
-wxString& CslGame::ProcessScript(const CslServerInfo& info,wxString& script)
+wxString& CslGame::ProcessScript(const CslServerInfo& info,wxUint32 connectMode,wxString& script)
 {
-    script.Replace(wxT("#csl_server_host#"),info.Host);
-    script.Replace(wxT("#csl_server_port#"),wxString::Format(wxT("%d"),info.GamePort));
-    script.Replace(wxT("#csl_server_pass#"),info.Password);
-    script.Replace(wxT("#csl_server_adminpass#"),info.PasswordAdmin);
+    if (!script.IsEmpty())
+    {
+        script.Replace(wxT("#csl_server_host#"),info.Host);
+        script.Replace(wxT("#csl_server_port#"),wxString::Format(wxT("%d"),info.GamePort));
+        script.Replace(wxT("#csl_server_pass#"),info.Password);
+        script.Replace(wxT("#csl_server_adminpass#"),info.PasswordAdmin);
+        script.Replace(wxT("#csl_server_used_pass#"),
+                       connectMode==CslServerInfo::CSL_CONNECT_ADMIN_PASS ? wxT("admin") :
+                       (connectMode==CslServerInfo::CSL_CONNECT_PASS ? wxT("server") : wxT("")));
+    }
 
     return script;
 }

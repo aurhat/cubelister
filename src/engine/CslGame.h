@@ -141,7 +141,7 @@ class CslGame
         void GetExtServers(vector <CslServerInfo*>& servers,bool all=false);
         CslServerInfo* FindServerByAddr(const wxString host,wxUint16 port);
         CslServerInfo* FindServerByAddr(const wxIPV4address& addr);
-        wxString& ProcessScript(const CslServerInfo& info,wxString& script);
+        static wxString& ProcessScript(const CslServerInfo& info,wxUint32 connectMode,wxString& script);
 
         wxInt32 GetId() { return m_gameId; }
         wxString GetName() { return m_name; }
