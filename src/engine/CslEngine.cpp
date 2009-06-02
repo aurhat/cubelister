@@ -444,7 +444,7 @@ wxInt32 CslEngine::UpdateFromMaster(CslMaster *master)
     }
     else if (connection.GetType()==CslMasterConnection::CONNECTION_OTHER)
     {
-        wxSocketClient sock(wxSOCKET_BLOCK);
+        wxSocketClient sock(wxSOCKET_BLOCK|wxSOCKET_WAITALL);
         sock.SetTimeout(10);
         wxIPV4address addr;
         addr.Hostname(connection.GetAddress());
