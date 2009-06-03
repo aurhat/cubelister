@@ -52,10 +52,10 @@ const wxChar* CslGameSauerbraten::GetVersionName(wxInt32 prot) const
 {
     static const wxChar* versions[] =
     {
-        wxT("CTF"),wxT("Assassin"),wxT("Summer"),wxT("Spring"),
-        wxT("Gui"),wxT("Water"),wxT("Normalmap"),wxT("Sp"),
-        wxT("Occlusion"),wxT("Shader"),wxT("Physics"),wxT("Mp"),
-        wxT(""),wxT("Agc"),wxT("Quakecon"),wxT("Independence")
+        wxT("Trooper"),wxT("CTF"),wxT("Assassin"),wxT("Summer"),
+        wxT("Spring"),wxT("Gui"),wxT("Water"),wxT("Normalmap"),
+        wxT("Sp"),wxT("Occlusion"),wxT("Shader"),wxT("Physics"),
+        wxT("Mp"),wxT(""),wxT("Agc"),wxT("Quakecon"),wxT("Independence")
     };
 
     wxInt32 v=CSL_LAST_PROTOCOL_SB-prot;
