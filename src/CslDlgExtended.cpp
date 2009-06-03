@@ -265,19 +265,9 @@ void CslDlgExtended::OnCommandEvent(wxCommandEvent& event)
 
 void CslDlgExtended::OnMenu(wxCommandEvent& event)
 {
-    switch (event.GetId())
-    {
-        case MENU_SERVER_EXT_FULL:
-        case MENU_SERVER_EXT_MICRO:
-        case MENU_SERVER_EXT_MINI:
-        case MENU_SERVER_EXT_DEFAULT:
-            event.SetClientData(m_info);
-        case MENU_SERVER_CONNECT:
-        case MENU_SERVER_CONNECT_PW:
-            wxPostEvent(m_parent,event);
-        default:
-            return;
-    }
+    wxPostEvent(m_parent,event);
+
+    return;
 }
 
 void CslDlgExtended::OnItemActivated(wxListEvent& event)
