@@ -127,7 +127,7 @@ wxString CslGameCube::GameStart(CslServerInfo *info,wxUint32 mode,wxString& erro
     //binary must be surrounded by quotes if the path contains spaces
     bin=wxT("\"")+m_clientSettings.Binary+wxT("\"");
 #else
-	CmdlineEscapeSpaces(bin)
+	CmdlineEscapeSpaces(bin);
 #endif
     bin<<wxT(" ")<<opts;
 
