@@ -184,18 +184,18 @@ bool CslGameAssaultCube::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) con
             info.MMDescription=wxT("O");
         if (i&PONGFLAG_BANNED)
         {
-            info.MMDescription+=wxT("/BAN");
+            info.MMDescription<<wxT("/BAN");
             info.MM|=CSL_SERVER_BAN;
         }
         if (i&PONGFLAG_BLACKLIST)
         {
-            info.MMDescription+=wxT("/BLACK");
+            info.MMDescription<<wxT("/BLACK");
             info.MM|=CSL_SERVER_BLACKLIST;
         }
 
         if (i&PONGFLAG_PASSWORD)
         {
-            info.MMDescription+=wxT("/PASS");
+            info.MMDescription<<wxT("/PASS");
             info.MM|=CSL_SERVER_PASSWORD;
         }
     }
@@ -314,34 +314,35 @@ wxString CslGameAssaultCube::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
 #ifdef __WXMSW__
     //binary must be surrounded by quotes if the path contains spaces
     bin=wxT("\"")+m_clientSettings.Binary+wxT("\"");
+    // use Prepend() and do not use opts+= here, since --home=<path> must be before --init
     opts.Prepend(wxT("--home=\"")+path.RemoveLast()+wxT("\" "));
 #else
-    bin.Replace(wxT(" "),wxT("\\ "));
-    path.Replace(wxT(" "),wxT("\\ "));
+    CmdlineEscapeSpaces(bin);
+    CmdlineEscapeSpaces(path);
     // use Prepend() and do not use opts+= here, since --home=<path> must be before --init
     opts.Prepend(wxT("--home=")+configpath+wxT(" "));
 #endif //__WXMSW__
 
-    bin+=wxT(" ")+opts;
+    bin<<wxT(" ")+opts;
 
-    password=mode==CslServerInfo::CSL_CONNECT_PASS ? info->Password:
+    password=mode==CslServerInfo::CSL_CONNECT_PASS ? info->Password :
              mode==CslServerInfo::CSL_CONNECT_ADMIN_PASS ?
-             info->PasswordAdmin:wxString(wxEmptyString);
+             info->PasswordAdmin : wxString(wxEmptyString);
 
     address=info->Host;
 
     // apply port on version >=1.0.0, otherwise
     // password based connect attemps don't work
     if (info->GamePort!=GetDefaultGamePort() || (info->Protocol>=1128 && !password.IsEmpty()))
-        address+=wxString::Format(wxT(" %d"),info->GamePort);
+        address<<wxString::Format(wxT(" %d"),info->GamePort);
 
-    configpath+=wxString(CSL_DEFAULT_INJECT_DIR_AC);
+    configpath<<wxString(CSL_DEFAULT_INJECT_DIR_AC);
 
     if (!::wxDirExists(configpath))
         if (!wxFileName::Mkdir(configpath,0700,wxPATH_MKDIR_FULL))
             return wxEmptyString;
 
-    configpath+=wxString(CSL_DEFAULT_INJECT_FILE_AC);
+    configpath<<wxString(CSL_DEFAULT_INJECT_FILE_AC);
 
     if (::wxFileExists(configpath))
     {

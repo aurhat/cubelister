@@ -33,9 +33,6 @@
 #define CSL_DEFAULT_MASTER_BF         wxT("bloodfrontier.com")
 #define CSL_DEFAULT_MASTER_PORT_BF    28800
 
-#define CSL_DEFAULT_INJECT_DIR_BF     wxT("packages/base/")
-#define CSL_DEFAULT_INJECT_FIL_BF     wxT("csl_start_sb")
-
 
 class CslBloodFrontier : public CslGame
 {

@@ -1,5 +1,4 @@
 csldatadir = $(datadir)/csl
-csldata_DATA = csl_start_sb.ogz
 if with_internal_geoipdatabase
 csldata_DATA += GeoIP.dat
 endif

@@ -33,15 +33,15 @@ CslGameSauerbraten::CslGameSauerbraten()
 {
     m_name=CSL_DEFAULT_NAME_SB;
     m_defaultMasterConnection=CslMasterConnection(CSL_DEFAULT_MASTER_SB,CSL_DEFAULT_MASTER_PORT_SB);
-    m_capabilities=CSL_CAPABILITY_EXTINFO | CSL_CAPABILITY_CUSTOM_CONFIG | CSL_CAPABILITY_CONNECT_PASS;
+    m_capabilities=CSL_CAPABILITY_EXTINFO | CSL_CAPABILITY_CUSTOM_CONFIG |
+                   CSL_CAPABILITY_CONNECT_PASS | CSL_CAPABILITY_CONNECT_ADMIN_PASS;
 #ifdef __WXMAC__
     m_configType=CSL_CONFIG_DIR;
     m_clientSettings.ConfigPath=::wxGetHomeDir();
-    m_clientSettings.ConfigPath+=wxT("/Library/Application Support/sauerbraten");
+    m_clientSettings.ConfigPath<<wxT("/Library/Application Support/sauerbraten");
 #elif __WXGTK__
     m_clientSettings.ConfigPath=::wxGetHomeDir()+wxT("/.sauerbraten");
 #endif
-    m_injected=false;
 }
 
 CslGameSauerbraten::~CslGameSauerbraten()
@@ -208,12 +208,12 @@ bool CslGameSauerbraten::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) con
     {
         if (attr[4]==MM_AUTH)
         {
-            info.MMDescription+=wxT("0 (O/AUTH)");
+            info.MMDescription<<wxT("0 (O/AUTH)");
             info.MM=MM_AUTH;
         }
         else if (attr[4]==MM_PASSWORD)
         {
-            info.MMDescription+=wxT("PASS");
+            info.MMDescription<<wxT("PASS");
             info.MM|=CSL_SERVER_PASSWORD;
         }
         else
@@ -221,10 +221,10 @@ bool CslGameSauerbraten::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) con
             info.MMDescription=wxString::Format(wxT("%d"),attr[4]);
 
             if (attr[4]==MM_OPEN)
-                info.MMDescription+=wxT(" (O)");
+                info.MMDescription<<wxT(" (O)");
             else if (attr[4]==MM_VETO)
             {
-                info.MMDescription+=wxT(" (V)");
+                info.MMDescription<<wxT(" (V)");
                 info.MM=CSL_SERVER_VETO;
             }
             else if (attr[4]==MM_LOCKED)
@@ -232,7 +232,7 @@ bool CslGameSauerbraten::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) con
                 if (info.HasRegisteredEvent(CslServerEvents::EVENT_LOCKED) &&
                     CSL_MM_IS_VALID(l) && !CSL_SERVER_IS_LOCKED(l))
                     info.SetEvents(CslServerEvents::EVENT_LOCKED);
-                info.MMDescription+=wxT(" (L)");
+                info.MMDescription<<wxT(" (L)");
                 info.MM=CSL_SERVER_LOCKED;
 
             }
@@ -241,7 +241,7 @@ bool CslGameSauerbraten::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) con
                 if (info.HasRegisteredEvent(CslServerEvents::EVENT_PRIVATE) &&
                     CSL_MM_IS_VALID(l) && !CSL_SERVER_IS_PRIVATE(l))
                     info.SetEvents(CslServerEvents::EVENT_PRIVATE);
-                info.MMDescription+=wxT(" (P)");
+                info.MMDescription<<wxT(" (P)");
                 info.MM=CSL_SERVER_PRIVATE;
             }
         }
@@ -331,10 +331,11 @@ void CslGameSauerbraten::SetClientSettings(const CslGameClientSettings& settings
 
 wxString CslGameSauerbraten::GameStart(CslServerInfo *info,wxUint32 mode,wxString& error)
 {
-    wxString address,path;
+    wxString address,password,path,script;
     wxString bin=m_clientSettings.Binary;
     wxString opts=m_clientSettings.Options;
-    bool param=false;
+    wxString preScript=m_clientSettings.PreScript;
+    wxString postScript=m_clientSettings.PostScript;
 
     if (m_clientSettings.Binary.IsEmpty() || !::wxFileExists(m_clientSettings.Binary))
     {
@@ -356,106 +357,62 @@ wxString CslGameSauerbraten::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
 #ifdef __WXMSW__
     //binary must be surrounded by quotes if the path contains spaces
     bin=wxT("\"")+m_clientSettings.Binary+wxT("\"");
+    // use Prepend() and do not use opts+= here, since -q<path> must be before -r
     opts.Prepend(wxT("-q\"")+path.RemoveLast()+wxT("\" "));
 #else
-    bin.Replace(wxT(" "),wxT("\\ "));
-    path.Replace(wxT(" "),wxT("\\ "));
+    CmdlineEscapeSpaces(bin);
+    CmdlineEscapeSpaces(path);
     // use Prepend() and do not use opts+= here, since -q<path> must be before -r
     opts.Prepend(wxT("-q")+path+wxT(" "));
 #endif //__WXMSW__
 
-    if (info->Protocol>=257 || info->MM==MM_PRIVATE)
-        param=true;
-    else if (info->MM!=MM_LOCKED &&
-             (info->Map.IsEmpty() ||
-              info->Map.CmpNoCase(CSL_DEFAULT_INJECT_FIL_SB)==0 ||
-              info->TimeRemain==0))
-        param=true;
+    ProcessScript(*info,mode,preScript);
+    ProcessScript(*info,mode,postScript);
+
+    if (!preScript.IsEmpty())
+    {
+        preScript<<wxT(";");
+        CmdlineEscapeQuotes(preScript);
+    }
+    if (!postScript.IsEmpty())
+    {
+        postScript.Prepend(wxT(";"));
+        CmdlineEscapeQuotes(postScript);
+    }
 
     address=info->Host;
-    if (GetDefaultGamePort()!=info->GamePort || mode==CslServerInfo::CSL_CONNECT_PASS)
-        address+=wxString::Format(wxT(" %d"),info->GamePort);
 
-    if (param)
-    {
+    if (info->GamePort!=GetDefaultGamePort() || !password.IsEmpty())
+        address<<wxString::Format(wxT(" %d"),info->GamePort);
+
+    password<<wxT("\"");
+    password<<(mode==CslServerInfo::CSL_CONNECT_PASS ? info->Password :
+               mode==CslServerInfo::CSL_CONNECT_ADMIN_PASS ?
+               info->PasswordAdmin : wxString(wxEmptyString));
+    password<<wxT("\"");
+
+    CmdlineEscapeQuotes(password);
+
+    script=wxString::Format(wxT("%sconnect %s %s%s"),
+                            preScript.c_str(),
+                            address.c_str(),password.c_str(),
+                            postScript.c_str());
 #ifdef __WXMSW__
-        opts+=wxT(" -x\"connect ")+address;
-        if (mode==CslServerInfo::CSL_CONNECT_PASS)
-            opts+=wxT(" ")+info->Password;
-        opts+=wxT("\"");
+    opts<<wxT(" -x\"")<<script<<wxT("\"");
 #else
-        address.Replace(wxT(" "),wxT("\\ "));
-        opts+=wxT(" -xconnect\\ ")+address;
-        if (mode==CslServerInfo::CSL_CONNECT_PASS)
-            opts+=wxT("\\ ")+info->Password;
+    opts<<wxT(" -x")<<CmdlineEscapeSpaces(script);
 #endif
-    }
-    else
-    {
-#ifdef __WXMSW__
-        opts+=wxT(" -x\"csl_connect = 1\" -l")+wxString(CSL_DEFAULT_INJECT_FIL_SB);
-#else
-        opts+=wxT(" -xcsl_connect\\ =\\ 1 -l")+wxString(CSL_DEFAULT_INJECT_FIL_SB);
-#endif
-        if (mode==CslServerInfo::CSL_CONNECT_PASS)
-            address+=wxT(" ")+info->Password;
 
-        if (InjectConfig(address,error)!=CSL_ERROR_NONE)
-            return wxEmptyString;
-        m_injected=true;
-    }
-
-    bin+=wxT(" ")+opts;
+    bin<<wxT(" ")<<opts;
 
     return bin;
 }
 
 wxInt32 CslGameSauerbraten::GameEnd(wxString& error)
 {
-    return m_injected ? InjectConfig(wxEmptyString,error):CSL_ERROR_NONE;
+    return CSL_ERROR_NONE;
 }
 
-wxInt32 CslGameSauerbraten::InjectConfig(const wxString& param,wxString& error)
-{
-    wxString dst=m_clientSettings.ConfigPath+wxString(CSL_DEFAULT_INJECT_DIR_SB);
-
-    if (!::wxDirExists(dst))
-    {
-        if (!wxFileName::Mkdir(dst,0700,wxPATH_MKDIR_FULL))
-            return CSL_ERROR_FILE_OPERATION;
-    }
-
-    wxString cfg=dst+wxString(CSL_DEFAULT_INJECT_FIL_SB)+wxString(wxT(".cfg"));
-    wxString map=wxString(CSL_DEFAULT_INJECT_FIL_SB)+wxString(wxT(".ogz"));
-    wxString src,script;
-
-    dst+=map;
-
-    if (!::wxFileExists(dst))
-    {
-        wxString src=DATAPATH+wxString(PATHDIV)+map;
-#ifdef __WXGTK__
-        if (!::wxFileExists(src))
-        {
-            src=::g_basePath+wxT("/data/")+map;
-#endif
-            if (!::wxFileExists(src))
-            {
-                error=wxString::Format(_("Couldn't find \"%s\""),map.c_str());
-                return CSL_ERROR_FILE_DONT_EXIST;
-            }
-#ifdef __WXGTK__
-        }
-#endif
-        if (!::wxCopyFile(src,dst))
-            return CSL_ERROR_FILE_OPERATION;
-    }
-
-    script=wxString::Format(wxT("if (= $csl_connect 1) [ sleep 1000 [ connect %s ] ]\r\n%s\r\n"),
-                            param.c_str(),wxT("csl_connect = 0"));
-
-    return WriteTextFile(cfg,script,wxFile::write);
-}
 
 bool CslGameSauerbraten::GetMapImagePaths(wxArrayString& paths) const
 {
@@ -468,6 +425,7 @@ bool CslGameSauerbraten::GetMapImagePaths(wxArrayString& paths) const
         paths.Add(path);
     }
 
+    //TODO look for extra package directories
     if ((pos=m_clientSettings.Options.Find(wxT("-k")))!=wxNOT_FOUND)
     {
     }

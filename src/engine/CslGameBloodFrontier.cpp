@@ -88,10 +88,11 @@ CslBloodFrontier::CslBloodFrontier()
 {
     m_name=CSL_DEFAULT_NAME_BF;
     m_defaultMasterConnection=CslMasterConnection(CSL_DEFAULT_MASTER_BF,CSL_DEFAULT_MASTER_PORT_BF);
-    m_capabilities=CSL_CAPABILITY_EXTINFO | CSL_CAPABILITY_CUSTOM_CONFIG | CSL_CAPABILITY_CONNECT_PASS;
+    m_capabilities=CSL_CAPABILITY_EXTINFO | CSL_CAPABILITY_CUSTOM_CONFIG |
+                   CSL_CAPABILITY_CONNECT_PASS | CSL_CAPABILITY_CONNECT_ADMIN_PASS;
 #ifdef __WXMAC__
     m_clientSettings.ConfigPath=::wxGetHomeDir();
-    m_clientSettings.ConfigPath+=wxT("/Library/Application Support/bloodfrontier");
+    m_clientSettings.ConfigPath<<wxT("/Library/Application Support/bloodfrontier");
 #elif __WXGTK__
     m_clientSettings.ConfigPath=::wxGetHomeDir()+wxT("/.bloodfrontier");
 #endif
@@ -119,8 +120,8 @@ wxString CslBloodFrontier::GetModeName(wxInt32 n,wxInt32 m) const
                 !(gametype[n].implied & mutstype[i].type))
             {
                 if (!addition.IsEmpty())
-                    addition+=wxT("/");
-                addition+=wxString(mutstype[i].name);
+                    addition<<wxT("/");
+                addition<<wxString(mutstype[i].name);
             }
         }
 
@@ -235,7 +236,7 @@ bool CslBloodFrontier::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
     {
         if (attr[5]==MM_PASSWORD)
         {
-            info.MMDescription+=wxT("PASS");
+            info.MMDescription<<wxT("PASS");
             info.MM|=CSL_SERVER_PASSWORD;
         }
         else
@@ -243,10 +244,10 @@ bool CslBloodFrontier::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
             info.MMDescription=wxString::Format(wxT("%d"),attr[5]);
 
             if (attr[5]==MM_OPEN)
-                info.MMDescription+=wxT(" (O)");
+                info.MMDescription<<wxT(" (O)");
             else if (attr[5]==MM_VETO)
             {
-                info.MMDescription+=wxT(" (V)");
+                info.MMDescription<<wxT(" (V)");
                 info.MM=CSL_SERVER_VETO;
             }
             else if (attr[5]==MM_LOCKED)
@@ -254,7 +255,7 @@ bool CslBloodFrontier::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
                 if (info.HasRegisteredEvent(CslServerEvents::EVENT_LOCKED) &&
                     CSL_MM_IS_VALID(l) && !CSL_SERVER_IS_LOCKED(l))
                     info.SetEvents(CslServerEvents::EVENT_LOCKED);
-                info.MMDescription+=wxT(" (L)");
+                info.MMDescription<<wxT(" (L)");
                 info.MM=CSL_SERVER_LOCKED;
             }
             else if (attr[5]==MM_PRIVATE)
@@ -262,7 +263,7 @@ bool CslBloodFrontier::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
                 if (info.HasRegisteredEvent(CslServerEvents::EVENT_PRIVATE) &&
                     CSL_MM_IS_VALID(l) && !CSL_SERVER_IS_PRIVATE(l))
                     info.SetEvents(CslServerEvents::EVENT_PRIVATE);
-                info.MMDescription+=wxT(" (P)");
+                info.MMDescription<<wxT(" (P)");
                 info.MM=CSL_SERVER_PRIVATE;
             }
         }
@@ -350,7 +351,7 @@ void CslBloodFrontier::SetClientSettings(const CslGameClientSettings& settings)
     if (set.ConfigPath.IsEmpty() || !::wxDirExists(set.ConfigPath))
         set.ConfigPath=set.GamePath;
     if (isApp)
-        set.Binary+=wxT("/Contents/gamedata/bloodfrontier.app/Contents/MacOS/bloodfrontier");
+        set.Binary<<wxT("/Contents/gamedata/bloodfrontier.app/Contents/MacOS/bloodfrontier");
     if (set.Options.IsEmpty())
         set.Options=wxT("-rinit.cfg");
 #else
@@ -367,9 +368,11 @@ void CslBloodFrontier::SetClientSettings(const CslGameClientSettings& settings)
 
 wxString CslBloodFrontier::GameStart(CslServerInfo *info,wxUint32 mode,wxString& error)
 {
-    wxString address,path;
+    wxString address,password,path,script;
     wxString bin=m_clientSettings.Binary;
     wxString opts=m_clientSettings.Options;
+    wxString preScript=m_clientSettings.PreScript;
+    wxString postScript=m_clientSettings.PostScript;
 
     if (m_clientSettings.Binary.IsEmpty() || !::wxFileExists(m_clientSettings.Binary))
     {
@@ -391,31 +394,55 @@ wxString CslBloodFrontier::GameStart(CslServerInfo *info,wxUint32 mode,wxString&
 #ifdef __WXMSW__
     //binary must be surrounded by quotes if the path contains spaces
     bin=wxT("\"")+m_clientSettings.Binary+wxT("\"");
+    // use Prepend() and do not use opts+= here, since -h<path> must be before -r
     opts.Prepend(wxT("-h\"")+path.RemoveLast()+wxT("\" "));
 #else
-    bin.Replace(wxT(" "),wxT("\\ "));
-    path.Replace(wxT(" "),wxT("\\ "));
+    CmdlineEscapeSpaces(bin);
+    CmdlineEscapeSpaces(path);
     // use Prepend() and do not use opts+= here, since -h<path> must be before -r
     opts.Prepend(wxT("-h")+path+wxT(" "));
 #endif //__WXMSW__
 
-    address=info->Host;
-    if (GetDefaultGamePort()!=info->GamePort || mode==CslServerInfo::CSL_CONNECT_PASS)
-        address+=wxString::Format(wxT(" %d %d"),info->GamePort,info->InfoPort);
+    ProcessScript(*info,mode,preScript);
+    ProcessScript(*info,mode,postScript);
 
+    if (!preScript.IsEmpty())
+    {
+        preScript<<wxT(";");
+        CmdlineEscapeQuotes(preScript);
+    }
+    if (!postScript.IsEmpty())
+    {
+        postScript.Prepend(wxT(";"));
+        CmdlineEscapeQuotes(postScript);
+    }
+
+    address=info->Host;
+
+    if (GetDefaultGamePort()!=info->GamePort || mode==CslServerInfo::CSL_CONNECT_PASS)
+        address<<wxString::Format(wxT(" %d %d"),info->GamePort,info->InfoPort);
+
+    password<<wxT("\"");
+    password<<(mode==CslServerInfo::CSL_CONNECT_PASS ? info->Password :
+               mode==CslServerInfo::CSL_CONNECT_ADMIN_PASS ?
+               info->PasswordAdmin : wxString(wxEmptyString));
+    password<<wxT("\"");
+
+    CmdlineEscapeQuotes(password);
+
+    script=wxString::Format(wxT("%sconnect %s %s%s"),
+                            preScript.c_str(),
+                            address.c_str(),password.c_str(),
+                            postScript.c_str());
 #ifdef __WXMSW__
-    opts+=wxT(" -x\"connect ")+address;
-    if (mode==CslServerInfo::CSL_CONNECT_PASS)
-        opts+=wxT(" ")+info->Password;
-    opts+=wxT("\"");
+    opts<<wxT(" -x\"")<<script<<wxT("\"");
 #else
-    address.Replace(wxT(" "),wxT("\\ "));
-    opts+=wxT(" -xconnect\\ ")+address;
-    if (mode==CslServerInfo::CSL_CONNECT_PASS)
-        opts+=wxT("\\ ")+info->Password;
+    opts<<wxT(" -x")<<CmdlineEscapeSpaces(script);
 #endif
 
-    bin+=wxT(" ")+opts;
+    bin<<wxT(" ")<<opts;
+
+    printf("%s\n\n",U2A(bin));
 
     return bin;
 }

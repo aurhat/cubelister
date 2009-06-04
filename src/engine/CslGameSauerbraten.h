@@ -33,9 +33,6 @@
 #define CSL_DEFAULT_MASTER_SB         wxT("sauerbraten.org")
 #define CSL_DEFAULT_MASTER_PORT_SB    28787
 
-#define CSL_DEFAULT_INJECT_DIR_SB     wxT("packages/base/")
-#define CSL_DEFAULT_INJECT_FIL_SB     wxT("csl_start_sb")
-
 
 class CslGameSauerbraten : public CslGame
 {
@@ -44,8 +41,6 @@ class CslGameSauerbraten : public CslGame
         ~CslGameSauerbraten();
 
     private:
-        bool m_injected;
-
         const wxChar* GetVersionName(wxInt32 prot) const;
         const wxChar* GetModeName(wxInt32 mode,wxInt32 prot) const;
 

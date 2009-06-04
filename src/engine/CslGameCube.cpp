@@ -121,7 +121,7 @@ wxString CslGameCube::GameStart(CslServerInfo *info,wxUint32 mode,wxString& erro
 
     address=info->Host;
     if (GetDefaultGamePort()!=info->GamePort)
-        address+=wxString::Format(wxT(" %d"),info->GamePort);
+        address<<wxString::Format(wxT(" %d"),info->GamePort);
 
 #ifdef __WXMSW__
     //binary must be surrounded by quotes if the path contains spaces
@@ -215,7 +215,7 @@ wxInt32 CslGameCube::InjectConfig(const wxString& address,const wxString& passwo
     if (!password.IsEmpty())
         script=wxT("password ")+password;
 
-    script+=wxString::Format(wxT("\r\nif (= $csl_connect 1) [ sleep 1000 [ connect %s ] ]\r\n%s\r\n"),
+    script<<wxString::Format(wxT("\r\nif (= $csl_connect 1) [ sleep 1000 [ connect %s ] ]\r\n%s\r\n"),
                              address.c_str(),wxT("alias csl_connect 0"));
 
     return WriteTextFile(cfg,script,wxFile::write_append);

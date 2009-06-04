@@ -40,6 +40,24 @@ void Debug_Printf(const char *file,int line,const char *func,const char *fmt,...
 }
 #endif
 
+wxString& CmdlineEscapeQuotes(wxString& str)
+{
+#ifdef __WXMSW__
+    str.Replace(wxT("\""),wxT("\\\""));
+#endif
+
+    return str;
+}
+
+wxString& CmdlineEscapeSpaces(wxString& str)
+{
+#ifndef __WXMSW__
+    str.Replace(wxT(" "),wxT("\\ "));
+#endif
+
+    return str;
+}
+
 void FixString(char *src,wxUint32 *len,wxUint32 count,bool keepnl)
 {
     char *dst=src;

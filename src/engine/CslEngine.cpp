@@ -450,6 +450,8 @@ wxInt32 CslEngine::UpdateFromMaster(CslMaster *master)
         addr.Hostname(connection.GetAddress());
         addr.Service(connection.GetPort());
 
+        printf("%s:%d\n",U2A(connection.GetAddress()),connection.GetPort());
+
         if (!sock.Connect(addr,true))
             return -1;
 

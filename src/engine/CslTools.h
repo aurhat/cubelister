@@ -98,6 +98,8 @@ enum
 
 extern wxString g_basePath;
 
+wxString& CmdlineEscapeQuotes(wxString& str);
+wxString& CmdlineEscapeSpaces(wxString& str);
 void FixString(char *src,wxUint32 *len,wxUint32 count,bool keepnl=false);
 void FixFilename(wxString& name);
 bool IsIP(const wxString& s);

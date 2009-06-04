@@ -57,7 +57,6 @@
     File unicode-release\csl.exe
     SetOutPath $INSTDIR\data
     File data\GeoIP.dat
-    File data\csl_start_sb.ogz
   
     ; Write the installation path into the registry
     WriteRegStr HKLM SOFTWARE\CSL "Install_Dir" "$INSTDIR"  
