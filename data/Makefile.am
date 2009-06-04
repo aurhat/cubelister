@@ -1,6 +1,6 @@
 csldatadir = $(datadir)/csl
 if with_internal_geoipdatabase
-csldata_DATA += GeoIP.dat
+csldata_DATA = GeoIP.dat
 endif
 
 desktopdir = $(datadir)/applications
