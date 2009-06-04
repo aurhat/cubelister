@@ -382,9 +382,6 @@ wxString CslGameSauerbraten::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
 
     address=info->Host;
 
-    if (info->GamePort!=GetDefaultGamePort() || !password.IsEmpty())
-        address<<wxString::Format(wxT(" %d"),info->GamePort);
-
     password<<wxT("\"");
     password<<(mode==CslServerInfo::CSL_CONNECT_PASS ? info->Password :
                mode==CslServerInfo::CSL_CONNECT_ADMIN_PASS ?
@@ -392,6 +389,9 @@ wxString CslGameSauerbraten::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
     password<<wxT("\"");
 
     CmdlineEscapeQuotes(password);
+
+    if (info->GamePort!=GetDefaultGamePort() || !password.IsEmpty())
+        address<<wxString::Format(wxT(" %d"),info->GamePort);
 
     script=wxString::Format(wxT("%sconnect %s %s%s"),
                             preScript.c_str(),
@@ -404,6 +404,8 @@ wxString CslGameSauerbraten::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
 #endif
 
     bin<<wxT(" ")<<opts;
+
+	LOG_DEBUG("start client: %s\n",U2A(bin));
 
     return bin;
 }

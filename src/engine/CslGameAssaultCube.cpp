@@ -372,6 +372,8 @@ wxString CslGameAssaultCube::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
                                      say ? wxT("]") : wxT(""),
                                      postScript.IsEmpty() ? wxT("") : postScript.c_str());
 
+	LOG_DEBUG("start client: %s\n",U2A(bin));
+
     return WriteTextFile(configpath,script,wxFile::write_append)==CSL_ERROR_NONE ? bin:wxString(wxEmptyString);
 }
 

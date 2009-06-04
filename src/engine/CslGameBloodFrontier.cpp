@@ -419,9 +419,6 @@ wxString CslBloodFrontier::GameStart(CslServerInfo *info,wxUint32 mode,wxString&
 
     address=info->Host;
 
-    if (GetDefaultGamePort()!=info->GamePort || mode==CslServerInfo::CSL_CONNECT_PASS)
-        address<<wxString::Format(wxT(" %d %d"),info->GamePort,info->InfoPort);
-
     password<<wxT("\"");
     password<<(mode==CslServerInfo::CSL_CONNECT_PASS ? info->Password :
                mode==CslServerInfo::CSL_CONNECT_ADMIN_PASS ?
@@ -429,6 +426,9 @@ wxString CslBloodFrontier::GameStart(CslServerInfo *info,wxUint32 mode,wxString&
     password<<wxT("\"");
 
     CmdlineEscapeQuotes(password);
+
+    if (GetDefaultGamePort()!=info->GamePort || mode==CslServerInfo::CSL_CONNECT_PASS)
+        address<<wxString::Format(wxT(" %d %d"),info->GamePort,info->InfoPort);
 
     script=wxString::Format(wxT("%sconnect %s %s%s"),
                             preScript.c_str(),
@@ -442,7 +442,7 @@ wxString CslBloodFrontier::GameStart(CslServerInfo *info,wxUint32 mode,wxString&
 
     bin<<wxT(" ")<<opts;
 
-    printf("%s\n\n",U2A(bin));
+	LOG_DEBUG("start client: %s\n",U2A(bin));
 
     return bin;
 }
