@@ -1357,7 +1357,7 @@ void CslFrame::SaveSettings()
 {
     wxString dir=::wxPathOnly(CSL_SETTINGS_FILE);
 
-    if (!::wxDirExists(::wxPathOnly(dir)))
+    if (!::wxDirExists(dir))
         ::wxMkdir(dir,0700);
 
     wxFileConfig config(wxT(""),wxT(""),CSL_SETTINGS_FILE,wxT(""),
