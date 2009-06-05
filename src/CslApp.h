@@ -35,10 +35,14 @@ class CslApp: public wxApp
             CSL_SHUTDOWN_FORCE
         };
 
-        const wxString& GetLanguage() { return m_lang; }
+        const wxString& GetLanguage() const { return m_lang; }
+    
         CslEngine* GetCslEngine() { return m_engine; }
+    
         void Shutdown(wxInt32 val) { m_shutdown=val; }
-        wxInt32 Shutdown() { return m_shutdown; }
+        wxInt32 Shutdown() const { return m_shutdown; }
+	
+    	void IpcCall(const wxString& value,wxEvtHandler *evtHandler=NULL) const;
 
     private:
         CslEngine *m_engine;
@@ -52,8 +56,6 @@ class CslApp: public wxApp
         virtual bool OnInit();
         virtual int OnRun();
         virtual int OnExit();
-
-        void IpcCall(const wxString& value,wxEvtHandler *evtHandler=NULL);
 
         int FilterEvent(wxEvent& event);
 
