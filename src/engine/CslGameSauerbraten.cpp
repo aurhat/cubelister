@@ -36,7 +36,6 @@ CslGameSauerbraten::CslGameSauerbraten()
     m_capabilities=CSL_CAPABILITY_EXTINFO | CSL_CAPABILITY_CUSTOM_CONFIG |
                    CSL_CAPABILITY_CONNECT_PASS | CSL_CAPABILITY_CONNECT_ADMIN_PASS;
 #ifdef __WXMAC__
-    m_configType=CSL_CONFIG_DIR;
     m_clientSettings.ConfigPath=::wxGetHomeDir();
     m_clientSettings.ConfigPath<<wxT("/Library/Application Support/sauerbraten");
 #elif __WXGTK__

@@ -28,7 +28,7 @@
 BEGIN_EVENT_TABLE(CslGamePage,wxPanel)
     EVT_FILEPICKER_CHANGED(wxID_ANY,CslGamePage::OnPicker)
     EVT_DIRPICKER_CHANGED(wxID_ANY,CslGamePage::OnPicker)
-    EVT_CHECKBOX(wxID_ANY,CslGamePage::OnCommandEvent)
+    EVT_BUTTON(wxID_ANY,CslGamePage::OnCommandEvent)
 END_EVENT_TABLE()
 
 
@@ -43,7 +43,7 @@ END_EVENT_TABLE()
 
 enum
 {
-    CHECK_GAME_EXPERT = wxID_HIGHEST + 1,
+    BUTTON_WIZARD = wxID_HIGHEST + 1,
 
     BUTTON_COLOUR_EMPTY,
     BUTTON_COLOUR_OFF,
@@ -91,68 +91,69 @@ CslGamePage::CslGamePage(wxWindow *parent,CslGame *game) :
 #else
     dpickBorder=4;
 #endif
-    sizer=new wxFlexGridSizer(6,2,0,0);
+	
+    wxFlexGridSizer *sizer_config=new wxFlexGridSizer(6,2,0,0);
 
     label_exe=new wxStaticText(this,wxID_ANY,_("Game executable:"));
-    sizer->Add(label_exe,0,wxLEFT|wxALIGN_CENTER_VERTICAL,8);
+    sizer_config->Add(label_exe,0,wxLEFT|wxALIGN_CENTER_VERTICAL,8);
 
     s=wxString::Format(_("Select %s executable"),game->GetName().c_str());
     filepicker=new wxFilePickerCtrl(this,FILE_PICKER,settings.Binary,
                                     s,extensions,wxDefaultPosition,wxDefaultSize,
                                     wxFLP_DEFAULT_STYLE|wxFLP_USE_TEXTCTRL|wxFLP_FILE_MUST_EXIST);
-    sizer->Add(filepicker,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,dpickBorder);
+    sizer_config->Add(filepicker,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,dpickBorder);
     filepicker->SetPath(settings.Binary);
 
     label_gamepath=new wxStaticText(this,wxID_ANY,_("Game directory:"));
-    sizer->Add(label_gamepath,0,wxLEFT|wxALIGN_CENTER_VERTICAL,8);
+    sizer_config->Add(label_gamepath,0,wxLEFT|wxALIGN_CENTER_VERTICAL,8);
 
     s=wxString::Format(_("Select %s game path"),game->GetName().c_str());
     dirpickergame=new wxDirPickerCtrl(this,DIR_PICKER_GAME,settings.GamePath,
                                       s,wxDefaultPosition,wxDefaultSize,
                                       wxDIRP_DEFAULT_STYLE|wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST);
-    sizer->Add(dirpickergame,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,dpickBorder);
+    sizer_config->Add(dirpickergame,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,dpickBorder);
 
     label_cfgpath=new wxStaticText(this,wxID_ANY,_("Config directory:"));
-    sizer->Add(label_cfgpath,0,wxLEFT|wxALIGN_CENTER_VERTICAL,8);
+    sizer_config->Add(label_cfgpath,0,wxLEFT|wxALIGN_CENTER_VERTICAL,8);
 
     s=wxString::Format(_("Select %s config path"),game->GetName().c_str());
     dirpickercfg=new wxDirPickerCtrl(this,DIR_PICKER_CFG,settings.ConfigPath,
                                      s,wxDefaultPosition,wxDefaultSize,
                                      wxDIRP_DEFAULT_STYLE|wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST);
-    sizer->Add(dirpickercfg,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,dpickBorder);
+    sizer_config->Add(dirpickercfg,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,dpickBorder);
 
     wxStaticText* label_options=new wxStaticText(this,wxID_ANY,_("Game parameters:"));
-    sizer->Add(label_options,0,wxLEFT|wxALIGN_CENTER_VERTICAL,8);
+    sizer_config->Add(label_options,0,wxLEFT|wxALIGN_CENTER_VERTICAL,8);
 
     text_ctrl_options=new wxTextCtrl(this,wxID_ANY,wxEmptyString);
-    sizer->Add(text_ctrl_options,0,wxALL|wxEXPAND,4);
+    sizer_config->Add(text_ctrl_options,0,wxALL|wxEXPAND,4);
     text_ctrl_options->SetValue(settings.Options);
 
     label_pre_script=new wxStaticText(this,wxID_ANY,_("Pre connect script:"));
-    sizer->Add(label_pre_script,0,wxLEFT|wxALIGN_CENTER_VERTICAL,8);
+    sizer_config->Add(label_pre_script,0,wxLEFT|wxALIGN_CENTER_VERTICAL,8);
 
     text_ctrl_pre_script=new wxTextCtrl(this,wxID_ANY,wxEmptyString);
-    sizer->Add(text_ctrl_pre_script,0,wxALL|wxEXPAND,4);
+    sizer_config->Add(text_ctrl_pre_script,0,wxALL|wxEXPAND,4);
     text_ctrl_pre_script->SetValue(settings.PreScript);
 
     label_post_script=new wxStaticText(this,wxID_ANY,_("Post connect script:"));
-    sizer->Add(label_post_script,0,wxLEFT|wxALIGN_CENTER_VERTICAL,8);
+    sizer_config->Add(label_post_script,0,wxLEFT|wxALIGN_CENTER_VERTICAL,8);
 
     text_ctrl_post_script=new wxTextCtrl(this,wxID_ANY,wxEmptyString);
-    sizer->Add(text_ctrl_post_script,0,wxALL|wxEXPAND,4);
+    sizer_config->Add(text_ctrl_post_script,0,wxALL|wxEXPAND,4);
     text_ctrl_post_script->SetValue(settings.PostScript);
 
-    label_expert=new wxStaticText(this,wxID_ANY,_("Configuration:"));
-    sizer->Add(label_expert,0,wxLEFT|wxALIGN_CENTER_VERTICAL,8);
+	wxFlexGridSizer *sizer=new wxFlexGridSizer(2,1,0,0);
+	sizer->Add(sizer_config,0,wxALL|wxEXPAND,0);
 
-    checkbox_expert=new wxCheckBox(this,CHECK_GAME_EXPERT,_("Expert configuration"));
-    sizer->Add(checkbox_expert,0,wxALL|wxALIGN_CENTER_VERTICAL,4);
-    checkbox_expert->SetValue(settings.Expert);
-
-    ToggleView(settings.Expert);
-
+	wxButton *button=new wxButton(this,BUTTON_WIZARD,_("Run configuration wizard"));
+    sizer->Add(button,1,wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL,24);
+	
     SetSizer(sizer);
-    sizer->AddGrowableCol(1);
+
+	sizer->AddGrowableCol(0);
+	sizer_config->AddGrowableCol(1);
+
 }
 
 CslGamePage::~CslGamePage()
@@ -175,8 +176,7 @@ bool CslGamePage::SaveSettings(wxString *message)
     CslGameClientSettings settings(filepicker->GetPath(),gamepath,configpath,
                                    text_ctrl_options->GetValue(),
                                    text_ctrl_pre_script->GetValue(),
-                                   text_ctrl_post_script->GetValue(),
-                                   checkbox_expert->GetValue());
+                                   text_ctrl_post_script->GetValue());
 
     if (!m_game->ValidateClientSettings(&settings,message))
         return false;
@@ -186,51 +186,12 @@ bool CslGamePage::SaveSettings(wxString *message)
     return true;
 }
 
-void CslGamePage::ToggleView(bool expertView)
-{
-    static bool expert=false;
-    expert=expertView;
-
-    if (!CSL_CAP_CUSTOM_CONFIG(m_game->GetCapabilities()))
-    {
-        label_cfgpath->Show(false);
-        dirpickercfg->Show(false);
-    }
-    else
-    {
-        label_cfgpath->Show(expert);
-        dirpickercfg->Show(expert);
-
-        label_pre_script->Show(expert);
-        label_post_script->Show(expert);
-        text_ctrl_pre_script->Show(expert);
-        text_ctrl_post_script->Show(expert);
-    }
-
-    if (m_game->GetConfigType()==CslGame::CSL_CONFIG_DIR)
-    {
-        label_exe->Show(expert);
-        filepicker->Show(expert);
-    }
-    else if (m_game->GetConfigType()==CslGame::CSL_CONFIG_EXE)
-    {
-        label_gamepath->Show(expert);
-        dirpickergame->Show(expert);
-    }
-
-    sizer->Layout();
-}
-
 void CslGamePage::OnPicker(wxFileDirPickerEvent& event)
 {
     switch (event.GetId())
     {
         case FILE_PICKER:
-#ifdef __WXMAC__
-            if (m_game->GetConfigType()==CslGame::CSL_CONFIG_DIR && dirpickergame->GetPath().IsEmpty())
-#else
             if (dirpickergame->GetPath().IsEmpty())
-#endif
                 dirpickergame->SetPath(event.GetPath().BeforeLast(PATHDIVA));
             if (dirpickercfg->GetPath().IsEmpty())
                 dirpickercfg->SetPath(event.GetPath().BeforeLast(PATHDIVA));
@@ -252,9 +213,6 @@ void CslGamePage::OnCommandEvent(wxCommandEvent& event)
 {
     switch (event.GetId())
     {
-        case CHECK_GAME_EXPERT:
-            ToggleView(event.IsChecked());
-            break;
         default:
             break;
     }

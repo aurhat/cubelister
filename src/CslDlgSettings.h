@@ -46,14 +46,10 @@ class CslGamePage : public wxPanel
         wxStaticText *label_exe,*label_gamepath,*label_cfgpath;
         wxStaticText *label_pre_script,*label_post_script,*label_expert;
         wxTextCtrl *text_ctrl_options,*text_ctrl_pre_script,*text_ctrl_post_script;
-        wxCheckBox *checkbox_expert;
-        wxFlexGridSizer *sizer;
         wxFilePickerCtrl *filepicker;
         wxDirPickerCtrl *dirpickergame,*dirpickercfg;
 
         CslGame *m_game;
-
-        void ToggleView(bool expertView);
 };
 
 class CslDlgSettings : public wxDialog

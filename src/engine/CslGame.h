@@ -102,16 +102,13 @@ class CslMasterConnection
 class CslGameClientSettings
 {
     public:
-        CslGameClientSettings() : Expert(false) {}
+	    CslGameClientSettings() {}
         CslGameClientSettings(const wxString& binary,const wxString& path,const wxString& configpath,
-                              const wxString& options,const wxString& preScript,const wxString& postScript,
-                              bool expert) :
+                              const wxString& options,const wxString& preScript,const wxString& postScript) :
                 Binary(binary),GamePath(path),ConfigPath(configpath),
-                Options(options),PreScript(preScript),PostScript(postScript),
-                Expert(expert) {}
+                Options(options),PreScript(preScript),PostScript(postScript) {}
 
         wxString Binary,GamePath,ConfigPath,Options,PreScript,PostScript;
-        bool Expert;
 };
 
 class CslGame
@@ -119,8 +116,6 @@ class CslGame
         friend class CslEngine;
 
     public:
-        enum { CSL_CONFIG_DIR, CSL_CONFIG_EXE };
-
         CslGame();
         virtual ~CslGame();
 
@@ -146,7 +141,6 @@ class CslGame
         wxInt32 GetId() { return m_gameId; }
         wxString GetName() { return m_name; }
         wxUint32 GetCapabilities() { return m_capabilities; }
-        wxUint32 GetConfigType() { return m_configType; }
         CslMasterConnection& GetDefaultMasterConnection() { return m_defaultMasterConnection; }
 
         CslGameClientSettings& GetClientSettings() { return  m_clientSettings; }
@@ -181,7 +175,6 @@ class CslGame
         wxString m_name;
         wxInt32 m_gameId;
         wxUint32 m_capabilities;
-        wxUint32 m_configType;
 
         CslMasterConnection m_defaultMasterConnection;
         CslGameClientSettings m_clientSettings;

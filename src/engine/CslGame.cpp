@@ -84,8 +84,7 @@ void CslMaster::Init(CslGame *game,wxUint32 id)
  */
 
 CslGame::CslGame() :
-        m_gameId(-1),m_capabilities(0),
-        m_configType(CSL_CONFIG_EXE)
+        m_gameId(-1),m_capabilities(0)
 {
 }
 
