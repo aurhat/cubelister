@@ -20,7 +20,6 @@
 		9ECC2F870CA172E500578B5E /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9ECC2F860CA172E500578B5E /* WebKit.framework */; };
 		9ECC32970CA1A9EC00578B5E /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9ECC32960CA1A9EC00578B5E /* AGL.framework */; };
 		9ECC32990CA1AA3400578B5E /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9ECC32980CA1AA3400578B5E /* OpenGL.framework */; };
-		9ECC329C0CA1AA6800578B5E /* csl_start_sb.ogz in Resources */ = {isa = PBXBuildFile; fileRef = 9ECC329A0CA1AA6800578B5E /* csl_start_sb.ogz */; };
 		9ECC329D0CA1AA6800578B5E /* GeoIP.dat in Resources */ = {isa = PBXBuildFile; fileRef = 9ECC329B0CA1AA6800578B5E /* GeoIP.dat */; };
 		9ED018690E1297BD001D91F4 /* CslEngine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED018540E1297BC001D91F4 /* CslEngine.cpp */; };
 		9ED0186A0E1297BD001D91F4 /* CslExtendedInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED018560E1297BC001D91F4 /* CslExtendedInfo.cpp */; };
@@ -99,7 +98,6 @@
 		9ECC2F860CA172E500578B5E /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		9ECC32960CA1A9EC00578B5E /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = /System/Library/Frameworks/AGL.framework; sourceTree = "<absolute>"; };
 		9ECC32980CA1AA3400578B5E /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
-		9ECC329A0CA1AA6800578B5E /* csl_start_sb.ogz */ = {isa = PBXFileReference; lastKnownFileType = file; name = csl_start_sb.ogz; path = ../data/csl_start_sb.ogz; sourceTree = SOURCE_ROOT; };
 		9ECC329B0CA1AA6800578B5E /* GeoIP.dat */ = {isa = PBXFileReference; lastKnownFileType = file; name = GeoIP.dat; path = ../data/GeoIP.dat; sourceTree = SOURCE_ROOT; };
 		9ED018540E1297BC001D91F4 /* CslEngine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslEngine.cpp; path = ../src/engine/CslEngine.cpp; sourceTree = SOURCE_ROOT; };
 		9ED018550E1297BC001D91F4 /* CslEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslEngine.h; path = ../src/engine/CslEngine.h; sourceTree = SOURCE_ROOT; };
@@ -127,7 +125,7 @@
 		9ED018D00E129AF2001D91F4 /* CslListCtrlPlayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslListCtrlPlayer.cpp; path = ../src/CslListCtrlPlayer.cpp; sourceTree = SOURCE_ROOT; };
 		9ED018D10E129AF2001D91F4 /* CslListCtrlPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslListCtrlPlayer.h; path = ../src/CslListCtrlPlayer.h; sourceTree = SOURCE_ROOT; };
 		9ED9D44A0CA161E000B0FC71 /* csl.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = csl.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		9ED9D44D0CA161E000B0FC71 /* csl-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "csl-Info.plist"; sourceTree = "<group>"; };
+		9ED9D44D0CA161E000B0FC71 /* csl-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "csl-Info.plist"; sourceTree = "<group>"; };
 		9ED9D4520CA1622F00B0FC71 /* CslArt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslArt.cpp; path = ../src/CslArt.cpp; sourceTree = SOURCE_ROOT; };
 		9ED9D4530CA1622F00B0FC71 /* CslArt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslArt.h; path = ../src/CslArt.h; sourceTree = SOURCE_ROOT; };
 		9ED9D4540CA1622F00B0FC71 /* CslDlgAddMaster.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslDlgAddMaster.cpp; path = ../src/CslDlgAddMaster.cpp; sourceTree = SOURCE_ROOT; };
@@ -262,7 +260,6 @@
 			children = (
 				9E3B1E480CCE2BA800E6D4A2 /* maps */,
 				9E015AE00CA569950029BEEF /* csl_mac.icns */,
-				9ECC329A0CA1AA6800578B5E /* csl_start_sb.ogz */,
 				9ECC329B0CA1AA6800578B5E /* GeoIP.dat */,
 				9ED9D44D0CA161E000B0FC71 /* csl-Info.plist */,
 			);
@@ -272,71 +269,17 @@
 		9EDD44A70F4A999800BD4083 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				9E374D6E0F868D0E0024ED42 /* GeoIPInternal.c */,
-				9EB2BDF30F84D90B0087A964 /* CslCharEncoding.cpp */,
-				9EB2BDF40F84D90B0087A964 /* CslCharEncoding.h */,
 				9EB2BDEB0F84D6D10087A964 /* Csl.h */,
-				9EEA7A100F5EAD8C00A54722 /* CslTTS.cpp */,
-				9EEA7A110F5EAD8C00A54722 /* CslTTS.h */,
-				9EF936340F3E1C6F00E5E1AE /* CslToolTip.cpp */,
-				9EF936350F3E1C6F00E5E1AE /* CslToolTip.h */,
-				9EE7487C0F36219C006D6C8E /* CslVersionCheck.cpp */,
-				9EE7487D0F36219C006D6C8E /* CslVersionCheck.h */,
-				9EE7482C0F3618A3006D6C8E /* libircclient.c */,
-				9EE748290F361885006D6C8E /* CslIRCEngine.cpp */,
-				9EE7482A0F361885006D6C8E /* CslIRCEngine.h */,
-				9EE748140F361857006D6C8E /* CslGameConnection.cpp */,
-				9EE748150F361857006D6C8E /* CslGameConnection.h */,
-				9EE748160F361857006D6C8E /* CslGameProcess.cpp */,
-				9EE748170F361857006D6C8E /* CslGameProcess.h */,
-				9EE748180F361857006D6C8E /* CslIPC.cpp */,
-				9EE748190F361857006D6C8E /* CslIPC.h */,
-				9EE7481A0F361857006D6C8E /* CslIRC.cpp */,
-				9EE7481B0F361857006D6C8E /* CslIRC.h */,
-				9EE7481C0F361857006D6C8E /* CslListCtrl.cpp */,
-				9EE7481D0F361857006D6C8E /* CslListCtrl.h */,
-				9EE7481E0F361857006D6C8E /* CslListCtrlCountry.cpp */,
-				9EE7481F0F361857006D6C8E /* CslListCtrlCountry.h */,
-				9EE748200F361857006D6C8E /* CslListCtrlPlayerSearch.cpp */,
-				9EE748210F361857006D6C8E /* CslListCtrlPlayerSearch.h */,
-				9EE748110F36182C006D6C8E /* CslApp.cpp */,
-				9EE748120F36182C006D6C8E /* CslApp.h */,
-				9ED018CC0E129AF2001D91F4 /* CslDlgTraffic.cpp */,
-				9ED018CD0E129AF2001D91F4 /* CslDlgTraffic.h */,
-				9ED018D00E129AF2001D91F4 /* CslListCtrlPlayer.cpp */,
-				9ED018D10E129AF2001D91F4 /* CslListCtrlPlayer.h */,
-				9ED018540E1297BC001D91F4 /* CslEngine.cpp */,
-				9ED018550E1297BC001D91F4 /* CslEngine.h */,
-				9ED018560E1297BC001D91F4 /* CslExtendedInfo.cpp */,
-				9ED018570E1297BC001D91F4 /* CslExtendedInfo.h */,
-				9ED018580E1297BC001D91F4 /* CslGame.cpp */,
-				9ED018590E1297BD001D91F4 /* CslGame.h */,
-				9ED0185A0E1297BD001D91F4 /* CslGameAssaultCube.cpp */,
-				9ED0185B0E1297BD001D91F4 /* CslGameAssaultCube.h */,
-				9ED0185C0E1297BD001D91F4 /* CslGameBloodFrontier.cpp */,
-				9ED0185D0E1297BD001D91F4 /* CslGameBloodFrontier.h */,
-				9ED0185E0E1297BD001D91F4 /* CslGameCube.cpp */,
-				9ED0185F0E1297BD001D91F4 /* CslGameCube.h */,
-				9ED018600E1297BD001D91F4 /* CslGameSauerbraten.cpp */,
-				9ED018610E1297BD001D91F4 /* CslGameSauerbraten.h */,
-				9ED018620E1297BD001D91F4 /* CslTools.cpp */,
-				9ED018630E1297BD001D91F4 /* CslTools.h */,
-				9ED018640E1297BD001D91F4 /* CslUDP.cpp */,
-				9ED018650E1297BD001D91F4 /* CslUDP.h */,
-				9ED018660E1297BD001D91F4 /* CslVersion.h */,
-				9ED018670E1297BD001D91F4 /* cube_tools.cpp */,
-				9ED018680E1297BD001D91F4 /* cube_tools.h */,
 				9EF31B7C0CE0C99900156B63 /* csl_icon_png.h */,
 				9EF31B7D0CE0C99900156B63 /* csl_logo_png.h */,
-				9EF31B7E0CE0C99900156B63 /* CslDlgAbout.cpp */,
-				9EF31B7F0CE0C99900156B63 /* CslDlgAbout.h */,
-				9EF31B820CE0C99900156B63 /* CslGeoIP.cpp */,
-				9EF31B830CE0C99900156B63 /* CslGeoIP.h */,
-				9EF31B840CE0C99900156B63 /* CslLicense.h */,
-				9EF31B850CE0C99900156B63 /* CslPanelMap.cpp */,
-				9EF31B860CE0C99900156B63 /* CslPanelMap.h */,
+				9EE748110F36182C006D6C8E /* CslApp.cpp */,
+				9EE748120F36182C006D6C8E /* CslApp.h */,
 				9ED9D4520CA1622F00B0FC71 /* CslArt.cpp */,
 				9ED9D4530CA1622F00B0FC71 /* CslArt.h */,
+				9EB2BDF30F84D90B0087A964 /* CslCharEncoding.cpp */,
+				9EB2BDF40F84D90B0087A964 /* CslCharEncoding.h */,
+				9EF31B7E0CE0C99900156B63 /* CslDlgAbout.cpp */,
+				9EF31B7F0CE0C99900156B63 /* CslDlgAbout.h */,
 				9ED9D4540CA1622F00B0FC71 /* CslDlgAddMaster.cpp */,
 				9ED9D4550CA1622F00B0FC71 /* CslDlgAddMaster.h */,
 				9ED9D4560CA1622F00B0FC71 /* CslDlgAddServer.cpp */,
@@ -352,18 +295,72 @@
 				9ED9D45E0CA1622F00B0FC71 /* CslDlgOutput.h */,
 				9ED9D45F0CA1622F00B0FC71 /* CslDlgSettings.cpp */,
 				9ED9D4600CA1622F00B0FC71 /* CslDlgSettings.h */,
+				9ED018CC0E129AF2001D91F4 /* CslDlgTraffic.cpp */,
+				9ED018CD0E129AF2001D91F4 /* CslDlgTraffic.h */,
+				9ED018540E1297BC001D91F4 /* CslEngine.cpp */,
+				9ED018550E1297BC001D91F4 /* CslEngine.h */,
+				9ED018560E1297BC001D91F4 /* CslExtendedInfo.cpp */,
+				9ED018570E1297BC001D91F4 /* CslExtendedInfo.h */,
 				9ED9D4630CA1622F00B0FC71 /* CslFlags.h */,
 				9ED9D4640CA1622F00B0FC71 /* CslFrame.cpp */,
 				9ED9D4650CA1622F00B0FC71 /* CslFrame.h */,
+				9ED018580E1297BC001D91F4 /* CslGame.cpp */,
+				9ED018590E1297BD001D91F4 /* CslGame.h */,
+				9ED0185A0E1297BD001D91F4 /* CslGameAssaultCube.cpp */,
+				9ED0185B0E1297BD001D91F4 /* CslGameAssaultCube.h */,
+				9ED0185C0E1297BD001D91F4 /* CslGameBloodFrontier.cpp */,
+				9ED0185D0E1297BD001D91F4 /* CslGameBloodFrontier.h */,
+				9EE748140F361857006D6C8E /* CslGameConnection.cpp */,
+				9EE748150F361857006D6C8E /* CslGameConnection.h */,
+				9ED0185E0E1297BD001D91F4 /* CslGameCube.cpp */,
+				9ED0185F0E1297BD001D91F4 /* CslGameCube.h */,
+				9EE748160F361857006D6C8E /* CslGameProcess.cpp */,
+				9EE748170F361857006D6C8E /* CslGameProcess.h */,
+				9ED018600E1297BD001D91F4 /* CslGameSauerbraten.cpp */,
+				9ED018610E1297BD001D91F4 /* CslGameSauerbraten.h */,
+				9EF31B820CE0C99900156B63 /* CslGeoIP.cpp */,
+				9EF31B830CE0C99900156B63 /* CslGeoIP.h */,
+				9EE748180F361857006D6C8E /* CslIPC.cpp */,
+				9EE748190F361857006D6C8E /* CslIPC.h */,
+				9EE7481A0F361857006D6C8E /* CslIRC.cpp */,
+				9EE7481B0F361857006D6C8E /* CslIRC.h */,
+				9EE748290F361885006D6C8E /* CslIRCEngine.cpp */,
+				9EE7482A0F361885006D6C8E /* CslIRCEngine.h */,
+				9EF31B840CE0C99900156B63 /* CslLicense.h */,
+				9EE7481C0F361857006D6C8E /* CslListCtrl.cpp */,
+				9EE7481D0F361857006D6C8E /* CslListCtrl.h */,
+				9EE7481E0F361857006D6C8E /* CslListCtrlCountry.cpp */,
+				9EE7481F0F361857006D6C8E /* CslListCtrlCountry.h */,
 				9ED9D4680CA1622F00B0FC71 /* CslListCtrlInfo.cpp */,
 				9ED9D4690CA1622F00B0FC71 /* CslListCtrlInfo.h */,
+				9ED018D00E129AF2001D91F4 /* CslListCtrlPlayer.cpp */,
+				9ED018D10E129AF2001D91F4 /* CslListCtrlPlayer.h */,
+				9EE748200F361857006D6C8E /* CslListCtrlPlayerSearch.cpp */,
+				9EE748210F361857006D6C8E /* CslListCtrlPlayerSearch.h */,
 				9ED9D46A0CA1622F00B0FC71 /* CslListCtrlServer.cpp */,
 				9ED9D46B0CA1622F00B0FC71 /* CslListCtrlServer.h */,
 				9E73FA0F0CA6EED200CA71BC /* CslMenu.cpp */,
 				9ED9D46C0CA1622F00B0FC71 /* CslMenu.h */,
+				9EF31B850CE0C99900156B63 /* CslPanelMap.cpp */,
+				9EF31B860CE0C99900156B63 /* CslPanelMap.h */,
 				9ED9D46D0CA1622F00B0FC71 /* CslSettings.h */,
 				9ED9D46E0CA1622F00B0FC71 /* CslStatusBar.cpp */,
 				9ED9D46F0CA1622F00B0FC71 /* CslStatusBar.h */,
+				9ED018620E1297BD001D91F4 /* CslTools.cpp */,
+				9ED018630E1297BD001D91F4 /* CslTools.h */,
+				9EF936340F3E1C6F00E5E1AE /* CslToolTip.cpp */,
+				9EF936350F3E1C6F00E5E1AE /* CslToolTip.h */,
+				9EEA7A100F5EAD8C00A54722 /* CslTTS.cpp */,
+				9EEA7A110F5EAD8C00A54722 /* CslTTS.h */,
+				9ED018640E1297BD001D91F4 /* CslUDP.cpp */,
+				9ED018650E1297BD001D91F4 /* CslUDP.h */,
+				9ED018660E1297BD001D91F4 /* CslVersion.h */,
+				9EE7487C0F36219C006D6C8E /* CslVersionCheck.cpp */,
+				9EE7487D0F36219C006D6C8E /* CslVersionCheck.h */,
+				9ED018670E1297BD001D91F4 /* cube_tools.cpp */,
+				9ED018680E1297BD001D91F4 /* cube_tools.h */,
+				9E374D6E0F868D0E0024ED42 /* GeoIPInternal.c */,
+				9EE7482C0F3618A3006D6C8E /* libircclient.c */,
 			);
 			name = Sources;
 			sourceTree = "<group>";
@@ -404,6 +401,7 @@
 		9ED9D43C0CA161B500B0FC71 /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 9ED9D43D0CA161B500B0FC71 /* Build configuration list for PBXProject "csl" */;
+			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 0;
 			mainGroup = 9ED9D43A0CA161B500B0FC71;
 			productRefGroup = 9ED9D44B0CA161E000B0FC71 /* Products */;
@@ -443,7 +441,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9ECC329C0CA1AA6800578B5E /* csl_start_sb.ogz in Resources */,
 				9ECC329D0CA1AA6800578B5E /* GeoIP.dat in Resources */,
 				9E015AE10CA569950029BEEF /* csl_mac.icns in Resources */,
 				9E3B1E520CCE2BA800E6D4A2 /* maps in Resources */,
