@@ -30,7 +30,7 @@
 
 #define CSL_DEFAULT_PORT_BF           28795
 
-#define CSL_DEFAULT_MASTER_BF         wxT("bloodfrontier.com")
+#define CSL_DEFAULT_MASTER_BF         wxT("play.bloodfrontier.com")
 #define CSL_DEFAULT_MASTER_PORT_BF    28800
 
 
