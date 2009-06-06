@@ -690,7 +690,6 @@ void CslListCtrlServer::ListCreateGameBitmaps()
     width=18;
     m_imgList.Create(18,16,true);
 
-    wxIcon icon;
     m_imgList.Add(AdjustBitmapSize(green_list_16_xpm,wxSize(18,16),wxPoint(0,0)));
     m_imgList.Add(AdjustBitmapSize(yellow_list_16_xpm,wxSize(18,16),wxPoint(0,0)));
     m_imgList.Add(AdjustBitmapSize(red_list_16_xpm,wxSize(18,16),wxPoint(0,0)));
@@ -722,9 +721,9 @@ void CslListCtrlServer::ListCreateGameBitmaps()
     //now create the icons for favourites list
     if (m_id==CSL_LIST_FAVOURITE)
     {
-        wxBitmap bmpExt(ext_green_8_xpm);
+        wxBitmap bmpExt=wxBitmap(ext_green_8_xpm);
 
-        //magic colour and brush for transparency
+        //magic colour and brush for transparency - not needed for PNG
         //wxColour magicColour(255,0,255);
         //wxBrush magicBrush(magicColour);
 
@@ -741,18 +740,20 @@ void CslListCtrlServer::ListCreateGameBitmaps()
 #endif
             m_imgList.Add(bmpGame);
 
-            wxBitmap bmp(width,16);
+			//force 24 bit to fix problems on WXMSW with PNG - DrawRectangle() necessary!
+            wxBitmap bmp(width,16,24);
             dc.SelectObject(bmp);
             //draw transparent background
-            //dc.SetBrush(magicBrush);
+            //dc.SetBrush(magicBrush); //not needed for PNG
             dc.SetPen(*wxTRANSPARENT_PEN);
             dc.DrawRectangle(0,0,width,16);
             //draw the bitmaps
             dc.DrawBitmap(bmpGame,0,0,true);
             dc.DrawBitmap(bmpExt,8,8,true);
-            //unref the bitmap and set the mask
+            //unref the bitmap
             dc.SelectObject(wxNullBitmap);
-            //bmp.SetMask(new wxMask(bmp,magicColour));
+			//set the mask
+            //bmp.SetMask(new wxMask(bmp,magicColour)); //not needed for PNG
 
             m_imgList.Add(bmp);
         }
