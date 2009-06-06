@@ -177,8 +177,6 @@
 		9EEA7A100F5EAD8C00A54722 /* CslTTS.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslTTS.cpp; path = ../src/CslTTS.cpp; sourceTree = SOURCE_ROOT; };
 		9EEA7A110F5EAD8C00A54722 /* CslTTS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslTTS.h; path = ../src/CslTTS.h; sourceTree = SOURCE_ROOT; };
 		9EECE2850E1655C700B03192 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /Developer/SDKs/MacOSX10.4u.sdk/System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
-		9EF31B7C0CE0C99900156B63 /* csl_icon_png.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = csl_icon_png.h; path = ../src/csl_icon_png.h; sourceTree = SOURCE_ROOT; };
-		9EF31B7D0CE0C99900156B63 /* csl_logo_png.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = csl_logo_png.h; path = ../src/csl_logo_png.h; sourceTree = SOURCE_ROOT; };
 		9EF31B7E0CE0C99900156B63 /* CslDlgAbout.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslDlgAbout.cpp; path = ../src/CslDlgAbout.cpp; sourceTree = SOURCE_ROOT; };
 		9EF31B7F0CE0C99900156B63 /* CslDlgAbout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslDlgAbout.h; path = ../src/CslDlgAbout.h; sourceTree = SOURCE_ROOT; };
 		9EF31B820CE0C99900156B63 /* CslGeoIP.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslGeoIP.cpp; path = ../src/CslGeoIP.cpp; sourceTree = SOURCE_ROOT; };
@@ -270,8 +268,6 @@
 			isa = PBXGroup;
 			children = (
 				9EB2BDEB0F84D6D10087A964 /* Csl.h */,
-				9EF31B7C0CE0C99900156B63 /* csl_icon_png.h */,
-				9EF31B7D0CE0C99900156B63 /* csl_logo_png.h */,
 				9EE748110F36182C006D6C8E /* CslApp.cpp */,
 				9EE748120F36182C006D6C8E /* CslApp.h */,
 				9ED9D4520CA1622F00B0FC71 /* CslArt.cpp */,

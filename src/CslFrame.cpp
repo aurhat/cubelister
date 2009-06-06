@@ -1109,9 +1109,6 @@ void CslFrame::UpdateMaster()
 
     m_timer.Stop();
 
-    CslMenu::EnableItem(MENU_UPDATE,false);
-    tree_ctrl_games->Enable(false);
-
     CslGame *game=master->GetGame();
     if (game)
     {
@@ -1173,9 +1170,6 @@ void CslFrame::UpdateMaster()
         list_ctrl_master->ListClear();
         SetStatusText(wxString::Format(_("Got %d servers from master"),num),1);
     }
-
-    CslMenu::EnableItem(MENU_UPDATE);
-    tree_ctrl_games->Enable();
 
     m_timerInit=true;
     m_timer.Start(CSL_TIMER_SHOT);
