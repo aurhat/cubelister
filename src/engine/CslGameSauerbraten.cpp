@@ -22,8 +22,8 @@
 #include "CslEngine.h"
 #include "CslGameSauerbraten.h"
 
-#include "../img/sb_24.xpm"
-#include "../img/sb_16.xpm"
+#include "../img/sb_16_png.h"
+#include "../img/sb_24_png.h"
 
 
 enum { MM_AUTH = -1, MM_OPEN, MM_VETO, MM_LOCKED, MM_PRIVATE, MM_PASSWORD };
@@ -41,6 +41,8 @@ CslGameSauerbraten::CslGameSauerbraten()
 #elif __WXGTK__
     m_clientSettings.ConfigPath=::wxGetHomeDir()+wxT("/.sauerbraten");
 #endif
+    m_icon16=BitmapFromData(wxBITMAP_TYPE_PNG,sb_16_png,sizeof(sb_16_png));
+    m_icon24=BitmapFromData(wxBITMAP_TYPE_PNG,sb_24_png,sizeof(sb_24_png));
 }
 
 CslGameSauerbraten::~CslGameSauerbraten()
@@ -404,7 +406,7 @@ wxString CslGameSauerbraten::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
 
     bin<<wxT(" ")<<opts;
 
-	LOG_DEBUG("start client: %s\n",U2A(bin));
+    LOG_DEBUG("start client: %s\n",U2A(bin));
 
     return bin;
 }
@@ -432,18 +434,4 @@ bool CslGameSauerbraten::GetMapImagePaths(wxArrayString& paths) const
     }
 
     return !paths.IsEmpty();
-}
-
-const char** CslGameSauerbraten::GetIcon(wxInt32 size) const
-{
-    switch (size)
-    {
-        case 16:
-            return sb_16_xpm;
-        case 24:
-            return sb_24_xpm;
-        default:
-            break;
-    }
-    return NULL;
 }

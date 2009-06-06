@@ -38,23 +38,23 @@ END_EVENT_TABLE()
 #ifdef __WXMAC__
 static pascal OSErr MacCallbackGetUrl(const AppleEvent *in,AppleEvent *out,long ptr)
 {
-	Size l=0;
-	OSErr err=noErr;
-	DescType type=typeChar;
-	
-	if ((err=AESizeOfParam(in,keyDirectObject,&type,&l))==noErr && l)
-	{
-	    char buf[l+1];
-			
-		if ((err=AEGetParamPtr(in,keyDirectObject,type,0,&buf,l,&l))==noErr && l)
-		{
-		    buf[l]=0;
-			const CslApp& app=::wxGetApp();
-			app.IpcCall(A2U(buf),app.GetTopWindow());
-		}
-	}
-	
-	return noErr;
+    Size l=0;
+    OSErr err=noErr;
+    DescType type=typeChar;
+
+    if ((err=AESizeOfParam(in,keyDirectObject,&type,&l))==noErr && l)
+    {
+        char buf[l+1];
+
+        if ((err=AEGetParamPtr(in,keyDirectObject,type,0,&buf,l,&l))==noErr && l)
+        {
+            buf[l]=0;
+            const CslApp& app=::wxGetApp();
+            app.IpcCall(A2U(buf),app.GetTopWindow());
+        }
+    }
+
+    return noErr;
 }
 #endif
 
@@ -80,10 +80,10 @@ bool CslApp::OnInit()
     //enables Command-H, Command-M and Command-Q at least when not in fullscreen
     wxSetEnv(wxT("SDL_SINGLEDISPLAY"),wxT("1"));
     wxSetEnv(wxT("SDL_ENABLEAPPEVENTS"),wxT("1"));
-	//TODO wxApp::SetExitOnFrameDelete(false);
-	//register event handler for URI schemes	
-	AEInstallEventHandler(kInternetEventClass,kAEGetURL,
-						  NewAEEventHandlerUPP((AEEventHandlerProcPtr)MacCallbackGetUrl),0,false);
+    //TODO wxApp::SetExitOnFrameDelete(false);
+    //register event handler for URI schemes
+    AEInstallEventHandler(kInternetEventClass,kAEGetURL,
+                          NewAEEventHandlerUPP((AEEventHandlerProcPtr)MacCallbackGetUrl),0,false);
 #endif
 
     wxString uri;

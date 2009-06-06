@@ -264,32 +264,30 @@ void CslListCtrlPlayerSearch::CreateImageList()
     vector<CslGame*>& games=::wxGetApp().GetCslEngine()->GetGames();
     loopv(games)
     {
-        const char **icon=games[i]->GetIcon(16);
-        wxBitmap bmpGame=icon ? (AdjustIconSize(icon,wxNullIcon,wxSize(20,16),wxPoint(4,0))):wxBitmap(20,16);
-        m_imgList.Add(bmpGame);
+        const wxBitmap& icon=games[i]->GetIcon(16);
+        m_imgList.Add(AdjustBitmapSize(icon.IsOk() ? icon : wxBitmap(16,16),wxSize(20,16),wxPoint(4,0)));
     }
 
-    m_imgList.Add(AdjustIconSize(local_xpm,wxNullIcon,wxSize(20,16),wxPoint(0,3)));
-    m_imgList.Add(AdjustIconSize(unknown_xpm,wxNullIcon,wxSize(20,16),wxPoint(0,3)));
+    m_imgList.Add(AdjustBitmapSize(local_xpm,wxSize(20,16),wxPoint(0,3)));
+    m_imgList.Add(AdjustBitmapSize(unknown_xpm,wxSize(20,16),wxPoint(0,3)));
     wxInt32 i,c=sizeof(codes)/sizeof(codes[0])-1;
     for (i=0;i<c;i++)
-        m_imgList.Add(AdjustIconSize(flags[i],wxNullIcon,wxSize(20,16),wxPoint(0,3)));
+        m_imgList.Add(AdjustBitmapSize(flags[i],wxSize(20,16),wxPoint(0,3)));
 #else
     m_imgList.Create(18,16,true);
 
     vector<CslGame*>& games=::wxGetApp().GetCslEngine()->GetGames();
     loopv(games)
     {
-        const char **icon=games[i]->GetIcon(16);
-        wxBitmap bmpGame=icon ? (AdjustIconSize(icon,wxNullIcon,wxSize(18,16),wxPoint(1,0))):wxBitmap(18,16);
-        m_imgList.Add(bmpGame);
+        const wxBitmap& icon=games[i]->GetIcon(16);
+        m_imgList.Add(AdjustBitmapSize(icon.IsOk() ? icon : wxBitmap(16,16),wxSize(18,16),wxPoint(1,0)));
     }
 
-    m_imgList.Add(AdjustIconSize(local_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,2)));
-    m_imgList.Add(AdjustIconSize(unknown_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,2)));
+    m_imgList.Add(AdjustBitmapSize(local_xpm,wxSize(18,16),wxPoint(0,2)));
+    m_imgList.Add(AdjustBitmapSize(unknown_xpm,wxSize(18,16),wxPoint(0,2)));
     wxInt32 i,c=sizeof(codes)/sizeof(codes[0])-1;
     for (i=0;i<c;i++)
-        m_imgList.Add(AdjustIconSize(flags[i],wxNullIcon,wxSize(18,16),wxPoint(0,2)));
+        m_imgList.Add(AdjustBitmapSize(flags[i],wxSize(18,16),wxPoint(0,2)));
 #endif
 
     SetImageList(&m_imgList,wxIMAGE_LIST_SMALL);

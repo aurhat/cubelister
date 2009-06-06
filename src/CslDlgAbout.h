@@ -37,7 +37,7 @@ class CslPanelAboutImage : public wxPanel
         DECLARE_EVENT_TABLE();
 
     protected:
-        wxBitmap *m_bitmap;
+        wxBitmap m_bitmap;
 };
 
 

@@ -22,8 +22,8 @@
 #include "CslEngine.h"
 #include "CslGameAssaultCube.h"
 
-#include "../img/ac_24.xpm"
-#include "../img/ac_16.xpm"
+#include "../img/ac_16_png.h"
+#include "../img/ac_24_png.h"
 
 enum
 {
@@ -46,6 +46,8 @@ CslGameAssaultCube::CslGameAssaultCube()
 #ifdef __WXGTK__
     m_clientSettings.ConfigPath=::wxGetHomeDir()+wxT("/.assaultcube_v1.0");
 #endif
+    m_icon16=BitmapFromData(wxBITMAP_TYPE_PNG,ac_16_png,sizeof(ac_16_png));
+    m_icon24=BitmapFromData(wxBITMAP_TYPE_PNG,ac_24_png,sizeof(ac_24_png));
 }
 
 CslGameAssaultCube::~CslGameAssaultCube()
@@ -369,7 +371,7 @@ wxString CslGameAssaultCube::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
                                      say ? wxT("]") : wxT(""),
                                      postScript.IsEmpty() ? wxT("") : postScript.c_str());
 
-	LOG_DEBUG("start client: %s\n",U2A(bin));
+    LOG_DEBUG("start client: %s\n",U2A(bin));
 
     return WriteTextFile(configpath,script,wxFile::write_append)==CSL_ERROR_NONE ? bin:wxString(wxEmptyString);
 }
@@ -386,18 +388,4 @@ wxInt32 CslGameAssaultCube::GameEnd(wxString& error)
         return CSL_ERROR_FILE_OPERATION;
 
     return CSL_ERROR_NONE;
-}
-
-const char** CslGameAssaultCube::GetIcon(wxInt32 size) const
-{
-    switch (size)
-    {
-        case 16:
-            return ac_16_xpm;
-        case 24:
-            return ac_24_xpm;
-        default:
-            break;
-    }
-    return NULL;
 }

@@ -20,8 +20,8 @@
 
 #include "Csl.h"
 #include "CslLicense.h"
-#include "csl_logo_png.h"
 #include "CslDlgAbout.h"
+#include "img/csl_256_png.h"
 
 // begin wxGlade: ::extracode
 
@@ -44,32 +44,23 @@ static const wxChar *g_csl_license_pre = wxT("Cube Server Lister is free softwar
 CslPanelAboutImage::CslPanelAboutImage(wxWindow *parent,wxInt32 id) :
         wxPanel(parent,id)
 {
-    wxMemoryInputStream stream(csl_logo_png,sizeof(csl_logo_png));
-    // see wx_wxbitmap.html
-#ifdef __WXMSW__
-    m_bitmap=new wxBitmap(stream,wxBITMAP_TYPE_PNG);
-#else
-    wxImage image(stream,wxBITMAP_TYPE_PNG);
-    m_bitmap=new wxBitmap(image);
-#endif
+    m_bitmap=BitmapFromData(wxBITMAP_TYPE_PNG,csl_256_png,sizeof(csl_256_png));
 }
 
 CslPanelAboutImage::~CslPanelAboutImage()
 {
-    delete m_bitmap;
 }
 
 void CslPanelAboutImage::OnPaint(wxPaintEvent& event)
 {
-    event.Skip();
-
-    if (!m_bitmap->IsOk())
-        return;
+    static const wxBitmap bmp=BitmapFromData(wxBITMAP_TYPE_PNG,csl_256_png,sizeof(csl_256_png));
 
     wxPaintDC dc(this);
     PrepareDC(dc);
 
-    dc.DrawBitmap(*m_bitmap,0,0,true);
+    dc.DrawBitmap(bmp,0,0,true);
+
+    event.Skip();
 }
 
 

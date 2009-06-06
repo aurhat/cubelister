@@ -119,7 +119,7 @@ bool IsLocalIP(const wxString& s)
         wxInt32 pos=m.Find(wxT("."));
 
         if (pos<0)
-           return false;
+            return false;
 
         long l;
         m.Left(pos).ToLong(&l);
@@ -312,17 +312,38 @@ wxUint32 GetTicks()
     return ticks;
 }
 
-wxBitmap AdjustIconSize(const char **data,const wxIcon& icon,
-                        const wxSize& size,const wxPoint& origin)
+wxBitmap AdjustBitmapSize(const char **data,const wxSize& size,const wxPoint& origin)
 {
-    wxBitmap bitmap;
-    if (data)
-        bitmap=wxBitmap(data);
-    else
-        bitmap=wxBitmap(icon);
+    wxBitmap bitmap=wxBitmap(data);
+    if (!bitmap.IsOk())
+        return wxNullBitmap;
     wxImage image=bitmap.ConvertToImage();
     image.Resize(size,origin);
     return wxBitmap(image);
+}
+
+wxBitmap AdjustBitmapSize(const wxBitmap& bitmap,const wxSize& size,const wxPoint& origin)
+{
+    if (!bitmap.IsOk())
+        return wxNullBitmap;
+
+    wxImage image=bitmap.ConvertToImage();
+    image.Resize(size,origin);
+    return wxBitmap(image);
+}
+
+wxBitmap BitmapFromData(wxInt32 type,const unsigned char *data,wxInt32 size)
+{
+    wxMemoryInputStream stream(data,size);
+    // see wx_wxbitmap.html
+#ifdef __WXMSW__
+    return wxBitmap(stream,type);
+#else
+    wxImage image(stream,type);
+    return wxBitmap(image);
+#endif
+
+    return wxNullBitmap;
 }
 
 bool BitmapFromWindow(wxWindow *window,wxBitmap& bitmap)

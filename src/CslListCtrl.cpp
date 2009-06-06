@@ -263,14 +263,14 @@ void CslListCtrl::CreateCountryFlagImageList()
 {
 #ifdef __WXMSW__
     ListImageList.Create(20,14,true);
-    ListImageList.Add(AdjustIconSize(sortasc_18_12_xpm,wxNullIcon,wxSize(20,14),wxPoint(0,0)));
-    ListImageList.Add(AdjustIconSize(sortdsc_18_12_xpm,wxNullIcon,wxSize(20,14),wxPoint(0,0)));
-    ListImageList.Add(AdjustIconSize(local_xpm,wxNullIcon,wxSize(20,14),wxPoint(0,2)));
-    ListImageList.Add(AdjustIconSize(unknown_xpm,wxNullIcon,wxSize(20,14),wxPoint(0,2)));
+    ListImageList.Add(AdjustBitmapSize(sortasc_18_12_xpm,wxSize(20,14),wxPoint(0,0)));
+    ListImageList.Add(AdjustBitmapSize(sortdsc_18_12_xpm,wxSize(20,14),wxPoint(0,0)));
+    ListImageList.Add(AdjustBitmapSize(local_xpm,wxSize(20,14),wxPoint(0,2)));
+    ListImageList.Add(AdjustBitmapSize(unknown_xpm,wxSize(20,14),wxPoint(0,2)));
 
     wxInt32 i,c=sizeof(codes)/sizeof(codes[0])-1;
     for (i=0;i<c;i++)
-        ListImageList.Add(AdjustIconSize(flags[i],wxNullIcon,wxSize(20,14),wxPoint(0,2)));
+        ListImageList.Add(AdjustBitmapSize(flags[i],wxSize(20,14),wxPoint(0,2)));
 #else
     ListImageList.Create(18,12,true);
     ListImageList.Add(wxBitmap(sortasc_18_12_xpm));

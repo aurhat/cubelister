@@ -102,7 +102,7 @@ class CslMasterConnection
 class CslGameClientSettings
 {
     public:
-	    CslGameClientSettings() {}
+        CslGameClientSettings() {}
         CslGameClientSettings(const wxString& binary,const wxString& path,const wxString& configpath,
                               const wxString& options,const wxString& preScript,const wxString& postScript) :
                 Binary(binary),GamePath(path),ConfigPath(configpath),
@@ -145,6 +145,8 @@ class CslGame
 
         CslGameClientSettings& GetClientSettings() { return  m_clientSettings; }
 
+        const wxBitmap& GetIcon(wxInt32 size) const;
+
         virtual void GetPlayerstatsDescriptions(vector<wxString>& desc) const;
         virtual const wxChar* GetWeaponName(wxInt32 n) const { return wxEmptyString; }
         virtual bool ModeHasFlags(wxInt32 mode,wxInt32 prot) const { return false; }
@@ -161,7 +163,6 @@ class CslGame
         virtual wxString GameStart(CslServerInfo *info,wxUint32 mode,wxString& error) = 0;
         virtual wxInt32 GameEnd(wxString& error) = 0;
         virtual bool GetMapImagePaths(wxArrayString& paths) const { return false; }
-        virtual const char** GetIcon(wxInt32 size) const { return NULL; }
         //hooks for workarounds or special handling
         virtual void ProcessOutput(char *data,wxUint32 *len) const {}
         virtual bool ReturnOk(wxInt32 code) const { return code==0; }
@@ -175,6 +176,7 @@ class CslGame
         wxString m_name;
         wxInt32 m_gameId;
         wxUint32 m_capabilities;
+        wxBitmap m_icon16,m_icon24;
 
         CslMasterConnection m_defaultMasterConnection;
         CslGameClientSettings m_clientSettings;
@@ -216,7 +218,7 @@ class CslMaster
 
 class CslServerEvents
 {
-   public:
+    public:
         enum
         {
             EVENT_NONE      = 0,

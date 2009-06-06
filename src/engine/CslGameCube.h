@@ -54,7 +54,6 @@ class CslGameCube : public CslGame
         void SetClientSettings(const CslGameClientSettings& settings);
         wxString GameStart(CslServerInfo *info,wxUint32 mode,wxString& error);
         wxInt32 GameEnd(wxString& error);
-        const char** GetIcon(wxInt32 size) const;
         void ProcessOutput(char *data,wxUint32 *len) const;
         bool ReturnOk(wxInt32 code) const { return code==0 || code==1; }
 };

@@ -109,14 +109,14 @@ wxString Int2IP(wxUint32 ip);
 wxString FormatBytes(wxUint64 size);
 wxString FormatSeconds(wxUint32 time,bool space=false,bool full=false);
 wxUint32 GetTicks();
+wxBitmap BitmapFromData(wxInt32 type,const unsigned char *data,wxInt32 size);
 bool BitmapFromWindow(wxWindow *window,wxBitmap& bitmap);
 void RegisterEventsRecursively(wxInt32 id,wxWindow *parent,wxEvtHandler *handler,
-                                          wxEventType type,wxObjectEventFunction function);
+                               wxEventType type,wxObjectEventFunction function);
 wxString GetHttpAgent();
 wxInt32 WriteTextFile(const wxString& filename,const wxString& data,const wxFile::OpenMode mode);
 
-
-wxBitmap AdjustIconSize(const char **data,const wxIcon& icon,
-                        const wxSize& size,const wxPoint& origin);
+wxBitmap AdjustBitmapSize(const char **data,const wxSize& size,const wxPoint& origin);
+wxBitmap AdjustBitmapSize(const wxBitmap& bitmap,const wxSize& size,const wxPoint& origin);
 
 #endif // CSLTOOLS_H

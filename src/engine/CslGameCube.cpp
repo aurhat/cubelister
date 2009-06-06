@@ -22,14 +22,16 @@
 #include "CslEngine.h"
 #include "CslGameCube.h"
 
-#include "../img/cb_24.xpm"
-#include "../img/cb_16.xpm"
+#include "../img/cb_16_png.h"
+#include "../img/cb_24_png.h"
 
 CslGameCube::CslGameCube()
 {
     m_name=CSL_DEFAULT_NAME_CB;
     m_defaultMasterConnection=CslMasterConnection(CSL_DEFAULT_MASTER_CB,CSL_DEFAULT_MASTER_PATH_CB);
     m_capabilities=CSL_CAPABILITY_CONNECT_PASS;
+    m_icon16=BitmapFromData(wxBITMAP_TYPE_PNG,cb_16_png,sizeof(cb_16_png));
+    m_icon24=BitmapFromData(wxBITMAP_TYPE_PNG,cb_24_png,sizeof(cb_24_png));
 }
 
 CslGameCube::~CslGameCube()
@@ -124,14 +126,14 @@ wxString CslGameCube::GameStart(CslServerInfo *info,wxUint32 mode,wxString& erro
     //binary must be surrounded by quotes if the path contains spaces
     bin=wxT("\"")+m_clientSettings.Binary+wxT("\"");
 #else
-	CmdlineEscapeSpaces(bin);
+    CmdlineEscapeSpaces(bin);
 #endif
     bin<<wxT(" ")<<opts;
 
     if (mode==CslServerInfo::CSL_CONNECT_ADMIN_PASS)
         password=info->Password;
 
-	LOG_DEBUG("start client: %s\n",U2A(bin));
+    LOG_DEBUG("start client: %s\n",U2A(bin));
 
     return InjectConfig(address,password,error)==CSL_ERROR_NONE ? bin : wxString(wxEmptyString);
 }
@@ -218,20 +220,6 @@ wxInt32 CslGameCube::InjectConfig(const wxString& address,const wxString& passwo
                              address.c_str(),wxT("alias csl_connect 0"));
 
     return WriteTextFile(cfg,script,wxFile::write_append);
-}
-
-const char** CslGameCube::GetIcon(wxInt32 size) const
-{
-    switch (size)
-    {
-        case 16:
-            return cb_16_xpm;
-        case 24:
-            return cb_24_xpm;
-        default:
-            break;
-    }
-    return NULL;
 }
 
 void CslGameCube::ProcessOutput(char *data,wxUint32 *len) const

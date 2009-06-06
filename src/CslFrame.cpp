@@ -33,7 +33,7 @@
 #include "CslGameProcess.h"
 #include "CslFrame.h"
 #ifndef __WXMSW__
-#include "csl_icon_png.h"
+#include "img/csl_48_png.h"
 #endif
 #ifndef __WXMAC__
 #include "img/csl_24.xpm"
@@ -216,11 +216,11 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
                 //add default servers here
             }
 
-            const char **icon=game->GetIcon(24);
             bool select=g_cslSettings->lastGame.IsEmpty() ? i==0 :
                         g_cslSettings->lastGame==game->GetName();
-            m_imgListTree.Add(icon ? wxBitmap(icon):wxBitmap(24,24));
-            TreeAddGame(game,icon ? i+1:-1,select);
+            const wxBitmap& bmp=game->GetIcon(24);
+            m_imgListTree.Add(bmp.IsOk() ? bmp : wxBitmap(24,24));
+            TreeAddGame(game,bmp.IsOk() ? i+1:-1,select);
         }
 
         CslMenu::EnableItem(MENU_ADD);
@@ -454,11 +454,8 @@ void CslFrame::SetProperties()
 #ifdef __WXMSW__
     SetIcon(wxICON(appicon));
 #else
-    wxMemoryInputStream stream(csl_icon_png,sizeof(csl_icon_png));
-    wxImage image(stream,wxBITMAP_TYPE_PNG);
-    wxBitmap bitmap(image);
     wxIcon icon;
-    icon.CopyFromBitmap(bitmap);
+    icon.CopyFromBitmap(BitmapFromData(wxBITMAP_TYPE_PNG,csl_48_png,sizeof(csl_48_png)));
     SetIcon(icon);
 #endif
 

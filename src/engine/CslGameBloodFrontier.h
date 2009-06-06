@@ -56,7 +56,6 @@ class CslBloodFrontier : public CslGame
         void SetClientSettings(const CslGameClientSettings& settings);
         wxString GameStart(CslServerInfo *info,wxUint32 mode,wxString& error);
         wxInt32 GameEnd(wxString& error);
-        const char** GetIcon(wxInt32 size) const;
 };
 
 #endif //CSLBLOODFRONTIER_H

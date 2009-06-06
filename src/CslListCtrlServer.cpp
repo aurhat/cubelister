@@ -691,17 +691,17 @@ void CslListCtrlServer::ListCreateGameBitmaps()
     m_imgList.Create(18,16,true);
 
     wxIcon icon;
-    m_imgList.Add(AdjustIconSize(green_list_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
-    m_imgList.Add(AdjustIconSize(yellow_list_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
-    m_imgList.Add(AdjustIconSize(red_list_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
-    m_imgList.Add(AdjustIconSize(grey_list_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
-    m_imgList.Add(AdjustIconSize(green_ext_list_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
-    m_imgList.Add(AdjustIconSize(yellow_ext_list_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
-    m_imgList.Add(AdjustIconSize(red_ext_list_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
-    m_imgList.Add(AdjustIconSize(sortasc_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
-    m_imgList.Add(AdjustIconSize(sortdsc_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
-    m_imgList.Add(AdjustIconSize(sortasclight_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
-    m_imgList.Add(AdjustIconSize(sortdsclight_16_xpm,wxNullIcon,wxSize(18,16),wxPoint(0,0)));
+    m_imgList.Add(AdjustBitmapSize(green_list_16_xpm,wxSize(18,16),wxPoint(0,0)));
+    m_imgList.Add(AdjustBitmapSize(yellow_list_16_xpm,wxSize(18,16),wxPoint(0,0)));
+    m_imgList.Add(AdjustBitmapSize(red_list_16_xpm,wxSize(18,16),wxPoint(0,0)));
+    m_imgList.Add(AdjustBitmapSize(grey_list_16_xpm,wxSize(18,16),wxPoint(0,0)));
+    m_imgList.Add(AdjustBitmapSize(green_ext_list_16_xpm,wxSize(18,16),wxPoint(0,0)));
+    m_imgList.Add(AdjustBitmapSize(yellow_ext_list_16_xpm,wxSize(18,16),wxPoint(0,0)));
+    m_imgList.Add(AdjustBitmapSize(red_ext_list_16_xpm,wxSize(18,16),wxPoint(0,0)));
+    m_imgList.Add(AdjustBitmapSize(sortasc_16_xpm,wxSize(18,16),wxPoint(0,0)));
+    m_imgList.Add(AdjustBitmapSize(sortdsc_16_xpm,wxSize(18,16),wxPoint(0,0)));
+    m_imgList.Add(AdjustBitmapSize(sortasclight_16_xpm,wxSize(18,16),wxPoint(0,0)));
+    m_imgList.Add(AdjustBitmapSize(sortdsclight_16_xpm,wxSize(18,16),wxPoint(0,0)));
 #else
     width=16;
     m_imgList.Create(16,16,true);
@@ -725,26 +725,26 @@ void CslListCtrlServer::ListCreateGameBitmaps()
         wxBitmap bmpExt(ext_green_8_xpm);
 
         //magic colour and brush for transparency
-        wxColour magicColour(255,0,255);
-        wxBrush magicBrush(magicColour);
+        //wxColour magicColour(255,0,255);
+        //wxBrush magicBrush(magicColour);
 
         wxMemoryDC dc;
 
         vector<CslGame*>& games=::wxGetApp().GetCslEngine()->GetGames();
         loopv(games)
         {
-            const char **icon=games[i]->GetIcon(16);
+            const wxBitmap& icon=games[i]->GetIcon(16);
 #ifdef __WXMSW__
-            wxBitmap bmpGame=icon ? (AdjustIconSize(icon,wxNullIcon,wxSize(18,16),wxPoint(0,0))):wxBitmap(width,16);
+            wxBitmap bmpGame=icon.IsOk() ? AdjustBitmapSize(icon,wxSize(18,16),wxPoint(0,0)) : wxBitmap(width,16);
 #else
-            wxBitmap bmpGame=icon ? wxBitmap(icon):wxBitmap(16,width);
+            wxBitmap bmpGame=icon.IsOk() ? icon : wxBitmap(16,width);
 #endif
             m_imgList.Add(bmpGame);
 
             wxBitmap bmp(width,16);
             dc.SelectObject(bmp);
             //draw transparent background
-            dc.SetBrush(magicBrush);
+            //dc.SetBrush(magicBrush);
             dc.SetPen(*wxTRANSPARENT_PEN);
             dc.DrawRectangle(0,0,width,16);
             //draw the bitmaps
@@ -752,7 +752,7 @@ void CslListCtrlServer::ListCreateGameBitmaps()
             dc.DrawBitmap(bmpExt,8,8,true);
             //unref the bitmap and set the mask
             dc.SelectObject(wxNullBitmap);
-            bmp.SetMask(new wxMask(bmp,magicColour));
+            //bmp.SetMask(new wxMask(bmp,magicColour));
 
             m_imgList.Add(bmp);
         }

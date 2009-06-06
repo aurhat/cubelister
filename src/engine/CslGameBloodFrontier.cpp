@@ -22,8 +22,8 @@
 #include "CslEngine.h"
 #include "CslGameBloodFrontier.h"
 
-#include "../img/bf_24.xpm"
-#include "../img/bf_16.xpm"
+#include "../img/bf_16_png.h"
+#include "../img/bf_24_png.h"
 
 enum { MM_OPEN, MM_VETO, MM_LOCKED, MM_PRIVATE, MM_PASSWORD };
 enum { CS_ALIVE, CS_DEAD, CS_SPAWNING, CS_EDITING, CS_SPECTATOR, CS_WAITING };
@@ -96,6 +96,8 @@ CslBloodFrontier::CslBloodFrontier()
 #elif __WXGTK__
     m_clientSettings.ConfigPath=::wxGetHomeDir()+wxT("/.bloodfrontier");
 #endif
+    m_icon16=BitmapFromData(wxBITMAP_TYPE_PNG,bf_16_png,sizeof(bf_16_png));
+    m_icon24=BitmapFromData(wxBITMAP_TYPE_PNG,bf_24_png,sizeof(bf_24_png));
 }
 
 CslBloodFrontier::~CslBloodFrontier()
@@ -442,7 +444,7 @@ wxString CslBloodFrontier::GameStart(CslServerInfo *info,wxUint32 mode,wxString&
 
     bin<<wxT(" ")<<opts;
 
-	LOG_DEBUG("start client: %s\n",U2A(bin));
+    LOG_DEBUG("start client: %s\n",U2A(bin));
 
     return bin;
 }
@@ -450,18 +452,4 @@ wxString CslBloodFrontier::GameStart(CslServerInfo *info,wxUint32 mode,wxString&
 wxInt32 CslBloodFrontier::GameEnd(wxString& error)
 {
     return CSL_ERROR_NONE;
-}
-
-const char** CslBloodFrontier::GetIcon(wxInt32 size) const
-{
-    switch (size)
-    {
-        case 16:
-            return bf_16_xpm;
-        case 24:
-            return bf_24_xpm;
-        default:
-            break;
-    }
-    return NULL;
 }

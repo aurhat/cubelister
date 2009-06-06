@@ -289,6 +289,19 @@ void CslGame::GetPlayerstatsDescriptions(vector<wxString>& desc) const
     desc.add(_("Weapon"));
 }
 
+const wxBitmap& CslGame::GetIcon(wxInt32 size) const
+{
+    switch (size)
+    {
+        case 16:
+            return m_icon16.IsOk() ? m_icon16 : wxNullBitmap;
+        case 24:
+            return m_icon24.IsOk() ? m_icon24 : wxNullBitmap;
+    }
+
+    return wxNullBitmap;
+}
+
 /**
  *  class CslServerInfo
  */

@@ -91,7 +91,7 @@ CslGamePage::CslGamePage(wxWindow *parent,CslGame *game) :
 #else
     dpickBorder=4;
 #endif
-	
+
     wxFlexGridSizer *sizer_config=new wxFlexGridSizer(6,2,0,0);
 
     label_exe=new wxStaticText(this,wxID_ANY,_("Game executable:"));
@@ -143,16 +143,16 @@ CslGamePage::CslGamePage(wxWindow *parent,CslGame *game) :
     sizer_config->Add(text_ctrl_post_script,0,wxALL|wxEXPAND,4);
     text_ctrl_post_script->SetValue(settings.PostScript);
 
-	wxFlexGridSizer *sizer=new wxFlexGridSizer(2,1,0,0);
-	sizer->Add(sizer_config,0,wxALL|wxEXPAND,0);
+    wxFlexGridSizer *sizer=new wxFlexGridSizer(2,1,0,0);
+    sizer->Add(sizer_config,0,wxALL|wxEXPAND,0);
 
-	wxButton *button=new wxButton(this,BUTTON_WIZARD,_("Run configuration wizard"));
+    wxButton *button=new wxButton(this,BUTTON_WIZARD,_("Run configuration wizard"));
     sizer->Add(button,1,wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL,24);
-	
+
     SetSizer(sizer);
 
-	sizer->AddGrowableCol(0);
-	sizer_config->AddGrowableCol(1);
+    sizer->AddGrowableCol(0);
+    sizer_config->AddGrowableCol(1);
 
 }
 
@@ -376,9 +376,15 @@ void CslDlgSettings::do_layout()
         CslGame *game=games[i];
         notebook_games->AddPage(new CslGamePage(notebook_games,game),game->GetName());
 
-        const char **icon=game->GetIcon(24);
-        imgList->Add(icon ? wxBitmap(icon):wxBitmap(24,24));
-        notebook_games->SetPageImage(i,i);
+        const wxBitmap& bmp=game->GetIcon(24);
+
+        if (bmp.IsOk())
+        {
+            imgList->Add(bmp);
+            notebook_games->SetPageImage(i,i);
+        }
+        else
+            imgList->Add(wxBitmap(24,24));
     }
 
     // begin wxGlade: CslDlgSettings::do_layout

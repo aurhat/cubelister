@@ -40,8 +40,8 @@ CslListCtrlInfo::CslListCtrlInfo(wxWindow* parent,wxWindowID id,const wxPoint& p
 
 #ifdef __WXMSW__
     m_imgList.Create(23,12,true);
-    m_imgList.Add(AdjustIconSize(info_18_12_xpm,wxNullIcon,wxSize(23,12),wxPoint(2,0)));
-    m_imgList.Add(AdjustIconSize(unknown_xpm,wxNullIcon,wxSize(23,12),wxPoint(5,0)));
+    m_imgList.Add(AdjustBitmapSize(info_18_12_xpm,wxSize(23,12),wxPoint(2,0)));
+    m_imgList.Add(AdjustBitmapSize(unknown_xpm,wxSize(23,12),wxPoint(5,0)));
 #else
     m_imgList.Create(18,12,true);
     m_imgList.Add(wxBitmap(info_18_12_xpm));
@@ -200,7 +200,7 @@ void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
     if (!flag)
         flag=unknown_xpm;
 #ifdef __WXMSW__
-    m_imgList.Replace(1,AdjustIconSize(flag,wxNullIcon,wxSize(23,12),wxPoint(5,0)));
+    m_imgList.Replace(1,AdjustBitmapSize(flag,wxSize(23,12),wxPoint(5,0)));
 #else
     m_imgList.Replace(1,wxBitmap(flag));
 #endif

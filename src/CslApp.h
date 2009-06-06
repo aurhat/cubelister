@@ -36,13 +36,13 @@ class CslApp: public wxApp
         };
 
         const wxString& GetLanguage() const { return m_lang; }
-    
+
         CslEngine* GetCslEngine() { return m_engine; }
-    
+
         void Shutdown(wxInt32 val) { m_shutdown=val; }
         wxInt32 Shutdown() const { return m_shutdown; }
-	
-    	void IpcCall(const wxString& value,wxEvtHandler *evtHandler=NULL) const;
+
+        void IpcCall(const wxString& value,wxEvtHandler *evtHandler=NULL) const;
 
     private:
         CslEngine *m_engine;
