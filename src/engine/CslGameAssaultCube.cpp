@@ -314,7 +314,7 @@ wxString CslGameAssaultCube::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
     //binary must be surrounded by quotes if the path contains spaces
     bin=wxT("\"")+m_clientSettings.Binary+wxT("\"");
     // use Prepend() and do not use opts+= here, since --home=<path> must be before --init
-    opts.Prepend(wxT("--home=\"")+path.RemoveLast()+wxT("\" "));
+    opts.Prepend(wxT("\"--home=")+path.RemoveLast()+wxT("\" "));
 #else
     CmdlineEscapeSpaces(bin);
     CmdlineEscapeSpaces(path);

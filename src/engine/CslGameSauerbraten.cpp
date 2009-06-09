@@ -359,7 +359,7 @@ wxString CslGameSauerbraten::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
     //binary must be surrounded by quotes if the path contains spaces
     bin=wxT("\"")+m_clientSettings.Binary+wxT("\"");
     // use Prepend() and do not use opts+= here, since -q<path> must be before -r
-    opts.Prepend(wxT("-q\"")+path.RemoveLast()+wxT("\" "));
+    opts.Prepend(wxT("\"-q")+path.RemoveLast()+wxT("\" "));
 #else
     CmdlineEscapeSpaces(bin);
     CmdlineEscapeSpaces(path);
@@ -399,7 +399,7 @@ wxString CslGameSauerbraten::GameStart(CslServerInfo *info,wxUint32 mode,wxStrin
                             address.c_str(),password.c_str(),
                             postScript.c_str());
 #ifdef __WXMSW__
-    opts<<wxT(" -x\"")<<script<<wxT("\"");
+    opts<<wxT(" \"-x")<<script<<wxT("\"");
 #else
     opts<<wxT(" -x")<<CmdlineEscapeSpaces(script);
 #endif
