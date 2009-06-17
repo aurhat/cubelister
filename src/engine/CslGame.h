@@ -155,6 +155,7 @@ class CslGame
         virtual wxInt32 GetBestTeam(CslTeamStats& stats,wxInt32 prot) const { return -1; }
         virtual wxUint16 GetDefaultGamePort() const = 0;
         virtual wxUint16 GetInfoPort(wxUint16 gamePort=0) const = 0;
+        virtual void PingDefault(ucharbuf& buf,CslServerInfo& info) const {};
         virtual bool ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const = 0;
         virtual bool ParsePlayerPong(wxUint32 protocol,ucharbuf& buf,CslPlayerStatsData& info) const { return false; }
         virtual bool ParseTeamPong(wxUint32 protocol,ucharbuf& buf,CslTeamStatsData& info) const { return false; }
@@ -302,6 +303,7 @@ class CslServerInfo : public CslExtendedInfo, public CslServerEvents
         bool IsFull() const { return Players>0 && PlayersMax>0 && Players>=PlayersMax; }
 
         wxString Host,Domain;
+        wxString InfoText;
         wxUint16 GamePort,InfoPort;
         wxIPV4address Addr;
         bool Pingable;

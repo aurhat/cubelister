@@ -238,6 +238,8 @@ void CslListCtrlPlayer::OnContextMenu(wxContextMenuEvent& event)
     CSL_MENU_CREATE_CONNECT(menu,m_info)
     CSL_MENU_CREATE_EXTINFO(menu,m_info,m_view);
     menu.AppendSeparator();
+    CSL_MENU_CREATE_SRVMSG(menu,m_info);
+    menu.AppendSeparator();
     CSL_MENU_CREATE_URICOPY(menu)
     menu.AppendSeparator();
     CSL_MENU_CREATE_NOTIFY(menu,m_info)
@@ -262,6 +264,7 @@ void CslListCtrlPlayer::OnMenu(wxCommandEvent& event)
 
     CSL_MENU_EVENT_SKIP_CONNECT(id,m_info)
     CSL_MENU_EVENT_SKIP_EXTINFO(id,m_info)
+    CSL_MENU_EVENT_SKIP_SRVMSG(id,m_info)
     CSL_MENU_EVENT_SKIP_NOTIFY(id,m_info)
     CSL_MENU_EVENT_SKIP_SAVEIMAGE(id)
 

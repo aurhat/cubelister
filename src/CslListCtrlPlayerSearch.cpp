@@ -128,6 +128,8 @@ void CslListCtrlPlayerSearch::OnContextMenu(wxContextMenuEvent& event)
         CSL_MENU_CREATE_CONNECT(menu,info)
         CSL_MENU_CREATE_EXTINFO(menu,info,-1)
         menu.AppendSeparator();
+        CSL_MENU_CREATE_SRVMSG(menu,info)
+        menu.AppendSeparator();
         if (!info->IsFavourite())
         {
             CslMenu::AddItem(&menu,MENU_ADD,MENU_SERVER_FAV_ADD_STR,wxART_ADD_BOOKMARK);
@@ -162,6 +164,7 @@ void CslListCtrlPlayerSearch::OnMenu(wxCommandEvent& event)
 
     CSL_MENU_EVENT_SKIP_CONNECT(id,info)
     CSL_MENU_EVENT_SKIP_EXTINFO(id,info)
+    CSL_MENU_EVENT_SKIP_SRVMSG(id,info)
     CSL_MENU_EVENT_SKIP_NOTIFY(id,info)
     CSL_MENU_EVENT_SKIP_SAVEIMAGE(id)
 

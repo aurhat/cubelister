@@ -346,6 +346,42 @@ wxBitmap BitmapFromData(wxInt32 type,const unsigned char *data,wxInt32 size)
     return wxNullBitmap;
 }
 
+wxImage& OverlayImage(wxImage& dst,const wxImage& src,wxInt32 offx,wxInt32 offy)
+{
+    unsigned char r,g,b,mr,mg,mb;
+    wxUint32 i,c,wsrc,xsrc,ysrc,xdst,ydst;
+    bool alpha=dst.HasAlpha();
+    bool mask=src.GetOrFindMaskColour(&mr,&mg,&mb);
+
+    wsrc=src.GetWidth();
+    c=src.GetHeight()*wsrc;
+
+    for (i=0;i<c;i++)
+    {
+        xsrc=i%wsrc;
+        ysrc=i/wsrc;
+        xdst=offx+i%wsrc;
+        ydst=offy+i/wsrc;
+
+        r=src.GetRed(xsrc,ysrc);
+        g=src.GetGreen(xsrc,ysrc);
+        b=src.GetBlue(xsrc,ysrc);
+
+        if (mask && alpha)
+        {
+            if (r!=mr && g!=mg && b!=mb)
+            {
+                dst.SetRGB(xdst,ydst,r,g,b);
+                dst.SetAlpha(xdst,ydst,255);
+            }
+        }
+        else
+            dst.SetRGB(xdst,ydst,r,g,b);
+    }
+
+    return dst;
+}
+
 bool BitmapFromWindow(wxWindow *window,wxBitmap& bitmap)
 {
     bool ret;

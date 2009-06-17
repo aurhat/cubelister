@@ -64,6 +64,7 @@ CslListCtrlInfo::CslListCtrlInfo(wxWindow* parent,wxWindowID id,const wxPoint& p
     InsertItem(i++,_("Game"),0);
     InsertItem(i++,_("Protocol version"),0);
     InsertItem(i++,_("Uptime"),0);
+    InsertItem(i++,_("Server message"),0);
     InsertItem(i++,_("Last seen"),0);
     InsertItem(i++,_("Last played"),0);
     InsertItem(i++,_("Last play time"),0);
@@ -227,6 +228,15 @@ void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
     }
     else
         s=_("Extended info not supported.");
+    SetItem(ic++,1,s);
+
+    if (!info->InfoText.IsEmpty())
+    {
+        i=info->InfoText.Length();
+        s=info->InfoText.Mid(0,min(i,50))+(i>50 ? wxT(" ...") : wxT(""));
+    }
+    else
+        s=_("Server has no info message.");
     SetItem(ic++,1,s);
 
     if (info->LastSeen)

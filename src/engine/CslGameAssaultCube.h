@@ -53,6 +53,7 @@ class CslGameAssaultCube : public CslGame
         wxInt32 GetBestTeam(CslTeamStats& stats,wxInt32 prot) const;
         wxUint16 GetDefaultGamePort() const { return CSL_DEFAULT_PORT_AC; }
         wxUint16 GetInfoPort(wxUint16 port=0) const { return port ? port+1:CSL_DEFAULT_PORT_AC+1; }
+        void PingDefault(ucharbuf& buf,CslServerInfo& info) const;
         bool ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const;
         bool ParsePlayerPong(wxUint32 protocol,ucharbuf& buf,CslPlayerStatsData& info) const;
         bool ParseTeamPong(wxUint32 protocol,ucharbuf& buf,CslTeamStatsData& info) const;

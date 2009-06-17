@@ -240,6 +240,8 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
         CSL_MENU_CREATE_CONNECT(menu,info)
         CSL_MENU_CREATE_EXTINFO(menu,info,-1)
         menu.AppendSeparator();
+        CSL_MENU_CREATE_SRVMSG(menu,info)
+        menu.AppendSeparator();
     }
 
     if (m_id==CSL_LIST_MASTER && selected)
@@ -418,16 +420,17 @@ void CslListCtrlServer::ListDeleteServers()
 
 void CslListCtrlServer::OnMenu(wxCommandEvent& event)
 {
-    CslServerInfo *info;
     wxListItem item;
     wxString s;
     wxUint32 i=0;
     wxInt32 c=0,id=event.GetId();
+    CslServerInfo *info=m_selected.Item(0)->Info;
 
-    CSL_MENU_EVENT_SKIP_CONNECT(id,m_selected.Item(0)->Info)
-    CSL_MENU_EVENT_SKIP_EXTINFO(id,m_selected.Item(0)->Info)
-    CSL_MENU_EVENT_SKIP_LOCATION(id,new wxString(m_selected.Item(0)->Info->Host))
-    CSL_MENU_EVENT_SKIP_NOTIFY(id,m_selected.Item(0)->Info)
+    CSL_MENU_EVENT_SKIP_CONNECT(id,info)
+    CSL_MENU_EVENT_SKIP_EXTINFO(id,info)
+    CSL_MENU_EVENT_SKIP_SRVMSG(id,info)
+    CSL_MENU_EVENT_SKIP_LOCATION(id,new wxString(info->Host))
+    CSL_MENU_EVENT_SKIP_NOTIFY(id,info)
 
     if (CSL_MENU_EVENT_IS_URICOPY(id))
     {
@@ -718,18 +721,14 @@ void CslListCtrlServer::ListCreateGameBitmaps()
     m_imgList.Add(wxBitmap(sortdsclight_16_xpm));
 #endif
 
-    //now create the icons for favourites list
+    //create icons for the favourites list
     if (m_id==CSL_LIST_FAVOURITE)
     {
         wxBitmap bmpExt=wxBitmap(ext_green_8_xpm);
 
-        //magic colour and brush for transparency - not needed for PNG
-        //wxColour magicColour(255,0,255);
-        //wxBrush magicBrush(magicColour);
-
-        wxMemoryDC dc;
-
+        stopwatch watch;
         vector<CslGame*>& games=::wxGetApp().GetCslEngine()->GetGames();
+
         loopv(games)
         {
             const wxBitmap& icon=games[i]->GetIcon(16);
@@ -740,22 +739,8 @@ void CslListCtrlServer::ListCreateGameBitmaps()
 #endif
             m_imgList.Add(bmpGame);
 
-			//force 24 bit to fix problems on WXMSW with PNG - DrawRectangle() necessary!
-            wxBitmap bmp(width,16,24);
-            dc.SelectObject(bmp);
-            //draw transparent background
-            //dc.SetBrush(magicBrush); //not needed for PNG
-            dc.SetPen(*wxTRANSPARENT_PEN);
-            dc.DrawRectangle(0,0,width,16);
-            //draw the bitmaps
-            dc.DrawBitmap(bmpGame,0,0,true);
-            dc.DrawBitmap(bmpExt,8,8,true);
-            //unref the bitmap
-            dc.SelectObject(wxNullBitmap);
-			//set the mask
-            //bmp.SetMask(new wxMask(bmp,magicColour)); //not needed for PNG
-
-            m_imgList.Add(bmp);
+            wxImage img=bmpGame.ConvertToImage();
+            m_imgList.Add(wxBitmap(OverlayImage(img,bmpExt.ConvertToImage(),8,8)));
         }
     }
 

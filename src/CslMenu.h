@@ -37,6 +37,7 @@
 
 #define MENU_SERVER_CONN_STR              _("&Connect")
 #define MENU_SERVER_CONN_PW_STR           _("Connect (&Password)")
+#define MENU_SERVER_MESSAGE_STR           _("Server &message ...")
 #define MENU_SERVER_COPY_STR              _("Create CS&L links")
 #define MENU_SERVER_COPY_CON_STR          _("Connec&t")
 #define MENU_SERVER_COPY_CONFAV_STR       _("Connect && &add to favourites")
@@ -93,6 +94,8 @@ enum
     MENU_SERVER_EXT_DEFAULT,
     MENU_SERVER_EXT_FULL,
 
+    MENU_SERVER_MESSAGE,
+
     MENU_SERVER_NOTIFY_RESET,
     MENU_SERVER_NOTIFY_ONLINE,
     MENU_SERVER_NOTIFY_OFFLINE,
@@ -128,6 +131,7 @@ enum
     MENU_VIEW_AUTO_SORT,
     MENU_VIEW_RELAYOUT,
 
+    // no new id's after this one. each locator is getting added automatically
     MENU_SERVER_LOCATION,
 
     MENU_CUSTOM_END=wxID_HIGHEST+100
@@ -175,6 +179,14 @@ enum
                 CslMenu::AddItem(_sub,MENU_SERVER_EXT_DEFAULT,MENU_SERVER_EXT_DEFAULT_STR,wxART_EXTINFO_DEFAULT); \
         } \
     }
+
+#define CSL_MENU_CREATE_SRVMSG(_menu,_info) \
+    wxMenuItem *_item; \
+    \
+    _item=&CslMenu::AddItem(&_menu,MENU_SERVER_MESSAGE,MENU_SERVER_MESSAGE_STR,wxART_ABOUT); \
+    \
+    if (!_info || _info->InfoText.IsEmpty()) \
+        _item->Enable(false);
 
 #define CSL_MENU_CREATE_URICOPY(_menu) \
     { \
@@ -244,6 +256,7 @@ enum
 
 #define CSL_MENU_EVENT_IS_CONNECT(_id)   (_id>=MENU_SERVER_CONNECT && _id<=MENU_SERVER_CONNECT_PW)
 #define CSL_MENU_EVENT_IS_EXTINFO(_id)   (_id>=MENU_SERVER_EXT_MICRO && _id<=MENU_SERVER_EXT_FULL)
+#define CSL_MENU_EVENT_IS_SRVMSG(_id)    (_id==MENU_SERVER_MESSAGE)
 #define CSL_MENU_EVENT_IS_URICOPY(_id)   (_id>=MENU_SERVER_COPY_CON && _id<=MENU_SERVER_COPY_FAV)
 #define CSL_MENU_EVENT_IS_NOTIFY(_id)    (_id>=MENU_SERVER_NOTIFY_RESET && _id<=MENU_SERVER_NOTIFY_PRIVATE)
 #define CSL_MENU_EVENT_IS_FILTER(_id)    (_id>=MENU_SERVER_FILTER_OFF && _id<=MENU_SERVER_FILTER_VER)
@@ -262,6 +275,14 @@ enum
 
 #define CSL_MENU_EVENT_SKIP_EXTINFO(_id,_info) \
     if (CSL_MENU_EVENT_IS_EXTINFO(_id)) \
+    { \
+        event.SetClientData(_info); \
+        event.Skip(); \
+        return; \
+    }
+
+#define CSL_MENU_EVENT_SKIP_SRVMSG(_id,_info) \
+    if (CSL_MENU_EVENT_IS_SRVMSG(_id)) \
     { \
         event.SetClientData(_info); \
         event.Skip(); \

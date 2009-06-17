@@ -152,7 +152,7 @@ class CslEngine : public wxEvtHandler
         wxInt32 m_gameId;
         vector<CslGame*> m_games;
 
-        wxInt32 m_updateInterval,m_pingsPerSecond;
+        wxInt32 m_updateInterval,m_pingRatio;
 
         void ParseDefaultPong(CslServerInfo *info,ucharbuf& buf,wxUint32 now);
         void ParsePong(CslServerInfo *info,CslUDPPacket& packet,wxUint32 now);

@@ -123,13 +123,13 @@ CslEngine::~CslEngine()
     }
 }
 
-bool CslEngine::Init(wxEvtHandler *handler,wxInt32 interval,wxInt32 pingsPerSecond)
+bool CslEngine::Init(wxEvtHandler *handler,wxInt32 interval,wxInt32 pingRatio)
 {
     if (m_ok)
         return false;
 
     m_updateInterval=interval;
-    m_pingsPerSecond=pingsPerSecond;
+    m_pingRatio=pingRatio;
     m_gameId=0;
 
     GetTicks();
@@ -247,6 +247,7 @@ bool CslEngine::PingDefault(CslServerInfo *info)
 
     ucharbuf p(ping,sizeof(ping));
     putint(p,info->PingSend);
+    info->GetGame().PingDefault(p,*info);
     packet->Init(info->Addr,ping,p.length());
 
     return m_pingSock->SendPing(packet);
@@ -329,9 +330,9 @@ wxUint32 CslEngine::PingServers(CslGame *game,bool force)
                 c++;
         }
 
-        if (!force && m_pingsPerSecond)
+        if (!force && m_pingRatio)
         {
-            if (c>(wxUint32)(servers.length()*3000/m_updateInterval/m_pingsPerSecond+1))
+            if (c>(wxUint32)(servers.length()*3000/m_updateInterval/m_pingRatio+1))
                 ResetPingSends(game,NULL);
         }
     }

@@ -369,8 +369,8 @@ void CslFrame::CreateMainMenu()
     CslMenu::EnableItem(MENU_ADD,false);
     CslMenu::EnableItem(MENU_DEL,false);
     CslMenu::EnableItem(MENU_UPDATE,false);
-    CslMenu::EnableItem(MENU_VIEW_SEARCH,g_cslSettings->showSearch);
-    CslMenu::EnableItem(MENU_VIEW_AUTO_SORT,g_cslSettings->autoSortColumns);
+    CslMenu::CheckItem(MENU_VIEW_SEARCH,g_cslSettings->showSearch);
+    CslMenu::CheckItem(MENU_VIEW_AUTO_SORT,g_cslSettings->autoSortColumns);
 }
 
 void CslFrame::CreateControls()
@@ -2618,6 +2618,12 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
                 CslGeoIPService *service=CslGeoIP::GetServices().Item(id-MENU_SERVER_LOCATION);
                 ::wxLaunchDefaultBrowser(service->Host+service->Path+*ip,wxBROWSER_NEW_WINDOW);
                 delete ip;
+            }
+            else if (CSL_MENU_EVENT_IS_SRVMSG(id))
+            {
+                CslServerInfo *info=(CslServerInfo*)event.GetClientData();
+                wxString s=_("Server message: ")+info->GetBestDescription();
+                wxMessageBox(info->InfoText,s,wxICON_INFORMATION,this);
             }
             else if (CSL_MENU_EVENT_IS_FILTER(id))
                 SetListCaption((wxInt32)(long)event.GetClientData());

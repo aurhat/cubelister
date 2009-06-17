@@ -109,8 +109,11 @@ wxString Int2IP(wxUint32 ip);
 wxString FormatBytes(wxUint64 size);
 wxString FormatSeconds(wxUint32 time,bool space=false,bool full=false);
 wxUint32 GetTicks();
+
 wxBitmap BitmapFromData(wxInt32 type,const unsigned char *data,wxInt32 size);
 bool BitmapFromWindow(wxWindow *window,wxBitmap& bitmap);
+wxImage& OverlayImage(wxImage& dst,const wxImage& src,wxInt32 offx,wxInt32 offy);
+
 void RegisterEventsRecursively(wxInt32 id,wxWindow *parent,wxEvtHandler *handler,
                                wxEventType type,wxObjectEventFunction function);
 wxString GetHttpAgent();

@@ -25,6 +25,7 @@
 #include "../img/ac_16_png.h"
 #include "../img/ac_24_png.h"
 
+// extra info requestable since 1.0.2, prot 1128
 enum
 {
     PONGFLAG_PASSWORD   = 1<<0,
@@ -32,6 +33,15 @@ enum
     PONGFLAG_BLACKLIST  = 1<<2,
     PONGFLAG_MASTERMODE = 1<<6,
     PONGFLAG_NUM        = 1<<7
+};
+
+enum
+{
+    AC_EXTPING_NOP = 0,
+    AC_EXTPING_NAMELIST,   //since 1.0.2, prot 1128
+    AC_EXTPING_SERVERINFO, //since 1.0.4, prot 1128
+    AC_EXTPING_MAPROT,     //since 1.0.4, prot 1128
+    AC_EXTPING_NUM
 };
 
 enum { CS_ALIVE, CS_DEAD, CS_SPAWNING, CS_LAGGED, CS_EDITING, CS_SPECTATE };
@@ -129,11 +139,36 @@ wxInt32 CslGameAssaultCube::GetBestTeam(CslTeamStats& stats,wxInt32 prot) const
     return best;
 }
 
+void CslGameAssaultCube::PingDefault(ucharbuf& buf,CslServerInfo& info) const
+{
+    if (info.Protocol==-1 || info.Protocol>=1128) // >=1.0.x
+    {
+        if (info.InfoText.IsEmpty())
+        {
+            putint(buf,AC_EXTPING_SERVERINFO);
+            putint(buf,'e'); putint(buf,'n');
+            return;
+        }
+    }
+
+    putint(buf,AC_EXTPING_NOP);
+}
+
 bool CslGameAssaultCube::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const
 {
+    wxInt32 q;
     wxUint32 i,l;
     char text[_MAXDEFSTR];
     bool wasfull=info.IsFull();
+
+    switch ((q=getint(buf)))
+    {
+        case AC_EXTPING_SERVERINFO:
+            loopi(2) getint(buf);
+            break;
+        default:
+            break;
+    }
 
     info.Protocol=getint(buf);
     info.Version=GetVersionName(info.Protocol);
@@ -167,7 +202,7 @@ bool CslGameAssaultCube::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) con
     info.MMDescription.Empty();
     info.MM=CSL_SERVER_OPEN;
 
-    if (info.Protocol>=1128 && buf.remaining()) // >1.0.1 (not sure if there is any prot bump for 1.0.2)
+    if (info.Protocol>=1128 && buf.remaining()) // >=1.0.x
     {
         i=getint(buf);
 
@@ -196,6 +231,38 @@ bool CslGameAssaultCube::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) con
         {
             info.MMDescription<<wxT("/PASS");
             info.MM|=CSL_SERVER_PASSWORD;
+        }
+
+        if (buf.remaining() && getint(buf)==q) // >=1.0.2
+        {
+            switch (q)
+            {
+                case AC_EXTPING_SERVERINFO:    // >=1.0.4
+                {
+                    getstring(text,buf);
+                    if (strlen(text)==2)
+                    {
+                        info.InfoText.Empty();
+                        while (buf.remaining())
+                        {
+                            getstring(text,buf);
+                            if (!*text)
+                                break;
+                            if (strcmp(text,"."))
+                            {
+                                l=strlen(text);
+                                FixString(text,&l,1,true);
+                                info.InfoText << A2U(text);
+                            }
+                            else
+                                info.InfoText << wxT("\r\n");
+                        }
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
         }
     }
     else
