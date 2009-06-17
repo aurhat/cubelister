@@ -725,8 +725,8 @@ void CslListCtrlServer::ListCreateGameBitmaps()
     if (m_id==CSL_LIST_FAVOURITE)
     {
         wxBitmap bmpExt=wxBitmap(ext_green_8_xpm);
+        wxImage imgExt=bmpExt.ConvertToImage();
 
-        stopwatch watch;
         vector<CslGame*>& games=::wxGetApp().GetCslEngine()->GetGames();
 
         loopv(games)
@@ -740,7 +740,7 @@ void CslListCtrlServer::ListCreateGameBitmaps()
             m_imgList.Add(bmpGame);
 
             wxImage img=bmpGame.ConvertToImage();
-            m_imgList.Add(wxBitmap(OverlayImage(img,bmpExt.ConvertToImage(),8,8)));
+            m_imgList.Add(wxBitmap(OverlayImage(img,imgExt,8,8)));
         }
     }
 
