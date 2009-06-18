@@ -232,8 +232,14 @@ void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
 
     if (!info->InfoText.IsEmpty())
     {
-        i=info->InfoText.Length();
-        s=info->InfoText.Mid(0,min(i,50))+(i>50 ? wxT(" ...") : wxT(""));
+        wxInt32 l=i=info->InfoText.Length();
+        if (l>50)
+        {
+            if ((i=info->InfoText.find_first_of(wxT(" \t\v\r\n"),50))==wxNOT_FOUND)
+                i=50;
+        }
+        s=info->InfoText.Mid(0,i)+(i<l ? wxT(" ...") : wxT(""));
+        s.Replace(wxT("\r\n"),wxT(" "));
     }
     else
         s=_("Server has no info message.");

@@ -254,8 +254,7 @@ bool CslGameAssaultCube::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) con
                                 FixString(text,&l,1,true);
                                 info.InfoText << A2U(text);
                             }
-                            else
-                                info.InfoText << wxT("\r\n");
+                            info.InfoText << wxT("\r\n");
                         }
                     }
                     break;
