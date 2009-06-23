@@ -26,9 +26,11 @@
 */
 
 #define CSL_DLG_GENERIC_DEFAULT     0
-#define CSL_DLG_GENERIC_OK       1<<0
-#define CSL_DLG_GENERIC_CLOSE    1<<1
-#define CSL_DLG_GENERIC_URL      1<<2
+#define CSL_DLG_GENERIC_RESIZE   1<<0
+#define CSL_DLG_GENERIC_OK       1<<1
+#define CSL_DLG_GENERIC_CLOSE    1<<2
+#define CSL_DLG_GENERIC_URL      1<<3
+#define CSL_DLG_GENERIC_TEXT     1<<4
 
 
 class CslDlgGeneric: public wxDialog
@@ -40,8 +42,8 @@ class CslDlgGeneric: public wxDialog
                       const wxString& text,
                       const wxBitmap& bitmap,
                       const wxString& url=wxEmptyString) :
-                wxDialog(parent,wxID_ANY,title,wxDefaultPosition,
-                         wxDefaultSize,wxDEFAULT_DIALOG_STYLE)
+                wxDialog(parent,wxID_ANY,title,wxDefaultPosition,wxDefaultSize,
+                         wxDEFAULT_DIALOG_STYLE|(type&CSL_DLG_GENERIC_RESIZE ? wxRESIZE_BORDER : 0))
         {
             wxUint32 rowsMain=1,rowsRight=1;
             if (type&CSL_DLG_GENERIC_URL) rowsRight++;
@@ -51,10 +53,17 @@ class CslDlgGeneric: public wxDialog
             wxFlexGridSizer* grid_sizer_top=new wxFlexGridSizer(1,2,0,0);
             wxFlexGridSizer* grid_sizer_right=new wxFlexGridSizer(rowsRight,1,0,0);
 
-            grid_sizer_top->Add(new wxStaticBitmap(this,wxID_ANY,bitmap),0,wxTOP|wxLEFT|wxBOTTOM,12);
+            wxWindow *window;
+            if (type&CSL_DLG_GENERIC_TEXT)
+                window=new wxTextCtrl(this,wxID_ANY,text,wxDefaultPosition,wxSize(450,230),
+                                      wxTE_MULTILINE|wxTE_READONLY|wxTE_DONTWRAP|wxTE_AUTO_URL|wxTE_RICH|wxTE_RICH2);
+            else
+                window=new wxStaticText(this,wxID_ANY,text);
 
-            grid_sizer_right->Add(new wxStaticText(this,wxID_ANY,text),
-                                  0,wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL,10);
+            grid_sizer_top->Add(new wxStaticBitmap(this,wxID_ANY,bitmap),0,wxLEFT|wxTOP|wxBOTTOM,12);
+            grid_sizer_top->Add(grid_sizer_right,1,wxEXPAND|wxTOP|wxBOTTOM,4);
+            grid_sizer_right->Add(window,0,wxEXPAND|wxALL,10);
+            grid_sizer_main->Add(grid_sizer_top,1,wxEXPAND);
 
             if (type&CSL_DLG_GENERIC_URL)
                 grid_sizer_right->Add(new wxHyperlinkCtrl(this,wxID_ANY,url,url),
@@ -64,23 +73,24 @@ class CslDlgGeneric: public wxDialog
             {
                 wxButton *button=new wxButton(this,type&CSL_DLG_GENERIC_OK ? wxID_OK : wxID_CLOSE);
 
-                grid_sizer_main->Add(button,0,wxALL|wxALIGN_RIGHT,8);
+                grid_sizer_main->Add(button,0,wxALL|wxALIGN_RIGHT|wxLEFT|wxRIGHT|wxBOTTOM,8);
                 Connect(wxEVT_COMMAND_BUTTON_CLICKED,
                         wxCommandEventHandler(CslDlgGeneric::OnCommandEvent),
                         NULL,this);
                 button->SetDefault();
             }
 
-            grid_sizer_top->Add(grid_sizer_right,1,wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM,4);
-            grid_sizer_main->Insert(0,grid_sizer_top,1,0,0);
-
+            grid_sizer_right->AddGrowableRow(0);
             grid_sizer_right->AddGrowableCol(0);
+            grid_sizer_top->AddGrowableRow(0);
             grid_sizer_top->AddGrowableCol(1);
+            grid_sizer_main->AddGrowableRow(0);
             grid_sizer_main->AddGrowableCol(0);
 
             SetSizer(grid_sizer_main);
             grid_sizer_main->Fit(this);
             Layout();
+            grid_sizer_main->SetSizeHints(this);
 
             CentreOnParent();
 

@@ -731,7 +731,7 @@ void CslListCtrlPlayer::ListInit(const wxInt32 view)
     SetColumn(m_sortHelper.Type,item);
 }
 
-int wxCALLBACK CslListCtrlPlayer::ListSortCompareFunc(long item1,long item2,long data)
+int wxCALLBACK CslListCtrlPlayer::ListSortCompareFunc(long item1,long item2,IntPtr data)
 {
     CslPlayerStatsData *data1=(CslPlayerStatsData*)item1;
     CslPlayerStatsData *data2=(CslPlayerStatsData*)item2;

@@ -97,7 +97,7 @@ class CslListCtrlCountry : public CslListCtrl
         void UpdateEntry(const wxString& country,wxInt32 id);
         void ListSort(const wxInt32 column);
 
-        static int wxCALLBACK ListSortCompareFunc(long item1,long item2,long data);
+        static int wxCALLBACK ListSortCompareFunc(long item1,long item2,IntPtr data);
 };
 
 #endif //CSLLISTCTRLCOUNTRY_H

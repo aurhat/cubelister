@@ -2551,7 +2551,7 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             else if (CSL_MENU_EVENT_IS_SRVMSG(id))
             {
                 CslServerInfo *info=(CslServerInfo*)event.GetClientData();
-                CslDlgGeneric *dlg=new CslDlgGeneric(this,CSL_DLG_GENERIC_CLOSE,
+                CslDlgGeneric *dlg=new CslDlgGeneric(this,CSL_DLG_GENERIC_RESIZE|CSL_DLG_GENERIC_TEXT|CSL_DLG_GENERIC_CLOSE,
                                                      _("Server message: ")+info->GetBestDescription(),info->InfoText,
                                                      wxArtProvider::GetBitmap(wxART_INFORMATION,wxART_CMN_DIALOG));
                 dlg->Show();
@@ -2873,7 +2873,7 @@ void CslFrame::OnVersionCheck(wxCommandEvent& event)
 
     if (version)
     {
-        if (version->Cmp(CSL_VERSION_STR)>0)
+        if (1||version->Cmp(CSL_VERSION_STR)>0)
         {
             CslDlgGeneric *dlg=new CslDlgGeneric(this,CSL_DLG_GENERIC_URL|CSL_DLG_GENERIC_CLOSE,
                                                  wxString::Format(_("New version %s"),version->c_str()),

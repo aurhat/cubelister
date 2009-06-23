@@ -168,7 +168,7 @@ class CslListCtrlServer : public CslListCtrl
         void OnContextMenu(wxContextMenuEvent& event);
         void OnMenu(wxCommandEvent& event);
 
-        static int wxCALLBACK ListSortCompareFunc(long item1,long item2,long data);
+        static int wxCALLBACK ListSortCompareFunc(long item1,long item2,IntPtr data);
 
         DECLARE_EVENT_TABLE()
 

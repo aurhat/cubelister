@@ -87,7 +87,7 @@ class CslListCtrlPlayer : public CslListCtrl
         wxSize GetImageListSize();
 
 
-        static int wxCALLBACK ListSortCompareFunc(long item1,long item2,long data);
+        static int wxCALLBACK ListSortCompareFunc(long item1,long item2,IntPtr data);
 };
 
 

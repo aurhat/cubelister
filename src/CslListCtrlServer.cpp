@@ -1287,7 +1287,7 @@ void CslListCtrlServer::ListSort(wxInt32 column)
 #endif
 }
 
-int wxCALLBACK CslListCtrlServer::ListSortCompareFunc(long item1,long item2,long data)
+int wxCALLBACK CslListCtrlServer::ListSortCompareFunc(long item1,long item2,IntPtr data)
 {
     CslListServerData *data1=(CslListServerData*)item1;
     CslListServerData *data2=(CslListServerData*)item2;

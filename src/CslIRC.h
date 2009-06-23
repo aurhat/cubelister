@@ -121,7 +121,7 @@ class CslIrcPanel: public wxPanel
         wxTextCtrl *text_ctrl_input;
         wxSplitterWindow *splitter;
 
-        static int wxCALLBACK ListSortCompareFunc(long item1,long item2,long data);
+        static int wxCALLBACK ListSortCompareFunc(long item1,long item2,IntPtr data);
 
         void OnKeypress(wxKeyEvent& event);
         void OnListCtrlActivated(wxListEvent& event);

@@ -30,42 +30,49 @@
 #endif //HAVE_CONFIG_H
 
 #include <wx/wx.h>
-#include <wx/socket.h>
-#include <wx/file.h>
-#include <wx/protocol/http.h>
-#include <wx/filename.h>
-#include <wx/regex.h>
-#include <wx/tokenzr.h>
-#include <wx/fileconf.h>
-#include <wx/wfstream.h>
 #include <wx/artprov.h>
-#include <wx/statline.h>
+#include <wx/aui/aui.h>
+#include <wx/clipbrd.h>
+#include <wx/colordlg.h>
+#include <wx/fileconf.h>
+#include <wx/file.h>
+#include <wx/filename.h>
 #include <wx/filepicker.h>
-#include <wx/spinctrl.h>
-#include <wx/listbook.h>
-#include <wx/listctrl.h>
-#include <wx/notebook.h>
-#include <wx/treectrl.h>
+#include <wx/hyperlink.h>
 #include <wx/imaglist.h>
 #include <wx/ipc.h>
-#include <wx/aui/aui.h>
-#include <wx/splitter.h>
-#include <wx/taskbar.h>
-#include <wx/snglinst.h>
-#include <wx/stdpaths.h>
-#include <wx/hyperlink.h>
+#include <wx/listbook.h>
+#include <wx/listctrl.h>
 #include <wx/mstream.h>
-#include <wx/wupdlock.h>
-#include <wx/colordlg.h>
-#include <wx/process.h>
-#include <wx/clipbrd.h>
-#include <wx/uri.h>
+#include <wx/notebook.h>
 #include <wx/numdlg.h>
+#include <wx/process.h>
+#include <wx/protocol/http.h>
+#include <wx/regex.h>
+#include <wx/snglinst.h>
+#include <wx/socket.h>
+#include <wx/spinctrl.h>
+#include <wx/splitter.h>
+#include <wx/statline.h>
+#include <wx/stdpaths.h>
+#include <wx/taskbar.h>
+#include <wx/tokenzr.h>
+#include <wx/treectrl.h>
+#include <wx/uri.h>
+#include <wx/wfstream.h>
+#include <wx/wupdlock.h>
+#include <wx/wizard.h>
 #ifdef __WXMAC__
 #include <wx/sysopt.h>
 #endif //__WXMAC__
 
 #include "../engine/CslTools.h"
 #include "../engine/CslVersion.h"
+
+#if wxCHECK_VERSION(2,9,0)
+typedef wxIntPtr IntPtr;
+#else
+typedef long IntPtr;
+#endif
 
 #endif //CSL_H

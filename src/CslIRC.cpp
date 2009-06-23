@@ -1377,7 +1377,7 @@ void CslIrcPanel::HandleInput(const wxString& text)
     AddLine(s.IsEmpty() ? text:s,false);
 }
 
-int wxCALLBACK CslIrcPanel::ListSortCompareFunc(long item1,long item2,long data)
+int wxCALLBACK CslIrcPanel::ListSortCompareFunc(long item1,long item2,IntPtr data)
 {
     CslIrcUser *user1,*user2;
 

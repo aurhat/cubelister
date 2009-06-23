@@ -317,7 +317,7 @@ void CslListCtrlCountry::ListSort(const wxInt32 column)
         SortItems(ListSortCompareFunc,(long)&m_sortHelper);
 }
 
-int wxCALLBACK CslListCtrlCountry::ListSortCompareFunc(long item1,long item2,long data)
+int wxCALLBACK CslListCtrlCountry::ListSortCompareFunc(long item1,long item2,IntPtr data)
 {
     CslCountryEntry *data1=(CslCountryEntry*)item1;
     CslCountryEntry *data2=(CslCountryEntry*)item2;
