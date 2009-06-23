@@ -2873,7 +2873,7 @@ void CslFrame::OnVersionCheck(wxCommandEvent& event)
 
     if (version)
     {
-        if (1||version->Cmp(CSL_VERSION_STR)>0)
+        if (version->Cmp(CSL_VERSION_STR)>0)
         {
             CslDlgGeneric *dlg=new CslDlgGeneric(this,CSL_DLG_GENERIC_URL|CSL_DLG_GENERIC_CLOSE,
                                                  wxString::Format(_("New version %s"),version->c_str()),
