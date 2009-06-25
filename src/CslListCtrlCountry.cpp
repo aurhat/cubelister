@@ -261,6 +261,8 @@ void CslListCtrlCountry::UpdateData(CslServerInfo *info)
         {
             if (!(player=info->PlayerStats.m_stats[i])->Ok)
                 break;
+            if (!(player->IP>>8))
+                continue;
 
             imgId=GetCountryFlag(player->IP);
             country=A2U(CslGeoIP::GetCountryNameByIPnum(player->IP));
