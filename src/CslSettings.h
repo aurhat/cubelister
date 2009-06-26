@@ -116,7 +116,7 @@ class CslSettings
                 colServerS8(0.07f),
                 colServerS9(0.08f),
                 colServerEmpty(wxColour(60,15,15)),
-                colServerOff(wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT)),
+                colServerOff(SYSCOLOUR(wxSYS_COLOUR_GRAYTEXT)),
                 colServerFull(*wxRED),
                 colServerMM1(*wxBLACK),
                 colServerMM2(*wxBLUE),

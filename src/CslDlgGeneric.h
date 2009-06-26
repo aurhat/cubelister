@@ -55,8 +55,16 @@ class CslDlgGeneric: public wxDialog
 
             wxWindow *window;
             if (type&CSL_DLG_GENERIC_TEXT)
+            {
                 window=new wxTextCtrl(this,wxID_ANY,text,wxDefaultPosition,wxSize(450,230),
-                                      wxTE_MULTILINE|wxTE_READONLY|wxTE_DONTWRAP|wxTE_AUTO_URL|wxTE_RICH|wxTE_RICH2);
+                                      wxTE_MULTILINE|wxTE_READONLY|wxTE_AUTO_URL|wxTE_DONTWRAP|wxTE_RICH|wxTE_RICH2);
+
+                if (!text.IsEmpty())
+                {
+                    wxSize size=GetBestWindowSizeForText(window,text,200,600,100,300);
+                    window->SetMinSize(size);
+                }
+            }
             else
                 window=new wxStaticText(this,wxID_ANY,text);
 
@@ -66,14 +74,14 @@ class CslDlgGeneric: public wxDialog
             grid_sizer_main->Add(grid_sizer_top,1,wxEXPAND);
 
             if (type&CSL_DLG_GENERIC_URL)
-                grid_sizer_right->Add(new wxHyperlinkCtrl(this,wxID_ANY,url,url),
-                                      0,wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL,10);
+                grid_sizer_right->Add(new wxHyperlinkCtrl(this,wxID_ANY,url,url),0,
+                                      wxALIGN_CENTER_HORIZONTAL|wxLEFT|wxRIGHT|wxBOTTOM,10);
 
             if (type&CSL_DLG_GENERIC_OK || type&CSL_DLG_GENERIC_CLOSE)
             {
                 wxButton *button=new wxButton(this,type&CSL_DLG_GENERIC_OK ? wxID_OK : wxID_CLOSE);
 
-                grid_sizer_main->Add(button,0,wxALL|wxALIGN_RIGHT|wxLEFT|wxRIGHT|wxBOTTOM,8);
+                grid_sizer_main->Add(button,0,wxALIGN_RIGHT|wxLEFT|wxRIGHT|wxBOTTOM,8);
                 Connect(wxEVT_COMMAND_BUTTON_CLICKED,
                         wxCommandEventHandler(CslDlgGeneric::OnCommandEvent),
                         NULL,this);

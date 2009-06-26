@@ -147,7 +147,7 @@ void CslToolTip::CreateFrame()
 
 #ifdef __WXMSW__
     //set the default tooltip bg colour otherwise it's the default window bg colour
-    const wxColour& bg=wxSystemSettings::GetColour(wxSYS_COLOUR_INFOBK);
+    const wxColour& bg=SYSCOLOUR(wxSYS_COLOUR_INFOBK);
     left->SetBackgroundColour(bg);
     right->SetBackgroundColour(bg);
     title->SetBackgroundColour(bg);

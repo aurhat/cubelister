@@ -312,6 +312,31 @@ wxUint32 GetTicks()
     return ticks;
 }
 
+wxString GetHttpAgent()
+{
+    wxPlatformInfo pinfo;
+    wxOperatingSystemId id=pinfo.GetOperatingSystemId();
+    wxString agent=wxT("Csl/");
+    agent+=CSL_VERSION_LONG_STR;
+    agent+=wxT("(")+pinfo.GetOperatingSystemFamilyName(id)+wxT(")");
+    return agent;
+}
+
+wxInt32 WriteTextFile(const wxString& filename,const wxString& data,const wxFile::OpenMode mode)
+{
+    wxFile file(filename,mode);
+
+    if (!file.IsOpened())
+        return CSL_ERROR_FILE_OPERATION;
+
+    size_t l=data.Length();
+    size_t w=file.Write(U2A(data),l);
+    file.Close();
+
+    return l!=w ? CSL_ERROR_FILE_OPERATION:CSL_ERROR_NONE;
+}
+
+#if wxUSE_GUI
 wxBitmap AdjustBitmapSize(const char **data,const wxSize& size,const wxPoint& origin)
 {
     wxBitmap bitmap=wxBitmap(data);
@@ -400,6 +425,16 @@ bool BitmapFromWindow(wxWindow *window,wxBitmap& bitmap)
     return ret;
 }
 
+wxWindow* GetParentWindowRecursively(wxWindow *self,wxInt32 depth)
+{
+    wxWindow *window=self ? self->GetParent() : NULL;
+
+    if (depth>0 && window)
+        window=GetParentWindowRecursively(window,--depth);
+
+    return window;
+}
+
 void RegisterEventsRecursively(wxInt32 id,wxWindow *parent,wxEvtHandler *handler,
                                wxEventType type,wxObjectEventFunction function)
 {
@@ -418,26 +453,28 @@ void RegisterEventsRecursively(wxInt32 id,wxWindow *parent,wxEvtHandler *handler
     }
 }
 
-wxString GetHttpAgent()
+wxSize GetBestWindowSizeForText(wxWindow *window,const wxString& text,
+                                wxInt32 minWidth,wxInt32 maxWidth,
+                                wxInt32 minHeight,wxInt32 maxHeight)
 {
-    wxPlatformInfo pinfo;
-    wxOperatingSystemId id=pinfo.GetOperatingSystemId();
-    wxString agent=wxT("Csl/");
-    agent+=CSL_VERSION_LONG_STR;
-    agent+=wxT("(")+pinfo.GetOperatingSystemFamilyName(id)+wxT(")");
-    return agent;
+    wxCoord w,h,border;
+    wxClientDC dc(window);
+
+    dc.GetTextExtent(text,&w,&h);
+
+    if (maxWidth<0)
+        maxWidth=w;
+    if (maxHeight<0)
+        maxHeight=h;
+
+    w=clamp(w,minWidth,maxWidth);
+    h=clamp(h,minHeight,maxHeight);
+
+    border=SYSMETRIC(wxSYS_BORDER_X,window);
+    //guess some border size on systems not supporting it (wxGTK)
+    border=2*(border<0 ? 4 : border);
+    w+=border+(h>=minHeight ? SYSMETRIC(wxSYS_VSCROLL_X,NULL) : 0);
+
+    return wxSize(w,h);
 }
-
-wxInt32 WriteTextFile(const wxString& filename,const wxString& data,const wxFile::OpenMode mode)
-{
-    wxFile file(filename,mode);
-
-    if (!file.IsOpened())
-        return CSL_ERROR_FILE_OPERATION;
-
-    size_t l=data.Length();
-    size_t w=file.Write(U2A(data),l);
-    file.Close();
-
-    return l!=w ? CSL_ERROR_FILE_OPERATION:CSL_ERROR_NONE;
-}
+#endif //wxUSE_GUI

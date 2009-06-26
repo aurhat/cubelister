@@ -60,6 +60,7 @@
 #define INT2COLOUR(int) wxColour((int>>16)&0xFF,(int>>8)&0xFF,int&0xFF)
 
 #define SYSCOLOUR(x) wxSystemSettings::GetColour(x)
+#define SYSMETRIC(x,w) wxSystemSettings::GetMetric(x,w)
 
 #ifdef __WXMSW__
 #define PATHDIV wxT("\\")
@@ -109,17 +110,23 @@ wxString Int2IP(wxUint32 ip);
 wxString FormatBytes(wxUint64 size);
 wxString FormatSeconds(wxUint32 time,bool space=false,bool full=false);
 wxUint32 GetTicks();
+wxString GetHttpAgent();
+wxInt32 WriteTextFile(const wxString& filename,const wxString& data,const wxFile::OpenMode mode);
 
+#if wxUSE_GUI
+wxBitmap AdjustBitmapSize(const char **data,const wxSize& size,const wxPoint& origin);
+wxBitmap AdjustBitmapSize(const wxBitmap& bitmap,const wxSize& size,const wxPoint& origin);
 wxBitmap BitmapFromData(wxInt32 type,const unsigned char *data,wxInt32 size);
 bool BitmapFromWindow(wxWindow *window,wxBitmap& bitmap);
 wxImage& OverlayImage(wxImage& dst,const wxImage& src,wxInt32 offx,wxInt32 offy);
 
+wxWindow* GetParentWindowRecursively(wxWindow *self,wxInt32 depth);
 void RegisterEventsRecursively(wxInt32 id,wxWindow *parent,wxEvtHandler *handler,
                                wxEventType type,wxObjectEventFunction function);
-wxString GetHttpAgent();
-wxInt32 WriteTextFile(const wxString& filename,const wxString& data,const wxFile::OpenMode mode);
 
-wxBitmap AdjustBitmapSize(const char **data,const wxSize& size,const wxPoint& origin);
-wxBitmap AdjustBitmapSize(const wxBitmap& bitmap,const wxSize& size,const wxPoint& origin);
+wxSize GetBestWindowSizeForText(wxWindow *window,const wxString& text,
+                                wxInt32 minWidth,wxInt32 maxWidth,
+                                wxInt32 minHeight,wxInt32 maxHeight);
+#endif //wxUSE_GUI
 
-#endif // CSLTOOLS_H
+#endif //CSLTOOLS_H

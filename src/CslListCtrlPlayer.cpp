@@ -506,9 +506,9 @@ void CslListCtrlPlayer::EnableEntries(bool enable)
         item.SetId(i);
 
         if (enable)
-            SetItemTextColour(item,wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
+            SetItemTextColour(item,SYSCOLOUR(wxSYS_COLOUR_WINDOWTEXT));
         else
-            SetItemTextColour(item,wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
+            SetItemTextColour(item,SYSCOLOUR(wxSYS_COLOUR_GRAYTEXT));
     }
 }
 
