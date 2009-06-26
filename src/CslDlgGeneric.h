@@ -57,7 +57,7 @@ class CslDlgGeneric: public wxDialog
             if (type&CSL_DLG_GENERIC_TEXT)
             {
                 window=new wxTextCtrl(this,wxID_ANY,text,wxDefaultPosition,wxSize(450,230),
-                                      wxTE_MULTILINE|wxTE_READONLY|wxTE_AUTO_URL|wxTE_DONTWRAP|wxTE_RICH|wxTE_RICH2);
+                                      wxTE_MULTILINE|wxTE_READONLY|wxTE_AUTO_URL|wxTE_RICH|wxTE_RICH2);
 
                 if (!text.IsEmpty())
                 {

@@ -459,8 +459,9 @@ wxSize GetBestWindowSizeForText(wxWindow *window,const wxString& text,
 {
     wxCoord w,h,border;
     wxClientDC dc(window);
+	wxFont font=window->GetFont();
 
-    dc.GetTextExtent(text,&w,&h);
+    dc.GetMultiLineTextExtent(text,&w,&h,NULL,&font);
 
     if (maxWidth<0)
         maxWidth=w;
@@ -474,6 +475,11 @@ wxSize GetBestWindowSizeForText(wxWindow *window,const wxString& text,
     //guess some border size on systems not supporting it (wxGTK)
     border=2*(border<0 ? 4 : border);
     w+=border+(h>=minHeight ? SYSMETRIC(wxSYS_VSCROLL_X,NULL) : 0);
+
+	border=SYSMETRIC(wxSYS_BORDER_Y,window);
+    //guess some border size on systems not supporting it (wxGTK)
+    border=2*(border<0 ? 4 : border)+4; //4 pixels additionally
+	h+=border;
 
     return wxSize(w,h);
 }

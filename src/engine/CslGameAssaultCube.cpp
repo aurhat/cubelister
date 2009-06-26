@@ -242,19 +242,21 @@ bool CslGameAssaultCube::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) con
                     getstring(text,buf);
                     if (strlen(text)==2)
                     {
+						i=0;
                         info.InfoText.Empty();
                         while (buf.remaining())
                         {
                             getstring(text,buf);
                             if (!*text)
                                 break;
+                            if (i++)
+                                info.InfoText << wxT("\r\n");
                             if (strcmp(text,"."))
                             {
                                 l=strlen(text);
                                 FixString(text,&l,1,true);
                                 info.InfoText << A2U(text);
                             }
-                            info.InfoText << wxT("\r\n");
                         }
                     }
                     break;
