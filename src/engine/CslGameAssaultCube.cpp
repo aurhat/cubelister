@@ -250,7 +250,7 @@ bool CslGameAssaultCube::ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) con
                             if (!*text)
                                 break;
                             if (i++)
-                                info.InfoText << wxT("\r\n");
+                                info.InfoText << NEWLINE;
                             if (strcmp(text,"."))
                             {
                                 l=strlen(text);

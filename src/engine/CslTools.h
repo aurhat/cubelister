@@ -63,9 +63,11 @@
 #define SYSMETRIC(x,w) wxSystemSettings::GetMetric(x,w)
 
 #ifdef __WXMSW__
+#define NEWLINE wxT("\r\n")
 #define PATHDIV wxT("\\")
 #define PATHDIVA wxT('\\')
 #else
+#define NEWLINE wxT("\n")
 #define PATHDIV wxT("/")
 #define PATHDIVA wxT('/')
 #endif
@@ -126,7 +128,8 @@ void RegisterEventsRecursively(wxInt32 id,wxWindow *parent,wxEvtHandler *handler
 
 wxSize GetBestWindowSizeForText(wxWindow *window,const wxString& text,
                                 wxInt32 minWidth,wxInt32 maxWidth,
-                                wxInt32 minHeight,wxInt32 maxHeight);
+                                wxInt32 minHeight,wxInt32 maxHeight,
+                                wxInt32 scrollbar=0);
 #endif //wxUSE_GUI
 
 #endif //CSLTOOLS_H

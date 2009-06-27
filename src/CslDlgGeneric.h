@@ -61,7 +61,7 @@ class CslDlgGeneric: public wxDialog
 
                 if (!text.IsEmpty())
                 {
-                    wxSize size=GetBestWindowSizeForText(window,text,200,600,100,300);
+                    wxSize size=GetBestWindowSizeForText(window,text,200,600,100,300,wxVERTICAL);
                     window->SetMinSize(size);
                 }
             }

@@ -455,11 +455,12 @@ void RegisterEventsRecursively(wxInt32 id,wxWindow *parent,wxEvtHandler *handler
 
 wxSize GetBestWindowSizeForText(wxWindow *window,const wxString& text,
                                 wxInt32 minWidth,wxInt32 maxWidth,
-                                wxInt32 minHeight,wxInt32 maxHeight)
+                                wxInt32 minHeight,wxInt32 maxHeight,
+								wxInt32 scrollbar)
 {
-    wxCoord w,h,border;
+    wxCoord w,h,border,scroll;
     wxClientDC dc(window);
-	wxFont font=window->GetFont();
+    wxFont font=window->GetFont();
 
     dc.GetMultiLineTextExtent(text,&w,&h,NULL,&font);
 
@@ -472,14 +473,22 @@ wxSize GetBestWindowSizeForText(wxWindow *window,const wxString& text,
     h=clamp(h,minHeight,maxHeight);
 
     border=SYSMETRIC(wxSYS_BORDER_X,window);
+    scroll=SYSMETRIC(wxSYS_VSCROLL_X,window);
     //guess some border size on systems not supporting it (wxGTK)
-    border=2*(border<0 ? 4 : border);
-    w+=border+(h>=minHeight ? SYSMETRIC(wxSYS_VSCROLL_X,NULL) : 0);
+    w+=(border=2*(border<0 ? 4 : border));
+    //scrollbar is always shown on these systems
+#if defined (__WXMSW__) || defined(__WXMAC__)
+    if (scrollbar&wxVERTICAL)
+        w+=scroll;
+#else
+    if (h>=maxHeight)
+        w+=scroll;
+#endif
 
-	border=SYSMETRIC(wxSYS_BORDER_Y,window);
-    //guess some border size on systems not supporting it (wxGTK)
-    border=2*(border<0 ? 4 : border)+4; //4 pixels additionally
-	h+=border;
+#ifdef __WXMSW__
+    border+=4;
+#endif //__WXMSW__
+    h+=border;
 
     return wxSize(w,h);
 }

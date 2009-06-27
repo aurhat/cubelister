@@ -1005,7 +1005,7 @@ void CslIrcPanel::AddLine(const wxString& line,bool scroll)
     attr=basic;
 
     if (m_textLength)
-        buf=wxT("\n");
+        buf=NEWLINE;
 
     text=wxString::Format(wxT("\0032[%-2.2d:%-2.2d]\003 "),now.GetHour(),now.GetMinute())+line;
     len=text.length();
