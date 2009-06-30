@@ -103,7 +103,7 @@ extern wxString g_basePath;
 
 wxString& CmdlineEscapeQuotes(wxString& str);
 wxString& CmdlineEscapeSpaces(wxString& str);
-void FixString(char *src,wxUint32 *len,wxUint32 count,bool keepnl=false);
+void FixString(char *src,wxUint32 *len,wxUint32 count,bool keepnl=false,bool keeptab=false);
 void FixFilename(wxString& name);
 bool IsIP(const wxString& s);
 bool IsLocalIP(const wxString& s);
@@ -122,7 +122,7 @@ wxBitmap BitmapFromData(wxInt32 type,const unsigned char *data,wxInt32 size);
 bool BitmapFromWindow(wxWindow *window,wxBitmap& bitmap);
 wxImage& OverlayImage(wxImage& dst,const wxImage& src,wxInt32 offx,wxInt32 offy);
 
-wxWindow* GetParentWindowRecursively(wxWindow *self,wxInt32 depth);
+wxWindow* GetParentWindow(wxWindow *window,wxInt32 depth);
 void RegisterEventsRecursively(wxInt32 id,wxWindow *parent,wxEvtHandler *handler,
                                wxEventType type,wxObjectEventFunction function);
 

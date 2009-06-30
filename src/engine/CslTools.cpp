@@ -58,7 +58,7 @@ wxString& CmdlineEscapeSpaces(wxString& str)
     return str;
 }
 
-void FixString(char *src,wxUint32 *len,wxUint32 count,bool keepnl)
+void FixString(char *src,wxUint32 *len,wxUint32 count,bool keepnl,bool keeptab)
 {
     char *dst=src;
     wxUint32 c,l=0;
@@ -70,7 +70,9 @@ void FixString(char *src,wxUint32 *len,wxUint32 count,bool keepnl)
             src+=count;
             *len-=count+1;
         }
-        else if (isprint(c) || (keepnl && (c=='\r' || c=='\n')))
+        else if (isprint(c) ||
+                 (keepnl && (c=='\r' || c=='\n')) ||
+                 (keeptab && (c=='\t' || c=='\v')))
         {
             *dst++=c;
             (*len)--;
@@ -425,12 +427,10 @@ bool BitmapFromWindow(wxWindow *window,wxBitmap& bitmap)
     return ret;
 }
 
-wxWindow* GetParentWindowRecursively(wxWindow *self,wxInt32 depth)
+wxWindow* GetParentWindow(wxWindow *window,wxInt32 depth)
 {
-    wxWindow *window=self ? self->GetParent() : NULL;
-
-    if (depth>0 && window)
-        window=GetParentWindowRecursively(window,--depth);
+    while (window && --depth>=0)
+        window=window->GetParent();
 
     return window;
 }
@@ -456,7 +456,7 @@ void RegisterEventsRecursively(wxInt32 id,wxWindow *parent,wxEvtHandler *handler
 wxSize GetBestWindowSizeForText(wxWindow *window,const wxString& text,
                                 wxInt32 minWidth,wxInt32 maxWidth,
                                 wxInt32 minHeight,wxInt32 maxHeight,
-								wxInt32 scrollbar)
+                                wxInt32 scrollbar)
 {
     wxCoord w,h,border,scroll;
     wxClientDC dc(window);
