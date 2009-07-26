@@ -173,7 +173,7 @@
 		9EE7482C0F3618A3006D6C8E /* libircclient.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = libircclient.c; path = ../src/irc/libircclient/src/libircclient.c; sourceTree = SOURCE_ROOT; };
 		9EE7487C0F36219C006D6C8E /* CslVersionCheck.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslVersionCheck.cpp; path = ../src/CslVersionCheck.cpp; sourceTree = SOURCE_ROOT; };
 		9EE7487D0F36219C006D6C8E /* CslVersionCheck.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslVersionCheck.h; path = ../src/CslVersionCheck.h; sourceTree = SOURCE_ROOT; };
-		9EE88C4D0F375BA000B549BE /* wxWindows.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = wxWindows.xcodeproj; path = ../../../Toolkits/wxMac/src/wxWindows.xcodeproj; sourceTree = SOURCE_ROOT; };
+		9EE88C4D0F375BA000B549BE /* wxWindows.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = wxWindows.xcodeproj; path = wxMac/src/wxWindows.xcodeproj; sourceTree = SOURCE_ROOT; };
 		9EEA7A100F5EAD8C00A54722 /* CslTTS.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CslTTS.cpp; path = ../src/CslTTS.cpp; sourceTree = SOURCE_ROOT; };
 		9EEA7A110F5EAD8C00A54722 /* CslTTS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CslTTS.h; path = ../src/CslTTS.h; sourceTree = SOURCE_ROOT; };
 		9EECE2850E1655C700B03192 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /Developer/SDKs/MacOSX10.4u.sdk/System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
@@ -599,8 +599,8 @@
 					"$(inherited)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_2)",
 				);
-				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../../../Toolkits/wxMac/src/build/Deployment\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/../../../Toolkits/wxMac/src/build/Development\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/wxMac/src/build/Deployment\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/wxMac/src/build/Development\"";
 				OTHER_CFLAGS = (
 					"-D__WXDEBUG__",
 					"-D__WXMAC__",
@@ -621,7 +621,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = csl;
-				USER_HEADER_SEARCH_PATHS = "$(inherited) \"$(SRCROOT)/../../../Toolkits/wxMac/include\" ../src ../src/pch ../src/img/flags ../src/irc/libircclient/include";
+				USER_HEADER_SEARCH_PATHS = "$(inherited) \"$(SRCROOT)/wxMac/include\" ../src ../src/pch ../src/img/flags ../src/irc/libircclient/include";
 				WARNING_CFLAGS = "-Wall";
 			};
 			name = Development;
@@ -653,8 +653,8 @@
 					"$(inherited)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
 				);
-				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../../../Toolkits/wxMac/src/build/Deployment\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/../../../Toolkits/wxMac/src/build/Development\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/wxMac/src/build/Deployment\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/wxMac/src/build/Development\"";
 				OTHER_CFLAGS = (
 					"-D__WXMAC__",
 					"-D_FILE_OFFSET_BITS=64",
@@ -674,7 +674,7 @@
 				PREBINDING = NO;
 				PRODUCT_NAME = csl;
 				SEPARATE_STRIP = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited) \"$(SRCROOT)/../../../Toolkits/wxMac/include\" ../src ../src/pch ../src/img/flags ../src/irc/libircclient/include";
+				USER_HEADER_SEARCH_PATHS = "$(inherited) \"$(SRCROOT)/wxMac/include\" ../src ../src/pch ../src/img/flags ../src/irc/libircclient/include";
 				WARNING_CFLAGS = "-Wall";
 				WRAPPER_EXTENSION = app;
 			};
