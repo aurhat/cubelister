@@ -424,7 +424,7 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
     wxString s;
     wxUint32 i=0;
     wxInt32 c=0,id=event.GetId();
-    CslServerInfo *info=m_selected.Item(0)->Info;
+    CslServerInfo *info=m_selected.GetCount() ? m_selected.Item(0)->Info : NULL;
 
     CSL_MENU_EVENT_SKIP_CONNECT(id,info)
     CSL_MENU_EVENT_SKIP_EXTINFO(id,info)
