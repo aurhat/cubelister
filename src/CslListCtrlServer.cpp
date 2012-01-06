@@ -537,7 +537,7 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
 
             ListRebuild();
 
-            event.SetClientData((void*)(wxIntPtr)m_id);
+            event.SetClientData((void*)(wxUIntPtr)m_id);
             event.Skip();
 
             break;
