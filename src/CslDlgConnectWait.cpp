@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -93,7 +93,7 @@ void CslDlgConnectWait::OnButton(wxCommandEvent& event)
     {
         *m_time=spin_ctrl_time->GetValue();
         if (checkbox_default->IsChecked())
-            g_cslSettings->waitServerFull=*m_time;
+            CslGetSettings().WaitServerFull=*m_time;
     }
 
     EndModal(id);

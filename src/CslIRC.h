@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -121,7 +121,7 @@ class CslIrcPanel: public wxPanel
         wxTextCtrl *text_ctrl_input;
         wxSplitterWindow *splitter;
 
-        static int wxCALLBACK ListSortCompareFunc(long item1,long item2,IntPtr data);
+        static int wxCALLBACK ListSortCompareFunc(long item1, long item2, long data);
 
         void OnKeypress(wxKeyEvent& event);
         void OnListCtrlActivated(wxListEvent& event);

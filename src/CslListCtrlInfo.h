@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -39,8 +39,6 @@ class CslListCtrlInfo : public CslListCtrl
         void UpdateInfo(CslServerInfo *info);
 
     private:
-        wxImageList m_imgList;
-
         void OnSize(wxSizeEvent& event);
 
         DECLARE_EVENT_TABLE()

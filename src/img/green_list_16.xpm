@@ -1,6 +1,6 @@
 /* XPM */
 static const char * green_list_16_xpm[] = {
-"16 16 77 1",
+"16 14 77 1",
 " 	c None",
 ".	c #58BC58",
 "+	c #318331",
@@ -80,7 +80,6 @@ static const char * green_list_16_xpm[] = {
 "L	c #354F35",
 "                ",
 "                ",
-"                ",
 "     .+@#$%     ",
 "    &*=-;>,'    ",
 "   )!~{]^/(_:   ",
@@ -91,6 +90,5 @@ static const char * green_list_16_xpm[] = {
 "   vwxyrk4zAB   ",
 "    CD__EtFG    ",
 "     HIJKLB     ",
-"                ",
 "                ",
 "                "};

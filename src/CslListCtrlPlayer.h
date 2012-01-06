@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -33,21 +33,15 @@ WX_DEFINE_ARRAY_PTR(CslPlayerStatsData*,t_aCslPlayerStatsData);
 class CslListCtrlPlayer : public CslListCtrl
 {
     public:
-        enum
-        {
-            SIZE_MICRO, SIZE_MINI,
-            SIZE_DEFAULT, SIZE_FULL
-        };
+        enum { SIZE_MICRO, SIZE_MINI, SIZE_DEFAULT, SIZE_FULL };
 
         CslListCtrlPlayer(wxWindow* parent,wxWindowID id,const wxPoint& pos=wxDefaultPosition,
                           const wxSize& size=wxDefaultSize,long style=wxLC_ICON,
                           const wxValidator& validator=wxDefaultValidator,
                           const wxString& name=wxListCtrlNameStr);
-
         ~CslListCtrlPlayer();
 
-        void ListInit(const wxInt32 view);
-        void ListAdjustSize(const wxSize& size=wxDefaultSize);
+        void ListInit(wxInt32 view);
         void UpdateData();
         void EnableEntries(bool enable);
         void ListClear();
@@ -63,12 +57,8 @@ class CslListCtrlPlayer : public CslListCtrl
         wxInt32 m_view;
         CslServerInfo *m_info;
 
-        CslListSortHelper m_sortHelper;
+        wxString& FormatStats(wxString& in, CslPlayerStatsData *data, int type);
 
-        bool m_processSelectEvent;
-        t_aCslPlayerStatsData m_selected;
-
-        void OnColumnLeftClick(wxListEvent& event);
         void OnItemSelected(wxListEvent& event);
         void OnItemDeselected(wxListEvent& event);
         void OnItemActivated(wxListEvent& event);
@@ -78,24 +68,30 @@ class CslListCtrlPlayer : public CslListCtrl
         DECLARE_EVENT_TABLE()
 
     protected:
-        wxInt32 ListFindItem(CslPlayerStatsData *data,wxListItem& item);
-        void ListSort(const wxInt32 column);
-
+        // CslListCtrl virtual functions
+        bool ListFindItemCompare(void *data1, void *data2)
+        {
+            return *(CslPlayerStatsData*)data1==*(CslPlayerStatsData*)data2;
+        }
+        void OnListUpdate() { UpdateData(); }
+        void OnListSort();
         void GetToolTipText(wxInt32 row,CslToolTipEvent& event);
         wxString GetScreenShotFileName();
         wxWindow *GetScreenShotWindow() { return GetParent(); }
-        wxSize GetImageListSize();
 
-
-        static int wxCALLBACK ListSortCompareFunc(long item1,long item2,IntPtr data);
+        static int wxCALLBACK ListSortCompareFunc(long item1, long item2, long data);
 };
 
 
 class CslPanelPlayer : public wxPanel
 {
-    public:
-        CslPanelPlayer(wxWindow* parent,long listStyle=wxLC_ICON);
+    DECLARE_DYNAMIC_CLASS(CslPanelPlayer)
 
+    private:
+        CslPanelPlayer() { }
+
+    public:
+        CslPanelPlayer(wxWindow* parent, const wxString& listname,long listStyle=wxLC_ICON);
         CslListCtrlPlayer* ListCtrl() { return m_listCtrl; }
         CslServerInfo* ServerInfo() { return m_listCtrl->ServerInfo(); }
         void ServerInfo(CslServerInfo *info) { m_listCtrl->ServerInfo(info); }

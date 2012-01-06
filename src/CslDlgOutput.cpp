@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -55,8 +55,7 @@ CslDlgOutput::CslDlgOutput(wxWindow* parent,int id,const wxString& title,
     button_search_prev = new wxButton(this, wxID_BACKWARD, _("&Back"));
     button_search_next = new wxButton(this, wxID_FORWARD, _("&Forward"));
     checkbox_conv_filter = new wxCheckBox(this, CHECK_CONV_FILTER, _("&Filter chat"));
-    const wxString choice_conv_filter_choices[] =
-    {
+    const wxString choice_conv_filter_choices[] = {
         _("0 (Low)"),
         _("1 (Default)")
     };
@@ -210,8 +209,8 @@ void CslDlgOutput::OnCommandEvent(wxCommandEvent& event)
 
         case wxID_OPEN:
         {
-            if (wxDirExists(g_cslSettings->gameOutputPath))
-                s=g_cslSettings->gameOutputPath;
+            if (wxDirExists(CslGetSettings().GameOutputPath))
+                s=CslGetSettings().GameOutputPath;
             wxFileDialog dlg(this,_("Open log file"),s,wxEmptyString,CSL_OUTPUT_EXTENSION,
 #if wxCHECK_VERSION(2,9,0)
                              wxFD_OPEN|wxFD_FILE_MUST_EXIST
@@ -229,22 +228,22 @@ void CslDlgOutput::OnCommandEvent(wxCommandEvent& event)
                 break;
 
             wxUint32 size=file.Length();
+
             char *buf=(char*)malloc(size+1);
+            if (!buf)
+                break;
             buf[size]=0;
 
-            if (file.Read((void*)buf,size)!=(wxInt32)size)
+            if (file.Read((void*)buf, size)==(wxInt32)size)
             {
+                Reset(wxString::Format(wxT("%s "), _("File"))+s);
+                HandleOutput(buf, size);
+            }
+
                 free(buf);
                 file.Close();
                 break;
             }
-            file.Close();
-
-            Reset(wxString::Format(wxT("%s "),_("File"))+s);
-            HandleOutput(buf,size);
-            free(buf);
-            break;
-        }
 
         case wxID_SAVE:
         {
@@ -278,7 +277,7 @@ void CslDlgOutput::SetSearchTextColour(wxUint32 pos,wxUint32 posOld)
     attr.SetFlags(wxTEXT_ATTR_BACKGROUND_COLOUR);
     attr.SetBackgroundColour(wxColour(255,64,64));
     attrOld.SetFlags(wxTEXT_ATTR_BACKGROUND_COLOUR);
-    attrOld.SetBackgroundColour(g_cslSettings->colServerHigh);
+    attrOld.SetBackgroundColour(CslGetSettings().ColServerHigh);
 #endif
 
     wxUint32 len=text_ctrl_search->GetValue().Len();
@@ -345,7 +344,7 @@ wxInt32 CslDlgOutput::Search(const wxString& needle)
 #ifdef __WXMAC__
         attr.SetTextColour(*wxGREEN);
 #else
-        attr.SetBackgroundColour(g_cslSettings->colServerHigh);
+        attr.SetBackgroundColour(CslGetSettings().ColServerHigh);
 #endif
         while (pos<=hlen)
         {
@@ -385,15 +384,10 @@ wxInt32 CslDlgOutput::Search(const wxString& needle)
 
 wxString CslDlgOutput::Filter(wxUint32 start,wxUint32 end)
 {
-    bool colon=false;
-    bool le=false;
-    bool lb=true;
-    bool skip=false;
-    wxUint32 i=start;
-    wxUint32 b=start;
-    wxString s;
-    wxString cmp;
     char c;
+    wxString s, cmp;
+    wxUint32 b=start, i=start;
+    bool lb=false, le=false, colon=false, skip=false;
 
     s.Alloc(end-start);
 
@@ -415,6 +409,7 @@ wxString CslDlgOutput::Filter(wxUint32 start,wxUint32 end)
                 if (m_filterLevel>=1)
                 {
                     cmp=m_text.Mid(b,i-b);
+
                     if (cmp==wxT("init"))
                         skip=true;
                     else if (!cmp.CmpNoCase(wxT("Renderer")))
@@ -437,8 +432,8 @@ wxString CslDlgOutput::Filter(wxUint32 start,wxUint32 end)
                     if (cmp==wxT("PLAYER"))
                         skip=true;
                 }*/
-                if (!skip && i+1<end && m_text.GetChar(i+1)!=' ')
-                    skip=true;
+                //if (!skip && i+1<end && m_text.GetChar(i+1)!=' ')
+                //    skip=true;
 
                 break;
 
@@ -475,6 +470,7 @@ wxString CslDlgOutput::Filter(wxUint32 start,wxUint32 end)
                     continue;
                 }
         }
+
         lb=false;
     }
 
@@ -491,7 +487,7 @@ void CslDlgOutput::HandleOutput(char *text,wxUint32 size)
     start=m_text.Len();
     end=start+size;
     m_text.Alloc(start+size+sizeof(wxChar));
-    m_text+=A2U(text);
+    m_text<<A2U(text);
     text_ctrl_output->AppendText(checkbox_conv_filter->GetValue() ?
                                  Filter(start,end) : m_text.Mid(start,size));
 
@@ -548,13 +544,13 @@ void CslDlgOutput::SaveFile(const wxString& path)
 #endif
                         );
         // wxGTK: hmm, doesn't work in the ctor?!
-        if (wxDirExists(g_cslSettings->gameOutputPath))
-            dlg.SetPath(g_cslSettings->gameOutputPath+PATHDIV+filename);
+        if (wxDirExists(CslGetSettings().GameOutputPath))
+            dlg.SetPath(CslGetSettings().GameOutputPath+PATHDIV+filename);
         if (dlg.ShowModal()!=wxID_OK)
             return;
 
         filename=dlg.GetPath();
-        g_cslSettings->gameOutputPath=::wxPathOnly(filename);
+        CslGetSettings().GameOutputPath=::wxPathOnly(filename);
     }
     else
     {

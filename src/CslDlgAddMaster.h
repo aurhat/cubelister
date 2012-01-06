@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -31,11 +31,11 @@ class CslDlgAddMaster: public wxDialog
     public:
         // begin wxGlade: CslDlgAddMaster::ids
         // end wxGlade
-        CslDlgAddMaster(wxWindow* parent,const wxInt32 id=wxID_ANY,const wxString& title=wxEmptyString,
+        CslDlgAddMaster(wxWindow* parent, wxInt32 id=wxID_ANY, const wxString& title=wxEmptyString,
                         const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize,
                         long style=wxDEFAULT_DIALOG_STYLE);
 
-        void InitDlg(wxInt32 *gameID);
+        void InitDlg(wxUint32 *fourcc);
 
     private:
         // begin wxGlade: CslDlgAddMaster::methods
@@ -59,7 +59,7 @@ class CslDlgAddMaster: public wxDialog
         wxButton* button_cancel;
         // end wxGlade
 
-        wxInt32 *m_gameID;
+        wxUint32 *m_fourcc;
 
         bool IsValid();
 }; // wxGlade: end class

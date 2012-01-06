@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -113,7 +113,7 @@ void CslDlgAbout::set_properties()
     s<<_("Compiled using:")<<wxT(" ")<<CSL_WXVERSION_STR;
 
     label_name->SetLabel(CSL_NAME_STR);
-    label_version->SetLabel(CSL_VERSION_LONG_STR);
+    label_version->SetLabel(CSL_VERSION_STR);
     label_desc->SetLabel(CSL_DESCRIPTION_STR);
     label_copyright->SetLabel(CSL_COPYRIGHT_STR);
     label_wxversion->SetLabel(s);
@@ -145,7 +145,7 @@ void CslDlgAbout::set_properties()
                      "Testing and support:\n"
                  ))+
         wxString(wxT(
-                     "  }TC{ clan\n"
+                     "  }TC{ and oo| clan\n"
                      _L_"  'grenadier'\n\n"
                  ))+
         wxString(_(

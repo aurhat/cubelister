@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -84,7 +84,7 @@ void CslMaster::Init(CslGame *game,wxUint32 id)
  */
 
 CslGame::CslGame() :
-        m_gameId(-1),m_capabilities(0)
+        m_fourcc(0), m_capabilities(0)
 {
 }
 
@@ -125,8 +125,7 @@ bool CslGame::DeleteMaster(wxInt32 masterID,wxInt32 pos)
             return false;
     }
 
-    delete m_masters[pos];
-    m_masters.remove(pos);
+    delete m_masters.remove(pos);
 
     return true;
 }
@@ -134,6 +133,7 @@ bool CslGame::DeleteMaster(wxInt32 masterID,wxInt32 pos)
 void CslGame::DeleteMasters()
 {
     loopvrev(m_masters) DeleteMaster(m_masters[i]->GetId(),i);
+    m_masters.setsizenodelete(0);
 }
 
 bool CslGame::AddServer(CslServerInfo *info,wxInt32 masterID)
@@ -211,7 +211,7 @@ bool CslGame::DeleteServer(CslServerInfo *info)
     return false;
 }
 
-CslServerInfo* CslGame::FindServerByAddr(const wxString host,wxUint16 port)
+CslServerInfo* CslGame::FindServerByAddr(const wxString& host, wxUint16 port)
 {
     CslServerInfo *info;
 
@@ -275,20 +275,20 @@ void CslGame::GetExtServers(vector <CslServerInfo*>& servers,bool all)
     }
 }
 
-void CslGame::GetPlayerstatsDescriptions(vector<wxString>& desc) const
+wxInt32 CslGame::GetPlayerstatsDescriptions(const wxChar ***desc) const
 {
-    desc.add(_("Player"));
-    desc.add(_("Team"));
-    desc.add(_("Frags"));
-    desc.add(_("Deaths"));
-    desc.add(_("Teamkills"));
-    desc.add(_("Ping"));
-    desc.add(_("Accuracy"));
-    desc.add(_("Health"));
-    desc.add(_("Armour"));
-    desc.add(_("Weapon"));
+    static const wxChar *descriptions[]=
+    {
+        _("Player"), _("Team"), _("Frags"), _("Deaths"), _("Teamkills"),
+        _("Ping"), _("KpD"), _("Accuracy"), _("Health"), _("Armour"), _("Weapon")
+    };
+
+    *desc=descriptions;
+
+    return sizeof(descriptions)/sizeof(descriptions[0]);
 }
 
+#if wxUSE_GUI
 const wxBitmap& CslGame::GetIcon(wxInt32 size) const
 {
     switch (size)
@@ -301,6 +301,7 @@ const wxBitmap& CslGame::GetIcon(wxInt32 size) const
 
     return wxNullBitmap;
 }
+#endif //wxUSE_GUI
 
 /**
  *  class CslServerInfo
@@ -422,7 +423,7 @@ void CslServerInfo::AddMaster(wxInt32 id)
 void CslServerInfo::RemoveMaster(wxInt32 id)
 {
     wxInt32 i=m_masterIDs.find(id);
-    if (id>=0) m_masterIDs.remove(i);
+    if (i>=0) m_masterIDs.remove(i);
     if (m_masterIDs.length()==0) RemoveDefault();
 }
 

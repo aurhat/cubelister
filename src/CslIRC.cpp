@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -19,7 +19,7 @@
  ***************************************************************************/
 
 #include "Csl.h"
-#include "engine/CslGame.h"
+#include "CslGame.h"
 #include "CslMenu.h"
 #include "CslIPC.h"
 #include "CslIRC.h"
@@ -257,7 +257,7 @@ void CslIrcPanel::OnKeypress(wxKeyEvent& event)
                 {
                     user=(CslIrcUser*)list_ctrl_users->GetItemData(i);
                     if (user->Nick.Lower().StartsWith(s))
-                        CslMenu::AddItem(&menu,MENU_TAB+i,user->Nick);
+                        CslMenu::AddItem(menu, MENU_TAB+i, user->Nick);
                 }
 
                 if (menu.GetMenuItemCount())
@@ -355,7 +355,7 @@ void CslIrcPanel::OnCommandEvent(wxCommandEvent& event)
                 if (!m_session)
                     break;
 
-                wxString s=CslCharEncodings[id-MENU_ENCODING_START].Encoding;
+                wxString s=CslCharEncodingTable[id-MENU_ENCODING_START].Encoding;
                 CslIrcChannel *channel=m_session->FindChannel(m_channel);
 
                 if (channel)
@@ -392,10 +392,9 @@ void CslIrcPanel::OnCommandEvent(wxCommandEvent& event)
 
 void CslIrcPanel::OnContextMenu(wxContextMenuEvent& event)
 {
-    wxUint32 i;
+    wxInt32 i;
     wxString s;
     wxMenu menu,*sub;
-    wxMenuItem *item;
     wxPoint point=event.GetPosition();
 
     //from keyboard
@@ -403,13 +402,13 @@ void CslIrcPanel::OnContextMenu(wxContextMenuEvent& event)
         point=wxGetMousePosition();
 
     sub=new wxMenu;
-    item=menu.AppendSubMenu(sub,_("Character encodings"));
+    menu.AppendSubMenu(sub, _("Character encodings"));
 
     for (i=0;i<CSL_NUM_CHAR_ENCODINGS;i++)
     {
         s.Empty();
-        s<<CslCharEncodings[i].Name<<wxT(" (")<<CslCharEncodings[i].Encoding<<wxT(")");
-        CslMenu::AddItem(sub,MENU_ENCODING_START+i,s,wxART_NONE,wxITEM_CHECK);
+        s<<CslCharEncodingTable[i].Name<<wxT(" (")<<CslCharEncodingTable[i].Encoding<<wxT(")");
+        CslMenu::AddItem(*sub, MENU_ENCODING_START+i, s, wxART_NONE, wxITEM_CHECK);
     }
 
     i=m_channel.Encoding.GetEncodingId();
@@ -635,22 +634,22 @@ void CslIrcPanel::OnUserModeChange(const wxString& initiator,const wxString& tar
     {
         if (!mode.CmpNoCase(wxT("+o")))
         {
-            user->Status|=CslIrcUser::STATUS_OP;
+            CSL_FLAG_SET(user->Status, CslIrcUser::STATUS_OP);
             s=_("gives operator status to");
         }
         else if (!mode.CmpNoCase(wxT("-o")))
         {
-            user->Status&=~CslIrcUser::STATUS_OP;
+            CSL_FLAG_UNSET(user->Status, CslIrcUser::STATUS_OP);
             s=_("takes operator status from");
         }
         else if (!mode.CmpNoCase(wxT("+v")))
         {
-            user->Status|=CslIrcUser::STATUS_VOICE;
+            CSL_FLAG_SET(user->Status, CslIrcUser::STATUS_VOICE);
             s=_("gives voice status to");
         }
         else if (!mode.CmpNoCase(wxT("-v")))
         {
-            user->Status&=~CslIrcUser::STATUS_VOICE;
+            CSL_FLAG_UNSET(user->Status, CslIrcUser::STATUS_VOICE);
             s=_("takes voice status from");
         }
         else
@@ -809,7 +808,7 @@ void CslIrcPanel::AddUser(const wxString& name)
         user->Nick=name;
 
     list_ctrl_users->InsertItem(0,name);
-    list_ctrl_users->SetItemData(0,(long)user);
+    list_ctrl_users->SetItemData(0, (wxUIntPtr)user);
     list_ctrl_users->SortItems(ListSortCompareFunc,0);
 }
 
@@ -850,9 +849,9 @@ void CslIrcPanel::ChangeUser(const wxString& oldName,const wxString& newName,wxI
 
     if (user)
     {
-        if (user->Status&CslIrcUser::STATUS_OP)
+        if (CSL_FLAG_CHECK(user->Status, CslIrcUser::STATUS_OP))
             name=wxT("@")+newName;
-        else if (user->Status&CslIrcUser::STATUS_VOICE)
+        else if (CSL_FLAG_CHECK(user->Status, CslIrcUser::STATUS_VOICE))
             name=wxT("+")+newName;
         else
             name=newName;
@@ -982,13 +981,13 @@ void CslIrcPanel::AddLine(const wxString& line,bool scroll)
     static wxUint32 lines=0;
 
 #ifdef CSL_USE_RICHTEXT
-    scroll|=text_ctrl_chat->IsPositionVisible(m_textLength);
+    CSL_FLAG_SET(scroll, text_ctrl_chat->IsPositionVisible(m_textLength));
     basic=text_ctrl_chat->GetBasicStyle();
 #else
     wxInt32 pos=text_ctrl_chat->GetScrollPos(wxVERTICAL);
     wxInt32 range=text_ctrl_chat->GetScrollRange(wxVERTICAL);
     wxInt32 height=text_ctrl_chat->GetClientSize().y;
-    scroll|=(range-pos<=height+1);
+    CSL_FLAG_SET(scroll, (range-pos<=height+1));
 #if 0
     LOG_DEBUG("pos: %d - range:%d - height:%d - range-pos:%d -  scroll:%d\n",
               pos,range,height,range-pos,scroll);
@@ -1005,7 +1004,7 @@ void CslIrcPanel::AddLine(const wxString& line,bool scroll)
     attr=basic;
 
     if (m_textLength)
-        buf=NEWLINE;
+        buf=CSL_NEWLINE;
 
     text=wxString::Format(wxT("\0032[%-2.2d:%-2.2d]\003 "),now.GetHour(),now.GetMinute())+line;
     len=text.length();
@@ -1377,7 +1376,7 @@ void CslIrcPanel::HandleInput(const wxString& text)
     AddLine(s.IsEmpty() ? text:s,false);
 }
 
-int wxCALLBACK CslIrcPanel::ListSortCompareFunc(long item1,long item2,IntPtr data)
+int wxCALLBACK CslIrcPanel::ListSortCompareFunc(long item1, long item2, long data)
 {
     CslIrcUser *user1,*user2;
 

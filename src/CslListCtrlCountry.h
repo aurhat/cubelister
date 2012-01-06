@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -77,27 +77,23 @@ class CslListCtrlCountry : public CslListCtrl
         ~CslListCtrlCountry();
 
         void ListClear();
-        void ListAdjustSize(const wxSize& size=wxDefaultSize);
         void UpdateData(CslServerInfo *info);
 
     private:
-        CslListSortHelper m_sortHelper;
         t_aCslCountryEntry m_entries;
 
-        void ListInit();
+        void UpdateEntry(const wxString& country, wxInt32 id);
 
-        void OnColumnLeftClick(wxListEvent& event);
         void OnItemActivated(wxListEvent& event);
         void OnContextMenu(wxContextMenuEvent& event);
-        void OnMenu(wxCommandEvent& event);
 
         DECLARE_EVENT_TABLE()
 
     protected:
-        void UpdateEntry(const wxString& country,wxInt32 id);
-        void ListSort(const wxInt32 column);
+        // CslListCtrl virtual functions
+        void OnListSort();
 
-        static int wxCALLBACK ListSortCompareFunc(long item1,long item2,IntPtr data);
+        static int wxCALLBACK ListSortCompareFunc(long item1, long item2, long data);
 };
 
 #endif //CSLLISTCTRLCOUNTRY_H

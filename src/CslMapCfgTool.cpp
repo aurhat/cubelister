@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -167,13 +167,7 @@ void CslMapToolPanelMap::SetBasePosition(const wxPoint& point)
     wxInt32 h=m_bitmap.GetHeight();
     wxPoint pos=point-GetBitmapOrigin();
 
-    if (pos.x<0)
-        return;
-    else if (pos.x>=w)
-        return;
-    if (pos.y<0)
-        return;
-    else if (pos.y>=h)
+    if (pos.x<0 || pos.x>=w || pos.y<0 || pos.y>=h)
         return;
 
     m_bases.Item(m_activeBase)->m_point=wxPoint(pos.x,pos.y);
@@ -502,7 +496,7 @@ void CslMapCfgTool::AddVersion()
     CslMapInfo *info;
     wxUint32 i,c,h;
     wxInt32 version=::wxGetNumberFromUser(_("Enter new version number"),_("Version: "),
-                                          _("New version number"),257,0,9999,this);
+                                          _("New version number"), 258, 0, 9999, this);
     if (version==-1)
         return;
 
@@ -585,7 +579,7 @@ void CslMapCfgTool::DelBase()
     button_base_del->Enable(choice_base->GetCount()>0);
 }
 
-void CslMapCfgTool::SetCurrentBase(const wxInt32 id)
+void CslMapCfgTool::SetCurrentBase(wxInt32 id)
 {
     m_mapInfo.ResetBasesColour();
 
@@ -595,7 +589,7 @@ void CslMapCfgTool::SetCurrentBase(const wxInt32 id)
     panel_bitmap->UpdateBases(m_mapInfo.m_bases,true);
 }
 
-void CslMapCfgTool::ChoiceSetVersion(const wxInt32 id)
+void CslMapCfgTool::ChoiceSetVersion(wxInt32 id)
 {
     m_mapInfo.m_mapNameFull=text_ctrl_map_name->GetValue();
     m_mapInfo.m_author=text_ctrl_author->GetValue();

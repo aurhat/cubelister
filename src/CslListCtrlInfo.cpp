@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -19,12 +19,10 @@
  ***************************************************************************/
 
 #include "Csl.h"
-#include "engine/CslGame.h"
+#include "CslGame.h"
 #include "CslSettings.h"
-#include "CslFlags.h"
 #include "CslGeoIP.h"
 #include "CslListCtrlInfo.h"
-#include "img/info_18_12.xpm"
 
 BEGIN_EVENT_TABLE(CslListCtrlInfo,CslListCtrl)
     EVT_SIZE(CslListCtrlInfo::OnSize)
@@ -36,21 +34,6 @@ CslListCtrlInfo::CslListCtrlInfo(wxWindow* parent,wxWindowID id,const wxPoint& p
                                  const wxValidator& validator, const wxString& name) :
         CslListCtrl(parent,id,pos,size,style,validator,name)
 {
-    FlickerFree(false);
-
-#ifdef __WXMSW__
-    m_imgList.Create(23,12,true);
-    m_imgList.Add(AdjustBitmapSize(info_18_12_xpm,wxSize(23,12),wxPoint(2,0)));
-    m_imgList.Add(AdjustBitmapSize(unknown_xpm,wxSize(23,12),wxPoint(5,0)));
-#else
-    m_imgList.Create(18,12,true);
-    m_imgList.Add(wxBitmap(info_18_12_xpm));
-    m_imgList.Add(wxBitmap(local_xpm));
-    m_imgList.Add(wxBitmap(unknown_xpm));
-#endif
-
-    SetImageList(&m_imgList,wxIMAGE_LIST_SMALL);
-
     wxInt32 i=0;
     wxListItem item;
 
@@ -59,22 +42,22 @@ CslListCtrlInfo::CslListCtrlInfo(wxWindow* parent,wxWindowID id,const wxPoint& p
     InsertColumn(0,item);
     InsertColumn(1,item);
 
-    InsertItem(i++,_("Address"),0);
-    InsertItem(i++,_("Location"),0);
-    InsertItem(i++,_("Game"),0);
-    InsertItem(i++,_("Protocol version"),0);
-    InsertItem(i++,_("Uptime"),0);
-    InsertItem(i++,_("Server message"),0);
-    InsertItem(i++,_("Last seen"),0);
-    InsertItem(i++,_("Last played"),0);
-    InsertItem(i++,_("Last play time"),0);
-    InsertItem(i++,_("Total play time"),0);
-    InsertItem(i,_("Connects"),0);
+    InsertItem(i++, _("Address"), CSL_LIST_IMG_INFO);
+    InsertItem(i++, _("Location"), CSL_LIST_IMG_INFO);
+    InsertItem(i++, _("Game"), CSL_LIST_IMG_INFO);
+    InsertItem(i++, _("Protocol version"), CSL_LIST_IMG_INFO);
+    InsertItem(i++, _("Uptime"), CSL_LIST_IMG_INFO);
+    InsertItem(i++, _("Server message"), CSL_LIST_IMG_INFO);
+    InsertItem(i++, _("Last seen"), CSL_LIST_IMG_INFO);
+    InsertItem(i++, _("Last played"), CSL_LIST_IMG_INFO);
+    InsertItem(i++, _("Last play time"), CSL_LIST_IMG_INFO);
+    InsertItem(i++, _("Total play time"), CSL_LIST_IMG_INFO);
+    InsertItem(i, _("Connects"), CSL_LIST_IMG_INFO);
 
     for (;i>=0;i-=2)
     {
         item.SetId(i);
-        SetItemBackgroundColour(item,g_cslSettings->colInfoStripe);
+        SetItemBackgroundColour(item, CslGetSettings().ColInfoStripe);
     }
 
     AdjustSize(GetClientSize());
@@ -94,11 +77,14 @@ void CslListCtrlInfo::OnSize(wxSizeEvent& event)
     }
     else
     {
-#ifdef __WXGTK__
-        ((wxScrolledWindow*)m_mainWin)->SetScrollbars(0,0,0,0);
+#if defined(__WXGTK__) || defined(__WXX11__)
+        //((wxScrolledWindow*)m_mainWin)->SetScrollbars(0, 0, 0, 0);
+        wxWindow *window=GetChildWindowByClassInfo(this, CLASSINFO(wxScrolledWindow));
+        if (window)
+            ((wxScrolledWindow*)window)->SetScrollbars(0, 0, 0, 0);
 #else
         ((wxScrolledWindow*)m_genericImpl->m_mainWin)->SetScrollbars(0,0,0,0);
-#endif //__WXGTK__
+#endif //defined(__WXGTK__) || defined(__WXX11__)
     }
 #else
     AdjustSize(event.GetSize());
@@ -146,10 +132,12 @@ void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
     if (!info)
         return;
 
-    wxString s;
+    wxWindowUpdateLocker lock(this);
+
+    wxString s, cn;
     wxDateTime dt;
     wxInt32 i,ic=0;
-    const char *country,**flag=NULL;
+    CslIPV4Addr addr(U2A(info->Addr.IPAddress()));
 
     s=wxString::Format(wxT("%s:%d"),info->Host.c_str(),info->GamePort);
     if (IsIP(info->Host))
@@ -159,53 +147,24 @@ void CslListCtrlInfo::UpdateInfo(CslServerInfo *info)
     }
     SetItem(ic++,1,s);
 
-    if (CslGeoIP::IsOk())
+    if (!CslGeoIP::IsOk())
+        s=_("GeoIP database not loaded.");
+    else if (IsLocalIP(addr))
+        s=_("local network");
+    else
     {
-        country=CslGeoIP::GetCountryCodeByAddr(U2A(info->Addr.IPAddress()));
+        s=CslGeoIP::GetCountryNameByIPnum(addr.GetIP());
+        wxString city=CslGeoIP::GetCityNameByIPnum(addr.GetIP());
 
-        s.Empty();
-
-        if (country)
+        if (!s.IsEmpty())
         {
-            i=sizeof(codes)/sizeof(codes[0])-1;
-
-            for (;i>=0;i--)
-            {
-                if (!strcasecmp(country,codes[i]))
-                {
-                    flag=flags[i];
-                    break;
-                }
-            }
-
-            s=A2U(country);
-            country=CslGeoIP::GetCountryNameByAddr(U2A(info->Addr.IPAddress()));
-
-            if (country)
-                s<<wxT(" (")<<A2U(country)<<wxT(")");
+            if (!city.IsEmpty())
+                s<<wxT(" (")<<city<<wxT(")");
         }
         else
-        {
-            if (IsLocalIP(info->Addr.IPAddress()))
-            {
-                flag=local_xpm;
-                s=_("local network");
+            s=_("Unknown location.");
             }
-            else
-                s=_("unknown country");
-        }
-    }
-    else
-        s=_("GeoIP database not found.");
-
-    if (!flag)
-        flag=unknown_xpm;
-#ifdef __WXMSW__
-    m_imgList.Replace(1,AdjustBitmapSize(flag,wxSize(23,12),wxPoint(5,0)));
-#else
-    m_imgList.Replace(1,wxBitmap(flag));
-#endif
-    SetItem(ic++,1,s,1);
+    SetItem(ic++, 1, s, GetCountryFlag(addr.GetIP()));
 
     SetItem(ic++,1,info->GetGame().GetName());
 

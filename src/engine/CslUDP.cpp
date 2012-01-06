@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -20,6 +20,9 @@
 
 #include "Csl.h"
 #include "CslUDP.h"
+#ifndef __WXMSW__
+#include <sys/socket.h> // SOL_SOCKET, SO_BROADCAST
+#endif // __WXMSW__
 
 DEFINE_EVENT_TYPE(wxCSL_EVT_PING)
 
@@ -44,7 +47,13 @@ CslUDP::CslUDP(wxEvtHandler *evtHandler) : wxEvtHandler(),
     while (!m_socket)
     {
         address.Service(port);
-        m_socket=new wxDatagramSocket(address,wxSOCKET_NOWAIT);
+
+        wxInt32 flags=wxSOCKET_NOWAIT;
+#if wxCHECK_VERSION(2, 9, 0)
+        flags|=wxSOCKET_NOBIND;
+#endif //wxCHECK_VERSION(2, 9, 0)
+
+        m_socket=new wxDatagramSocket(address, flags);
 
         if (!m_socket->IsOk())
         {
@@ -56,6 +65,12 @@ CslUDP::CslUDP(wxEvtHandler *evtHandler) : wxEvtHandler(),
                 LOG_DEBUG("Couldn't create socket\n");
                 return;
             }
+        }
+        else
+        {
+            // enable broadcast (wxSOCKET_BROADCAST flag is only availe on wx >= 2.9.0)
+            const wxInt32 opt=1;
+            m_socket->SetOption(SOL_SOCKET, SO_BROADCAST, &opt, sizeof(opt));
         }
     }
 
@@ -78,16 +93,17 @@ void CslUDP::OnSocketEvent(wxSocketEvent& event)
 
     wxIPV4address addr;
     wxUint32 size;
-    CslUDPPacket *packet=new CslUDPPacket(CSL_MAX_PACKET_SIZE);
+    CslNetPacket *packet=new CslNetPacket(CSL_MAX_PACKET_SIZE);
 
     m_socket->RecvFrom(addr,packet->Data(),CSL_MAX_PACKET_SIZE);
 
     if (m_socket->Error())
     {
-        packet->FreeData();
 #ifndef __WXMSW__
         LOG_DEBUG("Error receiving packet: %s\n",U2A(GetSocketError(m_socket->LastError())));
 #endif
+        packet->FreeData();
+        return;
     }
 
     size=m_socket->LastCount();
@@ -96,12 +112,11 @@ void CslUDP::OnSocketEvent(wxSocketEvent& event)
     m_bytesIn+=size;
     m_packetsIn++;
 
-    wxCommandEvent evt(wxCSL_EVT_PING);
-    evt.SetClientData(packet);
+    CslPingEvent evt(packet);
     wxPostEvent(m_evtHandler,evt);
 }
 
-bool CslUDP::SendPing(CslUDPPacket *packet)
+bool CslUDP::Send(CslNetPacket *packet)
 {
     wxInt32 size=packet->Size();
 

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -19,21 +19,20 @@
  ***************************************************************************/
 
 #include "Csl.h"
-#include "engine/CslEngine.h"
+#include "CslEngine.h"
 #include "CslFrame.h"
 #include "CslIPC.h"
 #include "CslApp.h"
+#include <wx/debugrpt.h>
 #ifdef __WXMAC__
 #include <Carbon/Carbon.h>
-#endif
+#endif //__WXMAC__
 
 IMPLEMENT_APP(CslApp)
-
 
 BEGIN_EVENT_TABLE(CslApp,wxApp)
     EVT_END_SESSION(CslApp::OnEndSession)
 END_EVENT_TABLE()
-
 
 #ifdef __WXMAC__
 static pascal OSErr MacCallbackGetUrl(const AppleEvent *in,AppleEvent *out,long ptr)
@@ -56,7 +55,7 @@ static pascal OSErr MacCallbackGetUrl(const AppleEvent *in,AppleEvent *out,long 
 
     return noErr;
 }
-#endif
+#endif //__WXMAC__
 
 bool CslApp::OnInit()
 {
@@ -64,15 +63,60 @@ bool CslApp::OnInit()
     m_single=NULL;
     m_shutdown=CSL_SHUTDOWN_NONE;
 
-    ::wxSetWorkingDirectory(wxPathOnly(wxTheApp->argv[0]));
-    g_basePath=::wxGetCwd();
+    ::wxHandleFatalExceptions(true);
 
-    m_locale.Init(wxLANGUAGE_DEFAULT,wxLOCALE_CONV_ENCODING);
-    m_locale.AddCatalogLookupPathPrefix(LOCALEPATH);
-#ifdef __WXGTK__
-    m_locale.AddCatalogLookupPathPrefix(g_basePath+wxString(wxT("/lang")));
-#endif
-    if (m_locale.AddCatalog(CSL_NAME_SHORT_STR))
+    wxString cwd=DirName(wxPathOnly(wxTheApp->argv[0]));
+
+#ifdef PROJECTDIR
+    AddDataDir(wxT(PROJECTDIR), true);
+#endif //PROJECTDIR
+    AddDataDir(CSL_USER_DIR, true);
+#ifndef DATADIR
+#ifdef __WXMAC__
+    AddDataDir(cwd+wxT("../Resources"), true);
+#else
+    AddDataDir(cwd, true);
+#endif //__WXMAC__
+#else
+    AddDataDir(wxT(DATADIR));
+#endif //DATADIR
+
+#ifdef BUILDDIR
+    AddPluginDir(wxT(BUILDDIR), true);
+#endif //BUILDDIR
+    AddPluginDir(CSL_USER_DIR, true);
+#ifndef PKGLIBDIR
+#ifdef __WXMAC__
+    AddPluginDir(cwd+wxT("../"), true);
+#endif //__WXMAC__
+#ifdef __WXMSW__
+    AddPluginDir(cwd, true);
+#endif //__WXMSW__
+#else
+    AddPluginDir(wxT(PKGLIBDIR));
+#endif //PKGLIBDIR
+
+    m_locale.Init(wxLANGUAGE_DEFAULT,
+#if wxCHECK_VERSION(2, 9, 0)
+                  wxLOCALE_LOAD_DEFAULT
+#else
+                  wxLOCALE_CONV_ENCODING
+#endif //wxCHECK_VERSION
+                 );
+
+#ifndef LOCALEDIR
+#ifdef __WXMSW__
+    m_locale.AddCatalogLookupPathPrefix(cwd+wxT("\\locale"));
+#else
+#ifdef __WXMAC__
+    m_locale.AddCatalogLookupPathPrefix(cwd+wxT("../Resources"));
+#endif //__WXMAC__
+#endif //__WXMSW__
+#else
+    m_locale.AddCatalogLookupPathPrefix(wxT(LOCALEDIR));
+#endif //LOCALEDIR
+
+    if (m_locale.AddCatalog(wxString(CSL_NAME_SHORT_STR).Lower()))
         m_lang=m_locale.GetCanonicalName();
 
 #ifdef __WXMAC__
@@ -84,7 +128,7 @@ bool CslApp::OnInit()
     //register event handler for URI schemes
     AEInstallEventHandler(kInternetEventClass,kAEGetURL,
                           NewAEEventHandlerUPP((AEEventHandlerProcPtr)MacCallbackGetUrl),0,false);
-#endif
+#endif //__WXMAC__
 
     wxString uri;
 
@@ -158,6 +202,17 @@ int CslApp::FilterEvent(wxEvent& event)
     return -1;
 }
 
+void CslApp::OnFatalException()
+{
+    wxDebugReport report;
+    wxDebugReportPreviewStd preview;
+
+    report.AddAll();
+
+    if (preview.Show(report))
+        report.Process();
+}
+
 void CslApp::IpcCall(const wxString& value,wxEvtHandler *evtHandler) const
 {
     if (evtHandler)
@@ -175,7 +230,6 @@ void CslApp::IpcCall(const wxString& value,wxEvtHandler *evtHandler) const
             client.GetConnection()->Poke(CSL_NAME_SHORT_STR,value.c_str());
 #else
             client.GetConnection()->Poke(CSL_NAME_SHORT_STR,(wxChar*)value.c_str());
-#endif
-
+#endif //wxCHECK_VERSION
     }
 }

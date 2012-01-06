@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -19,7 +19,7 @@
  ***************************************************************************/
 
 #include "Csl.h"
-#include "engine/CslEngine.h"
+#include "CslEngine.h"
 #include "CslApp.h"
 #include "CslDlgAddServer.h"
 #include "CslDlgOutput.h"
@@ -33,26 +33,32 @@
 #include "CslListCtrlPlayer.h"
 #include "CslListCtrlServer.h"
 
-#include "img/ext_green_8.xpm"
-#include "img/sortasc_16.xpm"
-#include "img/sortdsc_16.xpm"
-#include "img/sortasclight_16.xpm"
-#include "img/sortdsclight_16.xpm"
-#include "img/red_list_16.xpm"
-#include "img/green_list_16.xpm"
-#include "img/yellow_list_16.xpm"
-#include "img/grey_list_16.xpm"
-#include "img/red_ext_list_16.xpm"
-#include "img/green_ext_list_16.xpm"
-#include "img/yellow_ext_list_16.xpm"
-
 enum
 {
-    SORT_HOST = 0, SORT_DESCRIPTION, SORT_VER,
-    SORT_PING, SORT_MODE, SORT_MAP, SORT_TIME,
-    SORT_PLAYER, SORT_MM, SORT_UNKNOWN
+    COLUMN_HOST,
+    COLUMN_DESCRIPTION,
+    COLUMN_VERSION,
+    COLUMN_PING,
+    COLUMN_MODE,
+    COLUMN_MAP,
+    COLUMN_TIME,
+    COLUMN_PLAYER,
+    COLUMN_MM,
+    COLUMN_MAX
 };
 
+static const wxChar *ColumnNames[] =
+{
+    _("Host"),
+    _("Description"),
+    _("Version"),
+    _("Ping"),
+    _("Mode"),
+    _("Map"),
+    _("Time"),
+    _("Player"),
+    _("MM")
+};
 
 BEGIN_EVENT_TABLE(CslListCtrlServer, CslListCtrl)
     #ifdef __WXMSW__
@@ -61,30 +67,12 @@ BEGIN_EVENT_TABLE(CslListCtrlServer, CslListCtrl)
     #endif
     EVT_SIZE(CslListCtrlServer::OnSize)
     EVT_MENU(wxID_ANY,CslListCtrlServer::OnMenu)
-    EVT_LIST_COL_CLICK(wxID_ANY,CslListCtrlServer::OnColumnLeftClick)
     EVT_LIST_ITEM_ACTIVATED(wxID_ANY,CslListCtrlServer::OnItemActivated)
+    CSL_EVT_LIST_ALL_ITEMS_SELECTED(wxID_ANY, CslListCtrlServer::OnItemSelected)
     EVT_LIST_ITEM_SELECTED(wxID_ANY,CslListCtrlServer::OnItemSelected)
     EVT_LIST_ITEM_DESELECTED(wxID_ANY,CslListCtrlServer::OnItemDeselected)
     EVT_CONTEXT_MENU(CslListCtrlServer::OnContextMenu)
-    EVT_KEY_DOWN(CslListCtrlServer::OnKeyDown)
 END_EVENT_TABLE()
-
-
-enum
-{
-    LIST_IMG_GREEN,
-    LIST_IMG_YELLOW,
-    LIST_IMG_RED,
-    LIST_IMG_GREY,
-    LIST_IMG_GREEN_EXT,
-    LIST_IMG_YELLOW_EXT,
-    LIST_IMG_RED_EXT,
-    LIST_IMG_SORT_ASC,
-    LIST_IMG_SORT_DSC,
-    LIST_IMG_SORT_ASC_LIGHT,
-    LIST_IMG_SORT_DSC_LIGHT,
-    LIST_IMG_GAMES_START,
-};
 
 
 CslListCtrlServer::CslListCtrlServer(wxWindow* parent,wxWindowID id,const wxPoint& pos,
@@ -92,7 +80,6 @@ CslListCtrlServer::CslListCtrlServer(wxWindow* parent,wxWindowID id,const wxPoin
                                      const wxValidator& validator, const wxString& name) :
         CslListCtrl(parent,id,pos,size,style,validator,name),
         m_id(id),m_masterSelected(false),m_sibling(NULL),
-        m_processSelectEvent(true),
 #ifdef __WXMSW__
         m_dontAdjustSize(false),
 #endif
@@ -127,96 +114,55 @@ void CslListCtrlServer::OnSize(wxSizeEvent& event)
         return;
 #endif
 
-    Freeze();
+    wxWindowUpdateLocker lock(this);
+
     ListAdjustSize(event.GetSize());
-    Thaw();
 }
 
 void CslListCtrlServer::OnKeyDown(wxKeyEvent &event)
 {
-    wxInt32 code=event.GetKeyCode();
-
-    if (event.ControlDown() && code=='A')
+    switch (event.GetKeyCode())
     {
-        wxInt32 i;
-        wxListItem item;
-
-        m_processSelectEvent=false;
-
-        item.SetMask(wxLIST_MASK_DATA);
-
-        m_selected.Empty();
-
-        for (i=0;i<GetItemCount();i++)
-        {
-            item.SetId(i);
-            GetItem(item);
-
-            CslListServerData *server=(CslListServerData*)GetItemData(item);
-            m_selected.Add(server);
-
-            SetItemState(i,wxLIST_STATE_SELECTED,wxLIST_STATE_SELECTED);
-        }
-
-        m_processSelectEvent=true;
-    }
-    else if (code==WXK_DELETE || code==WXK_NUMPAD_DELETE)
-    {
+        case WXK_DELETE:
+        case WXK_NUMPAD_DELETE:
         //TODO multiple events?
         if (event.ShiftDown())
             ListDeleteServers();
         else if (m_id!=CSL_LIST_MASTER)
             ListRemoveServers();
+            break;
+        default: break;
     }
 
     event.Skip();
 }
 
-void CslListCtrlServer::OnColumnLeftClick(wxListEvent& event)
-{
-    ListSort(event.GetColumn());
-}
-
 void CslListCtrlServer::OnItemActivated(wxListEvent& event)
 {
-    wxListItem item;
-
-    item.SetId(event.GetIndex());
-    CslListServerData *server=(CslListServerData*)GetItemData(item);
-    event.SetClientData((void*)server->Info);
+    CslListServerData *s=(CslListServerData*)GetItemData(event.GetIndex());
+    event.SetClientData((void*)s->Info);
     event.Skip();
 }
 
 void CslListCtrlServer::OnItemSelected(wxListEvent& event)
 {
-    if (!m_processSelectEvent)
-        return;
+    CslListServerData *s=(CslListServerData*)GetItemData(event.GetIndex());
+    m_selected.Add(s);
 
-    wxListItem item;
-    item.SetId(event.GetIndex());
-    GetItem(item);
-
-    CslListServerData *server=(CslListServerData*)GetItemData(item);
-    m_selected.Add(server);
-
-    event.SetClientData((void*)server->Info);
+    //dont't skip the event on when selecting all items
+    if (event.GetEventType()!=wxCSL_EVT_COMMAND_LIST_ALL_ITEMS_SELECTED)
+    {
+        event.SetClientData((void*)s->Info);
     event.Skip();
+}
 }
 
 void CslListCtrlServer::OnItemDeselected(wxListEvent& event)
 {
-    if (!m_processSelectEvent)
-        return;
-
     wxInt32 i;
-    wxListItem item;
+    CslListServerData *s=(CslListServerData*)GetItemData(event.GetIndex());
 
-    item.SetId(event.GetIndex());
-    GetItem(item);
-
-    CslListServerData *server=(CslListServerData*)GetItemData(item);
-
-    if ((i=m_selected.Index(server))!=wxNOT_FOUND)
+    if ((i=m_selected.Index(s))!=wxNOT_FOUND)
         m_selected.RemoveAt(i);
 }
 
@@ -233,7 +179,7 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
         point=wxGetMousePosition();
 
     if ((selected=m_selected.GetCount())>0)
-        info=m_selected.Item(0)->Info;
+        info=((CslListServerData*)m_selected.Item(0))->Info;
 
     if (selected==1)
     {
@@ -245,22 +191,22 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
     }
 
     if (m_id==CSL_LIST_MASTER && selected)
-        CslMenu::AddItem(&menu,MENU_ADD,MENU_SERVER_FAV_ADD_STR,wxART_ADD_BOOKMARK);
+        CslMenu::AddItem(menu, MENU_ADD, MENU_SERVER_FAV_ADD_STR, wxART_ADD_BOOKMARK);
 
     else if (m_id==CSL_LIST_FAVOURITE)
     {
-        CslMenu::AddItem(&menu,MENU_ADD,MENU_SERVER_ADD_STR,wxART_ADD_BOOKMARK);
+        CslMenu::AddItem(menu, MENU_ADD, MENU_SERVER_ADD_STR, wxART_ADD_BOOKMARK);
         if (selected)
-            CslMenu::AddItem(&menu,MENU_REM,MENU_SERVER_FAV_REM_STR,wxART_DEL_BOOKMARK);
+            CslMenu::AddItem(menu, MENU_REM, MENU_SERVER_FAV_REM_STR, wxART_DEL_BOOKMARK);
     }
 
     if (selected>0)
     {
-        CslMenu::AddItem(&menu,MENU_DEL,selected>1 ?
+        CslMenu::AddItem(menu, MENU_DEL, selected>1 ?
                          MENU_SERVER_DELM_STR:MENU_SERVER_DEL_STR,wxART_DELETE);
         menu.AppendSeparator();
         CSL_MENU_CREATE_URICOPY(menu)
-        CslMenu::AddItem(&menu,MENU_COPY,MENU_SERVER_COPY_SERVER_STR,wxART_COPY);
+        CslMenu::AddItem(menu, MENU_COPY, MENU_SERVER_COPY_SERVER_STR, wxART_COPY);
         menu.AppendSeparator();
         filter=(wxMenu*)1;
     }
@@ -279,31 +225,31 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
     else
         filter=&menu;
 
-    item=&CslMenu::AddItem(filter,MENU_SERVER_FILTER_OFF,
+    item=&CslMenu::AddItem(*filter, MENU_SERVER_FILTER_OFF,
                            MENU_SERVER_FILTER_OFF_STR,wxART_NONE,wxITEM_CHECK);
-    item->Check(*m_filterFlags&CSL_FILTER_OFFLINE);
-    item=&CslMenu::AddItem(filter,MENU_SERVER_FILTER_FULL,
+    item->Check(CSL_FLAG_CHECK(*m_filterFlags, CSL_FILTER_OFFLINE));
+    item=&CslMenu::AddItem(*filter, MENU_SERVER_FILTER_FULL,
                            MENU_SERVER_FILTER_FULL_STR,wxART_NONE,wxITEM_CHECK);
-    item->Check((*m_filterFlags&CSL_FILTER_FULL)!=0);
-    item=&CslMenu::AddItem(filter,MENU_SERVER_FILTER_EMPTY,
+    item->Check(CSL_FLAG_CHECK(*m_filterFlags, CSL_FILTER_FULL));
+    item=&CslMenu::AddItem(*filter, MENU_SERVER_FILTER_EMPTY,
                            MENU_SERVER_FILTER_EMPTY_STR,wxART_NONE,wxITEM_CHECK);
-    item->Check((*m_filterFlags&CSL_FILTER_EMPTY)!=0);
-    item->Enable(!(*m_filterFlags&CSL_FILTER_NONEMPTY));
-    item=&CslMenu::AddItem(filter,MENU_SERVER_FILTER_NONEMPTY,
+    item->Check(CSL_FLAG_CHECK(*m_filterFlags, CSL_FILTER_EMPTY));
+    item->Enable(!(CSL_FLAG_CHECK(*m_filterFlags, CSL_FILTER_NONEMPTY)));
+    item=&CslMenu::AddItem(*filter, MENU_SERVER_FILTER_NONEMPTY,
                            MENU_SERVER_FILTER_NONEMPTY_STR,wxART_NONE,wxITEM_CHECK);
-    item->Check((*m_filterFlags&CSL_FILTER_NONEMPTY)!=0);
-    item->Enable(!(*m_filterFlags&CSL_FILTER_EMPTY));
-    item=&CslMenu::AddItem(filter,MENU_SERVER_FILTER_MM2,
+    item->Check(CSL_FLAG_CHECK(*m_filterFlags, CSL_FILTER_NONEMPTY));
+    item->Enable(!CSL_FLAG_CHECK(*m_filterFlags, CSL_FILTER_EMPTY));
+    item=&CslMenu::AddItem(*filter, MENU_SERVER_FILTER_MM2,
                            MENU_SERVER_FILTER_MM2_STR,wxART_NONE,wxITEM_CHECK);
-    item->Check((*m_filterFlags&CSL_FILTER_MM2)!=0);
-    item=&CslMenu::AddItem(filter,MENU_SERVER_FILTER_MM3,
+    item->Check(CSL_FLAG_CHECK(*m_filterFlags, CSL_FILTER_MM2));
+    item=&CslMenu::AddItem(*filter, MENU_SERVER_FILTER_MM3,
                            MENU_SERVER_FILTER_MM3_STR,wxART_NONE,wxITEM_CHECK);
-    item->Check((*m_filterFlags&CSL_FILTER_MM3)!=0);
+    item->Check(CSL_FLAG_CHECK(*m_filterFlags, CSL_FILTER_MM3));
 
     if (m_id==CSL_LIST_MASTER)
     {
         filter->AppendSeparator();
-        item=&CslMenu::AddItem(filter,MENU_SERVER_FILTER_VER,MENU_SERVER_FILTER_VER_STR,wxART_NONE,wxITEM_CHECK);
+        item=&CslMenu::AddItem(*filter, MENU_SERVER_FILTER_VER, MENU_SERVER_FILTER_VER_STR, wxART_NONE, wxITEM_CHECK);
         item->Enable(selected>0 || m_filterVersion>-1);
         item->Check(m_filterVersion>-1);
     }
@@ -322,89 +268,84 @@ void CslListCtrlServer::OnContextMenu(wxContextMenuEvent& event)
 
 void CslListCtrlServer::ListRemoveServers()
 {
-    wxInt32 i;
-    CslServerInfo *info;
+    wxInt32 i, pos;
     wxListItem item;
+    CslListServerData *data;
 
     for (i=m_selected.GetCount()-1;i>=0;i--)
     {
-        CslListServerData *ls=m_selected.Item(i);
-        info=ls->Info;
+        data=(CslListServerData*)m_selected.Item(i);
 
-        if (ListFindItem(info,item)==wxNOT_FOUND)
-            continue;
+        if ((pos=ListFindItem(data))!=wxNOT_FOUND)
+        {
+            item.SetId(pos);
+            ListDeleteItem(item);
 
-        ListDeleteItem(item);
         m_selected.RemoveAt(i);
-        m_servers.Remove(ls);
+            m_servers.Remove(data);
 
         if (m_id==CSL_LIST_FAVOURITE)
-            info->RemoveFavourite();
+                data->Info->RemoveFavourite();
     }
 }
-
-#define CSL_DELETE_YESNOCANCEL_STR _("\nChoose Yes to keep these servers, " \
-                                     _L_"No to delete them or\nCancel the operation.")
+}
 
 void CslListCtrlServer::ListDeleteServers()
 {
     wxInt32 i;
-    wxString msg,s;
+    wxString msg;
     CslServerInfo *info;
+    CslListServerData *data;
     wxInt32 skipFav=wxCANCEL,skipStats=wxCANCEL;
 
     for (i=m_selected.GetCount()-1;i>=0;i--)
     {
         msg.Empty();
-        CslListServerData *ls=m_selected.Item(i);
-        info=ls->Info;
+        data=(CslListServerData*)m_selected.Item(i);
+        info=data->Info;
 
         if (skipFav==wxCANCEL && info->IsFavourite())
         {
-            msg=_("You are about to delete servers which are also favourites!\n");
-            msg+=CSL_DELETE_YESNOCANCEL_STR;
+            msg=_("You are about to delete servers which are also favourites!");
+            msg<<CSL_NEWLINE<<_("Really delete these servers?");
             skipFav=wxMessageBox(msg,_("Warning"),wxYES_NO|wxCANCEL|wxICON_WARNING,this);
+
             if (skipFav==wxCANCEL)
                 return;
-            if (skipFav!=wxNO)
+            if (skipFav==wxNO)
                 continue;
         }
         if (skipStats==wxCANCEL && info->HasStats())
         {
-            msg=_("You are about to delete servers which have statistics!\n");
-            msg+=CSL_DELETE_YESNOCANCEL_STR;
+            msg=_("You are about to delete servers which have statistics!");
+            msg<<CSL_NEWLINE<<_("Really delete these servers?");
             skipStats=wxMessageBox(msg,_("Warning"),wxYES_NO|wxCANCEL|wxICON_WARNING,this);
+
             if (skipStats==wxCANCEL)
                 return;
-            if (skipStats!=wxNO)
+            if (skipStats==wxNO)
                 continue;
         }
     }
 
     for (i=m_selected.GetCount()-1;i>=0;i--)
     {
-        wxListItem item;
-        CslListServerData *ls=m_selected.Item(i);
-        info=ls->Info;
+        data=(CslListServerData*)m_selected.Item(i);
+        info=data->Info;
 
-        if (ListFindItem(info,item)==wxNOT_FOUND)
-            continue;
-
-        if (ls->Info->IsLocked())
+        if (data->Info->IsLocked())
         {
-            msg=wxString::Format(_("Server \"%s\" is currently locked,\nso deletion is not possible!"),
+            msg=wxString::Format(_("Server \"%s\" is currently locked, so deletion is not possible!"),
                                  info->GetBestDescription().c_str());
             wxMessageBox(msg,_("Error"),wxICON_ERROR,this);
             continue;
         }
 
-        if (info->IsFavourite() && skipFav!=wxNO)
+        if ((info->IsFavourite() && skipFav==wxNO) ||
+                (info->HasStats() && skipStats==wxNO))
             continue;
 
-        if (info->HasStats() && skipStats!=wxNO)
-            continue;
-
-        RemoveServer(ls,info,i);
+        RemoveServer(data, info, i);
 
         if (m_id==CSL_LIST_MASTER && info->IsFavourite())
             m_sibling->RemoveServer(NULL,info,-1);
@@ -416,15 +357,16 @@ void CslListCtrlServer::ListDeleteServers()
         wxPostEvent(m_parent,event);
     }
 }
-#undef CSL_DELETE_YESNOCANCEL_STR
 
 void CslListCtrlServer::OnMenu(wxCommandEvent& event)
 {
-    wxListItem item;
-    wxString s;
     wxUint32 i=0;
-    wxInt32 c=0,id=event.GetId();
-    CslServerInfo *info=m_selected.GetCount() ? m_selected.Item(0)->Info : NULL;
+    wxInt32 id=event.GetId();
+    CslServerInfo *info=NULL;
+
+    if (!m_selected.IsEmpty())
+    {
+        info=((CslListServerData*)m_selected.Item(0))->Info;
 
     CSL_MENU_EVENT_SKIP_CONNECT(id,info)
     CSL_MENU_EVENT_SKIP_EXTINFO(id,info)
@@ -438,17 +380,14 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
 
         for (i=0;i<m_selected.GetCount();i++)
         {
-            info=m_selected.Item(i)->Info;
-
-            if (ListFindItem(info,item)==wxNOT_FOUND)
-                continue;
-
+                info=((CslListServerData*)m_selected.Item(i))->Info;
             servers->Add((void*)info);
         }
 
         event.SetClientData((void*)servers);
         event.Skip();
         return;
+    }
     }
 
     switch (id)
@@ -460,10 +399,7 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
                 bool sort=false;
                 for (i=0;i<m_selected.GetCount();i++)
                 {
-                    info=m_selected.Item(i)->Info;
-
-                    if (ListFindItem(info,item)==wxNOT_FOUND)
-                        continue;
+                    info=((CslListServerData*)m_selected.Item(i))->Info;
                     info->SetFavourite();
                     sort=true;
                     m_sibling->ListUpdateServer(info);
@@ -482,11 +418,13 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
                 CslDlgAddServer dlg(wxTheApp->GetTopWindow());
                 info=new CslServerInfo;
                 dlg.InitDlg(info);
+
                 if (dlg.ShowModal()!=wxID_OK)
                 {
                     delete info;
                     break;
                 }
+
                 ListUpdateServer(info);
                 ListSort();
                 break;
@@ -508,35 +446,39 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
 
         case MENU_COPY:
         {
-            wxString s1;
+            wxString s;
+            wxInt32 pos;
             wxUint16 port;
+            wxListItem item;
 
             item.SetMask(wxLIST_MASK_TEXT);
 
-            for (i=0;i<m_selected.GetCount();i++)
+            for (i=m_selected.GetCount()-1; i>=0; i--)
             {
-                info=m_selected.Item(i)->Info;
+                info=((CslListServerData*)m_selected.Item(i))->Info;
 
-                if (ListFindItem(info,item)==wxNOT_FOUND)
+                if ((pos=ListFindItemByServerInfo(info))==wxNOT_FOUND)
                     continue;
 
-                port=info->GetGame().GetDefaultGamePort();
-                if (info->GamePort!=port)
+                item.SetId(pos);
+
+                if ((port=info->GetGame().GetDefaultGamePort())!=info->GamePort)
                     port=info->GamePort;
                 else
                     port=0;
 
-                for (c=0;c<GetColumnCount();c++)
+                for (wxInt32 j=GetColumnCount()-1; j>=0; j--)
                 {
-                    item.SetColumn(c);
+                    item.SetColumn(j);
                     GetItem(item);
-                    s1=item.GetText();
-                    if (!s1.IsEmpty())
+                    const wxString& is=item.GetText();
+
+                    if (!is.IsEmpty())
                     {
-                        s<<s1;
+                        s<<is;
                         if (port)
                         {
-                            GetColumn(c,item);
+                            GetColumn(j, item);
                             if (item.GetText()==_("Host"))
                             {
                                 s<<wxT(":")<<port;
@@ -547,7 +489,7 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
                     }
                 }
                 if (!s.IsEmpty())
-                    s<<wxT("\r\n");
+                    s<<CSL_NEWLINE;
             }
 
             if (s.IsEmpty())
@@ -582,27 +524,22 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
         {
             if (event.IsChecked())
             {
-                if (i==0)
-                {
-                    if (m_selected.GetCount())
-                        m_filterVersion=m_selected.Item(0)->Info->Protocol;
-                    break;
-                }
-                *m_filterFlags|=i;
+                if (i==0 && !m_selected.IsEmpty())
+                    m_filterVersion=((CslListServerData*)m_selected.Item(0))->Info->Protocol;
+                CSL_FLAG_SET(*m_filterFlags, i);
             }
             else
             {
                 if (i==0)
-                {
                     m_filterVersion=-1;
-                    break;
-                }
-                *m_filterFlags&=~i;
+                CSL_FLAG_UNSET(*m_filterFlags, i);
             }
 
-            ListFilter();
-            event.SetClientData((void*)m_id);
+            ListRebuild();
+
+            event.SetClientData((void*)(wxIntPtr)m_id);
             event.Skip();
+
             break;
         }
 
@@ -611,144 +548,33 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
     }
 }
 
-void CslListCtrlServer::ListInit(CslListCtrlServer *sibling)
-//CslDlgExtended *extendedDlg);
+void CslListCtrlServer::ListInit(CslListCtrlServer *sibling, wxInt32 *filter)
 {
     m_sibling=sibling;
-    m_filterFlags=m_id==CSL_LIST_MASTER ? &g_cslSettings->filterMaster:&g_cslSettings->filterFavourites;
     m_filterVersion=-1;
+    m_filterFlags=filter;
 
-    ListCreateGameBitmaps();
+    wxUint32 columns=CslSettings::GetListSettings(GetName())->ColumnMask;
 
-    wxListItem item;
+#define COLUMN_ENABLED(id) columns>0 ? CSL_FLAG_CHECK(columns, 1<<(id)) : true
+    ListAddColumn(ColumnNames[COLUMN_HOST],        wxLIST_FORMAT_LEFT,  2.5f, true, true                    );
+    ListAddColumn(ColumnNames[COLUMN_DESCRIPTION], wxLIST_FORMAT_LEFT,  3.0f, true, true                    );
+    ListAddColumn(ColumnNames[COLUMN_VERSION],     wxLIST_FORMAT_LEFT,  1.2f, COLUMN_ENABLED(COLUMN_VERSION));
+    ListAddColumn(ColumnNames[COLUMN_PING],        wxLIST_FORMAT_RIGHT, 1.0f, COLUMN_ENABLED(COLUMN_PING)   );
+    ListAddColumn(ColumnNames[COLUMN_MODE],        wxLIST_FORMAT_LEFT,  2.0f, COLUMN_ENABLED(COLUMN_MODE)   );
+    ListAddColumn(ColumnNames[COLUMN_MAP],         wxLIST_FORMAT_LEFT,  1.5f, COLUMN_ENABLED(COLUMN_MAP)    );
+    ListAddColumn(ColumnNames[COLUMN_TIME],        wxLIST_FORMAT_RIGHT, 1.0f, COLUMN_ENABLED(COLUMN_TIME)   );
+    ListAddColumn(ColumnNames[COLUMN_PLAYER],      wxLIST_FORMAT_LEFT,  1.0f, COLUMN_ENABLED(COLUMN_PLAYER) );
+    ListAddColumn(ColumnNames[COLUMN_MM],          wxLIST_FORMAT_LEFT,  1.4f, COLUMN_ENABLED(COLUMN_MM)     );
+#undef COLUMN_ENABLED
 
-    item.SetMask(wxLIST_MASK_FORMAT);
-    item.SetImage(-1);
-
-    item.SetAlign(wxLIST_FORMAT_LEFT);
-    item.SetText(_("Host"));
-    InsertColumn(0,item);
-    SetColumn(0,item);
-
-    item.SetText(_("Description"));
-    InsertColumn(1,item);
-    SetColumn(1,item);
-
-    item.SetText(_("Version"));
-    InsertColumn(2,item);
-    SetColumn(2,item);
-
-    item.SetAlign(wxLIST_FORMAT_RIGHT);
-    item.SetText(_("Ping"));
-    InsertColumn(3,item);
-    SetColumn(3,item);
-
-    item.SetAlign(wxLIST_FORMAT_LEFT);
-    item.SetText(_("Mode"));
-    InsertColumn(4,item);
-    SetColumn(4,item);
-
-    item.SetText(_("Map"));
-    InsertColumn(5,item);
-    SetColumn(5,item);
-
-    item.SetAlign(wxLIST_FORMAT_RIGHT);
-    item.SetText(_("Time"));
-    InsertColumn(6,item);
-    SetColumn(6,item);
-
-    item.SetAlign(wxLIST_FORMAT_LEFT);
-    item.SetText(_("Player"));
-    InsertColumn(7,item);
-    SetColumn(7,item);
-
-    item.SetText(_("MM"));
-    InsertColumn(8,item);
-    SetColumn(8,item);
-
-    m_sortHelper.Init(CslListSortHelper::SORT_DSC,SORT_PLAYER);
+    m_sortHelper.Init(CslListSort::SORT_DSC, COLUMN_PLAYER);
     ToggleSortArrow();
-}
-
-void CslListCtrlServer::ListAdjustSize(const wxSize& size)
-{
-    wxInt32 w=size.x-8;
-
-    SetColumnWidth(0,(wxInt32)(w*g_cslSettings->colServerS1));
-    SetColumnWidth(1,(wxInt32)(w*g_cslSettings->colServerS2));
-    SetColumnWidth(2,(wxInt32)(w*g_cslSettings->colServerS3));
-    SetColumnWidth(3,(wxInt32)(w*g_cslSettings->colServerS4));
-    SetColumnWidth(4,(wxInt32)(w*g_cslSettings->colServerS5));
-    SetColumnWidth(5,(wxInt32)(w*g_cslSettings->colServerS6));
-    SetColumnWidth(6,(wxInt32)(w*g_cslSettings->colServerS7));
-    SetColumnWidth(7,(wxInt32)(w*g_cslSettings->colServerS8));
-    SetColumnWidth(8,(wxInt32)(w*g_cslSettings->colServerS9));
-}
-
-void CslListCtrlServer::ListCreateGameBitmaps()
-{
-    wxInt32 width;
-
-#ifdef __WXMSW__
-    width=18;
-    m_imgList.Create(18,16,true);
-
-    m_imgList.Add(AdjustBitmapSize(green_list_16_xpm,wxSize(18,16),wxPoint(0,0)));
-    m_imgList.Add(AdjustBitmapSize(yellow_list_16_xpm,wxSize(18,16),wxPoint(0,0)));
-    m_imgList.Add(AdjustBitmapSize(red_list_16_xpm,wxSize(18,16),wxPoint(0,0)));
-    m_imgList.Add(AdjustBitmapSize(grey_list_16_xpm,wxSize(18,16),wxPoint(0,0)));
-    m_imgList.Add(AdjustBitmapSize(green_ext_list_16_xpm,wxSize(18,16),wxPoint(0,0)));
-    m_imgList.Add(AdjustBitmapSize(yellow_ext_list_16_xpm,wxSize(18,16),wxPoint(0,0)));
-    m_imgList.Add(AdjustBitmapSize(red_ext_list_16_xpm,wxSize(18,16),wxPoint(0,0)));
-    m_imgList.Add(AdjustBitmapSize(sortasc_16_xpm,wxSize(18,16),wxPoint(0,0)));
-    m_imgList.Add(AdjustBitmapSize(sortdsc_16_xpm,wxSize(18,16),wxPoint(0,0)));
-    m_imgList.Add(AdjustBitmapSize(sortasclight_16_xpm,wxSize(18,16),wxPoint(0,0)));
-    m_imgList.Add(AdjustBitmapSize(sortdsclight_16_xpm,wxSize(18,16),wxPoint(0,0)));
-#else
-    width=16;
-    m_imgList.Create(16,16,true);
-
-    m_imgList.Add(wxBitmap(green_list_16_xpm));
-    m_imgList.Add(wxBitmap(yellow_list_16_xpm));
-    m_imgList.Add(wxBitmap(red_list_16_xpm));
-    m_imgList.Add(wxBitmap(grey_list_16_xpm));
-    m_imgList.Add(wxBitmap(green_ext_list_16_xpm));
-    m_imgList.Add(wxBitmap(yellow_ext_list_16_xpm));
-    m_imgList.Add(wxBitmap(red_ext_list_16_xpm));
-    m_imgList.Add(wxBitmap(sortasc_16_xpm));
-    m_imgList.Add(wxBitmap(sortdsc_16_xpm));
-    m_imgList.Add(wxBitmap(sortasclight_16_xpm));
-    m_imgList.Add(wxBitmap(sortdsclight_16_xpm));
-#endif
-
-    //create icons for the favourites list
-    if (m_id==CSL_LIST_FAVOURITE)
-    {
-        wxBitmap bmpExt=wxBitmap(ext_green_8_xpm);
-        wxImage imgExt=bmpExt.ConvertToImage();
-
-        vector<CslGame*>& games=::wxGetApp().GetCslEngine()->GetGames();
-
-        loopv(games)
-        {
-            const wxBitmap& icon=games[i]->GetIcon(16);
-#ifdef __WXMSW__
-            wxBitmap bmpGame=icon.IsOk() ? AdjustBitmapSize(icon,wxSize(18,16),wxPoint(0,0)) : wxBitmap(width,16);
-#else
-            wxBitmap bmpGame=icon.IsOk() ? icon : wxBitmap(16,width);
-#endif
-            m_imgList.Add(bmpGame);
-
-            wxImage img=bmpGame.ConvertToImage();
-            m_imgList.Add(wxBitmap(OverlayImage(img,imgExt,8,8)));
-        }
-    }
-
-    SetImageList(&m_imgList,wxIMAGE_LIST_SMALL);
 }
 
 void CslListCtrlServer::Highlight(wxInt32 type,bool high,bool sort,CslServerInfo *info,wxListItem *item)
 {
+    wxInt32 pos;
     wxUint32 i,t;
     wxListItem it;
 
@@ -758,20 +584,23 @@ void CslListCtrlServer::Highlight(wxInt32 type,bool high,bool sort,CslServerInfo
     {
         if (!item)
         {
-            if (ListFindItem(info,it)==wxNOT_FOUND)
+            if ((pos=ListFindItemByServerInfo(info))==wxNOT_FOUND)
                 return;
+
             item=&it;
+            it.SetId(pos);
         }
 
         CslListServerData *server=(CslListServerData*)GetItemData(*item);
         t=server->SetHighlight(type,high);
 
-        if (t&CSL_HIGHLIGHT_LOCKED)
-            colour=g_cslSettings->colServerPlay;
-        else if (t&CSL_HIGHLIGHT_FOUND_SERVER || t&CSL_HIGHLIGHT_FOUND_PLAYER)
-            colour=g_cslSettings->colServerHigh;
-        else if (t&CSL_HIGHLIGHT_SEARCH_PLAYER)
-            colour=wxColour(g_cslSettings->colServerOff);
+        if (CSL_FLAG_CHECK(t, CSL_HIGHLIGHT_LOCKED))
+            colour=CslGetSettings().ColServerPlay;
+        else if (CSL_FLAG_CHECK(t, CSL_HIGHLIGHT_FOUND_SERVER) ||
+                 CSL_FLAG_CHECK(t, CSL_HIGHLIGHT_FOUND_PLAYER))
+            colour=CslGetSettings().ColServerHigh;
+        else if (CSL_FLAG_CHECK(t, CSL_HIGHLIGHT_SEARCH_PLAYER))
+            colour=wxColour(CslGetSettings().ColServerOff);
         else
             colour=GetBackgroundColour();
 
@@ -783,15 +612,18 @@ void CslListCtrlServer::Highlight(wxInt32 type,bool high,bool sort,CslServerInfo
         {
             info=m_servers.Item(i)->Info;
 
-            if (ListFindItem(info,it)==wxNOT_FOUND)
+            if ((pos=ListFindItemByServerInfo(info))==wxNOT_FOUND)
                 continue;
+
+            it.SetId(pos);
 
             t=m_servers.Item(i)->SetHighlight(type,high);
 
-            if (t&CSL_HIGHLIGHT_FOUND_SERVER || t&CSL_HIGHLIGHT_FOUND_PLAYER)
-                colour=g_cslSettings->colServerHigh;
-            else if (t&CSL_HIGHLIGHT_LOCKED)
-                colour=g_cslSettings->colServerPlay;
+            if (CSL_FLAG_CHECK(t, CSL_HIGHLIGHT_FOUND_SERVER) ||
+                    CSL_FLAG_CHECK(t, CSL_HIGHLIGHT_FOUND_PLAYER))
+                colour=CslGetSettings().ColServerHigh;
+            else if (CSL_FLAG_CHECK(t, CSL_HIGHLIGHT_LOCKED))
+                colour=CslGetSettings().ColServerPlay;
             else
                 colour=GetBackgroundColour();
 
@@ -805,48 +637,35 @@ void CslListCtrlServer::Highlight(wxInt32 type,bool high,bool sort,CslServerInfo
 
 wxUint32 CslListCtrlServer::GetPlayerCount()
 {
-    wxUint32 c=0,i;
+    wxUint32 i, c=0;
 
     for (i=0;i<m_servers.GetCount();i++)
+    {
         if (m_servers.Item(i)->Players>0 &&
-            CslEngine::PingOk(*m_servers.Item(i)->Info,g_cslSettings->updateInterval))
+                CslEngine::PingOk(*m_servers.Item(i)->Info, CslGetSettings().UpdateInterval))
             c+=m_servers.Item(i)->Players;
+    }
 
     return c;
 }
 
-wxInt32 CslListCtrlServer::ListFindItem(CslServerInfo *info,wxListItem& item)
-{
-    wxInt32 i,j=GetItemCount();
-
-    for (i=0;i<j;i++)
-    {
-        item.SetId(i);
-
-        if (info==((CslListServerData*)GetItemData(item))->Info)
-            return i;
-    }
-
-    return wxNOT_FOUND;
-}
-
 bool CslListCtrlServer::ListSearchItemMatches(CslServerInfo *info)
 {
-    wxString s;
-
-    s=info->Host.Lower();
-    if (s.Find(m_searchString)!=wxNOT_FOUND)
+    if (info->Host.Lower().Find(m_searchString)!=wxNOT_FOUND)
         return true;
     else
     {
-        s=info->Description.Lower();
-        if (s.Find(m_searchString)!=wxNOT_FOUND)
+        if (info->Description.Lower().Find(m_searchString)!=wxNOT_FOUND)
             return true;
         else
         {
-            s=info->Map.Lower();
-            if (s.Find(m_searchString)!=wxNOT_FOUND)
+            if (info->GameMode.Lower().Find(m_searchString)!=wxNOT_FOUND)
                 return true;
+            else
+            {
+                if (info->Map.Lower().Find(m_searchString)!=wxNOT_FOUND)
+                    return true;
+            }
         }
     }
 
@@ -857,18 +676,19 @@ bool CslListCtrlServer::ListFilterItemMatches(CslServerInfo *info)
 {
     if (m_filterVersion>-1 && info->Protocol!=m_filterVersion)
         return true;
-    else if (*m_filterFlags&CSL_FILTER_OFFLINE && !CslEngine::PingOk(*info,g_cslSettings->updateInterval))
+    else if (CSL_FLAG_CHECK(*m_filterFlags, CSL_FILTER_OFFLINE) &&
+             !CslEngine::PingOk(*info, CslGetSettings().UpdateInterval))
         return true;
-    else if (*m_filterFlags&CSL_FILTER_FULL && info->PlayersMax>0 &&
+    else if (CSL_FLAG_CHECK(*m_filterFlags, CSL_FILTER_FULL) && info->PlayersMax>0 &&
              info->Players>=info->PlayersMax)
         return true;
-    else if (*m_filterFlags&CSL_FILTER_EMPTY && info->Players==0)
+    else if (CSL_FLAG_CHECK(*m_filterFlags, CSL_FILTER_EMPTY) && info->Players==0)
         return true;
-    else if (*m_filterFlags&CSL_FILTER_NONEMPTY && info->Players>0)
+    else if (CSL_FLAG_CHECK(*m_filterFlags, CSL_FILTER_NONEMPTY) && info->Players>0)
         return true;
-    else if (*m_filterFlags&CSL_FILTER_MM2 && info->MM==2)
+    else if (CSL_FLAG_CHECK(*m_filterFlags, CSL_FILTER_MM2) && info->MM==2)
         return true;
-    else if (*m_filterFlags&CSL_FILTER_MM3 && info->MM==3)
+    else if (CSL_FLAG_CHECK(*m_filterFlags, CSL_FILTER_MM3) && info->MM==3)
         return true;
 
     return false;
@@ -876,60 +696,101 @@ bool CslListCtrlServer::ListFilterItemMatches(CslServerInfo *info)
 
 void CslListCtrlServer::GetToolTipText(wxInt32 row,CslToolTipEvent& event)
 {
-    if (row<GetItemCount())
+    CslListServerData *data;
+
+    if (row>=GetItemCount() || !(data=(CslListServerData*)GetItemData(row)))
+        return;
+
+    event.Title=_("Server information");
+
+    wxString s;
+    bool pingok=CslEngine::PingOk(*data->Info, CslGetSettings().UpdateInterval);
+
+    for (wxInt32 i=0; i<COLUMN_MAX; i++)
     {
-        wxInt32 i;
-        wxListItem item,column;
+        event.Text.Add(ColumnNames[i]);
 
-        column.SetMask(wxLIST_MASK_TEXT);
-        item.SetMask(wxLIST_MASK_TEXT);
-        item.SetId(row);
+        if (FormatStats(s, i, data->Info, pingok).IsEmpty())
+            s=_("no data");
 
-        for (i=0;i<GetColumnCount();i++)
-        {
-            item.SetColumn(i);
-            GetItem(item);
-            GetColumn(i,column);
-
-            const wxString& s=item.GetText();
-
-            if (!s.IsEmpty())
-            {
-                event.Text.Add(column.GetText());
                 event.Text.Add(s);
             }
         }
 
-        event.Title=_("Server information");
+void CslListCtrlServer::OnListSort()
+{
+    SortItems(ListSortCompareFunc, (long)&m_sortHelper);
     }
+
+inline wxString& CslListCtrlServer::FormatStats(wxString& in, int type, CslServerInfo *info, bool pingok)
+{
+    in.Empty();
+
+    switch (type)
+    {
+        case COLUMN_HOST:
+            in<<info->Host;
+            break;
+        case COLUMN_DESCRIPTION:
+            if (!pingok && info->Description.IsEmpty() && !info->DescriptionOld.IsEmpty())
+                in<<info->DescriptionOld;
+            else
+                in<<info->Description;
+            break;
+        case COLUMN_VERSION:
+            in<<info->Version;
+            break;
+        case COLUMN_PING:
+            in<<info->Ping;
+            break;
+        case COLUMN_MODE:
+            in<<info->GameMode;
+            break;
+        case COLUMN_MAP:
+            in<<info->Map;
+            break;
+        case COLUMN_TIME:
+            if (info->TimeRemain<0)
+                in<<_("no limit");
+            else
+                in<<(info->TimeRemain+60-1)/60;
+            break;
+        case COLUMN_PLAYER:
+            if (info->PlayersMax<=0)
+                in<<info->Players;
+            else
+                in<<in.Format(wxT("%d/%d"), info->Players, info->PlayersMax);
+            break;
+        case COLUMN_MM:
+            in<<info->MMDescription;
+            break;
+        default: break;
+    }
+
+    return in;
 }
 
 bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
 {
     if (!info)
-    {
-        wxASSERT_MSG(info,wxT("invalid info"));
         return false;
-    }
 
-    wxInt32 i,j;
     wxString s;
+    wxInt32 i,j;
     wxListItem item;
     bool found=false;
     CslListServerData *infoCmp=NULL;
 
-    i=m_servers.GetCount();
-    for (j=0;j<i;j++)
+    for (i=m_servers.GetCount()-1; i>=0; i--)
     {
-        if (m_servers.Item(j)->Info==info)
+        if (m_servers.Item(i)->Info==info)
         {
-            infoCmp=m_servers.Item(j);
+            infoCmp=m_servers.Item(i);
             break;
         }
     }
 
-    j=ListFindItem(info,item);
-    if (j==wxNOT_FOUND)
+    if ((j=ListFindItemByServerInfo(info))==wxNOT_FOUND)
         i=GetItemCount();
     else
         i=j;
@@ -939,10 +800,12 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
 
     // filter
     found=m_filterFlags||m_filterVersion>-1 ? ListFilterItemMatches(info) : false;
+
     if (found && j!=wxNOT_FOUND)
     {
         ListDeleteItem(item);
         wxInt32 pos=m_selected.Index(infoCmp);
+
         if (pos!=wxNOT_FOUND)
             m_selected.RemoveAt(pos);
     }
@@ -964,10 +827,9 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
             return true;
         }
 
-        item.SetData((long)infoCmp);
         InsertItem(item);
-
-        SetItem(i,0,info->Host);
+        ListSetItem(i, COLUMN_HOST, FormatStats(s, COLUMN_HOST, info));
+        SetItemPtrData(i, (wxUIntPtr)infoCmp);
     }
     else
     {
@@ -980,71 +842,58 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
         infoCmp=(CslListServerData*)GetItemData(item);
     }
 
-    if (CslEngine::PingOk(*info,g_cslSettings->updateInterval) || info->PingResp)
+    if (CslEngine::PingOk(*info, CslGetSettings().UpdateInterval) || info->PingResp)
     {
         if (infoCmp->Description!=info->Description)
-            SetItem(i,1,info->Description);
+            ListSetItem(i, COLUMN_DESCRIPTION, FormatStats(s, COLUMN_DESCRIPTION, info));
 
         if (infoCmp->Protocol!=info->Protocol)
-            SetItem(i,2,info->Version);
+            ListSetItem(i, COLUMN_VERSION, FormatStats(s, COLUMN_VERSION, info));
 
         if (infoCmp->Ping!=info->Ping)
-            SetItem(i,3,wxString::Format(wxT("%d"),info->Ping));
+            ListSetItem(i, COLUMN_PING, FormatStats(s, COLUMN_PING, info));
 
         if (infoCmp->GameMode!=info->GameMode)
-            SetItem(i,4,info->GameMode);
+            ListSetItem(i, COLUMN_MODE, FormatStats(s, COLUMN_MODE, info));
 
         if (infoCmp->Map!=info->Map)
-            SetItem(i,5,info->Map);
+            ListSetItem(i, COLUMN_MAP, FormatStats(s, COLUMN_MAP, info));
 
         if (infoCmp->TimeRemain!=info->TimeRemain)
-        {
-            if (info->TimeRemain<0)
-                s=_("no limit");
-            else
-                s=s.Format(wxT("%d"),info->TimeRemain);
-            SetItem(i,6,s);
-        }
+            ListSetItem(i, COLUMN_TIME, FormatStats(s, COLUMN_TIME, info));
 
-        if (infoCmp->Players!=info->Players ||
-            infoCmp->PlayersMax!=info->PlayersMax)
-        {
-            if (info->PlayersMax<=0)
-                s=s.Format(wxT("%d"),info->Players);
-            else
-                s=s.Format(wxT("%d/%d"),info->Players,info->PlayersMax);
-            SetItem(i,7,s);
-        }
+        if (infoCmp->Players!=info->Players || infoCmp->PlayersMax!=info->PlayersMax)
+            ListSetItem(i, COLUMN_PLAYER, FormatStats(s, COLUMN_PLAYER, info));
 
         if (infoCmp->MM!=info->MM)
-            SetItem(i,8,info->MMDescription);
+            ListSetItem(i, COLUMN_MM, FormatStats(s, COLUMN_MM, info));
     }
     else
     {
         if (info->Description.IsEmpty() && !info->DescriptionOld.IsEmpty())
-            SetItem(i,1,info->DescriptionOld);
+            ListSetItem(i, COLUMN_DESCRIPTION, FormatStats(s, COLUMN_DESCRIPTION, info, false));
     }
 
     wxColour colour(SYSCOLOUR(wxSYS_COLOUR_WINDOWTEXT));
 
-    if (!CslEngine::PingOk(*info,g_cslSettings->updateInterval))
-        colour=g_cslSettings->colServerOff;
+    if (!CslEngine::PingOk(*info, CslGetSettings().UpdateInterval))
+        colour=CslGetSettings().ColServerOff;
     else if (CSL_SERVER_IS_BAN(info->MM) ||
              CSL_SERVER_IS_PASSWORD(info->MM) ||
              CSL_SERVER_IS_BLACKLIST(info->MM))
-        colour=g_cslSettings->colServerMM3;
+        colour=CslGetSettings().ColServerMM3;
     else
     {
         if (info->IsFull())
-            colour=g_cslSettings->colServerFull;
+            colour=CslGetSettings().ColServerFull;
         else if (CSL_SERVER_IS_PRIVATE(info->MM))
-            colour=g_cslSettings->colServerMM3;
+            colour=CslGetSettings().ColServerMM3;
         else if (CSL_SERVER_IS_LOCKED(info->MM))
-            colour=g_cslSettings->colServerMM2;
+            colour=CslGetSettings().ColServerMM2;
         else if (CSL_SERVER_IS_VETO(info->MM))
-            colour=g_cslSettings->colServerMM1;
+            colour=CslGetSettings().ColServerMM1;
         else if (info->Players==0)
-            colour=g_cslSettings->colServerEmpty;
+            colour=CslGetSettings().ColServerEmpty;
     }
 
     SetItemTextColour(i,colour);
@@ -1055,14 +904,14 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
 
     if (m_id==CSL_LIST_MASTER)
     {
-        if (!CslEngine::PingOk(*info,g_cslSettings->updateInterval))
-            i=LIST_IMG_GREY;
-        else if (info->Ping>(wxInt32)g_cslSettings->pingbad)
-            i=info->ExtInfoStatus!=CSL_EXT_STATUS_FALSE ? LIST_IMG_RED_EXT : LIST_IMG_RED;
-        else if (info->Ping>(wxInt32)g_cslSettings->pinggood)
-            i=info->ExtInfoStatus!=CSL_EXT_STATUS_FALSE ? LIST_IMG_YELLOW_EXT : LIST_IMG_YELLOW;
+        if (!CslEngine::PingOk(*info, CslGetSettings().UpdateInterval))
+            i=CSL_LIST_IMG_GREY;
+        else if (info->Ping>(wxInt32)CslGetSettings().PingBad)
+            i=info->ExtInfoStatus!=CSL_EXT_STATUS_FALSE ? CSL_LIST_IMG_RED_EXT : CSL_LIST_IMG_RED;
+        else if (info->Ping>(wxInt32)CslGetSettings().PingGood)
+            i=info->ExtInfoStatus!=CSL_EXT_STATUS_FALSE ? CSL_LIST_IMG_YELLOW_EXT : CSL_LIST_IMG_YELLOW;
         else
-            i=info->ExtInfoStatus!=CSL_EXT_STATUS_FALSE ? LIST_IMG_GREEN_EXT : LIST_IMG_GREEN;
+            i=info->ExtInfoStatus!=CSL_EXT_STATUS_FALSE ? CSL_LIST_IMG_GREEN_EXT : CSL_LIST_IMG_GREEN;
 
         if (infoCmp->ImgId!=i)
         {
@@ -1072,8 +921,8 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
     }
     else
     {
-        i=LIST_IMG_GAMES_START+info->GetGame().GetId()*2-
-          (info->ExtInfoStatus==CSL_EXT_STATUS_OK ? 1:2);
+        i=GetGameImage(info->GetGame().GetFourCC(), info->ExtInfoStatus==CSL_EXT_STATUS_OK ? 1 : 0);
+
         if (infoCmp->ImgId!=i)
         {
             SetItemImage(item,i);
@@ -1086,30 +935,47 @@ bool CslListCtrlServer::ListUpdateServer(CslServerInfo *info)
     return found;
 }
 
+wxInt32 CslListCtrlServer::ListFindItemByServerInfo(CslServerInfo *info)
+{
+    wxListItem item;
+
+    for (wxInt32 i=GetItemCount()-1; i>=0; i--)
+    {
+        item.SetId(i);
+
+        if (((CslListServerData*)GetItemData(item))->Info==info)
+            return i;
+    }
+
+    return wxNOT_FOUND;
+}
+
 void CslListCtrlServer::ListDeleteItem(wxListItem& item)
 {
-    m_processSelectEvent=false;
     DeleteItem(item);
-    m_processSelectEvent=true;
 }
 
 void CslListCtrlServer::RemoveServer(CslListServerData *server,CslServerInfo *info,wxInt32 selId)
 {
-    wxInt32 i,l,c;
+    wxInt32 i;
     wxListItem item;
 
-    if (ListFindItem(info,item)!=wxNOT_FOUND)
+    if ((i=ListFindItem(server))!=wxNOT_FOUND)
+    {
+        item.SetId(i);
         ListDeleteItem(item);
+    }
 
     if (!server)
     {
-        l=m_servers.GetCount();
-        for (i=0;i<l;i++)
+        for (i=m_servers.GetCount()-1; i>=0; i--)
+        {
             if (m_servers.Item(i)->Info==info)
             {
                 server=m_servers.Item(i);
                 break;
             }
+    }
     }
 
     if (!server)
@@ -1117,8 +983,8 @@ void CslListCtrlServer::RemoveServer(CslListServerData *server,CslServerInfo *in
 
     if (selId<0)
     {
-        if ((c=m_selected.Index(server))!=wxNOT_FOUND)
-            m_selected.RemoveAt(c);
+        if ((i=m_selected.Index(server))!=wxNOT_FOUND)
+            m_selected.RemoveAt(i);
     }
     else
         m_selected.RemoveAt(selId);
@@ -1127,7 +993,7 @@ void CslListCtrlServer::RemoveServer(CslListServerData *server,CslServerInfo *in
     delete server;
 }
 
-wxUint32 CslListCtrlServer::ListUpdate(vector<CslServerInfo*>& servers)
+wxUint32 CslListCtrlServer::ListUpdate(CslServerInfos& servers)
 {
     bool sort=false;
     wxUint32 c=0;
@@ -1152,7 +1018,7 @@ wxUint32 CslListCtrlServer::ListUpdate(vector<CslServerInfo*>& servers)
             c++;
     }
 
-    if (!sort || !g_cslSettings->autoSortColumns)
+    if (!sort || !CslGetSettings().AutoSortColumns)
         return c;
 
     ListSort();
@@ -1177,6 +1043,8 @@ wxUint32 CslListCtrlServer::ListSearch(const wxString& search)
 
     wxUint32 i,c=0;
 
+    wxWindowUpdateLocker locker(this);
+
     for (i=0;i<m_servers.GetCount();i++)
     {
         CslServerInfo *info=m_servers.Item(i)->Info;
@@ -1190,16 +1058,19 @@ wxUint32 CslListCtrlServer::ListSearch(const wxString& search)
     return c;
 }
 
-wxUint32 CslListCtrlServer::ListFilter()
+wxUint32 CslListCtrlServer::ListRebuild(bool force)
 {
-    wxUint32 i,l,c=0;
+    wxUint32 c=0;
 
     wxWindowUpdateLocker locker(this);
 
-    l=m_servers.GetCount();
-    for (i=0;i<l;i++)
+    for (wxUint32 i=0, l=m_servers.GetCount(); i<l; i++)
     {
         CslServerInfo *info=m_servers.Item(i)->Info;
+
+        if (force)
+            m_servers.Item(i)->Reset();
+
         if (ListUpdateServer(info))
             c++;
     }
@@ -1214,95 +1085,33 @@ void CslListCtrlServer::ToggleSortArrow()
     wxListItem item;
     wxInt32 img=-1;
 
-    if (g_cslSettings->autoSortColumns)
+    if (CslGetSettings().AutoSortColumns)
     {
-        if (m_sortHelper.Mode==CslListSortHelper::SORT_ASC)
-            img=LIST_IMG_SORT_ASC;
+        if (m_sortHelper.Mode==CslListSort::SORT_ASC)
+            img=CSL_LIST_IMG_SORT_ASC;
         else
-            img=LIST_IMG_SORT_DSC;
+            img=CSL_LIST_IMG_SORT_DSC;
     }
     item.SetImage(img);
-    SetColumn(m_sortHelper.Type,item);
+    SetColumn(m_sortHelper.Column, item);
 }
 
-void CslListCtrlServer::ListSort(wxInt32 column)
-{
-    wxListItem item;
-    wxInt32 img;
-
-    if (column==-1)
-        column=m_sortHelper.Type;
-    else
-    {
-        item.SetMask(wxLIST_MASK_IMAGE);
-        GetColumn(column,item);
-
-        if (item.GetImage()==-1 ||
-            item.GetImage()==LIST_IMG_SORT_DSC ||
-            item.GetImage()==LIST_IMG_SORT_DSC_LIGHT)
-        {
-            g_cslSettings->autoSortColumns ? img=LIST_IMG_SORT_ASC : img=LIST_IMG_SORT_ASC_LIGHT;
-            m_sortHelper.Mode=CslListSortHelper::SORT_ASC;
-        }
-        else
-        {
-            g_cslSettings->autoSortColumns ? img=LIST_IMG_SORT_DSC : img=LIST_IMG_SORT_DSC_LIGHT;
-            m_sortHelper.Mode=CslListSortHelper::SORT_DSC;
-        }
-
-        item.Clear();
-        item.SetImage(-1);
-        SetColumn(m_sortHelper.Type,item);
-
-        item.SetImage(img);
-        SetColumn(column,item);
-
-        m_sortHelper.Type=column;
-    }
-
-    if (!GetItemCount())
-        return;
-
-    m_processSelectEvent=false;
-
-    SortItems(ListSortCompareFunc,(long)&m_sortHelper);
-
-#ifdef CSL_USE_WX_LIST_DESELECT_WORKAROUND
-    wxInt32 i,j;
-
-    for (i=0;i<(wxInt32)m_selected.GetCount();i++)
-    {
-        if ((j=ListFindItem(m_selected.Item(i)->Info,item))==wxNOT_FOUND)
-            continue;
-        SetItemState(j,wxLIST_STATE_SELECTED,wxLIST_STATE_SELECTED);
-    }
-#endif
-
-    m_processSelectEvent=true;
-
-#ifndef __WXMSW__
-    //removes flicker after sorting
-    wxIdleEvent idle;
-    wxTheApp->SendIdleEvents(this,idle);
-#endif
-}
-
-int wxCALLBACK CslListCtrlServer::ListSortCompareFunc(long item1,long item2,IntPtr data)
+int wxCALLBACK CslListCtrlServer::ListSortCompareFunc(long item1, long item2, long data)
 {
     CslListServerData *data1=(CslListServerData*)item1;
     CslListServerData *data2=(CslListServerData*)item2;
-    CslListSortHelper *helper=(CslListSortHelper*)data;
+    CslListSort *helper=(CslListSort*)data;
 
-    bool high1=data1->HighLight&CSL_HIGHLIGHT_FOUND_SERVER || data1->HighLight&CSL_HIGHLIGHT_FOUND_PLAYER;
-    bool high2=data2->HighLight&CSL_HIGHLIGHT_FOUND_SERVER || data2->HighLight&CSL_HIGHLIGHT_FOUND_PLAYER;
+    bool high1=CSL_FLAG_CHECK(data1->HighLight, CSL_HIGHLIGHT_FOUND_SERVER|CSL_HIGHLIGHT_FOUND_PLAYER);
+    bool high2=CSL_FLAG_CHECK(data2->HighLight, CSL_HIGHLIGHT_FOUND_SERVER|CSL_HIGHLIGHT_FOUND_PLAYER);
 
     if ((high1 || high2) && !(high1 && high2))
         return high1 ? -1:1;
 
-    bool ping1Ok=CslEngine::PingOk(*data1->Info,g_cslSettings->updateInterval);
-    bool ping2Ok=CslEngine::PingOk(*data2->Info,g_cslSettings->updateInterval);
+    bool ping1Ok=CslEngine::PingOk(*data1->Info, CslGetSettings().UpdateInterval);
+    bool ping2Ok=CslEngine::PingOk(*data2->Info, CslGetSettings().UpdateInterval);
 
-    if (helper->Type!=SORT_HOST)
+    if (helper->Column!=COLUMN_HOST)
     {
         if (!ping1Ok && !ping2Ok)
             return 0;
@@ -1319,53 +1128,54 @@ int wxCALLBACK CslListCtrlServer::ListSortCompareFunc(long item1,long item2,IntP
     { \
         ret=helper->Cmp(_data1->PlayersMax-_data1->Players, \
                         _data2->PlayersMax-_data2->Players, \
-                        CslListSortHelper::SORT_DSC); \
+                        CslListSort::SORT_DSC); \
     }
 
-    switch (helper->Type)
+    switch (helper->Column)
     {
-        case SORT_HOST:
+        case COLUMN_HOST:
         {
             bool isip1=IsIP(data1->Host);
             bool isip2=IsIP(data2->Host);
             if (isip1 && !isip2)
-                ret=helper->Mode==CslListSortHelper::SORT_ASC ? -1 : 1;
+                ret=helper->Mode==CslListSort::SORT_ASC ? -1 : 1;
             else if (!isip1 && isip2)
-                ret=helper->Mode==CslListSortHelper::SORT_ASC ? 1 : -1;
+                ret=helper->Mode==CslListSort::SORT_ASC ? 1 : -1;
             else if (isip1 && isip2)
-                ret=helper->Cmp(IP2Int(data1->Host),IP2Int(data2->Host));
+                ret=helper->Cmp(wxUINT32_SWAP_ON_LE(AtoN(data1->Host)),
+                                wxUINT32_SWAP_ON_LE(AtoN(data2->Host)));
             break;
         }
 
-        case SORT_DESCRIPTION:
+        case COLUMN_DESCRIPTION:
             ret=helper->Cmp(data1->Description,data2->Description);
             break;
 
-        case SORT_PING:
+        case COLUMN_PING:
             ret=helper->Cmp(data1->Ping,data2->Ping);
             break;
 
-        case SORT_VER:
+        case COLUMN_VERSION:
             ret=helper->Cmp(data1->Protocol,data2->Protocol);
             break;
 
-        case SORT_MODE:
+        case COLUMN_MODE:
             ret=helper->Cmp(data1->GameMode,data2->GameMode);
             break;
 
-        case SORT_MAP:
+        case COLUMN_MAP:
             ret=helper->Cmp(data1->Map,data2->Map);
             break;
 
-        case SORT_TIME:
+        case COLUMN_TIME:
             ret=helper->Cmp(data1->TimeRemain,data2->TimeRemain);
             break;
 
-        case SORT_PLAYER:
+        case COLUMN_PLAYER:
             LIST_SORT_PLAYER(data1,data2,helper->Mode)
             break;
 
-        case SORT_MM:
+        case COLUMN_MM:
             ret=helper->Cmp(data1->MM,data2->MM);
             break;
 
@@ -1375,15 +1185,17 @@ int wxCALLBACK CslListCtrlServer::ListSortCompareFunc(long item1,long item2,IntP
 
     if (!ret)
     {
-        if (helper->Type!=SORT_PLAYER)
-            LIST_SORT_PLAYER(data1,data2,CslListSortHelper::SORT_DSC);
+        if (helper->Column!=COLUMN_PLAYER)
+            LIST_SORT_PLAYER(data1, data2, CslListSort::SORT_DSC);
 
         if (!ret && !(ret=helper->Cmp(data1->Info->ConnectedTimes,
                                       data2->Info->ConnectedTimes,
-                                      CslListSortHelper::SORT_DSC)))
+                                      CslListSort::SORT_DSC)))
             ret=helper->Cmp(data1->Info->Uptime,data2->Info->Uptime,
-                            CslListSortHelper::SORT_DSC);
+                            CslListSort::SORT_DSC);
     }
+
+#undef LIST_SORT_PLAYER
 
     return ret;
 }

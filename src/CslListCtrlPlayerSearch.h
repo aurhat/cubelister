@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -50,18 +50,15 @@ class CslListCtrlPlayerSearch : public CslListCtrl
         ~CslListCtrlPlayerSearch();
 
         void ListClear();
-        void AddResult(CslServerInfo *info,CslPlayerStatsData *player);
+        void AddResult(CslServerInfo *info, CslPlayerStatsData *player, bool rebuild=false);
         void RemoveServer(CslServerInfo *info);
 
     private:
         t_aCslPlayerSearchEntry m_entries;
         CslPlayerSearchEntry *m_selected;
-        wxImageList m_imgList;
-
-        void ListInit();
-        void ListAdjustSize(const wxSize& size=wxDefaultSize);
 
         void OnSize(wxSizeEvent& event);
+        void OnColumnLeftClick(wxListEvent& event);
         void OnItem(wxListEvent& event);
         void OnItemDeselected(wxListEvent& event);
         void OnContextMenu(wxContextMenuEvent& event);
@@ -71,8 +68,6 @@ class CslListCtrlPlayerSearch : public CslListCtrl
 
     protected:
         void GetToolTipText(wxInt32 row,CslToolTipEvent& event);
-
-        void CreateImageList();
 };
 
 #endif //CSLLISTCTRLPLAYERSEARCH_H

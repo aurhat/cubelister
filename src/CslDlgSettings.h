@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -34,7 +34,7 @@ class CslGamePage : public wxPanel
         CslGamePage(wxWindow *parent,CslGame* game);
         ~CslGamePage();
 
-        bool SaveSettings(wxString *message);
+        bool SaveSettings(wxString& error);
 
     private:
         void OnPicker(wxFileDirPickerEvent& event);
@@ -43,14 +43,14 @@ class CslGamePage : public wxPanel
         DECLARE_EVENT_TABLE()
 
     protected:
-        wxStaticText *label_exe,*label_gamepath,*label_cfgpath;
-        wxStaticText *label_pre_script,*label_post_script,*label_expert;
         wxTextCtrl *text_ctrl_options,*text_ctrl_pre_script,*text_ctrl_post_script;
         wxFilePickerCtrl *filepicker;
         wxDirPickerCtrl *dirpickergame,*dirpickercfg;
 
         CslGame *m_game;
+        CslGameClientSettings m_settings;
 };
+
 
 class CslDlgSettings : public wxDialog
 {
@@ -77,15 +77,15 @@ class CslDlgSettings : public wxDialog
 
     protected:
         // begin wxGlade: CslDlgSettings::attributes
-        wxStaticBox* sizer_3_staticbox;
-        wxStaticBox* sizer_2_staticbox;
-        wxStaticBox* sizer_1_staticbox;
-        wxStaticBox* sizer_network_staticbox;
         wxStaticBox* sizer_output_staticbox;
         wxStaticBox* sizer_tts_staticbox;
         wxStaticBox* sizer_systray_staticbox;
         wxStaticBox* sizer_threshold_staticbox;
         wxStaticBox* sizer_times_staticbox;
+    wxStaticBox* sizer_3_staticbox;
+    wxStaticBox* sizer_2_staticbox;
+    wxStaticBox* sizer_1_staticbox;
+    wxStaticBox* sizer_network_staticbox;
         wxStaticBox* sizer_colours_staticbox;
         wxListbook* notebook_games;
         wxPanel* notebook_pane_games;
@@ -96,6 +96,26 @@ class CslDlgSettings : public wxDialog
         wxBitmapButton* button_colour_full;
         wxBitmapButton* button_colour_mm3;
         wxPanel* notebook_pane_colour;
+    wxTreeCtrl* tree_ctrl_network;
+    wxStaticText* label_7;
+    wxTextCtrl* text_ctrl_1;
+    wxStaticText* label_8;
+    wxSpinCtrl* spin_ctrl_1;
+    wxStaticText* label_9;
+    wxTextCtrl* text_ctrl_2;
+    wxStaticText* label_10;
+    wxCheckBox* checkbox_1;
+    wxStaticText* label_11;
+    wxTextCtrl* text_ctrl_3;
+    wxStaticText* label_12;
+    wxTextCtrl* text_ctrl_4;
+    wxListBox* list_box_1;
+    wxBitmapButton* bitmap_button_1;
+    wxBitmapButton* bitmap_button_2;
+    wxListBox* list_box_2;
+    wxBitmapButton* bitmap_button_3;
+    wxBitmapButton* bitmap_button_4;
+    wxPanel* notebook_pane_irc;
         wxSpinCtrl* spin_ctrl_update;
         wxCheckBox* checkbox_play_update;
         wxSpinCtrl* spin_ctrl_wait;
@@ -113,26 +133,6 @@ class CslDlgSettings : public wxDialog
         wxCheckBox* checkbox_game_output;
         wxDirPickerCtrl* dirpicker_game_output;
         wxPanel* notebook_pane_other;
-        wxTreeCtrl* tree_ctrl_network;
-        wxStaticText* label_7;
-        wxTextCtrl* text_ctrl_1;
-        wxStaticText* label_8;
-        wxSpinCtrl* spin_ctrl_1;
-        wxStaticText* label_9;
-        wxTextCtrl* text_ctrl_2;
-        wxStaticText* label_10;
-        wxCheckBox* checkbox_1;
-        wxStaticText* label_11;
-        wxTextCtrl* text_ctrl_3;
-        wxStaticText* label_12;
-        wxTextCtrl* text_ctrl_4;
-        wxListBox* list_box_1;
-        wxButton* button_2;
-        wxButton* button_3;
-        wxListBox* list_box_2;
-        wxButton* button_4;
-        wxButton* button_5;
-        wxPanel* notebook_pane_irc;
         wxNotebook* notebook_settings;
         wxButton* button_ok;
         wxButton* button_cancel;

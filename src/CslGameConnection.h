@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -25,13 +25,15 @@
  @author Glen Masgai <mimosius@users.sourceforge.net>
 */
 
+#include "CslGameProcess.h"
 
 class CslGameConnection
 {
     private:
-        CslGameConnection();
-        ~CslGameConnection();
-        CslGameConnection(const CslGameConnection& connection) {}
+        CslGameConnection() :
+                m_info(NULL), m_process(NULL),
+                m_locked(false), m_playing(false), m_detached(false) { }
+        ~CslGameConnection() { Reset(); }
 
         static CslGameConnection& GetInstance();
 
@@ -42,14 +44,20 @@ class CslGameConnection
         static bool CountDown();
         static bool Prepare(CslServerInfo *info,wxInt32 pass=NO_PASS);
         static bool Connect();
+        static void Detach();
         static bool IsPlaying() { return GetInstance().m_playing; }
-        static bool IsWaiting() { return GetInstance().m_info ? GetInstance().m_info->ConnectWait>0:false; }
+        static bool IsWaiting()
+        {
+            return GetInstance().m_info ?
+                   GetInstance().m_info->ConnectWait>0 : false;
+        }
         static CslServerInfo* GetInfo() { return GetInstance().m_info; }
 
     private:
-        bool m_locked,m_playing;
-        CslServerInfo *m_info;
         wxString m_cmd;
+        CslServerInfo *m_info;
+        CslGameProcess *m_process;
+        bool m_locked, m_playing, m_detached;
 };
 
 #endif //CSLGAMECONNECTION_H

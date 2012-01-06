@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -45,20 +45,20 @@ class CslApp: public wxApp
         void IpcCall(const wxString& value,wxEvtHandler *evtHandler=NULL) const;
 
     private:
-        CslEngine *m_engine;
-
-        wxSingleInstanceChecker *m_single;
-        wxInt32 m_shutdown;
-
         wxString m_lang;
         wxLocale m_locale;
+        wxString m_appPath;
+        wxInt32 m_shutdown;
+        wxSingleInstanceChecker *m_single;
 
-        virtual bool OnInit();
-        virtual int OnRun();
-        virtual int OnExit();
+        CslEngine *m_engine;
+
+        bool OnInit();
+        int OnRun();
+        int OnExit();
+        void OnFatalException();
 
         int FilterEvent(wxEvent& event);
-
         void OnEndSession(wxCloseEvent& event);
 
         DECLARE_EVENT_TABLE()
@@ -66,4 +66,4 @@ class CslApp: public wxApp
 
 DECLARE_APP(CslApp);
 
-#endif
+#endif //CSLAPP_H

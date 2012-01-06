@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -32,7 +32,7 @@ class CslDlgAddServer: public wxDialog
         // begin wxGlade: CslDlgAddServer::ids
         // end wxGlade
 
-        CslDlgAddServer(wxWindow* parent,const wxInt32 id=wxID_ANY,const wxString& title=wxEmptyString,
+        CslDlgAddServer(wxWindow* parent, wxInt32 id=wxID_ANY, const wxString& title=wxEmptyString,
                         const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize,
                         long style=wxDEFAULT_DIALOG_STYLE);
 

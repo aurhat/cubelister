@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -42,7 +42,7 @@
 #include "CslIPC.h"
 #include "CslIRC.h"
 
-class CslFrame: public wxFrame
+class CslFrame: public wxFrame, public CslPluginMgr, public CslPluginHostInfo
 {
     public:
         CslFrame(wxWindow *parent,int id,const wxString& title,
@@ -51,15 +51,29 @@ class CslFrame: public wxFrame
                  long style=wxDEFAULT_FRAME_STYLE);
         ~CslFrame();
 
+        wxAuiManager& GetAuiManager() { return m_AuiMgr; }
+        vector<CslPanelPlayer*>& GetPlayerViews() { return m_playerInfos; }
+        void PlayerListCreateView(CslServerInfo *info, wxUint32 view, const wxString& name=wxEmptyString);
+
+        // function accessable from within plugins
+        wxWindow* GetMainWindow() { return this; }
+        wxEvtHandler* GetEvtHandler() { return this; }
+
+        wxInt32 GetFreeId();
+        wxMenu* GetPluginMenu();
+        wxMenuBar* GetMainMenuBar() { return GetMenuBar(); }
+
+        CslEngine* GetCslEngine() { return m_engine; }
+        CslGame* GetSelectedGame() { return TreeGetSelectedGame(); }
+
     private:
         wxAuiManager m_AuiMgr;
 #ifndef __WXMAC__
         wxTaskBarIcon *m_tbIcon;
 #endif
-        bool m_maximised;
-
         wxFlexGridSizer *sizer_main,*sizer_search;
         wxPanel *pane_main,*pane_search;
+        wxNotebook *notebook_views;
         CslListCtrlServer *list_ctrl_master,*list_ctrl_favourites;
         CslPanelPlayer *player_info;
         CslListCtrlInfo *list_ctrl_info;
@@ -67,10 +81,10 @@ class CslFrame: public wxFrame
         CslPanelCountry *pane_country;
         CslIrcNotebook *notebook_irc;
         wxTreeCtrl *tree_ctrl_games;
-        wxTextCtrl *text_ctrl_search;
+        wxSearchCtrl *search_ctrl;
         wxStaticText *text_search_result;
         wxButton *button_search;
-        wxBitmapButton *button_search_clear;
+        wxBitmapButton *button_search_close;
         wxGauge *gauge_search;
         wxRadioButton *radio_search_server,*radio_search_player;
         wxMenu *menuMaster;
@@ -101,9 +115,9 @@ class CslFrame: public wxFrame
 
         CslServerInfo *m_oldSelectedInfo;
 
-        vector<CslServerInfo*> m_countryServers;
+        CslServerInfos m_countryServers;
 
-        vector<CslServerInfo*> m_searchedServers;
+        CslServerInfos m_searchedServers;
         wxString m_searchString;
         wxInt32 m_searchResultPlayer,m_searchResultServer;
 
@@ -115,7 +129,6 @@ class CslFrame: public wxFrame
         void PanelCountrySetCaption(CslServerInfo *info);
 
         wxString PlayerListGetCaption(CslServerInfo *info,bool selected);
-        void PlayerListCreateView(CslServerInfo *info,wxUint32 view,const wxString& name=wxEmptyString);
 
         void ToggleShow();
 #ifndef __WXMAC__
@@ -126,7 +139,7 @@ class CslFrame: public wxFrame
 
         void SetTotalPlaytime(CslGame *game);
         void SetListCaption(wxInt32 id,const wxString& addon=wxEmptyString);
-        void SetSearchbarColour(bool value);
+        void SetSearchbarErrorState(bool error);
 
         wxTreeItemId TreeFindItem(wxTreeItemId parent,CslGame *game,CslMaster *master);
         void TreeAddMaster(wxTreeItemId parent,CslMaster *master,bool focus=false);
@@ -138,15 +151,11 @@ class CslFrame: public wxFrame
         void UpdateMaster();
         void ConnectToServer(CslServerInfo *info=NULL,wxInt32 pass=CslGameConnection::NO_PASS);
 
-        void LoadSettings();
-        void SaveSettings();
-        bool LoadServers(wxUint32 *numm=NULL,wxUint32 *nums=NULL);
-        void SaveServers();
         wxUint32 LoadLocators();
         void SaveLocators();
 
     private:
-        void OnPong(wxCommandEvent& event);
+        void OnPong(CslPongEvent& event);
         void OnTimer(wxTimerEvent& event);
         void OnListItemSelected(wxListEvent& event);
         void OnListItemActivated(wxListEvent& event);

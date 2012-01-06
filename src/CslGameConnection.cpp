@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -19,26 +19,13 @@
  ***************************************************************************/
 
 #include "Csl.h"
-#include "engine/CslGame.h"
+#include "CslGame.h"
 #include "CslDlgConnectPass.h"
 #include "CslDlgConnectWait.h"
 #include "CslStatusBar.h"
 #include "CslSettings.h"
-#include "CslGameProcess.h"
 #include "CslGameConnection.h"
 
-
-CslGameConnection::CslGameConnection()
-{
-    m_locked=false;
-    m_playing=false;
-    m_info=NULL;
-}
-
-CslGameConnection::~CslGameConnection()
-{
-    Reset();
-}
 
 CslGameConnection& CslGameConnection::GetInstance()
 {
@@ -51,7 +38,7 @@ void CslGameConnection::Reset(CslServerInfo *info)
 {
     CslGameConnection& self=GetInstance();
 
-    if (self.m_info)
+    if (self.m_info && !self.m_detached)
     {
         wxString s;
 
@@ -79,10 +66,22 @@ void CslGameConnection::Reset(CslServerInfo *info)
         CslStatusBar::SetText(1,s);
     }
 
+    self.m_info=info;
+    self.m_process=NULL;
     self.m_locked=false;
     self.m_playing=false;
-    self.m_info=info;
     self.m_cmd.Empty();
+}
+
+void CslGameConnection::Detach()
+{
+    CslGameConnection& self=GetInstance();
+
+    if (self.m_process)
+    {
+        self.m_detached=true;
+        self.m_process->Detach();
+    }
 }
 
 bool CslGameConnection::CountDown()
@@ -173,7 +172,7 @@ bool CslGameConnection::Connect()
         if (IsWaiting())
             return true;
 
-        wxInt32 time=g_cslSettings->waitServerFull;
+        wxInt32 time=CslGetSettings().WaitServerFull;
 
         CslDlgConnectWait *dlg=new CslDlgConnectWait(wxTheApp->GetTopWindow(),&time);
         wxInt32 ret=dlg->ShowModal();
@@ -201,8 +200,8 @@ bool CslGameConnection::Connect()
         self.m_info->Lock();
     }
 
-    CslGameProcess *process=new CslGameProcess(self.m_info,self.m_cmd);
-    if (!::wxExecute(self.m_cmd,wxEXEC_ASYNC,process))
+    self.m_process=new CslGameProcess(self.m_info, self.m_cmd);
+    if (!::wxExecute(self.m_cmd, wxEXEC_ASYNC, self.m_process))
     {
         wxMessageBox(_("Failed to start: ")+self.m_cmd,_("Error"),
                      wxICON_ERROR,wxTheApp->GetTopWindow());
@@ -211,7 +210,6 @@ bool CslGameConnection::Connect()
     }
 
     self.m_playing=true;
-
     self.m_info->ConnectWait=0;
     self.m_info->ConnectedTimes++;
     self.m_info->PlayedLast=wxDateTime::Now().GetTicks();

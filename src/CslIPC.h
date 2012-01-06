@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -30,7 +30,7 @@
 #ifdef __WXMSW__
 #define CSL_IPC_SERV wxT("CSL_IPC")
 #else
-#define CSL_IPC_SERV wxString(CSL_USER_DATADIR+wxT("sock"))
+#define CSL_IPC_SERV wxString(CSL_USER_DIR+wxT("sock"))
 #endif
 #define CSL_IPC_TOPIC wxT("CSL_IPC_CONTROL")
 

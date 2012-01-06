@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -40,7 +40,7 @@ class CslMapToolPanelMap : public CslPanelMap
             m_basesPtr=basesPtr;
         }
         void SetCentre(const wxPoint& centre) { m_centre=centre; }
-        void SetActiveBase(const wxInt32 id) { m_activeBase=id; }
+        void SetActiveBase(wxInt32 id) { m_activeBase=id; }
 
     private:
         wxInt32 m_id;
@@ -126,8 +126,8 @@ class CslMapCfgTool: public wxDialog
         void DelVersion();
         void AddBase();
         void DelBase();
-        void SetCurrentBase(const wxInt32 Id);
-        void ChoiceSetVersion(const wxInt32 id);
+        void SetCurrentBase(wxInt32 Id);
+        void ChoiceSetVersion(wxInt32 id);
         void ChoiceFillBases();
         void Reset(const bool resetMap=true);
 }; // wxGlade: end class

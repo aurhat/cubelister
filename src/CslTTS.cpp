@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -150,11 +150,11 @@ void CslTTS::Say(const wxString& text)
 {
     CslTTS& self=GetInstance();
 
-    if (!self.m_ok || !g_cslSettings->tts || text.IsEmpty())
+    if (!self.m_ok || !CslGetSettings().TTS || text.IsEmpty())
         return;
 
-    if (self.m_volume!=g_cslSettings->ttsVolume)
-        SetVolume(g_cslSettings->ttsVolume);
+    if (self.m_volume!=CslGetSettings().TTSVolume)
+        SetVolume(CslGetSettings().TTSVolume);
 
 #if defined(__WXMSW__)
     if (self.m_voice)

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -19,26 +19,23 @@
  ***************************************************************************/
 
 #include "Csl.h"
-#include "engine/CslGame.h"
+#include "CslGame.h"
 #include "CslMenu.h"
 #include "CslGeoIP.h"
 #include "CslListCtrlCountry.h"
 
 enum
 {
-    SORT_NAME = 0,
-    SORT_COUNT
+    COLUMN_NAME = 0,
+    COLUMN_COUNT
 };
-
 
 BEGIN_EVENT_TABLE(CslPanelCountry,wxPanel)
     EVT_SIZE(CslPanelCountry::OnSize)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(CslListCtrlCountry,CslListCtrl)
-    EVT_LIST_COL_CLICK(wxID_ANY,CslListCtrlCountry::OnColumnLeftClick)
     EVT_CONTEXT_MENU(CslListCtrlCountry::OnContextMenu)
-    EVT_MENU(wxID_ANY,CslListCtrlCountry::OnMenu)
 END_EVENT_TABLE()
 
 
@@ -75,8 +72,10 @@ void CslPanelCountry::OnSize(wxSizeEvent& event)
     m_listCtrl->ListAdjustSize(size);
 #ifdef __WXMAC__
     //fixes flicker after resizing
+#if !wxCHECK_VERSION(2, 9, 0) //TODO: possible replacement needed
     wxIdleEvent idle;
     wxTheApp->SendIdleEvents(this,idle);
+#endif
 #endif //__WXMAC__
 
     event.Skip();
@@ -119,53 +118,21 @@ CslListCtrlCountry::CslListCtrlCountry(wxWindow* parent,wxWindowID id,const wxPo
                                        const wxValidator& validator,const wxString& name) :
         CslListCtrl(parent,id,pos,size,style,validator,name)
 {
-    ListInit();
+    wxListItem item;
+
+    ListAddColumn(_("Country"), wxLIST_FORMAT_LEFT, 2.5f, true, true);
+    ListAddColumn(_("Count"), wxLIST_FORMAT_LEFT, 1.0f, true, true);
+
+    m_sortHelper.Init(CslListSort::SORT_DSC, COLUMN_COUNT);
+    GetColumn(m_sortHelper.Column, item);
+    item.SetImage(CSL_LIST_IMG_SORT_DSC);
+    SetColumn(m_sortHelper.Column, item);
 }
 
 
 CslListCtrlCountry::~CslListCtrlCountry()
 {
     WX_CLEAR_ARRAY(m_entries);
-}
-
-void CslListCtrlCountry::ListInit()
-{
-    wxListItem item;
-
-    SetImageList(&ListImageList,wxIMAGE_LIST_SMALL);
-
-    item.SetMask(wxLIST_MASK_TEXT|wxLIST_MASK_FORMAT);
-    item.SetImage(-1);
-
-    item.SetAlign(wxLIST_FORMAT_LEFT);
-
-    item.SetText(_("Country"));
-    InsertColumn(0,item);
-    SetColumn(0,item);
-
-    item.SetText(_("Count"));
-    InsertColumn(1,item);
-    SetColumn(1,item);
-
-    m_sortHelper.Init(CslListSortHelper::SORT_DSC,SORT_COUNT);
-    item.SetImage(CSL_LIST_IMG_SORT_DSC);
-    SetColumn(m_sortHelper.Type,item);
-}
-
-void CslListCtrlCountry::ListAdjustSize(const wxSize& size)
-{
-    wxInt32 w;
-
-    if ((w=size==wxDefaultSize ? GetClientSize().x-8 : size.x-8)<0)
-        return;
-
-    SetColumnWidth(0,(wxInt32)(w*0.70f));
-    SetColumnWidth(1,(wxInt32)(w*0.28f));
-}
-
-void CslListCtrlCountry::OnColumnLeftClick(wxListEvent& event)
-{
-    ListSort(event.GetColumn());
 }
 
 void CslListCtrlCountry::OnContextMenu(wxContextMenuEvent& event)
@@ -183,11 +150,6 @@ void CslListCtrlCountry::OnContextMenu(wxContextMenuEvent& event)
         point=wxGetMousePosition();
     point=ScreenToClient(point);
     PopupMenu(&menu,point);
-}
-
-void CslListCtrlCountry::OnMenu(wxCommandEvent& event)
-{
-    CSL_MENU_EVENT_SKIP_SAVEIMAGE(event.GetId())
 }
 
 void CslListCtrlCountry::ListClear()
@@ -208,13 +170,15 @@ void CslListCtrlCountry::UpdateEntry(const wxString& country,wxInt32 img)
     {
         item.SetId(c);
         GetItem(item);
+        entry=(CslCountryEntry*)GetItemData(c);
 
-        if (img==item.GetImage())
+        if (entry->Country==country)
         {
-            entry=(CslCountryEntry*)GetItemData(c);
             entry->Count++;
             break;
         }
+        else
+            entry=NULL;
     }
 
     if (!entry)
@@ -223,11 +187,11 @@ void CslListCtrlCountry::UpdateEntry(const wxString& country,wxInt32 img)
         InsertItem(item);
         entry=new CslCountryEntry(country.IsEmpty() ? wxString(_("Unknown")) : country);
         m_entries.Add(entry);
-        SetItemData(c,(long)entry);
+        SetItemPtrData(c, (wxUIntPtr)entry);
     }
 
-    SetItem(c,0,entry->Country,img);
-    SetItem(c,1,wxString::Format(wxT("%d"),entry->Count));
+    ListSetItem(c, COLUMN_NAME, entry->Country, img);
+    ListSetItem(c, COLUMN_COUNT, wxString::Format(wxT("%d"), entry->Count));
 }
 
 void CslListCtrlCountry::UpdateData(CslServerInfo *info)
@@ -235,7 +199,7 @@ void CslListCtrlCountry::UpdateData(CslServerInfo *info)
     //fixes flickering if scrollbar is shown
     wxWindowUpdateLocker lock(this);
 
-    wxUint32 imgId;
+    wxInt32 imgId;
     wxString country;
 
     if (((CslPanelCountry*)GetParent())->GetMode()==CslPanelCountry::MODE_SERVER)
@@ -243,13 +207,12 @@ void CslListCtrlCountry::UpdateData(CslServerInfo *info)
         if (!info->Pingable)
             return;
 
-        wxUint32 ip=IP2Int(info->Addr.IPAddress());
+        wxUint32 ip=AtoN(info->Addr.IPAddress());
 
         if (ip)
         {
             imgId=GetCountryFlag(ip);
-            country=A2U(CslGeoIP::GetCountryNameByIPnum(ip));
-
+            country=CslGeoIP::GetCountryNameByIPnum(ip);
             UpdateEntry(country,imgId);
         }
     }
@@ -265,76 +228,36 @@ void CslListCtrlCountry::UpdateData(CslServerInfo *info)
                 continue;
 
             imgId=GetCountryFlag(player->IP);
-            country=A2U(CslGeoIP::GetCountryNameByIPnum(player->IP));
+            country=CslGeoIP::GetCountryNameByIPnum(player->IP);
 
             UpdateEntry(country,imgId);
         }
     }
 
-    ListSort(-1);
-
-#ifndef __WXMSW__
-    //removes flicker on autosort for wxGTK and wxMAC
-    wxIdleEvent idle;
-    wxTheApp->SendIdleEvents(this,idle);
-#endif
+    ListSort();
 }
 
-void CslListCtrlCountry::ListSort(const wxInt32 column)
+void CslListCtrlCountry::OnListSort()
 {
-    wxListItem item;
-    wxInt32 img;
-    wxInt32 col;
-
-    if (column==-1)
-        col=m_sortHelper.Type;
-    else
-    {
-        col=column;
-        item.SetMask(wxLIST_MASK_IMAGE);
-        GetColumn(col,item);
-
-        if (item.GetImage()==-1 || item.GetImage()==CSL_LIST_IMG_SORT_DSC)
-        {
-            img=CSL_LIST_IMG_SORT_ASC;
-            m_sortHelper.Mode=CslListSortHelper::SORT_ASC;
-        }
-        else
-        {
-            img=CSL_LIST_IMG_SORT_DSC;
-            m_sortHelper.Mode=CslListSortHelper::SORT_DSC;
-        }
-
-        item.Clear();
-        item.SetImage(-1);
-        SetColumn(m_sortHelper.Type,item);
-
-        item.SetImage(img);
-        SetColumn(col,item);
-
-        m_sortHelper.Type=col;
-    }
-
-    if (GetItemCount()>0)
         SortItems(ListSortCompareFunc,(long)&m_sortHelper);
 }
 
-int wxCALLBACK CslListCtrlCountry::ListSortCompareFunc(long item1,long item2,IntPtr data)
+int wxCALLBACK CslListCtrlCountry::ListSortCompareFunc(long item1, long item2, long data)
 {
     CslCountryEntry *data1=(CslCountryEntry*)item1;
     CslCountryEntry *data2=(CslCountryEntry*)item2;
-    CslListSortHelper *helper=(CslListSortHelper*)data;
+    CslListSort *helper=(CslListSort*)data;
 
     wxInt32 mode=helper->Mode;
 
-    if (helper->Type==SORT_COUNT)
+    if (helper->Column==COLUMN_COUNT)
     {
         wxInt32 ret=0;
 
         if ((ret=helper->Cmp(data1->Count,data2->Count)))
             return ret;
         else
-            mode=CslListSortHelper::SORT_ASC;
+            mode=CslListSort::SORT_ASC;
     }
 
     return helper->Cmp(data1->Country,data2->Country,mode);

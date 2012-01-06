@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -26,7 +26,7 @@
 */
 
 #define CSL_EX_VERSION_MIN      102
-#define CSL_EX_VERSION_MAX      104
+#define CSL_EX_VERSION_MAX      105
 // commands
 #define CSL_EX_PING_UPTIME      0
 #define CSL_EX_PING_PLAYERSTATS 1
@@ -64,13 +64,12 @@ enum
     CSL_PLAYER_PRIV_ADMIN
 };
 
-
 class CslPlayerStatsData
 {
     public:
         CslPlayerStatsData() :
                 Frags(0),Flagscore(0),Deaths(0),Teamkills(0),Accuracy(0),
-                Health(-1),Armour(-1),Weapon(-1),ID(-1),
+                Health(-1), Armour(-1), Weapon(-1), KpD(0.0f), ID(-1),
                 Privileges(CSL_PLAYER_STATE_UNKNOWN),State(CSL_PLAYER_PRIV_UNKNOWN),
                 Ping(-1),IP((wxUint32)-1),Ok(false) {}
 
@@ -82,6 +81,7 @@ class CslPlayerStatsData
         wxString Name,Team;
         wxInt32 Frags,Flagscore,Deaths,Teamkills,Accuracy;
         wxInt32 Health,Armour,Weapon;
+        float KpD;
         wxInt32 ID,Privileges,State,Ping;
         wxUint32 IP;
         bool Ok;

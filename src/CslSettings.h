@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -25,18 +25,11 @@
  @author Glen Masgai <mimosius@users.sourceforge.net>
 */
 
-#include "wx/wxprec.h"
-#ifdef __BORLANDC__
-#pragma hdrstop
-#endif
-#ifndef WX_PRECOMP
-#include "wx/wx.h"
-#endif
-#include "engine/CslEngine.h"
+#include "CslEngine.h"
 
-#define CSL_SETTINGS_FILE  wxString(CSL_USER_DATADIR+wxT("settings.ini"))
-#define CSL_SERVERS_FILE   wxString(CSL_USER_DATADIR+wxT("servers.ini"))
-#define CSL_LOCATORS_FILE  wxString(CSL_USER_DATADIR+wxT("locators.ini"))
+#define CSL_SETTINGS_FILE  wxString(CSL_USER_DIR+wxT("settings.ini"))
+#define CSL_SERVERS_FILE   wxString(CSL_USER_DIR+wxT("servers.ini"))
+#define CSL_LOCATORS_FILE  wxString(CSL_USER_DIR+wxT("locators.ini"))
 
 #define  CSL_CONFIG_VERSION         1
 #define  CSL_SERVERCONFIG_VERSION   1
@@ -78,91 +71,112 @@
 #define CSL_USE_SYSTRAY    (1<<0)
 #define CSL_SYSTRAY_CLOSE  (1<<1)
 
+#define CSL_COLOUR_MASTER     wxColour(64,  255, 128)
+#define CSL_COLOUR_ADMIN      wxColour(255, 128,   0)
+#define CSL_COLOUR_SPECTATOR  wxColour(192, 192, 192)
+
+class CslListCtrlSettings
+{
+    public:
+        CslListCtrlSettings(const wxString& name=wxEmptyString,
+                            wxUint32 columnMask=0) :
+                Name(name),
+                ColumnMask(columnMask)
+        { }
+
+        wxString Name;
+        wxUint32 ColumnMask;
+};
 
 class CslSettings
 {
     public:
         CslSettings() :
                 /* GUI */
-                frameSize(wxSize(CSL_FRAME_MIN_WIDTH,CSL_FRAME_MIN_HEIGHT)),
-                frameSizeMax(wxDefaultSize),
-                layout(CSL_AUI_DEFAULT_LAYOUT),
-                systray(0),
-                tooltipDelay(CSL_TOOLTIP_DELAY_STD),
-                tts(true),
-                ttsVolume(CSL_TTS_VOLUME_DEFAULT),
-                updateInterval(CSL_UPDATE_INTERVAL_MIN),
-                dontUpdatePlaying(true),
-                showSearch(true),
-                filterMaster(0),
-                filterFavourites(0),
-                waitServerFull(CSL_WAIT_SERVER_FULL_STD),
-                pinggood(CSL_PING_GOOD_STD),
-                pingbad(CSL_PING_BAD_STD),
-                cleanupServers(CSL_CLEANUP_SERVERS*86400),
-                cleanupServersKeepFav(true),
-                cleanupServersKeepStats(true),
-                autoSaveOutput(false),
+                FrameSize(wxSize(CSL_FRAME_MIN_WIDTH, CSL_FRAME_MIN_HEIGHT)),
+                FrameSizeMax(wxDefaultSize),
+                Layout(CSL_AUI_DEFAULT_LAYOUT),
+                Systray(0),
+                TooltipDelay(CSL_TOOLTIP_DELAY_STD),
+                TTS(true),
+                TTSVolume(CSL_TTS_VOLUME_DEFAULT),
+                UpdateInterval(CSL_UPDATE_INTERVAL_MIN),
+                DontUpdatePlaying(true),
+                ShowSearch(true),
+                SearchLAN(true),
+                FilterMaster(0),
+                FilterFavourites(0),
+                WaitServerFull(CSL_WAIT_SERVER_FULL_STD),
+                PingGood(CSL_PING_GOOD_STD),
+                PingBad(CSL_PING_BAD_STD),
+                CleanupServers(CSL_CLEANUP_SERVERS*86400),
+                CleanupServersKeepFav(true),
+                CleanupServersKeepStats(true),
+                AutoSaveOutput(false),
+                MinPlaytime(CSL_MIN_PLAYTIME_STD),
 
                 /* ListCtrl */
-                autoSortColumns(true),
-                colServerS1(0.18f),
-                colServerS2(0.19f),
-                colServerS3(0.09f),
-                colServerS4(0.07f),
-                colServerS5(0.10f),
-                colServerS6(0.14f),
-                colServerS7(0.07f),
-                colServerS8(0.07f),
-                colServerS9(0.08f),
-                colServerEmpty(wxColour(60,15,15)),
-                colServerOff(SYSCOLOUR(wxSYS_COLOUR_GRAYTEXT)),
-                colServerFull(*wxRED),
-                colServerMM1(*wxBLACK),
-                colServerMM2(*wxBLUE),
-                colServerMM3(*wxRED),
-                colServerHigh(wxColour(135,255,110)),
-                colServerPlay(wxColour(240,160,160)),
-                colInfoStripe(wxColour(235,255,235)),
-
-                /* Client */
-                minPlaytime(CSL_MIN_PLAYTIME_STD)
+                AutoSortColumns(true),
+                ColServerEmpty(wxColour(60, 15, 15)),
+                ColServerOff(SYSCOLOUR(wxSYS_COLOUR_GRAYTEXT)),
+                ColServerFull(*wxRED),
+                ColServerMM1(*wxBLACK),
+                ColServerMM2(*wxBLUE),
+                ColServerMM3(*wxRED),
+                ColServerHigh(wxColour(135, 255, 110)),
+                ColServerPlay(wxColour(240, 160, 160)),
+                ColInfoStripe(wxColour(235, 255, 235))
         {}
 
+        static CslSettings& GetInstance()
+        {
+            static CslSettings self;
+            return self;
+        }
+
+        static CslListCtrlSettings* GetListSettings(const wxString& name);
+
+        static void LoadSettings();
+        static void SaveSettings();
+
+        static bool LoadServers(wxUint32 *numm=NULL, wxUint32 *nums=NULL);
+        static void SaveServers();
+
         /* GUI */
-        wxSize frameSize,frameSizeMax;
-        wxString layout;
-        wxInt32 systray;
-        wxStringList layouts;
-        wxInt32 tooltipDelay;
-        bool tts;
-        wxInt32 ttsVolume;
-        wxInt32 updateInterval;
-        bool dontUpdatePlaying;
-        bool showSearch;
-        wxInt32 filterMaster,filterFavourites;
-        wxInt32 waitServerFull;
-        wxInt32 pinggood,pingbad;
-        wxString gameOutputPath,screenOutputPath;
-        wxUint32 cleanupServers;
-        bool cleanupServersKeepFav,cleanupServersKeepStats;
-        bool autoSaveOutput;
-        wxString lastGame;
+        wxSize FrameSize, FrameSizeMax;
+        wxString Layout;
+        wxInt32 Systray;
+        wxStringList Layouts;
+        wxInt32 TooltipDelay;
+        bool TTS;
+        wxInt32 TTSVolume;
+        wxInt32 UpdateInterval;
+        bool DontUpdatePlaying;
+        bool ShowSearch, SearchLAN;
+        wxUint32 ColumnsMaster, ColumnsFavourites;
+        wxInt32 FilterMaster, FilterFavourites;
+        wxInt32 WaitServerFull;
+        wxInt32 PingGood, PingBad;
+        wxString GameOutputPath, ScreenOutputPath;
+        wxUint32 CleanupServers;
+        bool CleanupServersKeepFav, CleanupServersKeepStats;
+        bool AutoSaveOutput;
+        wxString LastGame;
+        wxUint32 MinPlaytime;
 
         /* ListCtrl*/
-        bool autoSortColumns;
-        float colServerS1,colServerS2,colServerS3,colServerS4;
-        float colServerS5,colServerS6,colServerS7,colServerS8,colServerS9;
-        wxColour colServerEmpty,colServerOff,colServerFull;
-        wxColour colServerMM1,colServerMM2,colServerMM3;
-        wxColour colServerHigh;
-        wxColour colServerPlay;
-        wxColour colInfoStripe;
-
-        /* Client */
-        wxUint32 minPlaytime;
+        bool AutoSortColumns;
+        wxColour ColServerEmpty, ColServerOff, ColServerFull;
+        wxColour ColServerMM1, ColServerMM2, ColServerMM3;
+        wxColour ColServerHigh;
+        wxColour ColServerPlay;
+        wxColour ColInfoStripe;
+        vector<CslListCtrlSettings*> CslListSettings;
 };
 
-extern CslSettings *g_cslSettings;
+static inline CslSettings& CslGetSettings()
+{
+    return CslSettings::GetInstance();
+}
 
 #endif // CSLSETTINGS_H

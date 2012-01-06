@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -26,20 +26,16 @@
 */
 
 #define __CSL_NAME_STR          "Cube Server Lister (CSL)"
-#define __CSL_NAME_SHORT_STR    "csl"
+#define __CSL_NAME_SHORT_STR    "CSL"
 
-#define __CSL_VERSION           0,8,1,79
-#define __CSL_VERSION_STR       "0.8.1.79"
-#define __CSL_VERSION_ADD_STR   ""
+#define __CSL_VERSION           0,8,1,80
 
-#define __CSL_COPYRIGHT_STR     "(C) 2007-2009, Glen Masgai <mimosius@users.sourceforge.net>"
+#define __CSL_COPYRIGHT_STR     "(C) 2007-2011, Glen Masgai <mimosius@users.sourceforge.net>"
 
 #define CSL_NAME_STR            wxT(__CSL_NAME_STR)
 #define CSL_NAME_SHORT_STR      wxT(__CSL_NAME_SHORT_STR)
 
-#define CSL_VERSION_STR         wxT(__CSL_VERSION_STR)
-#define CSL_VERSION_ADD_STR     wxT(__CSL_VERSION_ADD_STR)
-#define CSL_VERSION_LONG_STR    wxString(CSL_VERSION_STR wxT(" ") CSL_VERSION_ADD_STR)
+#define CSL_VERSION_STR         wxString(CSL_GET_VERSION(CSL_BUILD_VERSION(__CSL_VERSION)))
 
 #define CSL_DESCRIPTION_STR     _("Tool to monitor cubeengine-based servers.")
 #define CSL_COPYRIGHT_STR       wxT(__CSL_COPYRIGHT_STR)
@@ -48,10 +44,10 @@
 #define CSL_WEBADDRFULL_STR     wxString(wxT("http://") CSL_WEBADDR_STR)
 
 #ifdef UNICODE
-#define __CSL_EMCODING__        wxT(" (Unicode)")
+#define __CSL_ENCODING__        wxT(" (Unicode)")
 #else
-#define __CSL_EMCODING__        wxT(" (ANSI)")
+#define __CSL_ENCODING__        wxT(" (ANSI)")
 #endif
-#define CSL_WXVERSION_STR       wxString(wxVERSION_STRING __CSL_EMCODING__)
+#define CSL_WXVERSION_STR       wxString(wxVERSION_STRING __CSL_ENCODING__)
 
 #endif // CSL_VERSION_H

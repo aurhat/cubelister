@@ -1,15 +1,12 @@
-
-AM_CXXFLAGS = -DLOCALEDIR=\"$(localedir)\" -DDATADIR=\"$(datadir)/csl\"
-
 METASOURCES = AUTO
 
-noinst_HEADERS = CslCharEncoding.h CslEngine.h CslExtendedInfo.h CslGame.h \
-	CslGameAssaultCube.h CslGameBloodFrontier.h CslGameCube.h CslGameSauerbraten.h CslTools.h \
-	CslUDP.h cube_tools.h
-noinst_LIBRARIES = libcslengine.a libcsltools.a
-libcsltools_a_SOURCES = CslCharEncoding.cpp CslTools.cpp
-libcslengine_a_SOURCES = CslEngine.cpp CslExtendedInfo.cpp CslGame.cpp \
-	CslGameAssaultCube.cpp CslGameBloodFrontier.cpp CslGameCube.cpp CslGameSauerbraten.cpp \
-	CslUDP.cpp cube_tools.cpp
+INCLUDES = -I$(top_srcdir)/src/engine/tools -I$(top_srcdir)/src/plugin \
+	-I$(top_srcdir)/src/tools -I$(top_builddir)/src/pch
 
-INCLUDES = -I$(top_builddir)/src/pch
+lib_LTLIBRARIES = libcslengine.la
+libcslengine_la_SOURCES = CslEngine.cpp CslExtendedInfo.cpp CslGame.cpp \
+	CslUDP.cpp
+libcslengine_la_LIBADD = $(top_builddir)/src/engine/tools/libcsltools.la \
+	$(top_builddir)/src/plugin/libcslplugin.la ${WX_LIBS}
+SUBDIRS = tools
+include_HEADERS = CslEngine.h CslExtendedInfo.h CslGame.h CslUDP.h CslVersion.h

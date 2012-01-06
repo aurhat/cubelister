@@ -1,10 +1,9 @@
 /* XPM */
 static const char * sortdsclight_16_xpm[] = {
-"16 16 3 1",
+"16 14 3 1",
 " 	c None",
 ".	c #787878",
 "+	c #FFFFFF",
-"                ",
 "                ",
 "                ",
 "                ",
@@ -14,7 +13,6 @@ static const char * sortdsclight_16_xpm[] = {
 "      .   +     ",
 "       . +      ",
 "        +       ",
-"                ",
 "                ",
 "                ",
 "                ",

@@ -1,4 +1,4 @@
-csldatadir =	$(datadir)/csl/maps/Sauerbraten/256
+csldatadir = $(pkgdatadir)/data/maps/Sauerbraten/256
 
 EXTRA_DIST = $(csldata_DATA)
 csldata_DATA = akroseum.png asteroids.png berlin_wall.png c_egypt.png \

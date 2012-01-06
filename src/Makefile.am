@@ -1,34 +1,34 @@
 
-SUBDIRS = pch libGeoIP irc engine
+SUBDIRS = pch plugin engine tools external irc plugins
 
 bin_PROGRAMS = csl
 if build_cslmapcfgtool
 bin_PROGRAMS += cslmapcfgtool
 endif
 
-AM_CXXFLAGS = -DLOCALEDIR=\"$(localedir)\" -DDATADIR=\"$(datadir)/csl\"
-
-# set the include path found by configure
-AM_CPPFLAGS =  $(all_includes)
+AM_CPPFLAGS = -DPROJECTDIR=\"$(abs_top_srcdir)\" -DBUILDDIR=\"$(abs_builddir)\" \
+	-DLOCALEDIR=\"$(localedir)\" -DDATADIR=\"$(datadir)/csl\" -DPKGLIBDIR=\"$(pkglibdir)\"
 
 # the library search path.
-csl_LDFLAGS = $(all_libraries)
-csl_LDADD = $(top_builddir)/src/engine/libcslengine.a \
-	$(top_builddir)/src/engine/libcsltools.a $(top_builddir)/src/irc/libcslirc.a ${GEOIP_LIBS} ${LIBIRCCLIENT_LIBS} \
-	${SPEECHD_LIBS} ${WX_LIBS} libcslpanelmap.a
-INCLUDES = -I$(top_srcdir)/src/irc/libircclient/include \
-	-I$(top_srcdir)/src/libGeoIP -I$(top_builddir)/src/pch -I$(top_srcdir)/src/img/flags
+csl_LDADD = $(top_builddir)/src/engine/libcslengine.la \
+	$(top_builddir)/src/engine/tools/libcsltools.la $(top_builddir)/src/irc/libcslircengine.la \
+	$(top_builddir)/src/plugin/libcslplugin.la $(top_builddir)/src/tools/libcslguitools.la \
+	${SPEECHD_LIBS} ${WX_LIBS}
+INCLUDES = -I$(top_srcdir)/src/engine -I$(top_srcdir)/src/engine/tools \
+	-I$(top_srcdir)/src/plugin -I$(top_srcdir)/src/tools \
+	-I$(top_builddir)/src/pch -I$(top_srcdir)/src/img/flags
 cslmapcfgtool_SOURCES = CslMapCfgTool.cpp
-cslmapcfgtool_LDADD = libcslpanelmap.a \
-	$(top_builddir)/src/engine/libcsltools.a ${WX_LIBS}
-csl_SOURCES = CslApp.cpp CslArt.cpp CslDlgAbout.cpp CslDlgAddMaster.cpp \
+cslmapcfgtool_LDADD = $(top_builddir)/src/tools/libcslguitools.la \
+	$(top_builddir)/src/engine/tools/libcsltools.la ${WX_LIBS}
+csl_SOURCES = CslApp.cpp CslDlgAbout.cpp CslDlgAddMaster.cpp \
 	CslDlgAddServer.cpp CslDlgConnectPass.cpp CslDlgConnectWait.cpp CslDlgExtended.cpp \
 	CslDlgOutput.cpp CslDlgSettings.cpp CslDlgTraffic.cpp CslFrame.cpp CslGameConnection.cpp \
-	CslGameProcess.cpp CslGeoIP.cpp CslIPC.cpp CslIRC.cpp CslListCtrl.cpp \
-	CslListCtrlCountry.cpp CslListCtrlInfo.cpp CslListCtrlPlayer.cpp CslListCtrlPlayerSearch.cpp \
-	CslListCtrlServer.cpp CslMenu.cpp CslStatusBar.cpp CslTTS.cpp CslToolTip.cpp \
-	CslVersionCheck.cpp
-noinst_LIBRARIES = libcslpanelmap.a
-libcslpanelmap_a_SOURCES = CslPanelMap.cpp
-noinst_HEADERS = CslApp.h CslGameConnection.h CslIRC.h CslListCtrl.h \
-	CslListCtrlPlayerSearch.h CslTTS.h CslToolTip.h
+	CslGameProcess.cpp CslIPC.cpp CslIRC.cpp CslListCtrlCountry.cpp CslListCtrlInfo.cpp \
+	CslListCtrlPlayer.cpp CslListCtrlPlayerSearch.cpp CslListCtrlServer.cpp CslSettings.cpp \
+	CslStatusBar.cpp CslTTS.cpp CslVersionCheck.cpp CslWizardGameSettings.cpp
+noinst_HEADERS = CslApp.h CslGameConnection.h CslIRC.h \
+	CslListCtrlPlayerSearch.h CslTTS.h CslWizardGameSettings.h
+
+if with_internal_libircclient
+INCLUDES += -I$(top_srcdir)/src/external/libircclient/include#include
+endif

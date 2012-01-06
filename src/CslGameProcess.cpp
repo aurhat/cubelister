@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -18,10 +18,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "Csl.h"
-#include "engine/CslGame.h"
+#include <Csl.h>
+#include <CslToolTip.h>
+#include <CslGame.h>
 #include "CslDlgOutput.h"
-#include "CslToolTip.h"
 #include "CslSettings.h"
 #include "CslGameProcess.h"
 
@@ -46,7 +46,7 @@ void CslGameProcess::OnTerminate(int pid,int code)
     m_watch.Pause();
 
     wxUint32 time=m_watch.Time()/1000;
-    if (time>g_cslSettings->minPlaytime)
+    if (time>CslGetSettings().MinPlaytime)
         m_info->SetLastPlayTime(time);
 
     // Cube returns with 1 - weird
@@ -57,8 +57,8 @@ void CslGameProcess::OnTerminate(int pid,int code)
     ProcessOutput(INPUT_STREAM);
     ProcessOutput(ERROR_STREAM);
 
-    if (g_cslSettings->autoSaveOutput && !g_cslSettings->gameOutputPath.IsEmpty())
-        CslDlgOutput::SaveFile(g_cslSettings->gameOutputPath);
+    if (CslGetSettings().AutoSaveOutput && !CslGetSettings().GameOutputPath.IsEmpty())
+        CslDlgOutput::SaveFile(CslGetSettings().GameOutputPath);
 
     wxCommandEvent evt(wxCSL_EVT_PROCESS);
     evt.SetClientData(m_info);
@@ -90,14 +90,14 @@ void CslGameProcess::ProcessOutput(wxInt32 type)
     {
         stream->Read((void*)m_self->m_buffer,CSL_PROCESS_BUFFER_SIZE-1);
 
-        wxUint32 last=stream->LastRead();
+        wxInt32 last=stream->LastRead();
         if (!last)
             break;
 
         m_self->m_buffer[last]=0;
 
         //Cube has color codes in it's output
-        m_self->m_info->GetGame().ProcessOutput(m_self->m_buffer,&last);
+        m_self->m_info->GetGame().ProcessOutput(m_self->m_buffer);
         CslDlgOutput::AddOutput(m_self->m_buffer,last);
         //LOG_DEBUG("%s",buf);
     }

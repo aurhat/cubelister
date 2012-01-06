@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -19,7 +19,7 @@
  ***************************************************************************/
 
 #include "Csl.h"
-#include "engine/CslGame.h"
+#include "CslGame.h"
 #include "CslIPC.h"
 
 DEFINE_EVENT_TYPE(wxCSL_EVT_IPC)

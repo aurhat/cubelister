@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -80,7 +80,7 @@ void CslPlayerStats::DeleteStats()
 {
     m_status=CSL_STATS_NEED_IDS;
     loopvrev(m_stats) delete m_stats[i];
-    m_stats.setsize(0);
+    m_stats.setsizenodelete(0);
 }
 
 bool CslPlayerStats::AddId(wxInt32 id)
@@ -167,7 +167,7 @@ void CslTeamStats::RemoveStats(CslTeamStatsData *data)
 void CslTeamStats::DeleteStats()
 {
     loopvrev(m_stats) delete m_stats[i];
-    m_stats.setsize(0);
+    m_stats.setsizenodelete(0);
 }
 
 void CslTeamStats::Reset()

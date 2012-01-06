@@ -22,7 +22,7 @@
   <kdevautoproject>
     <general>
       <activetarget>src/csl</activetarget>
-      <useconfiguration>debug</useconfiguration>
+      <useconfiguration>optimized</useconfiguration>
     </general>
     <run>
       <mainprogram>/home/mimosius/Documents/Development/csl</mainprogram>
@@ -55,15 +55,15 @@
         <ccompiler>kdevgccoptions</ccompiler>
         <cxxcompiler>kdevgppoptions</cxxcompiler>
         <f77compiler>kdevg77options</f77compiler>
-        <cxxflags>-O0 -ggdb3 -pg</cxxflags>
+        <cxxflags>-O0 -ggdb3</cxxflags>
         <envvars/>
         <topsourcedir/>
-        <cppflags/>
+        <cppflags>-D__DEBUG__</cppflags>
         <ldflags/>
         <ccompilerbinary/>
         <cxxcompilerbinary/>
         <f77compilerbinary/>
-        <cflags>-O0 -ggdb3 -pg</cflags>
+        <cflags>-O0 -ggdb3</cflags>
         <f77flags/>
       </debug-unicode>
       <debug>
@@ -72,15 +72,15 @@
         <ccompiler>kdevgccoptions</ccompiler>
         <cxxcompiler>kdevgppoptions</cxxcompiler>
         <f77compiler>kdevg77options</f77compiler>
-        <cxxflags>-O0 -ggdb3 -pg</cxxflags>
+        <cxxflags>-O0 -ggdb3</cxxflags>
         <envvars/>
         <topsourcedir/>
-        <cppflags/>
+        <cppflags>-D__DEBUG__</cppflags>
         <ldflags/>
         <ccompilerbinary/>
         <cxxcompilerbinary/>
         <f77compilerbinary/>
-        <cflags>-O0 -ggdb3 -pg</cflags>
+        <cflags>-O0 -ggdb3</cflags>
         <f77flags/>
       </debug>
       <optimized>
@@ -88,16 +88,16 @@
         <ccompiler>kdevgccoptions</ccompiler>
         <cxxcompiler>kdevgppoptions</cxxcompiler>
         <f77compiler>kdevg77options</f77compiler>
-        <cxxflags>-O2</cxxflags>
+        <cxxflags>-O3 -ggdb3</cxxflags>
         <envvars/>
         <configargs>--with-wx-config=wx-config-2.8</configargs>
         <topsourcedir/>
-        <cppflags/>
+        <cppflags>-D__DEBUG__</cppflags>
         <ldflags/>
         <ccompilerbinary/>
         <cxxcompilerbinary/>
         <f77compilerbinary/>
-        <cflags/>
+        <cflags>-O3 -ggdb3</cflags>
         <f77flags/>
       </optimized>
       <optimized-unicode>
@@ -105,21 +105,21 @@
         <ccompiler>kdevgccoptions</ccompiler>
         <cxxcompiler>kdevgppoptions</cxxcompiler>
         <f77compiler>kdevg77options</f77compiler>
-        <cxxflags>-O2</cxxflags>
+        <cxxflags>-O3 -ggdb3</cxxflags>
         <envvars/>
         <configargs>--with-wx-config=wx-config-2.8u</configargs>
         <topsourcedir/>
-        <cppflags/>
+        <cppflags>-D__DEBUG__</cppflags>
         <ldflags/>
         <ccompilerbinary/>
         <cxxcompilerbinary/>
         <f77compilerbinary/>
-        <cflags/>
+        <cflags>-O3 -ggdb3</cflags>
         <f77flags/>
       </optimized-unicode>
       <default>
         <envvars/>
-        <configargs/>
+        <configargs>--with-wx-config=/usr/bin/wx-config</configargs>
         <builddir/>
         <topsourcedir/>
         <cppflags/>
@@ -130,16 +130,16 @@
         <ccompilerbinary/>
         <cxxcompilerbinary/>
         <f77compilerbinary/>
-        <cflags>-O0 -ggdb3</cflags>
-        <cxxflags>-O0 -ggdb3</cxxflags>
+        <cflags>-g</cflags>
+        <cxxflags>-g</cxxflags>
         <f77flags/>
       </default>
       <debug-3>
         <envvars/>
-        <configargs>--with-wx-config=wx-config-3.0d</configargs>
+        <configargs>--with-wx-config=wx-config-2.9</configargs>
         <builddir>debug-3</builddir>
         <topsourcedir/>
-        <cppflags/>
+        <cppflags>-D__DEBUG__</cppflags>
         <ldflags/>
         <ccompiler>kdevgccoptions</ccompiler>
         <cxxcompiler>kdevgppoptions</cxxcompiler>
@@ -147,10 +147,27 @@
         <ccompilerbinary/>
         <cxxcompilerbinary/>
         <f77compilerbinary/>
-        <cflags>-O0 -g3 -pg</cflags>
-        <cxxflags>-O0 -g3 -pg</cxxflags>
+        <cflags>-O0 -ggdb3</cflags>
+        <cxxflags>-O0 -ggdb3</cxxflags>
         <f77flags/>
       </debug-3>
+      <default-debug>
+        <envvars/>
+        <configargs>--with-wx-config=/usr/bin/wx-config</configargs>
+        <builddir>default-debug</builddir>
+        <topsourcedir/>
+        <cppflags>-D__DEBUG__</cppflags>
+        <ldflags/>
+        <ccompiler>kdevgccoptions</ccompiler>
+        <cxxcompiler>kdevgppoptions</cxxcompiler>
+        <f77compiler>kdevg77options</f77compiler>
+        <ccompilerbinary/>
+        <cxxcompilerbinary/>
+        <f77compilerbinary/>
+        <cflags>-O0 -ggdb3</cflags>
+        <cxxflags>-O0 -ggdb3</cxxflags>
+        <f77flags/>
+      </default-debug>
     </configurations>
     <configurations>
       <default>
@@ -163,8 +180,8 @@
         <envvar value="1" name="WANT_AUTOMAKE_1_6" />
       </envvars>
       <abortonerror>true</abortonerror>
-      <runmultiplejobs>false</runmultiplejobs>
-      <numberofjobs>1</numberofjobs>
+      <runmultiplejobs>true</runmultiplejobs>
+      <numberofjobs>3</numberofjobs>
       <dontact>false</dontact>
       <makebin/>
       <prio>0</prio>
@@ -252,6 +269,12 @@
       <designer>/usr/lib/qt3/bin/designer</designer>
       <designerpluginpaths/>
     </qt>
+    <splitheadersource>
+      <enabled>false</enabled>
+      <synchronize>true</synchronize>
+      <orientation>Vertical</orientation>
+    </splitheadersource>
+    <references/>
     <codecompletion>
       <automaticCodeCompletion>true</automaticCodeCompletion>
       <automaticArgumentsHint>true</automaticArgumentsHint>
@@ -263,11 +286,11 @@
       <completionBoxItemOrder>0</completionBoxItemOrder>
       <howEvaluationContextMenu>true</howEvaluationContextMenu>
       <showCommentWithArgumentHint>true</showCommentWithArgumentHint>
-      <statusBarTypeEvaluation>true</statusBarTypeEvaluation>
+      <statusBarTypeEvaluation>false</statusBarTypeEvaluation>
       <namespaceAliases>std=_GLIBCXX_STD;__gnu_cxx=std</namespaceAliases>
       <processPrimaryTypes>true</processPrimaryTypes>
       <processFunctionArguments>true</processFunctionArguments>
-      <preProcessAllHeaders>false</preProcessAllHeaders>
+      <preProcessAllHeaders>true</preProcessAllHeaders>
       <parseMissingHeadersExperimental>false</parseMissingHeadersExperimental>
       <resolveIncludePathsUsingMakeExperimental>false</resolveIncludePathsUsingMakeExperimental>
       <alwaysParseInBackground>true</alwaysParseInBackground>
@@ -283,12 +306,6 @@
       <inlineGet>true</inlineGet>
       <inlineSet>true</inlineSet>
     </creategettersetter>
-    <splitheadersource>
-      <enabled>false</enabled>
-      <synchronize>true</synchronize>
-      <orientation>Vertical</orientation>
-    </splitheadersource>
-    <references/>
   </kdevcppsupport>
   <cppsupportpart>
     <filetemplates>
@@ -299,7 +316,7 @@
   <kdevdebugger>
     <general>
       <gdbpath/>
-      <dbgshell/>
+      <dbgshell>libtool --mode=execute</dbgshell>
       <configGdbScript/>
       <runShellScript/>
       <runGdbScript/>

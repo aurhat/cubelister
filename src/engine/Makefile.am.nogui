@@ -1,0 +1,20 @@
+METASOURCES = AUTO
+
+INCLUDES = -I$(top_srcdir)/src -I$(top_builddir)/src/pch
+AM_CXXFLAGS = -DLOCALEDIR=\"$(localedir)\" -DDATADIR=\"$(datadir)/csl\"
+
+noinst_HEADERS = CslCharEncoding.h CslEngine.h CslExtendedInfo.h CslGame.h \
+	CslGameAssaultCube.h CslGameBloodFrontier.h CslGameCube.h CslGameSauerbraten.h CslTools.h \
+	CslUDP.h cube_tools.h
+noinst_LIBRARIES = libcslengine.a libcslengine_nogui.a libcsltools.a \
+	libcsltools_nogui.a
+libcsltools_a_SOURCES = CslCharEncoding.cpp CslTools.cpp
+libcslengine_a_SOURCES = CslEngine.cpp CslExtendedInfo.cpp CslGame.cpp \
+	CslGameAssaultCube.cpp CslGameBloodFrontier.cpp CslGameCube.cpp CslGameSauerbraten.cpp \
+	CslUDP.cpp cube_tools.cpp
+libcslengine_nogui_a_SOURCES = CslEngine.cpp CslExtendedInfo.cpp CslGame.cpp \
+	CslGameAssaultCube.cpp CslGameBloodFrontier.cpp CslGameCube.cpp CslGameSauerbraten.cpp \
+	CslUDP.cpp cube_tools.cpp
+libcslengine_nogui_a_CXXFLAGS = -DwxUSE_GUI="0"
+libcsltools_nogui_a_SOURCES = CslCharEncoding.cpp CslTools.cpp
+libcsltools_nogui_a_CXXFLAGS = -DwxUSE_GUI="0"

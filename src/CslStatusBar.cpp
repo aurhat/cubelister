@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -41,6 +41,8 @@ CslStatusBar::CslStatusBar(wxWindow *parent) : wxStatusBar(parent, wxID_ANY), m_
     SetFieldsCount(FIELD_END);
     int styles[FIELD_END]={wxSB_FLAT,wxSB_FLAT};
     SetStatusStyles(FIELD_END,styles);
+    int widths[FIELD_END]={20, -1};
+    SetStatusWidths(FIELD_END, widths);
     m_bmp=new wxStaticBitmap(this,wxID_ANY,wxBitmap(grey_16_xpm));
 }
 
@@ -59,9 +61,6 @@ void CslStatusBar::OnSize(wxSizeEvent& event)
 #endif
     m_bmp->Move(rect.x+(rect.width-size.x)/2+CSL_STATUS_IMG_OFFSET,
                 rect.y+(rect.height-size.y)/2+CSL_STATUS_IMG_OFFSET);
-
-    int widths[FIELD_END]={20,-1};
-    SetStatusWidths(FIELD_END,widths);
 
     event.Skip();
 }

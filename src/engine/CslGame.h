@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -58,10 +58,20 @@ enum
 #define CSL_SERVER_IS_BAN(x)        (x>-1&&x&CSL_SERVER_BAN)
 #define CSL_SERVER_IS_BLACKLIST(x)  (x>-1&&x&CSL_SERVER_BLACKLIST)
 
+enum
+{
+    CSL_GAME_GET_PATH_BINARY = 0,
+    CSL_GAME_GET_PATH_GAME,
+    CSL_GAME_GET_PATH_CONFIG
+};
 
+class CslGame;
 class CslMaster;
 class CslServerInfo;
 
+typedef vector<CslGame*> CslGames;
+typedef vector<CslMaster*> CslMasters;
+typedef vector<CslServerInfo*> CslServerInfos;
 
 class CslMasterConnection
 {
@@ -102,13 +112,15 @@ class CslMasterConnection
 class CslGameClientSettings
 {
     public:
-        CslGameClientSettings() {}
+        CslGameClientSettings() : Width(0), Height(0), Fullscreen(0), Depth(0), DepthZ(0), AA(0), Shader(0) { }
         CslGameClientSettings(const wxString& binary,const wxString& path,const wxString& configpath,
                               const wxString& options,const wxString& preScript,const wxString& postScript) :
                 Binary(binary),GamePath(path),ConfigPath(configpath),
                 Options(options),PreScript(preScript),PostScript(postScript) {}
 
+        wxInt32 Width, Height, Fullscreen, Depth, DepthZ, AA, Shader;
         wxString Binary,GamePath,ConfigPath,Options,PreScript,PostScript;
+        wxArrayString PackageDirs;
 };
 
 class CslGame
@@ -121,7 +133,7 @@ class CslGame
 
         bool operator==(const CslGame& game) const
         {
-            return m_name.CmpNoCase(game.m_name)==0;
+            return m_fourcc==game.m_fourcc;
         }
 
         wxInt32 AddMaster(CslMaster *master);
@@ -130,59 +142,78 @@ class CslGame
         bool AddServer(CslServerInfo *info,wxInt32 masterID=-1);
         bool DeleteServer(CslServerInfo *info);
 
-        vector<CslMaster*>& GetMasters() { return m_masters; }
-        vector<CslServerInfo*>& GetServers() { return m_servers; }
-        void GetFavourites(vector <CslServerInfo*>& servers);
-        void GetExtServers(vector <CslServerInfo*>& servers,bool all=false);
-        CslServerInfo* FindServerByAddr(const wxString host,wxUint16 port);
+        CslMasters& GetMasters() { return m_masters; }
+        CslServerInfos& GetServers() { return m_servers; }
+        void GetFavourites(CslServerInfos& servers);
+        void GetExtServers(CslServerInfos& servers, bool all=false);
+        CslServerInfo* FindServerByAddr(const wxString& host, wxUint16 port);
         CslServerInfo* FindServerByAddr(const wxIPV4address& addr);
         static wxString& ProcessScript(const CslServerInfo& info,wxUint32 connectMode,wxString& script);
 
-        wxInt32 GetId() { return m_gameId; }
         wxString GetName() { return m_name; }
+        wxUint32 GetFourCC() { return m_fourcc; }
         wxUint32 GetCapabilities() { return m_capabilities; }
         CslMasterConnection& GetDefaultMasterConnection() { return m_defaultMasterConnection; }
 
         CslGameClientSettings& GetClientSettings() { return  m_clientSettings; }
 
+#if wxUSE_GUI
         const wxBitmap& GetIcon(wxInt32 size) const;
+#endif //wxUSE_GUI
 
-        virtual void GetPlayerstatsDescriptions(vector<wxString>& desc) const;
-        virtual const wxChar* GetWeaponName(wxInt32 n) const { return wxEmptyString; }
+        enum
+        {
+            PLAYER_STATS_NAME,
+            PLAYER_STATS_TEAM,
+            PLAYER_STATS_FRAGS,
+            PLAYER_STATS_DEATHS,
+            PLAYER_STATS_TEAMKILLS,
+            PLAYER_STATS_PING,
+            PLAYER_STATS_KPD,
+            PLAYER_STATS_ACCURACY,
+            PLAYER_STATS_HEALTH,
+            PLAYER_STATS_ARMOUR,
+            PLAYER_STATS_WEAPON
+        };
+
+        virtual wxInt32 GetPlayerstatsDescriptions(const wxChar ***desc) const;
+        virtual const wxChar* GetWeaponName(wxInt32 n, wxInt32 prot) const { return wxEmptyString; }
         virtual bool ModeHasFlags(wxInt32 mode,wxInt32 prot) const { return false; }
         virtual bool ModeHasBases(wxInt32 mode,wxInt32 prot) const { return false; }
         virtual wxInt32 ModeScoreLimit(wxInt32 mode,wxInt32 prot) const { return -1; }
         virtual wxInt32 GetBestTeam(CslTeamStats& stats,wxInt32 prot) const { return -1; }
         virtual wxUint16 GetDefaultGamePort() const = 0;
         virtual wxUint16 GetInfoPort(wxUint16 gamePort=0) const = 0;
-        virtual void PingDefault(ucharbuf& buf,CslServerInfo& info) const {};
+        virtual wxUint16 GetBroadcastPort() { return 0; }
+        virtual bool PingDefault(ucharbuf& buf, CslServerInfo& info) const { return false; }
         virtual bool ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const = 0;
-        virtual bool ParsePlayerPong(wxUint32 protocol,ucharbuf& buf,CslPlayerStatsData& info) const { return false; }
-        virtual bool ParseTeamPong(wxUint32 protocol,ucharbuf& buf,CslTeamStatsData& info) const { return false; }
-        virtual bool ValidateClientSettings(CslGameClientSettings *settings=NULL,wxString *msg=NULL) { return true; }
+        virtual bool ParsePlayerPong(wxInt32 protocol, ucharbuf& buf, CslPlayerStatsData& info) const { return false; }
+        virtual bool ParseTeamPong(wxInt32 protocol, ucharbuf& buf, CslTeamStatsData& info) const { return false; }
+        virtual wxInt32 GetClientPath(wxInt32 type, const wxString& path, wxArrayString& result, wxString& error) const { return 0; }
+        virtual bool ValidateClientSettings(CslGameClientSettings& settings, wxString& errmsg) const { return true; }
         virtual void SetClientSettings(const CslGameClientSettings& settings) { m_clientSettings=settings; }
-        virtual wxString GameStart(CslServerInfo *info,wxUint32 mode,wxString& error) = 0;
+        virtual wxString GameStart(CslServerInfo *info, wxInt32 mode, wxString& error) = 0;
         virtual wxInt32 GameEnd(wxString& error) = 0;
         virtual bool GetMapImagePaths(wxArrayString& paths) const { return false; }
         //hooks for workarounds or special handling
-        virtual void ProcessOutput(char *data,wxUint32 *len) const {}
+        virtual void ProcessOutput(char *data) const { }
         virtual bool ReturnOk(wxInt32 code) const { return code==0; }
 
     private:
-        vector<CslMaster*> m_masters;
-        vector<CslServerInfo*> m_servers;
-        void SetGameID(wxInt32 gameId) { m_gameId=gameId; }
+        CslMasters m_masters;
+        CslServerInfos m_servers;
 
     protected:
         wxString m_name;
-        wxInt32 m_gameId;
+        wxUint32 m_fourcc;
         wxUint32 m_capabilities;
+#if wxUSE_GUI
         wxBitmap m_icon16,m_icon24;
+#endif //wxUSE_GUI
 
         CslMasterConnection m_defaultMasterConnection;
         CslGameClientSettings m_clientSettings;
 };
-
 
 class CslMaster
 {
@@ -205,13 +236,13 @@ class CslMaster
         CslGame* GetGame() const { return m_game; }
         wxInt32 GetId() const { return m_id; }
         CslMasterConnection& GetConnection() { return m_connection; }
-        vector<CslServerInfo*>& GetServers() { return m_servers; }
+        CslServerInfos& GetServers() { return m_servers; }
 
     protected:
         CslGame *m_game;
         wxInt32 m_id;
         CslMasterConnection m_connection;
-        vector<CslServerInfo*> m_servers;
+        CslServerInfos m_servers;
 
         void Init(CslGame *game,wxUint32 id);
         void AddServer(CslServerInfo *info);
@@ -235,15 +266,15 @@ class CslServerEvents
 
         CslServerEvents() : m_flags(EVENT_NONE),m_events(EVENT_NONE) {}
 
-        void RegisterEvents(wxUint32 flags) { m_flags|=flags; }
-        void UnRegisterEvents(wxUint32 flags) { m_flags&=~flags; }
-        bool HasRegisteredEvent(wxUint32 flag) const { return (m_flags&flag)!=0; }
+        void RegisterEvents(wxUint32 flags) { CSL_FLAG_SET(m_flags, flags); }
+        void UnRegisterEvents(wxUint32 flags) { CSL_FLAG_UNSET(m_flags, flags); }
+        bool HasRegisteredEvent(wxUint32 flag) const { return CSL_FLAG_CHECK(m_flags, flag); }
         wxUint32 GetRegisteredEvents() const { return m_flags; }
 
         void ClearEvents() { m_events=EVENT_NONE; }
-        void SetEvents(wxUint32 flags) { m_events|=flags; }
+        void SetEvents(wxUint32 flags) { CSL_FLAG_SET(m_events, flags); }
         bool HasEvents() const { return m_events!=EVENT_NONE; }
-        bool HasEvent(wxUint32 flag) const { return (m_events&flag)!=0; }
+        bool HasEvent(wxUint32 flag) const { return CSL_FLAG_CHECK(m_events, flag); }
 
     private:
         wxUint32 m_flags,m_events;
@@ -289,14 +320,14 @@ class CslServerInfo : public CslExtendedInfo, public CslServerEvents
         void Lock(bool lock=true);
         bool IsLocked() const { return m_lock>0; }
 
-        void SetDefault() { View|=CSL_VIEW_DEFAULT; }
-        void SetFavourite() { View|=CSL_VIEW_FAVOURITE; }
-        void RemoveDefault() { View&=~CSL_VIEW_DEFAULT; }
-        void RemoveFavourite() { View&=~CSL_VIEW_FAVOURITE; }
+        void SetDefault() { CSL_FLAG_SET(View, CSL_VIEW_DEFAULT); }
+        void SetFavourite() { CSL_FLAG_SET(View, CSL_VIEW_FAVOURITE); }
+        void RemoveDefault() { CSL_FLAG_UNSET(View, CSL_VIEW_DEFAULT); }
+        void RemoveFavourite() { CSL_FLAG_UNSET(View, CSL_VIEW_FAVOURITE); }
 
         bool IsUnused() const { return View==0; }
-        bool IsDefault() const { return (View&CSL_VIEW_DEFAULT)>0; }
-        bool IsFavourite() const { return (View&CSL_VIEW_FAVOURITE)>0; }
+        bool IsDefault() const { return CSL_FLAG_CHECK(View, CSL_VIEW_DEFAULT); }
+        bool IsFavourite() const { return CSL_FLAG_CHECK(View, CSL_VIEW_FAVOURITE); }
 
         bool HasStats() const;
 

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -121,6 +121,7 @@ void CslDlgExtended::set_properties()
     m_teamLabel.Add(label_team7);
     m_teamLabel.Add(label_team8);
 
+    list_ctrl_players->SetName(wxT("playersfull0"));
     list_ctrl_players->ListInit(CslListCtrlPlayer::SIZE_FULL);
 #ifdef __WXMSW__
     list_ctrl_players->SetMinSize(wxSize(520,270));
@@ -190,7 +191,6 @@ void CslDlgExtended::do_layout()
     grid_sizer_author->Add(label_author_prefix, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_author->Add(label_author, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_map_label->Add(grid_sizer_author, 1, wxALIGN_CENTER_HORIZONTAL, 2);
-    grid_sizer_map_label->AddGrowableRow(2);
     grid_sizer_map_label->AddGrowableCol(0);
     sizer_map_label->Add(grid_sizer_map_label, 1, wxALIGN_CENTER_VERTICAL, 0);
     grid_sizer_info_team->Add(sizer_map_label, 1, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 4);
@@ -345,7 +345,7 @@ void CslDlgExtended::UpdateMap()
     }
 }
 
-void CslDlgExtended::ClearTeamScoreLabel(const wxUint32 start,const wxUint32 end)
+void CslDlgExtended::ClearTeamScoreLabel(wxUint32 start, wxUint32 end)
 {
     for (wxUint32 i=start;i<end;i++)
     {
@@ -492,8 +492,9 @@ void CslDlgExtended::UpdateTeamData()
     panel_map->UpdateBases(m_mapInfo.m_bases,bases);
     ClearTeamScoreLabel(lu ? lu : 1,lc);
 
-    s=FormatSeconds(stats.TimeRemain>-1 ? stats.TimeRemain*60 : 0,true,true);
-    if (s.IsEmpty())
+    if (stats.TimeRemain>0)
+        s=FormatSeconds(stats.TimeRemain, true, true);
+    else
         s=_("Time is up");
     label_remaining->SetLabel(s);
     SetFixedLabelText(label_mode,m_info->GameMode);
@@ -614,7 +615,7 @@ void CslDlgExtended::DoShow(CslServerInfo *info)
     SetFixedLabelText(label_server,m_info->GetBestDescription());
     SetFixedLabelText(label_mode,m_info->GameMode);
     if (m_info->TimeRemain>0)
-        s=FormatSeconds(m_info->TimeRemain*60,true,true);
+        s=FormatSeconds(m_info->TimeRemain, true, true);
     else
         s=_("Time is up");
     label_remaining->SetLabel(s);

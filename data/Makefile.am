@@ -1,4 +1,4 @@
-csldatadir = $(datadir)/csl
+csldatadir = $(pkgdatadir)/data
 if with_internal_geoipdatabase
 csldata_DATA = GeoIP.dat
 endif

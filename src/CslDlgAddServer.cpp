@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -19,7 +19,7 @@
  ***************************************************************************/
 
 #include "Csl.h"
-#include "engine/CslEngine.h"
+#include "CslEngine.h"
 #include "CslApp.h"
 #include "CslDlgAddServer.h"
 
@@ -49,8 +49,7 @@ CslDlgAddServer::CslDlgAddServer(wxWindow* parent,int id,const wxString& title,
 {
     // begin wxGlade: CslDlgAddServer::CslDlgAddServer
     sizer_address_staticbox = new wxStaticBox(this, -1, wxEmptyString);
-    const wxString choice_gametype_choices[] =
-    {
+    const wxString choice_gametype_choices[] = {
         _("default")
     };
     choice_gametype = new wxChoice(this, CHOICE_CTRL_GAMETYPE, wxDefaultPosition, wxDefaultSize, 1, choice_gametype_choices, 0);
@@ -123,20 +122,20 @@ void CslDlgAddServer::InitDlg(CslServerInfo *info)
     m_info=info;
 
     choice_gametype->Clear();
-    vector<CslGame*>& games=::wxGetApp().GetCslEngine()->GetGames();
-    loopv(games) choice_gametype->Append(games[i]->GetName(),(void*)games[i]->GetId());
+    CslGames& games=::wxGetApp().GetCslEngine()->GetGames();
+    loopv(games) choice_gametype->Append(games[i]->GetName(), (void*)(wxUIntPtr)games[i]->GetFourCC());
     choice_gametype->SetSelection(0);
     UpdatePort(SPIN_CTRL_GAMEPORT);
 }
 
 void CslDlgAddServer::UpdatePort(wxInt32 type)
 {
-    wxInt32 gameID=(wxInt32)(long)choice_gametype->GetClientData(choice_gametype->GetSelection());
-    vector<CslGame*>& games=::wxGetApp().GetCslEngine()->GetGames();
+    wxUint32 fourcc=(wxUint32)(long)choice_gametype->GetClientData(choice_gametype->GetSelection());
+    CslGames& games=::wxGetApp().GetCslEngine()->GetGames();
 
     loopv(games)
     {
-        if (games[i]->GetId()==gameID)
+        if (games[i]->GetFourCC()==fourcc)
         {
             if (type==SPIN_CTRL_GAMEPORT)
                 spin_ctrl_gameport->SetValue(games[i]->GetDefaultGamePort());
@@ -177,14 +176,15 @@ void CslDlgAddServer::OnCommandEvent(wxCommandEvent& event)
             if (host.IsEmpty())
                 return;
 
-            wxInt32 gameID=(wxInt32)(long)choice_gametype->GetClientData(choice_gametype->GetSelection());
+            CslGames& games=::wxGetApp().GetCslEngine()->GetGames();
+            wxUint32 fourcc=(wxUint32)(long)choice_gametype->GetClientData(choice_gametype->GetSelection());
 
-            vector<CslGame*>& games=::wxGetApp().GetCslEngine()->GetGames();
             loopv(games)
             {
-                if (games[i]->GetId()==gameID)
+                if (games[i]->GetFourCC()==fourcc)
                 {
                     m_info->Create(games[i],host,gameport,infoport);
+
                     if (games[i]->AddServer(m_info))
                     {
                         ::wxGetApp().GetCslEngine()->ResolveHost(m_info);

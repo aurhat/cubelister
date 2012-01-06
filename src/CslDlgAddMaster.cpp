@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -19,7 +19,7 @@
  ***************************************************************************/
 
 #include "Csl.h"
-#include "engine/CslEngine.h"
+#include "CslEngine.h"
 #include "CslApp.h"
 #include "CslDlgAddMaster.h"
 
@@ -40,21 +40,19 @@ enum
 };
 
 
-CslDlgAddMaster::CslDlgAddMaster(wxWindow* parent,const wxInt32 id,
+CslDlgAddMaster::CslDlgAddMaster(wxWindow* parent, wxInt32 id,
                                  const wxString& title,const wxPoint& pos,
                                  const wxSize& size,long style):
         wxDialog(parent, id, title, pos, size, style),
-        m_gameID(NULL)
+        m_fourcc(NULL)
 {
     // begin wxGlade: CslDlgAddMaster::CslDlgAddMaster
     sizer_address_staticbox = new wxStaticBox(this, -1, wxEmptyString);
-    const wxString choice_gametype_choices[] =
-    {
+    const wxString choice_gametype_choices[] = {
         _("default")
     };
     choice_gametype = new wxChoice(this, CHOICE_CTRL_GAMETYPE, wxDefaultPosition, wxDefaultSize, 1, choice_gametype_choices, 0);
-    const wxString choice_mastertype_choices[] =
-    {
+    const wxString choice_mastertype_choices[] = {
         _("default")
     };
     choice_mastertype = new wxChoice(this, CHOICE_CTRL_MASTERTYPE, wxDefaultPosition, wxDefaultSize, 1, choice_mastertype_choices, 0);
@@ -128,20 +126,22 @@ void CslDlgAddMaster::do_layout()
     CentreOnParent();
 }
 
-void CslDlgAddMaster::InitDlg(wxInt32 *gameID)
+void CslDlgAddMaster::InitDlg(wxUint32 *fourcc)
 {
     wxInt32 id=-1;
 
-    m_gameID=gameID;
+    m_fourcc=fourcc;
 
     choice_gametype->Clear();
     choice_mastertype->Clear();
 
-    vector<CslGame*>& games=::wxGetApp().GetCslEngine()->GetGames();
+    CslGames& games=::wxGetApp().GetCslEngine()->GetGames();
     loopv(games)
     {
-        choice_gametype->Append(games[i]->GetName(),(void*)games[i]->GetId());
-        if (games[i]->GetId()==*gameID)
+        wxUint32 fcc=games[i]->GetFourCC();
+        choice_gametype->Append(games[i]->GetName(), (void*)(wxUIntPtr)fcc);
+
+        if (*fourcc==fcc)
             id=i;
     }
 
@@ -190,17 +190,17 @@ void CslDlgAddMaster::OnCommandEvent(wxCommandEvent& event)
             if (!IsValid())
                 break;
 
-            wxInt32 gameID=(wxInt32)(long)choice_gametype->GetClientData(choice_gametype->GetSelection());
+            wxUint32 fourcc=(wxUint32)(long)choice_gametype->GetClientData(choice_gametype->GetSelection());
             wxInt32 type=(wxInt32)(long)choice_mastertype->GetClientData(choice_mastertype->GetSelection());
             CslGame *game=NULL;
-            vector<CslGame*>& games=::wxGetApp().GetCslEngine()->GetGames();
+            CslGames& games=::wxGetApp().GetCslEngine()->GetGames();
 
             loopv(games)
             {
-                if (games[i]->GetId()==gameID)
+                if (games[i]->GetFourCC()==fourcc)
                 {
                     game=games[i];
-                    *m_gameID=i;
+                    *m_fourcc=i;
                     break;
                 }
             }
@@ -224,7 +224,7 @@ void CslDlgAddMaster::OnCommandEvent(wxCommandEvent& event)
             else
                 connection=CslMasterConnection(addr,port);
 
-            vector<CslMaster*>& masters=game->GetMasters();
+            CslMasters& masters=game->GetMasters();
             loopv(masters)
             {
                 if (masters[i]->GetConnection()==connection)

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -220,7 +220,7 @@ void event_ctcp_request(irc_session_t *session,const char* WXUNUSED(event),const
     if (!strcasecmp(params[0],"VERSION"))
     {
         wxString s;
-        s<<wxT("VERSION ")<<CSL_NAME_STR<<wxT(" ")<<CSL_VERSION_LONG_STR<<CSL_WEBADDRFULL_STR;
+        s<<wxT("VERSION ")<<CSL_NAME_STR<<wxT(" ")<<CSL_VERSION_STR<<wxT(" ")<<CSL_WEBADDRFULL_STR;
         irc_cmd_ctcp_reply(session,nick,U2A(s));
     }
 }
@@ -541,7 +541,7 @@ void CslIrcSession::OnIrcEvent(CslIrcEvent& event)
     //convert to channel specific char encodings here
     if (event.CharData.GetCount())
     {
-        CslCharEncoding *encoding;
+        const CslCharEncoding *encoding;
 
         if ((channel=FindChannel(event.Channel)))
             encoding=&channel->Encoding;
@@ -650,7 +650,7 @@ bool CslIrcSession::Disconnect(const wxString& message)
     wxString s;
 
     if (message.IsEmpty())
-        s<<CSL_NAME_STR<<wxT(" ")<<CSL_VERSION_LONG_STR<<CSL_WEBADDRFULL_STR;
+        s<<CSL_NAME_STR<<wxT(" ")<<CSL_VERSION_STR<<CSL_WEBADDRFULL_STR;
     else
         s=message;
 

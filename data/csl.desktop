@@ -1,0 +1,17 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Cube Server Lister
+GenericName=Server Lister
+GenericName[cs]=Server Lister
+GenericName[de]=Server Lister
+GenericName[nl]=Server Lister
+Comment=Monitor Cubeengine based servers.
+Comment[cs]=Sledovat servery cubeengine her.
+Comment[de]=Cubeengine basierende Server beobachten.
+Comment[nl]=Monitor Cube-engine gebaseerde servers.
+Type=Application
+Exec=csl
+StartupNotify=true
+Terminal=false
+Icon=csl.png
+Categories=Game

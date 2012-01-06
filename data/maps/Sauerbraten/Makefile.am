@@ -1,4 +1,4 @@
-csldatadir =	$(datadir)/csl/maps/Sauerbraten
+csldatadir = $(pkgdatadir)/data/maps/Sauerbraten
 csldata_DATA = akroseum.cfg asteroids.cfg berlin_wall.cfg c_egypt.cfg \
 	c_valley.cfg capture_night.cfg corruption.cfg duomo.cfg face-capture.cfg \
 	fb_capture.cfg fc3.cfg frostbyte.cfg hades.cfg hallo.cfg hog2.cfg lostinspace.cfg \

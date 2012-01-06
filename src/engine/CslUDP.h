@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -32,30 +32,52 @@ BEGIN_DECLARE_EVENT_TYPES()
 DECLARE_EVENT_TYPE(wxCSL_EVT_PING,wxID_ANY)
 END_DECLARE_EVENT_TYPES()
 
-#define CSL_EVT_PING(id,fn) \
+class CslPingEvent;
+class CslNetPacket;
+
+typedef void (wxEvtHandler::*CslPingEventFunction)(CslPingEvent&);
+
+#define CSL_EVT_PING(fn) \
     DECLARE_EVENT_TABLE_ENTRY( \
-                               wxCSL_EVT_PING,id,wxID_ANY, \
+                               wxCSL_EVT_PING, wxID_ANY, wxID_ANY, \
                                (wxObjectEventFunction)(wxEventFunction) \
-                               wxStaticCastEvent(wxCommandEventFunction,&fn), \
+                               wxStaticCastEvent(CslPingEventFunction, &fn), \
                                (wxObject*)NULL \
                              ),
 
-class CslUDPPacket
+class CslPingEvent : public wxEvent
 {
     public:
-        CslUDPPacket(const wxUint32 size=0) { Create(size); }
-        CslUDPPacket(const wxUint32 size,void *data) :
+        CslPingEvent(CslNetPacket *packet=NULL) :
+                wxEvent(wxID_ANY, wxCSL_EVT_PING),
+                m_packet(packet) { }
+
+        virtual wxEvent* Clone() const
+        {
+            return new CslPingEvent(*this);
+        }
+
+        CslNetPacket* GetPacket() { return m_packet; }
+
+    private:
+        CslNetPacket *m_packet;
+};
+
+class CslNetPacket
+{
+    public:
+        CslNetPacket(wxUint32 size=0) { Create(size); }
+        CslNetPacket(wxUint32 size, void *data) :
                 m_size(size),m_data(data) {};
 
-        ~CslUDPPacket() { FreeData(); }
+        ~CslNetPacket() { FreeData(); }
 
-        void* Create(const wxUint32 size)
+        void* Create(wxUint32 size)
         {
             if (size>0)
             {
                 m_size=size;
-                m_data=calloc(1,size);
-                return m_data;
+                return (m_data=calloc(1, size)) ? m_data : NULL;
             }
             m_size=0;
             m_data=NULL;
@@ -73,13 +95,13 @@ class CslUDPPacket
             }
         }
 
-        void Init(const wxIPV4address& addr,void *data,const wxUint32 size)
+        void Init(const wxIPV4address& addr, void *data, wxUint32 size)
         {
             m_addr=addr;
             m_data=data;
             m_size=size;
         }
-        void SetSize(const wxUint32 size) { m_size=size; }
+        void SetSize(wxUint32 size) { m_size=size; }
         void SetAddr(const wxIPV4address& addr) { m_addr=addr; }
 
         void* Data() const { return m_data; }
@@ -102,7 +124,7 @@ class CslUDP : public wxEvtHandler
         ~CslUDP();
 
         bool IsOk() const { return m_socket ? m_socket->IsOk():false; }
-        bool SendPing(CslUDPPacket *packet);
+        bool Send(CslNetPacket *packet);
         static wxUint32 GetTraffic(wxUint32 type,bool overhead=false);
         static wxUint32 GetPacketCount(wxUint32 type);
         const wxString GetSocketError(wxInt32 code) const;

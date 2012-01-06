@@ -1,6 +1,6 @@
 /* XPM */
 static const char * red_ext_list_16_xpm[] = {
-"16 16 56 1",
+"16 14 56 1",
 " 	c None",
 ".	c #BC5858",
 "+	c #833131",
@@ -59,7 +59,6 @@ static const char * red_ext_list_16_xpm[] = {
 "q	c #541A19",
 "                ",
 "                ",
-"                ",
 "     .+@#$%     ",
 "    &*=-;>,'    ",
 "   )!~{]^/(_:   ",
@@ -71,5 +70,4 @@ static const char * red_ext_list_16_xpm[] = {
 "    lm_22299222 ",
 "     nopq2992   ",
 "         2222   ",
-"                ",
 "                "};

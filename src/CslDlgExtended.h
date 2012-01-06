@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -103,7 +103,7 @@ class CslDlgExtended: public wxDialog
         // end wxGlade
 
         void UpdateMap();
-        void ClearTeamScoreLabel(const wxUint32 start,const wxUint32 end);
+        void ClearTeamScoreLabel(wxUint32 start, wxUint32 end);
         void RecalcMinSize(bool reLayout,wxInt32 decWidth=-1);
         void ShowPanelMap(const bool show);
         void SetFixedLabelText(wxStaticText *label,const wxString& text);

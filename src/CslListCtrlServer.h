@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -79,9 +79,9 @@ class CslListServerData
         wxInt32 SetHighlight(wxInt32 type,const bool value)
         {
             if (value)
-                HighLight|=type;
+                CSL_FLAG_SET(HighLight, type);
             else
-                HighLight&=~type;
+                CSL_FLAG_UNSET(HighLight, type);
 
             return HighLight;
         }
@@ -116,18 +116,17 @@ class CslListCtrlServer : public CslListCtrl
                           const wxString& name=wxListCtrlNameStr);
         ~CslListCtrlServer();
 
-        void ListInit(CslListCtrlServer *sibling);
-        wxUint32 ListUpdate(vector<CslServerInfo*>& servers);
+        void ListInit(CslListCtrlServer *sibling, wxInt32 *filter);
+        wxUint32 ListUpdate(CslServerInfos& servers);
         void ListClear();
-        void ListSort(wxInt32 column=-1);
+        void ListDoSort() { ListSort(); }
         void ToggleSortArrow();
         wxUint32 ListSearch(const wxString& search);
-        wxUint32 ListFilter();
+        wxUint32 ListRebuild(bool force=false);
         bool ListUpdateServer(CslServerInfo *info);
         void RemoveServer(CslListServerData *server,CslServerInfo *info,wxInt32 id);
         void ListRemoveServers();
         void ListDeleteServers();
-        void ListAdjustSize(const wxSize& size);
 
         void SetMasterSelected(bool selected) { m_masterSelected=selected; }
         void Highlight(wxInt32 type,bool high,bool sort,CslServerInfo *info=NULL,wxListItem *item=NULL);
@@ -141,19 +140,16 @@ class CslListCtrlServer : public CslListCtrl
 
         CslListCtrlServer *m_sibling;
 
-        bool m_processSelectEvent;
 #ifdef __WXMSW__
         bool m_dontAdjustSize;
 #endif
-        t_aCslListServerData m_selected;
         t_aCslListServerData m_servers;
         wxString m_searchString;
+
         wxInt32 *m_filterFlags;
         wxInt32 m_filterVersion;
 
-        wxImageList m_imgList;
-
-        CslListSortHelper m_sortHelper;
+        wxString& FormatStats(wxString& in, int type, CslServerInfo *info, bool pingok=true);
 
 #ifdef __WXMSW__
         void OnColumnDragStart(wxListEvent& event);
@@ -168,25 +164,20 @@ class CslListCtrlServer : public CslListCtrl
         void OnContextMenu(wxContextMenuEvent& event);
         void OnMenu(wxCommandEvent& event);
 
-        static int wxCALLBACK ListSortCompareFunc(long item1,long item2,IntPtr data);
-
         DECLARE_EVENT_TABLE()
 
     protected:
-        void ListCreateGameBitmaps();
-        wxInt32 ListFindItem(CslServerInfo *info,wxListItem& item);
+        wxInt32 ListFindItemByServerInfo(CslServerInfo *info);
         void ListDeleteItem(wxListItem& item);
         bool ListSearchItemMatches(CslServerInfo *info);
         bool ListFilterItemMatches(CslServerInfo *info);
 
+        // CslListCtrl virtual functions
+        void OnListUpdate() { ListRebuild(true); };
+        void OnListSort();
         void GetToolTipText(wxInt32 row,CslToolTipEvent& event);
-        wxSize GetImageListSize()
-        {
-            wxInt32 x,y;
-            if (m_imgList.GetSize(0,x,y))
-                return wxSize(x,y);
-            return wxDefaultSize;
-        }
+
+        static int wxCALLBACK ListSortCompareFunc(long item1, long item2, long data);
 };
 
 #endif //CSLLISTCTRLSERVER_H

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Glen Masgai                                *
+ *   Copyright (C) 2007-2011 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -19,19 +19,24 @@
  ***************************************************************************/
 
 #include "Csl.h"
-#include "engine/CslEngine.h"
+#include "CslEngine.h"
 #include "CslApp.h"
 #include "CslGeoIP.h"
-#include "CslFlags.h"
 #include "CslMenu.h"
 #include "CslSettings.h"
 #include "CslGameConnection.h"
 #include "CslListCtrlPlayer.h"
 #include "CslListCtrlPlayerSearch.h"
 
+enum
+{
+    COLUMN_PLAYER,
+    COLUMN_SERVER
+};
 
 BEGIN_EVENT_TABLE(CslListCtrlPlayerSearch,CslListCtrl)
     EVT_SIZE(CslListCtrlPlayerSearch::OnSize)
+    EVT_LIST_COL_CLICK(wxID_ANY, CslListCtrlPlayerSearch::OnColumnLeftClick)
     EVT_LIST_ITEM_ACTIVATED(wxID_ANY,CslListCtrlPlayerSearch::OnItem)
     EVT_LIST_ITEM_SELECTED(wxID_ANY,CslListCtrlPlayerSearch::OnItem)
     EVT_LIST_ITEM_DESELECTED(wxID_ANY,CslListCtrlPlayerSearch::OnItemDeselected)
@@ -46,8 +51,8 @@ CslListCtrlPlayerSearch::CslListCtrlPlayerSearch(wxWindow* parent,wxWindowID id,
         CslListCtrl(parent,id,pos,size,style|wxLC_SINGLE_SEL,validator,name),
         m_selected(NULL)
 {
-    FlickerFree(false);
-    ListInit();
+    ListAddColumn(_("Player"), wxLIST_FORMAT_LEFT, 1.0f, true, true);
+    ListAddColumn(_("Server"), wxLIST_FORMAT_LEFT, 1.3f, true, true);
 }
 
 
@@ -56,44 +61,19 @@ CslListCtrlPlayerSearch::~CslListCtrlPlayerSearch()
     WX_CLEAR_ARRAY(m_entries);
 }
 
-void CslListCtrlPlayerSearch::ListInit()
-{
-    wxListItem item;
-
-    CreateImageList();
-
-    item.SetMask(wxLIST_MASK_TEXT|wxLIST_MASK_FORMAT);
-    item.SetImage(-1);
-
-    item.SetAlign(wxLIST_FORMAT_LEFT);
-
-    item.SetText(_("Player"));
-    InsertColumn(0,item);
-    SetColumn(0,item);
-
-    item.SetText(_("Server"));
-    InsertColumn(1,item);
-    SetColumn(1,item);
-}
-
-void CslListCtrlPlayerSearch::ListAdjustSize(const wxSize& size)
-{
-    wxInt32 w;
-
-    if ((w=size==wxDefaultSize ? GetClientSize().x-8 : size.x-8)<0)
-        return;
-
-    SetColumnWidth(0,(wxInt32)(w*0.44f));
-    SetColumnWidth(1,(wxInt32)(w*0.55f));
-}
-
 void CslListCtrlPlayerSearch::OnSize(wxSizeEvent& event)
 {
-    event.Skip();
+    //fixes flickering if scrollbar is shown
+    wxWindowUpdateLocker lock(this);
 
-    Freeze();
     ListAdjustSize(event.GetSize());
-    Thaw();
+
+    event.Skip();
+}
+
+void CslListCtrlPlayerSearch::OnColumnLeftClick(wxListEvent& WXUNUSED(event))
+{
+    //catch the event to prevent sorting
 }
 
 void CslListCtrlPlayerSearch::OnItem(wxListEvent& event)
@@ -132,7 +112,7 @@ void CslListCtrlPlayerSearch::OnContextMenu(wxContextMenuEvent& event)
         menu.AppendSeparator();
         if (!info->IsFavourite())
         {
-            CslMenu::AddItem(&menu,MENU_ADD,MENU_SERVER_FAV_ADD_STR,wxART_ADD_BOOKMARK);
+            CslMenu::AddItem(menu, MENU_ADD, MENU_SERVER_FAV_ADD_STR, wxART_ADD_BOOKMARK);
             menu.AppendSeparator();
         }
         CSL_MENU_CREATE_URICOPY(menu)
@@ -155,10 +135,11 @@ void CslListCtrlPlayerSearch::OnContextMenu(wxContextMenuEvent& event)
 void CslListCtrlPlayerSearch::OnMenu(wxCommandEvent& event)
 {
     CslServerInfo *info;
-    wxInt32 id=event.GetId();
 
     if (!(info=m_selected->Info))
         return;
+
+    wxInt32 id=event.GetId();
 
     event.SetEventObject(this);
 
@@ -166,11 +147,10 @@ void CslListCtrlPlayerSearch::OnMenu(wxCommandEvent& event)
     CSL_MENU_EVENT_SKIP_EXTINFO(id,info)
     CSL_MENU_EVENT_SKIP_SRVMSG(id,info)
     CSL_MENU_EVENT_SKIP_NOTIFY(id,info)
-    CSL_MENU_EVENT_SKIP_SAVEIMAGE(id)
 
     if (CSL_MENU_EVENT_IS_LOCATION(id))
     {
-        event.SetClientData((void*)new wxString(Int2IP(m_selected->Player.IP)));
+        event.SetClientData((void*)new wxString(NtoA(m_selected->Player.IP)));
         event.Skip();
         return;
     }
@@ -227,24 +207,23 @@ void CslListCtrlPlayerSearch::GetToolTipText(wxInt32 row,CslToolTipEvent& event)
 
 void CslListCtrlPlayerSearch::ListClear()
 {
+    wxWindowUpdateLocker lock(this);
+
     DeleteAllItems();
     WX_CLEAR_ARRAY(m_entries);
 }
 
-void CslListCtrlPlayerSearch::AddResult(CslServerInfo *info,CslPlayerStatsData *player)
+void CslListCtrlPlayerSearch::AddResult(CslServerInfo *info, CslPlayerStatsData *player, bool rebuild)
 {
-    wxListItem item;
     wxInt32 i=GetItemCount();
-    wxUint32 img=::wxGetApp().GetCslEngine()->GetGames().length();
 
-    item.SetId(i);
-    item.SetMask(wxLIST_MASK_TEXT|wxLIST_MASK_DATA);
-    InsertItem(item);
-    SetItem(i,0,player->Name,GetCountryFlag(player->IP,img));
-    SetItem(i,1,info->GetBestDescription(),info->GetGame().GetId()-1);
+    ListSetItem(i, COLUMN_PLAYER, player->Name, GetCountryFlag(player->IP));
+    ListSetItem(i, COLUMN_SERVER, info->GetBestDescription(), GetGameImage(info->GetGame().GetFourCC()));
 
+    if (!rebuild)
     m_entries.Add(new CslPlayerSearchEntry(info,*player));
-    SetItemData(i,(long)m_entries.Last());
+
+    SetItemPtrData(i, (wxUIntPtr)m_entries.Item(i));
 }
 
 void CslListCtrlPlayerSearch::RemoveServer(CslServerInfo *info)
@@ -257,41 +236,4 @@ void CslListCtrlPlayerSearch::RemoveServer(CslServerInfo *info)
             return;
         }
     }
-}
-
-void CslListCtrlPlayerSearch::CreateImageList()
-{
-#ifdef __WXMSW__
-    m_imgList.Create(20,16,true);
-
-    vector<CslGame*>& games=::wxGetApp().GetCslEngine()->GetGames();
-    loopv(games)
-    {
-        const wxBitmap& icon=games[i]->GetIcon(16);
-        m_imgList.Add(AdjustBitmapSize(icon.IsOk() ? icon : wxBitmap(16,16),wxSize(20,16),wxPoint(4,0)));
-    }
-
-    m_imgList.Add(AdjustBitmapSize(local_xpm,wxSize(20,16),wxPoint(0,3)));
-    m_imgList.Add(AdjustBitmapSize(unknown_xpm,wxSize(20,16),wxPoint(0,3)));
-    wxInt32 i,c=sizeof(codes)/sizeof(codes[0])-1;
-    for (i=0;i<c;i++)
-        m_imgList.Add(AdjustBitmapSize(flags[i],wxSize(20,16),wxPoint(0,3)));
-#else
-    m_imgList.Create(18,16,true);
-
-    vector<CslGame*>& games=::wxGetApp().GetCslEngine()->GetGames();
-    loopv(games)
-    {
-        const wxBitmap& icon=games[i]->GetIcon(16);
-        m_imgList.Add(AdjustBitmapSize(icon.IsOk() ? icon : wxBitmap(16,16),wxSize(18,16),wxPoint(1,0)));
-    }
-
-    m_imgList.Add(AdjustBitmapSize(local_xpm,wxSize(18,16),wxPoint(0,2)));
-    m_imgList.Add(AdjustBitmapSize(unknown_xpm,wxSize(18,16),wxPoint(0,2)));
-    wxInt32 i,c=sizeof(codes)/sizeof(codes[0])-1;
-    for (i=0;i<c;i++)
-        m_imgList.Add(AdjustBitmapSize(flags[i],wxSize(18,16),wxPoint(0,2)));
-#endif
-
-    SetImageList(&m_imgList,wxIMAGE_LIST_SMALL);
 }
