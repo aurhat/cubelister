@@ -482,7 +482,7 @@ wxString FindPackageFile(const wxString& filename)
 
 wxInt32 FindFiles(const wxString& path, const wxString& filespec, wxArrayString& results)
 {
-    return wxDir::GetAllFiles(path, &results, filespec);
+    return ::wxDirExists(path) ? wxDir::GetAllFiles(path, &results, filespec) : 0;
 }
 
 wxInt32 WriteTextFile(const wxString& filename, const wxString& data, const wxFile::OpenMode mode)
