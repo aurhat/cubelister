@@ -32,6 +32,7 @@ do
    config.status   \
    config.guess    \
    config.h.in     \
+   configure.in    \
    debug*          \
    optimized*      \
    depcomp         \
@@ -40,8 +41,9 @@ do
    missing         \
    mkinstalldirs   \
    intltool-*      \
-   po/Makefile.in.in
-  
+   po/Makefile.in.in \
+   src/plugins/Makefile.am \
+
    popd >/dev/null
   fi
 done

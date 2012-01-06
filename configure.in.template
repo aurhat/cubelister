@@ -158,8 +158,6 @@ fi
 AM_CONDITIONAL(ENABLE_PCH,test "x$use_pch" = "xyes")
 
 
-PLUGINS=""
-
 AC_OUTPUT(Makefile \
 	  data/Makefile \
 	  data/maps/Makefile \
@@ -182,22 +180,22 @@ AC_OUTPUT(Makefile \
 	  PLUGINS_MAKEFILES)
 
 echo
-echo "--------------------------------------------------"
-echo "$PACKAGE $VERSION"
+echo -e "--------------------------------------------------"
+echo -e "$PACKAGE $VERSION"
 
 echo
-echo "Install prefix..................: $prefix"
+echo -e "Install prefix................. : $prefix"
 echo
-echo "wxWidgets version.............. : $wxversion ($wxtype)"
-echo "Build using precompiled headers : $use_pch"
+echo -e "wxWidgets version.............. : $wxversion ($wxtype)"
+echo -e "Build using precompiled headers : $use_pch"
 echo
-echo "Speech-dispatcher support...... : $use_speechd"
-echo "Use internal libircclient...... : $use_internal_libircclient"
-echo "Use internal libGeoIP.......... : $use_internal_geoip"
-echo "Install package GeoIP database. : $use_internal_geoip_db"
+echo -e "Speech-dispatcher support...... : $use_speechd"
+echo -e "Use internal libircclient...... : $use_internal_libircclient"
+echo -e "Use internal libGeoIP.......... : $use_internal_geoip"
+echo -e "Install package GeoIP database. : $use_internal_geoip_db"
 echo
-echo "Enabled plugins................ : $PLUGINS"
+echo -e "Enabled plugins................ : PLUGINS_ENABLED"
 echo
-echo "Build map config tool.......... : $cslmapcfgtool"
-echo "--------------------------------------------------"
+echo -e "Build map config tool.......... : $cslmapcfgtool"
+echo -e "--------------------------------------------------"
 echo
