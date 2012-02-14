@@ -335,9 +335,7 @@ void putstring(const char *t, ucharbuf &p);
 int getstring(char *text, ucharbuf &p, int len=_MAXDEFSTR);
 
 int iscubeprint(int c);
-int uni2cube(int c);
 int cube2uni(int c);
-int decodeutf8(uchar *dst, uchar *src, int len, int *carry = NULL);
 int encodeutf8(uchar *dstbuf, int dstlen, uchar *srcbuf, int srclen, int *carry = NULL);
 
 #endif // CUBE_TOOLS_H

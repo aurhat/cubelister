@@ -76,7 +76,7 @@ class CslCharEncoding
         wxCSConv *m_conv;
 
     protected:
-        wxChar* ConvToLocalBuffer(const char *data, wxMBConv& conv) const;
+        wxChar* ConvToLocalBuffer(const char *data, const wxMBConv& conv) const;
 };
 
 wxString CslCubeEncodingToLocal(const char *data);

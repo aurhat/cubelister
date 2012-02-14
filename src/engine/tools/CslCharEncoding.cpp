@@ -99,7 +99,7 @@ wxString CslCharEncoding::ToLocal(const char *data) const
                   (const char*)m_name.mb_str(wxConvLocal), data);
     }
 
-    wxCSConv conv(wxT("ISO-8859-15"));
+    const wxCSConv conv(wxT("ISO-8859-15"));
 
     if ((buffer=ConvToLocalBuffer(data, conv)))
     {
@@ -155,7 +155,7 @@ wxCharBuffer CslCharEncoding::ToServer(const wxString& str) const
     return buffer;
 }
 
-wxChar* CslCharEncoding::ConvToLocalBuffer(const char *data, wxMBConv& conv) const
+wxChar* CslCharEncoding::ConvToLocalBuffer(const char *data, const wxMBConv& conv) const
 {
     size_t len;
 
