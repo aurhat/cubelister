@@ -1861,9 +1861,7 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
         case MENU_VIEW_AUTO_SORT:
             CslGetSettings().AutoSortColumns=event.IsChecked();
             list_ctrl_master->ListDoSort();
-            list_ctrl_master->ToggleSortArrow();
             list_ctrl_favourites->ListDoSort();
-            list_ctrl_favourites->ToggleSortArrow();
             break;
 
         case MENU_VIEW_RELAYOUT:

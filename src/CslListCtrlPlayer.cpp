@@ -529,11 +529,6 @@ void CslListCtrlPlayer::ListClear()
     m_selected.Empty();
 }
 
-void CslListCtrlPlayer::OnListSort()
-{
-    SortItems(ListSortCompareFunc,(long)&m_sortHelper);
-}
-
 void CslListCtrlPlayer::ServerInfo(CslServerInfo *info)
 {
     m_info=info;
@@ -551,7 +546,6 @@ void CslListCtrlPlayer::ServerInfo(CslServerInfo *info)
 
 void CslListCtrlPlayer::ListInit(wxInt32 view)
 {
-    wxInt32 img;
     bool enabled=true;
     wxUint32 columns=CslSettings::GetListSettings(GetName())->ColumnMask;
 
@@ -576,21 +570,20 @@ void CslListCtrlPlayer::ListInit(wxInt32 view)
     //assertion on __WXMAC__
     //ListAdjustSize();
 
+    wxInt32 mode, column;
+
     if (!ListIsColumnEnabled(COLUMN_FRAGS))
-        m_sortHelper.Init(CslListSort::SORT_ASC, COLUMN_NAME);
+    {
+        mode=CslListSort::SORT_ASC;
+        column=COLUMN_NAME;
+    }
     else
-        m_sortHelper.Init(CslListSort::SORT_DSC, COLUMN_FRAGS);
+    {
+        mode=CslListSort::SORT_DSC;
+        column=COLUMN_FRAGS;
+    }
 
-    if (m_sortHelper.Mode==CslListSort::SORT_ASC)
-        img=CSL_LIST_IMG_SORT_ASC;
-    else
-        img=CSL_LIST_IMG_SORT_DSC;
-
-    wxListItem item;
-
-    GetColumn(m_sortHelper.Column, item);
-    item.SetImage(img);
-    SetColumn(m_sortHelper.Column, item);
+    InitSort(ListSortCompareFunc, mode, column);
 }
 
 int wxCALLBACK CslListCtrlPlayer::ListSortCompareFunc(long item1, long item2, long data)

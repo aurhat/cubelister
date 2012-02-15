@@ -568,8 +568,7 @@ void CslListCtrlServer::ListInit(CslListCtrlServer *sibling, wxInt32 *filter)
     ListAddColumn(ColumnNames[COLUMN_MM],          wxLIST_FORMAT_LEFT,  1.4f, COLUMN_ENABLED(COLUMN_MM)     );
 #undef COLUMN_ENABLED
 
-    m_sortHelper.Init(CslListSort::SORT_DSC, COLUMN_PLAYER);
-    ToggleSortArrow();
+    InitSort(ListSortCompareFunc, CslListSort::SORT_DSC, COLUMN_PLAYER);
 }
 
 void CslListCtrlServer::Highlight(wxInt32 type,bool high,bool sort,CslServerInfo *info,wxListItem *item)
@@ -716,11 +715,6 @@ void CslListCtrlServer::GetToolTipText(wxInt32 row,CslToolTipEvent& event)
                 event.Text.Add(s);
             }
         }
-
-void CslListCtrlServer::OnListSort()
-{
-    SortItems(ListSortCompareFunc, (long)&m_sortHelper);
-    }
 
 inline wxString& CslListCtrlServer::FormatStats(wxString& in, int type, CslServerInfo *info, bool pingok)
 {
@@ -1078,22 +1072,6 @@ wxUint32 CslListCtrlServer::ListRebuild(bool force)
     ListSort();
 
     return c;
-}
-
-void CslListCtrlServer::ToggleSortArrow()
-{
-    wxListItem item;
-    wxInt32 img=-1;
-
-    if (CslGetSettings().AutoSortColumns)
-    {
-        if (m_sortHelper.Mode==CslListSort::SORT_ASC)
-            img=CSL_LIST_IMG_SORT_ASC;
-        else
-            img=CSL_LIST_IMG_SORT_DSC;
-    }
-    item.SetImage(img);
-    SetColumn(m_sortHelper.Column, item);
 }
 
 int wxCALLBACK CslListCtrlServer::ListSortCompareFunc(long item1, long item2, long data)

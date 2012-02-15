@@ -37,8 +37,6 @@
 #include "img/info_16.xpm"
 #include "img/sortasc_16.xpm"
 #include "img/sortdsc_16.xpm"
-#include "img/sortasclight_16.xpm"
-#include "img/sortdsclight_16.xpm"
 #include "CslFlags.h"
 
 // since wx>2.8.4 the list control items are getting deselected on wxGTK
@@ -72,7 +70,7 @@ IMPLEMENT_DYNAMIC_CLASS(CslListCtrl, wxListCtrl)
 CslListCtrl::CslListCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size,
                          long style, const wxValidator& validator, const wxString& name) :
         wxListCtrl(parent, id, pos, size, style, validator, name),
-        m_processSelectEvent(1), m_mouseLastMove(0)
+        m_sortCallback(NULL), m_processSelectEvent(1), m_mouseLastMove(0)
 {
     CreateImageList();
     SetImageList(&ListImageList, wxIMAGE_LIST_SMALL);
@@ -427,9 +425,29 @@ wxInt32 CslListCtrl::ListFindItem(void *data)
     return wxNOT_FOUND;
 }
 
+void CslListCtrl::InitSort(CslListSortCallBack fn, wxInt32 mode, wxInt32 column)
+{
+    m_sortCallback=fn;
+    m_sortHelper.Init(mode, column);
+
+    wxListItem item;
+    wxInt32 img, id;
+
+    if (m_sortHelper.Mode==CslListSort::SORT_ASC)
+        img=CSL_LIST_IMG_SORT_ASC;
+    else
+        img=CSL_LIST_IMG_SORT_DSC;
+
+    id=m_columns.GetColumnId(column, false);
+
+    GetColumn(id, item);
+    item.SetImage(img);
+    SetColumn(id, item);
+}
+
 void CslListCtrl::ListSort(wxInt32 column)
 {
-    if (!m_columns.GetCount())
+    if (!m_sortCallback || !m_columns.GetCount())
         return;
 
     wxListItem item;
@@ -472,7 +490,7 @@ void CslListCtrl::ListSort(wxInt32 column)
 
     m_processSelectEvent=0;
 
-    OnListSort();
+    SortItems(m_sortCallback, (long)&m_sortHelper);
 
 #ifdef CSL_USE_WX_LIST_DESELECT_WORKAROUND
     wxInt32 i, j, v;
@@ -604,8 +622,6 @@ void CslListCtrl::CreateImageList()
     offset.y=2;
     ListImageList.Add(AdjustBitmapSize(sortasc_16_xpm, size, offset));
     ListImageList.Add(AdjustBitmapSize(sortdsc_16_xpm, size, offset));
-    ListImageList.Add(AdjustBitmapSize(sortasclight_16_xpm, size, offset));
-    ListImageList.Add(AdjustBitmapSize(sortdsclight_16_xpm, size, offset));
 
     const CslGames& games=::wxGetApp().GetCslEngine()->GetGames();
     const wxImage imgExt=wxBitmap(ext_green_8_xpm).ConvertToImage();

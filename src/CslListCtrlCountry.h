@@ -90,9 +90,6 @@ class CslListCtrlCountry : public CslListCtrl
         DECLARE_EVENT_TABLE()
 
     protected:
-        // CslListCtrl virtual functions
-        void OnListSort();
-
         static int wxCALLBACK ListSortCompareFunc(long item1, long item2, long data);
 };
 

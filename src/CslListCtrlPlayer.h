@@ -74,7 +74,6 @@ class CslListCtrlPlayer : public CslListCtrl
             return *(CslPlayerStatsData*)data1==*(CslPlayerStatsData*)data2;
         }
         void OnListUpdate() { UpdateData(); }
-        void OnListSort();
         void GetToolTipText(wxInt32 row,CslToolTipEvent& event);
         wxString GetScreenShotFileName();
         wxWindow *GetScreenShotWindow() { return GetParent(); }

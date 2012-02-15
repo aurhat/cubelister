@@ -120,7 +120,6 @@ class CslListCtrlServer : public CslListCtrl
         wxUint32 ListUpdate(CslServerInfos& servers);
         void ListClear();
         void ListDoSort() { ListSort(); }
-        void ToggleSortArrow();
         wxUint32 ListSearch(const wxString& search);
         wxUint32 ListRebuild(bool force=false);
         bool ListUpdateServer(CslServerInfo *info);
@@ -174,7 +173,6 @@ class CslListCtrlServer : public CslListCtrl
 
         // CslListCtrl virtual functions
         void OnListUpdate() { ListRebuild(true); };
-        void OnListSort();
         void GetToolTipText(wxInt32 row,CslToolTipEvent& event);
 
         static int wxCALLBACK ListSortCompareFunc(long item1, long item2, long data);

@@ -123,10 +123,7 @@ CslListCtrlCountry::CslListCtrlCountry(wxWindow* parent,wxWindowID id,const wxPo
     ListAddColumn(_("Country"), wxLIST_FORMAT_LEFT, 2.5f, true, true);
     ListAddColumn(_("Count"), wxLIST_FORMAT_LEFT, 1.0f, true, true);
 
-    m_sortHelper.Init(CslListSort::SORT_DSC, COLUMN_COUNT);
-    GetColumn(m_sortHelper.Column, item);
-    item.SetImage(CSL_LIST_IMG_SORT_DSC);
-    SetColumn(m_sortHelper.Column, item);
+    InitSort(ListSortCompareFunc, CslListSort::SORT_DSC, COLUMN_COUNT);
 }
 
 
@@ -235,11 +232,6 @@ void CslListCtrlCountry::UpdateData(CslServerInfo *info)
     }
 
     ListSort();
-}
-
-void CslListCtrlCountry::OnListSort()
-{
-        SortItems(ListSortCompareFunc,(long)&m_sortHelper);
 }
 
 int wxCALLBACK CslListCtrlCountry::ListSortCompareFunc(long item1, long item2, long data)

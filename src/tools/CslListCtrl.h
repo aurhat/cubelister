@@ -51,16 +51,21 @@ enum
     CSL_LIST_IMG_INFO,
     CSL_LIST_IMG_SORT_ASC,
     CSL_LIST_IMG_SORT_DSC,
-    CSL_LIST_IMG_SORT_ASC_LIGHT,
-    CSL_LIST_IMG_SORT_DSC_LIGHT,
 
     CSL_LIST_IMG_GAMES_START
 };
+
+typedef int (wxCALLBACK *CslListSortCallBack)(long item1, long item2, long sorthelper);
 
 class CslListSort
 {
     public:
         enum { SORT_ASC = 0, SORT_DSC };
+
+        CslListSort(wxInt32 mode=SORT_ASC, wxInt32 column=0)
+        {
+            Init(mode, column);
+        }
 
         void Init(wxInt32 mode, wxInt32 column)
         {
@@ -230,12 +235,21 @@ class CslListCtrl : public wxListCtrl
         bool ListSetItem(wxInt32 row, wxInt32 column, const wxString& text=wxEmptyString, wxInt32 image=-1);
         bool ListSetColumn(wxInt32 column, const wxString& text=wxEmptyString);
 
-        wxUint32 ListGetColumnMask() { return m_columns.GetEnabledColumns(); }
-        bool ListIsColumnEnabled(wxInt32 id) { return m_columns.IsEnabled(id); }
+        wxInt32 GetColumnId(wxInt32 id, bool absolute=true) const { return m_columns.GetColumnId(id, absolute); }
+        wxUint32 ListGetColumnMask() const { return m_columns.GetEnabledColumns(); }
+        bool ListIsColumnEnabled(wxInt32 id) const { return m_columns.IsEnabled(id); }
+
+        void InitSort(CslListSortCallBack fn, wxInt32 mode, wxInt32 column);
+        void ListSort(wxInt32 column=-1);
 
         virtual void ListAdjustSize(const wxSize& size=wxDefaultSize);
 
     private:
+        CslListColumns m_columns;
+
+        CslListSort m_sortHelper;
+        CslListSortCallBack m_sortCallback;
+
         wxInt32 m_processSelectEvent;
         wxUint32 m_mouseLastMove;
 
@@ -260,16 +274,10 @@ class CslListCtrl : public wxListCtrl
 
         VoidPointerArray m_selected;
 
-        CslListSort m_sortHelper;
-        CslListColumns m_columns;
-
         wxInt32 ListFindItem(void *data);
         virtual bool ListFindItemCompare(void *data1, void *data2) { return data1==data2; }
 
         virtual void OnListUpdate() {};
-
-        void ListSort(wxInt32 column=-1);
-        virtual void OnListSort() {};
 
         virtual wxWindow* GetScreenShotWindow() { return this; }
         virtual wxString GetScreenShotFileName();
