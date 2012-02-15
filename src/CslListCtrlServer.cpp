@@ -453,7 +453,7 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
 
             item.SetMask(wxLIST_MASK_TEXT);
 
-            for (i=m_selected.GetCount()-1; i>=0; i--)
+            for (i=0; i<m_selected.GetCount(); i++)
             {
                 info=((CslListServerData*)m_selected.Item(i))->Info;
 
@@ -467,7 +467,7 @@ void CslListCtrlServer::OnMenu(wxCommandEvent& event)
                 else
                     port=0;
 
-                for (wxInt32 j=GetColumnCount()-1; j>=0; j--)
+                for (wxInt32 j=0; j<GetColumnCount(); j++)
                 {
                     item.SetColumn(j);
                     GetItem(item);
