@@ -32,12 +32,12 @@ bool LoadDatabase(const wxString& name, GeoIPDBTypes type, GeoIPOptions options)
     {
         if ((g_geoIP=GeoIP_open_type(type, options)))
         {
-            LOG_DEBUG("Loaded external database: %s\n", U2A(name));
-            return true;
+            LOG_DEBUG("Loaded external GeoIP database: %s\n", U2A(name));
         }
     }
-#else
-    if (!name.IsEmpty())
+#endif //CSL_EXTERNAL_GEOIP_DATABASE
+
+    if (!g_geoIP && !name.IsEmpty())
     {
         wxString path=FindPackageFile(wxT("data/")+name);
 
@@ -46,13 +46,20 @@ bool LoadDatabase(const wxString& name, GeoIPDBTypes type, GeoIPOptions options)
             if ((g_geoIP=GeoIP_open(U2A(path), options)))
             {
                 LOG_DEBUG("Loaded GeoIP database: %s\n", U2A(path));
-                return true;
             }
         }
     }
-#endif //CSL_EXTERNAL_GEOIP_DATABASE
 
-    return false;
+    return g_geoIP!=NULL;
+}
+
+void UnloadDatabase()
+{
+    if (g_geoIP)
+    {
+        GeoIP_delete(g_geoIP);
+        g_geoIP=NULL;
+    }
 }
 
 CslGeoIP::CslGeoIP() : m_type(GEOIP_TYPE_UNKNOWN)
@@ -63,15 +70,23 @@ CslGeoIP::CslGeoIP() : m_type(GEOIP_TYPE_UNKNOWN)
         m_type=GEOIP_TYPE_CITY;
     else if (LoadDatabase(wxT("GeoIP.dat"), GEOIP_COUNTRY_EDITION, GEOIP_MEMORY_CACHE))
         m_type=GEOIP_TYPE_COUNTRY;
+
+    for (wxInt32 i=0;; i++)
+    {
+        const char *code=GeoIP_code_by_id(i);
+        const char *name=GeoIP_name_by_id(i);
+
+        if (!code || !name)
+            break;
+
+        m_country_codes.add(A2U(code));
+        m_country_names.add(A2U(name));
+    }
 }
 
 CslGeoIP::~CslGeoIP()
 {
-    if (!g_geoIP)
-        return;
-
-    GeoIP_delete(g_geoIP);
-    g_geoIP=NULL;
+    UnloadDatabase();
 
     WX_CLEAR_ARRAY(m_services);
 }
@@ -225,6 +240,20 @@ wxString CslGeoIP::GetCityNameByIPnum(const unsigned long ipnum)
     }
 
     return city;
+}
+
+const vector<wxString>& CslGeoIP::GetCountryCodes()
+{
+    CslGeoIP& self=GetInstance();
+
+    return self.m_country_codes;
+}
+
+const vector<wxString>& CslGeoIP::GetCountryNames()
+{
+    CslGeoIP& self=GetInstance();
+
+    return self.m_country_names;
 }
 
 void CslGeoIP::AddService(const wxString& name, const wxString& host, const wxString& path)

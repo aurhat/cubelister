@@ -67,6 +67,8 @@ class CslGeoIP
         static wxString GetCountryNameByIPnum(const unsigned long ipnum);
         static wxString GetCityNameByAddr(const char *host);
         static wxString GetCityNameByIPnum(const unsigned long ipnum);
+        static const vector<wxString>& GetCountryCodes();
+        static const vector<wxString>& GetCountryNames();
 
         static void AddService(const wxString& name, const wxString& host, const wxString& path);
         static const CslGeoIPServices& GetServices();
@@ -74,6 +76,7 @@ class CslGeoIP
     private:
         wxInt32 m_type;
         CslGeoIPServices m_services;
+        vector<wxString> m_country_codes, m_country_names;
 };
 
 #endif
