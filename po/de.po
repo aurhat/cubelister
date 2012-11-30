@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: CSL\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-08-17 14:43+0200\n"
-"PO-Revision-Date: 2008-08-17 15:50+0100\n"
+"PO-Revision-Date: 2012-03-02 08:50+0100\n"
 "Last-Translator: Glen Masgai <mimosius@gmx.de>\n"
 "Language-Team: Glen Masgai <mimosius@gmx.de>\n"
 "MIME-Version: 1.0\n"
@@ -1294,44 +1294,64 @@ msgstr "Server Lister"
 #~ "Installationspfad des Spiels fehlt!\n"
 #~ "Damit %s zu einem Server verbinden kann, muss der Ordner\n"
 #~ " angegeben werden, in dem sich %s befindet."
+
 #~ msgid "2 (TC-Server)"
 #~ msgstr "2 (TC-Server)"
+
 #~ msgid "C&ustom"
 #~ msgstr "Ben&utzerdefiniert"
+
 #~ msgid "&Default master"
 #~ msgstr "Stan&dard Master"
+
 #~ msgid "&Save password"
 #~ msgstr "Passwort &speichern"
+
 #~ msgid "&Update"
 #~ msgstr "Akt&ualisieren"
+
 #~ msgid "&Auto update"
 #~ msgstr "&Automatisch aktualisieren"
+
 #~ msgid "Player records:"
 #~ msgstr "Spieler Datensätze:"
+
 #~ msgid "Waiting for data..."
 #~ msgstr "Warte auf Daten..."
+
 #~ msgid "Use private config files"
 #~ msgstr "Private Konfigurationsdateien verwenden"
+
 #~ msgid "Select Sauerbraten executable"
 #~ msgstr "Sauerbraten Spielverzeichnis"
+
 #~ msgid "Select AssaultCube executable"
 #~ msgstr "AssaultCube Programmdatei wählen"
+
 #~ msgid "Select Blood Frontier executable"
 #~ msgstr "Blood Frontier Programmdatei wählen"
+
 #~ msgid "Select Sauerbraten game path"
 #~ msgstr "Wähle Sauerbraten Spielverzeichnis"
+
 #~ msgid "Select AssaultCube game path"
 #~ msgstr "Wähle AssaultCube Spielverzeichnis"
+
 #~ msgid "Select Blood Frontier game path"
 #~ msgstr "Wähle Blood Frontier Spielverzeichnis"
+
 #~ msgid "Config files:"
 #~ msgstr "Konfigurationsdateien:"
+
 #~ msgid "Sauerbraten"
 #~ msgstr "Sauerbraten"
+
 #~ msgid "Blood Frontier"
 #~ msgstr "Blood Frontier"
+
 #~ msgid "Cube"
 #~ msgstr "Cube"
+
 #~ msgid ""
 #~ "The batch file (.bat) was selected as game\n"
 #~ "executeable for game %s.\n"
@@ -1350,32 +1370,42 @@ msgstr "Server Lister"
 #~ "oder die echte Programmdatei (.exe) angewählt werden.\n"
 #~ "Wenn nicht die Stapelverarbeitungsdatei (.bat) verwendet wird,\n"
 #~ "sollte -r als Spielparameter angegeben werden."
+
 #~ msgid "Mastermode &2"
 #~ msgstr "Mastermode &2"
+
 #~ msgid "Mastermode &3"
 #~ msgstr "Mastermode &3"
+
 #~ msgid "Filter fa&vourites as well"
 #~ msgstr "&Favoriten auch filtern"
+
 #~ msgid "&Reset"
 #~ msgstr "&Zurücksetzen"
+
 #~ msgid "Show &filter\tCTRL+F"
 #~ msgstr "Zeige &Filter\tCTRL+F"
+
 #~ msgid "Fit columns on window &resize"
 #~ msgstr "Listenspalten automatisch anpassen"
+
 #~ msgid "Redraw while dragging spli&tters"
 #~ msgstr "Fensterinhalt beim ziehen der Splitter zeichnen"
+
 #~ msgid ""
 #~ "Player statistics are shown for Server \"%s\",\n"
 #~ "so deletion is not possible!"
 #~ msgstr ""
 #~ "Server \"%s\" kann nicht gelöscht werden, da er durch das\n"
 #~ "Spielerstatistik-Fenster gesperrt ist!"
+
 #~ msgid ""
 #~ "There was no executable for game %s specified yet!\n"
 #~ "Please check your settings."
 #~ msgstr ""
 #~ "Es wurde keine Programmdatei für das Spiel %s angegeben.\n"
 #~ "Bitte die Einstellungen überprüfen."
+
 #~ msgid ""
 #~ "The server \"%s\" is in private mode, so it's\n"
 #~ "probably not possible to connect.\n"
@@ -1386,12 +1416,13 @@ msgstr "Server Lister"
 #~ "deshalb wird es nicht möglich sein zu verbinden.\n"
 #~ "\n"
 #~ "Trotzdem verbinden?"
+
 #~ msgid "Question"
 #~ msgstr "Frage"
+
 #~ msgid ""
 #~ "\n"
 #~ "Please check your installation!"
 #~ msgstr ""
 #~ "\n"
 #~ "Bitte die Installation überprüfen!"
-

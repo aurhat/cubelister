@@ -57,7 +57,7 @@ static const wxChar *ColumnNames[] =
     _("Map"),
     _("Time"),
     _("Player"),
-    _("MM")
+    _("Mastermode")
 };
 
 BEGIN_EVENT_TABLE(CslListCtrlServer, CslListCtrl)

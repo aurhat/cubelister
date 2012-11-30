@@ -38,9 +38,7 @@ class CslTTS
 
         static CslTTS& GetInstance();
 
-        static void SetVolume(wxInt32 volume);
-
-#if defined (__WXMAC__) && defined (_CSL_DECLARE_TTS_VARS_)
+#if defined (__WXMAC__)
         void Process(const wxString& text=wxEmptyString);
         static void OnProcessed(SpeechChannel channel,void *data);
 
@@ -52,22 +50,14 @@ class CslTTS
         static bool DeInit();
         static bool IsOk();
 
+        static int GetVolume(wxInt32 volume);
+        static int SetVolume(wxInt32 volume);
         static void Say(const wxString& text);
 
     private:
         bool m_ok;
         wxInt32 m_volume;
         wxString m_lang;
-
-#ifdef _CSL_DECLARE_TTS_VARS_
-#if defined(__WXMSW__)
-        ISpVoice *m_voice;
-#elif defined(__WXMAC__)
-        SpeechChannel m_channel;
-#elif defined(HAVE_LIBSPEECHD_H)
-        SPDConnection *m_spd;
-#endif //__WXMSW__
-#endif //_DECLARE_TTS_VARS_
 };
 
 #endif

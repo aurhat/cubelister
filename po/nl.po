@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-08-17 14:43+0200\n"
-"PO-Revision-Date: 2008-08-17 15:28+0100\n"
+"PO-Revision-Date: 2012-03-02 08:50+0100\n"
 "Last-Translator: ZuurKool <zuurkool@the-conquerors.net>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -1288,6 +1288,7 @@ msgstr "Server Lister"
 
 #~ msgid "&Remove from master"
 #~ msgstr "&Verwijder van master"
+
 #~ msgid ""
 #~ "Game installation path missing!\n"
 #~ "For game %s the directory which contains\n"
@@ -1296,8 +1297,9 @@ msgstr "Server Lister"
 #~ "Spel installatie path ontbreekt!\n"
 #~ "Voor het spel %s is de folder met daarin\n"
 #~ " \"%s\" noodzakelijk om het spel te starten."
+
 #~ msgid "2 (TC-Server)"
 #~ msgstr "2 (TC-Server)"
+
 #~ msgid "Select a player and press CTRL+C to copy to clipboard."
 #~ msgstr "Selecteer een speler en druk CTRL+C om te kopieren naar klembord."
-

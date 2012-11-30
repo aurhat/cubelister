@@ -1,5 +1,6 @@
 AC_INIT([csl], [0.8.2])
 AM_INIT_AUTOMAKE([foreign])
+AM_SILENT_RULES([yes])
 AC_CONFIG_HEADER([src/config.h])
 
 AC_LANG_CPLUSPLUS

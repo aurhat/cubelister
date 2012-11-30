@@ -69,7 +69,7 @@ void CslToolTip::OnPaint(wxPaintEvent& event)
 #ifdef __WXMAC__
     dc.DrawRectangle(0, 0, w, h);
 #else
-    dc.DrawRoundedRectangle(0, 0, w, h, 2.0);
+    dc.DrawRoundedRectangle(0, 0, w, h, 5.0);
 #endif
 }
 
@@ -143,6 +143,11 @@ void CslToolTip::CreateFrame()
     font.SetWeight(wxFONTWEIGHT_BOLD);
     left->SetFont(font);
     title->SetFont(font);
+
+    const wxColour& fg=SYSCOLOUR(wxSYS_COLOUR_INFOTEXT);
+    left->SetForegroundColour(fg);
+    right->SetForegroundColour(fg);
+    title->SetForegroundColour(fg);
 
 #ifdef __WXMSW__
     //set the default tooltip bg colour otherwise it's the default window bg colour

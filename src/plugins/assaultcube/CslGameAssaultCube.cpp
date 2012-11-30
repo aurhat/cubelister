@@ -76,13 +76,12 @@ const wxChar* CslGameAssaultCube::GetVersionName(wxInt32 prot) const
         wxT("0.93.x"), wxT("0.92"), wxT("0.91.x"), wxT("0.90")
     };
 
+    static wxInt32 count=sizeof(versions)/sizeof(versions[0]);
+
     wxInt32 v=CSL_LAST_PROTOCOL_AC-prot;
 
-    if (v<0 || (size_t)v>=sizeof(versions)/sizeof(versions[0]))
-    {
-        static wxString version=wxString::Format(wxT("%d"), prot);
-        return version.c_str();
-    }
+    if (v<0 || v>=count || !versions[v])
+        return wxString::Format(wxT("%d"), prot).c_str();
     else
         return versions[v];
 }

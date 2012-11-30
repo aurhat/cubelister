@@ -290,16 +290,15 @@ const wxChar* CslGameRedEclipse::GetVersionName(wxInt32 prot) const
 {
     static const wxChar* versions[] =
     {
-        wxT("Supernova"), wxT("Ides")
+        wxT("Cosmic"), NULL, NULL, wxT("Supernova"), wxT("Ides") 
     };
+
+    static wxInt32 count=sizeof(versions)/sizeof(versions[0]);
 
     wxInt32 v=CSL_LAST_PROTOCOL_RE-prot;
 
-    if (v<0 || (size_t)v>=sizeof(versions)/sizeof(versions[0]))
-    {
-        static wxString version=wxString::Format(wxT("%d"), prot);
-        return version.c_str();
-    }
+    if (v<0 || v>=count || !versions[v])
+        return wxString::Format(wxT("%d"), prot).c_str();
     else
         return versions[v];
 }

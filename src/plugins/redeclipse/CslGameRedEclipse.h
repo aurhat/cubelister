@@ -26,7 +26,7 @@
 */
 
 #define CSL_DEFAULT_NAME_RE           wxT("Red Eclipse")
-#define CSL_LAST_PROTOCOL_RE          211
+#define CSL_LAST_PROTOCOL_RE          214
 
 #define CSL_FOURCC_RE                 "RDEE"
 

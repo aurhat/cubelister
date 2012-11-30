@@ -87,17 +87,16 @@ const wxChar* CslGameSauerbraten::GetVersionName(wxInt32 prot) const
         wxT("Justice"), wxT("Trooper"), wxT("CTF"), wxT("Assassin"),
         wxT("Summer"), wxT("Spring"), wxT("Gui"), wxT("Water"),
         wxT("Normalmap"), wxT("Sp"), wxT("Occlusion"), wxT("Shader"),
-        wxT("Physics"), wxT("Mp"), wxT(""), wxT("Agc"), wxT("Quakecon"),
+        wxT("Physics"), wxT("Mp"), NULL, wxT("Agc"), wxT("Quakecon"),
         wxT("Independence")
     };
 
+    static wxInt32 count=sizeof(versions)/sizeof(versions[0]);
+
     wxInt32 v=CSL_LAST_PROTOCOL_SB-prot;
 
-    if (v<0 || (size_t)v>=sizeof(versions)/sizeof(versions[0]))
-    {
-        static wxString version=wxString::Format(wxT("%d"), prot);
-        return version.c_str();
-    }
+    if (v<0 || v>=count || !versions[v])
+        return wxString::Format(wxT("%d"), prot).c_str();
     else
         return versions[v];
 }
