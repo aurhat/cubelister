@@ -178,6 +178,7 @@ class CslGame
 
         virtual wxInt32 GetPlayerstatsDescriptions(const wxChar ***desc) const;
         virtual const wxChar* GetWeaponName(wxInt32 n, wxInt32 prot) const { return wxEmptyString; }
+        virtual wxInt32 GetPrivileges(wxInt32 n, wxInt32 prot) const { return n;}
         virtual bool ModeHasFlags(wxInt32 mode,wxInt32 prot) const { return false; }
         virtual bool ModeHasBases(wxInt32 mode,wxInt32 prot) const { return false; }
         virtual wxInt32 ModeScoreLimit(wxInt32 mode,wxInt32 prot) const { return -1; }

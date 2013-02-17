@@ -26,7 +26,7 @@
 */
 
 #define CSL_DEFAULT_NAME_SB           wxT("Sauerbraten")
-#define CSL_LAST_PROTOCOL_SB          258
+#define CSL_LAST_PROTOCOL_SB          259
 
 #define CSL_FOURCC_SB                 "SRBN"
 
@@ -50,6 +50,7 @@ class CslGameSauerbraten : public CslGame
 
         //implementations for base class
         inline const wxChar* GetWeaponName(wxInt32 n, wxInt32 prot) const;
+        inline wxInt32 GetPrivileges(wxInt32 n, wxInt32 prot) const;
         inline bool ModeHasFlags(wxInt32 mode, wxInt32 prot) const;
         inline bool ModeHasBases(wxInt32 mode, wxInt32 prot) const;
         inline wxInt32 ModeScoreLimit(wxInt32 mode, wxInt32 prot) const;

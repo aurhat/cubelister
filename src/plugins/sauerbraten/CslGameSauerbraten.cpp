@@ -27,7 +27,8 @@
 
 
 enum { MM_AUTH = -1, MM_OPEN, MM_VETO, MM_LOCKED, MM_PRIVATE, MM_PASSWORD };
-enum { CS_ALIVE, CS_DEAD, CS_SPAWNING, CS_LAGGED, CS_EDITING, CS_SPECTATOR };
+enum { CS_ALIVE = 0, CS_DEAD, CS_SPAWNING, CS_LAGGED, CS_EDITING, CS_SPECTATOR };
+enum { PRIV_NONE = 0, PRIV_MASTER, PRIV_AUTH, PRIV_ADMIN };
 
 static const wxChar* CLIENT_BINARY[] =
 {
@@ -84,11 +85,11 @@ const wxChar* CslGameSauerbraten::GetVersionName(wxInt32 prot) const
 {
     static const wxChar* versions[] =
     {
-        wxT("Justice"), wxT("Trooper"), wxT("CTF"), wxT("Assassin"),
-        wxT("Summer"), wxT("Spring"), wxT("Gui"), wxT("Water"),
-        wxT("Normalmap"), wxT("Sp"), wxT("Occlusion"), wxT("Shader"),
-        wxT("Physics"), wxT("Mp"), NULL, wxT("Agc"), wxT("Quakecon"),
-        wxT("Independence")
+        wxT("Collect"), wxT("Justice"), wxT("Trooper"), wxT("CTF"),
+        wxT("Assassin"),wxT("Summer"), wxT("Spring"), wxT("Gui"),
+        wxT("Water"), wxT("Normalmap"), wxT("Sp"), wxT("Occlusion"),
+        wxT("Shader"), wxT("Physics"), wxT("Mp"), NULL, wxT("Agc"),
+        wxT("Quakecon"), wxT("Independence")
     };
 
     static wxInt32 count=sizeof(versions)/sizeof(versions[0]);
@@ -162,12 +163,20 @@ const wxChar* CslGameSauerbraten::GetWeaponName(wxInt32 n, wxInt32 prot) const
     return _("unknown");
 }
 
+wxInt32 CslGameSauerbraten::GetPrivileges(wxInt32 n, wxInt32 prot) const
+{
+    if (prot<259 && n>PRIV_MASTER)
+        n++;
+
+    return n>CSL_PLAYER_PRIV_NONE && n<CSL_PLAYER_PRIV_MAX ? n : CSL_PLAYER_PRIV_UNKNOWN;
+}
+
 bool CslGameSauerbraten::ModeHasFlags(wxInt32 mode, wxInt32 prot) const
 {
     if (prot<257)
         return mode>16 && mode<19;
     else
-        return mode>10 && mode<20;
+        return mode>10 && mode<23;
 
     return false;
 }

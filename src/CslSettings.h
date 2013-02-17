@@ -72,6 +72,7 @@
 #define CSL_SYSTRAY_CLOSE  (1<<1)
 
 #define CSL_COLOUR_MASTER     wxColour(64,  255, 128)
+#define CSL_COLOUR_AUTH       wxColour(192,  64, 192)
 #define CSL_COLOUR_ADMIN      wxColour(255, 128,   0)
 #define CSL_COLOUR_SPECTATOR  wxColour(192, 192, 192)
 

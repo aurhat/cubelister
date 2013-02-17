@@ -421,7 +421,7 @@ void CslListCtrlPlayer::UpdateData()
 
     wxString s;
     wxListItem item;
-    wxInt32 i, j, column, image, dlen;
+    wxInt32 i, j, dlen;
     CslPlayerStatsData *data;
     const wxChar **descriptions;
     const CslPlayerStats& stats=m_info->PlayerStats;
@@ -442,7 +442,7 @@ void CslListCtrlPlayer::UpdateData()
 
         for (j=0; j<dlen; j++)
         {
-            image=-1;
+            wxInt32 column, image=-1;
 
             switch (j)
             {
@@ -469,9 +469,13 @@ void CslListCtrlPlayer::UpdateData()
 
         item.SetId(i);
 
-        if (data->Privileges==CSL_PLAYER_PRIV_MASTER)
+        wxInt32 priv = m_info->GetGame().GetPrivileges(data->Privileges, m_info->Protocol);
+
+        if (priv==CSL_PLAYER_PRIV_MASTER)
             SetItemBackgroundColour(item,CSL_COLOUR_MASTER);
-        else if (data->Privileges==CSL_PLAYER_PRIV_ADMIN)
+        else if (priv==CSL_PLAYER_PRIV_AUTH)
+            SetItemBackgroundColour(item,CSL_COLOUR_AUTH);
+        else if (priv==CSL_PLAYER_PRIV_ADMIN)
             SetItemBackgroundColour(item,CSL_COLOUR_ADMIN);
         else if (data->State==CSL_PLAYER_STATE_SPECTATOR)
             SetItemBackgroundColour(item,CSL_COLOUR_SPECTATOR);
