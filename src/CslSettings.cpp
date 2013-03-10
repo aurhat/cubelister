@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -23,17 +23,19 @@
 #include "CslApp.h"
 #include "CslFrame.h"
 
-CslListCtrlSettings* CslSettings::GetListSettings(const wxString& name)
+CslListCtrlSettings& CslSettings::GetListSettings(const wxString& name)
 {
     CslSettings& settings=GetInstance();
 
     loopv(settings.CslListSettings)
     {
         if (settings.CslListSettings[i]->Name==name)
-            return settings.CslListSettings[i];
+            return *settings.CslListSettings[i];
     }
 
-    return settings.CslListSettings.add(new CslListCtrlSettings(name));
+    settings.CslListSettings.push_back(new CslListCtrlSettings(name));
+
+    return *settings.CslListSettings.back();
 }
 
 void CslSettings::LoadSettings()
@@ -45,16 +47,13 @@ void CslSettings::LoadSettings()
         return;
 
     long int val;
-#if 0 // enable later if there is any custom column size support
-    double dval;
-#endif
     wxString s;
 
     wxFileConfig config(wxT(""), wxT(""), CSL_SETTINGS_FILE, wxT(""),
                         wxCONFIG_USE_LOCAL_FILE, wxConvLocal);
 
     config.SetPath(wxT("/Version"));
-    config.Read(wxT("Version"), &val, 0);
+    if (config.Read(wxT("Version"), &val)) settings.Version = val;
 
     config.SetPath(wxT("/Gui"));
     if (config.Read(wxT("SizeX"), &val)) settings.FrameSize.SetWidth(val);
@@ -76,7 +75,7 @@ void CslSettings::LoadSettings()
     }
     if (config.Read(wxT("NoUpdatePlaying"), &val)) settings.DontUpdatePlaying=val!=0;
     if (config.Read(wxT("ShowSearch"), &val)) settings.ShowSearch=val!=0;
-    if (config.Read(wxT("SearchLAN"), &val)) settings.SearchLAN=val;
+    if (config.Read(wxT("SearchLAN"), &val)) settings.SearchLAN=val!=0;
     if (config.Read(wxT("FilterMaster"), &val)) settings.FilterMaster=val;
     if (config.Read(wxT("FilterFavourites"), &val)) settings.FilterFavourites=val;
     if (config.Read(wxT("WaitOnFullServer"), &val))
@@ -121,15 +120,22 @@ void CslSettings::LoadSettings()
             settings.MinPlaytime=val;
     }
 
-    /* ListCtrl */
+    /* Lists */
     config.SetPath(wxT("/List"));
     if (config.Read(wxT("AutoSort"), &val)) settings.AutoSortColumns=val!=0;
+    /* Colours */
+    /* Server lists */
     if (config.Read(wxT("ColourEmpty"), &val)) settings.ColServerEmpty=INT2COLOUR(val);
     if (config.Read(wxT("ColourOffline"), &val)) settings.ColServerOff=INT2COLOUR(val);
     if (config.Read(wxT("ColourFull"), &val)) settings.ColServerFull=INT2COLOUR(val);
     if (config.Read(wxT("ColourMM1"), &val)) settings.ColServerMM1=INT2COLOUR(val);
     if (config.Read(wxT("ColourMM2"), &val)) settings.ColServerMM2=INT2COLOUR(val);
     if (config.Read(wxT("ColourMM3"), &val)) settings.ColServerMM3=INT2COLOUR(val);
+    /* Player lists */
+    if (config.Read(wxT("PlayerMaster"), &val)) settings.ColPlayerMaster=INT2COLOUR(val);
+    if (config.Read(wxT("PlayerAuth"), &val)) settings.ColPlayerAuth=INT2COLOUR(val);
+    if (config.Read(wxT("PlayerAdmin"), &val)) settings.ColPlayerAdmin=INT2COLOUR(val);
+    /* other */
     if (config.Read(wxT("ColourSearch"), &val)) settings.ColServerHigh=INT2COLOUR(val);
     if (config.Read(wxT("ColourPlaying"), &val)) settings.ColServerPlay=INT2COLOUR(val);
     if (config.Read(wxT("ColourStripes"), &val)) settings.ColInfoStripe=INT2COLOUR(val);
@@ -148,12 +154,12 @@ void CslSettings::LoadSettings()
         if ((name=name.Mid(pos+1)).IsEmpty())
             continue;
 
-        CslListCtrlSettings *ls=GetListSettings(name);
-        ls->ColumnMask=columnmask;
+        CslListCtrlSettings& ls = GetListSettings(name);
+        ls.ColumnMask = columnmask;
     }
 
     /* Client */
-    CslGames& games=engine->GetGames();
+    CslArrayCslGame& games=engine->GetGames();
     loopv(games)
     {
 #ifdef __WXMAC__
@@ -161,25 +167,17 @@ void CslSettings::LoadSettings()
 #else
         val=false;
 #endif //__WXMAC__
-        CslGameClientSettings& settings=games[i]->GetClientSettings();
+        CslGameClientSettings settings;
 
         config.SetPath(wxT("/")+games[i]->GetName());
         if (config.Read(wxT("Binary"), &s)) settings.Binary=s;
         if (config.Read(wxT("GamePath"), &s)) settings.GamePath=s;
         if (config.Read(wxT("ConfigPath"), &s))
-        {
-            if (s.IsEmpty() && !settings.GamePath.IsEmpty())
-                settings.ConfigPath=settings.GamePath;
-            else if (!s.IsEmpty() && ::wxDirExists(s))
-                settings.ConfigPath=s;
-        }
         if (config.Read(wxT("Options"), &s)) settings.Options=s;
         if (config.Read(wxT("PreScript"), &s)) settings.PreScript=s;
         if (config.Read(wxT("PostScript"), &s)) settings.PostScript=s;
-        if (!settings.Binary.IsEmpty() && !::wxFileExists(settings.Binary))
-            settings.Binary=wxEmptyString;
-        if (!settings.GamePath.IsEmpty() && !::wxDirExists(settings.GamePath))
-            settings.GamePath=wxEmptyString;
+
+        games[i]->SetClientSettings(settings);
     }
 }
 
@@ -246,29 +244,29 @@ void CslSettings::SaveSettings()
 
     wxInt32 id=0;
     wxString n, v;
-    vector<wxWindow*> lists;
+    CslArraywxWindow lists;
     GetChildWindowsByClassInfo(NULL, CLASSINFO(CslListCtrl), lists);
 
     loopv(lists)
     {
-        CslListCtrl *list=(CslListCtrl*)lists[i];
-        const wxString& name=list->GetName();
+        CslListCtrl *list = (CslListCtrl*)lists[i];
+        const wxString& name = list->GetName();
 
-        if (!name.empty())
+        if (!name.empty() && name!=wxListCtrlNameStr)
         {
-            wxUint32 m=list->ListGetColumnMask();
+            wxUint32 m = list->ListGetColumnMask();
 
             if (m)
             {
-                n=wxString::Format(wxT("ColumnsMask%d"), id++);
-                v=wxString::Format(wxT("%u:"), m)+name;
+                n = wxString::Format(wxT("ColumnsMask%d"), id++);
+                v = wxString::Format(wxT("%u:"), m)+name;
                 config.Write(n, v);
             }
         }
     }
 
     /* Client */
-    CslGames& games=engine->GetGames();
+    CslArrayCslGame& games=engine->GetGames();
     loopv(games)
     {
         CslGame& game=*games[i];
@@ -294,6 +292,7 @@ class CslIDMapping
 
         wxInt32 m_oldId, m_newId;
 };
+WX_DEFINE_ARRAY(CslIDMapping*, CslArrayCslIDMapping);
 
 bool CslSettings::LoadServers(wxUint32 *numm, wxUint32 *nums)
 {
@@ -307,8 +306,8 @@ bool CslSettings::LoadServers(wxUint32 *numm, wxUint32 *nums)
     bool read_server;
     wxUint32 mc=0, sc=0, tmc=0, tsc=0;
     CslMaster *master;
-    vector<CslIDMapping*> mappings;
-    vector<wxInt32> ids;
+    CslArrayCslIDMapping mappings;
+    wxArrayInt ids;
 
     wxString addr, path, pass1, pass2, description;
     wxUint16 port=0, iport=0;
@@ -324,9 +323,9 @@ bool CslSettings::LoadServers(wxUint32 *numm, wxUint32 *nums)
     wxFileConfig config(wxT(""), wxT(""), CSL_SERVERS_FILE, wxT(""),
                         wxCONFIG_USE_LOCAL_FILE, wxConvLocal);
 
-    CslGames& games=engine->GetGames();
+    CslArrayCslGame& games=engine->GetGames();
 
-    for (gt=0; gt<games.length(); gt++)
+    for (gt=0; gt<(wxInt32)games.GetCount(); gt++)
     {
         wxString s=wxT("/")+games[gt]->GetName();
         config.SetPath(s);
@@ -351,10 +350,10 @@ bool CslSettings::LoadServers(wxUint32 *numm, wxUint32 *nums)
                     {
                         port=port ? port:CSL_DEFAULT_MASTER_WEB_PORT;
                         if (config.Read(wxT("Path"), &path))
-                            master=new CslMaster(CslMasterConnection(addr, path, port));
+                            master = CslMaster::Create(CslMasterConnection(addr, path, port));
                     }
                     else if (port)
-                        master=new CslMaster(CslMasterConnection(addr, port));
+                        master = CslMaster::Create(CslMasterConnection(addr, port));
                 }
             }
             if (!master)
@@ -362,10 +361,10 @@ bool CslSettings::LoadServers(wxUint32 *numm, wxUint32 *nums)
 
             if (games[gt]->AddMaster(master)<0)
             {
-                delete master;
+                CslMaster::Destroy(master);
                 continue;
             }
-            mappings.add(new CslIDMapping(id, master->GetId()));
+            mappings.Add(new CslIDMapping(id, master->GetId()));
             tmc++;
         }
 
@@ -374,7 +373,7 @@ bool CslSettings::LoadServers(wxUint32 *numm, wxUint32 *nums)
         while (read_server)
         {
             wxInt32 id=0;
-            ids.setsize(0);
+            ids.Empty();
 
             config.SetPath(s+wxString::Format(wxT("/Server/%d"), sc++));
 
@@ -390,9 +389,9 @@ bool CslSettings::LoadServers(wxUint32 *numm, wxUint32 *nums)
                 config.Read(wxT("Description"), &description, wxEmptyString);
 
                 while (config.Read(wxString::Format(wxT("Master%d"), id++), &val))
-                    ids.add(val);
-                if (ids.length()==0)
-                    ids.add(-1);
+                    ids.Add(val);
+                if (ids.GetCount()==0)
+                    ids.Add(-1);
 
                 if (config.Read(wxT("View"), &val))
                 {
@@ -418,10 +417,10 @@ bool CslSettings::LoadServers(wxUint32 *numm, wxUint32 *nums)
 
             loopv(ids)
             {
-                CslServerInfo *info=new CslServerInfo(games[gt], addr, port, iport ? iport:port+1,
-                                                      view, lastSeen, playLast, playTimeLastGame,
-                                                      playTimeTotal, connectedTimes,
-                                                      description, pass1, pass2);
+                CslServerInfo *info = CslServerInfo::Create(games[gt], addr, port, iport ? iport:port+1,
+                                                            view, lastSeen, playLast, playTimeLastGame,
+                                                            playTimeTotal, connectedTimes,
+                                                            description, pass1, pass2);
 
                 if (ids[i]==-1)
                     id=-1;
@@ -437,13 +436,12 @@ bool CslSettings::LoadServers(wxUint32 *numm, wxUint32 *nums)
                     }
                 }
 
-                if (games[gt]->AddServer(info, id))
+                if (engine->AddServer(games[gt], info, id))
                 {
                     long type;
                     wxInt32 pos, j=0;
                     wxString guiview;
 
-                    engine->ResolveHost(info);
                     info->RegisterEvents(events);
 
                     while (config.Read(wxString::Format(wxT("GuiView%d"), j++), &guiview))
@@ -454,20 +452,19 @@ bool CslSettings::LoadServers(wxUint32 *numm, wxUint32 *nums)
                             continue;
                         if ((guiview=guiview.Mid(pos+1)).IsEmpty())
                             continue;
-                        frame->PlayerListCreateView(info, type, guiview);
+                        frame->CreateServerView(info, type, guiview);
                     }
 
                     tsc++;
                 }
                 else
-                    delete info;
+                    CslServerInfo::Destroy(info);
             }
         }
         //engine->ResetPingSends(games[gt], NULL);
     }
 
-    loopv(mappings)
-    delete mappings[i];
+    WX_CLEAR_ARRAY(mappings);
 
     if (numm)
         *nums=tmc;
@@ -497,9 +494,9 @@ void CslSettings::SaveServers()
     CslMaster *master;
     CslServerInfo *info;
 
-    CslGames& games=engine->GetGames();
+    CslArrayCslGame& games=engine->GetGames();
 
-    if (!games.length())
+    if (!games.GetCount())
         return;
 
     config.SetPath(wxT("/Version"));
@@ -511,7 +508,7 @@ void CslSettings::SaveServers()
         s=wxT("/")+game->GetName();
         config.SetPath(s);
 
-        CslMasters& masters=game->GetMasters();
+        CslArrayCslMaster& masters=game->GetMasters();
         mc=0;
 
         loopvj(masters)
@@ -520,15 +517,15 @@ void CslSettings::SaveServers()
             CslMasterConnection& connection=master->GetConnection();
 
             config.SetPath(s+s.Format(wxT("/Master/%d"), mc++));
-            config.Write(wxT("Type"), connection.GetType());
-            config.Write(wxT("Address"), connection.GetAddress());
-            config.Write(wxT("Port"), connection.GetPort());
-            config.Write(wxT("Path"), connection.GetPath());
+            config.Write(wxT("Type"), connection.Type);
+            config.Write(wxT("Address"), connection.Address);
+            config.Write(wxT("Port"), connection.Port);
+            config.Write(wxT("Path"), connection.Path);
             config.Write(wxT("ID"), master->GetId());
         }
 
-        CslServerInfos& servers=game->GetServers();
-        if (servers.length()==0)
+        CslArrayCslServerInfo& servers=game->GetServers();
+        if (servers.GetCount()==0)
             continue;
 
         sc=0;
@@ -538,11 +535,11 @@ void CslSettings::SaveServers()
             config.SetPath(s+s.Format(wxT("/Server/%d"), sc++));
             config.Write(wxT("Address"), info->Host);
             config.Write(wxT("Port"), info->GamePort);
-            config.Write(wxT("InfoPort"), info->InfoPort);
+            config.Write(wxT("InfoPort"), info->Address().GetPort());
             config.Write(wxT("Password"), info->Password);
             config.Write(wxT("AdminPassword"), info->PasswordAdmin);
             config.Write(wxT("Description"), info->DescriptionOld);
-            const vector<wxInt32> masters=info->GetMasterIDs();
+            wxArrayInt masters=info->GetMasterIDs();
             loopvk(masters) config.Write(wxString::Format(wxT("Master%d"), k), masters[k]);
             config.Write(wxT("View"), (int)info->View);
             config.Write(wxT("Events"), (int)info->GetRegisteredEvents());
@@ -554,14 +551,14 @@ void CslSettings::SaveServers()
 
             wxUint32 l=0;
             wxAuiManager& AuiMgr=((CslFrame*)wxGetApp().GetTopWindow())->GetAuiManager();
-            vector<CslPanelPlayer*>& playerInfos=((CslFrame*)wxGetApp().GetTopWindow())->GetPlayerViews();
+            CslArrayCslServerView& serverviews = ((CslFrame*)wxGetApp().GetTopWindow())->GetServerViews();
 
-            loopvk(playerInfos)
+            loopvk(serverviews)
             {
                 if (k==0)
                     continue;
-                CslPanelPlayer *list=playerInfos[k];
-                if (list->ServerInfo()==info)
+                CslPanelServerView *list=serverviews[k];
+                if (list->GetServerInfo()==info)
                 {
                     wxAuiPaneInfo& pane=AuiMgr.GetPane(list);
                     if (!pane.IsOk())

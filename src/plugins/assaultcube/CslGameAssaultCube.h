@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -40,40 +40,32 @@
 #define CSL_DEFAULT_INJECT_FILE_AC    wxT("autoexec.cfg")
 
 
-class CslGameAssaultCube : public CslGame
+class CSL_DLL_PLUGINS CslGameAssaultCube : public CslGame
 {
     public:
         CslGameAssaultCube();
         ~CslGameAssaultCube();
 
     private:
-        inline const wxChar* GetVersionName(wxInt32 prot) const;
-        inline const wxChar* GetModeName(wxInt32 mode) const;
+        wxString GetVersionName(wxInt32 prot) const;
+        const wxChar* GetModeName(wxInt32 mode) const;
 
         //implementations for base class
-        inline const wxChar* GetWeaponName(wxInt32 n, wxInt32 prot) const;
-        inline bool ModeHasFlags(wxInt32 mode, wxInt32 prot) const { return mode==5 || (mode>=13 && mode<=15); }
+        const wxChar* GetWeaponName(wxInt32 n, wxInt32 prot) const;
+        bool ModeHasFlags(wxInt32 mode, wxInt32 prot) const { return mode==5 || (mode>=13 && mode<=15); }
         wxInt32 GetBestTeam(CslTeamStats& stats, wxInt32 prot) const;
         wxUint16 GetDefaultGamePort() const { return CSL_DEFAULT_PORT_AC; }
         wxUint16 GetInfoPort(wxUint16 port=0) const { return port ? port+1 : CSL_DEFAULT_PORT_AC+1; }
         wxUint16 GetBroadcastPort() { return CSL_DEFAULT_BCAST_PORT_AC; }
-        inline bool PingDefault(ucharbuf& buf, CslServerInfo& info) const;
+        bool PingDefault(ucharbuf& buf, CslServerInfo& info) const;
         bool ParseDefaultPong(ucharbuf& buf, CslServerInfo& info) const;
         bool ParsePlayerPong(wxInt32 protocol, ucharbuf& buf, CslPlayerStatsData& info) const;
         bool ParseTeamPong(wxInt32 protocol, ucharbuf& buf, CslTeamStatsData& info) const;
+        CslGameClientSettings GuessClientSettings(const wxString& path) const;
+        wxString ValidateClientSettings(CslGameClientSettings& settings) const;
         void SetClientSettings(const CslGameClientSettings& settings);
         wxString GameStart(CslServerInfo *info, wxInt32 mode, wxString& error);
         wxInt32 GameEnd(wxString& error);
-};
-
-class CslGameAssaultCubePlugin: public CslPlugin
-{
-    public:
-        CslGameAssaultCubePlugin(CslPluginHostInfo *hostinfo, CslPluginInfo *plugininfo) :
-                CslPlugin(hostinfo, plugininfo) { }
-        virtual ~CslGameAssaultCubePlugin() { }
-
-        virtual bool Create();
 };
 
 #endif //CSLGAMEASSAULTCUBE_H

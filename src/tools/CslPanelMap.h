@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -26,7 +26,7 @@
 */
 
 
-class CslBaseInfo
+class CSL_DLL_GUITOOLS CslBaseInfo
 {
     public:
         CslBaseInfo(wxInt32 x, wxInt32 y) :
@@ -36,10 +36,9 @@ class CslBaseInfo
         wxColour m_colour;
 };
 
-WX_DEFINE_ARRAY_PTR(CslBaseInfo*, t_aBaseInfo);
-WX_DEFINE_ARRAY_INT(wxInt32, t_aInt32);
+WX_DEFINE_USER_EXPORTED_ARRAY(CslBaseInfo*, CslArrayCslBaseInfo, class CSL_DLL_GUITOOLS);
 
-class CslMapInfo
+class CSL_DLL_GUITOOLS CslMapInfo
 {
     public:
         CslMapInfo(const wxString& name=wxT(""), wxInt32 version=-1)
@@ -64,7 +63,7 @@ class CslMapInfo
             return *this;
         }
 
-        bool GetMapConfigVersions(wxFileConfig& config, t_aInt32& array);
+        bool GetMapConfigVersions(wxFileConfig& config, wxArrayInt& array);
         bool LoadMapConfig(wxFileConfig& config, wxInt32 protocol);
         bool LoadMapImage(const wxString& map, const wxString& path);
         bool LoadMapData(const wxString& map, const wxString& game, wxInt32 protocol);
@@ -87,19 +86,22 @@ class CslMapInfo
         wxInt32 m_version;
         wxString m_mapName, m_mapNameFull, m_author;
         wxBitmap m_bitmap;
-        t_aBaseInfo m_bases;
+        CslArrayCslBaseInfo m_bases;
         bool m_basesOk;
 };
 
 
-class CslPanelMap : public wxPanel
+class CSL_DLL_GUITOOLS CslPanelMap : public wxPanel
 {
     public:
-        CslPanelMap(wxWindow *parent, wxInt32 id) : wxPanel(parent, id),
+        CslPanelMap(wxWindow *parent, wxInt32 id,
+                    const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize,
+                    long style = wxTAB_TRAVERSAL, const wxString& name = wxT("panel")) :
+                wxPanel(parent, id, pos, size, style, name),
                 m_ok(false), m_background(false) { }
         ~CslPanelMap() { Reset(); }
 
-        void SetMap(const wxBitmap& bitmap, const bool refresh=true)
+        void SetMap(const wxBitmap& bitmap, const bool refresh = true)
         {
             m_bitmap=bitmap;
             m_ok=true;
@@ -119,7 +121,7 @@ class CslPanelMap : public wxPanel
         }
         bool IsOk() { return m_ok; }
 
-        void UpdateBases(const t_aBaseInfo& bases, const bool hasBases);
+        void UpdateBases(const CslArrayCslBaseInfo& bases, const bool hasBases);
 
         void Reset()
         {
@@ -140,7 +142,7 @@ class CslPanelMap : public wxPanel
 
     protected:
         wxBitmap m_bitmap;
-        t_aBaseInfo m_bases;
+        CslArrayCslBaseInfo m_bases;
 
         wxPoint GetBitmapOrigin()
         {

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -21,98 +21,79 @@
 #ifndef CSLPLUGIN_H
 #define CSLPLUGIN_H
 
-#define CSL_PLUGIN_VERSION_API     1
+#define CSL_PLUGIN_VERSION_API  1
 
-#ifdef __WXMSW__
-#define CSL_LIBRARY_EXTENSION wxT("*.dll")
-#elif __WXMAC__
-#define CSL_LIBRARY_EXTENSION wxT("*.dylib")
-#else
-#define CSL_LIBRARY_EXTENSION wxT("*.so")
-#endif
+enum { CSL_PLUGIN_TYPE_ENGINE, CSL_PLUGIN_TYPE_GUI };
 
-#define IMPLEMENT_PLUGIN(fcc, api, type, version, name, author, email, website, license, description, class) \
+#define IMPLEMENT_PLUGIN(api, type, fcc, name, version,                \
+                         author, email, website, license, description, \
+                         init, deinit, config)                         \
     extern "C" \
     { \
-        WXEXPORT CslPluginInfo* csl_init_plugin(CslPluginHostInfo *host) \
+        WXEXPORT CslPluginInfo csl_plugin_info = \
         { \
-            static CslPluginInfo info; \
-            \
-            info.FourCC=fcc; \
-            info.APIVersion=api; \
-            info.Type=type; \
-            info.Version=version; \
-            info.Name=name; \
-            info.Author=author; \
-            info.Email=email; \
-            info.Website=website; \
-            info.License=license; \
-            info.Description=description; \
-            info.Plugin=new class(host, &info); \
-            \
-            return &info; \
-        } \
+            api,         \
+            type,        \
+            fcc,         \
+            name,        \
+            version,     \
+            author,      \
+            email,       \
+            website,     \
+            license,     \
+            description, \
+            init,        \
+            deinit,      \
+            config,      \
+        }; \
     }
 
-class CslPlugin;
+class CslEngine;
+class CslGame;
 
-typedef struct
-{
-    wxInt32 Type;
-    wxUint32 APIVersion;
-    wxUint32 FourCC;
-    wxUint32 Version;
-    wxString Name;
-    wxString Author;
-    wxString Email;
-    wxString Website;
-    wxString License;
-    wxString Description;
-    CslPlugin *Plugin;
-} CslPluginInfo;
-
-
-class CslPluginHostInfo
+class CSL_DLL_PLUGIN CslPluginHost
 {
     public:
         virtual wxWindow* GetMainWindow() { return NULL; }
-        virtual wxEvtHandler* GetEvtHandler()  { return NULL; }
+        virtual wxEvtHandler* GetEvtHandler() { return NULL; }
 
         virtual wxInt32 GetFreeId() { return -1; }
-        virtual wxMenu* GetPluginMenu()  { return NULL; }
-        virtual wxMenuBar* GetMainMenuBar()  { return NULL; }
+#if wxUSE_GUI
+        virtual wxMenu* GetPluginMenu() { return NULL; }
+        virtual wxMenuBar* GetMainMenuBar() { return NULL; }
+#endif //wxUSE_GUI
 
-        virtual CslEngine* GetCslEngine()  { return NULL; }
-        virtual CslGame* GetSelectedGame()  { return NULL; }
+        virtual CslEngine* GetCslEngine() { return NULL; }
+        virtual CslGame* GetSelectedGame() { return NULL; }
 };
 
+typedef bool (*CslPluginInitFn)(CslPluginHost*);
+typedef void (*CslPluginDeinitFn)(CslPluginHost*);
+typedef void (*CslPluginConfigFn)(CslPluginHost*);
 
-class CslPlugin: public wxEvtHandler
+typedef struct
+{
+    wxUint32 APIVersion;
+    wxInt32 Type;
+    wxUint32 FourCC;
+    const wxChar *Name;
+    const wxChar *Version;
+    const wxChar *Author;
+    const wxChar *Email;
+    const wxChar *Website;
+    const wxChar *License;
+    const wxChar *Description;
+    CslPluginInitFn InitFn;
+    CslPluginDeinitFn DeinitFn;
+    CslPluginConfigFn ConfigFn;
+} CslPluginInfo;
+
+
+class CSL_DLL_PLUGIN CslPlugin
 {
     public:
-        enum { TYPE_NONE, TYPE_ENGINE, TYPE_GUI };
-
-        CslPlugin(CslPluginHostInfo *host, CslPluginInfo *plugin) :
-                wxEvtHandler(),
-                m_plugin(plugin), m_host(host) { }
-        virtual ~CslPlugin() { };
-
-        virtual bool Create() = 0;
-        virtual void CreateMenu(wxMenu *menu) { };
-
-    protected:
-        CslPluginInfo *m_plugin;
-        CslPluginHostInfo *m_host;
-};
-
-
-typedef CslPluginInfo* (*PluginInitFunction)(CslPluginHostInfo*);
-
-class CslPluginObject
-{
-    public:
-        CslPluginObject(const wxString& filename, CslPluginHostInfo *hostinfo);
-        ~CslPluginObject();
+        CslPlugin(const wxString& filename);
+        ~CslPlugin();
 
         bool IsLoaded() { return m_handle.IsLoaded(); }
 
@@ -122,26 +103,23 @@ class CslPluginObject
         wxInt32 m_id;
         wxString m_fileName;
         wxDynamicLibrary m_handle;
-        CslPluginInfo *m_initInfo;
-
-        PluginInitFunction m_initFunc;
+        CslPluginInfo *m_pluginInfo;
 };
 
-typedef vector<CslPluginObject*> CslPlugins;
+WX_DEFINE_USER_EXPORTED_ARRAY(CslPlugin*, CslPlugins, class CSL_DLL_PLUGIN);
 
 
-class CslPluginMgr
+class CSL_DLL_PLUGIN CslPluginMgr
 {
     public:
-        CslPluginMgr(wxUint32 type=CslPlugin::TYPE_NONE) : m_type(type) { }
+        CslPluginMgr(wxUint32 type);
 
-        wxInt32 LoadPlugins(CslPluginHostInfo *hostinfo);
-        void UnloadPlugins();
-
-        void BuildMenu(wxMenu *menu);
+        wxInt32 LoadPlugins(CslPluginHost *host);
+        void UnloadPlugins(CslPluginHost *host);
 
     private:
         wxInt32 m_type;
+        wxString m_extension;
         CslPlugins m_plugins;
 };
 

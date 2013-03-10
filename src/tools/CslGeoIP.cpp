@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -18,10 +18,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <GeoIP.h>
-#include <GeoIPCity.h>
 #include "Csl.h"
 #include "CslGeoIP.h"
+#include <GeoIP.h>
+#include <GeoIPCity.h>
 
 static GeoIP *g_geoIP=NULL;
 
@@ -31,9 +31,7 @@ bool LoadDatabase(const wxString& name, GeoIPDBTypes type, GeoIPOptions options)
     if (GeoIP_db_avail(type))
     {
         if ((g_geoIP=GeoIP_open_type(type, options)))
-        {
-            LOG_DEBUG("Loaded external GeoIP database: %s\n", U2A(name));
-        }
+            CSL_LOG_DEBUG("Loaded external GeoIP database: %s\n", U2C(name));
     }
 #endif //CSL_EXTERNAL_GEOIP_DATABASE
 
@@ -41,14 +39,12 @@ bool LoadDatabase(const wxString& name, GeoIPDBTypes type, GeoIPOptions options)
     {
         wxString path=FindPackageFile(wxT("data/")+name);
 
-        if (!path.IsEmpty())
-        {
-            if ((g_geoIP=GeoIP_open(U2A(path), options)))
-            {
-                LOG_DEBUG("Loaded GeoIP database: %s\n", U2A(path));
-            }
-        }
+        if (!path.IsEmpty() && (g_geoIP = GeoIP_open(U2C(path), options)))
+            CSL_LOG_DEBUG("Loaded GeoIP database: %s\n", U2C(path));
     }
+
+    if (g_geoIP)
+        g_geoIP->charset = GEOIP_CHARSET_UTF8;
 
     return g_geoIP!=NULL;
 }
@@ -64,9 +60,9 @@ void UnloadDatabase()
 
 CslGeoIP::CslGeoIP() : m_type(GEOIP_TYPE_UNKNOWN)
 {
-    if (LoadDatabase(wxT("GeoCity.dat"), GEOIP_CITY_EDITION_REV1, GEOIP_MEMORY_CACHE))
+    if (LoadDatabase(wxT("GeoCity.dat"), GEOIP_CITY_EDITION_REV1, GEOIP_STANDARD))
         m_type=GEOIP_TYPE_CITY;
-    else if (LoadDatabase(wxT("GeoLiteCity.dat"), GEOIP_CITY_EDITION_REV1, GEOIP_MEMORY_CACHE))
+    else if (LoadDatabase(wxT("GeoLiteCity.dat"), GEOIP_CITY_EDITION_REV1, GEOIP_STANDARD))
         m_type=GEOIP_TYPE_CITY;
     else if (LoadDatabase(wxT("GeoIP.dat"), GEOIP_COUNTRY_EDITION, GEOIP_MEMORY_CACHE))
         m_type=GEOIP_TYPE_COUNTRY;
@@ -79,8 +75,8 @@ CslGeoIP::CslGeoIP() : m_type(GEOIP_TYPE_UNKNOWN)
         if (!code || !name)
             break;
 
-        m_country_codes.add(A2U(code));
-        m_country_names.add(A2U(name));
+        m_country_codes.push_back(C2U(code));
+        m_country_names.push_back(C2U(name));
     }
 }
 
@@ -174,7 +170,7 @@ wxString CslGeoIP::GetCountryNameByAddr(const char *host)
             break;
     }
 
-    return country ? A2U(country) : wxString(wxEmptyString);
+    return country ? C2U(country) : wxString(wxEmptyString);
 }
 
 wxString CslGeoIP::GetCountryNameByIPnum(const unsigned long ipnum)
@@ -201,7 +197,7 @@ wxString CslGeoIP::GetCountryNameByIPnum(const unsigned long ipnum)
             break;
     }
 
-    return country ? A2U(country) : wxString(wxEmptyString);
+    return country ? C2U(country) : wxString(wxEmptyString);
 }
 
 wxString CslGeoIP::GetCityNameByAddr(const char *host)
@@ -215,7 +211,7 @@ wxString CslGeoIP::GetCityNameByAddr(const char *host)
 
         if (r)
         {
-            city=A2U(r->city);
+            city=C2U(r->city);
             GeoIPRecord_delete(r);
         }
     }
@@ -234,7 +230,7 @@ wxString CslGeoIP::GetCityNameByIPnum(const unsigned long ipnum)
 
         if (r)
         {
-            city=A2U(r->city);
+            city=C2U(r->city);
             GeoIPRecord_delete(r);
         }
     }
@@ -242,14 +238,14 @@ wxString CslGeoIP::GetCityNameByIPnum(const unsigned long ipnum)
     return city;
 }
 
-const vector<wxString>& CslGeoIP::GetCountryCodes()
+const wxArrayString& CslGeoIP::GetCountryCodes()
 {
     CslGeoIP& self=GetInstance();
 
     return self.m_country_codes;
 }
 
-const vector<wxString>& CslGeoIP::GetCountryNames()
+const wxArrayString& CslGeoIP::GetCountryNames()
 {
     CslGeoIP& self=GetInstance();
 

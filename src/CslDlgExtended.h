@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -26,10 +26,7 @@
 */
 
 #include "CslPanelMap.h"
-#include "CslListCtrlPlayer.h"
-
-
-WX_DEFINE_ARRAY_PTR(wxStaticText*,t_aLabel);
+#include "CslPanelServerView.h"
 
 class CslDlgExtended: public wxDialog
 {
@@ -60,13 +57,12 @@ class CslDlgExtended: public wxDialog
         bool m_update;
 
         wxFont m_labelFont;
-        t_aLabel m_teamLabel;
+        wxArrayPtrVoid m_teamLabel;
 
         wxFlexGridSizer *m_gridSizerMain,*m_gridSizerList,*m_gridSizerInfo;
         wxStaticBoxSizer *m_sizerMap,*m_sizerMapLabel;
 
         void OnClose(wxCloseEvent& event);
-        void OnSize(wxSizeEvent& event);
         void OnCommandEvent(wxCommandEvent& event);
         void OnMenu(wxCommandEvent& event);
         void OnItemActivated(wxListEvent& event);
@@ -79,7 +75,7 @@ class CslDlgExtended: public wxDialog
         wxStaticBox* sizer_info_staticbox;
         wxStaticBox* sizer_team_score_staticbox;
         wxStaticBox* sizer_map_staticbox;
-        CslListCtrlPlayer* list_ctrl_players;
+        CslListCtrlPlayerView* list_ctrl_players;
         CslPanelMap* panel_map;
         wxStaticText* label_team1;
         wxStaticText* label_team2;

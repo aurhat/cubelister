@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -21,12 +21,9 @@
 #ifndef CSLENGINE_H
 #define CSLENGINE_H
 
-/**
- @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
-
 #include <CslUDP.h>
 #include <CslGame.h>
+#include <CslDNSResolver.h>
 
 class CslEngine;
 
@@ -37,7 +34,7 @@ class CslEngine;
 #define CSL_UPDATE_INTERVAL_WAIT   2500
 
 BEGIN_DECLARE_EVENT_TYPES()
-DECLARE_EVENT_TYPE(wxCSL_EVT_PONG,wxID_ANY)
+DECLARE_EXPORTED_EVENT_TYPE(CSL_DLL_ENGINE, wxCSL_EVT_PONG, wxID_ANY)
 END_DECLARE_EVENT_TYPES()
 
 class CslPongEvent;
@@ -54,14 +51,16 @@ typedef void (wxEvtHandler::*CslPongEventFunction)(CslPongEvent&);
                                (wxObject*)NULL \
                              ),
 
+
 class CslPongEvent : public wxEvent
 {
     public:
-        enum { PONG=0, UPTIME, PLAYERSTATS, TEAMSTATS, EVENT };
+        enum { PONG, UPTIME, PLAYERSTATS, TEAMSTATS, EVENT };
 
-        CslPongEvent(wxInt32 id=wxID_ANY, CslServerInfo *info=NULL) :
+        CslPongEvent(wxInt32 id = wxID_ANY, CslServerInfo *info = NULL) :
                 wxEvent(id, wxCSL_EVT_PONG),
-                m_info(info) { }
+                m_info(info)
+        { }
 
         virtual wxEvent* Clone() const
         {
@@ -72,98 +71,12 @@ class CslPongEvent : public wxEvent
 
     private:
         CslServerInfo *m_info;
+
+        DECLARE_DYNAMIC_CLASS_NO_ASSIGN(CslPongEvent)
 };
 
 
-BEGIN_DECLARE_EVENT_TYPES()
-DECLARE_EVENT_TYPE(wxCSL_EVT_RESOLVE, wxID_ANY)
-END_DECLARE_EVENT_TYPES()
-
-class CslResolveEvent;
-class CslResolverPacket;
-
-typedef void (wxEvtHandler::*CslResolveEventFunction)(CslResolveEvent&);
-
-#define CslResolveEventHandler(fn) \
-    (wxObjectEventFunction)(wxEventFunction)wxStaticCastEvent(CslResolveEventFunction, &fn)
-
-#define CSL_EVT_RESOLVE(fn) \
-    DECLARE_EVENT_TABLE_ENTRY( \
-                               wxCSL_EVT_RESOLVE, wxID_ANY, wxID_ANY, \
-                               CslResolveEventHandler(fn), \
-                               (wxObject*)NULL \
-                             ),
-
-class CslResolveEvent : public wxEvent
-{
-    public:
-        CslResolveEvent(CslServerInfo *info) :
-                wxEvent(wxID_ANY, wxCSL_EVT_RESOLVE),
-                m_info(info), m_packet(NULL) { }
-        CslResolveEvent(CslResolverPacket *packet) :
-                wxEvent(wxID_ANY, wxCSL_EVT_RESOLVE),
-                m_info(NULL), m_packet(packet) { }
-
-        virtual wxEvent* Clone() const
-        {
-            return new CslResolveEvent(*this);
-        }
-
-        CslServerInfo* GetServerInfo() { return m_info; }
-        CslResolverPacket* GetPacket() { return m_packet; }
-
-    private:
-        CslServerInfo *m_info;
-        CslResolverPacket *m_packet;
-};
-
-class CslResolverPacket
-{
-    public:
-        CslResolverPacket(const wxString& host, wxUint16 port, wxUint32 fourcc) :
-                Host(host), GameFourCC(fourcc)
-        {
-            Address.Service(port);
-        }
-
-        wxString Host;
-        wxString Domain;
-        wxIPV4address Address;
-        wxUint32 GameFourCC;
-};
-
-class CslResolverThread : public wxThread
-{
-    public:
-        CslResolverThread(wxEvtHandler *evtHandler) :
-                wxThread(wxTHREAD_JOINABLE),m_evtHandler(evtHandler),m_terminate(false)
-        {
-            m_condition=new wxCondition(m_mutex);
-            m_ok=Create()==wxTHREAD_NO_ERROR;
-        }
-        virtual ~CslResolverThread() { delete m_condition; }
-
-        bool IsOk() { return m_ok; }
-        void AddPacket(CslResolverPacket *packet);
-        void Terminate();
-
-    private:
-        wxEvtHandler *m_evtHandler;
-        wxMutex m_mutex;
-        wxCondition *m_condition;
-        bool m_terminate;
-        bool m_ok;
-
-        wxCriticalSection m_section;
-        vector<CslResolverPacket*> m_packets;
-        wxIPV4address m_addr;
-
-    protected:
-        virtual wxThread::ExitCode Entry();
-};
-
-
-class CslEngine : public wxEvtHandler, public CslPluginMgr, public CslPluginHostInfo
+class CSL_DLL_ENGINE CslEngine : public wxEvtHandler, public CslPluginMgr, public CslPluginHost
 {
     public:
         CslEngine();
@@ -173,15 +86,20 @@ class CslEngine : public wxEvtHandler, public CslPluginMgr, public CslPluginHost
         void DeInit();
         bool IsOk() const { return m_ok; }
 
-        void SetUpdateInterval(wxInt32 interval) { m_updateInterval=interval; }
+        void SetUpdateInterval(wxInt32 interval) { m_updateInterval = interval; }
 
-        void ResolveHost(CslServerInfo *info);
+        void DNSResolve(const wxString& host, const void* clientData = NULL, wxEvtHandler *evtHandler = NULL)
+            { m_dnsResolver->Resolve(host, clientData, evtHandler); }
 
         bool AddGame(CslGame *game);
-        CslGames& GetGames() { return m_games; }
+        bool RemoveGame(CslGame *game);
         CslGame* FindGame(const wxString& name);
+        CslArrayCslGame& GetGames() { return m_games; }
 
-        void GetFavourites(CslServerInfos& servers);
+        bool AddServer(CslGame *game, CslServerInfo *info, wxInt32 masterID = -1);
+        bool DeleteServer(CslGame *game, CslServerInfo *info);
+
+        void GetFavourites(CslArrayCslServerInfo& servers);
 
         bool Ping(CslServerInfo *info,bool force=false);
         bool PingDefault(CslServerInfo *info);
@@ -199,35 +117,30 @@ class CslEngine : public wxEvtHandler, public CslPluginMgr, public CslPluginHost
         wxInt32 UpdateFromMaster(CslMaster *master);
 
         static bool PingOk(const CslServerInfo& info,wxInt32 interval)
-        {
-            return info.Ping>-1 && (wxInt32)(info.PingSend-info.PingResp)<interval*2;
-        }
+            { return info.Ping>-1 && (wxInt32)(info.PingSend-info.PingResp)<interval*2; }
 
         // function accessable from within plugins
         wxEvtHandler* GetEvtHandler() { return this; }
         CslEngine* GetCslEngine() { return this; }
 
     private:
-        bool m_ok;
+        wxInt32 EnumSystemIPV4Addresses();
 
-        CslUDP *m_udpSock;
-        vector<CslIPV4Addr*> m_networkInterfaces;
-
-        CslResolverThread *m_resolveThread;
-
-        CslGames m_games;
-
-        wxInt32 m_updateInterval,m_pingRatio;
-
-        bool ParseDefaultPong(CslServerInfo *info, ucharbuf& buf, wxUint32 now);
-        bool ParsePong(CslServerInfo *info, CslNetPacket& packet, wxUint32 now);
-
-        wxInt32 EnumNetworkInterfaces();
+        bool ParseDefaultPong(CslServerInfo *info, ucharbuf& buf);
+        bool ParsePong(CslServerInfo *info, CslNetPacket& packet);
 
         void OnPong(CslPingEvent& event);
-        void OnResolve(CslResolveEvent& event);
+        void OnResolve(CslDNSResolveEvent& event);
 
         DECLARE_EVENT_TABLE()
+
+        bool m_ok;
+        CslUDP *m_udpSock;
+        CslDNSResolver *m_dnsResolver;
+        wxUint32 m_lastEnumSystemIPV4Addresses;
+        CslArrayCslIPV4Addr m_systemIPV4Addresses;
+        wxInt32 m_updateInterval, m_pingRatio;
+        CslArrayCslGame m_games;
 };
 
 

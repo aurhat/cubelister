@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -28,6 +28,18 @@
 #ifndef wxART_NONE
 #define wxART_NONE             wxART_MAKE_ART_ID(wxART_NONE)
 #endif
+#ifndef wxART_CLOSE
+#define wxART_CLOSE            wxART_MAKE_ART_ID(wxART_BUTTON_CLOSE)
+#endif
+#ifndef wxART_CLOSE_HOVER
+#define wxART_CLOSE_HOVER      wxART_MAKE_ART_ID(wxART_BUTTON_CLOSE_HOVER)
+#endif
+#ifndef wxART_CLOSE_PRESSED
+#define wxART_CLOSE_PRESSED    wxART_MAKE_ART_ID(wxART_BUTTON_CLOSE_PRESSED)
+#endif
+#ifndef wxART_MASTER
+#define wxART_MASTER           wxART_MAKE_ART_ID(wxART_MASTER)
+#endif
 #ifndef wxART_CSL
 #define wxART_CSL              wxART_MAKE_ART_ID(wxART_CSL)
 #endif
@@ -45,6 +57,18 @@
 #endif
 #ifndef wxART_GEO
 #define wxART_GEO              wxART_MAKE_ART_ID(wxART_GEO)
+#endif
+#ifndef wxART_BUBBLE_GREY
+#define wxART_BUBBLE_GREY      wxART_MAKE_ART_ID(wxART_BUBBLE_GREY)
+#endif
+#ifndef wxART_BUBBLE_GREEN
+#define wxART_BUBBLE_GREEN     wxART_MAKE_ART_ID(wxART_BUBBLE_GREEN)
+#endif
+#ifndef wxART_BUBBLE_YELLOW
+#define wxART_BUBBLE_YELLOW    wxART_MAKE_ART_ID(wxART_BUBBLE_YELLOW)
+#endif
+#ifndef wxART_BUBBLE_RED
+#define wxART_BUBBLE_RED       wxART_MAKE_ART_ID(wxART_BUBBLE_RED)
 #endif
 #ifndef wxART_NOTIFICATION
 #define wxART_NOTIFICATION     wxART_MAKE_ART_ID(wxART_NOTIFICATION)
@@ -68,10 +92,21 @@
 #define wxART_COUNTRY_UNKNOWN  wxART_MAKE_ART_ID(wxART_COUNTRY_UNKNOWN)
 #endif
 
-class CslArt : public wxArtProvider
+class CSL_DLL_GUITOOLS CslArt : public wxArtProvider
 {
     public:
-        static wxBitmap GetMenuBitmap(const wxArtID& id) { return wxArtProvider::GetBitmap(id, wxART_MENU); }
+        static wxBitmap GetMenuBitmap(const wxArtID& id)
+        {
+            return wxArtProvider::GetBitmap(id, wxART_MENU);
+        }
+        static wxBitmap GetToolBarBitmap(const wxArtID& id)
+        {
+            return wxArtProvider::GetBitmap(id, wxART_TOOLBAR);
+        }
+        static wxBitmap GetFrameBitmap(const wxArtID& id)
+        {
+            return wxArtProvider::GetBitmap(id, wxART_FRAME_ICON);
+        }
 
     protected:
         wxBitmap CreateBitmap(const wxArtID& id,
@@ -79,6 +114,8 @@ class CslArt : public wxArtProvider
                               const wxSize& size);
 };
 
-#define GET_ART_MENU(ART) CslArt::GetMenuBitmap(ART)
+#define GET_ART_MENU(ART)    CslArt::GetMenuBitmap(ART)
+#define GET_ART_TOOLBAR(ART) CslArt::GetToolBarBitmap(ART)
+#define GET_ART_FRAME(ART)   CslArt::GetFrameBitmap(ART)
 
 #endif // CSLART_H

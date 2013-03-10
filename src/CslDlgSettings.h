@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -26,30 +26,6 @@
 */
 
 #include "CslSettings.h"
-
-
-class CslGamePage : public wxPanel
-{
-    public:
-        CslGamePage(wxWindow *parent,CslGame* game);
-        ~CslGamePage();
-
-        bool SaveSettings(wxString& error);
-
-    private:
-        void OnPicker(wxFileDirPickerEvent& event);
-        void OnCommandEvent(wxCommandEvent& event);
-
-        DECLARE_EVENT_TABLE()
-
-    protected:
-        wxTextCtrl *text_ctrl_options,*text_ctrl_pre_script,*text_ctrl_post_script;
-        wxFilePickerCtrl *filepicker;
-        wxDirPickerCtrl *dirpickergame,*dirpickercfg;
-
-        CslGame *m_game;
-        CslGameClientSettings m_settings;
-};
 
 
 class CslDlgSettings : public wxDialog
@@ -82,40 +58,21 @@ class CslDlgSettings : public wxDialog
         wxStaticBox* sizer_tts_staticbox;
         wxStaticBox* sizer_systray_staticbox;
         wxStaticBox* sizer_times_staticbox;
-        wxStaticBox* sizer_3_staticbox;
-        wxStaticBox* sizer_2_staticbox;
-        wxStaticBox* sizer_1_staticbox;
-        wxStaticBox* sizer_network_staticbox;
-        wxStaticBox* sizer_colours_staticbox;
+        wxStaticBox* sizer_colours_player_staticbox;
+        wxStaticBox* sizer_colours_server_staticbox;
         wxListbook* notebook_games;
         wxPanel* notebook_pane_games;
-        wxBitmapButton* button_colour_empty;
-        wxBitmapButton* button_colour_mm1;
-        wxBitmapButton* button_colour_off;
-        wxBitmapButton* button_colour_mm2;
-        wxBitmapButton* button_colour_full;
-        wxBitmapButton* button_colour_mm3;
+        wxBitmapButton* button_colour_server_empty;
+        wxBitmapButton* button_colour_server_mm1;
+        wxBitmapButton* button_colour_server_offline;
+        wxBitmapButton* button_colour_server_mm2;
+        wxBitmapButton* button_colour_server_full;
+        wxBitmapButton* button_colour_server_mm3;
+        wxBitmapButton* button_colour_player_master;
+        wxBitmapButton* button_colour_player_auth;
+        wxBitmapButton* button_colour_player_admin;
+        wxBitmapButton* button_colour_player_spectator;
         wxPanel* notebook_pane_colour;
-        wxTreeCtrl* tree_ctrl_network;
-        wxStaticText* label_7;
-        wxTextCtrl* text_ctrl_1;
-        wxStaticText* label_8;
-        wxSpinCtrl* spin_ctrl_1;
-        wxStaticText* label_9;
-        wxTextCtrl* text_ctrl_2;
-        wxStaticText* label_10;
-        wxCheckBox* checkbox_1;
-        wxStaticText* label_11;
-        wxTextCtrl* text_ctrl_3;
-        wxStaticText* label_12;
-        wxTextCtrl* text_ctrl_4;
-        wxListBox* list_box_1;
-        wxBitmapButton* bitmap_button_1;
-        wxBitmapButton* bitmap_button_2;
-        wxListBox* list_box_2;
-        wxBitmapButton* bitmap_button_3;
-        wxBitmapButton* bitmap_button_4;
-        wxPanel* notebook_pane_irc;
         wxSpinCtrl* spin_ctrl_update;
         wxCheckBox* checkbox_play_update;
         wxSpinCtrl* spin_ctrl_wait;
@@ -133,7 +90,7 @@ class CslDlgSettings : public wxDialog
         wxSpinCtrl* spin_ctrl_ping_bad;
         wxCheckBox* checkbox_game_output;
         wxDirPickerCtrl* dirpicker_game_output;
-        wxPanel* notebook_pane_other;
+        wxPanel* notebook_pane_irc;
         wxNotebook* notebook_settings;
         wxButton* button_ok;
         wxButton* button_cancel;

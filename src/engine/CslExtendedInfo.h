@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -66,7 +66,7 @@ enum
     CSL_PLAYER_PRIV_MAX,
 };
 
-class CslPlayerStatsData
+class CSL_DLL_ENGINE CslPlayerStatsData
 {
     public:
         CslPlayerStatsData() :
@@ -89,7 +89,9 @@ class CslPlayerStatsData
         bool Ok;
 };
 
-class CslPlayerStats
+WX_DEFINE_USER_EXPORTED_ARRAY(CslPlayerStatsData*, CslArrayPlayerStatsData, class CSL_DLL_ENGINE);
+
+class CSL_DLL_ENGINE CslPlayerStats
 {
     public:
         enum { CSL_STATS_NEED_IDS=0, CSL_STATS_NEED_STATS };
@@ -108,11 +110,11 @@ class CslPlayerStats
 
         wxUint32 m_status;
         wxUint32 m_lastPing,m_lastPong;
-        vector<wxInt32> m_ids;
-        vector<CslPlayerStatsData*> m_stats;
+        wxArrayInt m_ids;
+        CslArrayPlayerStatsData m_stats;
 };
 
-class CslTeamStatsData
+class CSL_DLL_ENGINE CslTeamStatsData
 {
     public:
         CslTeamStatsData() : Score(CSL_SCORE_INVALID),Score2(CSL_SCORE_INVALID),Ok(false) {}
@@ -120,16 +122,18 @@ class CslTeamStatsData
         void Reset()
         {
             Ok=false;
-            Bases.setsize(0);
+            Bases.Empty();
         }
 
         wxString Name;
         wxInt32 Score,Score2;
-        vector<wxInt32> Bases;
+        wxArrayInt Bases;
         bool Ok;
 };
 
-class CslTeamStats
+WX_DEFINE_USER_EXPORTED_ARRAY(CslTeamStatsData*, CslArrayCslTeamStatsData, class CSL_DLL_ENGINE);
+
+class CSL_DLL_ENGINE CslTeamStats
 {
     public:
         CslTeamStats();
@@ -144,18 +148,18 @@ class CslTeamStats
         bool TeamMode;
         wxInt32 TimeRemain,GameMode;
         wxUint32 LastPing,LastPong;
-        vector<CslTeamStatsData*> m_stats;
+        CslArrayCslTeamStatsData m_stats;
 };
 
 
-class CslExtendedInfo
+class CSL_DLL_ENGINE CslExtendedInfo
 {
     public:
         CslExtendedInfo() :
                 ExtInfoStatus(CSL_EXT_STATUS_FALSE),
                 ExtInfoVersion(0),Uptime(0),m_pingExt(0) {};
 
-        void PingExt(bool ping) { ping ? m_pingExt++:m_pingExt-=m_pingExt>0; }
+        void PingExt(bool ping) { ping ? m_pingExt++ : m_pingExt -= (m_pingExt ? 1 : 0); }
         bool PingExt() { return m_pingExt>0; }
 
         wxInt32 ExtInfoStatus,ExtInfoVersion;

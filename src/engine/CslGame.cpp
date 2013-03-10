@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -26,21 +26,6 @@
  *  class CslMaster
  */
 
-CslMaster::CslMaster() : m_game(NULL),m_id(0) {}
-
-CslMaster::CslMaster(const CslMasterConnection& connection):
-        m_game(NULL),m_id(0),m_connection(connection) {}
-
-CslMaster::~CslMaster()
-{
-    UnrefServers();
-}
-
-void CslMaster::Create(const CslMasterConnection& connection)
-{
-    m_connection=connection;
-}
-
 void CslMaster::AddServer(CslServerInfo *info)
 {
     loopv(m_servers)
@@ -52,17 +37,16 @@ void CslMaster::AddServer(CslServerInfo *info)
         }
     }
 
-    m_servers.add(info);
+    m_servers.push_back(info);
     info->AddMaster(m_id);
 }
 
 bool CslMaster::UnrefServer(CslServerInfo *info,wxInt32 pos)
 {
-    if (pos<0)
-        if ((pos=m_servers.find(info))<0)
-            return false;
+    if (pos<0 && (pos=m_servers.Index(info))==wxNOT_FOUND)
+        return false;
 
-    m_servers.remove(pos);
+    m_servers.RemoveAt(pos);
     info->RemoveMaster(m_id);
 
     return true;
@@ -90,8 +74,9 @@ CslGame::CslGame() :
 
 CslGame::~CslGame()
 {
+    WX_CLEAR_ARRAY(m_icons);
     DeleteMasters();
-    loopv(m_servers) m_servers[i]->Destroy();
+    WX_CLEAR_ARRAY(m_servers);
 }
 
 wxInt32 CslGame::AddMaster(CslMaster *master)
@@ -102,9 +87,9 @@ wxInt32 CslGame::AddMaster(CslMaster *master)
             return -1;
     }
 
-    wxInt32 id=m_masters.length();
+    wxInt32 id=m_masters.size();
     master->Init(this,id);
-    m_masters.add(master);
+    m_masters.push_back(master);
 
     return id;
 }
@@ -125,7 +110,8 @@ bool CslGame::DeleteMaster(wxInt32 masterID,wxInt32 pos)
             return false;
     }
 
-    delete m_masters.remove(pos);
+    delete m_masters[pos];
+    m_masters.erase(m_masters.begin()+pos);
 
     return true;
 }
@@ -133,7 +119,7 @@ bool CslGame::DeleteMaster(wxInt32 masterID,wxInt32 pos)
 void CslGame::DeleteMasters()
 {
     loopvrev(m_masters) DeleteMaster(m_masters[i]->GetId(),i);
-    m_masters.setsizenodelete(0);
+    m_masters.Empty();
 }
 
 bool CslGame::AddServer(CslServerInfo *info,wxInt32 masterID)
@@ -154,7 +140,7 @@ bool CslGame::AddServer(CslServerInfo *info,wxInt32 masterID)
 
     if (!found)
     {
-        m_servers.add(info);
+        m_servers.push_back(info);
         server=info;
     }
 
@@ -174,7 +160,7 @@ bool CslGame::AddServer(CslServerInfo *info,wxInt32 masterID)
         if (!master)
         {
             if (!found)
-                m_servers.drop();
+                m_servers.pop_back();
             return false;
         }
     }
@@ -202,8 +188,8 @@ bool CslGame::DeleteServer(CslServerInfo *info)
     {
         if (m_servers[i]==info)
         {
-            m_servers.remove(i);
-            info->Destroy();
+            m_servers.erase(m_servers.begin()+i);
+            delete info;
             return true;
         }
     }
@@ -211,30 +197,26 @@ bool CslGame::DeleteServer(CslServerInfo *info)
     return false;
 }
 
-CslServerInfo* CslGame::FindServerByAddr(const wxString& host, wxUint16 port)
+CslServerInfo* CslGame::FindServerByHost(const wxString& host, wxUint16 port)
 {
-    CslServerInfo *info;
-
     loopv(m_servers)
     {
-        info=m_servers[i];
-        if (info->Host==host && info->Addr.Service()==port)
+        CslServerInfo *info = m_servers[i];
+
+        if (info->m_addr.GetPort()==port && info->Host==host)
             return info;
     }
 
     return NULL;
 }
 
-CslServerInfo* CslGame::FindServerByAddr(const wxIPV4address& addr)
+CslServerInfo* CslGame::FindServerByAddr(const CslIPV4Addr& addr)
 {
-    CslServerInfo *info;
-
-    loopv(m_servers)
+    if (addr.IsOk()) loopv(m_servers)
     {
-        info=m_servers[i];
+        CslServerInfo *info = m_servers[i];
 
-        if (info->Addr.IPAddress()==addr.IPAddress() &&
-            info->Addr.Service()==addr.Service())
+        if (info->m_addr.IsOk() && info->m_addr==addr)
             return info;
     }
 
@@ -257,21 +239,23 @@ wxString& CslGame::ProcessScript(const CslServerInfo& info,wxUint32 connectMode,
     return script;
 }
 
-void CslGame::GetFavourites(vector <CslServerInfo*>& servers)
+void CslGame::GetFavourites(CslArrayCslServerInfo& servers)
 {
     loopv(m_servers)
     {
         if (m_servers[i]->IsFavourite())
-            servers.add(m_servers[i]);
+            servers.push_back(m_servers[i]);
     }
 }
 
-void CslGame::GetExtServers(vector <CslServerInfo*>& servers,bool all)
+void CslGame::GetExtServers(CslArrayCslServerInfo& servers, bool all)
 {
     loopv(m_servers)
     {
-        if ((all || m_servers[i]->PingExt()) && m_servers[i]->ExtInfoStatus==CSL_EXT_STATUS_OK)
-            servers.add(m_servers[i]);
+        CslServerInfo *server=m_servers[i];
+
+        if ((all || server->PingExt()) && server->ExtInfoStatus==CSL_EXT_STATUS_OK)
+            servers.Add(server);
     }
 }
 
@@ -288,46 +272,59 @@ wxInt32 CslGame::GetPlayerstatsDescriptions(const wxChar ***desc) const
     return sizeof(descriptions)/sizeof(descriptions[0]);
 }
 
-#if wxUSE_GUI
-const wxBitmap& CslGame::GetIcon(wxInt32 size) const
+void CslGame::AddIcon(wxInt32 type, wxInt32 size, const void *data, wxUint32 datasize)
 {
-    switch (size)
+    m_icons.push_back(new CslGameIcon(type, size, data, datasize));
+}
+
+void CslGame::FreeIcon(wxUint32 pos)
+{
+    if (pos<m_icons.GetCount())
     {
-        case 16:
-            return m_icon16.IsOk() ? m_icon16 : wxNullBitmap;
-        case 24:
-            return m_icon24.IsOk() ? m_icon24 : wxNullBitmap;
+        delete m_icons[pos];
+        m_icons.RemoveAt(pos);
+    }
+}
+
+const CslGameIcon* CslGame::GetIcon(wxInt32 size) const
+{
+    loopv(m_icons)
+    {
+        if (m_icons[i]->Size==size)
+            return m_icons[i];
     }
 
-    return wxNullBitmap;
+    return NULL;
 }
-#endif //wxUSE_GUI
 
 /**
  *  class CslServerInfo
  */
 
-CslServerInfo::CslServerInfo(CslGame *game,
-                             const wxString& host,
-                             wxUint16 gamePort,wxUint16 infoPort,
-                             wxUint32 view,wxUint32 lastSeen,
-                             wxUint32 playedLast,wxUint32 playTimeLast,
-                             wxUint32 playTimeTotal,wxUint32 connectedTimes,
-                             const wxString& oldDescription,
-                             const wxString& pass,const wxString& passAdm)
+#define CSL_SERVERINFO_CTOR_ARGS_CPP \
+    CslGame *game, \
+    const wxString& host, wxUint16 gamePort, wxUint16 infoPort, \
+    wxUint32 view, \
+    wxUint32 lastSeen, wxUint32 playedLast, wxUint32 playTimeLast, \
+    wxUint32 playTimeTotal, wxUint32 connectedTimes, \
+    const wxString& oldDescription, \
+    const wxString& pass, const wxString& passAdm \
+
+CslServerInfo::CslServerInfo(CSL_SERVERINFO_CTOR_ARGS_CPP)
+{
+    Init(game,
+         host, gamePort, infoPort,
+         view,
+         lastSeen, playedLast, playTimeLast, playTimeTotal, connectedTimes,
+         oldDescription,
+         pass, passAdm);
+}
+
+void CslServerInfo::Init(CSL_SERVERINFO_CTOR_ARGS_CPP)
 {
     m_game=game;
     Host=host;
     GamePort=gamePort ? gamePort:game ? game->GetDefaultGamePort():0;
-    InfoPort=infoPort ? infoPort:GamePort ? GamePort+1:0;
-    if (IsIP(host))
-    {
-        Addr.Hostname(host);
-        Pingable=GamePort && InfoPort;
-    }
-    else
-        Pingable=false;
-    Addr.Service(InfoPort);
     Protocol=-1;
     Ping=-1;
     TimeRemain=-2;
@@ -349,44 +346,20 @@ CslServerInfo::CslServerInfo(CslGame *game,
     PasswordAdmin=passAdm;
     Search=false;
     m_lock=0;
+       m_addr.Create(host, infoPort ? infoPort : (GamePort ? GamePort+1 : 0));
 }
 
-bool CslServerInfo::Create(CslGame *game,const wxString& host,
-                           wxUint16 gamePort,wxUint16 infoPort,
-                           const wxString& pass,
-                           const wxString& passAdmin)
+CslServerInfo* CslServerInfo::Create(CSL_SERVERINFO_CTOR_ARGS_CPP)
 {
-    if (!game)
-        return false;
-
-    m_game=game;
-    Host=host;
-
-    GamePort=gamePort ? gamePort:m_game->GetDefaultGamePort();
-    InfoPort=infoPort ? infoPort:GamePort+1;
-
-    if (IsIP(host))
-    {
-        Addr.Hostname(host);
-        Pingable=GamePort && InfoPort;
-    }
-    else
-        Pingable=false;
-    Addr.Service(InfoPort);
-
-    View=CSL_VIEW_FAVOURITE;
-
-    Password=pass;
-    PasswordAdmin=passAdmin;
-
-    return true;
+    return new CslServerInfo(game,
+                             host, gamePort, infoPort,
+                             view,
+                             lastSeen, playedLast, playTimeLast, playTimeTotal, connectedTimes,
+                             oldDescription,
+                             pass, passAdm);
 }
 
-void CslServerInfo::Destroy()
-{
-    delete this;
-}
-
+#undef CSL_SERVERINFO_CTOR_ARGS_CPP
 
 void CslServerInfo::SetLastPlayTime(wxUint32 time)
 {
@@ -417,14 +390,15 @@ void CslServerInfo::Lock(bool lock)
 
 void CslServerInfo::AddMaster(wxInt32 id)
 {
-    m_masterIDs.add(id);
+    m_masterIDs.Add(id);
     SetDefault();
 }
 void CslServerInfo::RemoveMaster(wxInt32 id)
 {
-    wxInt32 i=m_masterIDs.find(id);
-    if (i>=0) m_masterIDs.remove(i);
-    if (m_masterIDs.length()==0) RemoveDefault();
+    m_masterIDs.Remove(id);
+
+    if (!m_masterIDs.GetCount())
+        RemoveDefault();
 }
 
 bool CslServerInfo::HasStats() const

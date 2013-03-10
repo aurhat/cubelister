@@ -30,7 +30,7 @@ If it is not, install GNU gettext.
 fi
 
 
-dnl check for stuff required by libircclient and libGeoIP
+dnl check for stuff required by libGeoIP
 AC_CHECK_HEADERS(stdint.h)
 AC_CHECK_FUNCS([gettimeofday localtime_r socket inet_ntoa])
 AC_CHECK_FUNC(gethostbyname_r,[
@@ -87,12 +87,6 @@ if test "x$use_speechd" = "xyes"; then
   AC_CHECK_HEADERS(libspeechd.h,SPEECHD_LIBS="-lspeechd",use_speechd="no")
 fi
 AC_SUBST(SPEECHD_LIBS)
-
-
-dnl libircclient
-use_internal_libircclient="yes"
-AC_CHECK_HEADERS(libircclient.h,use_internal_libircclient="no")
-AM_CONDITIONAL(with_internal_libircclient,test "x$use_internal_libircclient" = "xyes")
 
 
 dnl libGeoIP
@@ -169,11 +163,6 @@ AC_OUTPUT(Makefile \
 	  src/Makefile \
 	  src/engine/Makefile \
 	  src/engine/tools/Makefile \
-	  src/external/Makefile \
-	  src/external/libircclient/Makefile \
-	  src/external/libircclient/include/Makefile \
-	  src/external/libircclient/src/Makefile \
-	  src/irc/Makefile \
 	  src/pch/Makefile \
 	  src/plugin/Makefile \
 	  src/plugins/Makefile \
@@ -191,7 +180,6 @@ echo -e "wxWidgets version.............. : $wxversion ($wxtype)"
 echo -e "Build using precompiled headers : $use_pch"
 echo
 echo -e "Speech-dispatcher support...... : $use_speechd"
-echo -e "Use internal libircclient...... : $use_internal_libircclient"
 echo -e "Use internal libGeoIP.......... : $use_internal_geoip"
 echo -e "Install package GeoIP database. : $use_internal_geoip_db"
 echo

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -18,8 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "Csl.h"
-#include "CslEngine.h"
+#include <Csl.h>
+#include <CslEngine.h>
 #include "CslGameSauerbraten.h"
 
 #include "../img/sb_16_png.h"
@@ -33,7 +33,7 @@ enum { PRIV_NONE = 0, PRIV_MASTER, PRIV_AUTH, PRIV_ADMIN };
 static const wxChar* CLIENT_BINARY[] =
 {
 #if defined(__WXMSW__)
-    wxT("sauerbraten.exe")
+    wxT("sauerbraten.bat"), wxT("sauerbraten.exe")
 #elif defined(__WXMAC__)
     wxT("sauerbraten")
 #elif defined(__WXGTK__) || defined(__WXX11__)
@@ -50,38 +50,35 @@ static const wxChar* CLIENT_GAME_REQUIRES[] =
                                   sizeof(CLIENT_GAME_REQUIRES[0])))
 
 #if defined(__WXMSW__)
-const wxString CLIENT_CFG_DIR;
+const wxString CLIENT_CFG_DIR = wxStandardPaths().GetDocumentsDir() + wxT("My Games");
 #elif defined(__WXMAC__)
-const wxString CLIENT_CFG_DIR=::wxGetHomeDir()<<wxT("/Library/Application Support/sauerbraten")
+const wxString CLIENT_CFG_DIR = ::wxGetHomeDir() + wxT("/Library/Application Support/sauerbraten")
 #elif defined(__WXGTK__) || defined(__WXX11__)
-const wxString CLIENT_CFG_DIR=::wxGetHomeDir()+wxT("/.sauerbraten");
+const wxString CLIENT_CFG_DIR = ::wxGetHomeDir() + wxT("/.sauerbraten");
 #endif //__WXMSW__
 
 
 CslGameSauerbraten::CslGameSauerbraten()
 {
-    m_name=CSL_DEFAULT_NAME_SB;
+    m_name = CSL_DEFAULT_NAME_SB;
+
     m_fourcc=CSL_BUILD_FOURCC(CSL_FOURCC_SB);
-    m_capabilities=CSL_CAPABILITY_EXTINFO | CSL_CAPABILITY_CUSTOM_CONFIG |
-                   CSL_CAPABILITY_CONNECT_PASS | CSL_CAPABILITY_CONNECT_ADMIN_PASS;
-    m_defaultMasterConnection=CslMasterConnection(CSL_DEFAULT_MASTER_SB, CSL_DEFAULT_MASTER_PORT_SB);
-#ifdef __WXMAC__
-    m_clientSettings.ConfigPath=::wxGetHomeDir();
-    m_clientSettings.ConfigPath<<wxT("/Library/Application Support/sauerbraten");
-#elif defined(__WXGTK__) || defined(__WXX11__)
-    m_clientSettings.ConfigPath=::wxGetHomeDir()+wxT("/.sauerbraten");
-#endif
-#if wxUSE_GUI
-    m_icon16=BitmapFromData(wxBITMAP_TYPE_PNG, sb_16_png, sizeof(sb_16_png));
-    m_icon24=BitmapFromData(wxBITMAP_TYPE_PNG, sb_24_png, sizeof(sb_24_png));
-#endif //wxUSE_GUI
+
+    m_capabilities = CSL_CAPABILITY_EXTINFO | CSL_CAPABILITY_CUSTOM_CONFIG |
+                     CSL_CAPABILITY_CONNECT_PASS | CSL_CAPABILITY_CONNECT_ADMIN_PASS;
+
+    m_defaultMasterConnection = CslMasterConnection(CSL_DEFAULT_MASTER_SB,
+                                                    CSL_DEFAULT_MASTER_PORT_SB);
+
+    AddIcon(CSL_BITMAP_TYPE_PNG, 16, sb_16_png, sizeof(sb_16_png));
+    AddIcon(CSL_BITMAP_TYPE_PNG, 24, sb_24_png, sizeof(sb_24_png));
 }
 
 CslGameSauerbraten::~CslGameSauerbraten()
 {
 }
 
-const wxChar* CslGameSauerbraten::GetVersionName(wxInt32 prot) const
+inline wxString CslGameSauerbraten::GetVersionName(wxInt32 prot) const
 {
     static const wxChar* versions[] =
     {
@@ -97,12 +94,12 @@ const wxChar* CslGameSauerbraten::GetVersionName(wxInt32 prot) const
     wxInt32 v=CSL_LAST_PROTOCOL_SB-prot;
 
     if (v<0 || v>=count || !versions[v])
-        return wxString::Format(wxT("%d"), prot).c_str();
+        return wxString::Format(wxT("%d"), prot);
     else
         return versions[v];
 }
 
-const wxChar* CslGameSauerbraten::GetModeName(wxInt32 mode, wxInt32 prot) const
+inline const wxChar* CslGameSauerbraten::GetModeName(wxInt32 mode, wxInt32 prot) const
 {
     if (prot<257)
     {
@@ -121,12 +118,12 @@ const wxChar* CslGameSauerbraten::GetModeName(wxInt32 mode, wxInt32 prot) const
     {
         static const wxChar* modes[] =
         {
-            wxT("ffa"), wxT("coop edit"), wxT("teamplay"), wxT("instagib"), wxT("instagib team"),
-            wxT("efficiency"), wxT("efficiency team"), wxT("tactics"), wxT("tactics team"),
+            wxT("ffa"), wxT("coop edit"), wxT("teamplay"), wxT("instagib"), wxT("insta team"),
+            wxT("efficiency"), wxT("effic team"), wxT("tactics"), wxT("tac team"),
             wxT("capture"), wxT("regen capture"), wxT("ctf"), wxT("insta ctf"),
             wxT("protect"), wxT("insta protect"), wxT("hold"), wxT("insta hold"),
-            wxT("efficiency ctf"), wxT("efficiency protect"), wxT("efficiency hold"),
-            wxT("collect"), wxT("insta collect"), wxT("efficiency collect")
+            wxT("effic ctf"), wxT("effic protect"), wxT("effic hold"),
+            wxT("collect"), wxT("insta collect"), wxT("effic collect")
         };
         return (mode>=0 && (size_t)mode<sizeof(modes)/sizeof(modes[0])) ?
                modes[mode] : T2C(_("unknown"));
@@ -135,7 +132,7 @@ const wxChar* CslGameSauerbraten::GetModeName(wxInt32 mode, wxInt32 prot) const
     return _("unknown");
 }
 
-const wxChar* CslGameSauerbraten::GetWeaponName(wxInt32 n, wxInt32 prot) const
+inline const wxChar* CslGameSauerbraten::GetWeaponName(wxInt32 n, wxInt32 prot) const
 {
     if (prot<257)
     {
@@ -163,7 +160,7 @@ const wxChar* CslGameSauerbraten::GetWeaponName(wxInt32 n, wxInt32 prot) const
     return _("unknown");
 }
 
-wxInt32 CslGameSauerbraten::GetPrivileges(wxInt32 n, wxInt32 prot) const
+inline wxInt32 CslGameSauerbraten::GetPrivileges(wxInt32 n, wxInt32 prot) const
 {
     if (prot<259 && n>PRIV_MASTER)
         n++;
@@ -171,7 +168,7 @@ wxInt32 CslGameSauerbraten::GetPrivileges(wxInt32 n, wxInt32 prot) const
     return n>CSL_PLAYER_PRIV_NONE && n<CSL_PLAYER_PRIV_MAX ? n : CSL_PLAYER_PRIV_UNKNOWN;
 }
 
-bool CslGameSauerbraten::ModeHasFlags(wxInt32 mode, wxInt32 prot) const
+inline bool CslGameSauerbraten::ModeHasFlags(wxInt32 mode, wxInt32 prot) const
 {
     if (prot<257)
         return mode>16 && mode<19;
@@ -181,7 +178,7 @@ bool CslGameSauerbraten::ModeHasFlags(wxInt32 mode, wxInt32 prot) const
     return false;
 }
 
-bool CslGameSauerbraten::ModeHasBases(wxInt32 mode, wxInt32 prot) const
+inline bool CslGameSauerbraten::ModeHasBases(wxInt32 mode, wxInt32 prot) const
 {
     if (prot<257)
         return mode>11 && mode<15;
@@ -191,7 +188,7 @@ bool CslGameSauerbraten::ModeHasBases(wxInt32 mode, wxInt32 prot) const
     return false;
 }
 
-wxInt32 CslGameSauerbraten::ModeScoreLimit(wxInt32 mode, wxInt32 prot) const
+inline wxInt32 CslGameSauerbraten::ModeScoreLimit(wxInt32 mode, wxInt32 prot) const
 {
     if (ModeHasBases(mode, prot))
         return 10000;
@@ -201,15 +198,15 @@ wxInt32 CslGameSauerbraten::ModeScoreLimit(wxInt32 mode, wxInt32 prot) const
     return -1;
 }
 
-wxInt32 CslGameSauerbraten::GetBestTeam(CslTeamStats& stats, wxInt32 prot) const
+inline wxInt32 CslGameSauerbraten::GetBestTeam(CslTeamStats& stats, wxInt32 prot) const
 {
     wxInt32 i, best=-1;
 
-    if (stats.TeamMode && stats.m_stats.length()>0 && stats.m_stats[0]->Ok)
+    if (stats.TeamMode && stats.m_stats.size()>0 && stats.m_stats[0]->Ok)
     {
         best=0;
 
-        for (i=1; i<stats.m_stats.length() && stats.m_stats[i]->Ok; i++)
+        for (i=1; i<(wxInt32)stats.m_stats.size() && stats.m_stats[i]->Ok; i++)
         {
             if (stats.m_stats[i]->Score>=stats.m_stats[best]->Score)
                 best=i;
@@ -227,9 +224,9 @@ bool CslGameSauerbraten::PingDefault(ucharbuf& buf, CslServerInfo& info) const
 
 bool CslGameSauerbraten::ParseDefaultPong(ucharbuf& buf, CslServerInfo& info) const
 {
-    vector<int>attr;
+    wxArrayInt attr;
     wxInt32 l, numattr;
-    char text[_MAXDEFSTR];
+    char text[MAXSTRLEN];
     bool wasfull=info.IsFull();
 
     if ((wxUint32)getint(buf)!=m_fourcc)
@@ -248,7 +245,7 @@ bool CslGameSauerbraten::ParseDefaultPong(ucharbuf& buf, CslServerInfo& info) co
         if (buf.overread())
             return false;
 
-        attr.add(getint(buf));
+        attr.push_back(getint(buf));
     }
 
     if (numattr>=1)
@@ -324,24 +321,24 @@ bool CslGameSauerbraten::ParseDefaultPong(ucharbuf& buf, CslServerInfo& info) co
     }
 
     getstring(text, buf);
-    info.Map=CslCubeEncodingToLocal(FixString(text, 1));
+    info.Map=CslCharEncoding::CubeMB2WX(FilterCubeString(text, 1));
     getstring(text, buf);
-    info.SetDescription(CslCubeEncodingToLocal(FixString(text, 1)));
+    info.SetDescription(CslCharEncoding::CubeMB2WX(FilterCubeString(text, 1)));
 
     return !buf.overread();
 }
 
 bool CslGameSauerbraten::ParsePlayerPong(wxInt32 protocol, ucharbuf& buf, CslPlayerStatsData& info) const
 {
-    char text[_MAXDEFSTR];
+    char text[MAXSTRLEN];
 
     info.ID=getint(buf);
     if (protocol>=104)
         info.Ping=getint(buf);
     getstring(text, buf);
-    info.Name=CslCubeEncodingToLocal(FixString(text, 1));
+    info.Name=CslCharEncoding::CubeMB2WX(FilterCubeString(text, 1));
     getstring(text, buf);
-    info.Team=CslCubeEncodingToLocal(FixString(text, 1));
+    info.Team=CslCharEncoding::CubeMB2WX(FilterCubeString(text, 1));
     info.Frags=getint(buf);
     if (protocol>=104)
         info.Flagscore=getint(buf);
@@ -371,88 +368,105 @@ bool CslGameSauerbraten::ParsePlayerPong(wxInt32 protocol, ucharbuf& buf, CslPla
 bool CslGameSauerbraten::ParseTeamPong(wxInt32 protocol, ucharbuf& buf, CslTeamStatsData& info) const
 {
     wxInt32 l;
-    char text[_MAXDEFSTR];
+    char text[MAXSTRLEN];
 
     getstring(text, buf);
-    info.Name=CslCubeEncodingToLocal(FixString(text, 1));
+    info.Name=CslCharEncoding::CubeMB2WX(FilterCubeString(text, 1));
     info.Score=getint(buf);
     l=getint(buf);
     while (l-->0)
-        info.Bases.add(getint(buf));
+        info.Bases.push_back(getint(buf));
 
     return !buf.overread();
 }
 
-wxInt32 CslGameSauerbraten::GetClientPath(wxInt32 type, const wxString& path,
-        wxArrayString& result, wxString& error) const
+bool GetClientPath(wxInt32 type, const wxString& path,
+                   const wxArrayString& ressources,
+                   wxArrayString& result, wxString& error)
 {
     wxDir dir;
 
-    if (!wxDirExists(path))
+    if (!wxDirExists(path) || !dir.Open(path))
     {
-        error=wxString::Format(_("Directory '%s' doesn't exist."), path.c_str());
-        return -1;
+        error = wxString::Format(_("Couldn't open directory '%s'."), path.c_str());
+        return false;
     }
 
     if (type==CSL_GAME_GET_PATH_BINARY)
     {
-        if (!dir.Open(path))
-        {
-            error=wxString::Format(_("Couldn't open directory '%s'."), path.c_str());
-            return -1;
-        }
-
-        for (wxInt32 i=0; i<CLIENT_BINARY_LEN; i++)
-            FindFiles(path, CLIENT_BINARY[i], result);
+        loopv(ressources)
+            FindFiles(path, ressources[i], result);
 
         if (result.IsEmpty())
         {
-            result=wxArrayString(CLIENT_BINARY_LEN, CLIENT_BINARY);
+            result = ressources;
             wxString::Format(_("Couldn't find any client binary."));
-            return -1;
+            return false;
         }
     }
     else if (type==CSL_GAME_GET_PATH_GAME)
     {
-        if (!dir.Open(path))
+        loopv(ressources)
         {
-            error=wxString::Format(_("Couldn't open directory '%s'."), path.c_str());
-            return -1;
-        }
-
-        for (wxInt32 i=0; i<CLIENT_GAME_REQUIRES_LEN; i++)
-        {
-            if (!dir.HasSubDirs(CLIENT_GAME_REQUIRES[i]))
-                result.Add(CLIENT_GAME_REQUIRES[i]);
+            if (!dir.HasSubDirs(ressources[i]))
+                result.Add(ressources[i]);
         }
 
         if (result.GetCount())
         {
-            error=wxString::Format(_("Couldn't find all necessary game folders."));
-            return -1;
+            error = wxString::Format(_("Couldn't find all necessary game folders."));
+            return false;
         }
     }
     else if (type==CSL_GAME_GET_PATH_CONFIG)
     {
-#ifdef __WXMSW__
-        result.Add(path);
-#else
         result.Add(CLIENT_CFG_DIR);
-#endif
-        if (!wxDirExists(result.Item(0)))
+
+        loopv(ressources)
         {
-            error=wxString::Format(_("Directory '%s' doesn't exist."),
-                                   result.Item(0).c_str());
-            return 1;
+            if (dir.HasSubDirs(ressources[i]))
+                result.Add(ressources[i]);
+        }
+
+        if (result.IsEmpty())
+        {
+            error = wxString::Format(_("Couldn't find an game config path."));
+            return false;
         }
     }
     else
-        return -1;
+    {
+        error = _("Invalid type");
+        return false;
+    }
 
-    return 0;
+    return true;
 }
 
-#undef CSL_CHECK_ERR
+
+CslGameClientSettings CslGameSauerbraten::GuessClientSettings(const wxString& path) const
+{
+    return CslGameClientSettings();
+}
+
+wxString CslGameSauerbraten::ValidateClientSettings(CslGameClientSettings& settings) const
+{
+
+    if (!::wxFileExists(settings.Binary))
+    {
+        return _("Client binary for game Sauerbraten not found!\n");
+    }
+    if (settings.GamePath.IsEmpty() || !::wxDirExists(settings.GamePath))
+    {
+        return _("Game path for game Sauerbraten not found!\n");
+    }
+    if (settings.ConfigPath.IsEmpty() || !::wxDirExists(settings.ConfigPath))
+    {
+        return _("Config path for game Sauerbraten not found!\n");
+    }
+
+    return wxEmptyString;
+}
 
 void CslGameSauerbraten::SetClientSettings(const CslGameClientSettings& settings)
 {
@@ -476,30 +490,14 @@ void CslGameSauerbraten::SetClientSettings(const CslGameClientSettings& settings
 
 wxString CslGameSauerbraten::GameStart(CslServerInfo *info, wxInt32 mode, wxString& error)
 {
+    if (!(error = ValidateClientSettings(m_clientSettings)).IsEmpty())
+        return error;
+
     wxString address, password, path, script;
     wxString bin=m_clientSettings.Binary;
     wxString opts=m_clientSettings.Options;
     wxString preScript=m_clientSettings.PreScript;
     wxString postScript=m_clientSettings.PostScript;
-
-    if (m_clientSettings.Binary.IsEmpty() || !::wxFileExists(m_clientSettings.Binary))
-    {
-        error=_("Client binary for game Sauerbraten not found!\n");
-        error<<_("Please check your settings.");
-        return wxEmptyString;
-    }
-    if (m_clientSettings.GamePath.IsEmpty() || !::wxDirExists(m_clientSettings.GamePath))
-    {
-        error=_("Game path for game Sauerbraten not found!\n");
-        error<<_("Please check your settings.");
-        return wxEmptyString;
-    }
-    if (m_clientSettings.ConfigPath.IsEmpty() || !::wxDirExists(m_clientSettings.ConfigPath))
-    {
-        error=_("Config path for game Sauerbraten not found!\n");
-        error<<_("Please check your settings.");
-        return wxEmptyString;
-    }
 
     path=m_clientSettings.ConfigPath;
 #ifdef __WXMSW__
@@ -553,7 +551,7 @@ wxString CslGameSauerbraten::GameStart(CslServerInfo *info, wxInt32 mode, wxStri
 
     bin<<wxT(" ")<<opts;
 
-    LOG_DEBUG("start client: %s\n", U2A(bin));
+    CSL_LOG_DEBUG("start client: %s\n", U2C(bin));
 
     return bin;
 }
@@ -571,7 +569,7 @@ bool CslGameSauerbraten::GetMapImagePaths(wxArrayString& paths) const
 
     if (!m_clientSettings.GamePath.IsEmpty())
     {
-        path<<m_clientSettings.GamePath<<wxT("packages")<<PATHDIV<<wxT("base")<<PATHDIV;
+        path<<m_clientSettings.GamePath<<wxT("packages")<<CSL_PATHDIV_WX<<wxT("base")<<CSL_PATHDIV_WX;
         paths.Add(path);
     }
 
@@ -583,18 +581,37 @@ bool CslGameSauerbraten::GetMapImagePaths(wxArrayString& paths) const
     return !paths.IsEmpty();
 }
 
-bool CslGameSauerbratenPlugin::Create()
+CslGameSauerbraten *sauerbraten = NULL;
+
+bool plugin_init(CslPluginHost *host)
 {
-    CslEngine *engine=m_host->GetCslEngine();
+    CslEngine *engine = host->GetCslEngine();
 
     if (engine)
-        return engine->AddGame(new CslGameSauerbraten());
+    {
+        sauerbraten = new CslGameSauerbraten;
+        return engine->AddGame(sauerbraten);
+    }
 
     return true;
 }
 
-IMPLEMENT_PLUGIN(CSL_BUILD_FOURCC(CSL_FOURCC_SB), CSL_PLUGIN_VERSION_API, CslPlugin::TYPE_ENGINE,
-                 CSL_BUILD_VERSION(__CSL_VERSION), CSL_DEFAULT_NAME_SB,
+void plugin_deinit(CslPluginHost *host)
+{
+    if (sauerbraten)
+    {
+        CslEngine *engine = host->GetCslEngine();
+
+        if (engine)
+            engine->RemoveGame(sauerbraten);
+
+        delete sauerbraten;
+        sauerbraten = NULL;
+    }
+}
+
+IMPLEMENT_PLUGIN(CSL_PLUGIN_VERSION_API, CSL_PLUGIN_TYPE_ENGINE, CSL_BUILD_FOURCC(CSL_FOURCC_SB),
+                 CSL_DEFAULT_NAME_SB, CSL_VERSION_STR,
                  wxT("Glen Masgai"), wxT("mimosius@users.sourceforge.net"),
-                 CSL_WEBADDRFULL_STR, wxT("GPLv2"),
-                 wxT("Sauerbraten CSL engine plugin"), CslGameSauerbratenPlugin)
+                 CSL_WEBADDR_STR, wxT("GPLv2"), wxT("Sauerbraten CSL engine plugin"),
+                 &plugin_init, &plugin_deinit, NULL)

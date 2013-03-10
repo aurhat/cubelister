@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -47,100 +47,121 @@ CslDlgAddServer::CslDlgAddServer(wxWindow* parent,int id,const wxString& title,
         wxDialog(parent, id, title, pos, size, style),
         m_info(NULL)
 {
-        // begin wxGlade: CslDlgAddServer::CslDlgAddServer
-        sizer_address_staticbox = new wxStaticBox(this, -1, wxEmptyString);
-        const wxString choice_gametype_choices[] = {
+    // begin wxGlade: CslDlgAddServer::CslDlgAddServer
+    sizer_address_staticbox = new wxStaticBox(this, -1, wxEmptyString);
+    const wxString choice_gametype_choices[] = {
         _("default")
     };
-        choice_gametype = new wxChoice(this, CHOICE_CTRL_GAMETYPE, wxDefaultPosition, wxDefaultSize, 1, choice_gametype_choices, 0);
-        text_ctrl_address = new wxTextCtrl(this, TEXT_CTRL_ADDRESS, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
-        spin_ctrl_gameport = new wxSpinCtrl(this, SPIN_CTRL_GAMEPORT, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 65535);
-        spin_ctrl_infoport = new wxSpinCtrl(this, SPIN_CTRL_INFOPORT, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 65535);
-        button_add = new wxButton(this, wxID_ADD, _("Add"));
-        button_cancel = new wxButton(this, wxID_CANCEL, _("&Cancel"));
+    choice_gametype = new wxChoice(this, CHOICE_CTRL_GAMETYPE, wxDefaultPosition, wxDefaultSize, 1, choice_gametype_choices, 0);
+    text_ctrl_address = new wxTextCtrl(this, TEXT_CTRL_ADDRESS, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
+    spin_ctrl_gameport = new wxSpinCtrl(this, SPIN_CTRL_GAMEPORT, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 65535);
+    spin_ctrl_infoport = new wxSpinCtrl(this, SPIN_CTRL_INFOPORT, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 65535);
+    button_add = new wxButton(this, wxID_ADD, _("Add"));
+    button_cancel = new wxButton(this, wxID_CANCEL, _("&Cancel"));
 
-        set_properties();
-        do_layout();
-        // end wxGlade
+    set_properties();
+    do_layout();
+    // end wxGlade
 }
 
 
 void CslDlgAddServer::set_properties()
 {
-        // begin wxGlade: CslDlgAddServer::set_properties
-        SetTitle(_("CSL - Add new server"));
-        choice_gametype->SetSelection(0);
-        text_ctrl_address->SetFocus();
-        spin_ctrl_gameport->SetMinSize(wxSize(80, -1));
-        spin_ctrl_infoport->SetMinSize(wxSize(80, -1));
-        button_add->Enable(false);
-        button_add->SetDefault();
-        // end wxGlade
+    // begin wxGlade: CslDlgAddServer::set_properties
+    SetTitle(_("CSL - Add new server"));
+    choice_gametype->SetSelection(0);
+    text_ctrl_address->SetFocus();
+    spin_ctrl_gameport->SetMinSize(wxSize(80, -1));
+    spin_ctrl_infoport->SetMinSize(wxSize(80, -1));
+    button_add->Enable(false);
+    button_add->SetDefault();
+    // end wxGlade
+
+    CSL_SET_WINDOW_ICON();
 }
 
 
 void CslDlgAddServer::do_layout()
 {
-        // begin wxGlade: CslDlgAddServer::do_layout
-        wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(2, 1, 0, 0);
-        wxFlexGridSizer* grid_sizer_button = new wxFlexGridSizer(1, 3, 0, 0);
-        wxStaticBoxSizer* sizer_address = new wxStaticBoxSizer(sizer_address_staticbox, wxHORIZONTAL);
-        wxFlexGridSizer* grid_sizer_input = new wxFlexGridSizer(3, 2, 0, 0);
-        wxFlexGridSizer* grid_sizer_port = new wxFlexGridSizer(1, 3, 0, 0);
-        wxStaticText* label_game_static = new wxStaticText(this, wxID_ANY, _("Game:"));
-        grid_sizer_input->Add(label_game_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_input->Add(choice_gametype, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
-        wxStaticText* label_address_static = new wxStaticText(this, wxID_ANY, _("Address:"));
-        grid_sizer_input->Add(label_address_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_input->Add(text_ctrl_address, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
-        wxStaticText* label_gameport_static = new wxStaticText(this, wxID_ANY, _("Port:"));
-        grid_sizer_input->Add(label_gameport_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_port->Add(spin_ctrl_gameport, 0, wxALL, 4);
-        wxStaticText* label_infoport_static = new wxStaticText(this, wxID_ANY, _("Info port:"));
-        grid_sizer_port->Add(label_infoport_static, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
-        grid_sizer_port->Add(spin_ctrl_infoport, 0, wxALL, 4);
-        grid_sizer_input->Add(grid_sizer_port, 1, 0, 0);
-        grid_sizer_input->AddGrowableRow(1);
-        grid_sizer_input->AddGrowableCol(0);
-        sizer_address->Add(grid_sizer_input, 1, wxEXPAND, 0);
-        grid_sizer_main->Add(sizer_address, 1, wxALL|wxEXPAND, 4);
-        grid_sizer_button->Add(1, 1, 0, 0, 0);
-        grid_sizer_button->Add(button_add, 0, wxALL|wxEXPAND, 4);
-        grid_sizer_button->Add(button_cancel, 0, wxALL|wxEXPAND, 4);
-        grid_sizer_button->AddGrowableCol(0);
-        grid_sizer_main->Add(grid_sizer_button, 1, wxBOTTOM|wxEXPAND, 4);
-        SetSizer(grid_sizer_main);
-        grid_sizer_main->Fit(this);
-        Layout();
-        // end wxGlade
+    // begin wxGlade: CslDlgAddServer::do_layout
+    wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* grid_sizer_button = new wxFlexGridSizer(1, 3, 0, 0);
+    wxStaticBoxSizer* sizer_address = new wxStaticBoxSizer(sizer_address_staticbox, wxHORIZONTAL);
+    wxFlexGridSizer* grid_sizer_input = new wxFlexGridSizer(3, 2, 0, 0);
+    wxFlexGridSizer* grid_sizer_port = new wxFlexGridSizer(1, 3, 0, 0);
+    wxStaticText* label_game_static = new wxStaticText(this, wxID_ANY, _("Game:"));
+    grid_sizer_input->Add(label_game_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_input->Add(choice_gametype, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    wxStaticText* label_address_static = new wxStaticText(this, wxID_ANY, _("Address:"));
+    grid_sizer_input->Add(label_address_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_input->Add(text_ctrl_address, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    wxStaticText* label_gameport_static = new wxStaticText(this, wxID_ANY, _("Port:"));
+    grid_sizer_input->Add(label_gameport_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_port->Add(spin_ctrl_gameport, 0, wxALL, 4);
+    wxStaticText* label_infoport_static = new wxStaticText(this, wxID_ANY, _("Info port:"));
+    grid_sizer_port->Add(label_infoport_static, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
+    grid_sizer_port->Add(spin_ctrl_infoport, 0, wxALL, 4);
+    grid_sizer_input->Add(grid_sizer_port, 1, 0, 0);
+    grid_sizer_input->AddGrowableRow(1);
+    grid_sizer_input->AddGrowableCol(0);
+    sizer_address->Add(grid_sizer_input, 1, wxEXPAND, 0);
+    grid_sizer_main->Add(sizer_address, 1, wxALL|wxEXPAND, 4);
+    grid_sizer_button->Add(1, 1, 0, 0, 0);
+    grid_sizer_button->Add(button_add, 0, wxALL|wxEXPAND, 4);
+    grid_sizer_button->Add(button_cancel, 0, wxALL|wxEXPAND, 4);
+    grid_sizer_button->AddGrowableCol(0);
+    grid_sizer_main->Add(grid_sizer_button, 1, wxBOTTOM|wxEXPAND, 4);
+    SetSizer(grid_sizer_main);
+    grid_sizer_main->Fit(this);
+    Layout();
+    // end wxGlade
 
     CentreOnParent();
 }
 
-void CslDlgAddServer::InitDlg(CslServerInfo *info)
+CslServerInfo* CslDlgAddServer::InitDlg(CslServerInfo *info)
 {
-    m_info=info;
+    m_info = info;
+    wxInt32 selected = -1;
 
     choice_gametype->Clear();
-    CslGames& games=::wxGetApp().GetCslEngine()->GetGames();
-    loopv(games) choice_gametype->Append(games[i]->GetName(), (void*)(wxUIntPtr)games[i]->GetFourCC());
-    choice_gametype->SetSelection(0);
+
+    CslArrayCslGame& games=::wxGetApp().GetCslEngine()->GetGames();
+
+    loopv(games)
+    {
+        CslGame *game = games[i];
+
+        if (selected<0 && info->GetGame().GetFourCC()==game->GetFourCC())
+            selected = i;
+
+        choice_gametype->Append(game->GetName(), (void*)(wxUIntPtr)game->GetFourCC());
+    }
+
+    if (!games.IsEmpty())
+        choice_gametype->SetSelection(selected>-1 ? selected : 0);
+
     UpdatePort(SPIN_CTRL_GAMEPORT);
+
+    return info;
 }
 
 void CslDlgAddServer::UpdatePort(wxInt32 type)
 {
     wxUint32 fourcc=(wxUint32)(long)choice_gametype->GetClientData(choice_gametype->GetSelection());
-    CslGames& games=::wxGetApp().GetCslEngine()->GetGames();
+    CslArrayCslGame& games=::wxGetApp().GetCslEngine()->GetGames();
 
     loopv(games)
     {
-        if (games[i]->GetFourCC()==fourcc)
+        CslGame *game = games[i];
+
+        if (game->GetFourCC()==fourcc)
         {
             if (type==SPIN_CTRL_GAMEPORT)
-                spin_ctrl_gameport->SetValue(games[i]->GetDefaultGamePort());
-            spin_ctrl_infoport->SetValue(games[i]->GetInfoPort(spin_ctrl_gameport->GetValue()));
-            break;
+                spin_ctrl_gameport->SetValue(game->GetDefaultGamePort());
+
+             spin_ctrl_infoport->SetValue(game->GetInfoPort(spin_ctrl_gameport->GetValue()));
+             break;
         }
     }
 }
@@ -176,18 +197,21 @@ void CslDlgAddServer::OnCommandEvent(wxCommandEvent& event)
             if (host.IsEmpty())
                 return;
 
-            CslGames& games=::wxGetApp().GetCslEngine()->GetGames();
+            CslArrayCslGame& games=::wxGetApp().GetCslEngine()->GetGames();
             wxUint32 fourcc=(wxUint32)(long)choice_gametype->GetClientData(choice_gametype->GetSelection());
 
             loopv(games)
             {
-                if (games[i]->GetFourCC()==fourcc)
-                {
-                    m_info->Create(games[i],host,gameport,infoport);
+                CslGame *game = games[i];
 
-                    if (games[i]->AddServer(m_info))
+                if (game->GetFourCC()==fourcc)
+                {
+                    CslEngine *engine = ::wxGetApp().GetCslEngine();
+
+                    m_info->Init(game, host, gameport, infoport);
+
+                    if (engine->AddServer(game, m_info))
                     {
-                        ::wxGetApp().GetCslEngine()->ResolveHost(m_info);
                         EndModal(wxID_OK);
                         return;
                     }

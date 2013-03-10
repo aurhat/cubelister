@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -25,16 +25,7 @@
     @author Glen Masgai <mimosius@users.sourceforge.net>
 */
 
-#ifdef __WXMSW__
-#ifndef _WINSOCK2API_
-#define _WINSOCK2API_
-#endif //_WINSOCK2API_
-#ifndef _WS2TCPIP_H_
-#define _WS2TCPIP_H_
-#endif //_WS2TCPIP_H_
-#endif //__WXMSW__
-
-class CslGeoIPService
+class CSL_DLL_GUITOOLS CslGeoIPService
 {
     public:
         CslGeoIPService(const wxString& name, const wxString& host, const wxString& path) :
@@ -43,9 +34,9 @@ class CslGeoIPService
         wxString Name, Host, Path;
 };
 
-WX_DEFINE_ARRAY_PTR(CslGeoIPService*, CslGeoIPServices);
+WX_DEFINE_USER_EXPORTED_ARRAY(CslGeoIPService*, CslGeoIPServices, class CSL_DLL_GUITOOLS);
 
-class CslGeoIP
+class CSL_DLL_GUITOOLS CslGeoIP
 {
     private:
         CslGeoIP();
@@ -67,8 +58,8 @@ class CslGeoIP
         static wxString GetCountryNameByIPnum(const unsigned long ipnum);
         static wxString GetCityNameByAddr(const char *host);
         static wxString GetCityNameByIPnum(const unsigned long ipnum);
-        static const vector<wxString>& GetCountryCodes();
-        static const vector<wxString>& GetCountryNames();
+        static const wxArrayString& GetCountryCodes();
+        static const wxArrayString& GetCountryNames();
 
         static void AddService(const wxString& name, const wxString& host, const wxString& path);
         static const CslGeoIPServices& GetServices();
@@ -76,7 +67,7 @@ class CslGeoIP
     private:
         wxInt32 m_type;
         CslGeoIPServices m_services;
-        vector<wxString> m_country_codes, m_country_names;
+        wxArrayString m_country_codes, m_country_names;
 };
 
 #endif

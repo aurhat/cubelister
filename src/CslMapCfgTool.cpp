@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "Csl.h"
+#include "CslArt.h"
 #include "CslPanelMap.h"
 #include "CslMapCfgTool.h"
 
@@ -35,7 +36,7 @@ enum
 
 
 BEGIN_DECLARE_EVENT_TYPES()
-DECLARE_EVENT_TYPE(wxCSL_EVT_PAINT,wxID_ANY)
+DECLARE_LOCAL_EVENT_TYPE(wxCSL_EVT_PAINT,wxID_ANY)
 END_DECLARE_EVENT_TYPES()
 
 #define CSL_EVT_PAINT(id,fn) \
@@ -236,6 +237,14 @@ void CslMapCfgTool::set_properties()
 
     choice_version->Clear();
     Reset();
+
+#ifdef __WXMSW__
+    SetIcon(wxICON(appicon));
+#else
+    wxIcon icon;
+    icon.CopyFromBitmap(GET_ART_FRAME(wxART_CSL));
+    SetIcon(icon);
+#endif
 }
 
 void CslMapCfgTool::do_layout()
@@ -414,7 +423,7 @@ void CslMapCfgTool::LoadConfig()
 
     Reset(false);
 
-    t_aInt32 versions;
+    wxArrayInt versions;
     m_mapInfo.GetMapConfigVersions(config,versions);
 
     for (wxUint32 i=0;i<versions.GetCount();i++)

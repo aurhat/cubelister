@@ -8,13 +8,13 @@ FLAG_PATH=src/img/flags
 
 declare -a flags
 
-for f in ${FLAG_PATH}/*.xpm
+while read f
 do
  flag=${f##*/}
  echo "#include \"${INC_PREFIX}${flag}\"" >>$FILE
  test $flag = "local.xpm" -o $flag = "unknown.xpm" || \
   flags=(${flags[*]} ${flag%%.xpm})
-done
+done < <(ls "${FLAG_PATH}"/*.xpm | sort)
 
 declare -i c=0
 declare -i j=1
@@ -23,9 +23,9 @@ declare -i e=${#flags[*]}-1
 echo -e "\nstatic const char **country_flags[] = {" >>$FILE
 for flag in ${flags[*]}
 do
- echo -n "${flag//\./_}_xpm" >> $FILE
+ echo -n "${flag//\./_}_xpm" >>$FILE
  test $c != $e && echo -n "," >>$FILE
-  test $j -eq 10 && { echo "" >>$FILE; j=0; } || { echo -n " " >>$FILE; }
+ test $j -eq 10 && { echo "" >>$FILE; j=0; } || { echo -n " " >>$FILE; }
  j+=1
  c+=1
 done
@@ -38,7 +38,7 @@ for flag in ${flags[*]}
 do
  echo -n "\"$flag\"" >> $FILE
  test $c != $e && echo -n "," >>$FILE
-  test $j -eq 10 && { echo "" >>$FILE; j=0; } || { echo -n " " >>$FILE; }
+ test $j -eq 10 && { echo "" >>$FILE; j=0; } || { echo -n " " >>$FILE; }
  j+=1
  c+=1
 done

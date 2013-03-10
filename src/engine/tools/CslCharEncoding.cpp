@@ -20,11 +20,30 @@
 
 #include "Csl.h"
 
-const CslCharEncoding CslDefaultCharEncoding;
+const CslCharEncodingTableEntry CslCharEncodingTable[CSL_NUM_CHAR_ENCODINGS] =
+{
+    { wxT("UTF-8"),       _("UTF-8")            },
+    { wxT("ISO-8859-2"),  _("Central European") },
+    { wxT("ISO-8859-3"),  _("Central European") },
+    { wxT("cp 1250"),     _("Central European") },
+    { wxT("cp 1251"),     _("Cyrillic")         },
+    { wxT("ISO-8859-5"),  _("Cyrillic")         },
+    { wxT("koi8-r"),      _("Cyrillic")         },
+    { wxT("koi8-u"),      _("Cyrillic")         },
+    { wxT("cp 1254"),     _("Turkish")          },
+    { wxT("ISO-8859-9"),  _("Turkish")          },
+    { wxT("ISO-8859-1"),  _("Western European") },
+    { wxT("ISO-8859-15"), _("Western European") },
+    { wxT("cp 1252"),     _("Western European") },
+};
+
+const CslCharEncoding CslCurrentEncoding(wxT(""));
+const CslCharEncoding CslUTF8Encoding(wxT("UTF-8"));
+const CslCharEncoding CslISO_8859_15Encoding(wxT("ISO-8859-15"));
 
 
-CslCharEncoding::CslCharEncoding(bool utf8, const wxString& name) :
-        m_utf8(utf8), m_conv(NULL)
+CslCharEncoding::CslCharEncoding(const wxString& name) :
+        m_conv(NULL)
 {
     SetEncoding(name);
 }
@@ -42,23 +61,23 @@ bool CslCharEncoding::SetEncoding(const wxString& name)
     if (m_conv)
     {
         delete m_conv;
-        m_conv=NULL;
+        m_conv = NULL;
     }
 
-    if (!name.IsEmpty() && !(m_conv=new wxCSConv(name))->IsOk())
+    if (!name.IsEmpty() && !(m_conv = new wxCSConv(name))->IsOk())
     {
         delete m_conv;
-        m_conv=NULL;
+        m_conv = NULL;
     }
 
-    m_name=name;
+    m_name = name;
 
     return m_conv!=NULL;
 }
 
 wxInt32 CslCharEncoding::GetEncodingId() const
 {
-    for (wxInt32 i=0; i<CSL_NUM_CHAR_ENCODINGS; i++)
+    loopi(CSL_NUM_CHAR_ENCODINGS)
     {
         if (CslCharEncodingTable[i].Encoding==m_name)
             return i;
@@ -67,132 +86,120 @@ wxInt32 CslCharEncoding::GetEncodingId() const
     return 0;
 }
 
-wxString CslCharEncoding::ToLocal(const char *data) const
+wxString CslCharEncoding::MB2WX(const char *psz) const
 {
-    if (!data || !*data)
+    if (!psz || !psz[0])
         return wxEmptyString;
 
     wxString s;
-    wxChar *buffer;
+    wchar_t *wbuf = ToWChar(m_conv ? m_conv : wxConvCurrent, psz);
 
-    if (m_utf8)
+    if (wbuf)
     {
-        if ((buffer=ConvToLocalBuffer(data, wxConvUTF8)))
-        {
-            s=buffer;
-            delete[] buffer;
-            return s;
-        }
-        LOG_DEBUG("Invalid UTF-8 sequence: %s\n", data);
+#if wxUSE_UNICODE
+        s = wbuf;
+#else
+        char *buf = FromWChar(wxConvCurrent, wbuf);
+
+        if (buf)
+            s = buf;
+#endif
+        delete[] wbuf;
     }
 
-    if (m_conv)
+    if (s.empty())
     {
-        LOG_DEBUG("trying '%s'\n", (const char*)m_name.mb_str(wxConvLocal));
-        if ((buffer=ConvToLocalBuffer(data,*m_conv)))
-        {
-            s=buffer;
-            delete[] buffer;
-            return s;
-        }
-        LOG_DEBUG("Invalid %s sequence: %s\n",
-                  (const char*)m_name.mb_str(wxConvLocal), data);
+        //CSL_LOG_DEBUG("Invalid %s sequence: %s\n",
+        //              (const char*)m_name.mb_str(wxConvLocal), psz);
+        if (m_conv)
+            return CslCurrentEncoding.MB2WX(psz);
     }
 
-    const wxCSConv conv(wxT("ISO-8859-15"));
-
-    if ((buffer=ConvToLocalBuffer(data, conv)))
-    {
-        s=buffer;
-        delete[] buffer;
-        return s;
-    }
-    LOG_DEBUG("Invalid ISO-8859-15 sequence: %s\n", data);
-
-    return wxConvCurrent->cMB2WX(data);
+    return s;
 }
 
-wxCharBuffer CslCharEncoding::ToServer(const wxString& str) const 
+const CslCharBuffer CslCharEncoding::WX2MB(const wxString& str) const
 {
-    wxCharBuffer buffer;
+    const char *buf = NULL;
 
-    if (m_conv)
-    {
 #if wxUSE_UNICODE
-        buffer=m_conv->cWX2MB(str);
+    buf = FromWChar(m_conv ? m_conv : wxConvCurrent, str);
 #else
-        wxWCharBuffer ubuffer;
+    if (!m_conv)
+        return CslCharBuffer(str.c_str());
 
-        if ((ubuffer=wxConvCurrent->cMB2WC(str)))
-            buffer=m_conv->cWC2MB(ubuffer);
+    wchar_t *wbuf = ToWChar(wxConvCurrent, str);
+
+    if (wbuf)
+        buf = FromWChar(m_conv, wbuf);
 #endif
-        if (buffer)
-            return buffer;
-
-        LOG_DEBUG("Conversion to %s failed.\n",
-                  (const char*)m_name.mb_str(wxConvLocal));
+    if (buf)
+    {
+        CslCharBuffer cbuf((const char*)buf);
+        delete[] buf;
+        return cbuf;
+    }
+    else
+    {
+        //CSL_LOG_DEBUG("Conversion to %s failed.\n",
+        //              (const char*)m_name.mb_str(wxConvLocal));
+        if (m_conv)
+            return CslCurrentEncoding.WX2MB(str);
     }
 
-    if (m_utf8)
-    {
-#if wxUSE_UNICODE
-        buffer=wxConvUTF8.cWX2MB(str);
-#else
-        wxWCharBuffer ubuffer;
-
-        if ((ubuffer=wxConvCurrent->cMB2WC(str)))
-            buffer=wxConvUTF8.cWC2MB(ubuffer);
-#endif
-        if (buffer)
-            return buffer;
-
-        LOG_DEBUG("Conversion to UTF-8 failed.\n");
-    }
-
-    if (!(buffer=wxConvCurrent->cWX2MB(str)))
-        buffer=wxCSConv(_T("ISO8859-15")).cWX2MB(str);
-
-    return buffer;
+    return CslCharBuffer("");
 }
 
-wxChar* CslCharEncoding::ConvToLocalBuffer(const char *data, const wxMBConv& conv) const
+char* CslCharEncoding::FromWChar(const wxMBConv *conv, const wchar_t *pwz)
 {
     size_t len;
+    char *buf = NULL;
 
-    if (!(len=conv.MB2WC(NULL, data, 0)) || len==wxCONV_FAILED)
-        return NULL;
-
-    wchar_t *ubuffer=new wchar_t[len+1];
-    conv.MB2WC(ubuffer, data, len+1);
-#if wxUSE_UNICODE
-    return ubuffer;
-#else
-    if (!(len=wxConvCurrent->WC2MB(NULL, ubuffer, 0)) || len==wxCONV_FAILED)
+    if ((len = conv->FromWChar(NULL, 0, pwz))!=wxCONV_FAILED)
     {
-        delete[] ubuffer;
-        return NULL;
+        buf = new char[len];
+
+        if (buf && conv->FromWChar(buf, len, pwz)!=wxCONV_FAILED)
+            return buf;
     }
 
-    wxChar *buffer=new wxChar[len+1];
-    wxConvCurrent->WC2MB(buffer, ubuffer, len+1);
-    delete[] ubuffer;
+    if (buf)
+        delete[] buf;
 
-    return buffer;
-#endif
+    return NULL;
 }
 
-wxString CslCubeEncodingToLocal(const char *data)
+wchar_t* CslCharEncoding::ToWChar(const wxMBConv *conv, const char *psz)
+{
+    size_t len;
+    wchar_t *wbuf = NULL;
+
+    if ((len = conv->ToWChar(NULL, 0, psz))!=wxCONV_FAILED)
+    {
+        wchar_t *wbuf = new wchar_t[len];
+
+        if (wbuf && conv->ToWChar(wbuf, len+1, psz)!=wxCONV_FAILED)
+            return wbuf;
+    }
+
+    if (wbuf)
+        delete[] wbuf;
+
+    return NULL;
+}
+
+wxString CslCharEncoding::CubeMB2WX(const char *pnz)
 {
     wxString ret;
-    wxInt32 numu=0, carry=0;
-    wxInt32 len=strlen(data);
-    uchar ubuf[4*_MAXDEFSTR];
+    wxInt32 numu = 0, carry = 0;
+    wxInt32 len = strlen(pnz);
+    uchar ubuf[4*MAXSTRLEN];
 
     while (carry<len)
     {
-        numu=encodeutf8(ubuf, sizeof(ubuf)-1, &((uchar*)data)[carry], len-carry, &carry);
-        ubuf[numu]='\0';
-        ret<<CslDefaultCharEncoding.ToLocal((const char*)ubuf);
+        numu = encodeutf8(ubuf, sizeof(ubuf)-1, &((uchar*)pnz)[carry], len-carry, &carry);
+        ubuf[numu] = '\0';
+        ret << CslUTF8Encoding.MB2WX((const char*)ubuf);
     }
 
     return ret;

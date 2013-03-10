@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -38,7 +38,7 @@
 #define CSL_DEFAULT_INJECT_FILE_CB    wxT("packages/base/metl3.cfg")
 
 
-class CslGameCube : public CslGame
+class CSL_DLL_PLUGINS CslGameCube : public CslGame
 {
     public:
         CslGameCube();
@@ -52,23 +52,15 @@ class CslGameCube : public CslGame
         //implementations for base class
         wxUint16 GetDefaultGamePort() const { return CSL_DEFAULT_PORT_CB; }
         wxUint16 GetInfoPort(wxUint16 port=0) const { return port ? port+1 : CSL_DEFAULT_PORT_CB+1; }
-        inline bool PingDefault(ucharbuf& buf, CslServerInfo& info) const;
+        bool PingDefault(ucharbuf& buf, CslServerInfo& info) const;
         bool ParseDefaultPong(ucharbuf& buf, CslServerInfo& info) const;
+        CslGameClientSettings GuessClientSettings(const wxString& path) const;
+        wxString ValidateClientSettings(CslGameClientSettings& settings) const;
         void SetClientSettings(const CslGameClientSettings& settings);
         wxString GameStart(CslServerInfo *info, wxInt32 mode, wxString& error);
         wxInt32 GameEnd(wxString& error);
         void ProcessOutput(char *data) const;
         bool ReturnOk(wxInt32 code) const { return code==0 || code==1; }
-};
-
-class CslGameCubePlugin: public CslPlugin
-{
-    public:
-        CslGameCubePlugin(CslPluginHostInfo *hostinfo, CslPluginInfo *plugininfo) :
-                CslPlugin(hostinfo, plugininfo) { }
-        virtual ~CslGameCubePlugin() { }
-
-        virtual bool Create();
 };
 
 #endif //CSLGAMECUBE_H

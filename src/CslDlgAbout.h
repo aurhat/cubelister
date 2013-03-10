@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -35,9 +35,6 @@ class CslPanelAboutImage : public wxPanel
     private:
         void OnPaint(wxPaintEvent& event);
         DECLARE_EVENT_TABLE();
-
-    protected:
-        wxBitmap m_bitmap;
 };
 
 
@@ -56,6 +53,7 @@ class CslDlgAbout: public wxDialog
         void do_layout();
         // end wxGlade
 
+        void OnClose(wxCloseEvent& event);
         void OnCommandEvent(wxCommandEvent& event);
 
         DECLARE_EVENT_TABLE();

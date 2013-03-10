@@ -66,6 +66,7 @@
 #include "er.xpm"
 #include "es.xpm"
 #include "et.xpm"
+#include "eu.xpm"
 #include "fi.xpm"
 #include "fj.xpm"
 #include "fk.xpm"
@@ -187,7 +188,6 @@
 #include "qa.xpm"
 #include "re.xpm"
 #include "ro.xpm"
-#include "rs.woa.xpm"
 #include "rs.xpm"
 #include "ru.xpm"
 #include "rw.xpm"
@@ -257,25 +257,25 @@ be_xpm, bf_xpm, bg_xpm, bh_xpm, bi_xpm, bj_xpm, bm_xpm, bn_xpm, bo_xpm, br_xpm,
 bs_xpm, bt_xpm, bv_xpm, bw_xpm, by_xpm, bz_xpm, ca_xpm, cc_xpm, cd_xpm, cf_xpm,
 cg_xpm, ch_xpm, ci_xpm, ck_xpm, cl_xpm, cm_xpm, cn_xpm, co_xpm, cr_xpm, cs_xpm,
 cu_xpm, cv_xpm, cx_xpm, cy_xpm, cz_xpm, de_xpm, dj_xpm, dk_xpm, dm_xpm, do_xpm,
-dz_xpm, ec_xpm, ee_xpm, eg_xpm, eh_xpm, er_xpm, es_xpm, et_xpm, fi_xpm, fj_xpm,
-fk_xpm, fm_xpm, fo_xpm, fr_xpm, fx_xpm, ga_xpm, gb_xpm, gd_xpm, ge_xpm, gf_xpm,
-gg_xpm, gh_xpm, gi_xpm, gl_xpm, gm_xpm, gn_xpm, gp_xpm, gq_xpm, gr_xpm, gs_xpm,
-gt_xpm, gu_xpm, gw_xpm, gy_xpm, hk_xpm, hm_xpm, hn_xpm, hr_xpm, ht_xpm, hu_xpm,
-id_xpm, ie_xpm, il_xpm, im_xpm, in_xpm, io_xpm, iq_xpm, ir_xpm, is_xpm, it_xpm,
-je_xpm, jm_xpm, jo_xpm, jp_xpm, ke_xpm, kg_xpm, kh_xpm, ki_xpm, km_xpm, kn_xpm,
-kp_xpm, kr_xpm, kw_xpm, ky_xpm, kz_xpm, la_xpm, lb_xpm, lc_xpm, li_xpm, lk_xpm,
-lr_xpm, ls_xpm, lt_xpm, lu_xpm, lv_xpm, ly_xpm, ma_xpm, mc_xpm, md_xpm, me_xpm,
-mg_xpm, mh_xpm, mk_xpm, ml_xpm, mm_xpm, mn_xpm, mo_xpm, mp_xpm, mq_xpm, mr_xpm,
-ms_xpm, mt_xpm, mu_xpm, mv_xpm, mw_xpm, mx_xpm, my_xpm, mz_xpm, na_xpm, nc_xpm,
-ne_xpm, nf_xpm, ng_xpm, ni_xpm, nl_xpm, no_xpm, np_xpm, nr_xpm, nu_xpm, nz_xpm,
-om_xpm, pa_xpm, pe_xpm, pf_xpm, pg_xpm, ph_xpm, pk_xpm, pl_xpm, pm_xpm, pn_xpm,
-pr_xpm, ps_xpm, pt_xpm, pw_xpm, py_xpm, qa_xpm, re_xpm, ro_xpm, rs_woa_xpm, rs_xpm,
+dz_xpm, ec_xpm, ee_xpm, eg_xpm, eh_xpm, er_xpm, es_xpm, et_xpm, eu_xpm, fi_xpm,
+fj_xpm, fk_xpm, fm_xpm, fo_xpm, fr_xpm, fx_xpm, ga_xpm, gb_xpm, gd_xpm, ge_xpm,
+gf_xpm, gg_xpm, gh_xpm, gi_xpm, gl_xpm, gm_xpm, gn_xpm, gp_xpm, gq_xpm, gr_xpm,
+gs_xpm, gt_xpm, gu_xpm, gw_xpm, gy_xpm, hk_xpm, hm_xpm, hn_xpm, hr_xpm, ht_xpm,
+hu_xpm, id_xpm, ie_xpm, il_xpm, im_xpm, in_xpm, io_xpm, iq_xpm, ir_xpm, is_xpm,
+it_xpm, je_xpm, jm_xpm, jo_xpm, jp_xpm, ke_xpm, kg_xpm, kh_xpm, ki_xpm, km_xpm,
+kn_xpm, kp_xpm, kr_xpm, kw_xpm, ky_xpm, kz_xpm, la_xpm, lb_xpm, lc_xpm, li_xpm,
+lk_xpm, lr_xpm, ls_xpm, lt_xpm, lu_xpm, lv_xpm, ly_xpm, ma_xpm, mc_xpm, md_xpm,
+me_xpm, mg_xpm, mh_xpm, mk_xpm, ml_xpm, mm_xpm, mn_xpm, mo_xpm, mp_xpm, mq_xpm,
+mr_xpm, ms_xpm, mt_xpm, mu_xpm, mv_xpm, mw_xpm, mx_xpm, my_xpm, mz_xpm, na_xpm,
+nc_xpm, ne_xpm, nf_xpm, ng_xpm, ni_xpm, nl_xpm, no_xpm, np_xpm, nr_xpm, nu_xpm,
+nz_xpm, om_xpm, pa_xpm, pe_xpm, pf_xpm, pg_xpm, ph_xpm, pk_xpm, pl_xpm, pm_xpm,
+pn_xpm, pr_xpm, ps_xpm, pt_xpm, pw_xpm, py_xpm, qa_xpm, re_xpm, ro_xpm, rs_xpm,
 ru_xpm, rw_xpm, sa_xpm, sb_xpm, sc_xpm, sd_xpm, se_xpm, sg_xpm, sh_xpm, si_xpm,
 sj_xpm, sk_xpm, sl_xpm, sm_xpm, sn_xpm, so_xpm, sr_xpm, st_xpm, sv_xpm, sy_xpm,
 sz_xpm, tc_xpm, td_xpm, tf_xpm, tg_xpm, th_xpm, tj_xpm, tk_xpm, tl_xpm, tm_xpm,
 tn_xpm, to_xpm, tp_xpm, tr_xpm, tt_xpm, tv_xpm, tw_xpm, tz_xpm, ua_xpm, ug_xpm,
 um_xpm, us_xpm, uy_xpm, uz_xpm, va_xpm, vc_xpm, ve_xpm, vg_xpm, vi_xpm, vn_xpm,
-vu_xpm, wf_xpm, ws_xpm, ye_xpm, yt_xpm, yu_xpm, za_xpm, zm_xpm, zw_xpm 
+vu_xpm, wf_xpm, ws_xpm, ye_xpm, yt_xpm, yu_xpm, za_xpm, zm_xpm, zw_xpm
 };
 
 static const char *country_codes[] = {
@@ -285,23 +285,23 @@ static const char *country_codes[] = {
 "bs", "bt", "bv", "bw", "by", "bz", "ca", "cc", "cd", "cf",
 "cg", "ch", "ci", "ck", "cl", "cm", "cn", "co", "cr", "cs",
 "cu", "cv", "cx", "cy", "cz", "de", "dj", "dk", "dm", "do",
-"dz", "ec", "ee", "eg", "eh", "er", "es", "et", "fi", "fj",
-"fk", "fm", "fo", "fr", "fx", "ga", "gb", "gd", "ge", "gf",
-"gg", "gh", "gi", "gl", "gm", "gn", "gp", "gq", "gr", "gs",
-"gt", "gu", "gw", "gy", "hk", "hm", "hn", "hr", "ht", "hu",
-"id", "ie", "il", "im", "in", "io", "iq", "ir", "is", "it",
-"je", "jm", "jo", "jp", "ke", "kg", "kh", "ki", "km", "kn",
-"kp", "kr", "kw", "ky", "kz", "la", "lb", "lc", "li", "lk",
-"lr", "ls", "lt", "lu", "lv", "ly", "ma", "mc", "md", "me",
-"mg", "mh", "mk", "ml", "mm", "mn", "mo", "mp", "mq", "mr",
-"ms", "mt", "mu", "mv", "mw", "mx", "my", "mz", "na", "nc",
-"ne", "nf", "ng", "ni", "nl", "no", "np", "nr", "nu", "nz",
-"om", "pa", "pe", "pf", "pg", "ph", "pk", "pl", "pm", "pn",
-"pr", "ps", "pt", "pw", "py", "qa", "re", "ro", "rs.woa", "rs",
+"dz", "ec", "ee", "eg", "eh", "er", "es", "et", "eu", "fi",
+"fj", "fk", "fm", "fo", "fr", "fx", "ga", "gb", "gd", "ge",
+"gf", "gg", "gh", "gi", "gl", "gm", "gn", "gp", "gq", "gr",
+"gs", "gt", "gu", "gw", "gy", "hk", "hm", "hn", "hr", "ht",
+"hu", "id", "ie", "il", "im", "in", "io", "iq", "ir", "is",
+"it", "je", "jm", "jo", "jp", "ke", "kg", "kh", "ki", "km",
+"kn", "kp", "kr", "kw", "ky", "kz", "la", "lb", "lc", "li",
+"lk", "lr", "ls", "lt", "lu", "lv", "ly", "ma", "mc", "md",
+"me", "mg", "mh", "mk", "ml", "mm", "mn", "mo", "mp", "mq",
+"mr", "ms", "mt", "mu", "mv", "mw", "mx", "my", "mz", "na",
+"nc", "ne", "nf", "ng", "ni", "nl", "no", "np", "nr", "nu",
+"nz", "om", "pa", "pe", "pf", "pg", "ph", "pk", "pl", "pm",
+"pn", "pr", "ps", "pt", "pw", "py", "qa", "re", "ro", "rs",
 "ru", "rw", "sa", "sb", "sc", "sd", "se", "sg", "sh", "si",
 "sj", "sk", "sl", "sm", "sn", "so", "sr", "st", "sv", "sy",
 "sz", "tc", "td", "tf", "tg", "th", "tj", "tk", "tl", "tm",
 "tn", "to", "tp", "tr", "tt", "tv", "tw", "tz", "ua", "ug",
 "um", "us", "uy", "uz", "va", "vc", "ve", "vg", "vi", "vn",
-"vu", "wf", "ws", "ye", "yt", "yu", "za", "zm", "zw" 
+"vu", "wf", "ws", "ye", "yt", "yu", "za", "zm", "zw"
 };

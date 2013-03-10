@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -19,22 +19,23 @@
  ***************************************************************************/
 
 #include "Csl.h"
-#include "CslIPV4Addr.h"
 
-wxInt32 CslIPV4Addr::Create(const char *addr)
+bool CslIPV4Addr::Create(const char *addr, wxUint16 port, wxUint32 netmask)
 {
     wxInt32 n;
-    char *end;
+    char *end = (char*)"0";
 
     union
     {
         wxUint32 i;
-        char b[sizeof(wxUint32)];
+        wxUint8 b[sizeof(wxUint32)];
     } ip, mask;
 
-    ip.i=mask.i=0;
+    ip.i = mask.i = 0;
 
     Reset();
+
+    m_port = port;
 
     loopi(5)
     {
@@ -45,17 +46,17 @@ wxInt32 CslIPV4Addr::Create(const char *addr)
             if (i<4)
             {
                 if (n<0 || n>255)
-                    return 0;
+                    return false;
 
-                ip.b[i]=n;
-                mask.b[i]=0xff;
+                ip.b[i] = n;
+                mask.b[i] = 0xff;
             }
             else
             {
                 if (n<0 || n>32)
-                    return 0;
+                    return false;
 
-                SetNetmask(n);
+                SetMaskBits(n);
                 break;
             }
 
@@ -63,23 +64,23 @@ wxInt32 CslIPV4Addr::Create(const char *addr)
                 break;
 
             if (end[0]!=(i<3 ? '.' : '/'))
-                return 0;
+                return false;
 
             addr=end+1;
         }
         else
-            return 0;
+            return false;
     }
 
     if (end[0])
-        return 0;
+        return false;
 
     if (!m_mask)
-        m_mask=mask.i;
+        m_mask = netmask ? netmask : mask.i;
 
-    m_ip=ip.i;
+    m_ip = ip.i;
 
-    return GetNetmask();
+    return (m_ip&m_mask)!=0;
 }
 
 wxString CslIPV4Addr::Format(const wxString& fmt) const
@@ -105,12 +106,16 @@ wxString CslIPV4Addr::Format(const wxString& fmt) const
                 buf<<NtoA(m_ip);
                 break;
 
-            case 'm': // full subnet mask
+            case 'm': // netmask as ip
                 buf<<NtoA(m_mask);
                 break;
 
-            case 's': // short subnet mask (/x)
-                buf<<wxString::Format(wxT("%d"), GetNetmask());
+            case 'p': // port
+                buf<<wxString::Format(wxT("%d"), m_port);
+                break;
+
+            case 's': // netmask bitcount (/x)
+                buf<<wxString::Format(wxT("%d"), GetMaskBits());
                 break;
 
             case 't': // to address (end)
@@ -137,8 +142,8 @@ wxInt32 CslIPV4Addr::GetMaskFromRange(const CslIPV4Addr& addr1, const CslIPV4Add
 
     for (wxInt32 i=1; i<32; i++)
     {
-        a1.SetNetmask(i);
-        a2.SetNetmask(i);
+        a1.SetMaskBits(i);
+        a2.SetMaskBits(i);
 
         if (!a1.IsInRange(a2))
             return i-1;

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -57,17 +57,16 @@ CslGameAssaultCube::CslGameAssaultCube()
 #if defined(__WXGTK__) || defined(__WXX11__)
     m_clientSettings.ConfigPath=::wxGetHomeDir()+wxT("/.assaultcube_v1.0");
 #endif
-#if wxUSE_GUI
-    m_icon16=BitmapFromData(wxBITMAP_TYPE_PNG, ac_16_png, sizeof(ac_16_png));
-    m_icon24=BitmapFromData(wxBITMAP_TYPE_PNG, ac_24_png, sizeof(ac_24_png));
-#endif //wxUSE_GUI
+
+    AddIcon(CSL_BITMAP_TYPE_PNG, 16, ac_16_png, sizeof(ac_16_png));
+    AddIcon(CSL_BITMAP_TYPE_PNG, 24, ac_24_png, sizeof(ac_24_png));
 }
 
 CslGameAssaultCube::~CslGameAssaultCube()
 {
 }
 
-const wxChar* CslGameAssaultCube::GetVersionName(wxInt32 prot) const
+inline wxString CslGameAssaultCube::GetVersionName(wxInt32 prot) const
 {
     static const wxChar* versions[] =
     {   wxT("1.1.0.4"),
@@ -81,12 +80,12 @@ const wxChar* CslGameAssaultCube::GetVersionName(wxInt32 prot) const
     wxInt32 v=CSL_LAST_PROTOCOL_AC-prot;
 
     if (v<0 || v>=count || !versions[v])
-        return wxString::Format(wxT("%d"), prot).c_str();
+        return wxString::Format(wxT("%d"), prot);
     else
         return versions[v];
 }
 
-const wxChar* CslGameAssaultCube::GetModeName(wxInt32 mode) const
+inline const wxChar* CslGameAssaultCube::GetModeName(wxInt32 mode) const
 {
     static const wxChar* modes[] =
     {
@@ -101,7 +100,7 @@ const wxChar* CslGameAssaultCube::GetModeName(wxInt32 mode) const
            modes[mode] : T2C(_("unknown"));
 }
 
-const wxChar* CslGameAssaultCube::GetWeaponName(wxInt32 n, wxInt32 prot) const
+inline const wxChar* CslGameAssaultCube::GetWeaponName(wxInt32 n, wxInt32 prot) const
 {
     if (prot<=1128) // < 1.1 series
     {
@@ -129,15 +128,15 @@ const wxChar* CslGameAssaultCube::GetWeaponName(wxInt32 n, wxInt32 prot) const
     return _("unknown");
 }
 
-wxInt32 CslGameAssaultCube::GetBestTeam(CslTeamStats& stats, wxInt32 prot) const
+inline wxInt32 CslGameAssaultCube::GetBestTeam(CslTeamStats& stats, wxInt32 prot) const
 {
     wxInt32 i, best=-1;
 
-    if (stats.TeamMode && stats.m_stats.length()>0 && stats.m_stats[0]->Ok)
+    if (stats.TeamMode && stats.m_stats.size()>0 && stats.m_stats[0]->Ok)
     {
         best=0;
 
-        for (i=1; i<stats.m_stats.length() && stats.m_stats[i]->Ok; i++)
+        for (i=1; i<(wxInt32)stats.m_stats.size() && stats.m_stats[i]->Ok; i++)
         {
             if (ModeHasFlags(stats.GameMode, prot))
             {
@@ -180,7 +179,7 @@ bool CslGameAssaultCube::PingDefault(ucharbuf& buf, CslServerInfo& info) const
 bool CslGameAssaultCube::ParseDefaultPong(ucharbuf& buf, CslServerInfo& info) const
 {
     wxInt32 i, l, q;
-    char text[_MAXDEFSTR];
+    char text[MAXSTRLEN];
     bool wasfull=info.IsFull();
 
     if ((wxUint32)getint(buf)!=m_fourcc)
@@ -208,9 +207,9 @@ bool CslGameAssaultCube::ParseDefaultPong(ucharbuf& buf, CslServerInfo& info) co
     if (info.Protocol<1133) // <= 1.1.0.5
         info.TimeRemain*=60;
     getstring(text, buf);
-    info.Map=CslCubeEncodingToLocal(FixString(text, 1));
+    info.Map=C2U(FilterCubeString(text, 1));
     getstring(text, buf);
-    info.SetDescription(CslCubeEncodingToLocal(FixString(text, 1)));
+    info.SetDescription(C2U(FilterCubeString(text, 1)));
 
     info.PlayersMax=getint(buf);
     if (info.HasRegisteredEvent(CslServerEvents::EVENT_FULL) && !wasfull && info.IsFull())
@@ -271,9 +270,9 @@ bool CslGameAssaultCube::ParseDefaultPong(ucharbuf& buf, CslServerInfo& info) co
                             if (!*text)
                                 break;
                             if (i++)
-                                info.InfoText<<CSL_NEWLINE;
+                                info.InfoText<<CSL_NEWLINE_WX;
                             if (strcmp(text, "."))
-                                info.InfoText<<CslCubeEncodingToLocal(FixString(text, 1, true, false, true));
+                                info.InfoText<<C2U(FilterCubeString(text, 1, true, false, true));
                         }
                     }
                     break;
@@ -291,15 +290,15 @@ bool CslGameAssaultCube::ParseDefaultPong(ucharbuf& buf, CslServerInfo& info) co
 
 bool CslGameAssaultCube::ParsePlayerPong(wxInt32 protocol, ucharbuf& buf, CslPlayerStatsData& info) const
 {
-    char text[_MAXDEFSTR];
+    char text[MAXSTRLEN];
 
     info.ID=getint(buf);
     if (protocol>=104)
         info.Ping=getint(buf);
     getstring(text, buf);
-    info.Name=CslCubeEncodingToLocal(FixString(text, 1));
+    info.Name=C2U(FilterCubeString(text, 1));
     getstring(text, buf);
-    info.Team=CslCubeEncodingToLocal(FixString(text, 1));
+    info.Team=C2U(FilterCubeString(text, 1));
     info.Frags=getint(buf);
     if (protocol>=104)
         info.Flagscore=getint(buf);
@@ -329,10 +328,10 @@ bool CslGameAssaultCube::ParsePlayerPong(wxInt32 protocol, ucharbuf& buf, CslPla
 bool CslGameAssaultCube::ParseTeamPong(wxInt32 protocol, ucharbuf& buf, CslTeamStatsData& info) const
 {
     wxInt32 l;
-    char text[_MAXDEFSTR];
+    char text[MAXSTRLEN];
 
     getstring(text, buf);
-    info.Name=CslCubeEncodingToLocal(FixString(text, 1));
+    info.Name=C2U(FilterCubeString(text, 1));
     info.Score=getint(buf);
     l=getint(buf);
     if (l>-1)
@@ -341,9 +340,19 @@ bool CslGameAssaultCube::ParseTeamPong(wxInt32 protocol, ucharbuf& buf, CslTeamS
         info.Score2=CSL_SCORE_INVALID;
     l=getint(buf);
     while (l-->0)
-        info.Bases.add(getint(buf));
+        info.Bases.push_back(getint(buf));
 
     return !buf.overread();
+}
+
+CslGameClientSettings CslGameAssaultCube::GuessClientSettings(const wxString& path) const
+{
+    return CslGameClientSettings();
+}
+
+wxString CslGameAssaultCube::ValidateClientSettings(CslGameClientSettings& settings) const
+{
+    return wxEmptyString;
 }
 
 void CslGameAssaultCube::SetClientSettings(const CslGameClientSettings& settings)
@@ -459,7 +468,7 @@ wxString CslGameAssaultCube::GameStart(CslServerInfo *info, wxInt32 mode, wxStri
                                      say ? wxT("]") : wxEmptyString,
                                      postScript.IsEmpty() ? wxEmptyString : postScript.c_str());
 
-    LOG_DEBUG("start client: %s\n", U2A(bin));
+    CSL_LOG_DEBUG("start client: %s\n", U2C(bin));
 
     return WriteTextFile(configpath, script, wxFile::write_append)==CSL_ERROR_NONE ? bin:wxString(wxEmptyString);
 }
@@ -479,18 +488,37 @@ wxInt32 CslGameAssaultCube::GameEnd(wxString& error)
 }
 
 
-bool CslGameAssaultCubePlugin::Create()
+CslGameAssaultCube *assaultcube = NULL;
+
+bool plugin_init(CslPluginHost *host)
 {
-    CslEngine *engine=m_host->GetCslEngine();
+    CslEngine *engine = host->GetCslEngine();
 
     if (engine)
-        return engine->AddGame(new CslGameAssaultCube());
+    {
+        assaultcube = new CslGameAssaultCube;
+        return engine->AddGame(assaultcube);
+    }
 
     return true;
 }
 
-IMPLEMENT_PLUGIN(CSL_BUILD_FOURCC(CSL_FOURCC_AC), CSL_PLUGIN_VERSION_API, CslPlugin::TYPE_ENGINE,
-                 CSL_BUILD_VERSION(__CSL_VERSION), CSL_DEFAULT_NAME_AC,
+void plugin_deinit(CslPluginHost *host)
+{
+    if (assaultcube)
+    {
+        CslEngine *engine = host->GetCslEngine();
+
+        if (engine)
+            engine->RemoveGame(assaultcube);
+
+        delete assaultcube;
+        assaultcube = NULL;
+    }
+}
+
+IMPLEMENT_PLUGIN(CSL_PLUGIN_VERSION_API, CSL_PLUGIN_TYPE_ENGINE, CSL_BUILD_FOURCC(CSL_FOURCC_AC),
+                 CSL_DEFAULT_NAME_AC, CSL_VERSION_STR,
                  wxT("Glen Masgai"), wxT("mimosius@users.sourceforge.net"),
-                 CSL_WEBADDRFULL_STR, wxT("GPLv2"),
-                 wxT("AssaultCube CSL engine plugin"), CslGameAssaultCubePlugin)
+                 CSL_WEBADDR_STR, wxT("GPLv2"), wxT("Assaultcube CSL engine plugin"),
+                 &plugin_init, &plugin_deinit, NULL)

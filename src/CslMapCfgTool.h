@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -34,7 +34,7 @@ class CslMapToolPanelMap : public CslPanelMap
                 m_id(id),m_panelZoom(NULL),m_basesPtr(NULL),m_activeBase(-1),
                 m_centre(wxPoint(-1,-1)),m_mouseLeftDown(false) {}
 
-        void Init(CslMapToolPanelMap *panel,t_aBaseInfo *basesPtr)
+        void Init(CslMapToolPanelMap *panel,CslArrayCslBaseInfo *basesPtr)
         {
             m_panelZoom=panel;
             m_basesPtr=basesPtr;
@@ -46,7 +46,7 @@ class CslMapToolPanelMap : public CslPanelMap
         wxInt32 m_id;
 
         CslMapToolPanelMap *m_panelZoom;
-        t_aBaseInfo *m_basesPtr;
+        CslArrayCslBaseInfo *m_basesPtr;
         wxInt32 m_activeBase;
 
         wxPoint m_centre;

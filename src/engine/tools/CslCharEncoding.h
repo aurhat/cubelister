@@ -21,64 +21,142 @@
 #ifndef CSLCHARENCODING_H
 #define CSLCHARENCODING_H
 
-/**
- @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
-
-class CslCharEncoding;
-
-extern const CslCharEncoding CslDefaultCharEncoding;
-//#define A2U(PSZA_CHART) wxString(wxConvertMB2WX(PSZA_CHART))
-//#define U2A(PSZT_CHART) (char*)(const char*)wxConvertWX2MB(PSZT_CHART)
-#define A2U(PSZA_CHART) CslDefaultCharEncoding.ToLocal(PSZA_CHART)
-#define U2A(PSZT_CHART) (const char*)CslDefaultCharEncoding.ToServer(PSZT_CHART)
-
 #if wxCHECK_VERSION(2, 9, 0)
 #define T2C(x) x.c_str()
 #else
 #define T2C(x) x
 #endif
 
-static const struct { const wxChar *Encoding, *Name; } CslCharEncodingTable[] =
-{
-    { wxT("UTF-8"),       _("Default")          },
-    { wxT("ISO-8859-2"),  _("Central European") },
-    { wxT("ISO-8859-3"),  _("Central European") },
-    { wxT("cp 1250"),     _("Central European") },
-    { wxT("cp 1251"),     _("Cyrillic")         },
-    { wxT("ISO-8859-5"),  _("Cyrillic")         },
-    { wxT("koi8-r"),      _("Cyrillic")         },
-    { wxT("koi8-u"),      _("Cyrillic")         },
-    { wxT("cp 1254"),     _("Turkish")          },
-    { wxT("ISO-8859-9"),  _("Turkish")          },
-    { wxT("ISO-8859-1"),  _("Western European") },
-    { wxT("ISO-8859-15"), _("Western European") },
-    { wxT("cp 1252"),     _("Western European") },
-};
-static const wxInt32 CSL_NUM_CHAR_ENCODINGS=sizeof(CslCharEncodingTable)/sizeof(CslCharEncodingTable[0]);
+// this is the wx(W)Charbuffer class from wxWidgets 2.8 (buffer.h).
+// the new template based ones within wxWidgets 2.9+ ares using
+// reference counters, which causes trouble with static CRT builds,
+// so don't use any wx-function which returns wx(W)Charbuffer !
 
-class CslCharEncoding
+#define CSL_DEFINE_STRING_BUFFER(classname, chartype, strdupfunc)           \
+class CSL_DLL_TOOLS classname                                               \
+{                                                                           \
+public:                                                                     \
+    classname(const chartype *str = NULL)                                   \
+        : m_str(str ? strdupfunc(str) : NULL)                               \
+    {                                                                       \
+    }                                                                       \
+                                                                            \
+    classname(size_t len)                                                   \
+        : m_str((chartype *)malloc((len + 1)*sizeof(chartype)))             \
+    {                                                                       \
+        m_str[len] = (chartype)0;                                           \
+    }                                                                       \
+                                                                            \
+    ~classname() { free(m_str); }                                           \
+                                                                            \
+    chartype *release() const                                               \
+    {                                                                       \
+        chartype *p = m_str;                                                \
+        ((classname *)this)->m_str = NULL;                                  \
+        return p;                                                           \
+    }                                                                       \
+                                                                            \
+    void reset()                                                            \
+    {                                                                       \
+        free(m_str);                                                        \
+        m_str = NULL;                                                       \
+    }                                                                       \
+                                                                            \
+    classname(const classname& src)                                         \
+        : m_str(src.release())                                              \
+    {                                                                       \
+    }                                                                       \
+                                                                            \
+    classname& operator=(const chartype *str)                               \
+    {                                                                       \
+        free(m_str);                                                        \
+        m_str = str ? strdupfunc(str) : NULL;                               \
+        return *this;                                                       \
+    }                                                                       \
+                                                                            \
+    classname& operator=(const classname& src)                              \
+    {                                                                       \
+        free(m_str);                                                        \
+        m_str = src.release();                                              \
+                                                                            \
+        return *this;                                                       \
+    }                                                                       \
+                                                                            \
+    bool extend(size_t len)                                                 \
+    {                                                                       \
+        chartype *                                                          \
+            str = (chartype *)realloc(m_str, (len + 1)*sizeof(chartype));   \
+        if ( !str )                                                         \
+            return false;                                                   \
+                                                                            \
+        m_str = str;                                                        \
+                                                                            \
+        return true;                                                        \
+    }                                                                       \
+                                                                            \
+    chartype *data() { return m_str; }                                      \
+    const chartype *data() const { return m_str; }                          \
+    operator const chartype *() const { return m_str; }                     \
+    chartype operator[](size_t n) const { return m_str[n]; }                \
+                                                                            \
+private:                                                                    \
+    chartype *m_str;                                                        \
+}
+
+CSL_DEFINE_STRING_BUFFER(CslCharBuffer, char, wxStrdupA);
+CSL_DEFINE_STRING_BUFFER(CslWCharBuffer, wchar_t, wxStrdupW);
+
+struct CslCharEncodingTableEntry
+{
+    const wxChar *Encoding, *Name;
+};
+
+#define CSL_NUM_CHAR_ENCODINGS  13
+CSL_DLL_TOOLS extern const CslCharEncodingTableEntry CslCharEncodingTable[CSL_NUM_CHAR_ENCODINGS];
+
+class CSL_DLL_TOOLS CslCharEncoding
 {
     public:
-        CslCharEncoding(bool utf8=true, const wxString& name=wxEmptyString);
+        CslCharEncoding(const wxString& name = wxEmptyString);
         ~CslCharEncoding();
 
         bool SetEncoding(const wxString& name);
         const wxString& GetEncoding() const { return m_name; }
         wxInt32 GetEncodingId() const;
 
-        wxString ToLocal(const char *data) const;
-        wxCharBuffer ToServer(const wxString& str) const;
+        wxString MB2WX(const char *data) const;
+        const CslCharBuffer WX2MB(const wxString& str) const;
+
+        static char* FromWChar(const wxMBConv *conv, const wchar_t *pwz);
+        static wchar_t* ToWChar(const wxMBConv *conv, const char *psz);
+
+        static wxString CubeMB2WX(const char *data);
 
     private:
-        bool m_utf8;
         wxString m_name;
         wxCSConv *m_conv;
 
     protected:
-        wxChar* ConvToLocalBuffer(const char *data, const wxMBConv& conv) const;
 };
 
-wxString CslCubeEncodingToLocal(const char *data);
+CSL_DLL_TOOLS extern const CslCharEncoding CslCurrentEncoding;
+CSL_DLL_TOOLS extern const CslCharEncoding CslUTF8Encoding;
+CSL_DLL_TOOLS extern const CslCharEncoding CslISO_8859_15Encoding;
+
+static inline wxString CslMB2WX(const char *s, const CslCharEncoding *conv = NULL)
+{
+    const CslCharEncoding *c = conv ? conv : &CslCurrentEncoding;
+    return c->MB2WX(s);
+}
+
+template<class T>
+inline CslCharBuffer CslWX2MB(const T& s, const CslCharEncoding *conv = NULL)
+{
+    const CslCharEncoding *c = conv ? conv : &CslUTF8Encoding;
+    return c->WX2MB(s);
+}
+
+#define C2U(PSZA_CHART)              CslMB2WX(PSZA_CHART)
+#define U2C(PSZW_CHART) (const char*)CslWX2MB(PSZW_CHART)
 
 #endif //CSLCHARENCODING_H

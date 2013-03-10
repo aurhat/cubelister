@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -219,8 +219,8 @@ mutstype[] =
     },
 };
 
-#define m_game(a)           (a > -1 && a < G_MAX)
-#define m_implied(a,b)      (gametype[a].implied|(a == G_BOMBER && !((b|gametype[a].implied) & G_M_GSP2) ? G_M_TEAM : G_M_NONE))
+#define m_game(a)      (a > -1 && a < G_MAX)
+#define m_implied(a,b) (gametype[a].implied|(a == G_BOMBER && !((b|gametype[a].implied) & G_M_GSP2) ? G_M_TEAM : G_M_NONE))
 
 
 CslGameRedEclipse::CslGameRedEclipse()
@@ -236,10 +236,9 @@ CslGameRedEclipse::CslGameRedEclipse()
 #elif defined(__WXGTK__) || defined(__WXX11__)
     m_clientSettings.ConfigPath=::wxGetHomeDir()+wxT("/.redeclipse");
 #endif
-#if wxUSE_GUI
-    m_icon16=BitmapFromData(wxBITMAP_TYPE_PNG, re_16_png, sizeof(re_16_png));
-    m_icon24=BitmapFromData(wxBITMAP_TYPE_PNG, re_24_png, sizeof(re_24_png));
-#endif //wxUSE_GUI
+
+    AddIcon(CSL_BITMAP_TYPE_PNG, 16, re_16_png, sizeof(re_16_png));
+    AddIcon(CSL_BITMAP_TYPE_PNG, 24, re_24_png, sizeof(re_24_png));
 }
 
 CslGameRedEclipse::~CslGameRedEclipse()
@@ -286,11 +285,11 @@ wxString CslGameRedEclipse::GetModeName(wxInt32 mode, wxInt32 muts) const
     return name;
 }
 
-const wxChar* CslGameRedEclipse::GetVersionName(wxInt32 prot) const
+inline wxString CslGameRedEclipse::GetVersionName(wxInt32 prot) const
 {
     static const wxChar* versions[] =
     {
-        wxT("Cosmic"), NULL, NULL, wxT("Supernova"), wxT("Ides") 
+        wxT("Cosmic"), NULL, NULL, wxT("Supernova"), wxT("Ides")
     };
 
     static wxInt32 count=sizeof(versions)/sizeof(versions[0]);
@@ -298,12 +297,12 @@ const wxChar* CslGameRedEclipse::GetVersionName(wxInt32 prot) const
     wxInt32 v=CSL_LAST_PROTOCOL_RE-prot;
 
     if (v<0 || v>=count || !versions[v])
-        return wxString::Format(wxT("%d"), prot).c_str();
+        return wxString::Format(wxT("%d"), prot);
     else
         return versions[v];
 }
 
-const wxChar* CslGameRedEclipse::GetWeaponName(wxInt32 n, wxInt32 prot) const
+inline const wxChar* CslGameRedEclipse::GetWeaponName(wxInt32 n, wxInt32 prot) const
 {
     static const wxChar* weapons[] =
     {
@@ -315,7 +314,7 @@ const wxChar* CslGameRedEclipse::GetWeaponName(wxInt32 n, wxInt32 prot) const
            weapons[n] : T2C(_("unknown"));
 }
 
-wxInt32 CslGameRedEclipse::GetPlayerstatsDescriptions(const wxChar ***desc) const
+inline wxInt32 CslGameRedEclipse::GetPlayerstatsDescriptions(const wxChar ***desc) const
 {
     static const wxChar *descriptions[]=
     {
@@ -328,15 +327,15 @@ wxInt32 CslGameRedEclipse::GetPlayerstatsDescriptions(const wxChar ***desc) cons
     return sizeof(descriptions)/sizeof(descriptions[0]);
 }
 
-wxInt32 CslGameRedEclipse::GetBestTeam(CslTeamStats& stats, wxInt32 prot) const
+inline wxInt32 CslGameRedEclipse::GetBestTeam(CslTeamStats& stats, wxInt32 prot) const
 {
     wxInt32 i, best=-1;
 
-    if (stats.TeamMode && stats.m_stats.length()>0 && stats.m_stats[0]->Ok)
+    if (stats.TeamMode && stats.m_stats.size()>0 && stats.m_stats[0]->Ok)
     {
         best=0;
 
-        for (i=1; i<stats.m_stats.length() && stats.m_stats[i]->Ok; i++)
+        for (i=1; i<(wxInt32)stats.m_stats.size() && stats.m_stats[i]->Ok; i++)
         {
             if (stats.m_stats[i]->Score>=stats.m_stats[best]->Score)
                 best=i;
@@ -354,9 +353,9 @@ bool CslGameRedEclipse::PingDefault(ucharbuf& buf, CslServerInfo& info) const
 
 bool CslGameRedEclipse::ParseDefaultPong(ucharbuf& buf, CslServerInfo& info) const
 {
-    vector<int>attr;
+    wxArrayInt attr;
     wxInt32 l, numattr;
-    char text[_MAXDEFSTR];
+    char text[MAXSTRLEN];
     bool wasfull=info.IsFull();
 
     if ((wxUint32)getint(buf)!=m_fourcc)
@@ -375,7 +374,7 @@ bool CslGameRedEclipse::ParseDefaultPong(ucharbuf& buf, CslServerInfo& info) con
         if (buf.overread())
             return false;
 
-        attr.add(getint(buf));
+        attr.push_back(getint(buf));
     }
 
     if (numattr>=1)
@@ -439,24 +438,24 @@ bool CslGameRedEclipse::ParseDefaultPong(ucharbuf& buf, CslServerInfo& info) con
     }
 
     getstring(text, buf);
-    info.Map=CslCubeEncodingToLocal(FixString(text, 1));
+    info.Map = CslCharEncoding::CubeMB2WX(FilterCubeString(text, 1));
     getstring(text, buf);
-    info.SetDescription(CslCubeEncodingToLocal(FixString(text, 1)));
+    info.SetDescription(CslCharEncoding::CubeMB2WX(FilterCubeString(text, 1)));
 
     return !buf.overread();
 }
 
 bool CslGameRedEclipse::ParsePlayerPong(wxInt32 protocol, ucharbuf& buf, CslPlayerStatsData& info) const
 {
-    char text[_MAXDEFSTR];
+    char text[MAXSTRLEN];
 
     info.ID=getint(buf);
     if (protocol>=104)
         info.Ping=getint(buf);
     getstring(text, buf);
-    info.Name=CslCubeEncodingToLocal(FixString(text, 1));
+    info.Name=CslCharEncoding::CubeMB2WX(FilterCubeString(text, 1));
     getstring(text, buf);
-    info.Team=CslCubeEncodingToLocal(FixString(text, 1));
+    info.Team=CslCharEncoding::CubeMB2WX(FilterCubeString(text, 1));
     info.Frags=getint(buf);
     if (protocol>=104)
         info.Flagscore=getint(buf);
@@ -486,16 +485,26 @@ bool CslGameRedEclipse::ParsePlayerPong(wxInt32 protocol, ucharbuf& buf, CslPlay
 bool CslGameRedEclipse::ParseTeamPong(wxInt32 protocol, ucharbuf& buf, CslTeamStatsData& info) const
 {
     wxInt32 l;
-    char text[_MAXDEFSTR];
+    char text[MAXSTRLEN];
 
     getstring(text, buf);
-    info.Name=CslCubeEncodingToLocal(FixString(text, 1));
+    info.Name=CslCharEncoding::CubeMB2WX(FilterCubeString(text, 1));
     info.Score=getint(buf);
     l=getint(buf);
     while (l-->0)
-        info.Bases.add(getint(buf));
+        info.Bases.push_back(getint(buf));
 
     return !buf.overread();
+}
+
+CslGameClientSettings CslGameRedEclipse::GuessClientSettings(const wxString& path) const
+{
+    return CslGameClientSettings();
+}
+
+wxString CslGameRedEclipse::ValidateClientSettings(CslGameClientSettings& settings) const
+{
+    return wxEmptyString;
 }
 
 void CslGameRedEclipse::SetClientSettings(const CslGameClientSettings& settings)
@@ -598,7 +607,7 @@ wxString CslGameRedEclipse::GameStart(CslServerInfo *info, wxInt32 mode, wxStrin
     CmdlineEscapeQuotes(password);
 
     if (GetDefaultGamePort()!=info->GamePort || mode==CslServerInfo::CSL_CONNECT_PASS)
-        address<<wxString::Format(wxT(" %d %d"), info->GamePort, info->InfoPort);
+        address<<wxString::Format(wxT(" %d %d"), info->GamePort, info->Address().GetPort());
 
     script=wxString::Format(wxT("%sconnect %s %s%s"),
                             preScript.c_str(),
@@ -612,7 +621,7 @@ wxString CslGameRedEclipse::GameStart(CslServerInfo *info, wxInt32 mode, wxStrin
 
     bin<<wxT(" ")<<opts;
 
-    LOG_DEBUG("start client: %s\n", U2A(bin));
+    CSL_LOG_DEBUG("start client: %s\n", U2C(bin));
 
     return bin;
 }
@@ -622,18 +631,38 @@ wxInt32 CslGameRedEclipse::GameEnd(wxString& error)
     return CSL_ERROR_NONE;
 }
 
-bool CslGameRedEclipsePlugin::Create()
+
+CslGameRedEclipse *redeclipse = NULL;
+
+bool plugin_init(CslPluginHost *host)
 {
-    CslEngine *engine=m_host->GetCslEngine();
+    CslEngine *engine = host->GetCslEngine();
 
     if (engine)
-        return engine->AddGame(new CslGameRedEclipse());
+    {
+        redeclipse = new CslGameRedEclipse;
+        return engine->AddGame(redeclipse);
+    }
 
     return true;
 }
 
-IMPLEMENT_PLUGIN(CSL_BUILD_FOURCC(CSL_FOURCC_RE), CSL_PLUGIN_VERSION_API, CslPlugin::TYPE_ENGINE,
-                 CSL_BUILD_VERSION(__CSL_VERSION), CSL_DEFAULT_NAME_RE,
+void plugin_deinit(CslPluginHost *host)
+{
+    if (redeclipse)
+    {
+        CslEngine *engine = host->GetCslEngine();
+
+        if (engine)
+            engine->RemoveGame(redeclipse);
+
+        delete redeclipse;
+        redeclipse = NULL;
+    }
+}
+
+IMPLEMENT_PLUGIN(CSL_PLUGIN_VERSION_API, CSL_PLUGIN_TYPE_ENGINE, CSL_BUILD_FOURCC(CSL_FOURCC_RE),
+                 CSL_DEFAULT_NAME_RE, CSL_VERSION_STR,
                  wxT("Glen Masgai"), wxT("mimosius@users.sourceforge.net"),
-                 CSL_WEBADDRFULL_STR, wxT("GPLv2"),
-                 wxT("Red Eclipse CSL engine plugin"), CslGameRedEclipsePlugin)
+                 CSL_WEBADDR_STR, wxT("GPLv2"), wxT("Red Eclipse CSL engine plugin"),
+                 &plugin_init, &plugin_deinit, NULL)

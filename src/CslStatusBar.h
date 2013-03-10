@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -21,38 +21,55 @@
 #ifndef CSLSTATUSBAR_H
 #define CSLSTATUSBAR_H
 
-/**
- @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
-
-
-enum { LIGHT_GREEN = 0, LIGHT_GREY, LIGHT_RED, LIGHT_YELLOW };
+enum { LIGHT_GREY,
+       LIGHT_GREEN,
+       LIGHT_YELLOW,
+       LIGHT_RED };
 
 class CslStatusBar : public wxStatusBar
 {
     public:
-        CslStatusBar(wxWindow *parent);
+        static CslStatusBar* Init(wxWindow *parent)
+        {
+            return (m_self = new CslStatusBar(parent));
+        }
 
-        static void InitBar(CslStatusBar *bar) { m_self=bar; }
-        static void Light(wxInt32 light) { m_self->SetLight(light); };
-        static wxInt32 Light() { return m_self->GetLight(); };
+        static void Light(wxInt32 light)
+        {
+            m_self->SetLight(light);
+        }
+
+        static wxInt32 Light()
+        {
+            return m_self->GetLight();
+        }
+
         static void SetText(wxUint32 id,const wxString& text)
         {
-            m_self->SetStatusText(text,id);
-        };
+#ifdef __WXMSW__
+            wxWindowUpdateLocker lock(m_self);
+#endif
+            m_self->SetStatusText(text, id);
+        }
 
     private:
-        static CslStatusBar* m_self;
+        CslStatusBar(wxWindow *parent);
 
         void OnSize(wxSizeEvent& event);
+
         DECLARE_EVENT_TABLE()
 
-    protected:
-        wxStaticBitmap *m_bmp;
+        static CslStatusBar* m_self;
+
         wxInt32 m_light;
+        CslBufferedStaticBitmap *m_bmp;
 
         void SetLight(wxInt32 light);
-        wxInt32 GetLight() { return m_light; };
+
+        wxInt32 GetLight()
+        {
+            return m_light;
+        }
 };
 
 #endif // CSLSTATUSBAR_H

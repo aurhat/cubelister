@@ -23,7 +23,22 @@
 #include "config.h"
 #endif
 #else
+#include <stdio.h>   // SEEK_SET, SEEK_CUR, SEEK_END
+#include <io.h>      // _lseek
+
+typedef int ssize_t;
+#define lseek _lseek
+
+int pread(unsigned int fd, char *buf, size_t count, int offset)
+{
+    if (_lseek(fd, offset, SEEK_SET)!=offset)
+        return -1;
+
+    return read(fd, buf, count);
+}
 #endif //_MSC_VER
+
+#define PACKAGE_VERSION  "1.4.8"
 
 #include "GeoIP.c"
 #include "GeoIPCity.c"

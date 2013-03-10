@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -31,9 +31,17 @@
 #define CSL_SERVERS_FILE   wxString(CSL_USER_DIR+wxT("servers.ini"))
 #define CSL_LOCATORS_FILE  wxString(CSL_USER_DIR+wxT("locators.ini"))
 
-#define  CSL_CONFIG_VERSION         1
-#define  CSL_SERVERCONFIG_VERSION   1
-#define  CSL_LOCATORCONFIG_VERSION  1
+/** Config file version changes
+*
+*   1: initial version
+*   2: ???
+*   3: force new "Selected server" AUI layout
+*
+**/
+
+#define CSL_CONFIG_VERSION         3
+#define CSL_SERVERCONFIG_VERSION   1
+#define CSL_LOCATORCONFIG_VERSION  1
 
 #define CSL_FRAME_MIN_WIDTH  800
 #define CSL_FRAME_MIN_HEIGHT 600
@@ -89,10 +97,13 @@ class CslListCtrlSettings
         wxUint32 ColumnMask;
 };
 
+WX_DEFINE_ARRAY(CslListCtrlSettings*, CslArrayListCtrlSettings);
+
 class CslSettings
 {
     public:
         CslSettings() :
+                Version(CSL_CONFIG_VERSION),
                 /* GUI */
                 FrameSize(wxSize(CSL_FRAME_MIN_WIDTH, CSL_FRAME_MIN_HEIGHT)),
                 FrameSizeMax(wxDefaultSize),
@@ -118,16 +129,29 @@ class CslSettings
 
                 /* ListCtrl */
                 AutoSortColumns(true),
+                 /* Server lists */
                 ColServerEmpty(wxColour(60, 15, 15)),
-                ColServerOff(SYSCOLOUR(wxSYS_COLOUR_GRAYTEXT)),
+                ColServerOff(CSL_SYSCOLOUR(wxSYS_COLOUR_GRAYTEXT)),
                 ColServerFull(*wxRED),
                 ColServerMM1(*wxBLACK),
                 ColServerMM2(*wxBLUE),
                 ColServerMM3(*wxRED),
                 ColServerHigh(wxColour(135, 255, 110)),
                 ColServerPlay(wxColour(240, 160, 160)),
-                ColInfoStripe(wxColour(235, 255, 235))
+                ColInfoStripe(wxColour(235, 255, 235)),
+                   /* Player lists */
+                ColPlayerMaster(CSL_COLOUR_MASTER),
+                ColPlayerAuth(CSL_COLOUR_AUTH),
+                ColPlayerAdmin(CSL_COLOUR_ADMIN),
+                ColPlayerSpectator(CSL_COLOUR_SPECTATOR)
         {}
+
+        CslSettings::~CslSettings()
+        {
+            CslSettings& self = GetInstance();
+
+            WX_CLEAR_ARRAY(self.CslListSettings);
+        }
 
         static CslSettings& GetInstance()
         {
@@ -135,7 +159,7 @@ class CslSettings
             return self;
         }
 
-        static CslListCtrlSettings* GetListSettings(const wxString& name);
+        static CslListCtrlSettings& GetListSettings(const wxString& name);
 
         static void LoadSettings();
         static void SaveSettings();
@@ -143,6 +167,7 @@ class CslSettings
         static bool LoadServers(wxUint32 *numm=NULL, wxUint32 *nums=NULL);
         static void SaveServers();
 
+        wxUint32 Version;
         /* GUI */
         wxSize FrameSize, FrameSizeMax;
         wxString Layout;
@@ -167,12 +192,14 @@ class CslSettings
 
         /* ListCtrl*/
         bool AutoSortColumns;
+        /* Server lists */
         wxColour ColServerEmpty, ColServerOff, ColServerFull;
         wxColour ColServerMM1, ColServerMM2, ColServerMM3;
-        wxColour ColServerHigh;
-        wxColour ColServerPlay;
-        wxColour ColInfoStripe;
-        vector<CslListCtrlSettings*> CslListSettings;
+        wxColour ColServerHigh, ColServerPlay, ColInfoStripe;
+           /* Player lists */
+        wxColour ColPlayerMaster, ColPlayerAuth, ColPlayerAdmin, ColPlayerSpectator;
+
+        CslArrayListCtrlSettings CslListSettings;
 };
 
 static inline CslSettings& CslGetSettings()

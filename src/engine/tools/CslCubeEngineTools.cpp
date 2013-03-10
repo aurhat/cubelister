@@ -1,5 +1,5 @@
 
-#include "CslCubeEngineTools.h"
+#include "Csl.h"
 
 void putint(ucharbuf &p, int n)
 {
@@ -60,13 +60,13 @@ void putstring(const char *t, ucharbuf &p)
 
 int getstring(char *text, ucharbuf &p, int len)
 {
-    int l=0;
-    char *t=text;
+    int l = 0;
+    char *t = text;
     do
     {
         if (t>=&text[len])
         {
-            text[len-1]=0;
+            text[len-1] = 0;
             return l;
         }
         if (!p.remaining())
@@ -74,7 +74,7 @@ int getstring(char *text, ucharbuf &p, int len)
             *t=0;
             return l;
         }
-        if ((*t=getint(p)))
+        if ((*t = getint(p)))
             l++;
     }
     while (*t++);
@@ -131,22 +131,23 @@ int cube2uni(int c)
     return conv[c];
 }
 
-int encodeutf8(uchar *dstbuf, int dstlen, uchar *srcbuf, int srclen, int *carry)
+int encodeutf8(uchar *dstbuf, int dstlen, const uchar *srcbuf, int srclen, int *carry)
 {
-    uchar *dst = dstbuf, *dstend = &dstbuf[dstlen], *src = srcbuf, *srcend = &srcbuf[srclen];
+    uchar *dst = dstbuf, *dstend = &dstbuf[dstlen];
+    const uchar *src = srcbuf, *srcend = &srcbuf[srclen];
     if(src < srcend && dst < dstend) do
     {
         int uni = cube2uni(*src);
         if(uni <= 0x7F)
         {
             if(dst >= dstend) goto done;
-            uchar *end = min(srcend, &src[dstend-dst]);
-            do 
-            { 
-                *dst++ = uni; 
-                if(++src >= end) goto done; 
-                uni = cube2uni(*src); 
-            } 
+            const uchar *end = min(srcend, &src[dstend-dst]);
+            do
+            {
+                *dst++ = uni;
+                if(++src >= end) goto done;
+                uni = cube2uni(*src);
+            }
             while(uni <= 0x7F);
         }
         if(uni <= 0x7FF) { if(dst + 2 > dstend) goto done; *dst++ = 0xC0 | (uni>>6); goto uni2; }
@@ -161,7 +162,7 @@ int encodeutf8(uchar *dstbuf, int dstlen, uchar *srcbuf, int srclen, int *carry)
     uni3: *dst++ = 0x80 | ((uni>>6)&0x3F);
     uni2: *dst++ = 0x80 | (uni&0x3F);
     uni1:;
-    } 
+    }
     while(++src < srcend);
 
 done:

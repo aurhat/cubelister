@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -31,8 +31,9 @@ class CslApp: public wxApp
         enum
         {
             CSL_SHUTDOWN_NONE = 0,
+            CSL_SHUTDOWN_FORCE,
             CSL_SHUTDOWN_NORMAL,
-            CSL_SHUTDOWN_FORCE
+            CSL_SHUTDOWN_ERROR
         };
 
         const wxString& GetLanguage() const { return m_lang; }
@@ -56,7 +57,9 @@ class CslApp: public wxApp
         bool OnInit();
         int OnRun();
         int OnExit();
+#ifndef _DEBUG
         void OnFatalException();
+#endif //_DEBUG
 
         int FilterEvent(wxEvent& event);
         void OnEndSession(wxCloseEvent& event);

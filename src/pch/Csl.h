@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -25,8 +25,18 @@
     @author Glen Masgai <mimosius@gmx.de>
 */
 
+#ifdef _WINDOWS
+#if defined(_DEBUG) && defined(_MSC_VER)
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
+#define new DEBUG_NEW
+#endif // _DEBUG && _MSC_VER
+#include <ws2tcpip.h>
+#else
 #include "config.h"
-
+#endif //_WINDOWS
 #include <wx/wx.h>
 #if wxUSE_GUI
 #include <wx/artprov.h>
@@ -75,10 +85,10 @@
 #include <wx/sysopt.h>
 #endif //__WXMAC__
 
-#include "CslTools.h"
-#include "CslVersion.h"
+#include <CslTools.h>
+#include <CslVersion.h>
 #if wxUSE_GUI
-#include "CslGuiTools.h"
+#include <CslGuiTools.h>
 #endif //wxUSE_GUI
 
 #endif //CSL_H

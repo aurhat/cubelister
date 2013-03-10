@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -28,8 +28,17 @@
 #include <CslToolTip.h>
 
 BEGIN_DECLARE_EVENT_TYPES()
-DECLARE_EVENT_TYPE(wxCSL_EVT_COMMAND_LIST_ALL_ITEMS_SELECTED, wxID_ANY)
+DECLARE_EXPORTED_EVENT_TYPE(CSL_DLL_GUITOOLS, wxCSL_EVT_COMMAND_LIST_COLUMN_TOGGLED, wxID_ANY)
+DECLARE_EXPORTED_EVENT_TYPE(CSL_DLL_GUITOOLS, wxCSL_EVT_COMMAND_LIST_ALL_ITEMS_SELECTED, wxID_ANY)
 END_DECLARE_EVENT_TYPES()
+
+#define CSL_EVT_LIST_COLUMN_TOGGLED(id, fn) \
+    DECLARE_EVENT_TABLE_ENTRY( \
+                               wxCSL_EVT_COMMAND_LIST_COLUMN_TOGGLED, id, wxID_ANY, \
+                               (wxObjectEventFunction)(wxEventFunction) \
+                               wxStaticCastEvent(wxListEventFunction, &fn), \
+                               (wxObject*)NULL \
+                             ),
 
 #define CSL_EVT_LIST_ALL_ITEMS_SELECTED(id, fn) \
     DECLARE_EVENT_TABLE_ENTRY( \
@@ -57,7 +66,7 @@ enum
 
 typedef int (wxCALLBACK *CslListSortCallBack)(long item1, long item2, long sorthelper);
 
-class CslListSort
+class CSL_DLL_GUITOOLS CslListSort : public wxObject
 {
     public:
         enum { SORT_ASC = 0, SORT_DSC };
@@ -84,180 +93,192 @@ class CslListSort
 
         wxInt32 Mode;
         wxInt32 Column;
+
+    private:
+        DECLARE_DYNAMIC_CLASS(CslListSort)
 };
 
-class CslListColumns
+
+class CSL_DLL_GUITOOLS CslListColumn : public wxObject
 {
+    public:
+        CslListColumn(const wxString& name = wxEmptyString,
+                      wxListColumnFormat format = wxLIST_FORMAT_LEFT,
+                      float weight = 0.0f,
+                      bool locked = false)
+            { Create(name, format, weight, locked); }
+
+        CslListColumn& Create(const wxString& name, wxListColumnFormat format,
+                              float weight, bool locked)
+        {
+            Name = name;
+            Format = format;
+            Width = 0;
+            Weight = weight;
+            Locked = Locked;
+            return *this;
+        }
+
+        wxString Name;
+        wxListColumnFormat Format;
+        wxInt32 Width;
+        float Weight;
+        bool Locked;
+
     private:
-        friend class CslListCtrl;
+        DECLARE_DYNAMIC_CLASS(CslListColumn)
+};
 
-        struct Column
+WX_DEFINE_USER_EXPORTED_ARRAY(CslListColumn*, CslArrayListColumn, class CSL_DLL_GUITOOLS);
+
+
+class CSL_DLL_GUITOOLS CslListColumns : public wxObject
+{
+    friend class CslListCtrl;
+
+    public:
+        CslListColumns() :
+            m_lockedCount(0), m_columnMask(0)
         {
-            wxString Name;
-            wxListColumnFormat Format;
-            int Width;
-            float Weight;
-            bool Locked;
-        };
-
-        CslListColumns() : m_lockedCount(0), m_columnMask(0) { }
-
-        void AddColumn(const wxString& name, wxListColumnFormat format=wxLIST_FORMAT_LEFT,
-                       float weight=1.0f, bool enabled=true, bool locked=false)
-        {
-            CSL_FLAG_SET(m_columnMask, enabled ? 1<<GetCount() : 0);
-            Column& c=m_columns.add();
-            c.Name=name;
-            c.Format=format;
-            c.Weight=weight;
-            c.Locked=locked;
-
-            if (locked)
-                m_lockedCount++;
+            m_columns.Alloc(32);
         }
 
-        void RemoveColumn(wxInt32 id)
+        ~CslListColumns()
         {
-            wxASSERT_MSG(id>=0 && id<m_columns.length(), wxT("Invalid column id."));
-            const Column& c = m_columns[id];
-            if (c.Locked) m_lockedCount--;
-            CSL_FLAG_UNSET(m_columnMask, 1<<id);
-            m_columns.remove(id);
+            Clear();
         }
 
-        void ToggleColumn(wxInt32 id)
-        {
-            wxASSERT_MSG(id>=0 && id<GetCount(), wxT("Invalid column id."));
-            if (id<0 || id>=GetCount())
-                return;
-
-            if (CSL_FLAG_CHECK(m_columnMask, 1<<id))
-                CSL_FLAG_UNSET(m_columnMask, 1<<id);
-            else
-                CSL_FLAG_SET(m_columnMask, 1<<id);
-        }
-
-        bool IsEnabled(wxInt32 id) const { return CSL_FLAG_CHECK(m_columnMask, 1<<id); }
+    private:
+        void AddColumn(const wxString& name, wxListColumnFormat format = wxLIST_FORMAT_LEFT,
+                       float weight = 1.0f, bool enabled = true, bool locked = false);
+        void RemoveColumn(wxInt32 id);
+        void ToggleColumn(wxInt32 id);
 
         void Clear()
         {
-            m_columnMask=0;
-            m_lockedCount=0;
-            loopvrev(m_columns) m_columns.remove(i);
+            m_columnMask = m_lockedCount = 0;
+            WX_CLEAR_ARRAY(m_columns);
         }
 
-        Column* GetColumn(wxInt32 id)
+        CslListColumn* GetColumn(wxInt32 id)
         {
             wxASSERT_MSG(id>=0 && id<GetCount(), wxT("invalid column"));
-            if (id<0 || id>=GetCount())
-                return NULL;
-            return &m_columns[id];
+            return (id<0 || id>=GetCount()) ? NULL : m_columns[id];
         }
 
-        Column* GetColumn(const wxString& name)
+        CslListColumn* GetColumn(const wxString& name)
         {
-            loopv(m_columns) if (m_columns[i].Name==name)
-                return &m_columns[i];
+            loopv(m_columns) if (m_columns[i]->Name==name)
+                return m_columns[i];
+
             return NULL;
         }
 
-        wxInt32 GetColumnId(wxInt32 id, bool absolute=true) const
+        bool LockColumn(wxInt32 id, bool lock);
+
+        CslArrayListColumn& GetColumns() { return m_columns; }
+
+    public:
+        wxInt32 GetColumnId(wxInt32 id, bool absolute = true) const;
+
+        wxUint32 GetColumnMask() const { return m_columnMask; }
+
+        wxInt32 GetCount(bool enabled = false) const
         {
-            wxASSERT_MSG(id>=0 && id<GetCount(), wxT("invalid column"));
-
-            if (absolute)
-            {
-                for (wxInt32 i=0; i<=id && i<GetCount(); i++)
-                {
-                    if (!IsEnabled(i))
-                        id++;
-                }
-                id=min(id, GetCount()-1);
-            }
-            else
-            {
-                for (wxInt32 i=0, c=id; i<c; i++)
-                {
-                    if (!IsEnabled(i))
-                        id--;
-                }
-                id=max(0, id);
-            }
-
-            return id;
+            return enabled ? BitCount32(m_columnMask) : m_columns.size();
         }
 
-        wxUint32 GetEnabledColumns() const
+        bool IsEnabled(wxInt32 id) const
         {
-            return m_columnMask;
+            return CSL_FLAG_CHECK(m_columnMask, 1<<id);
         }
 
-        wxInt32 GetCount(bool enabled=false) const
+        bool IsLocked(wxInt32 id) const
         {
-            if (enabled)
-                return BitCount32(m_columnMask);
-            else
-                return m_columns.length();
+            const CslListColumn *c = ((CslListColumns*)(this))->GetColumn(id);
+            return c && c->Locked;
         }
 
         wxInt32 GetLockedCount() const { return m_lockedCount; }
 
-        vector<Column>& GetColumns() { return m_columns; }
-
     private:
         wxInt32 m_lockedCount;
         wxUint32 m_columnMask;
-        vector<Column> m_columns;
+        CslArrayListColumn m_columns;
+
+        DECLARE_DYNAMIC_CLASS(CslListColumns)
 };
 
-class CslListCtrl : public wxListCtrl
+class CSL_DLL_GUITOOLS CslListCtrl : public wxListCtrl
 {
-    DECLARE_DYNAMIC_CLASS(CslListCtrl)
-
-    private:
-        CslListCtrl() { };
-
     public:
-        CslListCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos=wxDefaultPosition,
-                    const wxSize& size=wxDefaultSize, long style=wxLC_ICON,
-                    const wxValidator& validator=wxDefaultValidator,
-                    const wxString& name=wxListCtrlNameStr);
-        ~CslListCtrl();
+        CslListCtrl(wxWindow* parent = NULL,
+                    wxWindowID id = wxID_ANY,
+                    const wxPoint& pos = wxDefaultPosition,
+                    const wxSize& size = wxDefaultSize,
+                    long style = wxLC_REPORT,
+                    const wxValidator& validator = wxDefaultValidator,
+                    const wxString& name = wxListCtrlNameStr);
+
+        virtual ~CslListCtrl();
 
         void CreateScreenShot();
-        static wxInt32 GetGameImage(wxUint32 fourcc, wxInt32 offset=0);
-        static wxInt32 GetCountryFlag(wxUint32 ip);
 
-        void ListAddColumn(const wxString& name, wxListColumnFormat format=wxLIST_FORMAT_LEFT,
-                              float weight=1.0f, bool enabled=true, bool locked=false);
+        static wxInt32 GetGameImage(CslEngine* engine, wxUint32 fourcc, wxInt32 offset=0);
+        static wxInt32 GetCountryFlag(CslEngine* engine, wxUint32 ip);
+
+        void ListAddColumn(const wxString& name, wxListColumnFormat format = wxLIST_FORMAT_LEFT,
+                           float weight = 1.0f, bool enabled = true, bool locked = false);
         void ListDeleteColumn(wxInt32 column);
         wxUint32 ListToggleColumn(wxInt32 column);
-        bool ListSetItem(wxInt32 row, wxInt32 column, const wxString& text=wxEmptyString, wxInt32 image=-1);
-        bool ListSetColumn(wxInt32 column, const wxString& text=wxEmptyString);
 
-        wxInt32 GetColumnId(wxInt32 id, bool absolute=true) const { return m_columns.GetColumnId(id, absolute); }
-        wxUint32 ListGetColumnMask() const { return m_columns.GetEnabledColumns(); }
-        bool ListIsColumnEnabled(wxInt32 id) const { return m_columns.IsEnabled(id); }
+        bool ListSetColumn(wxInt32 column, const wxString& name = wxEmptyString);
+        bool ListSetItem(wxInt32 row, wxInt32 column, const wxString& text = wxEmptyString, wxInt32 image = -1);
 
-        void InitSort(CslListSortCallBack fn, wxInt32 mode, wxInt32 column);
+        void ListLockColumn(wxInt32 column, bool lock = true);
+        bool ListColumnIsLocked(wxInt32 column) const { return m_columns.IsLocked(column); }
+
+        wxInt32 GetColumnId(wxInt32 id, bool absolute = true) const { return m_columns.GetColumnId(id, absolute); }
+        wxUint32 ListGetColumnMask() const { return m_columns.GetColumnMask(); }
+        bool ListColumnIsEnabled(wxInt32 id) const { return m_columns.IsEnabled(id); }
+
+        void SetSortCallback(CslListSortCallBack fn, wxInt32 mode, wxInt32 column);
         void ListSort(wxInt32 column=-1);
 
-        virtual void ListAdjustSize(const wxSize& size=wxDefaultSize);
+        virtual void ListAdjustSize(const wxSize& size = wxDefaultSize);
+
+        static void CreateImageList(CslEngine* engine);
+
+    protected:
+        static wxImageList ListImageList;
+
+        wxArrayPtrVoid m_selected;
+
+        bool m_dontAdjustSize;
+
+        wxInt32 ListFindItem(void *data);
+
+        // virtual
+        virtual bool ListFindItemCompare(void *data1, void *data2) { return data1==data2; }
+        virtual wxWindow* GetScreenShotWindow() { return this; }
+        virtual wxString GetScreenShotFileName();
+        virtual void GetToolTipText(wxInt32 row, CslToolTipEvent& WXUNUSED(event)) { }
+
+        virtual wxSize GetImageListSize()
+        {
+            wxInt32 x, y;
+            if (ListImageList.GetSize(0, x, y))
+                return wxSize(x, y);
+            return wxDefaultSize;
+        }
 
     private:
-        CslListColumns m_columns;
-
-        CslListSort m_sortHelper;
-        CslListSortCallBack m_sortCallback;
-
-        wxInt32 m_processSelectEvent;
-        wxUint32 m_mouseLastMove;
-
-        static void CreateImageList();
-
 #ifdef __WXMSW__
         void OnEraseBackground(wxEraseEvent& event);
 #endif
+        void OnColumnDragStart(wxListEvent& event);
+        void OnColumnDragEnd(wxListEvent& event);
+        void OnSize(wxSizeEvent& event);
         void OnMouseMove(wxMouseEvent& event);
         void OnMenu(wxCommandEvent& event);
         void OnContextMenu(wxContextMenuEvent& event);
@@ -267,30 +288,16 @@ class CslListCtrl : public wxListCtrl
         void OnItem(wxListEvent& event);
         void OnToolTip(CslToolTipEvent& event);
 
+        CslListColumns m_columns;
+
+        CslListSort m_sortHelper;
+        CslListSortCallBack m_sortCallback;
+
+        wxInt32 m_processSelectEvent;
+        wxUint32 m_mouseLastMove;
+
         DECLARE_EVENT_TABLE()
-
-    protected:
-        static wxImageList ListImageList;
-
-        VoidPointerArray m_selected;
-
-        wxInt32 ListFindItem(void *data);
-        virtual bool ListFindItemCompare(void *data1, void *data2) { return data1==data2; }
-
-        virtual void OnListUpdate() {};
-
-        virtual wxWindow* GetScreenShotWindow() { return this; }
-        virtual wxString GetScreenShotFileName();
-
-        virtual void GetToolTipText(wxInt32 row, CslToolTipEvent& event) { }
-
-        virtual wxSize GetImageListSize()
-        {
-            wxInt32 x, y;
-            if (ListImageList.GetSize(0, x, y))
-                return wxSize(x, y);
-            return wxDefaultSize;
-        }
+        DECLARE_DYNAMIC_CLASS_NO_COPY(CslListCtrl)
 };
 
 #endif //CSLLISTCTRL_H

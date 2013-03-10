@@ -6,16 +6,10 @@ make distclean >/dev/null 2>&1
 
 find . -iname "*~" -exec rm -f {} \;
 find . -iname "*.bak" -exec rm -f {} \;
-find . -iname "*.plg" -exec rm -f {} \;
-find . -iname "*.ncb" -exec rm -f {} \;
+find . -iname "*.orig" -exec rm -f {} \;
 find . -iname "Makefile.in" -exec rm -f {} \;
 find . -iname "Makefile" -exec rm -f {} \;
 find . -iname "gmon.out" -exec rm -f {} \;
-find . -type d -iname "debug" -exec rm -Rf {} \;
-find . -type d -iname "default-debug" -exec rm -Rf {} \;
-find . -type d -iname "release" -exec rm -Rf {} \;
-find . -type d -iname "release-static" -exec rm -Rf {} \;
-find . -type d -iname "release-static-engine" -exec rm -Rf {} \;
 
 DIRS=(.)
 for i in ${DIRS[*]}
@@ -32,8 +26,9 @@ do
    config.status   \
    config.guess    \
    configure.in    \
+   ipch            \
    debug*          \
-   optimized*      \
+   release*        \
    depcomp         \
    ltmain.sh       \
    install-sh      \

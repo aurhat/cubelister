@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -29,7 +29,7 @@ BEGIN_EVENT_TABLE(CslPanelMap, wxPanel)
 END_EVENT_TABLE()
 
 
-bool CslMapInfo::GetMapConfigVersions(wxFileConfig& config, t_aInt32& array)
+bool CslMapInfo::GetMapConfigVersions(wxFileConfig& config, wxArrayInt& array)
 {
     wxUint32 i;
     long int index, val;
@@ -134,7 +134,7 @@ bool CslMapInfo::LoadMapData(const wxString& map, const wxString& game, wxInt32 
     wxFileConfig config(stream);
 
     wxInt32 version;
-    t_aInt32 versions;
+    wxArrayInt versions;
 
     if (!GetMapConfigVersions(config, versions))
         return false;
@@ -165,7 +165,7 @@ bool CslMapInfo::LoadMapData(const wxString& map, const wxString& game, wxInt32 
 }
 
 
-void CslPanelMap::UpdateBases(const t_aBaseInfo& bases, const bool hasBases)
+void CslPanelMap::UpdateBases(const CslArrayCslBaseInfo& bases, const bool hasBases)
 {
     wxUint32 i;
     wxRect rect;

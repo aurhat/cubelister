@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -21,8 +21,6 @@
 #ifndef CSLDLGOUTPUT_H
 #define CSLDLGOUTPUT_H
 
-
-WX_DEFINE_ARRAY_INT(wxUint32, t_aUint);
 
 class CslDlgOutput: public wxDialog
 {
@@ -72,7 +70,7 @@ class CslDlgOutput: public wxDialog
         wxString m_title;
         wxString m_text;
         wxUint32 m_filterLevel;
-        t_aUint m_searchResults;
+        wxArrayInt m_searchResults;
         wxUint32 m_searchPos;
 
         void HandleOutput(char *text,wxUint32 size);

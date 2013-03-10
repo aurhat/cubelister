@@ -1,11 +1,13 @@
 ;Include Modern UI
 !include "MUI.nsh"
 
+!define CSL_VERSION 0.8.1.90
+
 ;The name of the installer
-  Name "Cube Server Lister 0.8.1.79"
+  Name "Cube Server Lister ${CSL_VERSION}"
 
 ;The file to write
-  OutFile "CSL-Installer-v0.8.1.79.exe"
+  OutFile "CSL-Installer-${CSL_VERSION}.exe"
 
 ;The default installation directory
   InstallDir "$PROGRAMFILES\CSL"
@@ -15,15 +17,15 @@
   InstallDirRegKey HKLM "Software\CSL" "Install_Dir"
 
 ;Compressor
-  SetCompressor lzma
+  SetCompressor /SOLID lzma
 
 
 ;Images
   !define MUI_HEADERIMAGE
-  !define MUI_HEADERIMAGE_BITMAP         "src\img\install_header.bmp"
-  !define MUI_HEADERIMAGE_UNBITMAP       "src\img\install_header.bmp"
-  !define MUI_ICON                       "src\img\csl_48.ico"
-  !define MUI_UNICON                     "src\img\uninstall.ico"
+  !define MUI_HEADERIMAGE_BITMAP   "src\img\install_header.bmp"
+  !define MUI_HEADERIMAGE_UNBITMAP "src\img\install_header.bmp"
+  !define MUI_ICON                 "src\img\csl_48.ico"
+  !define MUI_UNICON               "src\img\uninstall.ico"
 
 
 ;Finish page  
@@ -54,7 +56,17 @@
     SectionIn RO
     ; Set output path to the installation directory.
     SetOutPath $INSTDIR
-    File unicode-release\csl.exe
+    File Release\csl.exe
+    File Release\cslengine.dll
+    File Release\cslguitools.dll
+    File Release\cslplugin.dll
+    File Release\csltools.dll
+    File Release\wxmsw28u_vc_csl.dll
+    SetOutPath $INSTDIR\plugins
+    File Release\plugins\assaultcube.dll
+    File Release\plugins\cube.dll
+    File Release\plugins\redeclipse.dll
+    File Release\plugins\sauerbraten.dll
     SetOutPath $INSTDIR\data
     File data\GeoIP.dat
   
@@ -62,10 +74,10 @@
     WriteRegStr HKLM SOFTWARE\CSL "Install_Dir" "$INSTDIR"  
     ; Write the uninstall keys for Windows
     WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\CSL" "DisplayName" "CSL"
-    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\CSL" "UninstallString" '"$INSTDIR\csluninstall.exe"'
+    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\CSL" "UninstallString" '"$INSTDIR\uninstall.exe"'
     WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\CSL" "NoModify" 1
     WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\CSL" "NoRepair" 1
-    WriteUninstaller "csluninstall.exe"
+    WriteUninstaller "uninstall.exe"
 
     ; Register the URI
     WriteRegStr HKCR "CSL" "" "URL:csl Protocol Handler"
@@ -77,7 +89,7 @@
 
   Section $(TITLE_Section2) SecMapCfgTool
     SetOutPath $INSTDIR
-    File unicode-release\cslmapcfgtool.exe
+    File Release\cslmapcfgtool.exe
   SectionEnd
 
 
@@ -88,12 +100,12 @@
   SectionEnd
 
 
-  Section $(TITLE_Section4) SecMapLang
-    SetOutPath $INSTDIR\lang\cs
+  Section $(TITLE_Section4) SecLang
+    SetOutPath $INSTDIR\locale\cs
     File po\cs\csl.mo
-    SetOutPath $INSTDIR\lang\de
+    SetOutPath $INSTDIR\locale\de
     File po\de\csl.mo
-    SetOutPath $INSTDIR\lang\nl
+    SetOutPath $INSTDIR\locale\nl
     File po\nl\csl.mo
   SectionEnd
 
@@ -105,7 +117,7 @@
      SetOutPath $INSTDIR
      CreateDirectory "$SMPROGRAMS\Cube Server Lister"
      CreateShortCut "$SMPROGRAMS\Cube Server Lister\Cube Server Lister.lnk" "$INSTDIR\csl.exe" "" "$INSTDIR\csl.exe" 0
-     CreateShortCut "$SMPROGRAMS\Cube Server Lister\Uninstall.lnk" "$INSTDIR\csluninstall.exe" "" "$INSTDIR\csluninstall.exe" 0
+     CreateShortCut "$SMPROGRAMS\Cube Server Lister\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
    SectionEnd
 
    Section  $(TITLE_Section5b)
@@ -150,7 +162,7 @@
     !insertmacro MUI_DESCRIPTION_TEXT ${SecProgram}    $(DESC_Section1)
     !insertmacro MUI_DESCRIPTION_TEXT ${SecMapCfgTool} $(DESC_Section2)
     !insertmacro MUI_DESCRIPTION_TEXT ${SecMapPreview} $(DESC_Section3)
-    !insertmacro MUI_DESCRIPTION_TEXT ${SecMapLang}    $(DESC_Section4)
+    !insertmacro MUI_DESCRIPTION_TEXT ${SecLang}       $(DESC_Section4)
     !insertmacro MUI_DESCRIPTION_TEXT ${SecShortcut}   $(DESC_Section5)
     !insertmacro MUI_FUNCTION_DESCRIPTION_END
 

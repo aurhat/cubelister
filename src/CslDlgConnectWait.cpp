@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -31,56 +31,58 @@ CslDlgConnectWait::CslDlgConnectWait(wxWindow* parent,wxInt32 *time,int id,const
                                      const wxPoint& pos,const wxSize& size,long style):
         wxDialog(parent,id,title,pos,size,style),m_time(time)
 {
-        // begin wxGlade: CslDlgConnectWait::CslDlgConnectWait
-        spin_ctrl_time = new wxSpinCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 0, 100);
-        checkbox_default = new wxCheckBox(this, wxID_ANY, _("Set as default waiting time."));
-        button_ok = new wxButton(this, wxID_OK, _("&Wait"));
-        button_connect = new wxButton(this, wxID_ANY, _("C&onnect"));
-        button_cancel = new wxButton(this, wxID_CANCEL, _("&Cancel"));
+    // begin wxGlade: CslDlgConnectWait::CslDlgConnectWait
+    spin_ctrl_time = new wxSpinCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 0, 100);
+    checkbox_default = new wxCheckBox(this, wxID_ANY, _("Set as default waiting time."));
+    button_ok = new wxButton(this, wxID_OK, _("&Wait"));
+    button_connect = new wxButton(this, wxID_ANY, _("C&onnect"));
+    button_cancel = new wxButton(this, wxID_CANCEL, _("&Cancel"));
 
-        set_properties();
-        do_layout();
-        // end wxGlade
+    set_properties();
+    do_layout();
+    // end wxGlade
 }
 
 
 void CslDlgConnectWait::set_properties()
 {
-        // begin wxGlade: CslDlgConnectWait::set_properties
-        SetTitle(_("CSL - Server full"));
-        button_ok->SetFocus();
-        button_ok->SetDefault();
-        // end wxGlade
+    // begin wxGlade: CslDlgConnectWait::set_properties
+    SetTitle(_("CSL - Server full"));
+    button_ok->SetFocus();
+    button_ok->SetDefault();
+    // end wxGlade
 
     spin_ctrl_time->SetRange(CSL_WAIT_SERVER_FULL_MIN,CSL_WAIT_SERVER_FULL_MAX);
     spin_ctrl_time->SetValue(*m_time);
+
+    CSL_SET_WINDOW_ICON();
 }
 
 
 void CslDlgConnectWait::do_layout()
 {
-        // begin wxGlade: CslDlgConnectWait::do_layout
-        wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(2, 1, 0, 0);
-        wxFlexGridSizer* grid_sizer_button = new wxFlexGridSizer(1, 3, 0, 0);
-        wxFlexGridSizer* grid_sizer_top = new wxFlexGridSizer(3, 1, 0, 0);
-        wxFlexGridSizer* grid_sizer_spin = new wxFlexGridSizer(1, 2, 0, 0);
-        wxStaticText* label_static = new wxStaticText(this, wxID_ANY, _("The server is full at the moment. Wait for a free slot?"));
-        grid_sizer_top->Add(label_static, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
-        wxStaticText* label_spin_static = new wxStaticText(this, wxID_ANY, _("Time to wait (sec):"));
-        grid_sizer_spin->Add(label_spin_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_spin->Add(spin_ctrl_time, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_top->Add(grid_sizer_spin, 1, wxEXPAND, 0);
-        grid_sizer_top->Add(checkbox_default, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
-        grid_sizer_main->Add(grid_sizer_top, 1, wxALL|wxEXPAND, 4);
-        grid_sizer_button->Add(button_ok, 0, wxALL, 4);
-        grid_sizer_button->Add(button_connect, 0, wxALL, 4);
-        grid_sizer_button->Add(button_cancel, 0, wxALL, 4);
-        grid_sizer_button->AddGrowableCol(0);
-        grid_sizer_main->Add(grid_sizer_button, 1, wxBOTTOM|wxALIGN_CENTER_HORIZONTAL, 4);
-        SetSizer(grid_sizer_main);
-        grid_sizer_main->Fit(this);
-        Layout();
-        // end wxGlade
+    // begin wxGlade: CslDlgConnectWait::do_layout
+    wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* grid_sizer_button = new wxFlexGridSizer(1, 3, 0, 0);
+    wxFlexGridSizer* grid_sizer_top = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* grid_sizer_spin = new wxFlexGridSizer(1, 2, 0, 0);
+    wxStaticText* label_static = new wxStaticText(this, wxID_ANY, _("The server is full at the moment. Wait for a free slot?"));
+    grid_sizer_top->Add(label_static, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
+    wxStaticText* label_spin_static = new wxStaticText(this, wxID_ANY, _("Time to wait (sec):"));
+    grid_sizer_spin->Add(label_spin_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_spin->Add(spin_ctrl_time, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_top->Add(grid_sizer_spin, 1, wxEXPAND, 0);
+    grid_sizer_top->Add(checkbox_default, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
+    grid_sizer_main->Add(grid_sizer_top, 1, wxALL|wxEXPAND, 4);
+    grid_sizer_button->Add(button_ok, 0, wxALL, 4);
+    grid_sizer_button->Add(button_connect, 0, wxALL, 4);
+    grid_sizer_button->Add(button_cancel, 0, wxALL, 4);
+    grid_sizer_button->AddGrowableCol(0);
+    grid_sizer_main->Add(grid_sizer_button, 1, wxBOTTOM|wxALIGN_CENTER_HORIZONTAL, 4);
+    SetSizer(grid_sizer_main);
+    grid_sizer_main->Fit(this);
+    Layout();
+    // end wxGlade
 
     CentreOnParent();
 }

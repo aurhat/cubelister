@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -23,7 +23,9 @@
 #include "CslFrame.h"
 #include "CslIPC.h"
 #include "CslApp.h"
+#ifndef _DEBUG
 #include <wx/debugrpt.h>
+#endif //_DEBUG
 #ifdef __WXMAC__
 #include <Carbon/Carbon.h>
 #endif //__WXMAC__
@@ -49,7 +51,7 @@ static pascal OSErr MacCallbackGetUrl(const AppleEvent *in,AppleEvent *out,long 
         {
             buf[l]=0;
             const CslApp& app=::wxGetApp();
-            app.IpcCall(A2U(buf),app.GetTopWindow());
+            app.IpcCall(C2U(buf),app.GetTopWindow());
         }
     }
 
@@ -59,24 +61,30 @@ static pascal OSErr MacCallbackGetUrl(const AppleEvent *in,AppleEvent *out,long 
 
 bool CslApp::OnInit()
 {
-    m_engine=NULL;
-    m_single=NULL;
-    m_shutdown=CSL_SHUTDOWN_NONE;
-
+#ifdef _DEBUG
+    #ifdef _MSC_VER
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+    #endif
+#else
     ::wxHandleFatalExceptions(true);
+#endif
 
-    wxString cwd=DirName(wxPathOnly(wxTheApp->argv[0]));
+    m_engine = NULL;
+    m_single = NULL;
+    m_shutdown = CSL_SHUTDOWN_NONE;
+
+    wxString cwd = DirName(wxPathOnly(wxTheApp->argv[0]));
 
 #ifdef PROJECTDIR
     AddDataDir(wxT(PROJECTDIR), true);
 #endif //PROJECTDIR
     AddDataDir(CSL_USER_DIR, true);
 #ifndef DATADIR
-#ifdef __WXMAC__
-    AddDataDir(cwd+wxT("../Resources"), true);
-#else
+    #ifdef __WXMAC__
+    AddDataDir(cwd+wxT("../Resources/"), true);
+    #else
     AddDataDir(cwd, true);
-#endif //__WXMAC__
+    #endif
 #else
     AddDataDir(wxT(DATADIR));
 #endif //DATADIR
@@ -86,12 +94,12 @@ bool CslApp::OnInit()
 #endif //BUILDDIR
     AddPluginDir(CSL_USER_DIR, true);
 #ifndef PKGLIBDIR
-#ifdef __WXMAC__
+    #ifdef __WXMAC__
     AddPluginDir(cwd+wxT("../"), true);
-#endif //__WXMAC__
-#ifdef __WXMSW__
+    #endif
+    #ifdef __WXMSW__
     AddPluginDir(cwd, true);
-#endif //__WXMSW__
+    #endif
 #else
     AddPluginDir(wxT(PKGLIBDIR));
 #endif //PKGLIBDIR
@@ -130,25 +138,17 @@ bool CslApp::OnInit()
                           NewAEEventHandlerUPP((AEEventHandlerProcPtr)MacCallbackGetUrl),0,false);
 #endif //__WXMAC__
 
-    wxString uri;
+    wxString cmdline;
 
     for (wxInt32 i=1;i<wxApp::argc;i++)
-    {
-        uri=wxApp::argv[i];
+        cmdline << argv[i] << wxT(" ");
 
-        if (!uri.StartsWith(CSL_URI_SCHEME_STR))
-            uri.Empty();
-    }
-
-    wxString lock=wxString::Format(wxT(".%s-%s.lock"),CSL_NAME_SHORT_STR,wxGetUserId().c_str());
-    m_single=new wxSingleInstanceChecker(lock);
+    wxString lock = wxString::Format(wxT(".%s-%s.lock"),CSL_NAME_SHORT_STR,wxGetUserId().c_str());
+    m_single = new wxSingleInstanceChecker(lock);
 
     if (m_single->IsAnotherRunning())
     {
-        if (uri.IsEmpty())
-            uri=wxT("show");
-
-        IpcCall(uri);
+        IpcCall(cmdline.IsEmpty() ? wxT("show") : cmdline);
         return true;
     }
 
@@ -156,12 +156,16 @@ bool CslApp::OnInit()
 
     wxInitAllImageHandlers();
 
-    CslFrame* frame=new CslFrame(NULL,wxID_ANY,wxEmptyString,wxDefaultPosition);
+    CslFrame* frame = new CslFrame(NULL,wxID_ANY,wxEmptyString,wxDefaultPosition);
+
+    if (m_shutdown!=CSL_SHUTDOWN_NONE)
+        return true;
+
     SetTopWindow(frame);
     frame->Show();
 
-    if (!uri.IsEmpty())
-        IpcCall(uri,frame);
+    if (cmdline.Find(CSL_URI_SCHEME_STR)!=wxNOT_FOUND)
+        IpcCall(cmdline, frame);
 
     return true;
 }
@@ -171,7 +175,7 @@ int CslApp::OnRun()
     if (GetTopWindow())
         wxApp::OnRun();
 
-    return 0;
+    return m_shutdown>CSL_SHUTDOWN_NORMAL ? 1 : 0;
 }
 
 int CslApp::OnExit()
@@ -187,7 +191,7 @@ int CslApp::OnExit()
 
 void CslApp::OnEndSession(wxCloseEvent& event)
 {
-    LOG_DEBUG("\n");
+    CSL_LOG_DEBUG("\n");
 
     m_shutdown=CSL_SHUTDOWN_FORCE;
 
@@ -197,11 +201,12 @@ void CslApp::OnEndSession(wxCloseEvent& event)
 int CslApp::FilterEvent(wxEvent& event)
 {
     if (event.GetEventType()==wxEVT_KEY_DOWN)
-        CslToolTip::ResetTip();
+        CslToolTip::Reset();
 
     return -1;
 }
 
+#ifndef _DEBUG
 void CslApp::OnFatalException()
 {
     wxDebugReport report;
@@ -212,13 +217,13 @@ void CslApp::OnFatalException()
     if (preview.Show(report))
         report.Process();
 }
+#endif //_DEBUG
 
 void CslApp::IpcCall(const wxString& value,wxEvtHandler *evtHandler) const
 {
     if (evtHandler)
     {
         CslIpcEvent evt(CslIpcEvent::IPC_COMMAND,value);
-
         wxPostEvent(evtHandler,evt);
     }
     else

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -24,30 +24,48 @@
 /**
  @author Glen Masgai <mimosius@users.sourceforge.net>
 */
+#define CSL_STRINGIFY(x) #x
+#define CSL_TO_STRING(x) CSL_STRINGIFY(x)
+#define CSL_VERSION_TO_STRING(a, b, c, d) CSL_TO_STRING(a##.##b##.##c##.##d)
 
-#define __CSL_NAME_STR          "Cube Server Lister (CSL)"
-#define __CSL_NAME_SHORT_STR    "CSL"
+#define __CSL_VERSION_MAJOR        0
+#define __CSL_VERSION_MINOR        8
+#define __CSL_VERSION_RELEASE      1
+#define __CSL_VERSION_SUBRELEASE  90
 
-#define __CSL_VERSION           0,8,1,80
+#define __CSL_NAME_STR         "Cube Server Lister (CSL)"
+#define __CSL_NAME_SHORT_STR   "CSL"
+#define __CSL_VERSION          __CSL_VERSION_MAJOR, \
+                               __CSL_VERSION_MINOR, \
+                               __CSL_VERSION_RELEASE, \
+                               __CSL_VERSION_SUBRELEASE
+#define __CSL_VERSION_STR      CSL_VERSION_TO_STRING(__CSL_VERSION_MAJOR, \
+                                                     __CSL_VERSION_MINOR, \
+                                                     __CSL_VERSION_RELEASE, \
+                                                     __CSL_VERSION_SUBRELEASE)
+#define __CSL_COPYRIGHT_STR    "(C) 2007-2013, Glen Masgai <mimosius@users.sourceforge.net>"
+#define __CSL_DESCRIPTION_STR  "Tool to monitor cubeengine-based servers."
 
-#define __CSL_COPYRIGHT_STR     "(C) 2007-2011, Glen Masgai <mimosius@users.sourceforge.net>"
+#define CSL_NAME_STR           wxT(__CSL_NAME_STR)
+#define CSL_NAME_SHORT_STR     wxT(__CSL_NAME_SHORT_STR)
 
-#define CSL_NAME_STR            wxT(__CSL_NAME_STR)
-#define CSL_NAME_SHORT_STR      wxT(__CSL_NAME_SHORT_STR)
+#define CSL_VERSION_STR        wxT(__CSL_VERSION_STR)
 
-#define CSL_VERSION_STR         wxString(CSL_GET_VERSION(CSL_BUILD_VERSION(__CSL_VERSION)))
+#define CSL_DESCRIPTION_STR    _("Tool to monitor cubeengine-based servers.")
+#define CSL_COPYRIGHT_STR      _(__CSL_DESCRIPTION_STR)
 
-#define CSL_DESCRIPTION_STR     _("Tool to monitor cubeengine-based servers.")
-#define CSL_COPYRIGHT_STR       wxT(__CSL_COPYRIGHT_STR)
-
-#define CSL_WEBADDR_STR         wxT("cubelister.sourceforge.net")
-#define CSL_WEBADDRFULL_STR     wxString(wxT("http://") CSL_WEBADDR_STR)
+#define CSL_WEBADDR_STR        wxT("http://cubelister.sourceforge.net")
 
 #ifdef UNICODE
-#define __CSL_ENCODING__        wxT(" (Unicode)")
+#define __CSL_ENCODING__       wxT(" (Unicode)")
 #else
-#define __CSL_ENCODING__        wxT(" (ANSI)")
+#define __CSL_ENCODING__       wxT(" (ANSI)")
 #endif
-#define CSL_WXVERSION_STR       wxString(wxVERSION_STRING __CSL_ENCODING__)
+#if wxUSE_STL
+#define __CSL_STL__            wxT(" (STL)")
+#else
+#define __CSL_STL__
+#endif
+#define CSL_WXVERSION_STR      wxString(wxVERSION_STRING __CSL_ENCODING__ __CSL_STL__)
 
 #endif // CSL_VERSION_H

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -29,7 +29,7 @@
 class CslToolTipEvent;
 
 BEGIN_DECLARE_EVENT_TYPES()
-DECLARE_EVENT_TYPE(wxCSL_EVT_TOOLTIP, wxID_ANY)
+DECLARE_EXPORTED_EVENT_TYPE(CSL_DLL_GUITOOLS, wxCSL_EVT_TOOLTIP, wxID_ANY)
 END_DECLARE_EVENT_TYPES()
 
 typedef void (wxEvtHandler::*CslToolTipEventFunction)(CslToolTipEvent&);
@@ -45,36 +45,38 @@ typedef void (wxEvtHandler::*CslToolTipEventFunction)(CslToolTipEvent&);
 class CslToolTipEvent : public wxEvent
 {
     public:
-        CslToolTipEvent(const wxPoint& pos) :
-                wxEvent(wxID_ANY, wxCSL_EVT_TOOLTIP), Pos(pos) { }
+        CslToolTipEvent(wxFrame *frame = NULL, const wxPoint& pos = wxDefaultPosition) :
+                wxEvent(wxID_ANY, wxCSL_EVT_TOOLTIP),
+                Parent(frame), Pos(pos), UserWindow(NULL)
+        { }
 
         virtual wxEvent* Clone() const
         {
             return new CslToolTipEvent(*this);
         }
 
+        wxFrame *Parent;
         wxPoint Pos;
         wxString Title;
         wxArrayString Text;
+        wxWindow *UserWindow;
+
+    private:
+        DECLARE_DYNAMIC_CLASS_NO_ASSIGN(CslToolTipEvent)
 };
 
 
-class CslToolTip : public wxEvtHandler
+class CSL_DLL_GUITOOLS CslToolTip : public wxEvtHandler
 {
     private:
         CslToolTip();
         ~CslToolTip();
 
     public:
-        static void InitTip(wxWindow *window, wxInt32 delay, bool top=false);
-        static void ResetTip();
+        static void Init(wxWindow *window, wxInt32 delay, bool top=false);
+        static void Reset();
 
     private:
-        bool m_top;
-        wxFrame *m_frame;
-        wxWindow *m_parent;
-        wxTimer m_timer;
-
         static CslToolTip& GetInstance();
 
         void CreateFrame();
@@ -89,6 +91,12 @@ class CslToolTip : public wxEvtHandler
         void OnMouseButton(wxMouseEvent& event);
 
         DECLARE_EVENT_TABLE();
+
+        bool m_top;
+        bool m_processMouseButton;
+        wxFrame *m_frame;
+        wxWindow *m_parent;
+        wxTimer m_timer;
 };
 
 #endif //CSLTOOLTIP_H

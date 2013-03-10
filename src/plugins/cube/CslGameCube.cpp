@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -31,17 +31,16 @@ CslGameCube::CslGameCube()
     m_fourcc=CSL_BUILD_FOURCC(CSL_FOURCC_CB);
     m_capabilities=CSL_CAPABILITY_CONNECT_PASS;
     m_defaultMasterConnection=CslMasterConnection(CSL_DEFAULT_MASTER_CB, CSL_DEFAULT_MASTER_PATH_CB);
-#if wxUSE_GUI
-    m_icon16=BitmapFromData(wxBITMAP_TYPE_PNG, cb_16_png, sizeof(cb_16_png));
-    m_icon24=BitmapFromData(wxBITMAP_TYPE_PNG, cb_24_png, sizeof(cb_24_png));
-#endif //wxUSE_GUI
+
+    AddIcon(CSL_BITMAP_TYPE_PNG, 16, cb_16_png, sizeof(cb_16_png));
+    AddIcon(CSL_BITMAP_TYPE_PNG, 24, cb_24_png, sizeof(cb_24_png));
 }
 
 CslGameCube::~CslGameCube()
 {
 }
 
-const wxChar* CslGameCube::GetModeName(wxInt32 mode) const
+inline const wxChar* CslGameCube::GetModeName(wxInt32 mode) const
 {
     static const wxChar* modes[] =
     {
@@ -62,7 +61,7 @@ bool CslGameCube::PingDefault(ucharbuf& buf, CslServerInfo& info) const
 
 bool CslGameCube::ParseDefaultPong(ucharbuf& buf, CslServerInfo& info) const
 {
-    char text[_MAXDEFSTR];
+    char text[MAXSTRLEN];
     wxInt32 i;
 
     if ((wxUint32)getint(buf)!=m_fourcc)
@@ -88,12 +87,22 @@ bool CslGameCube::ParseDefaultPong(ucharbuf& buf, CslServerInfo& info) const
     info.Players=i;
     info.TimeRemain=max(0, getint(buf))*60;
     getstring(text, buf);
-    info.Map=A2U(text);
+    info.Map=C2U(text);
     getstring(text, buf);
-    FixString(text, 1);
-    info.SetDescription(A2U(text));
+    FilterCubeString(text, 1);
+    info.SetDescription(C2U(text));
 
     return !buf.overread();
+}
+
+CslGameClientSettings CslGameCube::GuessClientSettings(const wxString& path) const
+{
+    return CslGameClientSettings();
+}
+
+wxString CslGameCube::ValidateClientSettings(CslGameClientSettings& settings) const
+{
+    return wxEmptyString;
 }
 
 void CslGameCube::SetClientSettings(const CslGameClientSettings& settings)
@@ -146,7 +155,7 @@ wxString CslGameCube::GameStart(CslServerInfo *info, wxInt32 mode, wxString& err
     if (mode==CslServerInfo::CSL_CONNECT_ADMIN_PASS)
         password=info->Password;
 
-    LOG_DEBUG("start client: %s\n", U2A(bin));
+    CSL_LOG_DEBUG("start client: %s\n", U2C(bin));
 
     return InjectConfig(address, password, error)==CSL_ERROR_NONE ? bin : wxString(wxEmptyString);
 }
@@ -237,21 +246,41 @@ wxInt32 CslGameCube::InjectConfig(const wxString& address, const wxString& passw
 
 void CslGameCube::ProcessOutput(char *data) const
 {
-    FixString(data, 0, true, true);
+    FilterCubeString(data, 0, true, true);
 }
 
-bool CslGameCubePlugin::Create()
+
+CslGameCube *cube = NULL;
+
+bool plugin_init(CslPluginHost *host)
 {
-    CslEngine *engine=m_host->GetCslEngine();
+    CslEngine *engine = host->GetCslEngine();
 
     if (engine)
-        return engine->AddGame(new CslGameCube());
+    {
+        cube = new CslGameCube;
+        return engine->AddGame(cube);
+    }
 
-    return false;
+    return true;
 }
 
-IMPLEMENT_PLUGIN(CSL_BUILD_FOURCC(CSL_FOURCC_CB), CSL_PLUGIN_VERSION_API, CslPlugin::TYPE_ENGINE,
-                 CSL_BUILD_VERSION(__CSL_VERSION), CSL_DEFAULT_NAME_CB,
+void plugin_deinit(CslPluginHost *host)
+{
+    if (cube)
+    {
+        CslEngine *engine = host->GetCslEngine();
+
+        if (engine)
+            engine->RemoveGame(cube);
+
+        delete cube;
+        cube = NULL;
+    }
+}
+
+IMPLEMENT_PLUGIN(CSL_PLUGIN_VERSION_API, CSL_PLUGIN_TYPE_ENGINE, CSL_BUILD_FOURCC(CSL_FOURCC_CB),
+                 CSL_DEFAULT_NAME_CB, CSL_VERSION_STR,
                  wxT("Glen Masgai"), wxT("mimosius@users.sourceforge.net"),
-                 CSL_WEBADDRFULL_STR, wxT("GPLv2"),
-                 wxT("Cube CSL engine plugin"), CslGameCubePlugin)
+                 CSL_WEBADDR_STR, wxT("GPLv2"), wxT("Cube CSL engine plugin"),
+                 &plugin_init, &plugin_deinit, NULL)

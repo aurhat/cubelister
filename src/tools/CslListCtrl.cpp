@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -20,17 +20,12 @@
 
 #include "Csl.h"
 #include "CslEngine.h"
-#include "CslApp.h"
 #include "CslSettings.h"
 #include "CslGeoIP.h"
 #include "CslMenu.h"
 #include "CslListCtrl.h"
 
 #include "img/ext_green_8.xpm"
-#include "img/red_list_16.xpm"
-#include "img/green_list_16.xpm"
-#include "img/yellow_list_16.xpm"
-#include "img/grey_list_16.xpm"
 #include "img/red_ext_list_16.xpm"
 #include "img/green_ext_list_16.xpm"
 #include "img/yellow_ext_list_16.xpm"
@@ -39,8 +34,8 @@
 #include "img/sortdsc_16.xpm"
 #include "CslFlags.h"
 
-// since wx>2.8.4 the list control items are getting deselected on wxGTK
-// this happens too on wxMAC (maybe because of the generic list control?)
+// since wx 2.8.4 the list control items are getting deselected on wxGTK
+// this also happens on wxMAC (maybe because of the generic list control?)
 #if defined(__WXGTK__) || defined(__WXMAC__) || defined(__WXUNIVERSAL__)
 #ifndef CSL_USE_WX_LIST_DESELECT_WORKAROUND
 #if wxVERSION_NUMBER > 2804 || defined(__WXMAC__)
@@ -49,12 +44,16 @@
 #endif
 #endif
 
+DEFINE_EVENT_TYPE(wxCSL_EVT_COMMAND_LIST_COLUMN_TOGGLED)
 DEFINE_EVENT_TYPE(wxCSL_EVT_COMMAND_LIST_ALL_ITEMS_SELECTED)
 
 BEGIN_EVENT_TABLE(CslListCtrl, wxListCtrl)
     #ifdef __WXMSW__
     EVT_ERASE_BACKGROUND(CslListCtrl::OnEraseBackground)
     #endif
+    EVT_LIST_COL_BEGIN_DRAG(wxID_ANY, CslListCtrl::OnColumnDragStart)
+    EVT_LIST_COL_END_DRAG(wxID_ANY, CslListCtrl::OnColumnDragEnd)
+    EVT_SIZE(CslListCtrl::OnSize)
     EVT_MOTION(CslListCtrl::OnMouseMove)
     EVT_KEY_DOWN(CslListCtrl::OnKeyDown)
     EVT_LIST_COL_CLICK(wxID_ANY, CslListCtrl::OnColumnLeftClick)
@@ -62,20 +61,91 @@ BEGIN_EVENT_TABLE(CslListCtrl, wxListCtrl)
     CSL_EVT_TOOLTIP(wxID_ANY, CslListCtrl::OnToolTip)
 END_EVENT_TABLE()
 
+IMPLEMENT_DYNAMIC_CLASS(CslListSort, wxObject)
+IMPLEMENT_DYNAMIC_CLASS(CslListColumn, wxObject)
+IMPLEMENT_DYNAMIC_CLASS(CslListColumns, wxObject)
+IMPLEMENT_DYNAMIC_CLASS(CslListCtrl, wxListCtrl)
 
 wxImageList CslListCtrl::ListImageList;
 
-IMPLEMENT_DYNAMIC_CLASS(CslListCtrl, wxListCtrl)
 
-CslListCtrl::CslListCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size,
-                         long style, const wxValidator& validator, const wxString& name) :
-        wxListCtrl(parent, id, pos, size, style, validator, name),
-        m_sortCallback(NULL), m_processSelectEvent(1), m_mouseLastMove(0)
+void CslListColumns::AddColumn(const wxString& name, wxListColumnFormat format,
+                                   float weight, bool enabled, bool locked)
 {
-    CreateImageList();
+    CSL_FLAG_SET(m_columnMask, enabled ? 1<<GetCount() : 0);
+
+    m_columns.push_back(new CslListColumn(name, format, weight, locked));
+
+    if (locked)
+        m_lockedCount++;
+}
+
+void CslListColumns::RemoveColumn(wxInt32 id)
+{
+    wxASSERT_MSG(id>=0 && id<(wxInt32)m_columns.size(), wxT("Invalid column id."));
+
+    CslListColumn *c = m_columns[id];
+
+    if (c->Locked)
+        m_lockedCount--;
+
+    CSL_FLAG_UNSET(m_columnMask, 1<<id);
+
+    delete c;
+
+    m_columns.RemoveAt(id);
+}
+
+void CslListColumns::ToggleColumn(wxInt32 id)
+{
+    wxASSERT_MSG(id>=0 && id<GetCount(), wxT("Invalid column id."));
+
+    if (id<0 || id>=GetCount())
+        return;
+
+    if (CSL_FLAG_CHECK(m_columnMask, 1<<id))
+        CSL_FLAG_UNSET(m_columnMask, 1<<id);
+    else
+        CSL_FLAG_SET(m_columnMask, 1<<id);
+}
+
+wxInt32 CslListColumns::GetColumnId(wxInt32 id, bool absolute) const
+{
+    wxASSERT_MSG(id>=0 && id<GetCount(), wxT("invalid column"));
+
+    if (absolute)
+    {
+        for (wxInt32 i=0; i<=id && i<GetCount(); i++)
+        {
+            if (!IsEnabled(i))
+                id++;
+        }
+        id=min(id, GetCount()-1);
+    }
+    else
+    {
+        for (wxInt32 i = 0, c = id; i<c; i++)
+        {
+            if (!IsEnabled(i))
+                id--;
+        }
+        id = max(0, id);
+    }
+
+    return id;
+}
+
+
+CslListCtrl::CslListCtrl(wxWindow* parent, wxWindowID id,
+                         const wxPoint& pos, const wxSize& size,
+                         long style, const wxValidator& validator,
+                         const wxString& name) :
+        wxListCtrl(parent, id, pos, size, style, validator, name),
+        m_sortCallback(NULL), m_processSelectEvent(1), m_mouseLastMove(0),
+        m_dontAdjustSize(false)
+{
     SetImageList(&ListImageList, wxIMAGE_LIST_SMALL);
 
-    // don't use the static event tables, so the event is processed in the base class first
     Connect(wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler(CslListCtrl::OnItem), NULL, this);
     Connect(wxEVT_COMMAND_LIST_ITEM_DESELECTED, wxListEventHandler(CslListCtrl::OnItem), NULL, this);
     Connect(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler(CslListCtrl::OnItem), NULL, this);
@@ -85,13 +155,18 @@ CslListCtrl::CslListCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, co
 
 CslListCtrl::~CslListCtrl()
 {
-    CslToolTip::ResetTip();
+    CslToolTip::Reset();
 }
 
 #ifdef __WXMSW__
 void CslListCtrl::OnEraseBackground(wxEraseEvent& event)
 {
     // to prevent flickering, erase only content *outside* of the actual items
+    //
+    // another solution is to set the LVS_EX_DOUBLEBUFFER style
+    // (commctrl 6.0) within the ctor but it needs a little more cpu:
+    //     HWND hwnd = (HWND)GetHWND();
+    //   ListView_SetExtendedListViewStyle(hwnd, ListView_GetExtendedListViewStyle(hwnd)|LVS_EX_DOUBLEBUFFER);
 
     if (GetItemCount()>0)
     {
@@ -118,7 +193,7 @@ void CslListCtrl::OnEraseBackground(wxEraseEvent& event)
         {
             GetItemRect(0, bRect, wxLIST_RECT_ICON);
             bRect.height-=3;
-            wxRegion imgRegion(imgSize);
+            wxRegion imgRegion(0, 0, imgSize.x, imgSize.y);
             imgRegion.Offset(bRect.x, bRect.y+1);
             region.Xor(imgRegion);
 
@@ -130,7 +205,11 @@ void CslListCtrl::OnEraseBackground(wxEraseEvent& event)
         }
 
         dc->DestroyClippingRegion();
+#if wxCHECK_VERSION(2, 9, 0)
+        dc->SetDeviceClippingRegion(region);
+#else
         dc->SetClippingRegion(region);
+#endif
 #if 0
         static int c=0;
         wxBitmap bmp=region.ConvertToBitmap();
@@ -149,6 +228,26 @@ void CslListCtrl::OnEraseBackground(wxEraseEvent& event)
 }
 #endif //__WXMSW__
 
+void CslListCtrl::OnColumnDragStart(wxListEvent& WXUNUSED(event))
+{
+    m_dontAdjustSize = true;
+}
+
+void CslListCtrl::OnColumnDragEnd(wxListEvent& WXUNUSED(event))
+{
+    m_dontAdjustSize = false;
+}
+
+void CslListCtrl::OnSize(wxSizeEvent& event)
+{
+    if (m_dontAdjustSize)
+        return;
+
+    CslValueRestore<bool> noresize(m_dontAdjustSize, true);
+
+    ListAdjustSize();
+}
+
 void CslListCtrl::OnMouseMove(wxMouseEvent& event)
 {
     event.Skip();
@@ -163,7 +262,7 @@ void CslListCtrl::OnMouseMove(wxMouseEvent& event)
 
     m_mouseLastMove=ticks;
 
-    CslToolTip::InitTip(this, CslGetSettings().TooltipDelay);
+    CslToolTip::Init(this, CslGetSettings().TooltipDelay);
 }
 
 void CslListCtrl::OnMenu(wxCommandEvent& event)
@@ -177,9 +276,6 @@ void CslListCtrl::OnMenu(wxCommandEvent& event)
         id-=MENU_LISTCTRL_COLUMN;
 
         ListToggleColumn(id);
-
-        if (m_columns.IsEnabled(id))
-            OnListUpdate();
     }
 
     event.Skip();
@@ -187,7 +283,7 @@ void CslListCtrl::OnMenu(wxCommandEvent& event)
 
 void CslListCtrl::OnContextMenu(wxContextMenuEvent& event)
 {
-    CslToolTip::ResetTip();
+    CslToolTip::Reset();
     event.Skip();
 }
 
@@ -195,7 +291,8 @@ void CslListCtrl::OnKeyDown(wxKeyEvent &event)
 {
     if (!(GetWindowStyle()&wxLC_SINGLE_SEL) && event.ControlDown() && event.GetKeyCode()=='A')
     {
-        wxWindowUpdateLocker lock(this);
+        if (!IsFrozen())
+            wxWindowUpdateLocker lock(this);
 
         for (wxInt32 i=0; i<GetItemCount(); i++)
             SetItemState(i, 0, wxLIST_STATE_SELECTED);
@@ -217,9 +314,9 @@ void CslListCtrl::OnColumnLeftClick(wxListEvent& event)
     event.Skip();
 }
 
-void CslListCtrl::OnColumnRightClick(wxListEvent& event)
+void CslListCtrl::OnColumnRightClick(wxListEvent& WXUNUSED(event))
 {
-    CslToolTip::ResetTip();
+    CslToolTip::Reset();
 
     wxInt32 count=m_columns.GetCount();
 
@@ -228,16 +325,18 @@ void CslListCtrl::OnColumnRightClick(wxListEvent& event)
 
     wxMenu menu;
     wxMenuItem *item;
-    const vector<CslListColumns::Column>& columns=m_columns.GetColumns();
+    CslArrayListColumn& columns=m_columns.GetColumns();
 
     count=m_columns.GetCount(true);
 
     loopv(columns)
     {
-        if (columns[i].Locked)
+        const CslListColumn& c=*columns[i];
+
+        if (c.Locked)
             continue;
 
-        item=new wxMenuItem(&menu, MENU_LISTCTRL_COLUMN+i, columns[i].Name, wxART_NONE, wxITEM_CHECK);
+        item=new wxMenuItem(&menu, MENU_LISTCTRL_COLUMN+i, c.Name, wxART_NONE, wxITEM_CHECK);
         menu.Append(item);
         item->Check(m_columns.IsEnabled(i));
 
@@ -257,10 +356,11 @@ void CslListCtrl::OnColumnRightClick(wxListEvent& event)
 void CslListCtrl::OnItem(wxListEvent& event)
 {
     //if (event.GetEventType()!=wxEVT_COMMAND_LIST_ITEM_DESELECTED)
-    //    CslToolTip::ResetTip();
+    //    CslToolTip::Reset();
 
     if (!m_processSelectEvent)
         return;
+
     //all items selected via CTRL+A
     if (m_processSelectEvent<0)
         event.SetEventType(wxCSL_EVT_COMMAND_LIST_ALL_ITEMS_SELECTED);
@@ -272,28 +372,28 @@ void CslListCtrl::OnToolTip(CslToolTipEvent& event)
 {
     wxRect rect;
     wxListItem item;
-    wxInt32 i, offset=0;
-#ifdef __WXGTK__
-    bool first=true;
+    wxInt32 i, offset = 0;
+#if defined(__WXGTK__) || defined(__WXMAC__)
+    bool first = true;
 #endif
-    const wxSize& size=GetClientSize();
-    const wxPoint& pos=ScreenToClient(event.Pos);
+    const wxSize& size = GetClientSize();
+    const wxPoint& pos = ScreenToClient(event.Pos);
 
     if (pos.x>=0 && pos.y>=0 && pos.x<=size.x && pos.y<=size.y)
     {
-        for (i=GetTopItem(); i<GetItemCount(); i++)
+        for (i = GetTopItem(); i<GetItemCount(); i++)
         {
             item.SetId(i);
             GetItemRect(item, rect, wxLIST_RECT_BOUNDS);
 
-#ifdef __WXGTK__
+#if defined(__WXGTK__) || defined(__WXMAC__)
             if (first)
             {
-                offset=rect.y;
-                first=false;
+                offset = rect.y;
+                first = false;
             }
 #endif
-            rect.y-=offset;
+            rect.y -= offset;
 
             if (!rect.Contains(pos))
                 continue;
@@ -302,9 +402,7 @@ void CslListCtrl::OnToolTip(CslToolTipEvent& event)
             wxArrayString text;
 
             GetToolTipText(i, event);
-
-            if (!event.Text.IsEmpty())
-                return;
+            return;
         }
     }
 
@@ -312,14 +410,14 @@ void CslListCtrl::OnToolTip(CslToolTipEvent& event)
 }
 
 void CslListCtrl::ListAddColumn(const wxString& name, wxListColumnFormat format,
-                                   float weight, bool enabled, bool locked)
+                                float weight, bool enabled, bool locked)
 {
     m_columns.AddColumn(name, format, weight, enabled, locked);
 
-    if (enabled)
+    if (enabled && !name.IsEmpty())
     {
         wxListItem item;
-        wxInt32 rcolumn=m_columns.GetColumnId(m_columns.GetCount()-1, false);
+        wxInt32 rcolumn = m_columns.GetColumnId(m_columns.GetCount()-1, false);
 
         item.SetMask(wxLIST_MASK_TEXT|wxLIST_MASK_IMAGE|wxLIST_MASK_FORMAT);
         item.SetAlign(format);
@@ -344,7 +442,7 @@ wxUint32 CslListCtrl::ListToggleColumn(wxInt32 column)
     {
         wxListItem item;
         wxInt32 colrel=m_columns.GetColumnId(column, false);
-        CslListColumns::Column *c=m_columns.GetColumn(column);
+        CslListColumn *c=m_columns.GetColumn(column);
 
         item.SetMask(wxLIST_MASK_FORMAT);
         item.SetImage(-1);
@@ -357,9 +455,39 @@ wxUint32 CslListCtrl::ListToggleColumn(wxInt32 column)
 
     m_columns.ToggleColumn(column);
 
+    // process the event immediately
+    wxListEvent evt(wxCSL_EVT_COMMAND_LIST_COLUMN_TOGGLED);
+    evt.m_col = column;
+    ProcessEvent(evt);
+
     ListAdjustSize();
 
-    return m_columns.GetEnabledColumns();
+    return m_columns.GetColumnMask();
+}
+
+bool CslListCtrl::ListSetColumn(wxInt32 column, const wxString& name)
+{
+    CslListColumn *c=m_columns.GetColumn(column);
+
+    if (!c)
+        return false;
+
+    c->Name=name;
+
+    if (!m_columns.IsEnabled(column))
+        return false;
+
+    wxListItem item;
+
+    column=m_columns.GetColumnId(column, false);
+    GetColumn(column, item);
+
+    item.SetMask(wxLIST_MASK_TEXT);
+    item.SetText(name);
+
+    SetColumn(column, item);
+
+    return true;
 }
 
 bool CslListCtrl::ListSetItem(wxInt32 row, wxInt32 column, const wxString& text, wxInt32 image)
@@ -372,8 +500,6 @@ bool CslListCtrl::ListSetItem(wxInt32 row, wxInt32 column, const wxString& text,
 
     column=m_columns.GetColumnId(column, false);
 
-    wxWindowUpdateLocker lock(this);
-
     while (l++<=row)
         InsertItem(l, -1);
 
@@ -384,29 +510,12 @@ bool CslListCtrl::ListSetItem(wxInt32 row, wxInt32 column, const wxString& text,
     return true;
 }
 
-bool CslListCtrl::ListSetColumn(wxInt32 column, const wxString& text)
+void CslListCtrl::ListLockColumn(wxInt32 column, bool lock)
 {
-    CslListColumns::Column *c=m_columns.GetColumn(column);
+    CslListColumn *c = m_columns.GetColumn(column);
 
-    if (!c)
-        return false;
-
-    c->Name=text;
-
-    if (!m_columns.IsEnabled(column))
-        return false;
-
-    wxListItem item;
-
-    column=m_columns.GetColumnId(column, false);
-    GetColumn(column, item);
-
-    wxWindowUpdateLocker lock(this);
-
-    item.SetMask(wxLIST_MASK_TEXT);
-    SetColumn(column, item);
-
-    return true;
+    if (c)
+        c->Locked = lock;
 }
 
 wxInt32 CslListCtrl::ListFindItem(void *data)
@@ -425,7 +534,7 @@ wxInt32 CslListCtrl::ListFindItem(void *data)
     return wxNOT_FOUND;
 }
 
-void CslListCtrl::InitSort(CslListSortCallBack fn, wxInt32 mode, wxInt32 column)
+void CslListCtrl::SetSortCallback(CslListSortCallBack fn, wxInt32 mode, wxInt32 column)
 {
     m_sortCallback=fn;
     m_sortHelper.Init(mode, column);
@@ -493,10 +602,10 @@ void CslListCtrl::ListSort(wxInt32 column)
     SortItems(m_sortCallback, (long)&m_sortHelper);
 
 #ifdef CSL_USE_WX_LIST_DESELECT_WORKAROUND
-    wxInt32 i, j, v;
-
-    for (i=0, j=(wxInt32)m_selected.GetCount(); i<j; i++)
+    loopi(m_selected.GetCount())
     {
+        wxInt32 v;
+
         if ((v=ListFindItem(m_selected.Item(i)))==wxNOT_FOUND)
             continue;
 
@@ -507,7 +616,7 @@ void CslListCtrl::ListSort(wxInt32 column)
     m_processSelectEvent=1;
 
 #ifndef __WXMSW__
-#if !wxCHECK_VERSION(2, 9, 0) //TODO: possible replacement needed
+#if !wxCHECK_VERSION(2, 9, 0) //TODO: replacement needed?
     //removes flicker on autosort for wxGTK and wxMAC
     wxIdleEvent idle;
     wxTheApp->SendIdleEvents(this, idle);
@@ -539,7 +648,7 @@ void CslListCtrl::CreateScreenShot()
                     );
     // wxGTK: hmm, doesn't work in the ctor?!
     if (wxDirExists(CslGetSettings().ScreenOutputPath))
-        dlg.SetPath(CslGetSettings().ScreenOutputPath+PATHDIV+file);
+        dlg.SetPath(CslGetSettings().ScreenOutputPath+CSL_PATHDIV_WX+file);
     if (dlg.ShowModal()!=wxID_OK)
         return;
 
@@ -554,9 +663,9 @@ wxString CslListCtrl::GetScreenShotFileName()
     return wxDateTime::Now().Format(wxT("%Y%m%d_%H%M%S"))+wxT(".png");
 }
 
-wxInt32 CslListCtrl::GetGameImage(wxUint32 fourcc, wxInt32 offset)
+wxInt32 CslListCtrl::GetGameImage(CslEngine* engine, wxUint32 fourcc, wxInt32 offset)
 {
-    CslGames& games=::wxGetApp().GetCslEngine()->GetGames();
+    CslArrayCslGame& games=engine->GetGames();
 
     loopv(games)
     {
@@ -567,20 +676,20 @@ wxInt32 CslListCtrl::GetGameImage(wxUint32 fourcc, wxInt32 offset)
     return -1;
 }
 
-wxInt32 CslListCtrl::GetCountryFlag(wxUint32 ip)
+wxInt32 CslListCtrl::GetCountryFlag(CslEngine* engine, wxUint32 ip)
 {
     wxInt32 i;
     const char *country;
     static wxInt32 offset=0;
 
     if (!offset)
-        offset=CSL_LIST_IMG_GAMES_START+::wxGetApp().GetCslEngine()->GetGames().length()*2;
+        offset=CSL_LIST_IMG_GAMES_START+engine->GetGames().size()*2;
 
     if (ip && ip!=(wxUint32)-1)
     {
         if (!(country=CslGeoIP::GetCountryCodeByIPnum(ip)))
         {
-            if (IsLocalIP(ip))
+            if (IsLocalIPV4(ip))
                 return offset; // local_xpm
         }
         else
@@ -596,25 +705,20 @@ wxInt32 CslListCtrl::GetCountryFlag(wxUint32 ip)
     return offset+1; // unknown_xpm
 }
 
-void CslListCtrl::CreateImageList()
+void CslListCtrl::CreateImageList(CslEngine* engine)
 {
-    if (ListImageList.GetImageCount())
-        return;
-
-    wxInt32 i, l;
-
     wxSize size(18, 14);
     wxPoint offset(0, 0);
 
 #ifdef __WXMSW__
-    size.x=20;
+    size.x = 20;
 #endif
     ListImageList.Create(size.x, size.y, true);
 
-    ListImageList.Add(AdjustBitmapSize(green_list_16_xpm, size, offset));
-    ListImageList.Add(AdjustBitmapSize(yellow_list_16_xpm, size, offset));
-    ListImageList.Add(AdjustBitmapSize(red_list_16_xpm, size, offset));
-    ListImageList.Add(AdjustBitmapSize(grey_list_16_xpm, size, offset));
+    ListImageList.Add(AdjustBitmapSize(GET_ART_MENU(wxART_BUBBLE_GREEN), size, offset));
+    ListImageList.Add(AdjustBitmapSize(GET_ART_MENU(wxART_BUBBLE_YELLOW), size, offset));
+    ListImageList.Add(AdjustBitmapSize(GET_ART_MENU(wxART_BUBBLE_RED), size, offset));
+    ListImageList.Add(AdjustBitmapSize(GET_ART_MENU(wxART_BUBBLE_GREY), size, offset));
     ListImageList.Add(AdjustBitmapSize(green_ext_list_16_xpm, size, offset));
     ListImageList.Add(AdjustBitmapSize(yellow_ext_list_16_xpm, size, offset));
     ListImageList.Add(AdjustBitmapSize(red_ext_list_16_xpm, size, offset));
@@ -623,64 +727,94 @@ void CslListCtrl::CreateImageList()
     ListImageList.Add(AdjustBitmapSize(sortasc_16_xpm, size, offset));
     ListImageList.Add(AdjustBitmapSize(sortdsc_16_xpm, size, offset));
 
-    const CslGames& games=::wxGetApp().GetCslEngine()->GetGames();
-    const wxImage imgExt=wxBitmap(ext_green_8_xpm).ConvertToImage();
+    const CslArrayCslGame& games = engine->GetGames();
+    const wxImage imgExt = wxBitmap(ext_green_8_xpm).ConvertToImage();
 
-    offset.y=0;
+    offset.y = 0;
 
     loopv(games)
     {
-        const wxBitmap& icon=games[i]->GetIcon(16);
-        wxBitmap bmpGame=icon.IsOk() ? AdjustBitmapSize(icon, size, offset) : wxBitmap(size.x, size.y);
+        const CslGameIcon *icon=games[i]->GetIcon(16);
 
-        ListImageList.Add(bmpGame);
-        wxImage img=bmpGame.ConvertToImage();
+        wxBitmap bmpGame = icon ?
+            BitmapFromData(Csl2wxBitmapType(icon->Type), icon->Data, icon->DataSize) :
+            wxNullBitmap;
+
+        wxBitmap bmp=bmpGame.IsOk() ?
+            AdjustBitmapSize(bmpGame, size, offset) :
+            wxBitmap(size.x, size.y);
+
+        ListImageList.Add(bmp);
+        wxImage img = bmp.ConvertToImage();
+
         ListImageList.Add(wxBitmap(OverlayImage(img, imgExt, size.x-8, size.y-8)));
     }
+
+#ifdef __WXMSW__
+    offset.y = 2;
+#else
+    offset.y = 1;
+#endif //__WXMSW__
 
     ListImageList.Add(AdjustBitmapSize(local_xpm, size, offset));
     ListImageList.Add(AdjustBitmapSize(unknown_xpm, size, offset));
 
-    offset.y=1;
-
-    for (i=0, l=sizeof(country_codes)/sizeof(country_codes[0]); i<l; i++)
+    loopi(sizeof(country_codes)/sizeof(country_codes[0]))
         ListImageList.Add(AdjustBitmapSize(country_flags[i], size, offset));
 }
 
 void CslListCtrl::ListAdjustSize(const wxSize& size)
 {
-    wxInt32 w=size==wxDefaultSize ? GetClientSize().x-12 : size.x-12;
+    wxSize cs = size == wxDefaultSize ? GetClientSize() : size;
 
-    if (w<0)
+    if (cs.x<0 || cs.y<0)
         return;
 
-    wxInt32 c=m_columns.GetCount(true);
+#ifndef __WXMSW__
+    // scrollbars are included in GetClientSize() on __WXGTK__ and __WXMAC__
+    // so check the height of all items and substract the horinzontal
+    // scrollbar    width if necessary
+    wxInt32 count = GetItemCount();
+
+    if (count>0)
+    {
+        wxRect rect;
+        GetItemRect(0, rect);
+        wxInt32 sw = wxSystemSettings::GetMetric(wxSYS_HSCROLL_Y) + 1;
+
+        if (rect.height*count>cs.y)
+            cs.x = max(cs.x-sw, sw);
+    }
+#endif
+
+    wxInt32 c = m_columns.GetCount(true);
 
     if (c>1)
     {
-        wxInt32 i, s=0, l=m_columns.GetCount();
-        vector<CslListColumns::Column>& columns=m_columns.GetColumns();
+        wxInt32 s = 0;
+        CslArrayListColumn& columns = m_columns.GetColumns();
 
-        for (i=0; i<l; i++)
+        loopi(m_columns.GetCount())
         {
             if (m_columns.IsEnabled(i))
-                s+=(columns[i].Width=w/c*columns[i].Weight);
+                s += (columns[i]->Width = cs.x/c*columns[i]->Weight);
         }
 
-        if (s!=w)
+        if (s>cs.x || cs.x-s>1)
         {
-            float scale=w/(float)s;
+            float scale = cs.GetWidth()/(float)s;
 
-            for (i=0; i<l; i++)
+               loopi(m_columns.GetCount())
             {
                 if (m_columns.IsEnabled(i))
                 {
-                    columns[i].Width*=scale;
-                    SetColumnWidth(m_columns.GetColumnId(i, false), columns[i].Width);
+                    columns[i]->Width *= scale;
+
+                    SetColumnWidth(m_columns.GetColumnId(i, false), columns[i]->Width);
                 }
             }
         }
     }
     else if (c==1)
-        SetColumnWidth(0, w);
+        SetColumnWidth(0, cs.x);
 }

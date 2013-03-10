@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -27,7 +27,7 @@
 
 
 BEGIN_DECLARE_EVENT_TYPES()
-DECLARE_EVENT_TYPE(wxCSL_EVT_VERSIONCHECK,wxID_ANY)
+DECLARE_LOCAL_EVENT_TYPE(wxCSL_EVT_VERSIONCHECK, wxID_ANY)
 END_DECLARE_EVENT_TYPES()
 
 #define CSL_EVT_VERSIONCHECK(id,fn) \
@@ -43,11 +43,14 @@ class CslVersionCheckThread : public wxThread
 {
     public:
         CslVersionCheckThread(wxEvtHandler *evtHandler);
+        ~CslVersionCheckThread();
 
         bool IsOk() { return m_ok; }
 
     protected:
         bool m_ok;
+        bool m_terminate;
+        wxMutex m_mutex;
         wxEvtHandler *m_evtHandler;
 
         virtual ExitCode Entry();

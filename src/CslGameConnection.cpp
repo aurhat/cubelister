@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -90,8 +90,9 @@ bool CslGameConnection::CountDown()
 
     if (--self.m_info->ConnectWait>0)
     {
-        CslStatusBar::SetText(1,wxString::Format(_("Waiting %s for a free slot on '%s (%s)' " \
-                              _L_"(press ESC to abort or join another server)"),
+        CslStatusBar::SetText(1, wxString::Format(
+                                  _("Waiting %s for a free slot on '%s (%s)' "
+                              wxT_2("(press ESC to abort or join another server)")),
                               FormatSeconds(self.m_info->ConnectWait,true,true).c_str(),
                               self.m_info->GetBestDescription().c_str(),
                               self.m_info->GetGame().GetName().c_str()));

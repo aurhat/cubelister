@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -50,12 +50,12 @@ bool CslPlayerStats::AddStats(CslPlayerStatsData *data)
         {
             if (m_ids[i]!=data->ID)
                 continue;
-            m_ids.remove(i);
+            m_ids.erase(m_ids.begin()+i);
             data->Ok=true;
-            if (m_ids.length()==0)
+            if (m_ids.size()==0)
                 m_status=CSL_STATS_NEED_IDS;
             loopvj(m_stats) if (m_stats[j]==data) return true;
-            m_stats.add(data);
+            m_stats.push_back(data);
             return true;
         }
     }
@@ -79,8 +79,7 @@ void CslPlayerStats::RemoveStats(CslPlayerStatsData *data)
 void CslPlayerStats::DeleteStats()
 {
     m_status=CSL_STATS_NEED_IDS;
-    loopvrev(m_stats) delete m_stats[i];
-    m_stats.setsizenodelete(0);
+    WX_CLEAR_ARRAY(m_stats);
 }
 
 bool CslPlayerStats::AddId(wxInt32 id)
@@ -88,7 +87,7 @@ bool CslPlayerStats::AddId(wxInt32 id)
     if (m_status!=CSL_STATS_NEED_IDS)
         return false;
     loopv(m_ids) if (m_ids[i]==id) return false;
-    m_ids.add(id);
+    m_ids.push_back(id);
     return true;
 }
 
@@ -98,8 +97,8 @@ bool CslPlayerStats::RemoveId(wxInt32 id)
     {
         if (m_ids[i]!=id)
             continue;
-        m_ids.remove(i);
-        if (m_ids.length()==0)
+        m_ids.erase(m_ids.begin()+i);
+        if (m_ids.size()==0)
             m_status=CSL_STATS_NEED_IDS;
         return true;
     }
@@ -108,7 +107,7 @@ bool CslPlayerStats::RemoveId(wxInt32 id)
 
 void CslPlayerStats::SetWaitForStats()
 {
-    if (m_ids.length())
+    if (m_ids.size())
         m_status=CSL_STATS_NEED_STATS;
     else
         m_status=CSL_STATS_NEED_IDS;
@@ -118,7 +117,7 @@ void CslPlayerStats::Reset()
 {
     m_status=CSL_STATS_NEED_IDS;
     loopv(m_stats) m_stats[i]->Ok=false;
-    loopv(m_ids) m_ids.remove(0);
+    m_ids.Empty();
 }
 
 
@@ -148,7 +147,7 @@ void CslTeamStats::AddStats(CslTeamStatsData *data)
 {
     data->Ok=true;
     loopv(m_stats) if (m_stats[i]==data) return;
-    m_stats.add(data);
+    m_stats.push_back(data);
 }
 
 void CslTeamStats::RemoveStats(CslTeamStatsData *data)
@@ -166,8 +165,7 @@ void CslTeamStats::RemoveStats(CslTeamStatsData *data)
 
 void CslTeamStats::DeleteStats()
 {
-    loopvrev(m_stats) delete m_stats[i];
-    m_stats.setsizenodelete(0);
+    WX_CLEAR_ARRAY(m_stats);
 }
 
 void CslTeamStats::Reset()

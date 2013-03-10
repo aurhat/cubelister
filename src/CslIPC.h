@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -32,7 +32,7 @@
 #else
 #define CSL_IPC_SERV wxString(CSL_USER_DIR+wxT("sock"))
 #endif
-#define CSL_IPC_TOPIC wxT("CSL_IPC_CONTROL")
+#define CSL_IPC_TOPIC               wxT("CSL_IPC_CONTROL")
 
 #define CSL_URI_SCHEME_STR          wxT("csl://")
 #define CSL_URI_INFOPORT_STR        wxT("infoport")
@@ -45,7 +45,7 @@
 class CslIpcEvent;
 
 BEGIN_DECLARE_EVENT_TYPES()
-DECLARE_EVENT_TYPE(wxCSL_EVT_IPC,wxID_ANY)
+DECLARE_LOCAL_EVENT_TYPE(wxCSL_EVT_IPC, wxID_ANY)
 END_DECLARE_EVENT_TYPES()
 
 typedef void (wxEvtHandler::*CslIpcEventEventFunction)(CslIpcEvent&);

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -37,40 +37,32 @@
 #define CSL_DEFAULT_MASTER_PORT_RE    28800
 
 
-class CslGameRedEclipse : public CslGame
+class CSL_DLL_PLUGINS CslGameRedEclipse : public CslGame
 {
     public:
         CslGameRedEclipse();
         ~CslGameRedEclipse();
 
     private:
-        inline const wxChar* GetVersionName(wxInt32 prot) const;
-        inline wxString GetModeName(wxInt32 mode, wxInt32 muts) const;
+        wxString GetVersionName(wxInt32 prot) const;
+        wxString GetModeName(wxInt32 mode, wxInt32 muts) const;
 
         //implementations for base class
-        inline wxInt32 GetPlayerstatsDescriptions(const wxChar ***desc) const;
-        inline const wxChar* GetWeaponName(wxInt32 n, wxInt32 prot) const;
+        wxInt32 GetPlayerstatsDescriptions(const wxChar ***desc) const;
+        const wxChar* GetWeaponName(wxInt32 n, wxInt32 prot) const;
         wxInt32 GetBestTeam(CslTeamStats& stats, wxInt32 prot) const;
         wxUint16 GetDefaultGamePort() const { return CSL_DEFAULT_PORT_RE; }
         wxUint16 GetInfoPort(wxUint16 port=0) const { return port ? port+1 : CSL_DEFAULT_PORT_RE+1; }
         wxUint16 GetBroadcastPort() { return CSL_DEFAULT_BCAST_PORT_RE; }
-        inline bool PingDefault(ucharbuf& buf, CslServerInfo& info) const;
+        bool PingDefault(ucharbuf& buf, CslServerInfo& info) const;
         bool ParseDefaultPong(ucharbuf& buf, CslServerInfo& info) const;
         bool ParsePlayerPong(wxInt32 protocol, ucharbuf& buf, CslPlayerStatsData& info) const ;
         bool ParseTeamPong(wxInt32 protocol, ucharbuf& buf, CslTeamStatsData& info) const;
+        CslGameClientSettings GuessClientSettings(const wxString& path) const;
+        wxString ValidateClientSettings(CslGameClientSettings& settings) const;
         void SetClientSettings(const CslGameClientSettings& settings);
         wxString GameStart(CslServerInfo *info, wxInt32 mode, wxString& error);
         wxInt32 GameEnd(wxString& error);
-};
-
-class CslGameRedEclipsePlugin: public CslPlugin
-{
-    public:
-        CslGameRedEclipsePlugin(CslPluginHostInfo *hostinfo, CslPluginInfo *plugininfo) :
-                CslPlugin(hostinfo, plugininfo) { }
-        virtual ~CslGameRedEclipsePlugin() { }
-
-        virtual bool Create();
 };
 
 #endif //CSLREDECLIPSE_H

@@ -1,6 +1,6 @@
 
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -51,7 +51,7 @@ void CslMenu::EnableItem(wxMenu& menu, wxInt32 id, bool enable)
 {
     wxMenuItem *item;
 
-    if ((item=menu.FindItem(id)))
+    if ((item = menu.FindItem(id)))
         item->Enable(enable);
 }
 

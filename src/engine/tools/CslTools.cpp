@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -20,8 +20,7 @@
 
 #include <Csl.h>
 // GetSystemIPAddresses()
-#ifdef __WXMSW__
-#else
+#ifndef __WXMSW__
 #include <sys/ioctl.h>
 #include <net/if.h>
 #include <netinet/in.h>
@@ -29,53 +28,48 @@
 #include <arpa/inet.h>
 #endif // __WXMSW__
 
-#ifdef __DEBUG__
+DEFINE_EVENT_TYPE(wxCSL_EVT_THREAD_TERMINATE)
+
+wxMutex g_csl_printf_mutex;
+
 void Debug_Printf(const char *file, int line, const char *func, const char *fmt, ...)
 {
-#ifdef __WXMSW__
-    const char *filename=strstr(file, "\\src\\");
-#else
-    const char *filename=strstr(file, "/src/");
-#endif
-    filename=filename ? filename+1:file;
+    const char *filename = strstr(file, CSL_PATHDIV_MB "src" CSL_PATHDIV_MB);
+    filename=filename ? filename+1 : file;
     va_list ArgList;
     va_start(ArgList, fmt);
+    g_csl_printf_mutex.Lock();
     fprintf(stdout, "%u:%s:%d:%s(): ", GetTicks(), filename, line, func);
     vfprintf(stdout, fmt, ArgList);
     fflush(stdout);
+    g_csl_printf_mutex.Unlock();
     va_end(ArgList);
 }
-#endif
 
-wxString& CmdlineEscapeQuotes(wxString& str)
+void CmdlineEscapeQuotes(wxString& str)
 {
-#ifdef __WXMSW__
+#ifndef __WXMSW__
     str.Replace(wxT("\""), wxT("\\\""));
 #endif
-
-    return str;
 }
 
-wxString& CmdlineEscapeSpaces(wxString& str)
+void CmdlineEscapeSpaces(wxString& str)
 {
 #ifndef __WXMSW__
     str.Replace(wxT(" "), wxT("\\ "));
 #endif
-
-    return str;
 }
 
-char* FixString(char *src, wxInt32 coloursize, bool space, bool newline, bool tab)
+char* FilterCubeString(char *src, wxInt32 coloursize, bool space, bool newline, bool tab)
 {
     uchar c;
     char *buf=src, *dst=src;
 
     for (c=*buf; c; c=*(++buf))
     {
-        if (c=='\f')
-            for (wxInt32 l=coloursize; l && *++buf; l--);
+        if (c=='\f') for (wxInt32 l=coloursize; l && *++buf; l--);
         else if (iscubeprint(c) ||
-                 (space   && c==' ') ||
+                 (space   &&  c==' ') ||
                  (newline && (c=='\r' || c=='\n')) ||
                  (tab     && (c=='\t' || c=='\v')))
             *dst++=c;
@@ -107,14 +101,8 @@ wxInt32 BitCount32(wxUint32 value)
     return ((tmp+(tmp>>3))&030707070707)%63;
 }
 
-bool IsIP(const wxString& s)
-{
-    CslIPV4Addr addr(s);
-    return addr.GetNetmask()==32;
-}
-
 #define CSLIPV4ADDRESSESLOCALLEN  5
-static const CslIPV4Addr CslIPV4AddressesLocal[CSLIPV4ADDRESSESLOCALLEN] =
+static const CslIPV4Addr CslArrayCslIPV4AddrLocal[CSLIPV4ADDRESSESLOCALLEN] =
 {
     CslIPV4Addr("0.0.0.0/8"),
     CslIPV4Addr("10.0.0.0/8"),
@@ -123,18 +111,18 @@ static const CslIPV4Addr CslIPV4AddressesLocal[CSLIPV4ADDRESSESLOCALLEN] =
     CslIPV4Addr("192.168.0.0/16")
 };
 
-bool IsLocalIP(const CslIPV4Addr& addr, vector<CslIPV4Addr*> *ifaces)
+bool IsLocalIPV4(const CslIPV4Addr& addr, CslArrayCslIPV4Addr *addresses)
 {
     if (!addr.IsOk())
         return false;
 
-    if (ifaces)
+    if (addresses)
     {
-        loopv(*ifaces)
+        loopv(*addresses)
         {
-            const CslIPV4Addr& iface=*(*ifaces)[i];
+            const CslIPV4Addr& sysaddr=*(*addresses)[i];
 
-            if (iface.IsInRange(addr))
+            if (sysaddr.IsInRange(addr))
                 return true;
         }
 
@@ -143,24 +131,60 @@ bool IsLocalIP(const CslIPV4Addr& addr, vector<CslIPV4Addr*> *ifaces)
 
     for (wxUint32 i=0; i<CSLIPV4ADDRESSESLOCALLEN; i++)
     {
-        if (CslIPV4AddressesLocal[i].IsInRange(addr))
+        if (CslArrayCslIPV4AddrLocal[i].IsInRange(addr))
             return true;
     }
 
     return false;
 }
 
-void GetSystemIPAddresses(vector<CslIPV4Addr*>& ifaces)
+void GetSystemIPV4Addresses(CslArrayCslIPV4Addr& addresses)
 {
-#ifndef __WXMSW__
+    wxUint32 ip, mask;
+
+#ifdef __WXMSW__
+    SOCKET sock=WSASocket(AF_INET, SOCK_DGRAM, 0, 0, 0, 0);
+
+    if (sock==INVALID_SOCKET)
+    {
+        CSL_LOG_DEBUG("WSASocket() failed (WSA error: %d).\n", WSAGetLastError());
+        return;
+    }
+
+    unsigned long len;
+    INTERFACE_INFO ifi[24];
+
+    if (WSAIoctl(sock, SIO_GET_INTERFACE_LIST, 0, 0, &ifi,
+                 sizeof(ifi), &len, 0, 0)==SOCKET_ERROR)
+    {
+        CSL_LOG_DEBUG("WSAIoctl() failed (WSA error: %d).\n", WSAGetLastError());
+        goto cleanup;
+    }
+
+    len/=sizeof(INTERFACE_INFO);
+
+    for (unsigned long i=0;i<len; ++i)
+    {
+        ip=(wxUint32)((sockaddr_in*)&(ifi[i].iiAddress))->sin_addr.S_un.S_addr;
+        mask=(wxUint32)((sockaddr_in*)&(ifi[i].iiNetmask))->sin_addr.S_un.S_addr;
+
+        addresses.Add(new CslIPV4Addr(ip, mask));
+
+        CSL_LOG_DEBUG("%s / %s\n", U2C(NtoA(ip)), U2C(NtoA(mask)));
+    }
+
+cleanup:
+    if (closesocket(sock)==SOCKET_ERROR)
+        CSL_LOG_DEBUG("closesocket() failed (WSA error: %d).\n", WSAGetLastError());
+#else
     int len, sock;
-    char buf[1024];
+    char buf[4096];
     struct ifreq *ifr;
     struct ifconf ifc;
 
     if ((sock=socket(AF_INET, SOCK_DGRAM, 0))<0)
     {
-        LOG_DEBUG("socket() failed.");
+        CSL_LOG_DEBUG("socket() failed.");
         return;
     }
 
@@ -169,14 +193,12 @@ void GetSystemIPAddresses(vector<CslIPV4Addr*>& ifaces)
 
     if (ioctl(sock, SIOCGIFCONF, &ifc)<0)
     {
-        LOG_DEBUG("ioctl(SIOCGIFCONF) failed.");
-        return;
+        CSL_LOG_DEBUG("ioctl(SIOCGIFCONF) failed.\n");
+        goto cleanup;
     }
 
     ifr=ifc.ifc_req;
     len=ifc.ifc_len/sizeof(struct ifreq);
-
-    wxUint32 ip, mask;
 
     for (int i=0; i<len; i++)
     {
@@ -186,73 +208,55 @@ void GetSystemIPAddresses(vector<CslIPV4Addr*>& ifaces)
 
         if (ioctl(sock, SIOCGIFNETMASK, item)<0)
         {
-            LOG_DEBUG("ioctl(SIOCGIFNETMASK) failed.");
+            CSL_LOG_DEBUG("ioctl(SIOCGIFNETMASK) failed.\n");
             continue;
         }
         mask=(wxUint32)((sockaddr_in*)&item->ifr_netmask)->sin_addr.s_addr;
 
         if (ioctl(sock, SIOCGIFBRDADDR, item)<0)
         {
-            LOG_DEBUG("ioctl(SIOCGIFBRDADDR) failed.");
+            CSL_LOG_DEBUG("ioctl(SIOCGIFBRDADDR) failed.\n");
             continue;
         }
 
-        ifaces.add(new CslIPV4Addr(ip, mask));
+        addresses.Add(new CslIPV4Addr(ip, mask));
 
-        LOG_DEBUG("%s / %s\n", U2A(NtoA(ip)), U2A(NtoA(mask)));
+        CSL_LOG_DEBUG("%s / %s\n", U2C(NtoA(ip)), U2C(NtoA(mask)));
     }
+
+cleanup:
+    if (close(sock)<0)
+        CSL_LOG_DEBUG("close() failed.\n");
 #endif // __WXMSW__
+}
+
+void FreeSystemIPV4Addresses(CslArrayCslIPV4Addr& addresses)
+{
+    WX_CLEAR_ARRAY(addresses);
 }
 
 wxUint32 AtoN(const wxString& s)
 {
-#if 0
-    wxString m;
-    long unsigned int ul;
-    wxUint32 i=0, ip=0, l=(wxUint32)s.Len(), mult=0x1000000;
-
-    for (; i<=l; i++)
-    {
-        if (i<l && s.Mid(i, 1).IsNumber())
-            m+=s.Mid(i, 1);
-        else
-        {
-            m.ToULong(&ul, 10);
-            if (ul>255)
-                return 0;
-            ip+=ul*mult;
-            mult>>=8;
-            m.Empty();
-        }
-    }
-
-    return ip;
-#else
 #ifdef __WXMSW__
     wxUint32 ip=0;
 
-    if ((ip=inet_addr(U2A(s)))!=(wxUint32)-1)
+    if ((ip=inet_addr(U2C(s)))!=(wxUint32)-1)
         return ip;
 #else
     in_addr in;
 
-    if (inet_aton(U2A(s), &in))
+    if (inet_aton(U2C(s), &in))
         return in.s_addr;
 #endif // __WXMSW__
     return 0;
-#endif
 }
 
 wxString NtoA(wxUint32 ip)
 {
-#if 0
-    return wxString::Format(wxT("%d.%d.%d.%d"), ip&0xff, ip>>8&0xff, ip>>16&0xff, ip>>24);
-#else
     in_addr in;
     in.s_addr=ip;
 
-    return wxString(A2U(inet_ntoa(in)));
-#endif
+    return C2U(inet_ntoa(in));
 }
 
 wxString FormatBytes(wxUint64 size)
@@ -320,8 +324,6 @@ wxString FormatSeconds(wxUint32 time, bool space, bool full)
     return s.Trim(true);
 }
 
-#define CSL_USE_WIN32_TICK
-
 #ifdef __WXMSW__
 #ifndef CSL_USE_WIN32_TICK
 #include <time.h>
@@ -332,7 +334,7 @@ struct timeval
     long tv_usec;
 };
 #endif // !defined(_WINSOCK2API_) && !defined(_WINSOCKAPI_)
-int gettimeofday(struct timeval* tv, void *dummy)
+int gettimeofday(struct timeval* tv, void *WXUNUSED(dummy))
 {
     union
     {
@@ -493,7 +495,7 @@ wxInt32 WriteTextFile(const wxString& filename, const wxString& data, const wxFi
         return CSL_ERROR_FILE_OPERATION;
 
     size_t l=data.Length();
-    size_t w=file.Write(U2A(data), l);
+    size_t w=file.Write(U2C(data), l);
     file.Close();
 
     return l!=w ? CSL_ERROR_FILE_OPERATION:CSL_ERROR_NONE;

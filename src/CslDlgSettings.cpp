@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -21,18 +21,10 @@
 #include "Csl.h"
 #include "CslEngine.h"
 #include "CslApp.h"
-#include "CslTTS.h"
 #include "CslArt.h"
+#include "CslTTS.h"
+#include "CslPanelGameSettings.h"
 #include "CslDlgSettings.h"
-#include "CslWizardGameSettings.h"
-#include "img/csl_wizard_png.h"
-
-
-BEGIN_EVENT_TABLE(CslGamePage,wxPanel)
-    EVT_FILEPICKER_CHANGED(wxID_ANY,CslGamePage::OnPicker)
-    EVT_DIRPICKER_CHANGED(wxID_ANY,CslGamePage::OnPicker)
-    EVT_BUTTON(wxID_ANY,CslGamePage::OnCommandEvent)
-END_EVENT_TABLE()
 
 
 BEGIN_EVENT_TABLE(CslDlgSettings,wxDialog)
@@ -46,14 +38,18 @@ END_EVENT_TABLE()
 
 enum
 {
-    BUTTON_WIZARD = wxID_HIGHEST + 1,
-
-    BUTTON_COLOUR_EMPTY,
-    BUTTON_COLOUR_OFF,
-    BUTTON_COLOUR_FULL,
-    BUTTON_COLOUR_MM1,
-    BUTTON_COLOUR_MM2,
-    BUTTON_COLOUR_MM3,
+    /* server lists */
+    BUTTON_COLOUR_SERVER_EMPTY = wxID_HIGHEST + 1,
+    BUTTON_COLOUR_SERVER_OFFLINE,
+    BUTTON_COLOUR_SERVER_FULL,
+    BUTTON_COLOUR_SERVER_MM1,
+    BUTTON_COLOUR_SERVER_MM2,
+    BUTTON_COLOUR_SERVER_MM3,
+    /* player lists */
+    BUTTON_COLOUR_PLAYER_MASTER,
+    BUTTON_COLOUR_PLAYER_AUTH,
+    BUTTON_COLOUR_PLAYER_ADMIN,
+    BUTTON_COLOUR_PLAYER_SPECTATOR,
 
     SPIN_CLEANUP_SERVERS,
 
@@ -67,168 +63,8 @@ enum
     CHECK_TTS,
     BUTTON_TEST_TTS,
 
-    CHECK_GAME_OUTPUT,
-
-    FILE_PICKER,
-    DIR_PICKER_GAME,
-    DIR_PICKER_CFG,
-
-    WIZARD_START
+    CHECK_GAME_OUTPUT
 };
-
-
-CslGamePage::CslGamePage(wxWindow *parent,CslGame *game) :
-        wxPanel(parent,wxID_ANY),m_game(game)
-{
-    wxString s;
-
-    wxInt32 dpickBorder;
-    m_settings=game->GetClientSettings();
-
-#ifdef __WXMAC__
-    dpickBorder=-1;
-#else
-    dpickBorder=4;
-#endif
-
-    wxFlexGridSizer *sizer_config=new wxFlexGridSizer(6,2,0,0);
-
-    sizer_config->Add(new wxStaticText(this, wxID_ANY, _("Game executable:")),
-                      0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
-
-    s=wxString::Format(_("Select %s executable"),game->GetName().c_str());
-    filepicker=new wxFilePickerCtrl(this, FILE_PICKER,
-                                    m_settings.Binary.IsEmpty() ? ::wxGetHomeDir() : m_settings.Binary,
-                                    s, CSL_EXE_EXTENSIONS, wxDefaultPosition, wxDefaultSize,
-                                    wxFLP_DEFAULT_STYLE|wxFLP_USE_TEXTCTRL|wxFLP_FILE_MUST_EXIST);
-    sizer_config->Add(filepicker,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,dpickBorder);
-    filepicker->SetPath(m_settings.Binary.IsEmpty() ? ::wxGetHomeDir() : m_settings.Binary);
-
-    sizer_config->Add(new wxStaticText(this, wxID_ANY, _("Game directory:")),
-                      0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
-
-    s=wxString::Format(_("Select %s game path"),game->GetName().c_str());
-    dirpickergame=new wxDirPickerCtrl(this, DIR_PICKER_GAME,
-                                      m_settings.GamePath.IsEmpty() ? ::wxGetHomeDir() : m_settings.GamePath,
-                                      s,wxDefaultPosition,wxDefaultSize,
-                                      wxDIRP_DEFAULT_STYLE|wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST);
-    sizer_config->Add(dirpickergame,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,dpickBorder);
-
-    sizer_config->Add(new wxStaticText(this, wxID_ANY, _("Config directory:")),
-                      0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
-
-    s=wxString::Format(_("Select %s config path"),game->GetName().c_str());
-    dirpickercfg=new wxDirPickerCtrl(this, DIR_PICKER_CFG,
-                                     m_settings.ConfigPath.IsEmpty() ? ::wxGetHomeDir() : m_settings.ConfigPath,
-                                     s,wxDefaultPosition,wxDefaultSize,
-                                     wxDIRP_DEFAULT_STYLE|wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST);
-    sizer_config->Add(dirpickercfg,0,wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL,dpickBorder);
-
-    sizer_config->Add(new wxStaticText(this, wxID_ANY, _("Game parameters:")),
-                      0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
-
-    text_ctrl_options=new wxTextCtrl(this,wxID_ANY,wxEmptyString);
-    sizer_config->Add(text_ctrl_options,0,wxALL|wxEXPAND,4);
-    text_ctrl_options->SetValue(m_settings.Options);
-
-    sizer_config->Add(new wxStaticText(this, wxID_ANY, _("Pre connect script:")),
-                      0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
-
-    text_ctrl_pre_script=new wxTextCtrl(this,wxID_ANY,wxEmptyString);
-    sizer_config->Add(text_ctrl_pre_script,0,wxALL|wxEXPAND,4);
-    text_ctrl_pre_script->SetValue(m_settings.PreScript);
-
-    sizer_config->Add(new wxStaticText(this, wxID_ANY, _("Post connect script:")),
-                      0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
-
-    text_ctrl_post_script=new wxTextCtrl(this,wxID_ANY,wxEmptyString);
-    sizer_config->Add(text_ctrl_post_script,0,wxALL|wxEXPAND,4);
-    text_ctrl_post_script->SetValue(m_settings.PostScript);
-
-    wxFlexGridSizer *sizer=new wxFlexGridSizer(2,1,0,0);
-    sizer->Add(sizer_config,0,wxALL|wxEXPAND,0);
-
-    wxButton *button=new wxButton(this,BUTTON_WIZARD,_("Run configuration wizard"));
-    sizer->Add(button,1,wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL,24);
-
-    SetSizer(sizer);
-
-    sizer->AddGrowableCol(0);
-    sizer_config->AddGrowableCol(1);
-
-}
-
-CslGamePage::~CslGamePage()
-{
-    delete filepicker;
-    delete dirpickergame;
-    delete dirpickercfg;
-}
-
-bool CslGamePage::SaveSettings(wxString& error)
-{
-    wxString gamepath=dirpickergame->GetPath();
-    wxString configpath=dirpickercfg->GetPath();
-
-    if (!gamepath.IsEmpty() && !gamepath.EndsWith(wxString(PATHDIV)))
-        gamepath+=PATHDIV;
-    if (!configpath.IsEmpty() && !configpath.EndsWith(wxString(PATHDIV)))
-        configpath+=PATHDIV;
-
-    CslGameClientSettings settings(filepicker->GetPath(),gamepath,configpath,
-                                   text_ctrl_options->GetValue(),
-                                   text_ctrl_pre_script->GetValue(),
-                                   text_ctrl_post_script->GetValue());
-
-    if (!m_game->ValidateClientSettings(settings, error))
-        return false;
-
-    m_game->SetClientSettings(settings);
-
-    return true;
-}
-
-void CslGamePage::OnPicker(wxFileDirPickerEvent& event)
-{
-    switch (event.GetId())
-    {
-        case FILE_PICKER:
-            if (dirpickergame->GetPath().IsEmpty())
-                dirpickergame->SetPath(::wxPathOnly(event.GetPath()));
-            if (dirpickercfg->GetPath().IsEmpty())
-                dirpickercfg->SetPath(::wxPathOnly(event.GetPath()));
-            break;
-        case DIR_PICKER_GAME:
-            if (dirpickergame->GetPath().IsEmpty())
-                dirpickergame->SetPath(event.GetPath());
-            if (dirpickercfg->GetPath().IsEmpty())
-                dirpickercfg->SetPath(event.GetPath());
-            break;
-        case DIR_PICKER_CFG:
-            if (dirpickercfg->GetPath().IsEmpty())
-                dirpickercfg->SetPath(event.GetPath());
-            break;
-    }
-}
-
-void CslGamePage::OnCommandEvent(wxCommandEvent& event)
-{
-    switch (event.GetId())
-    {
-        case BUTTON_WIZARD:
-        {
-            CslGameClientSettings settings=m_settings;
-            wxBitmap bitmap=BitmapFromData(wxBITMAP_TYPE_PNG, csl_wizard_png, sizeof(csl_wizard_png));
-
-            CslWizardGameSettings wizard(this, m_game, &settings, m_game->GetName(), bitmap);
-            if (wizard.Run())
-                m_settings=settings;
-            break;
-        }
-        default:
-            break;
-    }
-}
 
 
 CslDlgSettings::CslDlgSettings(wxWindow* parent,int id,const wxString& title,
@@ -237,98 +73,80 @@ CslDlgSettings::CslDlgSettings(wxWindow* parent,int id,const wxString& title,
 {
     m_settings=CslGetSettings();
 
-        // begin wxGlade: CslDlgSettings::CslDlgSettings
-        notebook_settings = new wxNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0);
-        notebook_pane_other = new wxPanel(notebook_settings, wxID_ANY);
-        notebook_pane_irc = new wxPanel(notebook_settings, wxID_ANY);
-        notebook_pane_colour = new wxPanel(notebook_settings, wxID_ANY);
-        sizer_colours_staticbox = new wxStaticBox(notebook_pane_colour, -1, _("Server lists"));
-        sizer_network_staticbox = new wxStaticBox(notebook_pane_irc, -1, _("Networks"));
-        sizer_1_staticbox = new wxStaticBox(notebook_pane_irc, -1, _("Server"));
-        sizer_2_staticbox = new wxStaticBox(notebook_pane_irc, -1, _("Name"));
-        sizer_3_staticbox = new wxStaticBox(notebook_pane_irc, -1, _("Autojoin channels"));
-        sizer_times_staticbox = new wxStaticBox(notebook_pane_other, -1, _("Times && Intervals"));
-        sizer_systray_staticbox = new wxStaticBox(notebook_pane_other, -1, _("System tray"));
-        sizer_tts_staticbox = new wxStaticBox(notebook_pane_other, -1, _("Text to speech"));
-        sizer_ping_staticbox = new wxStaticBox(notebook_pane_other, -1, _("Ping thresholds"));
-        sizer_output_staticbox = new wxStaticBox(notebook_pane_other, -1, _("Game output"));
-        notebook_pane_games = new wxPanel(notebook_settings, wxID_ANY);
-        notebook_games = new wxListbook(notebook_pane_games, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0);
-        button_colour_empty = new wxBitmapButton(notebook_pane_colour, BUTTON_COLOUR_EMPTY, wxNullBitmap);
-        button_colour_mm1 = new wxBitmapButton(notebook_pane_colour, BUTTON_COLOUR_MM1, wxNullBitmap);
-        button_colour_off = new wxBitmapButton(notebook_pane_colour, BUTTON_COLOUR_OFF, wxNullBitmap);
-        button_colour_mm2 = new wxBitmapButton(notebook_pane_colour, BUTTON_COLOUR_MM2, wxNullBitmap);
-        button_colour_full = new wxBitmapButton(notebook_pane_colour, BUTTON_COLOUR_FULL, wxNullBitmap);
-        button_colour_mm3 = new wxBitmapButton(notebook_pane_colour, BUTTON_COLOUR_MM3, wxNullBitmap);
-        tree_ctrl_network = new wxTreeCtrl(notebook_pane_irc, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_HAS_BUTTONS|wxTR_NO_LINES|wxTR_LINES_AT_ROOT|wxTR_DEFAULT_STYLE|wxSUNKEN_BORDER);
-        label_7 = new wxStaticText(notebook_pane_irc, wxID_ANY, _("Server address:"));
-        text_ctrl_1 = new wxTextCtrl(notebook_pane_irc, wxID_ANY, wxEmptyString);
-        label_8 = new wxStaticText(notebook_pane_irc, wxID_ANY, _("Port:"));
-        spin_ctrl_1 = new wxSpinCtrl(notebook_pane_irc, wxID_ANY, wxT("6667"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 65535);
-        label_9 = new wxStaticText(notebook_pane_irc, wxID_ANY, _("Password:"));
-        text_ctrl_2 = new wxTextCtrl(notebook_pane_irc, wxID_ANY, wxEmptyString);
-        label_10 = new wxStaticText(notebook_pane_irc, wxID_ANY, _("Auto connect:"));
-        checkbox_1 = new wxCheckBox(notebook_pane_irc, wxID_ANY, wxEmptyString);
-        label_11 = new wxStaticText(notebook_pane_irc, wxID_ANY, _("Real name:"));
-        text_ctrl_3 = new wxTextCtrl(notebook_pane_irc, wxID_ANY, wxEmptyString);
-        label_12 = new wxStaticText(notebook_pane_irc, wxID_ANY, _("Ident:"));
-        text_ctrl_4 = new wxTextCtrl(notebook_pane_irc, wxID_ANY, wxEmptyString);
-        const wxString *list_box_1_choices = NULL;
-        list_box_1 = new wxListBox(notebook_pane_irc, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, list_box_1_choices, 0);
-        bitmap_button_1 = new wxBitmapButton(notebook_pane_irc, wxID_ANY, wxNullBitmap);
-        bitmap_button_2 = new wxBitmapButton(notebook_pane_irc, wxID_ANY, wxNullBitmap);
-        const wxString *list_box_2_choices = NULL;
-        list_box_2 = new wxListBox(notebook_pane_irc, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, list_box_2_choices, 0);
-        bitmap_button_3 = new wxBitmapButton(notebook_pane_irc, wxID_ANY, wxNullBitmap);
-        bitmap_button_4 = new wxBitmapButton(notebook_pane_irc, wxID_ANY, wxNullBitmap);
-        spin_ctrl_update = new wxSpinCtrl(notebook_pane_other, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_AUTO_URL, 0, 100);
-        checkbox_play_update = new wxCheckBox(notebook_pane_other, wxID_ANY, _("Don't update when playing"));
-        spin_ctrl_wait = new wxSpinCtrl(notebook_pane_other, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_AUTO_URL, 0, 100);
-        spin_ctrl_min_playtime = new wxSpinCtrl(notebook_pane_other, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_AUTO_URL, 0, 100);
-        spin_ctrl_server_cleanup = new wxSpinCtrl(notebook_pane_other, SPIN_CLEANUP_SERVERS, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_AUTO_URL, 0, 100);
-        checkbox_server_cleanup_favourites = new wxCheckBox(notebook_pane_other, wxID_ANY, _("Keep favourites"));
-        checkbox_server_cleanup_stats = new wxCheckBox(notebook_pane_other, wxID_ANY, _("Keep servers with statistics"));
-        spin_ctrl_tooltip_delay = new wxSpinCtrl(notebook_pane_other, SPIN_TOOLTIP_DELAY, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_AUTO_URL, 0, 100);
-        checkbox_systray = new wxCheckBox(notebook_pane_other, CHECK_SYSTRAY, _("Use system tray icon"));
-        checkbox_systray_close = new wxCheckBox(notebook_pane_other, wxID_ANY, _("Minimise on close button"));
-        checkbox_tts = new wxCheckBox(notebook_pane_other, CHECK_TTS, _("Enable text to speech"));
-        spin_ctrl_tts_volume = new wxSpinCtrl(notebook_pane_other, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_AUTO_URL, 1, 100);
-        button_test_tts = new wxButton(notebook_pane_other, BUTTON_TEST_TTS, _("Test"));
-        spin_ctrl_ping_good = new wxSpinCtrl(notebook_pane_other, SPIN_PING_GOOD, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_AUTO_URL, 0, 100);
-        spin_ctrl_ping_bad = new wxSpinCtrl(notebook_pane_other, SPIN_PING_BAD, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_AUTO_URL, 0, 100);
-        checkbox_game_output = new wxCheckBox(notebook_pane_other, CHECK_GAME_OUTPUT, _("Auto &save game output to:"));
-        dirpicker_game_output = new wxDirPickerCtrl(notebook_pane_other, wxID_ANY, m_settings.GameOutputPath, _("Select game output path"), wxDefaultPosition, wxDefaultSize, wxDIRP_DEFAULT_STYLE|wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST);
-        button_ok = new wxButton(this, wxID_OK, _("&Ok"));
-        button_cancel = new wxButton(this, wxID_CANCEL, _("&Cancel"));
+    // begin wxGlade: CslDlgSettings::CslDlgSettings
+    notebook_settings = new wxNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0);
+    notebook_pane_irc = new wxPanel(notebook_settings, wxID_ANY);
+    notebook_pane_colour = new wxPanel(notebook_settings, wxID_ANY);
+    sizer_colours_server_staticbox = new wxStaticBox(notebook_pane_colour, -1, _("Server"));
+    sizer_colours_player_staticbox = new wxStaticBox(notebook_pane_colour, -1, _("Player"));
+    sizer_times_staticbox = new wxStaticBox(notebook_pane_irc, -1, _("Times && Intervals"));
+    sizer_systray_staticbox = new wxStaticBox(notebook_pane_irc, -1, _("System tray"));
+    sizer_tts_staticbox = new wxStaticBox(notebook_pane_irc, -1, _("Text to speech"));
+    sizer_ping_staticbox = new wxStaticBox(notebook_pane_irc, -1, _("Ping thresholds"));
+    sizer_output_staticbox = new wxStaticBox(notebook_pane_irc, -1, _("Game output"));
+    notebook_pane_games = new wxPanel(notebook_settings, wxID_ANY);
+    notebook_games = new wxListbook(notebook_pane_games, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0);
+    button_colour_server_empty = new wxBitmapButton(notebook_pane_colour, BUTTON_COLOUR_SERVER_EMPTY, wxNullBitmap);
+    button_colour_server_mm1 = new wxBitmapButton(notebook_pane_colour, BUTTON_COLOUR_SERVER_MM1, wxNullBitmap);
+    button_colour_server_offline = new wxBitmapButton(notebook_pane_colour, BUTTON_COLOUR_SERVER_OFFLINE, wxNullBitmap);
+    button_colour_server_mm2 = new wxBitmapButton(notebook_pane_colour, BUTTON_COLOUR_SERVER_MM2, wxNullBitmap);
+    button_colour_server_full = new wxBitmapButton(notebook_pane_colour, BUTTON_COLOUR_SERVER_FULL, wxNullBitmap);
+    button_colour_server_mm3 = new wxBitmapButton(notebook_pane_colour, BUTTON_COLOUR_SERVER_MM3, wxNullBitmap);
+    button_colour_player_master = new wxBitmapButton(notebook_pane_colour, BUTTON_COLOUR_PLAYER_MASTER, wxNullBitmap);
+    button_colour_player_auth = new wxBitmapButton(notebook_pane_colour, BUTTON_COLOUR_PLAYER_AUTH, wxNullBitmap);
+    button_colour_player_admin = new wxBitmapButton(notebook_pane_colour, BUTTON_COLOUR_PLAYER_ADMIN, wxNullBitmap);
+    button_colour_player_spectator = new wxBitmapButton(notebook_pane_colour, BUTTON_COLOUR_PLAYER_SPECTATOR, wxNullBitmap);
+    spin_ctrl_update = new wxSpinCtrl(notebook_pane_irc, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_AUTO_URL, 0, 100);
+    checkbox_play_update = new wxCheckBox(notebook_pane_irc, wxID_ANY, _("Don't update when playing"));
+    spin_ctrl_wait = new wxSpinCtrl(notebook_pane_irc, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_AUTO_URL, 0, 100);
+    spin_ctrl_min_playtime = new wxSpinCtrl(notebook_pane_irc, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_AUTO_URL, 0, 100);
+    spin_ctrl_server_cleanup = new wxSpinCtrl(notebook_pane_irc, SPIN_CLEANUP_SERVERS, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_AUTO_URL, 0, 100);
+    checkbox_server_cleanup_favourites = new wxCheckBox(notebook_pane_irc, wxID_ANY, _("Keep favourites"));
+    checkbox_server_cleanup_stats = new wxCheckBox(notebook_pane_irc, wxID_ANY, _("Keep servers with statistics"));
+    spin_ctrl_tooltip_delay = new wxSpinCtrl(notebook_pane_irc, SPIN_TOOLTIP_DELAY, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_AUTO_URL, 0, 100);
+    checkbox_systray = new wxCheckBox(notebook_pane_irc, CHECK_SYSTRAY, _("Enable to system tray icon"));
+    checkbox_systray_close = new wxCheckBox(notebook_pane_irc, wxID_ANY, _("Minimise on close"));
+    checkbox_tts = new wxCheckBox(notebook_pane_irc, CHECK_TTS, _("Enable text to speech"));
+    spin_ctrl_tts_volume = new wxSpinCtrl(notebook_pane_irc, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_AUTO_URL, 1, 100);
+    button_test_tts = new wxButton(notebook_pane_irc, BUTTON_TEST_TTS, _("Test"));
+    spin_ctrl_ping_good = new wxSpinCtrl(notebook_pane_irc, SPIN_PING_GOOD, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_AUTO_URL, 0, 100);
+    spin_ctrl_ping_bad = new wxSpinCtrl(notebook_pane_irc, SPIN_PING_BAD, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_AUTO_URL, 0, 100);
+    checkbox_game_output = new wxCheckBox(notebook_pane_irc, CHECK_GAME_OUTPUT, _("Auto &save game output to:"));
+    dirpicker_game_output = new wxDirPickerCtrl(notebook_pane_irc, wxID_ANY, m_settings.GameOutputPath, _("Select game output path"), wxDefaultPosition, wxDefaultSize, wxDIRP_DEFAULT_STYLE|wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST);
+    button_ok = new wxButton(this, wxID_OK, _("&Ok"));
+    button_cancel = new wxButton(this, wxID_CANCEL, _("&Cancel"));
 
-        set_properties();
-        do_layout();
-        // end wxGlade
+    set_properties();
+    do_layout();
+    // end wxGlade
 }
 
 void CslDlgSettings::set_properties()
 {
-        // begin wxGlade: CslDlgSettings::set_properties
-        SetTitle(_("Cube Server Lister - Settings"));
-        button_colour_empty->SetSize(button_colour_empty->GetBestSize());
-        button_colour_mm1->SetSize(button_colour_mm1->GetBestSize());
-        button_colour_off->SetSize(button_colour_off->GetBestSize());
-        button_colour_mm2->SetSize(button_colour_mm2->GetBestSize());
-        button_colour_full->SetSize(button_colour_full->GetBestSize());
-        button_colour_mm3->SetSize(button_colour_mm3->GetBestSize());
-        tree_ctrl_network->SetMinSize(wxSize(180, -1));
-        bitmap_button_1->SetSize(bitmap_button_1->GetBestSize());
-        bitmap_button_2->SetSize(bitmap_button_2->GetBestSize());
-        bitmap_button_3->SetSize(bitmap_button_3->GetBestSize());
-        bitmap_button_4->SetSize(bitmap_button_4->GetBestSize());
-        spin_ctrl_update->SetMinSize(wxSize(64, -1));
-        spin_ctrl_wait->SetMinSize(wxSize(64, -1));
-        spin_ctrl_min_playtime->SetMinSize(wxSize(64, -1));
-        spin_ctrl_server_cleanup->SetMinSize(wxSize(64, -1));
-        checkbox_server_cleanup_favourites->SetValue(1);
-        checkbox_server_cleanup_stats->SetValue(1);
-        dirpicker_game_output->Enable(false);
-        // end wxGlade
+    // begin wxGlade: CslDlgSettings::set_properties
+    SetTitle(_("Cube Server Lister - Settings"));
+    button_colour_server_empty->SetSize(button_colour_server_empty->GetBestSize());
+    button_colour_server_mm1->SetSize(button_colour_server_mm1->GetBestSize());
+    button_colour_server_offline->SetSize(button_colour_server_offline->GetBestSize());
+    button_colour_server_mm2->SetSize(button_colour_server_mm2->GetBestSize());
+    button_colour_server_full->SetSize(button_colour_server_full->GetBestSize());
+    button_colour_server_mm3->SetSize(button_colour_server_mm3->GetBestSize());
+    button_colour_player_master->SetSize(button_colour_player_master->GetBestSize());
+    button_colour_player_auth->SetSize(button_colour_player_auth->GetBestSize());
+    button_colour_player_admin->SetSize(button_colour_player_admin->GetBestSize());
+    button_colour_player_spectator->SetSize(button_colour_player_spectator->GetBestSize());
+    spin_ctrl_update->SetMinSize(wxSize(64, -1));
+    spin_ctrl_wait->SetMinSize(wxSize(64, -1));
+    spin_ctrl_min_playtime->SetMinSize(wxSize(64, -1));
+    spin_ctrl_server_cleanup->SetMinSize(wxSize(64, -1));
+    checkbox_server_cleanup_favourites->SetValue(1);
+    checkbox_server_cleanup_stats->SetValue(1);
+    spin_ctrl_tooltip_delay->SetMinSize(wxSize(64, -1));
+    spin_ctrl_tts_volume->SetMinSize(wxSize(61, -1));
+    spin_ctrl_ping_good->SetMinSize(wxSize(64, -1));
+    spin_ctrl_ping_bad->SetMinSize(wxSize(64, -1));
+    dirpicker_game_output->Enable(false);
+    // end wxGlade
 
     checkbox_play_update->SetValue(m_settings.DontUpdatePlaying);
     spin_ctrl_update->SetRange(CSL_UPDATE_INTERVAL_MIN/1000,CSL_UPDATE_INTERVAL_MAX/1000);
@@ -350,12 +168,18 @@ void CslDlgSettings::set_properties()
     spin_ctrl_ping_bad->SetRange(0,9999);
     spin_ctrl_ping_bad->SetValue(m_settings.PingBad);
 
-    SetButtonColour(button_colour_empty, button_ok, m_settings.ColServerEmpty);
-    SetButtonColour(button_colour_off, button_ok, m_settings.ColServerOff);
-    SetButtonColour(button_colour_full, button_ok, m_settings.ColServerFull);
-    SetButtonColour(button_colour_mm1, button_ok, m_settings.ColServerMM1);
-    SetButtonColour(button_colour_mm2, button_ok, m_settings.ColServerMM2);
-    SetButtonColour(button_colour_mm3, button_ok, m_settings.ColServerMM3);
+    /* server lists */
+    SetButtonColour(button_colour_server_empty, button_ok, m_settings.ColServerEmpty);
+    SetButtonColour(button_colour_server_offline, button_ok, m_settings.ColServerOff);
+    SetButtonColour(button_colour_server_full, button_ok, m_settings.ColServerFull);
+    SetButtonColour(button_colour_server_mm1, button_ok, m_settings.ColServerMM1);
+    SetButtonColour(button_colour_server_mm2, button_ok, m_settings.ColServerMM2);
+    SetButtonColour(button_colour_server_mm3, button_ok, m_settings.ColServerMM3);
+    /* player lists */
+    SetButtonColour(button_colour_player_master, button_ok, m_settings.ColPlayerMaster);
+    SetButtonColour(button_colour_player_auth, button_ok, m_settings.ColPlayerAuth);
+    SetButtonColour(button_colour_player_admin, button_ok, m_settings.ColPlayerAdmin);
+    SetButtonColour(button_colour_player_spectator, button_ok, m_settings.ColPlayerSpectator);
 
 #ifndef __WXMAC__
     if (CSL_FLAG_CHECK(CslGetSettings().Systray, CSL_USE_SYSTRAY))
@@ -380,21 +204,27 @@ void CslDlgSettings::set_properties()
     checkbox_game_output->SetValue(m_settings.AutoSaveOutput);
     dirpicker_game_output->SetPath(m_settings.GameOutputPath);
     dirpicker_game_output->Enable(m_settings.AutoSaveOutput);
-}
 
+    CSL_SET_WINDOW_ICON();
+}
 
 void CslDlgSettings::do_layout()
 {
     wxImageList *imgList=new wxImageList(24,24,true);
     notebook_games->AssignImageList(imgList);
 
-    CslGames& games=::wxGetApp().GetCslEngine()->GetGames();
+    CslArrayCslGame& games=::wxGetApp().GetCslEngine()->GetGames();
     loopv(games)
     {
         CslGame *game=games[i];
-        notebook_games->AddPage(new CslGamePage(notebook_games,game),game->GetName());
 
-        const wxBitmap& bmp=game->GetIcon(24);
+        notebook_games->AddPage(new CslPanelGameSettings(notebook_games, game), game->GetName());
+
+        const CslGameIcon *icon=game->GetIcon(24);
+
+        wxBitmap bmp = icon ?
+            BitmapFromData(Csl2wxBitmapType(icon->Type), icon->Data, icon->DataSize) :
+            wxNullBitmap;
 
         if (bmp.IsOk())
         {
@@ -405,196 +235,140 @@ void CslDlgSettings::do_layout()
             imgList->Add(wxBitmap(24,24));
     }
 
-        // begin wxGlade: CslDlgSettings::do_layout
-        wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(2, 1, 0, 0);
-        wxFlexGridSizer* grid_sizer_button = new wxFlexGridSizer(1, 3, 0, 0);
-        wxFlexGridSizer* grid_sizer_pane_other = new wxFlexGridSizer(3, 1, 0, 0);
-        wxBoxSizer* sizer_ping_output = new wxBoxSizer(wxHORIZONTAL);
-        wxStaticBoxSizer* sizer_output = new wxStaticBoxSizer(sizer_output_staticbox, wxHORIZONTAL);
-        wxFlexGridSizer* grid_sizer_output = new wxFlexGridSizer(1, 2, 0, 0);
-        wxStaticBoxSizer* sizer_ping = new wxStaticBoxSizer(sizer_ping_staticbox, wxHORIZONTAL);
-        wxFlexGridSizer* grid_sizer_ping = new wxFlexGridSizer(1, 5, 0, 0);
-        wxBoxSizer* sizer_tray_tts = new wxBoxSizer(wxHORIZONTAL);
-        wxStaticBoxSizer* sizer_tts = new wxStaticBoxSizer(sizer_tts_staticbox, wxHORIZONTAL);
-        wxFlexGridSizer* grid_sizer_tts = new wxFlexGridSizer(1, 5, 0, 0);
-        wxStaticBoxSizer* sizer_systray = new wxStaticBoxSizer(sizer_systray_staticbox, wxHORIZONTAL);
-        wxFlexGridSizer* grid_sizer_systray = new wxFlexGridSizer(1, 3, 0, 0);
-        wxStaticBoxSizer* sizer_times = new wxStaticBoxSizer(sizer_times_staticbox, wxHORIZONTAL);
-        wxFlexGridSizer* grid_sizer_times = new wxFlexGridSizer(5, 3, 0, 0);
-        wxFlexGridSizer* grid_sizer_server_cleanup = new wxFlexGridSizer(1, 2, 0, 0);
-        wxFlexGridSizer* grid_sizer_pane_irc = new wxFlexGridSizer(1, 2, 0, 0);
-        wxFlexGridSizer* grid_sizer_1 = new wxFlexGridSizer(3, 1, 0, 0);
-        wxStaticBoxSizer* sizer_3 = new wxStaticBoxSizer(sizer_3_staticbox, wxHORIZONTAL);
-        wxFlexGridSizer* grid_sizer_6 = new wxFlexGridSizer(1, 2, 0, 0);
-        wxFlexGridSizer* sizer_5 = new wxFlexGridSizer(2, 1, 0, 0);
-        wxStaticBoxSizer* sizer_2 = new wxStaticBoxSizer(sizer_2_staticbox, wxHORIZONTAL);
-        wxFlexGridSizer* grid_sizer_3 = new wxFlexGridSizer(2, 1, 0, 0);
-        wxFlexGridSizer* grid_sizer_5 = new wxFlexGridSizer(1, 2, 0, 0);
-        wxFlexGridSizer* sizer_4 = new wxFlexGridSizer(2, 1, 0, 0);
-        wxFlexGridSizer* grid_sizer_4 = new wxFlexGridSizer(1, 4, 0, 0);
-        wxStaticBoxSizer* sizer_1 = new wxStaticBoxSizer(sizer_1_staticbox, wxHORIZONTAL);
-        wxFlexGridSizer* grid_sizer_2 = new wxFlexGridSizer(2, 4, 0, 0);
-        wxStaticBoxSizer* sizer_network = new wxStaticBoxSizer(sizer_network_staticbox, wxHORIZONTAL);
-        wxFlexGridSizer* grid_sizer_pane_colours = new wxFlexGridSizer(1, 1, 0, 0);
-        wxStaticBoxSizer* sizer_colours = new wxStaticBoxSizer(sizer_colours_staticbox, wxHORIZONTAL);
-        wxFlexGridSizer* grid_sizer_colours = new wxFlexGridSizer(3, 5, 0, 0);
-        wxBoxSizer* sizer_games = new wxBoxSizer(wxVERTICAL);
-        sizer_games->Add(notebook_games, 1, wxALL|wxEXPAND|wxFIXED_MINSIZE, 4);
-        notebook_pane_games->SetSizer(sizer_games);
-        wxStaticText* label_colour_empty = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Server empty"));
-        grid_sizer_colours->Add(label_colour_empty, 0, wxALL|wxALIGN_CENTER_VERTICAL, 6);
-        grid_sizer_colours->Add(button_colour_empty, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_colours->Add(1, 1, 0, 0, 0);
-        wxStaticText* label_colour_open = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Server veto mode"));
-        grid_sizer_colours->Add(label_colour_open, 0, wxALL|wxALIGN_CENTER_VERTICAL, 6);
-        grid_sizer_colours->Add(button_colour_mm1, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
-        wxStaticText* label_colour_offline = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Server offline"));
-        grid_sizer_colours->Add(label_colour_offline, 0, wxALL|wxALIGN_CENTER_VERTICAL, 6);
-        grid_sizer_colours->Add(button_colour_off, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_colours->Add(1, 1, 0, 0, 0);
-        wxStaticText* label_colour_limited = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Server game locked"));
-        grid_sizer_colours->Add(label_colour_limited, 0, wxALL|wxALIGN_CENTER_VERTICAL, 6);
-        grid_sizer_colours->Add(button_colour_mm2, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
-        wxStaticText* label_colour_full = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Server full"));
-        grid_sizer_colours->Add(label_colour_full, 0, wxALL|wxALIGN_CENTER_VERTICAL, 6);
-        grid_sizer_colours->Add(button_colour_full, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_colours->Add(1, 1, 0, 0, 0);
-        wxStaticText* label_colour_restricted = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Server restricted (password, banned, private)"));
-        grid_sizer_colours->Add(label_colour_restricted, 0, wxALL|wxALIGN_CENTER_VERTICAL, 6);
-        grid_sizer_colours->Add(button_colour_mm3, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_colours->AddGrowableCol(2);
-        sizer_colours->Add(grid_sizer_colours, 1, wxEXPAND, 0);
-        grid_sizer_pane_colours->Add(sizer_colours, 1, wxALL|wxEXPAND, 4);
-        notebook_pane_colour->SetSizer(grid_sizer_pane_colours);
-        grid_sizer_pane_colours->AddGrowableCol(0);
-        grid_sizer_pane_colours->AddGrowableCol(1);
-        sizer_network->Add(tree_ctrl_network, 1, wxEXPAND, 0);
-        grid_sizer_pane_irc->Add(sizer_network, 1, wxALL|wxEXPAND, 4);
-        grid_sizer_2->Add(label_7, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_2->Add(text_ctrl_1, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_2->Add(label_8, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_2->Add(spin_ctrl_1, 0, wxALL, 4);
-        grid_sizer_2->Add(label_9, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_2->Add(text_ctrl_2, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_2->Add(label_10, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_2->Add(checkbox_1, 0, wxALL, 4);
-        grid_sizer_2->AddGrowableCol(1);
-        sizer_1->Add(grid_sizer_2, 1, wxEXPAND, 0);
-        grid_sizer_1->Add(sizer_1, 1, wxRIGHT|wxTOP|wxBOTTOM|wxEXPAND, 4);
-        grid_sizer_4->Add(label_11, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_4->Add(text_ctrl_3, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_4->Add(label_12, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_4->Add(text_ctrl_4, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_4->AddGrowableCol(1);
-        grid_sizer_4->AddGrowableCol(3);
-        grid_sizer_3->Add(grid_sizer_4, 1, wxEXPAND, 0);
-        grid_sizer_5->Add(list_box_1, 0, wxALL|wxEXPAND, 4);
-        sizer_4->Add(bitmap_button_1, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-        sizer_4->Add(bitmap_button_2, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-        sizer_4->AddGrowableRow(0);
-        sizer_4->AddGrowableRow(1);
-        grid_sizer_5->Add(sizer_4, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 0);
-        grid_sizer_5->AddGrowableRow(0);
-        grid_sizer_5->AddGrowableCol(0);
-        grid_sizer_3->Add(grid_sizer_5, 1, wxEXPAND, 0);
-        grid_sizer_3->AddGrowableRow(1);
-        grid_sizer_3->AddGrowableCol(0);
-        sizer_2->Add(grid_sizer_3, 1, wxEXPAND, 0);
-        grid_sizer_1->Add(sizer_2, 1, wxRIGHT|wxTOP|wxBOTTOM|wxEXPAND, 4);
-        grid_sizer_6->Add(list_box_2, 0, wxALL|wxEXPAND, 4);
-        sizer_5->Add(bitmap_button_3, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-        sizer_5->Add(bitmap_button_4, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-        sizer_5->AddGrowableRow(0);
-        sizer_5->AddGrowableRow(1);
-        grid_sizer_6->Add(sizer_5, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 0);
-        grid_sizer_6->AddGrowableRow(0);
-        grid_sizer_6->AddGrowableCol(0);
-        sizer_3->Add(grid_sizer_6, 1, wxEXPAND, 0);
-        grid_sizer_1->Add(sizer_3, 1, wxRIGHT|wxTOP|wxBOTTOM|wxEXPAND, 4);
-        grid_sizer_1->AddGrowableRow(1);
-        grid_sizer_1->AddGrowableRow(2);
-        grid_sizer_1->AddGrowableCol(0);
-        grid_sizer_pane_irc->Add(grid_sizer_1, 1, wxEXPAND, 0);
-        notebook_pane_irc->SetSizer(grid_sizer_pane_irc);
-        grid_sizer_pane_irc->AddGrowableRow(0);
-        grid_sizer_pane_irc->AddGrowableCol(1);
-        wxStaticText* label_update_static = new wxStaticText(notebook_pane_other, wxID_ANY, _("Update interval (seconds):"));
-        grid_sizer_times->Add(label_update_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_times->Add(spin_ctrl_update, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_times->Add(checkbox_play_update, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-        wxStaticText* label_wait_static = new wxStaticText(notebook_pane_other, wxID_ANY, _("Wait on full server (seconds):"));
-        grid_sizer_times->Add(label_wait_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_times->Add(spin_ctrl_wait, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_times->Add(1, 1, 0, 0, 0);
-        wxStaticText* label_min_playtime_static = new wxStaticText(notebook_pane_other, wxID_ANY, _("Minimum playtime for statistics (seconds):"));
-        grid_sizer_times->Add(label_min_playtime_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_times->Add(spin_ctrl_min_playtime, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_times->Add(1, 1, 0, 0, 0);
-        wxStaticText* label_server_cleanup = new wxStaticText(notebook_pane_other, wxID_ANY, _("Cleanup dead servers (days)"));
-        grid_sizer_times->Add(label_server_cleanup, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_times->Add(spin_ctrl_server_cleanup, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_server_cleanup->Add(checkbox_server_cleanup_favourites, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_server_cleanup->Add(checkbox_server_cleanup_stats, 0, wxALL, 4);
-        grid_sizer_times->Add(grid_sizer_server_cleanup, 1, wxALIGN_CENTER_VERTICAL, 0);
-        wxStaticText* label_tooltip_delay = new wxStaticText(notebook_pane_other, wxID_ANY, _("Tooltip delay (milliseconds)"));
-        grid_sizer_times->Add(label_tooltip_delay, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_times->Add(spin_ctrl_tooltip_delay, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
-        wxStaticText* label_tooltip_delay_help = new wxStaticText(notebook_pane_other, wxID_ANY, _("To disable tooltips, set this value to 0."));
-        grid_sizer_times->Add(label_tooltip_delay_help, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_times->AddGrowableCol(1);
-        sizer_times->Add(grid_sizer_times, 1, wxEXPAND, 0);
-        grid_sizer_pane_other->Add(sizer_times, 1, wxALL|wxEXPAND, 4);
-        grid_sizer_systray->Add(checkbox_systray, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_systray->Add(checkbox_systray_close, 0, wxALL|wxALIGN_RIGHT, 4);
-        grid_sizer_systray->AddGrowableCol(0);
-        grid_sizer_systray->AddGrowableCol(1);
-        grid_sizer_systray->AddGrowableCol(2);
-        sizer_systray->Add(grid_sizer_systray, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 0);
-        sizer_tray_tts->Add(sizer_systray, 1, wxALL|wxEXPAND, 4);
-        grid_sizer_tts->Add(checkbox_tts, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-        wxStaticText* label_tts_volume = new wxStaticText(notebook_pane_other, wxID_ANY, _("Volume"));
-        grid_sizer_tts->Add(label_tts_volume, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_tts->Add(spin_ctrl_tts_volume, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_tts->Add(button_test_tts, 0, wxALL, 4);
-        grid_sizer_tts->Add(1, 1, 0, 0, 0);
-        grid_sizer_tts->AddGrowableCol(4);
-        sizer_tts->Add(grid_sizer_tts, 1, wxEXPAND, 0);
-        sizer_tray_tts->Add(sizer_tts, 1, wxALL|wxEXPAND, 4);
-        grid_sizer_pane_other->Add(sizer_tray_tts, 1, wxEXPAND, 0);
-        wxStaticText* label_ping_good = new wxStaticText(notebook_pane_other, wxID_ANY, _("Good"));
-        grid_sizer_ping->Add(label_ping_good, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_ping->Add(spin_ctrl_ping_good, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_ping->Add(1, 1, 0, 0, 0);
-        wxStaticText* label_ping_bad = new wxStaticText(notebook_pane_other, wxID_ANY, _("Bad"));
-        grid_sizer_ping->Add(label_ping_bad, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_ping->Add(spin_ctrl_ping_bad, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-        grid_sizer_ping->AddGrowableCol(2);
-        sizer_ping->Add(grid_sizer_ping, 1, wxEXPAND, 0);
-        sizer_ping_output->Add(sizer_ping, 1, wxALL|wxEXPAND, 4);
-        grid_sizer_output->Add(checkbox_game_output, 0, wxALL, 4);
-        grid_sizer_output->Add(dirpicker_game_output, 1, wxEXPAND, 0);
-        grid_sizer_output->AddGrowableCol(1);
-        sizer_output->Add(grid_sizer_output, 1, wxEXPAND, 0);
-        sizer_ping_output->Add(sizer_output, 1, wxALL|wxEXPAND, 4);
-        grid_sizer_pane_other->Add(sizer_ping_output, 1, wxEXPAND, 0);
-        notebook_pane_other->SetSizer(grid_sizer_pane_other);
-        grid_sizer_pane_other->AddGrowableCol(0);
-        notebook_settings->AddPage(notebook_pane_games, _("Games"));
-        notebook_settings->AddPage(notebook_pane_colour, _("Colours"));
-        notebook_settings->AddPage(notebook_pane_irc, _("IRC"));
-        notebook_settings->AddPage(notebook_pane_other, _("Other"));
-        grid_sizer_main->Add(notebook_settings, 1, wxALL|wxEXPAND, 4);
-        grid_sizer_button->Add(20, 1, 0, 0, 0);
-        grid_sizer_button->Add(button_ok, 0, wxALL, 4);
-        grid_sizer_button->Add(button_cancel, 0, wxALL, 4);
-        grid_sizer_button->AddGrowableCol(0);
-        grid_sizer_main->Add(grid_sizer_button, 1, wxEXPAND, 0);
-        SetSizer(grid_sizer_main);
-        grid_sizer_main->Fit(this);
-        grid_sizer_main->AddGrowableRow(0);
-        grid_sizer_main->AddGrowableCol(0);
-        Layout();
-        // end wxGlade
+    // begin wxGlade: CslDlgSettings::do_layout
+    wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* grid_sizer_button = new wxFlexGridSizer(1, 3, 0, 0);
+    wxFlexGridSizer* grid_sizer_pane_other = new wxFlexGridSizer(5, 1, 0, 0);
+    wxStaticBoxSizer* sizer_output = new wxStaticBoxSizer(sizer_output_staticbox, wxHORIZONTAL);
+    wxFlexGridSizer* grid_sizer_output = new wxFlexGridSizer(1, 2, 0, 0);
+    wxStaticBoxSizer* sizer_ping = new wxStaticBoxSizer(sizer_ping_staticbox, wxHORIZONTAL);
+    wxFlexGridSizer* grid_sizer_ping = new wxFlexGridSizer(1, 4, 0, 0);
+    wxStaticBoxSizer* sizer_tts = new wxStaticBoxSizer(sizer_tts_staticbox, wxHORIZONTAL);
+    wxFlexGridSizer* grid_sizer_tts = new wxFlexGridSizer(1, 4, 0, 0);
+    wxStaticBoxSizer* sizer_systray = new wxStaticBoxSizer(sizer_systray_staticbox, wxHORIZONTAL);
+    wxFlexGridSizer* grid_sizer_systray = new wxFlexGridSizer(1, 2, 0, 0);
+    wxStaticBoxSizer* sizer_times = new wxStaticBoxSizer(sizer_times_staticbox, wxHORIZONTAL);
+    wxFlexGridSizer* grid_sizer_times = new wxFlexGridSizer(5, 3, 0, 0);
+    wxFlexGridSizer* grid_sizer_server_cleanup = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* grid_sizer_pane_colours = new wxFlexGridSizer(2, 1, 0, 0);
+    wxStaticBoxSizer* sizer_colours_player = new wxStaticBoxSizer(sizer_colours_player_staticbox, wxVERTICAL);
+    wxFlexGridSizer* grid_sizer_colours_player = new wxFlexGridSizer(2, 5, 0, 0);
+    wxStaticBoxSizer* sizer_colours_server = new wxStaticBoxSizer(sizer_colours_server_staticbox, wxVERTICAL);
+    wxFlexGridSizer* grid_sizer_colours_server = new wxFlexGridSizer(3, 5, 0, 0);
+    wxBoxSizer* sizer_games = new wxBoxSizer(wxVERTICAL);
+    sizer_games->Add(notebook_games, 1, wxALL|wxEXPAND|wxFIXED_MINSIZE, 4);
+    notebook_pane_games->SetSizer(sizer_games);
+    wxStaticText* label_colour_server_empty = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Empty"));
+    grid_sizer_colours_server->Add(label_colour_server_empty, 0, wxALL|wxALIGN_CENTER_VERTICAL, 6);
+    grid_sizer_colours_server->Add(button_colour_server_empty, 0, wxALL|wxEXPAND|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_colours_server->Add(1, 1, 0, 0, 0);
+    wxStaticText* label_colour_server_mm1 = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Master control"));
+    grid_sizer_colours_server->Add(label_colour_server_mm1, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 6);
+    grid_sizer_colours_server->Add(button_colour_server_mm1, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    wxStaticText* label_colour_server_offline = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Offline"));
+    grid_sizer_colours_server->Add(label_colour_server_offline, 0, wxALL|wxALIGN_CENTER_VERTICAL, 6);
+    grid_sizer_colours_server->Add(button_colour_server_offline, 0, wxALL|wxEXPAND|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_colours_server->Add(1, 1, 0, 0, 0);
+    wxStaticText* label_colour_server_mm2 = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Locked"));
+    grid_sizer_colours_server->Add(label_colour_server_mm2, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 6);
+    grid_sizer_colours_server->Add(button_colour_server_mm2, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    wxStaticText* label_colour_server_full = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Full"));
+    grid_sizer_colours_server->Add(label_colour_server_full, 0, wxALL|wxALIGN_CENTER_VERTICAL, 6);
+    grid_sizer_colours_server->Add(button_colour_server_full, 0, wxALL|wxEXPAND|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_colours_server->Add(1, 1, 0, 0, 0);
+    wxStaticText* label_colour_server_mm3 = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Restricted (password, banned, private)"));
+    grid_sizer_colours_server->Add(label_colour_server_mm3, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 6);
+    grid_sizer_colours_server->Add(button_colour_server_mm3, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_colours_server->AddGrowableCol(2);
+    sizer_colours_server->Add(grid_sizer_colours_server, 1, wxEXPAND, 0);
+    grid_sizer_pane_colours->Add(sizer_colours_server, 1, wxALL|wxEXPAND, 4);
+    wxStaticText* label_colour_player_master = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Master"));
+    grid_sizer_colours_player->Add(label_colour_player_master, 0, wxALL|wxALIGN_CENTER_VERTICAL, 6);
+    grid_sizer_colours_player->Add(button_colour_player_master, 0, wxALL|wxEXPAND|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_colours_player->Add(1, 1, 0, 0, 0);
+    wxStaticText* label_colour_player_auth = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Auth master"));
+    grid_sizer_colours_player->Add(label_colour_player_auth, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 6);
+    grid_sizer_colours_player->Add(button_colour_player_auth, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    wxStaticText* label_colour_player_admin = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Admin"));
+    grid_sizer_colours_player->Add(label_colour_player_admin, 0, wxALL|wxALIGN_CENTER_VERTICAL, 6);
+    grid_sizer_colours_player->Add(button_colour_player_admin, 0, wxALL|wxEXPAND|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_colours_player->Add(1, 1, 0, 0, 0);
+    wxStaticText* label_colour_player_spectator = new wxStaticText(notebook_pane_colour, wxID_ANY, _("Spectator (background)"));
+    grid_sizer_colours_player->Add(label_colour_player_spectator, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 6);
+    grid_sizer_colours_player->Add(button_colour_player_spectator, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_colours_player->AddGrowableCol(2);
+    sizer_colours_player->Add(grid_sizer_colours_player, 1, wxEXPAND, 0);
+    grid_sizer_pane_colours->Add(sizer_colours_player, 1, wxALL|wxEXPAND, 4);
+    notebook_pane_colour->SetSizer(grid_sizer_pane_colours);
+    grid_sizer_pane_colours->AddGrowableCol(0);
+    grid_sizer_pane_colours->AddGrowableCol(1);
+    wxStaticText* label_update_static = new wxStaticText(notebook_pane_irc, wxID_ANY, _("Update interval (seconds):"));
+    grid_sizer_times->Add(label_update_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_times->Add(spin_ctrl_update, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_times->Add(checkbox_play_update, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    wxStaticText* label_wait_static = new wxStaticText(notebook_pane_irc, wxID_ANY, _("Wait on full server (seconds):"));
+    grid_sizer_times->Add(label_wait_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_times->Add(spin_ctrl_wait, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_times->Add(1, 1, 0, 0, 0);
+    wxStaticText* label_min_playtime_static = new wxStaticText(notebook_pane_irc, wxID_ANY, _("Minimum playtime for statistics (seconds):"));
+    grid_sizer_times->Add(label_min_playtime_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_times->Add(spin_ctrl_min_playtime, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_times->Add(1, 1, 0, 0, 0);
+    wxStaticText* label_server_cleanup = new wxStaticText(notebook_pane_irc, wxID_ANY, _("Cleanup dead servers (days)"));
+    grid_sizer_times->Add(label_server_cleanup, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_times->Add(spin_ctrl_server_cleanup, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_server_cleanup->Add(checkbox_server_cleanup_favourites, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_server_cleanup->Add(checkbox_server_cleanup_stats, 0, wxALL, 4);
+    grid_sizer_times->Add(grid_sizer_server_cleanup, 1, wxALIGN_CENTER_VERTICAL, 0);
+    wxStaticText* label_tooltip_delay = new wxStaticText(notebook_pane_irc, wxID_ANY, _("Tooltip delay (milliseconds)"));
+    grid_sizer_times->Add(label_tooltip_delay, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_times->Add(spin_ctrl_tooltip_delay, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    wxStaticText* label_tooltip_delay_help = new wxStaticText(notebook_pane_irc, wxID_ANY, _("To disable tooltips, set this value to 0."));
+    grid_sizer_times->Add(label_tooltip_delay_help, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_times->AddGrowableCol(1);
+    sizer_times->Add(grid_sizer_times, 1, wxEXPAND, 0);
+    grid_sizer_pane_other->Add(sizer_times, 1, wxALL|wxEXPAND, 4);
+    grid_sizer_systray->Add(checkbox_systray, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_systray->Add(checkbox_systray_close, 0, wxALL|wxALIGN_RIGHT, 4);
+    sizer_systray->Add(grid_sizer_systray, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 0);
+    grid_sizer_pane_other->Add(sizer_systray, 1, wxALL|wxEXPAND, 4);
+    grid_sizer_tts->Add(checkbox_tts, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    wxStaticText* label_tts_volume = new wxStaticText(notebook_pane_irc, wxID_ANY, _("Volume"));
+    grid_sizer_tts->Add(label_tts_volume, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_tts->Add(spin_ctrl_tts_volume, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_tts->Add(button_test_tts, 0, wxALL, 4);
+    sizer_tts->Add(grid_sizer_tts, 1, wxEXPAND, 0);
+    grid_sizer_pane_other->Add(sizer_tts, 1, wxALL|wxEXPAND, 4);
+    wxStaticText* label_ping_good = new wxStaticText(notebook_pane_irc, wxID_ANY, _("Good"));
+    grid_sizer_ping->Add(label_ping_good, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_ping->Add(spin_ctrl_ping_good, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    wxStaticText* label_ping_bad = new wxStaticText(notebook_pane_irc, wxID_ANY, _("Bad"));
+    grid_sizer_ping->Add(label_ping_bad, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_ping->Add(spin_ctrl_ping_bad, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    sizer_ping->Add(grid_sizer_ping, 1, wxEXPAND, 0);
+    grid_sizer_pane_other->Add(sizer_ping, 1, wxALL|wxEXPAND, 4);
+    grid_sizer_output->Add(checkbox_game_output, 0, wxALL, 4);
+    grid_sizer_output->Add(dirpicker_game_output, 1, wxEXPAND, 0);
+    grid_sizer_output->AddGrowableCol(1);
+    sizer_output->Add(grid_sizer_output, 1, wxEXPAND, 0);
+    grid_sizer_pane_other->Add(sizer_output, 1, wxALL|wxEXPAND, 4);
+    notebook_pane_irc->SetSizer(grid_sizer_pane_other);
+    grid_sizer_pane_other->AddGrowableCol(0);
+    notebook_settings->AddPage(notebook_pane_games, _("Games"));
+    notebook_settings->AddPage(notebook_pane_colour, _("Gui"));
+    notebook_settings->AddPage(notebook_pane_irc, _("Other"));
+    grid_sizer_main->Add(notebook_settings, 1, wxALL|wxEXPAND, 4);
+    grid_sizer_button->Add(20, 1, 0, 0, 0);
+    grid_sizer_button->Add(button_ok, 0, wxALL, 4);
+    grid_sizer_button->Add(button_cancel, 0, wxALL, 4);
+    grid_sizer_button->AddGrowableCol(0);
+    grid_sizer_main->Add(grid_sizer_button, 1, wxEXPAND, 0);
+    SetSizer(grid_sizer_main);
+    grid_sizer_main->Fit(this);
+    grid_sizer_main->AddGrowableRow(0);
+    grid_sizer_main->AddGrowableCol(0);
+    Layout();
+    // end wxGlade
 
     // hmm ...
 #ifdef __WXMSW__
@@ -669,50 +443,79 @@ void CslDlgSettings::OnPicker(wxFileDirPickerEvent& event)
 
 void CslDlgSettings::OnCommandEvent(wxCommandEvent& event)
 {
-    wxColour colnew,*colour=NULL;
-    wxBitmapButton *colButton=NULL;
+    wxColour *colour = NULL;
+    wxBitmapButton *button_color = NULL;
 
     switch (event.GetId())
     {
-        case BUTTON_COLOUR_EMPTY:
-            colour=&m_settings.ColServerEmpty;
-            colButton=button_colour_empty;
-        case BUTTON_COLOUR_OFF:
+        case BUTTON_COLOUR_SERVER_EMPTY:
+            colour = &m_settings.ColServerEmpty;
+            button_color = button_colour_server_empty;
+        case BUTTON_COLOUR_SERVER_OFFLINE:
             if (!colour)
             {
-                colour=&m_settings.ColServerOff;
-                colButton=button_colour_off;
+                colour = &m_settings.ColServerOff;
+                button_color = button_colour_server_offline;
             }
-        case BUTTON_COLOUR_FULL:
+        case BUTTON_COLOUR_SERVER_FULL:
             if (!colour)
             {
-                colour=&m_settings.ColServerFull;
-                colButton=button_colour_full;
+                colour = &m_settings.ColServerFull;
+                button_color = button_colour_server_full;
             }
-        case BUTTON_COLOUR_MM1:
+        case BUTTON_COLOUR_SERVER_MM1:
             if (!colour)
             {
-                colour=&m_settings.ColServerMM1;
-                colButton=button_colour_mm1;
+                colour = &m_settings.ColServerMM1;
+                button_color = button_colour_server_mm1;
             }
-        case BUTTON_COLOUR_MM2:
+        case BUTTON_COLOUR_SERVER_MM2:
             if (!colour)
             {
-                colour=&m_settings.ColServerMM2;
-                colButton=button_colour_mm2;
+                colour = &m_settings.ColServerMM2;
+                button_color = button_colour_server_mm2;
             }
-        case BUTTON_COLOUR_MM3:
+        case BUTTON_COLOUR_SERVER_MM3:
             if (!colour)
             {
-                colour=&m_settings.ColServerMM3;
-                colButton=button_colour_mm3;
+                colour = &m_settings.ColServerMM3;
+                button_color = button_colour_server_mm3;
             }
-            colnew=wxGetColourFromUser(this,*colour);
-            if (!colnew.Ok())
-                return;
-            *colour=colnew;
-            SetButtonColour(colButton,button_ok,*colour);
+        case BUTTON_COLOUR_PLAYER_MASTER:
+            if (!colour)
+            {
+                colour = &m_settings.ColPlayerMaster;
+                button_color = button_colour_player_master;
+            }
+        case BUTTON_COLOUR_PLAYER_AUTH:
+            if (!colour)
+            {
+                colour = &m_settings.ColPlayerAuth;
+                button_color = button_colour_player_auth;
+            }
+        case BUTTON_COLOUR_PLAYER_ADMIN:
+            if (!colour)
+            {
+                colour = &m_settings.ColPlayerAdmin;
+                button_color = button_colour_player_admin;
+            }
+        case BUTTON_COLOUR_PLAYER_SPECTATOR:
+        {
+            if (!colour)
+            {
+                colour = &m_settings.ColPlayerSpectator;
+                button_color = button_colour_player_spectator;
+            }
+
+            wxColor color_new = wxGetColourFromUser(this, *colour);
+
+            if (!color_new.Ok())
+                break;
+
+            *colour = color_new;
+            SetButtonColour(button_color, button_ok, color_new);
             break;
+        }
 
 #ifndef __WXMAC__
         case CHECK_SYSTRAY:
@@ -726,9 +529,7 @@ void CslDlgSettings::OnCommandEvent(wxCommandEvent& event)
 
         case BUTTON_TEST_TTS:
         {
-            int vol = CslTTS::SetVolume(spin_ctrl_tts_volume->GetValue());
-            CslTTS::Say(wxT("CSL TTS test"));
-            CslTTS::SetVolume(vol);
+            CslTTS::Say(wxT("CSL TTS test"), spin_ctrl_tts_volume->GetValue());
             break;
         }
 
@@ -765,14 +566,16 @@ void CslDlgSettings::OnCommandEvent(wxCommandEvent& event)
                 return;
             for (wxUint32 i=0;i<notebook_games->GetPageCount();i++)
             {
-                if (!((CslGamePage*)notebook_games->GetPage(i))->SaveSettings(msg))
+                if (!((CslPanelGameSettings*)notebook_games->GetPage(i))->SaveSettings(msg))
                 {
                     wxMessageBox(msg,_("Error"),wxICON_ERROR,this);
                     return;
                 }
             }
 
-            CslGetSettings()=m_settings;
+            CslTTS::Set(m_settings.TTS, m_settings.TTSVolume);
+
+            CslGetSettings() = m_settings;
 
             EndModal(wxID_OK);
             break;
@@ -803,8 +606,8 @@ bool CslDlgSettings::ValidateSettings()
 {
     if (m_settings.PingGood>m_settings.PingBad)
     {
-        wxMessageBox(_("Threshold for good ping can't be higher than\n" \
-                       _L_"threshold for bad ping."),_("Error"),wxICON_ERROR,this);
+        wxMessageBox(    _("Threshold for good ping can't be higher than\n"
+                     wxT_2("threshold for bad ping.")), _("Error"), wxICON_ERROR, this);
         return false;
     }
 

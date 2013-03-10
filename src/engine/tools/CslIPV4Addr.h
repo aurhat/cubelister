@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -23,90 +23,78 @@
 
 #include <CslTools.h>
 
-class CslIPV4Addr
+class CSL_DLL_TOOLS CslIPV4Addr
 {
     public:
         CslIPV4Addr()
-        {
-            Reset();
-        }
-
-        CslIPV4Addr(wxUint32 ip, wxInt32 mask=32)
-        {
-            Create(ip, mask);
-        }
-
+            { Reset(); }
+        CslIPV4Addr(wxUint32 ip, wxUint16 port = 0, wxUint32 netmask = 0xffffffff)
+            { Create(ip, port, netmask); }
         CslIPV4Addr(const CslIPV4Addr& addr)
-        {
-            *this=addr;
-        }
+            { *this = addr; }
+        CslIPV4Addr(const wxIPV4address& addr)
+            { Create(addr); }
+        CslIPV4Addr(const char *addr, wxUint16 port = 0, wxUint32 netmask = 0xffffffff)
+            { Create(addr, port, netmask); }
+        CslIPV4Addr(const wxString& addr, wxUint16 port = 0, wxUint32 netmask = 0xffffffff)
+            { Create(U2C(addr), port, netmask); }
 
-        CslIPV4Addr(const char *addr)
-        {
-            Create(addr);
-        }
-
-        CslIPV4Addr(const wxString& addr)
-        {
-            Create(U2A(addr));
-        }
-
-        CslIPV4Addr& operator=(const CslIPV4Addr& addr)
-        {
-            m_ip=addr.m_ip;
-            m_mask=addr.m_mask;
-            return *this;
-        }
-
+        bool operator==(const CslIPV4Addr& addr) const
+            { return m_ip == addr.m_ip && m_port == addr.m_port; }
         bool operator<(const CslIPV4Addr& addr) const
-        {
-            return wxUINT32_SWAP_ON_LE(m_ip)<wxUINT32_SWAP_ON_LE(addr.m_ip);
-        }
-
+            { return wxUINT32_SWAP_ON_LE(m_ip)<wxUINT32_SWAP_ON_LE(addr.m_ip); }
         bool operator>(const CslIPV4Addr& addr) const
+            { return !(*this<addr); }
+
+        bool Create(const char *addr, wxUint16 port = 0, wxUint32 netmask=0xffffffff);
+        bool Create(const wxString& addr, wxUint16 port = 0, wxUint32 netmask=0xffffffff)
+            { return Create(U2C(addr), port, netmask); }
+        bool Create(const wxIPV4address& addr)
+            { return Create(addr.IPAddress(), addr.Service()); }
+        bool Create(wxUint32 ip, wxUint16 port = 0, wxUint32 netmask = 0xffffffff)
         {
-            return !(*this<addr);
+            m_ip = ip;
+            m_port = port;
+            m_mask = netmask;
+            return (m_ip&m_mask)!=0;
         }
 
-        void Reset() { m_ip=m_mask=0; }
-        bool IsOk() const { return m_ip!=0 && m_mask!=0; }
+        void Reset() { m_ip = m_mask = 0; }
 
-        wxUint32 SetNetmask(wxInt32 bits)
+        bool IsOk() const {    return m_ip!=0 && m_mask!=0; }
+
+        wxUint32 SetIP(wxUint32 ip)    { return (m_ip = ip); }
+        wxUint16 SetPort(wxUint16 port)    { return (m_port = port); }
+        wxUint32 SetMask(wxUint32 mask)    { return (m_mask = mask); }
+        wxUint32 SetMaskBits(wxInt32 bits)
         {
             if (bits==32)
-                m_mask=-1;
+                m_mask = (wxUint32)-1;
             else
-                m_mask=wxUINT32_SWAP_ON_LE(((1<<bits)-1)<<(32-bits));
+                m_mask = wxUINT32_SWAP_ON_LE(((1<<bits)-1)<<(32-bits));
             return m_mask;
         }
 
-        wxInt32 GetNetmask() const { return BitCount32(m_mask); }
-
+        wxUint32 GetIP() const { return m_ip; }
+        wxString GetIPString() const { return Format(wxT("%i")); }
+        wxUint16 GetPort() const { return m_port; }
+        wxUint32 GetMask() const { return m_mask; }
+        wxInt32 GetMaskBits() const    { return BitCount32(m_mask); }
         wxUint32 GetHostcount() const
         {
-            wxInt32 i=GetNetmask();
+            wxInt32 i = GetMaskBits();
             return i==32 ? 1 : (1<<(32-i))-2;
         }
 
-        wxUint32 GetIP() const { return m_ip; }
-
         bool IsInRange(const CslIPV4Addr& addr) const
-        {
-            return (m_ip&m_mask)==(addr.m_ip&m_mask);
-        }
+            { return (m_ip&m_mask)==(addr.m_ip&m_mask); }
 
-        wxInt32 Create(wxUint32 ip, wxInt32 mask=32)
+        const wxIPV4address TowxIPV4Address() const
         {
-            m_ip=ip;
-            SetNetmask(mask);
-            return mask;
-        }
-
-        wxInt32 Create(const char *addr);
-
-        wxInt32 Create(const wxString& addr)
-        {
-            return Create(U2A(addr));
+            wxIPV4address addr;
+            addr.Hostname(GetIPString());
+            addr.Service(m_port);
+            return addr;
         }
 
         wxString Format(const wxString& fmt) const;
@@ -115,6 +103,10 @@ class CslIPV4Addr
 
     protected:
         wxUint32 m_ip, m_mask;
+        wxUint16 m_port;
+        wxIPV4address *m_wxIPV4;
 };
+
+WX_DEFINE_USER_EXPORTED_ARRAY(CslIPV4Addr*, CslArrayCslIPV4Addr, class CSL_DLL_TOOLS);
 
 #endif // CSLNETADDR_H

@@ -1,6 +1,6 @@
 
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -80,6 +80,7 @@ enum
     MENU_COPY = wxID_COPY,
     MENU_UPDATE = wxID_REFRESH,
     MENU_SAVEIMAGE = wxID_SAVEAS,
+
     //custom events/art
     MENU_CUSTOM_START = wxID_HIGHEST+1,
 
@@ -125,7 +126,6 @@ enum
     MENU_VIEW_PLAYER_SEARCH,
     MENU_VIEW_COUNTRY,
     MENU_VIEW_FAVOURITES,
-    MENU_VIEW_USER_CHAT,
     MENU_VIEW_SEARCH,
     MENU_VIEW_OUTPUT,
     MENU_VIEW_TRAFFIC,
@@ -168,16 +168,16 @@ enum
             item->Enable(false); \
         else \
         { \
-            if (_view!=CslListCtrlPlayer::SIZE_FULL) \
+            if (_view!=CslListCtrlPlayerView::SIZE_FULL) \
             { \
                 CslMenu::AddItem(*sub, MENU_SERVER_EXT_FULL, MENU_SERVER_EXT_FULL_STR, wxART_ABOUT); \
                 sub->AppendSeparator(); \
             } \
-            if (_view!=CslListCtrlPlayer::SIZE_MICRO) \
+            if (_view!=CslListCtrlPlayerView::SIZE_MICRO) \
                 CslMenu::AddItem(*sub, MENU_SERVER_EXT_MICRO, MENU_SERVER_EXT_MICRO_STR, wxART_EXTINFO_MICRO); \
-            if (_view!=CslListCtrlPlayer::SIZE_MINI) \
+            if (_view!=CslListCtrlPlayerView::SIZE_MINI) \
                 CslMenu::AddItem(*sub, MENU_SERVER_EXT_MINI, MENU_SERVER_EXT_MINI_STR, wxART_EXTINFO_MINI); \
-            if (_view!=CslListCtrlPlayer::SIZE_DEFAULT) \
+            if (_view!=CslListCtrlPlayerView::SIZE_DEFAULT) \
                 CslMenu::AddItem(*sub, MENU_SERVER_EXT_DEFAULT, MENU_SERVER_EXT_DEFAULT_STR, wxART_EXTINFO_DEFAULT); \
         } \
     }
@@ -316,7 +316,7 @@ enum
     }
 
 
-class CslMenu
+class CSL_DLL_GUITOOLS CslMenu
 {
     public:
         static void SetMainMenu(wxMenuBar *menu);
@@ -334,7 +334,6 @@ class CslMenu
 
     private:
         CslMenu();
-        CslMenu(const CslMenu& menu) { }
 
         static CslMenu& GetInstance();
 

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -19,110 +19,116 @@
  ***************************************************************************/
 
 #include "Csl.h"
-#include "CslEngine.h"
 #include "CslPlugin.h"
 
-CslPluginObject::CslPluginObject(const wxString& filename, CslPluginHostInfo *hostinfo) :
-        m_fileName(filename), m_handle(filename), m_initInfo(NULL), m_initFunc(NULL)
+CslPlugin::CslPlugin(const wxString& filename) :
+        m_fileName(filename), m_handle(filename), m_pluginInfo(NULL)
 {
     if (m_handle.IsLoaded())
     {
-        if (m_handle.HasSymbol(wxT("csl_init_plugin")) &&
-            (m_initFunc=(PluginInitFunction)m_handle.GetSymbol(wxT("csl_init_plugin"))))
-        {
-            m_initInfo=m_initFunc(hostinfo);
-            return;
-        }
-
-        m_handle.Unload();
+        if (m_handle.HasSymbol(wxT("csl_plugin_info")))
+            m_pluginInfo = (CslPluginInfo*)m_handle.GetSymbol(wxT("csl_plugin_info"));
+        else
+            m_handle.Unload();
     }
 }
 
-CslPluginObject::~CslPluginObject()
+CslPlugin::~CslPlugin()
 {
-    if (m_initInfo)
-        delete m_initInfo->Plugin;
+    if (m_handle.IsLoaded())
+        m_handle.Unload();
 }
 
-
-wxInt32 CslPluginMgr::LoadPlugins(CslPluginHostInfo *hostinfo)
+CslPluginMgr::CslPluginMgr(wxUint32 type) :
+        m_type(type)
 {
-    wxInt32 c=0;
+    m_extension = wxDynamicLibrary::CanonicalizeName(wxT("*"), wxDL_MODULE);
+}
+
+wxInt32 CslPluginMgr::LoadPlugins(CslPluginHost *host)
+{
+    wxInt32 c = 0;
     wxString path;
     wxArrayString files;
     wxArrayString dirs=GetPluginDirs();
 
-    for (wxInt32 i=0, l=dirs.GetCount(); i<l; i++)
+    for (wxInt32 i = 0, l = dirs.GetCount(); i<l; i++)
     {
-        wxString path=dirs.Item(i)+wxT("plugins");
-        c+=FindFiles(path, CSL_LIBRARY_EXTENSION, files);
+        wxString path = dirs.Item(i)+wxT("plugins");
+        c += FindFiles(path, m_extension, files);
     }
 
     files.Sort(true);
 
-    LOG_DEBUG("found %d possible plugins\n", c);
+    CSL_LOG_DEBUG("found %d possible plugins\n", c);
 
     while (c>0)
     {
-        const wxString& file=files.Item(--c);
+        const wxString& file = files.Item(--c);
 
-        CslPluginObject *p=new CslPluginObject(file, hostinfo);
+        CslPlugin *p = new CslPlugin(file);
 
         if (!p->IsLoaded())
         {
-            LOG_DEBUG("Couldn't load plugin %s\n", U2A(file));
+            CSL_LOG_DEBUG("Couldn't load plugin %s\n", U2C(file));
             goto fail;
         }
-        if (p->m_initInfo->APIVersion!=CSL_PLUGIN_VERSION_API)
+        if (p->m_pluginInfo->APIVersion!=CSL_PLUGIN_VERSION_API)
         {
-            LOG_DEBUG("Couldn't load plugin %s. Invalid API version (%d!=%d)\n",
-                      U2A(file), p->m_initInfo->APIVersion!=CSL_PLUGIN_VERSION_API);
+            CSL_LOG_DEBUG("Couldn't load plugin %s. Invalid API version (%d!=%d)\n",
+                          U2C(file), p->m_pluginInfo->APIVersion!=CSL_PLUGIN_VERSION_API);
             goto fail;
         }
-        if (p->m_initInfo->Type!=m_type)
+        if (p->m_pluginInfo->Type<CSL_PLUGIN_TYPE_ENGINE ||
+            p->m_pluginInfo->Type>CSL_PLUGIN_TYPE_GUI)
         {
-            LOG_DEBUG("Couldn't load plugin %s. Invalid Type (%d!=%d)\n",
-                      U2A(file), p->m_initInfo->Type, m_type);
+            CSL_LOG_DEBUG("Couldn't load plugin %s. Invalid Type (%d)\n",
+                          U2C(file), p->m_pluginInfo->Type);
             goto fail;
         }
+        if (p->m_pluginInfo->Type!=m_type)
+            goto fail;
+
         loopv(m_plugins)
         {
-            if (m_plugins[i]->m_initInfo->FourCC==p->m_initInfo->FourCC)
+            if (m_plugins[i]->m_pluginInfo->FourCC==p->m_pluginInfo->FourCC)
             {
-                LOG_DEBUG("Couldn't load plugin %s. Plugin was already loaded.\n", U2A(file));
+                CSL_LOG_DEBUG("Couldn't load plugin %s. Plugin was already loaded.\n", U2C(file));
                 goto fail;
             }
         }
-        if (!p->m_initInfo->Plugin->Create())
+        if (!p->m_pluginInfo->InitFn(host))
         {
-            LOG_DEBUG("Couldn't load plugin %s. Create() failed.\n", U2A(file));
+            CSL_LOG_DEBUG("Couldn't load plugin %s. Create() failed.\n", U2C(file));
             goto fail;
         }
 
-        m_plugins.add(p);
-        LOG_DEBUG("loaded plugin %s (%s / %s)\n", U2A(file),
-                  U2A(p->m_initInfo->Name),
-                  U2A(CSL_GET_VERSION(p->m_initInfo->Version)));
+        m_plugins.push_back(p);
+
+        CSL_LOG_DEBUG("loaded plugin %s (%s / %s)\n", U2C(file),
+                      U2C(p->m_pluginInfo->Name),
+                      U2C(p->m_pluginInfo->Version));
+
         continue;
 
     fail:
         delete p;
     }
 
-    return m_plugins.length();
+    return m_plugins.size();
 }
 
-void CslPluginMgr::UnloadPlugins()
+void CslPluginMgr::UnloadPlugins(CslPluginHost *host)
 {
     loopvrev(m_plugins)
-        delete m_plugins.remove(i);
-}
-
-void CslPluginMgr::BuildMenu(wxMenu *menu)
-{
-    loopv(m_plugins)
     {
-        CslPlugin *plugin=m_plugins[i]->m_initInfo->Plugin;
-        plugin->CreateMenu(menu);
+        CslPlugin *p = m_plugins[i];
+
+        if (p->m_pluginInfo->DeinitFn)
+            p->m_pluginInfo->DeinitFn(host);
+
+        delete p;
     }
+
+    m_plugins.Empty();
 }

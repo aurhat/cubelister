@@ -42,9 +42,16 @@ MANIFEST
 *.pdb
 *.manifest
 *.res
+*.ncb
+*.suo
+*.vcproj.*
 .deps/
 .libs/
 debug/
 debug-unicode/
 optimized/
 optimized-unicode/
+Debug
+Unicode-Debug/
+Release/
+Unicode-Release/

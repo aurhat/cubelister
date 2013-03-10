@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -19,6 +19,46 @@
  ***************************************************************************/
 
 #include <Csl.h>
+#include <wx/dcbuffer.h>
+
+DEFINE_EVENT_TYPE(wxCSL_EVT_SETTINGS_CHANGED)
+
+IMPLEMENT_DYNAMIC_CLASS(CslBufferedStaticBitmap, wxPanel)
+
+CslBufferedStaticBitmap::CslBufferedStaticBitmap(wxWindow *parent, const wxSize& size,
+                                                 const wxBitmap& bmp, long flags) :
+        wxPanel(parent, wxID_ANY, wxDefaultPosition, size, flags),
+        m_size(size)
+{
+    Connect(wxEVT_PAINT, wxPaintEventHandler(CslBufferedStaticBitmap::OnPaint), NULL, this);
+    SetBitmap(bmp);
+}
+
+void CslBufferedStaticBitmap::SetBitmap(const wxBitmap& bmp)
+{
+    wxSize bmpSize(bmp.GetWidth(), bmp.GetHeight());
+    wxASSERT(m_size.x >= m_bmpSize.x || m_size.y >= m_bmpSize.y);
+
+    m_bmp = bmp;
+    m_bmpSize = bmpSize;
+
+    Refresh(false);
+}
+
+void CslBufferedStaticBitmap::OnPaint(wxPaintEvent& event)
+{
+    wxBufferedPaintDC dc(this);
+
+    dc.SetBackground(wxBrush(GetBackgroundColour(), wxSOLID));
+    dc.Clear();
+
+    if (!m_bmp.IsNull())
+    {
+        wxPoint offset(m_size.x/2-m_bmpSize.x/2, m_size.y/2-m_bmpSize.y/2);
+
+        dc.DrawBitmap(m_bmp, offset, true);
+    }
+}
 
 wxBitmap AdjustBitmapSize(const char **data, const wxSize& size, const wxPoint& origin)
 {
@@ -29,25 +69,38 @@ wxBitmap AdjustBitmapSize(const char **data, const wxSize& size, const wxPoint& 
 
 wxBitmap AdjustBitmapSize(const wxBitmap& bitmap, const wxSize& size, const wxPoint& origin)
 {
+    wxASSERT(bitmap.IsOk());
+
     if (!bitmap.IsOk())
         return wxNullBitmap;
 
     wxImage image=bitmap.ConvertToImage();
     image.Resize(size, origin);
 
-    return wxBitmap(image);
+    return image;
 }
 
-wxBitmap BitmapFromData(wxInt32 type, const unsigned char *data, wxInt32 size)
+wxBitmap RescaleBitmap(const wxBitmap& bitmap, const wxSize& size, bool hq)
 {
-    wxMemoryInputStream stream(data, size);
-    // see wx_wxbitmap.html
-#ifdef __WXMSW__
-    return wxBitmap(stream, type);
-#else
-    wxImage image(stream, type);
-    return wxBitmap(image);
-#endif
+    wxASSERT(bitmap.IsOk());
+
+    if (!bitmap.IsOk())
+        return wxNullBitmap;
+
+    wxImage image = bitmap.ConvertToImage();
+    image.Rescale(size.x, size.y, hq ? wxIMAGE_QUALITY_HIGH : wxIMAGE_QUALITY_NORMAL);
+
+    return image;
+}
+
+wxBitmap BitmapFromData(wxInt32 type, const void *data, wxInt32 size)
+{
+    if (data && size)
+    {
+        wxMemoryInputStream stream(data, size);
+        wxImage image(stream, (wxBitmapType)type);
+        return image;
+    }
 
     return wxNullBitmap;
 }
@@ -55,14 +108,14 @@ wxBitmap BitmapFromData(wxInt32 type, const unsigned char *data, wxInt32 size)
 wxImage& OverlayImage(wxImage& dst, const wxImage& src, wxInt32 offx, wxInt32 offy)
 {
     unsigned char r, g, b, mr, mg, mb;
-    wxUint32 i, c, wsrc, xsrc, ysrc, xdst, ydst;
+    wxInt32 c, wsrc, xsrc, ysrc, xdst, ydst;
     bool alpha=dst.HasAlpha();
     bool mask=src.GetOrFindMaskColour(&mr, &mg, &mb);
 
     wsrc=src.GetWidth();
     c=src.GetHeight()*wsrc;
 
-    for (i=0; i<c; i++)
+    loopi(c)
     {
         xsrc=i%wsrc;
         ysrc=i/wsrc;
@@ -106,22 +159,56 @@ bool BitmapFromWindow(wxWindow *window, wxBitmap& bitmap)
     return ret;
 }
 
-void RegisterEventsRecursively(wxInt32 id, wxWindow *parent, wxEvtHandler *handler,
-                               wxEventType type, wxObjectEventFunction function)
+void ConnectEventRecursive(wxInt32 id, wxWindow *parent, wxEvtHandler *handler,
+                           wxEventType type, wxObjectEventFunction function)
 {
     if (parent)
     {
         parent->Connect(id, type, function, NULL, handler);
 
-        wxWindowList::compatibility_iterator node=parent->GetChildren().GetFirst();
+        wxWindowList::compatibility_iterator node = parent->GetChildren().GetFirst();
 
         while (node)
         {
-            wxWindow* child=node->GetData();
-            RegisterEventsRecursively(id, child, handler, type, function);
-            node=node->GetNext();
+            wxWindow* child = node->GetData();
+            ConnectEventRecursive(id, child, handler, type, function);
+            node = node->GetNext();
         }
     }
+}
+
+void DisconnectEventRecursive(wxInt32 id, wxWindow *parent, wxEvtHandler *handler,
+                              wxEventType type, wxObjectEventFunction function)
+{
+    if (parent)
+    {
+        parent->Disconnect(id, type, function, NULL, handler);
+
+        wxWindowList::compatibility_iterator node = parent->GetChildren().GetFirst();
+
+        while (node)
+        {
+            wxWindow* child = node->GetData();
+            DisconnectEventRecursive(id, child, handler, type, function);
+            node = node->GetNext();
+        }
+    }
+}
+
+CslArraywxWindow& GetChildWindows(wxWindow *parent, CslArraywxWindow& list)
+{
+    wxWindowList::compatibility_iterator node=parent->GetChildren().GetFirst();
+
+    while (node)
+    {
+        wxWindow* child=node->GetData();
+
+        list.push_back(child);
+        node=node->GetNext();
+        GetChildWindows(child, list);
+    }
+
+    return list;
 }
 
 wxWindow* GetParentWindow(wxWindow *window, wxInt32 depth)
@@ -164,23 +251,7 @@ wxWindow* GetChildWindowByClassInfo(wxWindow *parent, wxClassInfo *classinfo)
     return NULL;
 }
 
-vector<wxWindow*>& GetChildWindows(wxWindow *parent, vector<wxWindow*>& list)
-{
-    wxWindowList::compatibility_iterator node=parent->GetChildren().GetFirst();
-
-    while (node)
-    {
-        wxWindow* child=node->GetData();
-
-        list.add(child);
-        node=node->GetNext();
-        GetChildWindows(child, list);
-    }
-
-    return list;
-}
-
-vector<wxWindow*>& GetChildWindowsByClassInfo(wxWindow *parent, wxClassInfo *classinfo, vector<wxWindow*>& list)
+wxUint32 GetChildWindowsByClassInfo(wxWindow *parent, wxClassInfo *classinfo, CslArraywxWindow& list)
 {
     if (!parent)
         parent=wxTheApp->GetTopWindow();
@@ -192,10 +263,10 @@ vector<wxWindow*>& GetChildWindowsByClassInfo(wxWindow *parent, wxClassInfo *cla
         wxWindow *child=list[i];
 
         if (!child->IsKindOf(classinfo))
-            list.remove(i);
+            list.RemoveAt(i);
     }
 
-    return list;
+    return list.GetCount();
 }
 
 bool WindowHasChildWindow(wxWindow *parent, wxWindow *child)
@@ -230,15 +301,23 @@ void SetTextCtrlErrorState(wxTextCtrl *ctrl, bool error)
     {
 #ifdef __WXMAC__
         // very ugly - setting back to black doesnt work, so add 1
-        ctrl->SetForegroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOWTEXT).Red()+1);
+        ctrl->SetForegroundColour(CSL_SYSCOLOUR(wxSYS_COLOUR_WINDOWTEXT).Red()+1);
 #else
-        ctrl->SetBackgroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOW));
-        ctrl->SetForegroundColour(SYSCOLOUR(wxSYS_COLOUR_WINDOWTEXT));
+        ctrl->SetBackgroundColour(CSL_SYSCOLOUR(wxSYS_COLOUR_WINDOW));
+        ctrl->SetForegroundColour(CSL_SYSCOLOUR(wxSYS_COLOUR_WINDOWTEXT));
 #endif
     }
 #ifdef __WXMSW__
     ctrl->Refresh();
 #endif
+}
+
+void SetSearchCtrlErrorState(wxSearchCtrl *ctrl, bool error)
+{
+    wxTextCtrl *tctrl = NULL;
+
+    if ((tctrl = (wxTextCtrl*)GetChildWindowByClassInfo(ctrl, CLASSINFO(wxTextCtrl))))
+        SetTextCtrlErrorState(tctrl, error);
 }
 
 wxSize GetBestWindowSizeForText(wxWindow *window, const wxString& text,
@@ -260,8 +339,8 @@ wxSize GetBestWindowSizeForText(wxWindow *window, const wxString& text,
     w=clamp(w, minWidth, maxWidth);
     h=clamp(h, minHeight, maxHeight);
 
-    border=SYSMETRIC(wxSYS_BORDER_X, window);
-    scroll=SYSMETRIC(wxSYS_VSCROLL_X, window);
+    border = CSL_SYSMETRIC(wxSYS_BORDER_X, window);
+    scroll = CSL_SYSMETRIC(wxSYS_VSCROLL_X, window);
     //guess some border size on systems not supporting it (wxGTK)
     w+=(border=2*(border<0 ? 4 : border));
     //scrollbar is always shown on these systems

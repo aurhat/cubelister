@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -75,8 +75,8 @@ wxString CslIpcBase::CreateURI(const CslServerInfo& info,bool pass,bool connect,
     s<<wxT("=")<<s1<<wxT("&");
     s1.Empty();
 
-    if (info.InfoPort!=info.GetGame().GetInfoPort(info.GamePort))
-        s<<CSL_URI_INFOPORT_STR<<wxT("=")<<info.InfoPort<<wxT("&");
+    if (info.Address().GetPort()!=info.GetGame().GetInfoPort(info.GamePort))
+        s<<CSL_URI_INFOPORT_STR<<wxT("=")<<info.Address().GetPort()<<wxT("&");
 
     if (connect)
         s1<<CSL_URI_ACTION_STR<<wxT("=")<<CSL_URI_ACTION_CONNECT_STR;

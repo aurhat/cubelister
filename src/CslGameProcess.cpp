@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -35,7 +35,7 @@ CslGameProcess::CslGameProcess(CslServerInfo *info,const wxString& cmd) :
 {
     m_self=this;
 
-    CslToolTip::ResetTip();
+    CslToolTip::Reset();
     CslDlgOutput::Reset(m_info->GetBestDescription());
 
     m_watch.Start(0);
@@ -99,6 +99,6 @@ void CslGameProcess::ProcessOutput(wxInt32 type)
         //Cube has color codes in it's output
         m_self->m_info->GetGame().ProcessOutput(m_self->m_buffer);
         CslDlgOutput::AddOutput(m_self->m_buffer,last);
-        //LOG_DEBUG("%s",buf);
+        //CSL_LOG_DEBUG("%s",buf);
     }
 }

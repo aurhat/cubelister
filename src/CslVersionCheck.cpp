@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -21,60 +21,85 @@
 #include "Csl.h"
 #include "CslVersionCheck.h"
 
-
 DEFINE_EVENT_TYPE(wxCSL_EVT_VERSIONCHECK)
-
 
 CslVersionCheckThread::CslVersionCheckThread(wxEvtHandler *evtHandler) :
         wxThread(wxTHREAD_JOINABLE),
-        m_ok(false),m_evtHandler(evtHandler)
+        m_ok(false), m_terminate(false), m_evtHandler(evtHandler)
 {
-    m_ok=Create()==wxTHREAD_NO_ERROR;
+    m_ok = Create()==wxTHREAD_NO_ERROR;
+}
+
+CslVersionCheckThread::~CslVersionCheckThread()
+{
+    m_mutex.Lock();
+    m_terminate = true;
+    m_mutex.Unlock();
+
+    if (IsRunning())
+        Wait();
 }
 
 wxThread::ExitCode CslVersionCheckThread::Entry()
 {
-    wxString *version=NULL;
-
     wxHTTP http;
     http.SetTimeout(10);
 
-    if (http.Connect(CSL_WEBADDR_STR,80))
+    wxString version;
+    wxString host = wxString(CSL_WEBADDR_STR);
+
+    CSL_LOG_DEBUG("version check: checking %s\n", U2C(host));
+
+    host.Replace(wxT("http://"), wxT(""), false);
+
+    if (http.Connect(host, 80))
     {
-        http.SetHeader(wxT("User-Agent"),GetHttpAgent());
-        wxInputStream *data=http.GetInputStream(wxT("/latest.txt"));
-        wxUint32 code=http.GetResponse();
+        http.SetHeader(wxT("User-Agent"), GetHttpAgent());
+        wxInputStream *data = http.GetInputStream(wxT("/latest.txt"));
 
         if (data)
         {
-            if (code==200)
+            if (http.GetResponse()==200)
             {
-                size_t size=min(data->GetSize(),(size_t)15);
+                char buf[64] = { 0 };
+                size_t size = min(data->GetSize(), sizeof(buf)-1);
+
                 if (size)
                 {
-                    char buf[16]={0};
-                    data->Read((void*)buf,size);
+                    data->Read((void*)buf, size);
 
-                    if (!(strstr(buf,"<html>") ||
-                          strstr(buf,"<HTML>")))
+                    if (!(strstr(buf, "<html>") || strstr(buf, "<HTML>")))
                     {
-                        char *pend=strpbrk(buf," \t\r\n");
+                        char *pend = strpbrk(buf, " \t\r\n");
+
                         if (pend)
-                            *pend='\0';
-                        version=new wxString(A2U(buf));
-                        LOG_DEBUG("version check: %s\n",buf);
+                            *pend = '\0';
+
+                        version = C2U(buf);
+
+                        CSL_LOG_DEBUG("version check: %s\n", buf);
                     }
                 }
             }
+
             delete data;
         }
     }
+    else
+        CSL_LOG_DEBUG("version check: couldn't connect to %s\n", U2C(host));
 
-    wxCommandEvent evt(wxCSL_EVT_VERSIONCHECK);
-    evt.SetClientData(version);
-    wxPostEvent(m_evtHandler,evt);
+    m_mutex.Lock();
 
-    LOG_DEBUG("version check: thread exit\n");
+    if (!m_terminate)
+    {
+        wxCommandEvent evt(wxCSL_EVT_VERSIONCHECK);
+        evt.SetString(version);
+        wxPostEvent(m_evtHandler, evt);
+    }
+
+    m_mutex.Unlock();
+
+    CSL_LOG_DEBUG("version check: thread exit\n");
 
     return 0;
 }
