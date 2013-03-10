@@ -71,7 +71,7 @@ class CslNetPacket
     public:
         CslNetPacket(wxUint32 size = 0, void *data = NULL,
                      const CslIPV4Addr *addr = NULL) :
-                m_size(size), m_data(data)
+            m_data(data), m_size(size)
         {
             if (addr)
                 m_addr = *addr;
@@ -91,7 +91,7 @@ class CslNetPacket
 
         static void* Alloc(CslNetPacket *packet, wxUint32 size)
         {
-            packet->Alloc(size);
+            return packet->Alloc(size);
         }
 
         static void Free(CslNetPacket *packet)
