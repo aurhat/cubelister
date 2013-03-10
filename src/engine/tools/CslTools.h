@@ -28,11 +28,11 @@
 #include <CslDynlib.h>
 
 #ifdef __WXMSW__
-#define CSL_PATHDIV_MB     "\\"
-#define CSL_NEWLINE_MB     "\r\n"
+#define CSL_PATHDIV_MB  "\\"
+#define CSL_NEWLINE_MB  "\r\n"
 #else
-#define CSL_CSL_PATHDIV_MB "/"
-#define CSL_NEWLINE_MB     "\n"
+#define CSL_PATHDIV_MB  "/"
+#define CSL_NEWLINE_MB  "\n"
 #endif
 #define CSL_PATHDIV_WX wxT(CSL_PATHDIV_MB)
 #define CSL_NEWLINE_WX wxT(CSL_NEWLINE_MB)
