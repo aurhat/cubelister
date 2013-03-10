@@ -61,7 +61,7 @@ CslListCtrlInfo::CslListCtrlInfo(wxWindow* parent,wxWindowID id,const wxPoint& p
     InsertItem(i++, _("Total play time"), CSL_LIST_IMG_INFO);
     InsertItem(i++, _("Connects"), CSL_LIST_IMG_INFO);
 
-    SetSize(GetBestSize());
+    SetClientSize(GetBestSize());
 
     for (i -= 1; i>=0; i -= 2)
     {
@@ -286,6 +286,9 @@ wxSize CslListCtrlInfo::DoGetBestSize() const
 
     GetItemRect(0, rect);
     size = wxSize(240, rect.GetHeight() * GetItemCount());
+#if !defined(__WXMSW__) &&  !wxCHECK_VERSION(2, 9, 0)
+     size.y += 4;
+#endif
 
     return size;
 }
@@ -304,11 +307,13 @@ void CslListCtrlInfo::OnSize(wxSizeEvent& event)
 #else
         ScrollList(0, 0);
 #endif
+        event.Skip();
     }
     else
     {
 #if defined(__WXGTK__) || defined(__WXX11__)
         wxWindow *window = GetChildWindowByClassInfo(this, CLASSINFO(wxScrolledWindow));
+
         if (window)
             ((wxScrolledWindow*)window)->SetScrollbars(0, 0, 0, 0);
 #elif __WXMAC__
@@ -319,8 +324,6 @@ void CslListCtrlInfo::OnSize(wxSizeEvent& event)
 
 void CslListCtrlInfo::OnPong(CslPongEvent& event)
 {
-    CslServerInfo *info = event.GetServerInfo();
-
     if (event.GetServerInfo()==m_info)
         UpdateServer(m_info, true);
 

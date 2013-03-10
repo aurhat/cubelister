@@ -30,6 +30,7 @@ enum { MM_AUTH = -1, MM_OPEN, MM_VETO, MM_LOCKED, MM_PRIVATE, MM_PASSWORD };
 enum { CS_ALIVE = 0, CS_DEAD, CS_SPAWNING, CS_LAGGED, CS_EDITING, CS_SPECTATOR };
 enum { PRIV_NONE = 0, PRIV_MASTER, PRIV_AUTH, PRIV_ADMIN };
 
+#if 0
 static const wxChar* CLIENT_BINARY[] =
 {
 #if defined(__WXMSW__)
@@ -48,6 +49,7 @@ static const wxChar* CLIENT_GAME_REQUIRES[] =
 };
 #define CLIENT_GAME_REQUIRES_LEN ((wxInt32)(sizeof(CLIENT_GAME_REQUIRES)/\
                                   sizeof(CLIENT_GAME_REQUIRES[0])))
+#endif
 
 #if defined(__WXMSW__)
 const wxString CLIENT_CFG_DIR = wxStandardPaths().GetDocumentsDir() + wxT("My Games");

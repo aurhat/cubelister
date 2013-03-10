@@ -5,5 +5,5 @@ METASOURCES = AUTO
 lib_LTLIBRARIES = libcsltools.la
 libcsltools_la_SOURCES = CslCharEncoding.cpp CslIPV4Addr.cpp \
 	CslTools.cpp CslCubeEngineTools.cpp
-include_HEADERS = CslCharEncoding.h CslIPV4Addr.h CslTools.h \
-	CslCubeEngineTools.h
+include_HEADERS = CslCharEncoding.h CslCubeEngineTools.h CslDynlib.h \
+	CslIPV4Addr.h CslTools.h

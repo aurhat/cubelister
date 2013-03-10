@@ -182,7 +182,7 @@ bool CslTTS::Say(const wxString& text, wxInt32 volume)
 
     SetVolume(volume);
     ret = Say(text);
-    //SetVolume(volumeold);
+    SetVolume(volumeold);
 
     return ret;
 }

@@ -172,7 +172,7 @@ void CslSettings::LoadSettings()
         config.SetPath(wxT("/")+games[i]->GetName());
         if (config.Read(wxT("Binary"), &s)) settings.Binary=s;
         if (config.Read(wxT("GamePath"), &s)) settings.GamePath=s;
-        if (config.Read(wxT("ConfigPath"), &s))
+        if (config.Read(wxT("ConfigPath"), &s)) settings.ConfigPath=s;
         if (config.Read(wxT("Options"), &s)) settings.Options=s;
         if (config.Read(wxT("PreScript"), &s)) settings.PreScript=s;
         if (config.Read(wxT("PostScript"), &s)) settings.PostScript=s;

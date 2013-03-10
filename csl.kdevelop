@@ -22,7 +22,7 @@
   <kdevautoproject>
     <general>
       <activetarget>src/csl</activetarget>
-      <useconfiguration>optimized-unicode</useconfiguration>
+      <useconfiguration>debug-unicode</useconfiguration>
     </general>
     <run>
       <mainprogram>/home/mimosius/Documents/Development/csl</mainprogram>
@@ -50,7 +50,7 @@
     </run>
     <configurations>
       <debug-unicode>
-        <configargs>--with-wx-config=wx-config-2.8ud</configargs>
+        <configargs>--with-wx-config=wx-config-2.8u --disable-pch</configargs>
         <builddir>debug-unicode</builddir>
         <ccompiler>kdevgccoptions</ccompiler>
         <cxxcompiler>kdevgppoptions</cxxcompiler>
@@ -58,7 +58,7 @@
         <cxxflags>-O0 -ggdb3</cxxflags>
         <envvars/>
         <topsourcedir/>
-        <cppflags>-D__DEBUG__</cppflags>
+        <cppflags>-DCSL_DEBUG</cppflags>
         <ldflags/>
         <ccompilerbinary/>
         <cxxcompilerbinary/>
@@ -75,7 +75,7 @@
         <cxxflags>-O0 -ggdb3</cxxflags>
         <envvars/>
         <topsourcedir/>
-        <cppflags>-D__DEBUG__</cppflags>
+        <cppflags>-DCSL_DEBUG</cppflags>
         <ldflags/>
         <ccompilerbinary/>
         <cxxcompilerbinary/>
@@ -92,7 +92,7 @@
         <envvars/>
         <configargs>--with-wx-config=wx-config-2.8</configargs>
         <topsourcedir/>
-        <cppflags>-D__DEBUG__</cppflags>
+        <cppflags>-DCSL_DEBUG</cppflags>
         <ldflags/>
         <ccompilerbinary/>
         <cxxcompilerbinary/>
@@ -109,7 +109,7 @@
         <envvars/>
         <configargs>--with-wx-config=wx-config-2.8u</configargs>
         <topsourcedir/>
-        <cppflags>-D__DEBUG__</cppflags>
+        <cppflags>-DCSL_DEBUG</cppflags>
         <ldflags/>
         <ccompilerbinary/>
         <cxxcompilerbinary/>
@@ -136,10 +136,10 @@
       </default>
       <debug-3>
         <envvars/>
-        <configargs>--with-wx-config=wx-config-2.9</configargs>
+        <configargs>--with-wx-config=wx-config</configargs>
         <builddir>debug-3</builddir>
         <topsourcedir/>
-        <cppflags>-D__DEBUG__</cppflags>
+        <cppflags>-DCSL_DEBUG</cppflags>
         <ldflags/>
         <ccompiler>kdevgccoptions</ccompiler>
         <cxxcompiler>kdevgppoptions</cxxcompiler>
@@ -156,7 +156,7 @@
         <configargs>--with-wx-config=/usr/bin/wx-config</configargs>
         <builddir>default-debug</builddir>
         <topsourcedir/>
-        <cppflags>-D__DEBUG__</cppflags>
+        <cppflags>-DCSL_DEBUG</cppflags>
         <ldflags/>
         <ccompiler>kdevgccoptions</ccompiler>
         <cxxcompiler>kdevgppoptions</cxxcompiler>
@@ -176,6 +176,7 @@
     </configurations>
     <make>
       <envvars>
+        <envvar value="1" name="V" />
         <envvar value="1" name="WANT_AUTOCONF_2_5" />
         <envvar value="1" name="WANT_AUTOMAKE_1_6" />
       </envvars>

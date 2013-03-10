@@ -118,7 +118,8 @@ void CslUDP::OnSocketEvent(wxSocketEvent& event)
     m_bytesIn += read;
     m_packetsIn++;
 
-    wxPostEvent(m_evtHandler, CslPingEvent(packet));
+    CslPingEvent evt(packet);
+    wxPostEvent(m_evtHandler, evt);
 }
 
 bool CslUDP::Send(const CslNetPacket& packet)
@@ -135,7 +136,7 @@ bool CslUDP::Send(const CslNetPacket& packet)
     if (m_socket->SendTo(addr.TowxIPV4Address(), packet.Data(), size).Error())
     {
         CSL_LOG_DEBUG("Error sending packet to: %s\n (%s)\n",
-                      addr.Format(wxT("%i:%p")),
+                      U2C(addr.Format(wxT("%i:%p"))),
                       U2C(GetSocketError(m_socket->LastError())));
         return false;
     }

@@ -1,5 +1,5 @@
 
-SUBDIRS = pch plugin engine tools external plugins
+SUBDIRS = pch plugin engine tools plugins
 
 bin_PROGRAMS = csl
 if build_cslmapcfgtool
@@ -22,9 +22,8 @@ cslmapcfgtool_LDADD = $(top_builddir)/src/tools/libcslguitools.la \
 	$(top_builddir)/src/engine/tools/libcsltools.la ${WX_LIBS}
 csl_SOURCES = CslApp.cpp CslDlgAbout.cpp CslDlgAddMaster.cpp \
 	CslDlgAddServer.cpp CslDlgConnectPass.cpp CslDlgConnectWait.cpp CslDlgExtended.cpp \
-	CslDlgOutput.cpp CslDlgSettings.cpp CslDlgTraffic.cpp CslFrame.cpp CslGameConnection.cpp \
-	CslGameProcess.cpp CslIPC.cpp CslListCtrlCountry.cpp CslListCtrlInfo.cpp \
-	CslPanelServerView.cpp CslListCtrlPlayerSearch.cpp CslListCtrlServer.cpp CslSettings.cpp \
-	CslStatusBar.cpp CslVersionCheck.cpp
-noinst_HEADERS = CslApp.h CslGameConnection.h \
-	CslListCtrlPlayerSearch.h
+	CslDlgOutput.cpp CslDlgSettings.cpp CslFrame.cpp CslGameConnection.cpp \
+	CslGameProcess.cpp CslIPC.cpp CslPanelCountryView.cpp CslPanelGameSettings.cpp \
+	CslPanelPlayerSearch.cpp CslPanelServerView.cpp CslPanelTraffic.cpp CslServerBrowser.cpp \
+	CslServerInfo.cpp CslSettings.cpp CslStatusBar.cpp CslVersionCheck.cpp
+noinst_HEADERS = CslApp.h CslGameConnection.h

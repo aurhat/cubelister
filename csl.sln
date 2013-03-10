@@ -32,8 +32,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "plugin_sauerbraten", "src\p
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dll_cslguitools", "src\tools\cslguitools.vcxproj", "{873EC02B-2792-47FD-B7F0-E5F199A11F56}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "plugingui_playertracker", "src\plugins\playertracker\playertracker.vcxproj", "{796989EF-B73D-4B57-B6C1-A69FD4E5A011}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -176,18 +174,6 @@ Global
 		{873EC02B-2792-47FD-B7F0-E5F199A11F56}.Release|Win32.Build.0 = Release|Win32
 		{873EC02B-2792-47FD-B7F0-E5F199A11F56}.Release-wx3|Win32.ActiveCfg = Release-wx3|Win32
 		{873EC02B-2792-47FD-B7F0-E5F199A11F56}.Release-wx3|Win32.Build.0 = Release-wx3|Win32
-		{796989EF-B73D-4B57-B6C1-A69FD4E5A011}.Debug|Win32.ActiveCfg = Debug|Win32
-		{796989EF-B73D-4B57-B6C1-A69FD4E5A011}.Debug|Win32.Build.0 = Debug|Win32
-		{796989EF-B73D-4B57-B6C1-A69FD4E5A011}.Debug-wx3|Win32.ActiveCfg = Debug-wx3|Win32
-		{796989EF-B73D-4B57-B6C1-A69FD4E5A011}.Debug-wx3|Win32.Build.0 = Debug-wx3|Win32
-		{796989EF-B73D-4B57-B6C1-A69FD4E5A011}.Profile|Win32.ActiveCfg = Profile|Win32
-		{796989EF-B73D-4B57-B6C1-A69FD4E5A011}.Profile|Win32.Build.0 = Profile|Win32
-		{796989EF-B73D-4B57-B6C1-A69FD4E5A011}.Profile-wx3|Win32.ActiveCfg = Profile-wx3|Win32
-		{796989EF-B73D-4B57-B6C1-A69FD4E5A011}.Profile-wx3|Win32.Build.0 = Profile-wx3|Win32
-		{796989EF-B73D-4B57-B6C1-A69FD4E5A011}.Release|Win32.ActiveCfg = Release|Win32
-		{796989EF-B73D-4B57-B6C1-A69FD4E5A011}.Release|Win32.Build.0 = Release|Win32
-		{796989EF-B73D-4B57-B6C1-A69FD4E5A011}.Release-wx3|Win32.ActiveCfg = Release-wx3|Win32
-		{796989EF-B73D-4B57-B6C1-A69FD4E5A011}.Release-wx3|Win32.Build.0 = Release-wx3|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

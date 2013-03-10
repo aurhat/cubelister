@@ -25,7 +25,7 @@
         #else
             #include "../../wx28/lib/vc_dll/mswu/wx/setup.h"
         #endif
-        
+
         #ifdef _DEBUG
             #pragma comment(lib,"wxmsw28ud.lib")
         #else

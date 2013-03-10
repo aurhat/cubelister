@@ -92,7 +92,8 @@ wxThread::ExitCode CslDNSResolver::Entry()
         ::wxPostEvent(handler ? handler : this, evt);
     }
 
-    WX_CLEAR_ARRAY(m_queries);
+    loopv(m_queries) delete (CslDNSResolverQuery*)m_queries[i];
+    m_queries.Empty();
 
     m_mutex.Unlock();
 

@@ -246,6 +246,8 @@ void CslListCtrl::OnSize(wxSizeEvent& event)
     CslValueRestore<bool> noresize(m_dontAdjustSize, true);
 
     ListAdjustSize();
+
+    event.Skip();
 }
 
 void CslListCtrl::OnMouseMove(wxMouseEvent& event)

@@ -517,25 +517,25 @@ void CslFrame::DoLayout()
     wxSize size=list_ctrl_master->GetBestSize();
 
     m_aui.AddPane(list_ctrl_master, wxAuiPaneInfo().Name(wxT("masterlist")).
-                  CloseButton(false).Center().BestSize(size).MinSize(size.x,20));
+                  CloseButton(false).Center().BestSize(size).MinSize(size.x, 20));
     m_aui.AddPane(list_ctrl_favourites, wxAuiPaneInfo().Name(wxT("favlist")).
-                  Bottom().Row(2).BestSize(size).MinSize(size).FloatingSize(600,240));
+                  Bottom().Row(2).BestSize(size).MinSize(size).FloatingSize(600, 240));
     m_aui.AddPane(tree_ctrl_games, wxAuiPaneInfo().Name(wxT("games")).
                   Left().Layer(2).Position(0).
-                  MinSize(240,20).BestSize(240,120).FloatingSize(240,200));
+                  MinSize(300, 20).BestSize(300, 240).FloatingSize(300, 240));
     m_aui.AddPane(list_ctrl_info, wxAuiPaneInfo().Name(wxT("info")).
                   Left().Layer(2).Position(1).Fixed());
     m_aui.AddPane(player_info, wxAuiPaneInfo().Name(wxT("players0")).
                   Left().Layer(2).Position(2).
-                  MinSize(240,20).BestSize(CslListCtrlPlayerView::BestSizeMini).FloatingSize(280,200));
+                  MinSize(300, 20).BestSize(CslListCtrlPlayerView::BestSizeMini).FloatingSize(300, 240));
     m_aui.AddPane(pane_traffic, wxAuiPaneInfo().Name(wxT("traffic")).
                   Bottom().Left().Layer(2).Position(3).Hide().Fixed());
     m_aui.AddPane(list_ctrl_player_search, wxAuiPaneInfo().Name(wxT("search")).
                   Left().Layer(1).Position(0).Hide().
-                  MinSize(240,80).BestSize(240,150).FloatingSize(240,150));
+                  MinSize(300, 80).BestSize(300, 240).FloatingSize(300, 240));
     m_aui.AddPane(pane_country, wxAuiPaneInfo().Name(wxT("country")).
                   Left().Layer(1).Position(1).Hide().
-                  MinSize(240,80).BestSize(240,150).FloatingSize(240,150));
+                  MinSize(300, 80).BestSize(300, 240).FloatingSize(300, 240));
 
     m_aui_default_layout = m_aui.SavePerspective();
 
@@ -2099,7 +2099,8 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             sizer_search->Layout();
             search_ctrl->SetFocus();
             SetSearchCtrlErrorState(search_ctrl, false);
-            wxPostEvent(this, wxCommandEvent(wxEVT_COMMAND_TEXT_UPDATED, CSL_TEXT_SEARCH));
+            wxCommandEvent evt(wxEVT_COMMAND_TEXT_UPDATED, CSL_TEXT_SEARCH);
+            AddPendingEvent(evt);
             break;
         }
 
@@ -2111,7 +2112,8 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             text_search_result->SetLabel(wxString::Format(_("Result: %d players on %d servers"), 0, 0));
             sizer_search->Layout();
             SetSearchCtrlErrorState(search_ctrl, false);
-            wxPostEvent(this, wxCommandEvent(wxEVT_COMMAND_TEXT_UPDATED, CSL_TEXT_SEARCH));
+            wxCommandEvent evt(wxEVT_COMMAND_TEXT_UPDATED, CSL_TEXT_SEARCH);
+            AddPendingEvent(evt);
             break;
         }
 
@@ -2264,8 +2266,8 @@ void CslFrame::OnKeypress(wxKeyEvent& event)
             search_ctrl->Clear();
             search_ctrl->SetFocus();
 
-            wxPostEvent(this, wxCommandEvent(wxEVT_COMMAND_TEXT_UPDATED,CSL_TEXT_SEARCH));
-
+            wxCommandEvent evt(wxEVT_COMMAND_TEXT_UPDATED,CSL_TEXT_SEARCH);
+            AddPendingEvent(evt);
             return;
         }
     }
@@ -2296,11 +2298,6 @@ void CslFrame::OnSize(wxSizeEvent& event)
 #ifndef __WXMAC__
 void CslFrame::OnIconize(wxIconizeEvent& event)
 {
-#if wxCHECK_VERSION(2,9,0)
-    bool iconized=event.IsIconized();
-#else
-    bool iconized=event.Iconized();
-#endif
     if (CSL_FLAG_CHECK(CslGetSettings().Systray, CSL_USE_SYSTRAY) && IsIconized())
         Hide();
 

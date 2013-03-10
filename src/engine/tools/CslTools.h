@@ -22,7 +22,10 @@
 #define CSLTOOLS_H
 
 #ifdef _MSC_VER
-    #define strcasecmp _stricmp
+#ifdef _DEBUG
+#define CSL_DEBUG
+#endif
+#define strcasecmp _stricmp
 #endif //_MSC_VER
 
 #include <CslDynlib.h>
@@ -47,7 +50,7 @@
 
 CSL_DLL_TOOLS void Debug_Printf(const char *file, int line, const char *func, const char *fmt, ...);
 
-#ifdef _DEBUG
+#ifdef CSL_DEBUG
 #define CSL_DEF_DEBUG(...)  __VA_ARGS__
 #define CSL_DO_DEBUG(body)  do { body; } while (0)
 #define CSL_LOG_DEBUG(...)  do { Debug_Printf(__FILE__, __LINE__, __FUNCTION__, ## __VA_ARGS__); } while (0)
@@ -181,8 +184,8 @@ CSL_DLL_TOOLS wxInt32 BitCount32(wxUint32 value);
 #include <CslIPV4Addr.h>
 #include <CslCubeEngineTools.h>
 
-CSL_DLL_TOOLS void CmdlineEscapeQuotes(wxString& str);
-CSL_DLL_TOOLS void CmdlineEscapeSpaces(wxString& str);
+CSL_DLL_TOOLS wxString& CmdlineEscapeQuotes(wxString& str);
+CSL_DLL_TOOLS wxString& CmdlineEscapeSpaces(wxString& str);
 CSL_DLL_TOOLS char* FilterCubeString(char *src, wxInt32 coloursize, bool space = true, bool newline = false, bool tab = false);
 CSL_DLL_TOOLS wxString& FixFilename(wxString& name);
 inline bool IsIPV4(const CslIPV4Addr& addr, wxInt32 maskbits = 32) { return addr.GetMaskBits()==maskbits; }

@@ -13,7 +13,7 @@ include_HEADERS = CslArt.h CslGeoIP.h CslGuiTools.h \
 	CslListCtrl.h CslMenu.h CslPanelMap.h \
 	CslTTS.h CslToolTip.h
 
-libcslguitools_la_LIBADD = ${SPEECHD_LIBS}
+libcslguitools_la_LIBADD += ${SPEECHD_LIBS}
 
 if with_internal_geoip
 INCLUDES += -I$(top_srcdir)/src/external/libGeoIP

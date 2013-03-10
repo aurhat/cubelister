@@ -146,7 +146,7 @@ class CslSettings
                 ColPlayerSpectator(CSL_COLOUR_SPECTATOR)
         {}
 
-        CslSettings::~CslSettings()
+        ~CslSettings()
         {
             CslSettings& self = GetInstance();
 

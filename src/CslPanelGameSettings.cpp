@@ -67,6 +67,18 @@ void CslPanelGameSettings::set_properties()
 {
     // begin wxGlade: CslPanelGameSettings::set_properties
     // end wxGlade
+
+    CslGameClientSettings settings = m_game->GetClientSettings();
+
+    if (!settings.Binary.IsEmpty())
+        m_filepicker_binary->SetPath(settings.Binary);
+    if (!settings.GamePath.IsEmpty())
+        m_dirpicker_gamepath->SetPath(settings.GamePath);
+    if (!settings.ConfigPath.IsEmpty())
+        m_dirpicker_userdir->SetPath(settings.ConfigPath);
+
+    m_textctrl_precscript->SetValue(settings.PreScript);
+    m_textctrl_postscript->SetValue(settings.PostScript);
 }
 
 void CslPanelGameSettings::do_layout()
@@ -144,13 +156,13 @@ void CslPanelGameSettings::OnFileDirPicker(wxFileDirPickerEvent& event)
 
 bool CslPanelGameSettings::SaveSettings(wxString& error)
 {
-    wxString gamepath=m_dirpicker_gamepath->GetPath();
-    wxString configpath=m_dirpicker_userdir->GetPath();
+    wxString gamepath = m_dirpicker_gamepath->GetPath();
+    wxString configpath = m_dirpicker_userdir->GetPath();
 
     if (!gamepath.IsEmpty() && !gamepath.EndsWith(wxString(CSL_PATHDIV_WX)))
-        gamepath+=CSL_PATHDIV_WX;
+        gamepath += CSL_PATHDIV_WX;
     if (!configpath.IsEmpty() && !configpath.EndsWith(wxString(CSL_PATHDIV_WX)))
-        configpath+=CSL_PATHDIV_WX;
+        configpath += CSL_PATHDIV_WX;
 
     CslGameClientSettings settings(m_filepicker_binary->GetPath(),gamepath,configpath,
                                    m_textctrl_options->GetValue(),

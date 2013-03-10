@@ -46,18 +46,20 @@ void Debug_Printf(const char *file, int line, const char *func, const char *fmt,
     va_end(ArgList);
 }
 
-void CmdlineEscapeQuotes(wxString& str)
+wxString& CmdlineEscapeQuotes(wxString& str)
 {
 #ifndef __WXMSW__
     str.Replace(wxT("\""), wxT("\\\""));
 #endif
+    return str;
 }
 
-void CmdlineEscapeSpaces(wxString& str)
+wxString& CmdlineEscapeSpaces(wxString& str)
 {
 #ifndef __WXMSW__
     str.Replace(wxT(" "), wxT("\\ "));
 #endif
+    return str;
 }
 
 char* FilterCubeString(char *src, wxInt32 coloursize, bool space, bool newline, bool tab)

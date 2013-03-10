@@ -26,12 +26,12 @@
 */
 #define CSL_STRINGIFY(x) #x
 #define CSL_TO_STRING(x) CSL_STRINGIFY(x)
-#define CSL_VERSION_TO_STRING(a, b, c, d) CSL_TO_STRING(a##.##b##.##c##.##d)
+#define CSL_VERSION_TO_STRING(a, b, c, d) CSL_TO_STRING(a.b.c.d)
 
 #define __CSL_VERSION_MAJOR        0
 #define __CSL_VERSION_MINOR        8
 #define __CSL_VERSION_RELEASE      1
-#define __CSL_VERSION_SUBRELEASE  90
+#define __CSL_VERSION_SUBRELEASE  91
 
 #define __CSL_NAME_STR         "Cube Server Lister (CSL)"
 #define __CSL_NAME_SHORT_STR   "CSL"
@@ -57,14 +57,18 @@
 #define CSL_WEBADDR_STR        wxT("http://cubelister.sourceforge.net")
 
 #ifdef UNICODE
-#define __CSL_ENCODING__       wxT(" (Unicode)")
+    #if wxUSE_UNICODE_UTF8
+        #define __CSL_ENCODING__   wxT(" (UTF-8)")
+    #else
+        #define __CSL_ENCODING__   wxT(" (Unicode)")
+    #endif
 #else
-#define __CSL_ENCODING__       wxT(" (ANSI)")
+    #define __CSL_ENCODING__       wxT(" (ANSI)")
 #endif
 #if wxUSE_STL
-#define __CSL_STL__            wxT(" (STL)")
+    #define __CSL_STL__            wxT(" (STL)")
 #else
-#define __CSL_STL__
+    #define __CSL_STL__
 #endif
 #define CSL_WXVERSION_STR      wxString(wxVERSION_STRING __CSL_ENCODING__ __CSL_STL__)
 

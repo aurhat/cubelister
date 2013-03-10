@@ -254,8 +254,6 @@ class CSL_DLL_GUITOOLS CslListCtrl : public wxListCtrl
 
         wxArrayPtrVoid m_selected;
 
-        bool m_dontAdjustSize;
-
         wxInt32 ListFindItem(void *data);
 
         // virtual
@@ -295,6 +293,7 @@ class CSL_DLL_GUITOOLS CslListCtrl : public wxListCtrl
 
         wxInt32 m_processSelectEvent;
         wxUint32 m_mouseLastMove;
+        bool m_dontAdjustSize;
 
         DECLARE_EVENT_TABLE()
         DECLARE_DYNAMIC_CLASS_NO_COPY(CslListCtrl)

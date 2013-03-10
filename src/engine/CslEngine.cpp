@@ -57,8 +57,6 @@ bool CslEngine::Init(wxEvtHandler *handler,wxInt32 interval,wxInt32 pingRatio)
     if (m_ok)
         return false;
 
-    bool ok = true;
-
     GetTicks();
 
     m_udpSock = new CslUDP(this);
@@ -385,7 +383,7 @@ wxUint32 CslEngine::PingServersEx(bool force)
     }
 
 #if 0
-#ifdef _DEBUG
+#ifdef CSL_DEBUG
     if (c)
         CSL_LOG_DEBUG("Pinged %d servers\n",c);
 #endif
@@ -538,10 +536,14 @@ bool CslEngine::ParseDefaultPong(CslServerInfo *info, ucharbuf& buf)
 
     info->LastSeen = wxDateTime::Now().GetTicks();
 
-    AddPendingEvent(CslPongEvent(CslPongEvent::PONG, info));
+    CslPongEvent evt(CslPongEvent::PONG, info);
+    AddPendingEvent(evt);
 
     if (info->HasEvents())
-        AddPendingEvent(CslPongEvent(CslPongEvent::EVENT, info));
+    {
+        CslPongEvent evt(CslPongEvent::EVENT, info);
+        AddPendingEvent(evt);
+    }
 
     return info->Ping!=-1;
 }
@@ -553,7 +555,7 @@ bool CslEngine::ParsePong(CslServerInfo *info, CslNetPacket& packet)
     bool ret=true;
     ucharbuf p((uchar*)packet.Data(),packet.Size());
 
-#ifdef _DEBUG
+#ifdef CSL_DEBUG
     wxString msg_type=wxT("unknown");
 #endif
 
@@ -565,7 +567,7 @@ bool CslEngine::ParsePong(CslServerInfo *info, CslNetPacket& packet)
         {
             case CSL_EX_PING_UPTIME:
             {
-#ifdef _DEBUG
+#ifdef CSL_DEBUG
                 msg_type=wxT("uptime");
 #endif
                 vu=p.length(); // remember buffer position
@@ -601,13 +603,14 @@ bool CslEngine::ParsePong(CslServerInfo *info, CslNetPacket& packet)
 
                 info->ExtInfoStatus=CSL_EXT_STATUS_OK;
 
-                AddPendingEvent(CslPongEvent(CslPongEvent::UPTIME, info));
+                CslPongEvent evt(CslPongEvent::UPTIME, info);
+                AddPendingEvent(evt);
                 break;
             }
 
             case CSL_EX_PING_PLAYERSTATS:
             {
-#ifdef _DEBUG
+#ifdef CSL_DEBUG
                 msg_type=wxT("playerstats");
 #endif
                 CslPlayerStats& stats=info->PlayerStats;
@@ -655,7 +658,10 @@ bool CslEngine::ParsePong(CslServerInfo *info, CslNetPacket& packet)
                         stats.RemoveId(rid);
 
                         if (stats.m_ids.size()==0)
-                            AddPendingEvent(CslPongEvent(CslPongEvent::PLAYERSTATS, info));
+                        {
+                            CslPongEvent evt(CslPongEvent::PLAYERSTATS, info);
+                            AddPendingEvent(evt);
+                        }
                     }
 
                     break;
@@ -699,7 +705,10 @@ bool CslEngine::ParsePong(CslServerInfo *info, CslNetPacket& packet)
                     info->ExtInfoStatus=CSL_EXT_STATUS_OK;
 
                     if (rid==-1 && stats.m_ids.size()==0)
-                        AddPendingEvent(CslPongEvent(CslPongEvent::PLAYERSTATS, info));
+                    {
+                        CslPongEvent evt(CslPongEvent::PLAYERSTATS, info);
+                        AddPendingEvent(evt);
+                    }
 
                     break;
                 }
@@ -750,7 +759,10 @@ bool CslEngine::ParsePong(CslServerInfo *info, CslNetPacket& packet)
                                   data->IP>>24,data->IP>>16&0xff,data->IP>>8&0xff,data->IP&0xff,data->IP);
 #endif
                     if (stats.m_ids.size()==0)
-                        AddPendingEvent(CslPongEvent(CslPongEvent::PLAYERSTATS, info));
+                    {
+                        CslPongEvent evt(CslPongEvent::PLAYERSTATS, info);
+                        AddPendingEvent(evt);
+                    }
                 }
                 else
                 {
@@ -765,7 +777,7 @@ bool CslEngine::ParsePong(CslServerInfo *info, CslNetPacket& packet)
 
             case CSL_EX_PING_TEAMSTATS:
             {
-#ifdef _DEBUG
+#ifdef CSL_DEBUG
                 msg_type=wxT("teamstats");
 #endif
                 CslTeamStats& stats=info->TeamStats;
@@ -826,7 +838,8 @@ bool CslEngine::ParsePong(CslServerInfo *info, CslNetPacket& packet)
                 {
                     stats.Reset();
 
-                    AddPendingEvent(CslPongEvent(CslPongEvent::TEAMSTATS, info));
+                    CslPongEvent evt(CslPongEvent::TEAMSTATS, info);
+                    AddPendingEvent(evt);
 #if 0
                     CSL_LOG_DEBUG("%s (%s) ERROR: received - no teammode\n",
                                   U2C(msg_type),U2C(info->GetBestDescription()));
@@ -861,13 +874,14 @@ bool CslEngine::ParsePong(CslServerInfo *info, CslNetPacket& packet)
                 if (info->ExtInfoStatus==CSL_EXT_STATUS_FALSE)
                     break;
 
-                AddPendingEvent(CslPongEvent(CslPongEvent::TEAMSTATS, info));
+                CslPongEvent evt(CslPongEvent::TEAMSTATS, info);
+                AddPendingEvent(evt);
                 break;
             }
 
             default:
             {
-#ifdef _DEBUG
+#ifdef CSL_DEBUG
                 msg_type=wxT("unknown tag");
 #endif
                 CSL_LOG_DEBUG("%s: ERROR: unknown tag: %d\n",U2C(info->GetBestDescription()),cmd);
@@ -881,7 +895,7 @@ bool CslEngine::ParsePong(CslServerInfo *info, CslNetPacket& packet)
         ret=ParseDefaultPong(info, p);
     }
 
-#ifdef _DEBUG
+#ifdef CSL_DEBUG
     if (!p.overread() && p.remaining())
         CSL_LOG_DEBUG("%s: %d bytes left (type=%s)\n",U2C(info->GetBestDescription()),
                       packet.Size()-p.length(),U2C(msg_type));
@@ -951,12 +965,11 @@ void CslEngine::OnPong(CslPingEvent& event)
         return;
     }
 
+    CslServerInfo *info = NULL;
     const CslIPV4Addr& addr = packet->Address();
 
     if (!addr.IsOk())
         goto cleanup;
-
-    CslServerInfo *info = NULL;
 
     loopv(m_games)
     {
@@ -981,7 +994,7 @@ void CslEngine::OnPong(CslPingEvent& event)
 
         if (!IsLocalIPV4(addr, &m_systemIPV4Addresses))
         {
-             CSL_LOG_DEBUG("non local packet from %s\n", addr.Format(wxT("%i:%p")));
+            CSL_LOG_DEBUG("non local packet from %s\n", U2C(addr.Format(wxT("%i:%p"))));
             goto cleanup;
         }
 
