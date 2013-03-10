@@ -77,6 +77,7 @@ void CslPanelGameSettings::set_properties()
     if (!settings.ConfigPath.IsEmpty())
         m_dirpicker_userdir->SetPath(settings.ConfigPath);
 
+    m_textctrl_options->SetValue(settings.Options);
     m_textctrl_precscript->SetValue(settings.PreScript);
     m_textctrl_postscript->SetValue(settings.PostScript);
 }
