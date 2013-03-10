@@ -47,10 +47,10 @@ void CslBufferedStaticBitmap::SetBitmap(const wxBitmap& bmp)
 
 void CslBufferedStaticBitmap::OnPaint(wxPaintEvent& WXUNUSED(event))
 {
+    wxPaintDC dc(this);
+
     if (!m_bmp.IsNull())
     {
-        wxPaintDC dc(this);
-
         wxPoint offset(m_size.x/2-m_bmpSize.x/2, m_size.y/2-m_bmpSize.y/2);
 
         dc.DrawBitmap(m_bmp, offset, true);
