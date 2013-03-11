@@ -108,14 +108,15 @@ class CSL_DLL_GUITOOLS CslListColumn : public wxObject
                       bool locked = false)
             { Create(name, format, weight, locked); }
 
-        CslListColumn& Create(const wxString& name, wxListColumnFormat format,
+        CslListColumn& Create(const wxString& name,
+                              wxListColumnFormat format,
                               float weight, bool locked)
         {
             Name = name;
             Format = format;
             Width = 0;
             Weight = weight;
-            Locked = Locked;
+            Locked = locked;
             return *this;
         }
 
