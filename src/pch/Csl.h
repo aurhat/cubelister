@@ -34,8 +34,6 @@
 #define new DEBUG_NEW
 #endif // _DEBUG && _MSC_VER
 #include <ws2tcpip.h>
-#else
-#include "config.h"
 #endif //_WINDOWS
 #include <wx/wx.h>
 #if wxUSE_GUI

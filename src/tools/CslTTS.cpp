@@ -21,19 +21,20 @@
 #include "Csl.h"
 
 #if defined(__WXMSW__)
-#include <sapi.h>
+    #include <sapi.h>
     #ifdef _MSC_VER
         #pragma comment(lib, "sapi.lib")
     #endif
 #elif defined(__WXMAC__)
     #include <Carbon/Carbon.h>
 #elif defined(HAVE_CONFIG_H)
+    #include <config.h>
     #if HAVE_LIBSPEECHD_H
         #include <libspeechd.h>
     #elif HAVE_LIBSPEECHD_08_H
         #define HAVE_LIBSPEECHD_H 1
         #include <speech-dispatcher/libspeechd.h>
-    #endif //HAVE_LIBSPEECHD_H
+    #endif
 #endif //__WXMSW__
 
 #include "CslTTS.h"
@@ -167,6 +168,8 @@ bool CslTTS::Say(const wxString& text)
     return self.Process(text);
 #elif defined(HAVE_LIBSPEECHD_H)
     return spd_say(g_csl_spd,SPD_MESSAGE,U2C(text))>-1;
+#else
+    return false;
 #endif //__WXMSW__
 }
 
