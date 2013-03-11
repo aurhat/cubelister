@@ -170,9 +170,10 @@ void GetSystemIPV4Addresses(CslArrayCslIPV4Addr& addresses)
         ip=(wxUint32)((sockaddr_in*)&(ifi[i].iiAddress))->sin_addr.S_un.S_addr;
         mask=(wxUint32)((sockaddr_in*)&(ifi[i].iiNetmask))->sin_addr.S_un.S_addr;
 
-        addresses.Add(new CslIPV4Addr(ip, mask));
+        CslIPV4Addr *addr = new CslIPV4Addr(ip, 0, mask);
+        addresses.Add(addr);
 
-        CSL_LOG_DEBUG("%s / %s\n", U2C(NtoA(ip)), U2C(NtoA(mask)));
+        CSL_LOG_DEBUG("%s\n", U2C(addr->Format(wxT("%i / %m"))));
     }
 
 cleanup:
@@ -221,9 +222,10 @@ cleanup:
             continue;
         }
 
-        addresses.Add(new CslIPV4Addr(ip, mask));
+        CslIPV4Addr *addr = new CslIPV4Addr(ip, 0, mask);
+        addresses.Add(addr);
 
-        CSL_LOG_DEBUG("%s / %s\n", U2C(NtoA(ip)), U2C(NtoA(mask)));
+        CSL_LOG_DEBUG("%s\n", U2C(addr->Format(wxT("%i / %m"))));
     }
 
 cleanup:
