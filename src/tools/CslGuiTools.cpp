@@ -19,7 +19,6 @@
  ***************************************************************************/
 
 #include <Csl.h>
-#include <wx/dcbuffer.h>
 
 DEFINE_EVENT_TYPE(wxCSL_EVT_SETTINGS_CHANGED)
 
