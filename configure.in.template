@@ -66,13 +66,13 @@ WXTEST
 
 dnl Check for minimum wx version
 vers=`echo $wxversion | $AWK 'BEGIN { FS = "."; } { printf "% d", ($1 * 1000 + $2) * 1000 + $3;}'`
-if test -n "$vers" && test "$vers" -ge 2008000; then
+if test -n "$vers" && test "$vers" -ge 2008008; then
   WX_CXXFLAGS=" `$WXCONFIG --cxxflags | sed -e 's/-fno-exceptions//'`"
   dnl WX_LIBS="`$WXCONFIG --libs`"
   WX_LIBS="`$WXCONFIG --libs base,adv,core,net,richtext,qa,xml,html,xml,aui`"
   wxtype=`echo $WX_CXXFLAGS | sed 's/\(.*\)\(ansi\|unicode\)\(.*\)/\2/'`
 else
-  AC_MSG_ERROR([wxWidgets 2.8.0 or newer is required])
+  AC_MSG_ERROR([wxWidgets 2.8.8 or newer is required])
 fi
 CXXFLAGS+="$WX_CXXFLAGS"
 AC_SUBST(WX_LIBS)
@@ -80,14 +80,17 @@ AC_SUBST(WX_LIBS)
 
 dnl speech-dispatcher
 use_speechd="yes"
-AC_ARG_ENABLE(speechd,AC_HELP_STRING([--disable-speechd],
-                                     [disable speech-dispatcher support]),
+AC_ARG_ENABLE(speechd, AC_HELP_STRING([--disable-speechd],
+                                      [disable speech-dispatcher support]),
               use_speechd=$enableval)
 if test "x$use_speechd" = "xyes"; then
-  AC_CHECK_HEADERS(libspeechd.h,SPEECHD_LIBS="-lspeechd",use_speechd="no")
+  PKG_CHECK_MODULES(SPEECHD, speech-dispatcher, [
+    AC_DEFINE([HAVE_LIBSPEECHD_08_H], [1], [""])
+    CXXFLAGS+=" $SPEECHD_CFLAGS"
+  ], [
+    AC_CHECK_HEADERS(libspeechd.h, SPEECHD_LIBS="-lspeechd", use_speechd="no")
+  ])
 fi
-AC_SUBST(SPEECHD_LIBS)
-
 
 dnl libGeoIP
 use_internal_geoip="yes"

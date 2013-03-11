@@ -28,8 +28,11 @@
 #elif defined(__WXMAC__)
     #include <Carbon/Carbon.h>
 #elif defined(HAVE_CONFIG_H)
-    #ifdef HAVE_LIBSPEECHD_H
+    #if HAVE_LIBSPEECHD_H
         #include <libspeechd.h>
+    #elif HAVE_LIBSPEECHD_08_H
+        #define HAVE_LIBSPEECHD_H 1
+        #include <speech-dispatcher/libspeechd.h>
     #endif //HAVE_LIBSPEECHD_H
 #endif //__WXMSW__
 
