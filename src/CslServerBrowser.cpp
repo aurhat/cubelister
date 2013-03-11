@@ -128,6 +128,9 @@ wxUint32 CslListCtrlServer::Rebuild(bool force)
 
     wxWindowUpdateLocker locker(this);
 
+    if (force)
+        DeleteAllItems();
+
     loopv(m_servers)
     {
         CslListServerData *data = m_servers[i];
