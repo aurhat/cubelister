@@ -1660,6 +1660,8 @@ void CslFrame::OnTreeSelChanged(wxTreeEvent& event)
     wxTreeItemId item=event.GetItem();
     wxTreeItemId olditem=event.GetOldItem();
 
+    wxWindowUpdateLocker lock(this);
+
     if (olditem.IsOk())
     {
         wxString s=tree_ctrl_games->GetItemText(olditem);
