@@ -2349,7 +2349,7 @@ void CslFrame::OnClose(wxCloseEvent& event)
 #ifndef __WXMAC__
         if (CSL_FLAG_CHECK(CslGetSettings().Systray, CSL_USE_SYSTRAY) &&
             CSL_FLAG_CHECK(CslGetSettings().Systray, CSL_SYSTRAY_CLOSE) &&
-            ::wxGetApp().Shutdown()==CslApp::CSL_SHUTDOWN_NORMAL)
+            ::wxGetApp().Shutdown()!=CslApp::CSL_SHUTDOWN_NORMAL)
         {
             ToggleShow(-1);
             return;
