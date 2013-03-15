@@ -416,7 +416,7 @@ void CslListCtrl::ListAddColumn(const wxString& name, wxListColumnFormat format,
 {
     m_columns.AddColumn(name, format, weight, enabled, locked);
 
-    if (enabled && !name.IsEmpty())
+    if (enabled && !(GetWindowStyle()&wxLC_NO_HEADER))
     {
         wxListItem item;
         wxInt32 rcolumn = m_columns.GetColumnId(m_columns.GetCount()-1, false);
