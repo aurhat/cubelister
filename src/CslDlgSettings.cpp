@@ -307,7 +307,6 @@ void CslDlgSettings::do_layout()
     grid_sizer_pane_colours->Add(sizer_colours_player, 1, wxALL|wxEXPAND, 4);
     notebook_pane_colour->SetSizer(grid_sizer_pane_colours);
     grid_sizer_pane_colours->AddGrowableCol(0);
-    grid_sizer_pane_colours->AddGrowableCol(1);
     wxStaticText* label_update_static = new wxStaticText(notebook_pane_other, wxID_ANY, _("Update interval (seconds):"));
     grid_sizer_times->Add(label_update_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_spin_ctrl_update->Add(1, 1, 0, 0, 0);
