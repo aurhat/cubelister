@@ -629,7 +629,7 @@ void CslListCtrl::ListSort(wxInt32 column)
     m_processSelectEvent=1;
 
 #ifndef __WXMSW__
-#if !wxCHECK_VERSION(2, 9, 0) //TODO: replacement needed?
+#if !wxCHECK_VERSION(2, 9, 0)
     //removes flicker on autosort for wxGTK and wxMAC
     wxIdleEvent idle;
     wxTheApp->SendIdleEvents(this, idle);

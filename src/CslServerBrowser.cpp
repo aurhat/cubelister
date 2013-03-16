@@ -694,7 +694,6 @@ void CslListCtrlServer::GetToolTipText(wxInt32 row,CslToolTipEvent& event)
         // some image was found
         if (bmp.IsOk())
         {
-            // TODO: should min size base on screen resolution ?
             if (bmp.GetWidth()>150)
                 bmp = RescaleBitmap(bmp, wxSize(150, 150), true);
 
