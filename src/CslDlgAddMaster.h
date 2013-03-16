@@ -31,9 +31,11 @@ class CslDlgAddMaster: public wxDialog
     public:
         // begin wxGlade: CslDlgAddMaster::ids
         // end wxGlade
-        CslDlgAddMaster(wxWindow* parent, wxInt32 id=wxID_ANY, const wxString& title=wxEmptyString,
-                        const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize,
-                        long style=wxDEFAULT_DIALOG_STYLE);
+        CslDlgAddMaster(wxWindow* parent, wxInt32 id = wxID_ANY,
+                        const wxString& title = wxEmptyString,
+                        const wxPoint& pos = wxDefaultPosition,
+                        const wxSize& size = wxDefaultSize,
+                        long style = wxDEFAULT_DIALOG_STYLE);
 
         void InitDlg(wxUint32 *fourcc);
 
@@ -49,7 +51,7 @@ class CslDlgAddMaster: public wxDialog
 
     protected:
         // begin wxGlade: CslDlgAddMaster::attributes
-        wxStaticBox* sizer_address_staticbox;
+        wxStaticBox* sizer_master_staticbox;
         wxChoice* choice_gametype;
         wxChoice* choice_mastertype;
         wxTextCtrl* text_ctrl_address;

@@ -90,7 +90,7 @@ class CslDlgSettings : public wxDialog
         wxSpinCtrl* spin_ctrl_ping_bad;
         wxCheckBox* checkbox_game_output;
         wxDirPickerCtrl* dirpicker_game_output;
-        wxPanel* notebook_pane_irc;
+        wxPanel* notebook_pane_other;
         wxNotebook* notebook_settings;
         wxButton* button_ok;
         wxButton* button_cancel;

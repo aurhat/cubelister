@@ -32,9 +32,11 @@ class CslDlgAddServer: public wxDialog
         // begin wxGlade: CslDlgAddServer::ids
         // end wxGlade
 
-        CslDlgAddServer(wxWindow* parent, wxInt32 id=wxID_ANY, const wxString& title=wxEmptyString,
-                        const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize,
-                        long style=wxDEFAULT_DIALOG_STYLE);
+        CslDlgAddServer(wxWindow* parent, wxInt32 id = wxID_ANY,
+                        const wxString& title = wxEmptyString,
+                        const wxPoint& pos = wxDefaultPosition,
+                        const wxSize& size = wxDefaultSize,
+                        long style = wxDEFAULT_DIALOG_STYLE);
 
         CslServerInfo* InitDlg(CslServerInfo *info);
 

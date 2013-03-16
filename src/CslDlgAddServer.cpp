@@ -97,13 +97,15 @@ void CslDlgAddServer::do_layout()
     grid_sizer_input->Add(text_ctrl_address, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
     wxStaticText* label_gameport_static = new wxStaticText(this, wxID_ANY, _("Port:"));
     grid_sizer_input->Add(label_gameport_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_port->Add(spin_ctrl_gameport, 0, wxALL, 4);
+    grid_sizer_port->Add(spin_ctrl_gameport, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
     wxStaticText* label_infoport_static = new wxStaticText(this, wxID_ANY, _("Info port:"));
     grid_sizer_port->Add(label_infoport_static, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
-    grid_sizer_port->Add(spin_ctrl_infoport, 0, wxALL, 4);
-    grid_sizer_input->Add(grid_sizer_port, 1, 0, 0);
+    grid_sizer_port->Add(spin_ctrl_infoport, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_port->AddGrowableCol(0);
+    grid_sizer_port->AddGrowableCol(2);
+    grid_sizer_input->Add(grid_sizer_port, 1, wxEXPAND, 0);
     grid_sizer_input->AddGrowableRow(1);
-    grid_sizer_input->AddGrowableCol(0);
+    grid_sizer_input->AddGrowableCol(1);
     sizer_address->Add(grid_sizer_input, 1, wxEXPAND, 0);
     grid_sizer_main->Add(sizer_address, 1, wxALL|wxEXPAND, 4);
     grid_sizer_button->Add(1, 1, 0, 0, 0);
@@ -113,6 +115,7 @@ void CslDlgAddServer::do_layout()
     grid_sizer_main->Add(grid_sizer_button, 1, wxBOTTOM|wxEXPAND, 4);
     SetSizer(grid_sizer_main);
     grid_sizer_main->Fit(this);
+    grid_sizer_main->AddGrowableCol(0);
     Layout();
     // end wxGlade
 

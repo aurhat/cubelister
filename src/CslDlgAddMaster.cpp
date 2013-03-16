@@ -47,7 +47,7 @@ CslDlgAddMaster::CslDlgAddMaster(wxWindow* parent, wxInt32 id,
         m_fourcc(NULL)
 {
     // begin wxGlade: CslDlgAddMaster::CslDlgAddMaster
-    sizer_address_staticbox = new wxStaticBox(this, -1, wxEmptyString);
+    sizer_master_staticbox = new wxStaticBox(this, -1, wxEmptyString);
     const wxString choice_gametype_choices[] = {
         _("default")
     };
@@ -88,32 +88,34 @@ void CslDlgAddMaster::do_layout()
     // begin wxGlade: CslDlgAddMaster::do_layout
     wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(2, 1, 0, 0);
     wxFlexGridSizer* grid_sizer_button = new wxFlexGridSizer(1, 3, 0, 0);
-    wxStaticBoxSizer* sizer_address = new wxStaticBoxSizer(sizer_address_staticbox, wxHORIZONTAL);
-    wxFlexGridSizer* grid_sizer_address = new wxFlexGridSizer(3, 2, 0, 0);
-    wxFlexGridSizer* grid_sizer_address_copy = new wxFlexGridSizer(1, 3, 0, 0);
-    wxFlexGridSizer* grid_sizer_choice = new wxFlexGridSizer(1, 3, 0, 0);
-    wxStaticText* label_game_static_copy = new wxStaticText(this, wxID_ANY, _("Game:"));
-    grid_sizer_address->Add(label_game_static_copy, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_choice->Add(choice_gametype, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    wxStaticBoxSizer* sizer_master = new wxStaticBoxSizer(sizer_master_staticbox, wxHORIZONTAL);
+    wxFlexGridSizer* grid_sizer_master = new wxFlexGridSizer(3, 2, 0, 0);
+    wxFlexGridSizer* grid_sizer_address = new wxFlexGridSizer(1, 3, 0, 0);
+    wxFlexGridSizer* grid_sizer_game = new wxFlexGridSizer(1, 3, 0, 0);
+    wxStaticText* label_game_static = new wxStaticText(this, wxID_ANY, _("Game:"));
+    grid_sizer_master->Add(label_game_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_game->Add(choice_gametype, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
     wxStaticText* label_master_static = new wxStaticText(this, wxID_ANY, _("Master type:"));
-    grid_sizer_choice->Add(label_master_static, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
-    grid_sizer_choice->Add(choice_mastertype, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_choice->AddGrowableCol(0);
-    grid_sizer_choice->AddGrowableCol(2);
-    grid_sizer_address->Add(grid_sizer_choice, 1, wxEXPAND, 0);
+    grid_sizer_game->Add(label_master_static, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
+    grid_sizer_game->Add(choice_mastertype, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_game->AddGrowableCol(0);
+    grid_sizer_game->AddGrowableCol(2);
+    grid_sizer_master->Add(grid_sizer_game, 1, wxEXPAND, 0);
     wxStaticText* label_address_static = new wxStaticText(this, wxID_ANY, _("Address:"));
-    grid_sizer_address->Add(label_address_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_address_copy->Add(text_ctrl_address, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_master->Add(label_address_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_address->Add(text_ctrl_address, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
     wxStaticText* label_port_static = new wxStaticText(this, wxID_ANY, _("Port:"));
-    grid_sizer_address_copy->Add(label_port_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_address_copy->Add(spin_ctrl_port, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_address->Add(grid_sizer_address_copy, 1, wxEXPAND, 0);
+    grid_sizer_address->Add(label_port_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_address->Add(spin_ctrl_port, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_address->AddGrowableCol(0);
+    grid_sizer_address->AddGrowableCol(2);
+    grid_sizer_master->Add(grid_sizer_address, 1, wxEXPAND, 0);
     wxStaticText* label_path_static = new wxStaticText(this, wxID_ANY, _("Path:"));
-    grid_sizer_address->Add(label_path_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_address->Add(text_ctrl_path, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_address->AddGrowableCol(1);
-    sizer_address->Add(grid_sizer_address, 1, wxTOP|wxEXPAND, 2);
-    grid_sizer_main->Add(sizer_address, 1, wxALL|wxEXPAND, 4);
+    grid_sizer_master->Add(label_path_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_master->Add(text_ctrl_path, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_master->AddGrowableCol(1);
+    sizer_master->Add(grid_sizer_master, 1, wxTOP|wxEXPAND, 2);
+    grid_sizer_main->Add(sizer_master, 1, wxALL|wxEXPAND, 4);
     grid_sizer_button->Add(1, 1, 0, 0, 0);
     grid_sizer_button->Add(button_add, 0, wxALL|wxEXPAND, 4);
     grid_sizer_button->Add(button_cancel, 0, wxALL|wxEXPAND, 4);
