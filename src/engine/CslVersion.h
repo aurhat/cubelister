@@ -31,7 +31,7 @@
 #define __CSL_VERSION_MAJOR        0
 #define __CSL_VERSION_MINOR        8
 #define __CSL_VERSION_RELEASE      1
-#define __CSL_VERSION_SUBRELEASE  92
+#define __CSL_VERSION_SUBRELEASE  93
 
 #define __CSL_NAME_STR         "Cube Server Lister (CSL)"
 #define __CSL_NAME_SHORT_STR   "CSL"
