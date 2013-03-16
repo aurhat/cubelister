@@ -87,6 +87,10 @@ template<class T> inline T min(T a, T b) { return a < b ? a : b; }
 #define loopvk(v)       _loopv(k, v)
 #define loopvrev(v)     _loopvrev(i, v)
 
+#ifndef wxT_2 // older wx versions
+#define wxT_2(x) wxT(x)
+#endif
+
 typedef const char FourCCTag[4];
 static inline wxUint32 CSL_BUILD_FOURCC(FourCCTag tag)
 {
