@@ -15,14 +15,14 @@
     <projectname>csl</projectname>
     <projectdirectory>.</projectdirectory>
     <absoluteprojectpath>false</absoluteprojectpath>
-    <description/>
-    <defaultencoding/>
+    <description></description>
+    <defaultencoding></defaultencoding>
     <versioncontrol/>
   </general>
   <kdevautoproject>
     <general>
       <activetarget>src/csl</activetarget>
-      <useconfiguration>debug-unicode</useconfiguration>
+      <useconfiguration>release</useconfiguration>
     </general>
     <run>
       <mainprogram>/home/mimosius/Documents/Development/csl</mainprogram>
@@ -49,48 +49,31 @@
       <envvars/>
     </run>
     <configurations>
-      <debug-unicode>
-        <configargs>--with-wx-config=wx-config-2.8u --disable-pch</configargs>
-        <builddir>debug-unicode</builddir>
-        <ccompiler>kdevgccoptions</ccompiler>
-        <cxxcompiler>kdevgppoptions</cxxcompiler>
-        <f77compiler>kdevg77options</f77compiler>
-        <cxxflags>-O0 -ggdb3</cxxflags>
-        <envvars/>
-        <topsourcedir/>
-        <cppflags>-DCSL_DEBUG</cppflags>
-        <ldflags/>
-        <ccompilerbinary/>
-        <cxxcompilerbinary/>
-        <f77compilerbinary/>
-        <cflags>-O0 -ggdb3</cflags>
-        <f77flags/>
-      </debug-unicode>
       <debug>
-        <configargs>--with-wx-config=wx-config-2.8d</configargs>
+        <configargs>--with-wx-config=wx-config --disable-pch</configargs>
         <builddir>debug</builddir>
         <ccompiler>kdevgccoptions</ccompiler>
         <cxxcompiler>kdevgppoptions</cxxcompiler>
         <f77compiler>kdevg77options</f77compiler>
         <cxxflags>-O0 -ggdb3</cxxflags>
         <envvars/>
-        <topsourcedir/>
+        <topsourcedir></topsourcedir>
         <cppflags>-DCSL_DEBUG</cppflags>
-        <ldflags/>
-        <ccompilerbinary/>
-        <cxxcompilerbinary/>
-        <f77compilerbinary/>
+        <ldflags></ldflags>
+        <ccompilerbinary></ccompilerbinary>
+        <cxxcompilerbinary></cxxcompilerbinary>
+        <f77compilerbinary></f77compilerbinary>
         <cflags>-O0 -ggdb3</cflags>
-        <f77flags/>
+        <f77flags></f77flags>
       </debug>
-      <optimized>
-        <builddir>optimized</builddir>
+      <release>
+        <builddir>release</builddir>
         <ccompiler>kdevgccoptions</ccompiler>
         <cxxcompiler>kdevgppoptions</cxxcompiler>
         <f77compiler>kdevg77options</f77compiler>
         <cxxflags>-O3 -ggdb3</cxxflags>
         <envvars/>
-        <configargs>--with-wx-config=wx-config-2.8</configargs>
+        <configargs>--with-wx-config=wx-config</configargs>
         <topsourcedir/>
         <cppflags>-DCSL_DEBUG</cppflags>
         <ldflags/>
@@ -99,24 +82,7 @@
         <f77compilerbinary/>
         <cflags>-O3 -ggdb3</cflags>
         <f77flags/>
-      </optimized>
-      <optimized-unicode>
-        <builddir>optimized-unicode</builddir>
-        <ccompiler>kdevgccoptions</ccompiler>
-        <cxxcompiler>kdevgppoptions</cxxcompiler>
-        <f77compiler>kdevg77options</f77compiler>
-        <cxxflags>-O3 -ggdb3</cxxflags>
-        <envvars/>
-        <configargs>--with-wx-config=wx-config-2.8u</configargs>
-        <topsourcedir/>
-        <cppflags>-DCSL_DEBUG</cppflags>
-        <ldflags/>
-        <ccompilerbinary/>
-        <cxxcompilerbinary/>
-        <f77compilerbinary/>
-        <cflags>-O3 -ggdb3</cflags>
-        <f77flags/>
-      </optimized-unicode>
+      </release>
       <default>
         <envvars/>
         <configargs>--with-wx-config=/usr/bin/wx-config</configargs>
@@ -134,10 +100,27 @@
         <cxxflags>-g</cxxflags>
         <f77flags/>
       </default>
-      <debug-3>
+      <debug-wx3>
         <envvars/>
-        <configargs>--with-wx-config=wx-config</configargs>
-        <builddir>debug-3</builddir>
+        <configargs>--with-wx-config=wx-config-2.9 --disable-pch</configargs>
+        <builddir>debug-wx3</builddir>
+        <topsourcedir></topsourcedir>
+        <cppflags>-DCSL_DEBUG</cppflags>
+        <ldflags></ldflags>
+        <ccompiler>kdevgccoptions</ccompiler>
+        <cxxcompiler>kdevgppoptions</cxxcompiler>
+        <f77compiler>kdevg77options</f77compiler>
+        <ccompilerbinary></ccompilerbinary>
+        <cxxcompilerbinary></cxxcompilerbinary>
+        <f77compilerbinary></f77compilerbinary>
+        <cflags>-O0 -ggdb3</cflags>
+        <cxxflags>-O0 -ggdb3</cxxflags>
+        <f77flags></f77flags>
+      </debug-wx3>
+      <release-wx3>
+        <envvars/>
+        <configargs>--with-wx-config=wx-config-2.9</configargs>
+        <builddir>release-wx3</builddir>
         <topsourcedir/>
         <cppflags>-DCSL_DEBUG</cppflags>
         <ldflags/>
@@ -147,27 +130,10 @@
         <ccompilerbinary/>
         <cxxcompilerbinary/>
         <f77compilerbinary/>
-        <cflags>-O0 -ggdb3</cflags>
-        <cxxflags>-O0 -ggdb3</cxxflags>
+        <cflags>-O3 -ggdb3</cflags>
+        <cxxflags>-O3 -ggdb3</cxxflags>
         <f77flags/>
-      </debug-3>
-      <default-debug>
-        <envvars/>
-        <configargs>--with-wx-config=/usr/bin/wx-config</configargs>
-        <builddir>default-debug</builddir>
-        <topsourcedir/>
-        <cppflags>-DCSL_DEBUG</cppflags>
-        <ldflags/>
-        <ccompiler>kdevgccoptions</ccompiler>
-        <cxxcompiler>kdevgppoptions</cxxcompiler>
-        <f77compiler>kdevg77options</f77compiler>
-        <ccompilerbinary/>
-        <cxxcompilerbinary/>
-        <f77compilerbinary/>
-        <cflags>-O0 -ggdb3</cflags>
-        <cxxflags>-O0 -ggdb3</cxxflags>
-        <f77flags/>
-      </default-debug>
+      </release-wx3>
     </configurations>
     <configurations>
       <default>
@@ -300,7 +266,7 @@
       <includePaths>.;</includePaths>
     </codecompletion>
     <creategettersetter>
-      <prefixGet/>
+      <prefixGet></prefixGet>
       <prefixSet>set</prefixSet>
       <prefixVariable>m_,_</prefixVariable>
       <parameterName>theValue</parameterName>
@@ -316,11 +282,11 @@
   </cppsupportpart>
   <kdevdebugger>
     <general>
-      <gdbpath/>
+      <gdbpath></gdbpath>
       <dbgshell>libtool --mode=execute</dbgshell>
-      <configGdbScript/>
-      <runShellScript/>
-      <runGdbScript/>
+      <configGdbScript></configGdbScript>
+      <runShellScript></runShellScript>
+      <runGdbScript></runGdbScript>
       <breakonloadinglibs>true</breakonloadinglibs>
       <separatetty>false</separatetty>
       <floatingtoolbar>false</floatingtoolbar>

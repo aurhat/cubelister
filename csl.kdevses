@@ -4,11 +4,7 @@
  <DocsAndViews NumberOfDocuments="0" />
  <pluginList>
   <kdevdebugger>
-   <breakpointList>
-    <breakpoint0 location="/home/mimosius/Documents/Development/projects/csl/csl/src/tools/CslGuiTools.h:91" type="1" tracingFormatString="" traceFormatStringEnabled="0" condition="" tracingEnabled="0" enabled="1" >
-     <tracedExpressions/>
-    </breakpoint0>
-   </breakpointList>
+   <breakpointList/>
    <showInternalCommands value="0" />
   </kdevdebugger>
   <kdevastyle>

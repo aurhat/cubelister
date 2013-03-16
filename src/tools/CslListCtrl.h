@@ -21,10 +21,6 @@
 #ifndef CSLLISTCTRL_H
 #define CSLLISTCTRL_H
 
-/**
-    @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
-
 #include <CslToolTip.h>
 
 BEGIN_DECLARE_EVENT_TYPES()
@@ -63,8 +59,6 @@ enum
 
     CSL_LIST_IMG_GAMES_START
 };
-
-typedef int (wxCALLBACK *CslListSortCallBack)(long item1, long item2, long sorthelper);
 
 class CSL_DLL_GUITOOLS CslListSort : public wxObject
 {
@@ -210,6 +204,7 @@ class CSL_DLL_GUITOOLS CslListColumns : public wxObject
         DECLARE_DYNAMIC_CLASS(CslListColumns)
 };
 
+
 class CSL_DLL_GUITOOLS CslListCtrl : public wxListCtrl
 {
     public:
@@ -243,7 +238,7 @@ class CSL_DLL_GUITOOLS CslListCtrl : public wxListCtrl
         wxUint32 ListGetColumnMask() const { return m_columns.GetColumnMask(); }
         bool ListColumnIsEnabled(wxInt32 id) const { return m_columns.IsEnabled(id); }
 
-        void SetSortCallback(CslListSortCallBack fn, wxInt32 mode, wxInt32 column);
+        void SetSortCallback(wxListCtrlCompare fn, wxInt32 mode, wxInt32 column);
         void ListSort(wxInt32 column=-1);
 
         virtual void ListAdjustSize(const wxSize& size = wxDefaultSize);
@@ -251,9 +246,14 @@ class CSL_DLL_GUITOOLS CslListCtrl : public wxListCtrl
         static void CreateImageList(CslEngine* engine);
 
     protected:
-        static wxImageList ListImageList;
-
-        wxArrayPtrVoid m_selected;
+        wxInt32 GetHeaderHeight()
+        {
+#ifdef __WXMSW__
+            return 0;
+#else
+            return HasHeader() ? ((wxWindow*)m_headerWin)->GetSize().GetHeight() : 0;
+#endif
+        }
 
         wxInt32 ListFindItem(void *data);
 
@@ -271,6 +271,18 @@ class CSL_DLL_GUITOOLS CslListCtrl : public wxListCtrl
             return wxDefaultSize;
         }
 
+        wxUint32 m_mouseLastMove;
+
+        CslListSort m_sortHelper;
+
+        bool m_dontAdjustSize;
+        bool m_userColumnSize;
+        CslListColumns m_columns;
+
+        wxInt32 m_processSelectEvent;
+        wxArrayPtrVoid m_selected;
+
+        static wxImageList ListImageList;
     private:
 #ifdef __WXMSW__
         void OnEraseBackground(wxEraseEvent& event);
@@ -287,14 +299,7 @@ class CSL_DLL_GUITOOLS CslListCtrl : public wxListCtrl
         void OnItem(wxListEvent& event);
         void OnToolTip(CslToolTipEvent& event);
 
-        CslListColumns m_columns;
-
-        CslListSort m_sortHelper;
-        CslListSortCallBack m_sortCallback;
-
-        wxInt32 m_processSelectEvent;
-        wxUint32 m_mouseLastMove;
-        bool m_dontAdjustSize;
+        wxListCtrlCompare m_sortCallback;
 
         DECLARE_EVENT_TABLE()
         DECLARE_DYNAMIC_CLASS_NO_COPY(CslListCtrl)

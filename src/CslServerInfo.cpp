@@ -297,13 +297,10 @@ void CslListCtrlInfo::OnSize(wxSizeEvent& event)
 {
     if (event.GetEventObject())
     {
-        wxWindowUpdateLocker lock(this);
-
-        ListAdjustSize();
-
-#ifndef __WXMSW__
+#if !defined(__WXMSW__) && !wxCHECK_VERSION(2, 9, 0)
+        // post another event to remove the scrollbars
         wxSizeEvent evt;
-        wxPostEvent(this, evt);
+        AddPendingEvent(evt);
 #else
         ScrollList(0, 0);
 #endif
@@ -311,13 +308,12 @@ void CslListCtrlInfo::OnSize(wxSizeEvent& event)
     }
     else
     {
-#if defined(__WXGTK__) || defined(__WXX11__)
-        wxWindow *window = GetChildWindowByClassInfo(this, CLASSINFO(wxScrolledWindow));
+#if !defined(__WXMSW__) && !wxCHECK_VERSION(2, 9, 0)
+        // remove the scrollbars
+        wxWindow *wnd = GetChildWindowByClassInfo(this, CLASSINFO(wxScrolledWindow));
 
-        if (window)
-            ((wxScrolledWindow*)window)->SetScrollbars(0, 0, 0, 0);
-#elif __WXMAC__
-        ((wxScrolledWindow*)m_genericImpl->m_mainWin)->SetScrollbars(0, 0, 0, 0);
+        if (wnd)
+            ((wxScrolledWindow*)wnd)->SetScrollbars(0, 0, 0, 0);
 #endif
     }
 }

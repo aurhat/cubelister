@@ -141,8 +141,10 @@ CslListCtrl::CslListCtrl(wxWindow* parent, wxWindowID id,
                          long style, const wxValidator& validator,
                          const wxString& name) :
         wxListCtrl(parent, id, pos, size, style, validator, name),
-        m_sortCallback(NULL), m_processSelectEvent(1), m_mouseLastMove(0),
-        m_dontAdjustSize(false)
+        m_mouseLastMove(0),
+        m_dontAdjustSize(false), m_userColumnSize(false),
+        m_processSelectEvent(1),
+        m_sortCallback(NULL)
 {
     SetImageList(&ListImageList, wxIMAGE_LIST_SMALL);
 
@@ -165,7 +167,7 @@ void CslListCtrl::OnEraseBackground(wxEraseEvent& event)
     //
     // another solution is to set the LVS_EX_DOUBLEBUFFER style
     // (commctrl 6.0) within the ctor but it needs a little more cpu:
-    //     HWND hwnd = (HWND)GetHWND();
+    //   HWND hwnd = (HWND)GetHWND();
     //   ListView_SetExtendedListViewStyle(hwnd, ListView_GetExtendedListViewStyle(hwnd)|LVS_EX_DOUBLEBUFFER);
 
     if (GetItemCount()>0)
@@ -230,7 +232,7 @@ void CslListCtrl::OnEraseBackground(wxEraseEvent& event)
 
 void CslListCtrl::OnColumnDragStart(wxListEvent& WXUNUSED(event))
 {
-    m_dontAdjustSize = true;
+    m_dontAdjustSize = m_userColumnSize = true;
 }
 
 void CslListCtrl::OnColumnDragEnd(wxListEvent& WXUNUSED(event))
@@ -269,13 +271,19 @@ void CslListCtrl::OnMouseMove(wxMouseEvent& event)
 
 void CslListCtrl::OnMenu(wxCommandEvent& event)
 {
-    wxInt32 id=event.GetId();
+    wxInt32 id = event.GetId();
 
     if (id==MENU_SAVEIMAGE)
         CreateScreenShot();
+    else if (id==MENU_LISTCTRL_COLUMN_ADJUST)
+    {
+        m_userColumnSize = false;
+
+        ListAdjustSize();
+    }
     else if (CSL_MENU_EVENT_IS_COLUMN(id))
     {
-        id-=MENU_LISTCTRL_COLUMN;
+        id -= MENU_LISTCTRL_COLUMN;
 
         ListToggleColumn(id);
     }
@@ -320,37 +328,50 @@ void CslListCtrl::OnColumnRightClick(wxListEvent& WXUNUSED(event))
 {
     CslToolTip::Reset();
 
-    wxInt32 count=m_columns.GetCount();
-
-    if (!count || count<=m_columns.GetLockedCount())
-        return;
-
     wxMenu menu;
-    wxMenuItem *item;
-    CslArrayListColumn& columns=m_columns.GetColumns();
+    wxMenuItem *item = NULL;
 
-    count=m_columns.GetCount(true);
+    wxInt32 count = m_columns.GetCount();
 
-    loopv(columns)
+    if (count && count>m_columns.GetLockedCount())
     {
-        const CslListColumn& c=*columns[i];
+        CslArrayListColumn& columns = m_columns.GetColumns();
 
-        if (c.Locked)
-            continue;
+        count = m_columns.GetCount(true);
 
-        item=new wxMenuItem(&menu, MENU_LISTCTRL_COLUMN+i, c.Name, wxART_NONE, wxITEM_CHECK);
-        menu.Append(item);
-        item->Check(m_columns.IsEnabled(i));
+        loopv(columns)
+        {
+            const CslListColumn& c = *columns[i];
 
-        if (count==1 && m_columns.IsEnabled(i))
-            menu.Enable(MENU_LISTCTRL_COLUMN+i, false);
+            if (c.Locked)
+                continue;
+
+            item = new wxMenuItem(&menu, MENU_LISTCTRL_COLUMN+i, c.Name, wxART_NONE, wxITEM_CHECK);
+            menu.Append(item);
+            item->Check(m_columns.IsEnabled(i));
+
+            if (count==1 && m_columns.IsEnabled(i))
+                 menu.Enable(MENU_LISTCTRL_COLUMN+i, false);
+        }
     }
 
-    wxPoint point=wxDefaultPosition;
+    if (HasHeader())
+    {
+        if (item)
+            menu.AppendSeparator();
+
+        item = new wxMenuItem(&menu, MENU_LISTCTRL_COLUMN_ADJUST, _("Adjust columns"));
+        menu.Append(item);
+    }
+
+    if (!item)
+        return;
+
+    wxPoint point = wxDefaultPosition;
     //from keyboard
     if (point==wxDefaultPosition)
-        point=wxGetMousePosition();
-    point=ScreenToClient(point);
+        point = wxGetMousePosition();
+    point = ScreenToClient(point);
 
     PopupMenu(&menu, point);
 }
@@ -374,27 +395,17 @@ void CslListCtrl::OnToolTip(CslToolTipEvent& event)
 {
     wxRect rect;
     wxListItem item;
-    wxInt32 i, offset = 0;
-#if defined(__WXGTK__) || defined(__WXMAC__)
-    bool first = true;
-#endif
+    wxInt32 offset = GetHeaderHeight();
     const wxSize& size = GetClientSize();
     const wxPoint& pos = ScreenToClient(event.Pos);
 
     if (pos.x>=0 && pos.y>=0 && pos.x<=size.x && pos.y<=size.y)
     {
-        for (i = GetTopItem(); i<GetItemCount(); i++)
+        for (wxInt32 i = GetTopItem(); i<GetItemCount(); i++)
         {
             item.SetId(i);
             GetItemRect(item, rect, wxLIST_RECT_BOUNDS);
 
-#if defined(__WXGTK__) || defined(__WXMAC__)
-            if (first)
-            {
-                offset = rect.y;
-                first = false;
-            }
-#endif
             rect.y -= offset;
 
             if (!rect.Contains(pos))
@@ -416,7 +427,7 @@ void CslListCtrl::ListAddColumn(const wxString& name, wxListColumnFormat format,
 {
     m_columns.AddColumn(name, format, weight, enabled, locked);
 
-    if (enabled && !(GetWindowStyle()&wxLC_NO_HEADER))
+    if (enabled && HasHeader())
     {
         wxListItem item;
         wxInt32 rcolumn = m_columns.GetColumnId(m_columns.GetCount()-1, false);
@@ -536,7 +547,7 @@ wxInt32 CslListCtrl::ListFindItem(void *data)
     return wxNOT_FOUND;
 }
 
-void CslListCtrl::SetSortCallback(CslListSortCallBack fn, wxInt32 mode, wxInt32 column)
+void CslListCtrl::SetSortCallback(wxListCtrlCompare fn, wxInt32 mode, wxInt32 column)
 {
     m_sortCallback=fn;
     m_sortHelper.Init(mode, column);
@@ -767,15 +778,19 @@ void CslListCtrl::CreateImageList(CslEngine* engine)
 
 void CslListCtrl::ListAdjustSize(const wxSize& size)
 {
-    wxSize cs = size == wxDefaultSize ? GetClientSize() : size;
-
-    if (cs.x<0 || cs.y<0)
+    if (m_userColumnSize)
         return;
 
-#ifndef __WXMSW__
-    // scrollbars are included in GetClientSize() on __WXGTK__ and __WXMAC__
-    // so check the height of all items and substract the horinzontal
-    // scrollbar    width if necessary
+    wxSize cs = size==wxDefaultSize ? GetClientSize() : size;
+
+    if (cs.x<=0 || cs.y<=0)
+        return;
+
+#if !defined(__WXMSW__) && !wxCHECK_VERSION(2, 9, 0)
+    // header and scrollbars aren't excluded in GetClientSize()
+    // when using the *generic* wxListCtrl on wx 2.8
+    // check the height of all items and substract the vertical
+    // scrollbar width if necessary
     wxInt32 count = GetItemCount();
 
     if (count>0)
@@ -784,7 +799,7 @@ void CslListCtrl::ListAdjustSize(const wxSize& size)
         GetItemRect(0, rect);
         wxInt32 sw = wxSystemSettings::GetMetric(wxSYS_HSCROLL_Y) + 1;
 
-        if (rect.height*count>cs.y)
+        if (rect.height*count>cs.y-GetHeaderHeight())
             cs.x = max(cs.x-sw, sw);
     }
 #endif
@@ -806,14 +821,11 @@ void CslListCtrl::ListAdjustSize(const wxSize& size)
         {
             float scale = cs.GetWidth()/(float)s;
 
-               loopi(m_columns.GetCount())
+            loopi(m_columns.GetCount()) if (m_columns.IsEnabled(i))
             {
-                if (m_columns.IsEnabled(i))
-                {
-                    columns[i]->Width *= scale;
+                columns[i]->Width *= scale;
 
-                    SetColumnWidth(m_columns.GetColumnId(i, false), columns[i]->Width);
-                }
+                SetColumnWidth(m_columns.GetColumnId(i, false), columns[i]->Width);
             }
         }
     }
