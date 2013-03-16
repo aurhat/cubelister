@@ -102,8 +102,8 @@ bool CslTTS::Init(const CslTTSSettings& settings)
             DisposeSpeechChannel(g_csl_tts);
     }
 #elif defined(HAVE_LIBSPEECHD_H)
-    if ((g_csl_tts = spd_open2(__CSL_NAME_SHORT_STR, __CSL_NAME_SHORT_STR, U2C(::wxGetUserName()),
-                               SPD_MODE_THREADED, SPD_METHOD_UNIX_SOCKET, 1)))
+    if ((g_csl_tts = spd_open(__CSL_NAME_SHORT_STR, __CSL_NAME_SHORT_STR,
+                              U2C(::wxGetUserName()), SPD_MODE_THREADED)))
     {
         if (spd_set_punctuation(g_csl_tts, SPD_PUNCT_NONE))
             CSL_LOG_DEBUG("Failed to set punctuation mode.\n");
