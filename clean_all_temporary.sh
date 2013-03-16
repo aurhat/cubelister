@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 test "${PWD##*/}" = "csl" || exit 1
 
