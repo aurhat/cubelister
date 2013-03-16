@@ -56,6 +56,7 @@ bool CslIPV4Addr::Create(const char *addr, wxUint16 port, wxUint32 netmask)
                 if (n<0 || n>32)
                     return false;
 
+                if (!netmask)
                 SetMaskBits(n);
                 break;
             }

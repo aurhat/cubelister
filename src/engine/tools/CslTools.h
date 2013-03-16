@@ -182,7 +182,7 @@ END_DECLARE_EVENT_TYPES()
                                (wxObject*)NULL                                   \
                              ),
 
-CSL_DLL_TOOLS wxInt32 BitCount32(wxUint32 value);
+CSL_DLL_TOOLS wxUint32 BitCount32(wxUint32 value);
 
 #include <CslCharEncoding.h>
 #include <CslIPV4Addr.h>
@@ -192,9 +192,9 @@ CSL_DLL_TOOLS wxString& CmdlineEscapeQuotes(wxString& str);
 CSL_DLL_TOOLS wxString& CmdlineEscapeSpaces(wxString& str);
 CSL_DLL_TOOLS char* FilterCubeString(char *src, wxInt32 coloursize, bool space = true, bool newline = false, bool tab = false);
 CSL_DLL_TOOLS wxString& FixFilename(wxString& name);
-inline bool IsIPV4(const CslIPV4Addr& addr, wxInt32 maskbits = 32) { return addr.GetMaskBits()==maskbits; }
+inline bool IsIPV4(const CslIPV4Addr& addr, wxUint32 maskbits = 32) { return addr.GetMaskBits()==maskbits; }
 template<class T>
-bool IsIPV4(const T& t, wxInt32 maskbits = 32) { return IsIPV4(CslIPV4Addr(t), maskbits); }
+bool IsIPV4(const T& t, wxUint32 maskbits = 32) { return IsIPV4(CslIPV4Addr(t), maskbits); }
 CSL_DLL_TOOLS bool IsLocalIPV4(const CslIPV4Addr& addr, CslArrayCslIPV4Addr *addresses=NULL);
 template<class T>
 bool IsLocalIPV4(const T& t, CslArrayCslIPV4Addr *addresses=NULL) { return IsLocalIPV4(CslIPV4Addr(t), addresses); }

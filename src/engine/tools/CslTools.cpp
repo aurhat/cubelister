@@ -96,7 +96,7 @@ wxString& FixFilename(wxString& name)
 }
 
 // MIT bit count
-wxInt32 BitCount32(wxUint32 value)
+wxUint32 BitCount32(wxUint32 value)
 {
     register wxUint32 tmp;
     tmp=value-((value>>1)&033333333333)-((value>>2)&011111111111);

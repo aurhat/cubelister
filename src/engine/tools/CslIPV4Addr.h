@@ -28,15 +28,15 @@ class CSL_DLL_TOOLS CslIPV4Addr
     public:
         CslIPV4Addr()
             { Reset(); }
-        CslIPV4Addr(wxUint32 ip, wxUint16 port = 0, wxUint32 netmask = 0xffffffff)
+        CslIPV4Addr(wxUint32 ip, wxUint16 port = 0, wxUint32 netmask = 0)
             { Create(ip, port, netmask); }
         CslIPV4Addr(const CslIPV4Addr& addr)
             { *this = addr; }
         CslIPV4Addr(const wxIPV4address& addr)
             { Create(addr); }
-        CslIPV4Addr(const char *addr, wxUint16 port = 0, wxUint32 netmask = 0xffffffff)
+        CslIPV4Addr(const char *addr, wxUint16 port = 0, wxUint32 netmask = 0)
             { Create(addr, port, netmask); }
-        CslIPV4Addr(const wxString& addr, wxUint16 port = 0, wxUint32 netmask = 0xffffffff)
+        CslIPV4Addr(const wxString& addr, wxUint16 port = 0, wxUint32 netmask = 0)
             { Create(U2C(addr), port, netmask); }
 
         bool operator==(const CslIPV4Addr& addr) const
@@ -46,12 +46,12 @@ class CSL_DLL_TOOLS CslIPV4Addr
         bool operator>(const CslIPV4Addr& addr) const
             { return !(*this<addr); }
 
-        bool Create(const char *addr, wxUint16 port = 0, wxUint32 netmask=0xffffffff);
-        bool Create(const wxString& addr, wxUint16 port = 0, wxUint32 netmask=0xffffffff)
+        bool Create(const char *addr, wxUint16 port = 0, wxUint32 netmask = 0);
+        bool Create(const wxString& addr, wxUint16 port = 0, wxUint32 netmask = 0)
             { return Create(U2C(addr), port, netmask); }
         bool Create(const wxIPV4address& addr)
             { return Create(addr.IPAddress(), addr.Service()); }
-        bool Create(wxUint32 ip, wxUint16 port = 0, wxUint32 netmask = 0xffffffff)
+        bool Create(wxUint32 ip, wxUint16 port = 0, wxUint32 netmask = 0)
         {
             m_ip = ip;
             m_port = port;
@@ -79,7 +79,7 @@ class CSL_DLL_TOOLS CslIPV4Addr
         wxString GetIPString() const { return Format(wxT("%i")); }
         wxUint16 GetPort() const { return m_port; }
         wxUint32 GetMask() const { return m_mask; }
-        wxInt32 GetMaskBits() const    { return BitCount32(m_mask); }
+        wxUint32 GetMaskBits() const { return BitCount32(m_mask); }
         wxUint32 GetHostcount() const
         {
             wxInt32 i = GetMaskBits();
