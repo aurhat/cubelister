@@ -171,7 +171,7 @@ bool CslTTS::Say(const wxString& text, const CslTTSSettings& settings)
     ret = self.Process(new CslTTSMessage(text, settings));
 #elif defined(HAVE_LIBSPEECHD_H)
     if (!settings.IsEmpty())
-        ApplySettings(settings);
+        self.ApplySettings(settings);
 
        ret = spd_say(g_csl_tts, SPD_MESSAGE, U2C(text))>-1;
 #endif
@@ -209,8 +209,7 @@ bool CslTTS::ApplySettings(const CslTTSSettings& settings)
     if (!self.m_ok)
         return false;
 
-    if (settings!=self.m_settings &&
-        SetVolume(settings.Volume))
+    if (SetVolume(settings.Volume))
         return true;
 
     return true;

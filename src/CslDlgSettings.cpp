@@ -552,7 +552,7 @@ void CslDlgSettings::OnCommandEvent(wxCommandEvent& event)
         {
             CslTTSSettings tts = CslTTS::GetSettings();
             tts.Volume = spin_ctrl_tts_volume->GetValue();
-            CslTTS::Say(_("1, 2, square root of 9. CSL TTS test."), tts);
+            CslTTS::Say(_("1, 2, square root of 9. TTS test."), tts);
             break;
         }
 
