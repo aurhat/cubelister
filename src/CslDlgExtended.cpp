@@ -218,6 +218,8 @@ void CslDlgExtended::do_layout()
     m_sizerMapLabel=sizer_map_label;
 
     grid_sizer_main->SetSizeHints(this);
+
+    CSL_CENTRE_DIALOG();
 }
 
 void CslDlgExtended::OnClose(wxCloseEvent& event)

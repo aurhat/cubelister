@@ -97,7 +97,7 @@ void CslDlgConnectPass::do_layout()
         Layout();
     }
 
-    CentreOnParent();
+    CSL_CENTRE_DIALOG();
 }
 
 void CslDlgConnectPass::OnCommandEvent(wxCommandEvent& event)

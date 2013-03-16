@@ -382,7 +382,7 @@ void CslDlgSettings::do_layout()
 
     grid_sizer_main->SetSizeHints(this);
 
-    CentreOnParent();
+    CSL_CENTRE_DIALOG();
 }
 
 void CslDlgSettings::OnSpinCtrl(wxSpinEvent& event)

@@ -116,7 +116,7 @@ void CslDlgAddServer::do_layout()
     Layout();
     // end wxGlade
 
-    CentreOnParent();
+    CSL_CENTRE_DIALOG();
 }
 
 CslServerInfo* CslDlgAddServer::InitDlg(CslServerInfo *info)

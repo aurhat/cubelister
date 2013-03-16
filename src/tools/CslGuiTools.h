@@ -56,7 +56,7 @@ inline long Csl2wxBitmapType(long type)
 #define CSL_SET_WINDOW_ICON() \
     SetIcon(((wxTopLevelWindow*)wxTheApp->GetTopWindow())->GetIcon())
 
-#define CSL_CENTER_DIALOG()                              \
+#define CSL_CENTRE_DIALOG()                              \
     do {                                                 \
         wxWindow *parent = GetParent();                  \
                                                          \
@@ -66,7 +66,9 @@ inline long Csl2wxBitmapType(long type)
             CentreOnParent();                            \
         else                                             \
             CentreOnScreen();                            \
-    } while (0);
+    } while (0)
+
+#define CSL_CENTER_DIALOG() CSL_CENTRE_DIALOG()
 
 #define COLOUR2INT(col) ((col.Red()<<16)|(col.Green()<<8)|col.Blue())
 #define INT2COLOUR(val) wxColour((val>>16)&0xFF, (val>>8)&0xFF, val&0xFF)

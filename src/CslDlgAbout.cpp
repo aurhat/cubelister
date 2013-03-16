@@ -203,7 +203,7 @@ void CslDlgAbout::do_layout()
     SetMinSize(wxSize(380,300));
     grid_sizer_main->SetSizeHints(this);
 
-    CSL_CENTER_DIALOG();
+    CSL_CENTRE_DIALOG();
 }
 
 void CslDlgAbout::OnClose(wxCloseEvent& event)

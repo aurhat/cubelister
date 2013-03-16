@@ -125,7 +125,7 @@ void CslDlgAddMaster::do_layout()
     Layout();
     // end wxGlade
 
-    CSL_CENTER_DIALOG();
+    CSL_CENTRE_DIALOG();
 }
 
 void CslDlgAddMaster::InitDlg(wxUint32 *fourcc)

@@ -84,7 +84,7 @@ void CslDlgConnectWait::do_layout()
     Layout();
     // end wxGlade
 
-    CentreOnParent();
+    CSL_CENTRE_DIALOG();
 }
 
 void CslDlgConnectWait::OnButton(wxCommandEvent& event)

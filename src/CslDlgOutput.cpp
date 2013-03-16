@@ -155,7 +155,8 @@ void CslDlgOutput::do_layout()
 #endif
 
     grid_sizer_main->SetSizeHints(this);
-    //CentreOnScreen();
+
+    CSL_CENTRE_DIALOG();
 }
 
 void CslDlgOutput::OnClose(wxCloseEvent& event)
