@@ -107,6 +107,7 @@ CslDlgSettings::CslDlgSettings(wxWindow* parent,int id,const wxString& title,
     checkbox_systray = new wxCheckBox(notebook_pane_other, CHECK_SYSTRAY, _("Enable to system tray icon"));
     checkbox_systray_close = new wxCheckBox(notebook_pane_other, wxID_ANY, _("Minimise on close"));
     checkbox_tts = new wxCheckBox(notebook_pane_other, CHECK_TTS, _("Enable text to speech"));
+    label_tts_volume = new wxStaticText(notebook_pane_other, wxID_ANY, _("Volume"));
     spin_ctrl_tts_volume = new wxSpinCtrl(notebook_pane_other, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_AUTO_URL, 1, 100);
     button_test_tts = new wxButton(notebook_pane_other, BUTTON_TEST_TTS, _("Test"));
     spin_ctrl_ping_good = new wxSpinCtrl(notebook_pane_other, SPIN_PING_GOOD, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_AUTO_URL, 0, 100);
@@ -195,7 +196,9 @@ void CslDlgSettings::set_properties()
     checkbox_systray_close->SetValue(CSL_FLAG_CHECK(CslGetSettings().Systray, CSL_SYSTRAY_CLOSE));
 #endif
 
+    /* tts */
     checkbox_tts->SetValue(CslGetSettings().TTS);
+    label_tts_volume->Enable(CslTTS::IsOk());
     spin_ctrl_tts_volume->SetValue(CslGetSettings().TTSVolume);
     checkbox_tts->Enable(CslTTS::IsOk());
     spin_ctrl_tts_volume->Enable(CslTTS::IsOk() && CslGetSettings().TTS);
@@ -348,7 +351,6 @@ void CslDlgSettings::do_layout()
     sizer_systray->Add(grid_sizer_systray, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 0);
     grid_sizer_pane_other->Add(sizer_systray, 1, wxALL|wxEXPAND, 4);
     grid_sizer_tts->Add(checkbox_tts, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    wxStaticText* label_tts_volume = new wxStaticText(notebook_pane_other, wxID_ANY, _("Volume"));
     grid_sizer_tts->Add(label_tts_volume, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_spin_ctrl_tts_volume->Add(1, 1, 0, 0, 0);
     grid_sizer_spin_ctrl_tts_volume->Add(spin_ctrl_tts_volume, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);

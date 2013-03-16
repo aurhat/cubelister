@@ -84,6 +84,7 @@ class CslDlgSettings : public wxDialog
         wxCheckBox* checkbox_systray;
         wxCheckBox* checkbox_systray_close;
         wxCheckBox* checkbox_tts;
+        wxStaticText* label_tts_volume;
         wxSpinCtrl* spin_ctrl_tts_volume;
         wxButton* button_test_tts;
         wxSpinCtrl* spin_ctrl_ping_good;
