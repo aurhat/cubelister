@@ -183,7 +183,8 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
                              wxT("search?query="));
     }
 
-    CslTTS::Init(::wxGetApp().GetLanguage(), CslGetSettings().TTS, CslGetSettings().TTSVolume);
+    CslTTSSettings tts(CslGetSettings().TTS, CslGetSettings().TTSVolume);
+    CslTTS::Init(tts);
 
     CreateControls();
     SetProperties();

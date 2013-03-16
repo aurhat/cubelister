@@ -550,7 +550,9 @@ void CslDlgSettings::OnCommandEvent(wxCommandEvent& event)
 
         case BUTTON_TEST_TTS:
         {
-            CslTTS::Say(wxT("CSL TTS test"), spin_ctrl_tts_volume->GetValue());
+            CslTTSSettings tts = CslTTS::GetSettings();
+            tts.Volume = spin_ctrl_tts_volume->GetValue();
+            CslTTS::Say(_("1, 2, square root of 9. CSL TTS test."), tts);
             break;
         }
 
@@ -594,7 +596,8 @@ void CslDlgSettings::OnCommandEvent(wxCommandEvent& event)
                 }
             }
 
-            CslTTS::Set(m_settings.TTS, m_settings.TTSVolume);
+            CslTTSSettings tts(m_settings.TTS, m_settings.TTSVolume);
+            CslTTS::SetSettings(tts);
 
             CslGetSettings() = m_settings;
 

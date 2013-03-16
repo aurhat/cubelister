@@ -19,9 +19,11 @@
  ***************************************************************************/
 
 #include "Csl.h"
+#include "CslTTS.h"
 
 #if defined(__WXMSW__)
     #include <sapi.h>
+    #include <comdef.h> // _com_error
     #ifdef _MSC_VER
         #pragma comment(lib, "sapi.lib")
     #endif
@@ -37,28 +39,25 @@
     #endif
 #endif //__WXMSW__
 
-#include "CslTTS.h"
-
 #if defined(__WXMSW__)
-ISpVoice *g_csl_voice;
+ISpVoice *g_csl_tts;
 #elif defined(__WXMAC__)
-SpeechChannel g_csl_channel;
+SpeechChannel g_csl_tts;
 #elif defined(HAVE_LIBSPEECHD_H)
-SPDConnection *g_csl_spd;
+SPDConnection *g_csl_tts;
 #endif //__WXMSW__
+
+
+IMPLEMENT_DYNAMIC_CLASS(CslTTSSettings, wxObject);
+IMPLEMENT_DYNAMIC_CLASS(CslTTSMessage, wxObject);
+
+const CslTTSSettings CslTTSEmptySettings = CslTTSSettings(false, -1);
 
 
 CslTTS::CslTTS()
 {
     m_ok = false;
-    m_enabled = false;
-    m_volume = 0;
-#if defined(__WXMSW__)
-    g_csl_voice = NULL;
-#elif defined(__WXMAC__)
-#elif defined(HAVE_LIBSPEECHD_H)
-    g_csl_spd = NULL;
-#endif //__WXMSW__
+    g_csl_tts = NULL;
 }
 
 CslTTS& CslTTS::GetInstance()
@@ -68,7 +67,7 @@ CslTTS& CslTTS::GetInstance()
     return self;
 }
 
-bool CslTTS::Init(const wxString& lang, bool enable, wxInt32 volume)
+bool CslTTS::Init(const CslTTSSettings& settings)
 {
     CslTTS& self = GetInstance();
 
@@ -76,31 +75,41 @@ bool CslTTS::Init(const wxString& lang, bool enable, wxInt32 volume)
         return false;
 
 #if defined(__WXMSW__)
-    if (CoCreateInstance(CLSID_SpVoice, NULL, CLSCTX_ALL,
-                         IID_ISpVoice, (void**)&g_csl_voice)!=S_OK)
-        g_csl_voice = NULL;
-    else
-        self.m_ok = true;
-#elif defined(__WXMAC__)
-    if (NewSpeechChannel(NULL, &g_csl_channel)==noErr)
+    HRESULT hr;
+
+    if ((hr = CoCreateInstance(CLSID_SpVoice, NULL, CLSCTX_ALL,
+                               IID_ISpVoice, (void**)&g_csl_tts))!=S_OK ||
+        (hr = g_csl_tts->SetNotifyCallbackFunction(CslTTS::OnProcessed, 0, 0))!=S_OK ||
+        (hr = g_csl_tts->SetInterest(SPFEI(SPEI_END_INPUT_STREAM), SPFEI(SPEI_END_INPUT_STREAM)))!=S_OK)
     {
-        if (SetSpeechInfo(g_csl_channel, soSpeechDoneCallBack, (void*)OnProcessed)==noErr)
+        g_csl_tts = NULL;
+        CSL_LOG_DEBUG("Failed to initialise TTS (%s)\n", _com_error(hr).ErrorMessage());
+    }
+    else
+    {
+        self.m_ok = true;
+        self.Connect(wxEVT_IDLE, wxIdleEventHandler(CslTTS::OnIdle), NULL, &self);
+    }
+#elif defined(__WXMAC__)
+    if (NewSpeechChannel(NULL, &g_csl_tts)==noErr)
+    {
+        if (SetSpeechInfo(g_csl_tts, soSpeechDoneCallBack, (void*)c)==noErr)
         {
             self.m_ok = true;
             self.Connect(wxEVT_IDLE, wxIdleEventHandler(CslTTS::OnIdle), NULL, &self);
         }
         else
-            DisposeSpeechChannel(g_csl_channel);
+            DisposeSpeechChannel(g_csl_tts);
     }
 #elif defined(HAVE_LIBSPEECHD_H)
-    if ((g_csl_spd=spd_open(__CSL_NAME_SHORT_STR,NULL,NULL,SPD_MODE_THREADED)))
+    if ((g_csl_tts = spd_open(__CSL_NAME_SHORT_STR, NULL, NULL, SPD_MODE_THREADED)))
     {
-        if (spd_set_punctuation(g_csl_spd, SPD_PUNCT_NONE))
+        if (spd_set_punctuation(g_csl_tts, SPD_PUNCT_NONE))
             CSL_LOG_DEBUG("Failed to set punctuation mode.\n");
-        if (spd_set_spelling(g_csl_spd, SPD_SPELL_ON))
+        if (spd_set_spelling(g_csl_tts, SPD_SPELL_ON))
             CSL_LOG_DEBUG("Failed to set spelling mode.\n");
 #if 0 //disable for now
-        if (!lang.IsEmpty() && spd_set_language(g_csl_spd, U2C(lang)))
+        if (!lang.IsEmpty() && spd_set_language(g_csl_tts, U2C(lang)))
             CSL_LOG_DEBUG("Failed to set language \"%s\"\n", U2C(lang));
 #endif
     }
@@ -113,7 +122,7 @@ bool CslTTS::Init(const wxString& lang, bool enable, wxInt32 volume)
     self.m_ok = true;
 #endif //__WXMSW__
 
-    Set(enable, volume);
+    SetSettings(settings);
 
     return self.m_ok;
 }
@@ -122,163 +131,143 @@ bool CslTTS::DeInit()
 {
     CslTTS& self = GetInstance();
 
-    if (!self.m_ok)
+    if (!self.m_ok || !g_csl_tts)
         return false;
 
 #if defined(__WXMSW__)
-    if (g_csl_voice)
-    {
-        g_csl_voice->Release();
-        g_csl_voice = NULL;
-    }
+    g_csl_tts->Release();
 #elif defined(__WXMAC__)
-    if (g_csl_channel)
-    {
-        DisposeSpeechChannel(g_csl_channel);
-        g_csl_channel = NULL;
-    }
+    DisposeSpeechChannel(g_csl_tts);
 #elif defined(HAVE_LIBSPEECHD_H)
-    if (g_csl_spd)
-    {
-        spd_close(g_csl_spd);
-        g_csl_spd = NULL;
-    }
+    spd_cancel(g_csl_tts);
+    spd_close(g_csl_tts);
 #endif //__WXMSW__
 
     self.m_ok = false;
+    g_csl_tts = NULL;
+
+#if defined(__WXMSW__) || defined(__WXMAC__)
+    wxCriticalSectionLocker lock(self.m_messagesCritSection);
+
+    WX_CLEAR_ARRAY(self.m_messages);
+#endif
 
     return true;
 }
 
-bool CslTTS::IsOk()
-{
-    return GetInstance().m_ok;
-}
-
-bool CslTTS::Say(const wxString& text)
+bool CslTTS::Say(const wxString& text, const CslTTSSettings& settings)
 {
     CslTTS& self = GetInstance();
 
-    if (!self.m_ok || !self.m_enabled || !self.m_volume || text.IsEmpty())
+    if (!self.m_ok || text.IsEmpty())
         return false;
 
-#if defined(__WXMSW__)
-    return g_csl_voice->Speak(text.wc_str(wxConvUTF8), SPF_ASYNC,NULL)==S_OK;
-#elif defined(__WXMAC__)
-    return self.Process(text);
+    if (settings.IsEmpty() && self.m_settings.IsEmpty())
+        return false;
+
+    bool ret = false;
+
+#if defined(__WXMSW__) || defined(__WXMAC__)
+    ret = self.Process(new CslTTSMessage(text, settings));
 #elif defined(HAVE_LIBSPEECHD_H)
-    return spd_say(g_csl_spd,SPD_MESSAGE,U2C(text))>-1;
+    if (!settings.IsEmpty())
+        ApplySettings(settings);
+
+       ret = spd_say(g_csl_tts, SPD_MESSAGE, U2C(text))>-1;
+#endif
+
+    return ret;
+}
+
+bool CslTTS::SetVolume(wxInt32 volume)
+{
+    if (!IsOk())
+        return false;
+
+    volume = clamp(volume, 0, 100);
+
+#if defined(__WXMSW__)
+    if (g_csl_tts)
+        g_csl_tts->SetVolume(volume);
+#elif defined(__WXMAC__)
+    Fixed vol = FixRatio(volume, 100);
+    SetSpeechInfo(g_csl_tts, soVolume, &vol);
+#elif defined(HAVE_LIBSPEECHD_H)
+    if (g_csl_tts)
+        spd_set_volume(g_csl_tts, volume*2-100);
 #else
     return false;
 #endif //__WXMSW__
-}
-
-bool CslTTS::Say(const wxString& text, wxInt32 volume)
-{
-    CslTTS& self = GetInstance();
-
-    if (!self.m_ok)
-        return false;
-
-    bool ret = true;
-    wxInt32 volumeold;
-
-    volume = clamp(volume, 0, 100);
-    volumeold = self.m_volume;
-
-    SetVolume(volume);
-    ret = Say(text);
-    SetVolume(volumeold);
-
-    return ret;
-}
-
-bool CslTTS::Set(bool enable, wxInt32 volume)
-{
-    CslTTS& self = GetInstance();
-
-    if (!self.m_ok)
-        return false;
-
-    self.m_enabled = enable;
-    SetVolume(volume);
 
     return true;
 }
 
-bool CslTTS::Enable(bool v)
-{
-    CslTTS& self = GetInstance();
-
-    return self.m_ok ? (self.m_enabled = v) : false;
-}
-
-bool CslTTS::Enabled()
-{
-    CslTTS& self = GetInstance();
-
-    return self.m_ok ? self.m_enabled : false;
-}
-
-int CslTTS::GetVolume()
-{
-    CslTTS& self = GetInstance();
-
-    return self.m_ok ? self.m_volume : -1;
-}
-
-int CslTTS::SetVolume(wxInt32 volume)
+bool CslTTS::ApplySettings(const CslTTSSettings& settings)
 {
     CslTTS& self = GetInstance();
 
     if (!self.m_ok)
-        return -1;
+        return false;
 
-    wxInt32 old = self.m_volume;
+    if (settings!=self.m_settings &&
+        SetVolume(settings.Volume))
+        return true;
 
-    self.m_volume = clamp(volume, 0, 100);
-
-#if defined(__WXMSW__)
-    if (g_csl_voice)
-        g_csl_voice->SetVolume(volume);
-#elif defined(__WXMAC__)
-    Fixed vol = FixRatio(self.m_volume, 100);
-    SetSpeechInfo(g_csl_channel,soVolume, &vol);
-#elif defined(HAVE_LIBSPEECHD_H)
-    if (g_csl_spd)
-        spd_set_volume(g_csl_spd, self.m_volume*2-100);
-#endif //__WXMSW__
-
-    return old;
+    return true;
 }
 
-#ifdef __WXMAC__
-bool CslTTS::Process(const wxString& text)
+#if defined(__WXMSW__) || defined(__WXMAC__)
+bool CslTTS::Process(CslTTSMessage *message)
 {
-    static wxArrayString messages;
+    wxCriticalSectionLocker lock(m_messagesCritSection);
 
-    if (text.IsEmpty())
+    if (!message)
     {
-        if (messages.IsEmpty())
-            return true;
+        if (!m_messages.size())
+            return ApplySettings(m_settings);
     }
     else
     {
-        messages.Add(text);
+        m_messages.push_back(message);
 
-        if (SpeechBusy())
+        if (m_messages.size()>1)
             return true;
     }
 
-    const wxString& msg = messages.Item(0);
-    ret = SpeakText(g_csl_channel, U2C(msg), msg.Length())==noErr;
-    messages.RemoveAt(0);
+    message = m_messages[0];
+
+    if (!message->Settings.IsEmpty())
+        ApplySettings(message->Settings);
+
+    bool ret = false;
+
+#if defined(__WXMSW__)
+    ret = g_csl_tts->Speak(message->Text.wc_str(wxConvUTF8), SPF_ASYNC, NULL)==S_OK;
+#elif defined(__WXMAC__)
+    ret = SpeakText(g_csl_tts, U2C(msg), msg.Length())==noErr;
+#endif
 
     return ret;
 }
 
-void CslTTS::OnProcessed(SpeechChannel channel, void *data)
+#if defined(__WXMSW__)
+void CslTTS::OnProcessed(WPARAM WXUNUSED(wParam), LPARAM WXUNUSED(lParam))
+#elif defined(__WXMAC__)
+void CslTTS::OnProcessed(SpeechChannel WXUNUSED(channel), void* WXUNUSED(data))
+#endif
 {
+    CslTTS& self = GetInstance();
+
+    self.m_messagesCritSection.Enter();
+
+    if (self.m_messages.size())
+    {
+        delete self.m_messages[0];
+        self.m_messages.erase(self.m_messages.begin());
+    }
+
+    self.m_messagesCritSection.Leave();
+
     wxIdleEvent evt;
     wxPostEvent(&GetInstance(), evt);
 }
