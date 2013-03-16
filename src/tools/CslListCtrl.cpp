@@ -821,6 +821,9 @@ void CslListCtrl::ListAdjustSize(const wxSize& size)
         {
             float scale = cs.GetWidth()/(float)s;
 
+            // avoids wrong column size at least on WXMSW
+            wxWindowUpdateLocker lock(this);
+
             loopi(m_columns.GetCount()) if (m_columns.IsEnabled(i))
             {
                 columns[i]->Width *= scale;
