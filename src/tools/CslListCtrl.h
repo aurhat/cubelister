@@ -175,7 +175,6 @@ class CSL_DLL_GUITOOLS CslListColumns : public wxObject
 
     public:
         wxInt32 GetColumnId(wxInt32 id, bool absolute = true) const;
-
         wxUint32 GetColumnMask() const { return m_columnMask; }
 
         wxInt32 GetCount(bool enabled = false) const
@@ -218,34 +217,13 @@ class CSL_DLL_GUITOOLS CslListCtrl : public wxListCtrl
 
         virtual ~CslListCtrl();
 
-        void CreateScreenShot();
-
-        static wxInt32 GetGameImage(CslEngine* engine, wxUint32 fourcc, wxInt32 offset=0);
-        static wxInt32 GetCountryFlag(CslEngine* engine, wxUint32 ip);
-
-        void ListAddColumn(const wxString& name, wxListColumnFormat format = wxLIST_FORMAT_LEFT,
-                           float weight = 1.0f, bool enabled = true, bool locked = false);
-        void ListDeleteColumn(wxInt32 column);
-        wxUint32 ListToggleColumn(wxInt32 column);
-
-        bool ListSetColumn(wxInt32 column, const wxString& name = wxEmptyString);
-        bool ListSetItem(wxInt32 row, wxInt32 column, const wxString& text = wxEmptyString, wxInt32 image = -1);
-
-        void ListLockColumn(wxInt32 column, bool lock = true);
-        bool ListColumnIsLocked(wxInt32 column) const { return m_columns.IsLocked(column); }
-
-        wxInt32 GetColumnId(wxInt32 id, bool absolute = true) const { return m_columns.GetColumnId(id, absolute); }
-        wxUint32 ListGetColumnMask() const { return m_columns.GetColumnMask(); }
-        bool ListColumnIsEnabled(wxInt32 id) const { return m_columns.IsEnabled(id); }
-
-        void SetSortCallback(wxListCtrlCompare fn, wxInt32 mode, wxInt32 column);
-        void ListSort(wxInt32 column=-1);
-
-        virtual void ListAdjustSize(const wxSize& size = wxDefaultSize);
-
-        static void CreateImageList(CslEngine* engine);
-
-    protected:
+#ifdef __WXMSW__
+        // functions from generic implementation
+        bool InReportView() const
+            { return CSL_FLAG_CHECK(GetWindowStyle(), wxLC_REPORT); }
+        bool HasHeader() const
+            { return InReportView() && !CSL_FLAG_CHECK(GetWindowStyle(), wxLC_NO_HEADER); }
+#endif
         wxInt32 GetHeaderHeight()
         {
 #ifdef __WXMSW__
@@ -255,6 +233,42 @@ class CSL_DLL_GUITOOLS CslListCtrl : public wxListCtrl
 #endif
         }
 
+        void CreateScreenShot();
+
+        static wxInt32 GetGameImage(CslEngine* engine, wxUint32 fourcc, wxInt32 offset=0);
+        static wxInt32 GetCountryFlag(CslEngine* engine, wxUint32 ip);
+
+        void ListAddColumn(const wxString& name,
+                           wxListColumnFormat format = wxLIST_FORMAT_LEFT,
+                           float weight = 1.0f,
+                           bool enabled = true, bool locked = false);
+        void ListDeleteColumn(wxInt32 column);
+        wxUint32 ListToggleColumn(wxInt32 column);
+
+        bool ListSetColumn(wxInt32 column, const wxString& name = wxEmptyString);
+        bool ListSetItem(wxInt32 row, wxInt32 column,
+                         const wxString& text = wxEmptyString,
+                         wxInt32 image = -1);
+
+        void ListLockColumn(wxInt32 column, bool lock = true);
+        bool ListColumnIsLocked(wxInt32 column) const
+            { return m_columns.IsLocked(column); }
+
+        wxInt32 GetColumnId(wxInt32 id, bool absolute = true) const
+            { return m_columns.GetColumnId(id, absolute); }
+        wxUint32 ListGetColumnMask() const
+            { return m_columns.GetColumnMask(); }
+        bool ListColumnIsEnabled(wxInt32 id) const
+            { return m_columns.IsEnabled(id); }
+
+        void SetSortCallback(wxListCtrlCompare fn, wxInt32 mode, wxInt32 column);
+        void ListSort(wxInt32 column = -1);
+
+        virtual void ListAdjustSize(const wxSize& size = wxDefaultSize);
+
+        static void CreateImageList(CslEngine* engine);
+
+    protected:
         wxInt32 ListFindItem(void *data);
 
         // virtual
