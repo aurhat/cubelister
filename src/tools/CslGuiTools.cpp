@@ -35,11 +35,14 @@ CslBufferedStaticBitmap::CslBufferedStaticBitmap(wxWindow *parent, const wxSize&
 
 void CslBufferedStaticBitmap::SetBitmap(const wxBitmap& bmp)
 {
-    wxSize bmpSize(bmp.GetWidth(), bmp.GetHeight());
-    wxASSERT(m_size.x >= m_bmpSize.x || m_size.y >= m_bmpSize.y);
+    if (!bmp.IsNull())
+    {
+        wxSize bmpSize(bmp.GetWidth(), bmp.GetHeight());
+        wxASSERT(m_size.x >= m_bmpSize.x || m_size.y >= m_bmpSize.y);
 
-    m_bmp = bmp;
-    m_bmpSize = bmpSize;
+        m_bmp = bmp;
+        m_bmpSize = bmpSize;
+    }
 
     Refresh(false);
 }
