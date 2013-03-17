@@ -346,5 +346,5 @@ void CslToolTip::OnMouseButton(wxMouseEvent& event)
     // to process these event before the frame is getting destroyed
     wxMouseEvent evt(event.GetEventType());
     evt.SetEventObject(this);
-    m_frame->GetEventHandler()->AddPendingEvent(evt);
+    ::wxPostEvent(m_frame, evt);
 }
