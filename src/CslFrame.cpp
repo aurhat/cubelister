@@ -55,7 +55,7 @@ BEGIN_EVENT_TABLE(CslFrame,wxFrame)
     EVT_CHECKBOX(wxID_ANY,CslFrame::OnCommandEvent)
     EVT_RADIOBUTTON(wxID_ANY,CslFrame::OnCommandEvent)
     EVT_CHOICE(wxID_ANY,CslFrame::OnCommandEvent)
-    // dont use wxID_ANY for EVT_BUTTON, because on wxMAC
+    // don't use wxID_ANY for EVT_BUTTON, because on wxMAC
     // wxID_CANCEL is sent when pressing ESC
     EVT_BUTTON(CSL_BUTTON_SEARCH,CslFrame::OnCommandEvent)
     EVT_BUTTON(CSL_BUTTON_SEARCH_CLOSE,CslFrame::OnCommandEvent)
@@ -339,9 +339,6 @@ void CslFrame::CreateMainMenu()
     CslMenu::AddItem(*menu, MENU_VIEW_RELAYOUT,      _("Reset layout"),              wxART_NONE);
     menubar->Append(menu,_("&View"));
 
-    menu=new wxMenu();
-    menubar->Append(menu, _("&Plugins"));
-
 #ifndef __WXMAC__
     menu=new wxMenu();
     CslMenu::AddItem(*menu, wxID_ABOUT, _("A&bout"), wxART_ABOUT);
@@ -375,8 +372,14 @@ wxMenu* CslFrame::GetPluginMenu()
     wxInt32  menuid;
     wxMenuBar *menubar=GetMenuBar();
 
-    if (menubar && (menuid=menubar->FindMenu(_("&Plugins")))!=wxNOT_FOUND)
+    if ((menuid = menubar->FindMenu(_("&Plugins")))!=wxNOT_FOUND)
         return menubar->GetMenu(menuid);
+    else
+    {
+        wxMenu *menu = new wxMenu;
+        menubar->Insert(3, menu, _("&Plugins"));
+        return menu;
+    }
 
     return NULL;
 }
