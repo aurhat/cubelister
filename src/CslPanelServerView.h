@@ -58,7 +58,7 @@ class CslListCtrlPlayerView : public CslListCtrl
 
     protected:
         // CslListCtrl virtual functions
-        virtual bool ListFindItemCompare(void *data1, void *data2)
+        bool ListFindItemCompare(void *data1, void *data2)
         {
             return *(CslPlayerStatsData*)data1==*(CslPlayerStatsData*)data2;
         }

@@ -250,6 +250,10 @@ class CSL_DLL_GUITOOLS CslListCtrl : public wxListCtrl
                          const wxString& text = wxEmptyString,
                          wxInt32 image = -1);
 
+        bool ListSelectItem(wxInt32 id, bool select = true, bool noevent = true);
+        bool ListDeselectItem(wxInt32 id, bool deselect = true, bool noevent = true)
+            { return ListSelectItem(id, !deselect, noevent); }
+
         void ListLockColumn(wxInt32 column, bool lock = true);
         bool ListColumnIsLocked(wxInt32 column) const
             { return m_columns.IsLocked(column); }

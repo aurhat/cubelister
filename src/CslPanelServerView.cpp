@@ -190,11 +190,11 @@ void CslListCtrlPlayerView::OnItemSelected(wxListEvent& event)
 
 void CslListCtrlPlayerView::OnItemDeselected(wxListEvent& event)
 {
-    CslPlayerStatsData *d, *id=(CslPlayerStatsData*)GetItemData(event.GetIndex());
+    CslPlayerStatsData *id = (CslPlayerStatsData*)GetItemData(event.GetIndex());
 
-    for (wxInt32 i=0, j=m_selected.GetCount(); i<j; i++)
+    loopi(m_selected.GetCount())
     {
-        d=(CslPlayerStatsData*)m_selected.Item(i);
+        CslPlayerStatsData *d = (CslPlayerStatsData*)m_selected.Item(i);
 
         if (*d==*id)
         {
@@ -441,8 +441,13 @@ void CslListCtrlPlayerView::UpdateData()
     dlen=m_info->GetGame().GetPlayerstatsDescriptions(&descriptions);
 
     // check if parent already did it
-    if (!IsFrozen())
-        wxWindowUpdateLocker lock(this);
+    bool freeze = !IsFrozen();
+
+    if (freeze)
+        Freeze();
+
+    for (i = 0; i<GetItemCount(); i++)
+        ListDeselectItem(i);
 
     for (i=0; i<(wxInt32)stats.m_stats.size(); i++)
     {
@@ -497,24 +502,29 @@ void CslListCtrlPlayerView::UpdateData()
             SetItemBackgroundColour(item,GetBackgroundColour());
     }
 
-    for (j=GetItemCount()-1; j>i; j--)
+    for (j = GetItemCount()-1; j>i; j--)
     {
         item.SetId(j);
         DeleteItem(item);
     }
 
-    for (i=m_selected.GetCount()-1; i>=0; i--)
+    for (i = m_selected.GetCount()-1; i>=0; i--)
     {
         data=(CslPlayerStatsData*)m_selected.Item(i);
 
-        if (ListFindItem(data)==wxNOT_FOUND)
+        if ((j = ListFindItem(data))==wxNOT_FOUND)
         {
             delete data;
             m_selected.RemoveAt(i);
         }
+        else
+            ListSelectItem(j);
     }
 
     ListSort();
+
+    if (freeze)
+        Thaw();
 }
 
 void CslListCtrlPlayerView::EnableEntries(bool enable)

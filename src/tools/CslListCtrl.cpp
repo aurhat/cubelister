@@ -523,6 +523,22 @@ bool CslListCtrl::ListSetItem(wxInt32 row, wxInt32 column, const wxString& text,
     return true;
 }
 
+bool CslListCtrl::ListSelectItem(wxInt32 id, bool select, bool noevent)
+{
+    wxListItem item;
+
+    item.SetId(id);
+
+    if (!GetItem(item))
+        return false;
+
+    CslValueRestore<wxInt32> restore(m_processSelectEvent, noevent ? 0 : 1);
+
+    SetItemState(id, select ? wxLIST_STATE_SELECTED : 0, wxLIST_STATE_SELECTED);
+
+    return true;
+}
+
 void CslListCtrl::ListLockColumn(wxInt32 column, bool lock)
 {
     CslListColumn *c = m_columns.GetColumn(column);
