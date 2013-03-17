@@ -238,6 +238,13 @@ void CslListCtrlPlayerView::OnContextMenu(wxContextMenuEvent& event)
     }
     CSL_MENU_CREATE_SAVEIMAGE(menu)
 
+    // notify plugins
+    CslPluginEvent evt(CslPluginEvent::EVT_PLAYER_MENU);
+    evt.SetMenu(&menu);
+    evt.SetServerInfo(m_info);
+    evt.SetPlayerStatsData(m_selected.GetCount()==1 ? (CslPlayerStatsData*)m_selected[0] : NULL);
+    ::wxGetApp().GetTopWindow()->GetEventHandler()->ProcessEvent(evt);
+
     //from keyboard
     if (point==wxDefaultPosition)
         point=wxGetMousePosition();

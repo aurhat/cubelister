@@ -19,10 +19,18 @@
  ***************************************************************************/
 
 #include "Csl.h"
+#include "CslEngine.h"
 #include "CslPlugin.h"
 
-CslPlugin::CslPlugin(const wxString& filename) :
-        m_fileName(filename), m_handle(filename), m_pluginInfo(NULL)
+DEFINE_EVENT_TYPE(wxCSL_EVT_PLUGIN)
+
+IMPLEMENT_DYNAMIC_CLASS(CslPluginEvent, wxEvent)
+
+
+CslPlugin::CslPlugin(const wxString& filename, CslPluginHost *host) :
+        m_fileName(filename),
+        m_handle(filename),
+        m_pluginInfo(NULL)
 {
     if (m_handle.IsLoaded())
     {
@@ -66,7 +74,7 @@ wxInt32 CslPluginMgr::LoadPlugins(CslPluginHost *host)
     {
         const wxString& file = files.Item(--c);
 
-        CslPlugin *p = new CslPlugin(file);
+        CslPlugin *p = new CslPlugin(file, host);
 
         if (!p->IsLoaded())
         {

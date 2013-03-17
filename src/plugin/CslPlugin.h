@@ -21,7 +21,64 @@
 #ifndef CSLPLUGIN_H
 #define CSLPLUGIN_H
 
-#define CSL_PLUGIN_VERSION_API  1
+#define CSL_PLUGIN_VERSION_API  2
+
+#define CSL_PLUGIN_EVENT_ID_MIN_GUI     (wxID_HIGHEST + 20000)
+#define CSL_PLUGIN_EVENT_ID_MIN_ENGINE  (wxID_HIGHEST + 40000)
+
+BEGIN_DECLARE_EVENT_TYPES()
+DECLARE_EXPORTED_EVENT_TYPE(CSL_DLL_PLUGIN, wxCSL_EVT_PLUGIN, wxID_ANY)
+END_DECLARE_EVENT_TYPES()
+
+class CslPluginEvent;
+
+typedef void (wxEvtHandler::*CslPluginEventFunction)(CslPluginEvent&);
+
+#define CslPluginEventHandler(fn) \
+    (wxObjectEventFunction)(wxEventFunction)wxStaticCastEvent(CslPluginEventFunction, &fn)
+
+#define CSL_EVT_PLUGIN(id, fn)                                 \
+    DECLARE_EVENT_TABLE_ENTRY(                                 \
+                               wxCSL_EVT_PLUGIN, id, wxID_ANY, \
+                               CslPluginEventHandler(fn),      \
+                               (wxObject*)NULL                 \
+                             ),
+
+
+class CslPluginEvent : public wxEvent
+{
+    public:
+        enum { EVT_SERVER_MENU = 0, EVT_PLAYER_MENU };
+
+        CslPluginEvent(wxInt32 id = wxID_ANY) :
+                wxEvent(id, wxCSL_EVT_PLUGIN),
+                m_menu(NULL),
+                m_serverInfo(NULL),
+                m_playerStatsData(NULL)
+            { }
+
+        virtual wxEvent* Clone() const
+            { return new CslPluginEvent(*this); }
+
+        wxMenu* GetMenu() const { return m_menu; }
+
+        CslServerInfo* GetServerInfo() const { return m_serverInfo; }
+        CslPlayerStatsData* GetPlayerStatsData() const { return m_playerStatsData; }
+
+        void SetMenu(wxMenu *menu) { m_menu = menu; }
+
+        void SetServerInfo(CslServerInfo *info) { m_serverInfo = info; }
+        void SetPlayerStatsData(CslPlayerStatsData *data) { m_playerStatsData = data; }
+
+    private:
+        wxMenu *m_menu;
+
+        CslServerInfo *m_serverInfo;
+        CslPlayerStatsData *m_playerStatsData;
+
+        DECLARE_DYNAMIC_CLASS_NO_ASSIGN(CslPluginEvent)
+};
+
 
 enum { CSL_PLUGIN_TYPE_ENGINE, CSL_PLUGIN_TYPE_GUI };
 
@@ -58,6 +115,7 @@ class CSL_DLL_PLUGIN CslPluginHost
         virtual wxEvtHandler* GetEvtHandler() { return NULL; }
 
         virtual wxInt32 GetFreeId() { return -1; }
+        virtual wxInt32 GetFreeIds(wxInt32 count, wxInt32 ids[]) { return -1; }
 #if wxUSE_GUI
         virtual wxMenu* GetPluginMenu() { return NULL; }
         virtual wxMenuBar* GetMainMenuBar() { return NULL; }
@@ -91,16 +149,15 @@ typedef struct
 
 class CSL_DLL_PLUGIN CslPlugin
 {
+    friend class CslPluginMgr;
+
     public:
-        CslPlugin(const wxString& filename);
+        CslPlugin(const wxString& filename, CslPluginHost *host);
         ~CslPlugin();
 
         bool IsLoaded() { return m_handle.IsLoaded(); }
 
-        friend class CslPluginMgr;
-
     private:
-        wxInt32 m_id;
         wxString m_fileName;
         wxDynamicLibrary m_handle;
         CslPluginInfo *m_pluginInfo;

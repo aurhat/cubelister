@@ -362,15 +362,26 @@ wxInt32 CslFrame::GetFreeId()
     static wxInt32 id=wxID_ANY;
 
     if (id==wxID_ANY)
-        wxRegisterId((id=wxID_HIGHEST+5000));
+        wxRegisterId((id = CSL_PLUGIN_EVENT_ID_MIN_GUI));
 
     return wxNewId();
+}
+
+wxInt32 CslFrame::GetFreeIds(wxInt32 count, wxInt32 ids[])
+{
+    if (count<=0)
+        return -1;
+
+    loopi(count)
+        ids[i] = GetFreeId();
+
+    return ids[0];
 }
 
 wxMenu* CslFrame::GetPluginMenu()
 {
     wxInt32  menuid;
-    wxMenuBar *menubar=GetMenuBar();
+    wxMenuBar *menubar = GetMenuBar();
 
     if ((menuid = menubar->FindMenu(_("&Plugins")))!=wxNOT_FOUND)
         return menubar->GetMenu(menuid);

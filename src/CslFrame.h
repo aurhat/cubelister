@@ -67,31 +67,23 @@ class CslFrame: public wxFrame, public CslPluginMgr, public CslPluginHost
         void CreateServerView(CslServerInfo *info, wxUint32 view,
                               const wxString& name = wxEmptyString);
 
-        // function accessable from within plugins
+        // CslPluginHost implementations
         wxWindow* GetMainWindow()
-        {
-            return this;
-        }
-
+            { return this; }
         wxEvtHandler* GetEvtHandler()
-        {
-            return this;
-        }
+            { return this; }
 
         wxInt32 GetFreeId();
+        wxInt32 GetFreeIds(wxInt32 count, wxInt32 ids[]);
+
         wxMenu* GetPluginMenu();
         wxMenuBar* GetMainMenuBar()
-        {
-            return GetMenuBar();
-        }
+            { return GetMenuBar(); }
+
         CslEngine* GetCslEngine()
-        {
-            return m_engine;
-        }
+            { return m_engine;  }
         CslGame* GetSelectedGame()
-        {
-            return TreeGamesGetSelectedGame();
-        }
+            { return TreeGamesGetSelectedGame(); }
 
     private:
         void CreateMainMenu();
