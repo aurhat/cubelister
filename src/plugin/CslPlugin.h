@@ -45,7 +45,7 @@ typedef void (wxEvtHandler::*CslPluginEventFunction)(CslPluginEvent&);
                              ),
 
 
-class CslPluginEvent : public wxEvent
+class CSL_DLL_PLUGIN CslPluginEvent : public wxEvent
 {
     public:
         enum { EVT_SERVER_MENU = 0, EVT_PLAYER_MENU };
@@ -62,13 +62,17 @@ class CslPluginEvent : public wxEvent
 
         wxMenu* GetMenu() const { return m_menu; }
 
-        CslServerInfo* GetServerInfo() const { return m_serverInfo; }
-        CslPlayerStatsData* GetPlayerStatsData() const { return m_playerStatsData; }
+        CslServerInfo* GetServerInfo() const
+            { return m_serverInfo; }
+        CslPlayerStatsData* GetPlayerStatsData() const
+            { return m_playerStatsData; }
 
         void SetMenu(wxMenu *menu) { m_menu = menu; }
 
-        void SetServerInfo(CslServerInfo *info) { m_serverInfo = info; }
-        void SetPlayerStatsData(CslPlayerStatsData *data) { m_playerStatsData = data; }
+        void SetServerInfo(CslServerInfo *info)
+            { m_serverInfo = info; }
+        void SetPlayerStatsData(CslPlayerStatsData *data)
+            { m_playerStatsData = data; }
 
     private:
         wxMenu *m_menu;
