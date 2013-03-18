@@ -35,7 +35,7 @@ CslListCtrlSettings& CslSettings::GetListSettings(const wxString& name)
 
     settings.CslListSettings.push_back(new CslListCtrlSettings(name));
 
-    return *settings.CslListSettings.back();
+    return *settings.CslListSettings.Last();
 }
 
 void CslSettings::LoadSettings()
