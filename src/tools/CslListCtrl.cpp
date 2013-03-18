@@ -287,8 +287,8 @@ void CslListCtrl::OnMenu(wxCommandEvent& event)
 
         ListToggleColumn(id);
     }
-
-    event.Skip();
+    else
+        event.Skip();
 }
 
 void CslListCtrl::OnContextMenu(wxContextMenuEvent& event)
