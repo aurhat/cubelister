@@ -399,26 +399,23 @@ void CslFrame::CreateControls()
     m_imgListTree.Create(24,24,true);
     m_imgListTree.Add(GET_ART_TOOLBAR(wxART_MASTER));
 
-    pane_main = new wxPanel(this, wxID_ANY);
+    tree_ctrl_games = new wxTreeCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, tree_style);
+    list_ctrl_info = new CslListCtrlInfo(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, list_style|wxLC_NO_HEADER|wxLC_HRULES);
 
-    tree_ctrl_games = new wxTreeCtrl(pane_main, wxID_ANY, wxDefaultPosition, wxDefaultSize, tree_style);
-    list_ctrl_info = new CslListCtrlInfo(pane_main, wxID_ANY, wxDefaultPosition, wxDefaultSize, list_style|wxLC_NO_HEADER|wxLC_HRULES);
-
-    player_info = new CslPanelServerView(pane_main, wxT("players0"), list_style);
+    player_info = new CslPanelServerView(this, wxT("players0"), list_style);
     m_serverViews.push_back(player_info);
 
     pane_search = new CslPanelSearch(this);
 
     pane_traffic = new CslPanelTraffic(this);
 
-    pane_country=new CslPanelCountry(pane_main, list_style);
-    list_ctrl_player_search = new CslListCtrlPlayerSearch(pane_main, wxID_ANY, wxDefaultPosition, wxDefaultSize, list_style);
+    pane_country=new CslPanelCountry(this, list_style);
+    list_ctrl_player_search = new CslListCtrlPlayerSearch(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, list_style);
 
-    list_ctrl_master = new CslListCtrlServer(pane_main, CslListCtrlServer::CSL_LIST_MASTER, wxDefaultPosition, wxDefaultSize,
+    list_ctrl_master = new CslListCtrlServer(this, CslListCtrlServer::CSL_LIST_MASTER, wxDefaultPosition, wxDefaultSize,
                                              list_style, wxDefaultValidator, wxT("master"));
-    list_ctrl_favourites = new CslListCtrlServer(pane_main,CslListCtrlServer::CSL_LIST_FAVOURITE,
-                                                 wxDefaultPosition, wxDefaultSize, list_style,
-                                                 wxDefaultValidator, wxT("favourites"));
+    list_ctrl_favourites = new CslListCtrlServer(this, CslListCtrlServer::CSL_LIST_FAVOURITE, wxDefaultPosition, wxDefaultSize,
+                                                 list_style, wxDefaultValidator, wxT("favourites"));
 
     m_outputDlg = new CslDlgOutput(this);
     m_extendedDlg = new CslDlgExtended(this);
@@ -434,7 +431,7 @@ void CslFrame::SetProperties()
     m_aui.SetFlags(wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_HINT_FADE |
                    wxAUI_MGR_VENETIAN_BLINDS_HINT | wxAUI_MGR_NO_VENETIAN_BLINDS_FADE);
 #endif
-    m_aui.SetManagedWindow(pane_main);
+    m_aui.SetManagedWindow(this);
 
     SetTitle(_("Cube Server Lister"));
 
@@ -443,7 +440,7 @@ void CslFrame::SetProperties()
     list_ctrl_master->Init(list_ctrl_favourites, &CslGetSettings().FilterMaster);
     list_ctrl_favourites->Init(list_ctrl_master, &CslGetSettings().FilterFavourites);
 
-    pane_main->Connect(wxEVT_AUI_PANE_CLOSE, wxAuiManagerEventHandler(CslFrame::OnAuiPaneClose), NULL, this);
+    Connect(wxEVT_AUI_PANE_CLOSE, wxAuiManagerEventHandler(CslFrame::OnAuiPaneClose), NULL, this);
 
     // depending on platform, key events from childs never reach
     // the main frame using static event tables - connect them here
@@ -463,13 +460,6 @@ void CslFrame::SetProperties()
 
 void CslFrame::DoLayout()
 {
-    sizer_main = new wxFlexGridSizer(1,1,0,0);
-    sizer_main->Add(pane_main,1,wxEXPAND,0);
-
-    sizer_main->AddGrowableRow(0);
-    sizer_main->AddGrowableCol(0);
-    SetSizer(sizer_main);
-
     wxSize size=list_ctrl_master->GetBestSize();
 
     m_aui.AddPane(list_ctrl_master, wxAuiPaneInfo().Name(wxT("masterlist")).
@@ -506,9 +496,6 @@ void CslFrame::DoLayout()
     ServerBrowserSetCaption(CslListCtrlServer::CSL_LIST_FAVOURITE);
 
     m_aui.Update();
-
-    sizer_main->Fit(this);
-    Layout();
 
     if (CslGetSettings().FrameSizeMax!=wxDefaultSize)
     {
@@ -820,9 +807,9 @@ void CslFrame::CreateServerView(CslServerInfo *info,wxUint32 view,const wxString
 #endif // __WXMSW__
 
     // lock the main pane until aui manages the new pane
-    wxWindowUpdateLocker lock(pane_main);
+    wxWindowUpdateLocker lock(this);
 
-    CslPanelServerView *playerinfo = new CslPanelServerView(pane_main, panename, style);
+    CslPanelServerView *playerinfo = new CslPanelServerView(this, panename, style);
     playerinfo->ListCtrl()->ListInit(view);
     playerinfo->SetServerInfo(info);
     m_serverViews.push_back(playerinfo);

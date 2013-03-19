@@ -144,8 +144,6 @@ class CslFrame: public wxFrame, public CslPluginMgr, public CslPluginHost
 
         DECLARE_EVENT_TABLE()
 
-        wxFlexGridSizer *sizer_main;
-        wxPanel *pane_main;
         wxNotebook *notebook_views;
         CslListCtrlServer *list_ctrl_master, *list_ctrl_favourites;
         CslPanelServerView *player_info;
