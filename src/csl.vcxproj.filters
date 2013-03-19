@@ -87,6 +87,9 @@
     <ClCompile Include="CslPanelGameSettings.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="CslPanelSearch.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch\Csl.h">
@@ -168,6 +171,9 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="CslPanelGameSettings.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="CslPanelSearch.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

@@ -352,6 +352,7 @@ copy "$(SolutionDir)\src\external\wx\wx28\lib\vc_dll\wxmsw28ud_vc_csl.dll" "$(Ou
     <ClCompile Include="CslPanelCountryView.cpp" />
     <ClCompile Include="CslPanelGameSettings.cpp" />
     <ClCompile Include="CslPanelPlayerSearch.cpp" />
+    <ClCompile Include="CslPanelSearch.cpp" />
     <ClCompile Include="CslPanelServerView.cpp" />
     <ClCompile Include="CslPanelTraffic.cpp" />
     <ClCompile Include="CslServerBrowser.cpp" />
@@ -372,6 +373,7 @@ copy "$(SolutionDir)\src\external\wx\wx28\lib\vc_dll\wxmsw28ud_vc_csl.dll" "$(Ou
     <ClInclude Include="CslPanelCountryView.h" />
     <ClInclude Include="CslPanelGameSettings.h" />
     <ClInclude Include="CslPanelPlayerSearch.h" />
+    <ClInclude Include="CslPanelSearch.h" />
     <ClInclude Include="CslPanelServerView.h" />
     <ClInclude Include="CslPanelTraffic.h" />
     <ClInclude Include="CslServerBrowser.h" />
