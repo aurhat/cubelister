@@ -1925,7 +1925,7 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
 
                 pane_search->SetSearchCtrlError(!(c || s.IsEmpty()));
 
-                if (c)
+                if (!s.IsEmpty())
                     pane_search->SetResult(wxString::Format(_("%d servers"), c));
             }
             else if (event.GetEventType()!=wxEVT_COMMAND_TEXT_ENTER)
