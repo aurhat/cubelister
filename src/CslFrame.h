@@ -33,6 +33,7 @@
 #include "CslPanelCountryView.h"
 #include "CslPanelPlayerSearch.h"
 #include "CslPanelServerView.h"
+#include "CslPanelSearch.h"
 #include "CslPanelTraffic.h"
 #include "CslServerBrowser.h"
 #include "CslServerInfo.h"
@@ -101,7 +102,6 @@ class CslFrame: public wxFrame, public CslPluginMgr, public CslPluginHost
 #ifndef __WXMAC__
         void ToggleTrayIcon();
 #endif
-        void ToggleSearchBar();
         void ToggleAuiPane(wxInt32 id, bool force = false);
 
         void SetTotalPlaytime(CslGame *game);
@@ -144,22 +144,17 @@ class CslFrame: public wxFrame, public CslPluginMgr, public CslPluginHost
 
         DECLARE_EVENT_TABLE()
 
-        wxFlexGridSizer *sizer_main,*sizer_search;
-        wxPanel *pane_main,*pane_search;
+        wxFlexGridSizer *sizer_main;
+        wxPanel *pane_main;
         wxNotebook *notebook_views;
         CslListCtrlServer *list_ctrl_master, *list_ctrl_favourites;
         CslPanelServerView *player_info;
         CslListCtrlInfo *list_ctrl_info;
         CslListCtrlPlayerSearch *list_ctrl_player_search;
+        CslPanelSearch *pane_search;
         CslPanelCountry *pane_country;
         CslPanelTraffic *pane_traffic;
         wxTreeCtrl *tree_ctrl_games;
-        wxSearchCtrl *search_ctrl;
-        wxStaticText *text_search_result;
-        wxButton *button_search;
-        wxBitmapButton *button_search_close;
-        wxGauge *gauge_search;
-        wxRadioButton *radio_search_server, *radio_search_player;
         wxMenu *menuMaster;
         wxAuiManager m_aui;
 #ifndef __WXMAC__

@@ -74,7 +74,6 @@ void CslSettings::LoadSettings()
             settings.UpdateInterval=val;
     }
     if (config.Read(wxT("NoUpdatePlaying"), &val)) settings.DontUpdatePlaying=val!=0;
-    if (config.Read(wxT("ShowSearch"), &val)) settings.ShowSearch=val!=0;
     if (config.Read(wxT("SearchLAN"), &val)) settings.SearchLAN=val!=0;
     if (config.Read(wxT("FilterMaster"), &val)) settings.FilterMaster=val;
     if (config.Read(wxT("FilterFavourites"), &val)) settings.FilterFavourites=val;
@@ -214,7 +213,6 @@ void CslSettings::SaveSettings()
     config.Write(wxT("TTSVolume"), settings.TTSVolume);
     config.Write(wxT("UpdateInterval"), (long int)settings.UpdateInterval);
     config.Write(wxT("NoUpdatePlaying"), settings.DontUpdatePlaying);
-    config.Write(wxT("ShowSearch"), settings.ShowSearch);
     config.Write(wxT("SearchLAN"), settings.SearchLAN);
     config.Write(wxT("FilterMaster"), (long int)settings.FilterMaster);
     config.Write(wxT("FilterFavourites"), (long int)settings.FilterFavourites);

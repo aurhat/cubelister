@@ -24,6 +24,6 @@ csl_SOURCES = CslApp.cpp CslDlgAbout.cpp CslDlgAddMaster.cpp \
 	CslDlgAddServer.cpp CslDlgConnectPass.cpp CslDlgConnectWait.cpp CslDlgExtended.cpp \
 	CslDlgOutput.cpp CslDlgSettings.cpp CslFrame.cpp CslGameConnection.cpp \
 	CslGameProcess.cpp CslIPC.cpp CslPanelCountryView.cpp CslPanelGameSettings.cpp \
-	CslPanelPlayerSearch.cpp CslPanelServerView.cpp CslPanelTraffic.cpp CslServerBrowser.cpp \
-	CslServerInfo.cpp CslSettings.cpp CslStatusBar.cpp CslVersionCheck.cpp
-noinst_HEADERS = CslApp.h CslGameConnection.h
+	CslPanelPlayerSearch.cpp CslPanelSearch.cpp CslPanelServerView.cpp CslPanelTraffic.cpp \
+	CslServerBrowser.cpp CslServerInfo.cpp CslSettings.cpp CslStatusBar.cpp CslVersionCheck.cpp
+noinst_HEADERS = CslApp.h CslGameConnection.h CslPanelSearch.h

@@ -35,11 +35,12 @@
 *
 *   1: initial version
 *   2: ???
-*   3: force new "Selected server" AUI layout
+*   3: AUI layout changes (new Server info pane and Traffic pane)
+*   4: AUI layout changes (new Search pane)
 *
 **/
 
-#define CSL_CONFIG_VERSION         3
+#define CSL_CONFIG_VERSION         4
 #define CSL_SERVERCONFIG_VERSION   1
 #define CSL_LOCATORCONFIG_VERSION  1
 
@@ -114,7 +115,6 @@ class CslSettings
                 TTSVolume(CSL_TTS_VOLUME_DEFAULT),
                 UpdateInterval(CSL_UPDATE_INTERVAL_MIN),
                 DontUpdatePlaying(true),
-                ShowSearch(true),
                 SearchLAN(true),
                 FilterMaster(0),
                 FilterFavourites(0),
@@ -178,7 +178,7 @@ class CslSettings
         wxInt32 TTSVolume;
         wxInt32 UpdateInterval;
         bool DontUpdatePlaying;
-        bool ShowSearch, SearchLAN;
+        bool SearchLAN;
         wxUint32 ColumnsMaster, ColumnsFavourites;
         wxInt32 FilterMaster, FilterFavourites;
         wxInt32 WaitServerFull;
