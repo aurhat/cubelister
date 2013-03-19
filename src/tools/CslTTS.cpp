@@ -164,9 +164,7 @@ bool CslTTS::Say(const wxString& text, const CslTTSSettings& settings)
 #if defined(__WXMSW__) || defined(__WXMAC__)
     ret = self.Process(new CslTTSMessage(text, settings));
 #elif defined(HAVE_LIBSPEECHD_H)
-    if (!settings.IsEmpty())
-        self.ApplySettings(settings);
-
+    self.ApplySettings(settings.IsEmpty() ? self.m_settings : settings);
        ret = spd_say(g_csl_tts, SPD_MESSAGE, U2C(text))>-1;
 #endif
 
