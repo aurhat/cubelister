@@ -529,7 +529,7 @@ void CslFrame::SetAuiPaneSettings()
 {
     #define CSL_CAPTION_GAMES                  _("Games")
     #define CSL_CAPTION_MASTER_LIST_SERVERS    _("Master list servers")
-    #define CSL_CAPTION_FAVLAN_LIST_SERVERS    _("Favourite & LAN servers")
+    #define CSL_CAPTION_FAVLAN_LIST_SERVERS    _("Favourites & LAN servers")
     #define CSL_CAPTION_PLAYERS_SELECTED       _("Selected server")
     #define CSL_CAPTION_TRAFFIC                _("Traffic")
     #define CSL_CAPTION_SEARCH                 _("Search Servers")
