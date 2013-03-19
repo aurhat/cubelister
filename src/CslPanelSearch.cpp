@@ -82,11 +82,11 @@ void CslPanelSearch::do_layout()
     wxFlexGridSizer* grid_sizer_result = new wxFlexGridSizer(1, 3, 0, 0);
     wxFlexGridSizer* grid_sizer_radio_progress = new wxFlexGridSizer(1, 3, 0, 0);
     wxFlexGridSizer* grid_sizer_progress = new wxFlexGridSizer(3, 1, 0, 0);
-    grid_sizer_main->Add(m_search_ctrl, 1, wxLEFT|wxRIGHT|wxTOP|wxEXPAND, 4);
-    grid_sizer_radio_progress->Add(m_radio_server, 0, wxLEFT|wxRIGHT|wxTOP, 4);
-    grid_sizer_radio_progress->Add(m_radio_player, 0, wxLEFT|wxRIGHT|wxTOP, 4);
+    grid_sizer_main->Add(m_search_ctrl, 1, wxALL|wxEXPAND, 4);
+    grid_sizer_radio_progress->Add(m_radio_server, 0, wxALL, 4);
+    grid_sizer_radio_progress->Add(m_radio_player, 0, wxALL, 4);
     grid_sizer_progress->Add(1, 0, 0, 0, 0);
-    grid_sizer_progress->Add(m_gauge_progress, 0, wxLEFT|wxRIGHT|wxTOP|wxEXPAND, 4);
+    grid_sizer_progress->Add(m_gauge_progress, 0, wxALL|wxEXPAND, 4);
     grid_sizer_progress->Add(1, 0, 0, 0, 0);
     grid_sizer_progress->AddGrowableRow(0);
     grid_sizer_progress->AddGrowableRow(2);
