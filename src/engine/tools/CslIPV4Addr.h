@@ -28,7 +28,7 @@ class CSL_DLL_TOOLS CslIPV4Addr
     public:
         CslIPV4Addr()
             { Reset(); }
-        CslIPV4Addr(wxUint32 ip, wxUint16 port = 0, wxUint32 netmask = 0)
+        CslIPV4Addr(wxUint32 ip, wxUint16 port = 0, wxUint32 netmask = (wxUint32)-1)
             { Create(ip, port, netmask); }
         CslIPV4Addr(const CslIPV4Addr& addr)
             { *this = addr; }
@@ -51,7 +51,7 @@ class CSL_DLL_TOOLS CslIPV4Addr
             { return Create(U2C(addr), port, netmask); }
         bool Create(const wxIPV4address& addr)
             { return Create(addr.IPAddress(), addr.Service()); }
-        bool Create(wxUint32 ip, wxUint16 port = 0, wxUint32 netmask = 0)
+        bool Create(wxUint32 ip, wxUint16 port = 0, wxUint32 netmask = (wxUint32)-1)
         {
             m_ip = ip;
             m_port = port;
