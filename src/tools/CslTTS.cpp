@@ -45,6 +45,8 @@ ISpVoice *g_csl_tts;
 SpeechChannel g_csl_tts;
 #elif defined(HAVE_LIBSPEECHD_H)
 SPDConnection *g_csl_tts;
+#else
+void *g_csl_tts;
 #endif //__WXMSW__
 
 
@@ -165,7 +167,7 @@ bool CslTTS::Say(const wxString& text, const CslTTSSettings& settings)
     ret = self.Process(new CslTTSMessage(text, settings));
 #elif defined(HAVE_LIBSPEECHD_H)
     self.ApplySettings(settings.IsEmpty() ? self.m_settings : settings);
-       ret = spd_say(g_csl_tts, SPD_MESSAGE, U2C(text))>-1;
+    ret = spd_say(g_csl_tts, SPD_MESSAGE, U2C(text))>-1;
 #endif
 
     return ret;
