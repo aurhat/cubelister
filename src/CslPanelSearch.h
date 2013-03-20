@@ -77,6 +77,7 @@ class CslPanelSearch: public wxPanel {
         void do_layout();
         // end wxGlade
 
+        void OnShow(wxShowEvent& event);
         void OnKeypress(wxKeyEvent& event);
         void OnCommandEvent(wxCommandEvent& event);
 

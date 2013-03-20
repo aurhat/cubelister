@@ -28,9 +28,10 @@
 
 
 BEGIN_EVENT_TABLE(CslPanelSearch, wxPanel)
-EVT_RADIOBUTTON(wxID_ANY, CslPanelSearch::OnCommandEvent)
-EVT_BUTTON(wxID_ANY, CslPanelSearch::OnCommandEvent)
+EVT_SHOW(CslPanelSearch::OnShow)
 EVT_TEXT(wxID_ANY, CslPanelSearch::OnCommandEvent)
+EVT_BUTTON(wxID_ANY, CslPanelSearch::OnCommandEvent)
+EVT_RADIOBUTTON(wxID_ANY, CslPanelSearch::OnCommandEvent)
 END_EVENT_TABLE()
 
 
@@ -117,6 +118,14 @@ void CslPanelSearch::SetResult(const wxString& text, const wxString& prefix)
     m_label_result->SetLabel(text);
 
     m_sizer_result->Layout();
+}
+
+void CslPanelSearch::OnShow(wxShowEvent& event)
+{
+    if (event.IsShown())
+        m_search_ctrl->SetFocus();
+
+    event.Skip();
 }
 
 void CslPanelSearch::OnKeypress(wxKeyEvent& event)
