@@ -883,7 +883,7 @@ void CslFrame::ToggleShow(wxInt32 mode)
     if (iconized)
     {
 #ifndef __WXMAC__
-        if (CSL_FLAG_CHECK(CslGetSettings().Systray, CSL_USE_SYSTRAY))
+        if (!IsShown())
             Show(true);
 #endif
         Iconize(false);
