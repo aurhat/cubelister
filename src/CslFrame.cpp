@@ -2300,6 +2300,8 @@ void CslFrame::OnAuiPaneClose(wxAuiManagerEvent& event)
         CslMenu::CheckItem(MENU_VIEW_SERVER_INFO, false);
     else if (event.pane->name==wxT("playerlist"))
         CslMenu::CheckItem(MENU_VIEW_PLAYER_LIST, false);
+    else if (event.pane->name==wxT("searchmain"))
+        CslMenu::CheckItem(MENU_VIEW_SEARCH, false);
     else if (event.pane->name==wxT("traffic"))
         CslMenu::CheckItem(MENU_VIEW_TRAFFIC, false);
     else if (event.pane->name==wxT("search"))
