@@ -48,7 +48,13 @@
 #define CSL_EXE_EXTENSIONS wxString(wxT("*"))
 #endif
 
-CSL_DLL_TOOLS void Debug_Printf(const char *file, int line, const char *func, const char *fmt, ...);
+#ifdef __GNUC__
+#define CSL_PRINTF_CHECK(fmt, args) __attribute__((format(printf, fmt, args)))
+#else
+#define CSL_PRINTF_CHECK(fmt, args)
+#endif
+
+CSL_DLL_TOOLS void Debug_Printf(const char *file, int line, const char *func, const char *fmt, ...) CSL_PRINTF_CHECK(4, 5);
 
 #ifdef CSL_DEBUG
 #define CSL_DEF_DEBUG(...)  __VA_ARGS__

@@ -74,7 +74,7 @@ CslUDP::CslUDP(wxEvtHandler *evtHandler) : wxEvtHandler(),
         }
     }
 
-    CSL_LOG_DEBUG("Ping port: %li\n",address.Service());
+    CSL_LOG_DEBUG("Ping port: %d\n", address.Service());
 
     m_socket->SetEventHandler(*this);
     m_socket->SetNotify(wxSOCKET_INPUT_FLAG);

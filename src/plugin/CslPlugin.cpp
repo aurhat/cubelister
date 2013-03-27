@@ -84,7 +84,7 @@ wxInt32 CslPluginMgr::LoadPlugins(CslPluginHost *host)
         if (p->m_pluginInfo->APIVersion!=CSL_PLUGIN_VERSION_API)
         {
             CSL_LOG_DEBUG("Couldn't load plugin %s. Invalid API version (%d!=%d)\n",
-                          U2C(file), p->m_pluginInfo->APIVersion!=CSL_PLUGIN_VERSION_API);
+                          U2C(file), p->m_pluginInfo->APIVersion, CSL_PLUGIN_VERSION_API);
             goto fail;
         }
         if (p->m_pluginInfo->Type<CSL_PLUGIN_TYPE_ENGINE ||

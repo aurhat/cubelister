@@ -679,8 +679,8 @@ bool CslEngine::ParsePong(CslServerInfo *info, CslNetPacket& packet)
                 {
                     if (rid>-1 && stats.m_ids.Index(rid)==wxNOT_FOUND)
                     {
-                        CSL_LOG_DEBUG("%s (%s) ERROR(%d): resend id not found (%d | %d).\n",U2C(msg_type),
-                                      U2C(info->GetBestDescription()),GetTicks(),rid,stats.m_ids.GetCount());
+                        CSL_LOG_DEBUG("%s (%s) ERROR(%d): resend id not found (%d | %lu).\n", U2C(msg_type),
+                                      U2C(info->GetBestDescription()), GetTicks(), rid, stats.m_ids.GetCount());
                         break;
                     }
 
@@ -688,14 +688,14 @@ bool CslEngine::ParsePong(CslServerInfo *info, CslNetPacket& packet)
                     {
                         vi=getint(p);
 #if 0
-                        CSL_LOG_DEBUG("%s (%s) INFO(%d): got id (%d).\n",U2C(msg_type),
-                                  U2C(info->GetBestDescription()),GetTicks(),vi);
+                        CSL_LOG_DEBUG("%s (%s) INFO(%d): got id (%d).\n", U2C(msg_type),
+                                      U2C(info->GetBestDescription()), GetTicks(), vi);
 #endif
                         if (rid==-1 && !stats.AddId(vi))
                         {
                             stats.Reset();
-                            CSL_LOG_DEBUG("%s (%s) ERROR: AddId(%d)\n",U2C(msg_type),
-                                      U2C(info->GetBestDescription()),vi);
+                            CSL_LOG_DEBUG("%s (%s) ERROR: AddId(%d)\n", U2C(msg_type),
+                                          U2C(info->GetBestDescription()), vi);
                             break;
                         }
                     }
