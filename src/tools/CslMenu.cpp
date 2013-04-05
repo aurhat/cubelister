@@ -75,9 +75,17 @@ wxMenuItem& CslMenu::AddItem(wxMenu& menu, wxInt32 id,
                              const wxString& text, const wxArtID& art,
                              const wxItemKind kind, const wxString& help)
 {
-    wxMenuItem *item=new wxMenuItem(&menu, id, text, help, kind);
+    wxString h;
 
-    wxOperatingSystemId os=wxPlatformInfo().GetOperatingSystemId();
+    if (help.IsEmpty())
+    {
+        h = text.BeforeFirst('\t');
+        h.Replace(wxT("&"), wxT(""), true);
+    }
+
+    wxMenuItem *item = new wxMenuItem(&menu, id, text, h.IsEmpty() ? help : h, kind);
+
+    wxOperatingSystemId os = wxPlatformInfo().GetOperatingSystemId();
 
     if (art!=wxART_NONE && (id>wxID_HIGHEST || (os&wxOS_WINDOWS) || (os&wxOS_MAC)))
         item->SetBitmap(GET_ART_MENU(art));

@@ -421,6 +421,7 @@ void CslFrame::CreateControls()
     m_extendedDlg = new CslDlgExtended(this);
 
     SetStatusBar(CslStatusBar::Init(this));
+    SetStatusBarPane(1);
 
     CreateMainMenu();
 }
