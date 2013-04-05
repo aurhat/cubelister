@@ -108,7 +108,8 @@ CSL_DEFINE_STRING_BUFFER(CslWCharBuffer, wchar_t, wxStrdupW);
 
 struct CslCharEncodingTableEntry
 {
-    const wxChar *Encoding, *Name;
+    const wxChar *Encoding;
+    const wxString Name;
 };
 
 #define CSL_NUM_CHAR_ENCODINGS  13

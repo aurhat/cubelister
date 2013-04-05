@@ -34,7 +34,7 @@ const CslCharEncodingTableEntry CslCharEncodingTable[CSL_NUM_CHAR_ENCODINGS] =
     { wxT("ISO-8859-9"),  _("Turkish")          },
     { wxT("ISO-8859-1"),  _("Western European") },
     { wxT("ISO-8859-15"), _("Western European") },
-    { wxT("cp 1252"),     _("Western European") },
+    { wxT("cp 1252"),     _("Western European") }
 };
 
 const CslCharEncoding CslCurrentEncoding(wxT(""));
@@ -92,6 +92,13 @@ wxString CslCharEncoding::MB2WX(const char *psz) const
         return wxEmptyString;
 
     wxString s;
+
+#if wxUSE_UNICODE_UTF8
+    if (!m_conv || this==&CslCurrentEncoding || this==&CslUTF8Encoding)
+        s = psz;
+    else
+        s = wxString(psz, *m_conv);
+#else
     wchar_t *wbuf = ToWChar(m_conv ? m_conv : wxConvCurrent, psz);
 
     if (wbuf)
@@ -103,7 +110,7 @@ wxString CslCharEncoding::MB2WX(const char *psz) const
 
         if (buf)
             s = buf;
-#endif
+#endif // wxUSE_UNICODE
         delete[] wbuf;
     }
 
@@ -114,12 +121,19 @@ wxString CslCharEncoding::MB2WX(const char *psz) const
         if (m_conv)
             return CslCurrentEncoding.MB2WX(psz);
     }
+#endif // wxUSE_UNICODE_UTF8
 
     return s;
 }
 
 const CslCharBuffer CslCharEncoding::WX2MB(const wxString& str) const
 {
+#if wxUSE_UNICODE_UTF8
+    if (!m_conv || this==&CslCurrentEncoding || this==&CslUTF8Encoding)
+        return CslCharBuffer(str.wx_str());
+    else
+        return CslCharBuffer(str.mb_str(*m_conv));
+#else
     const char *buf = NULL;
 
 #if wxUSE_UNICODE
@@ -132,7 +146,7 @@ const CslCharBuffer CslCharEncoding::WX2MB(const wxString& str) const
 
     if (wbuf)
         buf = FromWChar(m_conv, wbuf);
-#endif
+#endif // wxUSE_UNICODE
     if (buf)
     {
         CslCharBuffer cbuf((const char*)buf);
@@ -141,11 +155,12 @@ const CslCharBuffer CslCharEncoding::WX2MB(const wxString& str) const
     }
     else
     {
-        //CSL_LOG_DEBUG("Conversion to %s failed.\n",
+        //CSL_LOG_DEBUG("conversion to %s failed.\n",
         //              (const char*)m_name.mb_str(wxConvLocal));
         if (m_conv)
             return CslCurrentEncoding.WX2MB(str);
     }
+#endif // wxUSE_UNICODE_UTF8
 
     return CslCharBuffer("");
 }
