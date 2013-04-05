@@ -51,9 +51,9 @@ class CslDlgConnectWait: public wxDialog
         // begin wxGlade: CslDlgConnectWait::attributes
         wxSpinCtrl* spin_ctrl_time;
         wxCheckBox* checkbox_default;
+        wxButton* button_cancel;
         wxButton* button_ok;
         wxButton* button_connect;
-        wxButton* button_cancel;
         // end wxGlade
 }; // wxGlade: end class
 

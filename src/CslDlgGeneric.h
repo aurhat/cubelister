@@ -117,9 +117,8 @@ class CslDlgGeneric: public wxDialog
             {
                 case wxID_OK:
                 case wxID_CLOSE:
+                case wxID_CANCEL:
                     Destroy();
-                    break;
-                default:
                     break;
             }
         }

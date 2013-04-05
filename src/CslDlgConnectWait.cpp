@@ -34,9 +34,9 @@ CslDlgConnectWait::CslDlgConnectWait(wxWindow* parent,wxInt32 *time,int id,const
     // begin wxGlade: CslDlgConnectWait::CslDlgConnectWait
     spin_ctrl_time = new wxSpinCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 0, 100);
     checkbox_default = new wxCheckBox(this, wxID_ANY, _("Set as default waiting time."));
+    button_cancel = new wxButton(this, wxID_CANCEL, _("&Cancel"));
     button_ok = new wxButton(this, wxID_OK, _("&Wait"));
     button_connect = new wxButton(this, wxID_ANY, _("C&onnect"));
-    button_cancel = new wxButton(this, wxID_CANCEL, _("&Cancel"));
 
     set_properties();
     do_layout();
@@ -74,10 +74,10 @@ void CslDlgConnectWait::do_layout()
     grid_sizer_top->Add(grid_sizer_spin, 1, wxEXPAND, 0);
     grid_sizer_top->Add(checkbox_default, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
     grid_sizer_main->Add(grid_sizer_top, 1, wxALL|wxEXPAND, 4);
+    grid_sizer_button->Add(button_cancel, 0, wxALL, 4);
     grid_sizer_button->Add(button_ok, 0, wxALL, 4);
     grid_sizer_button->Add(button_connect, 0, wxALL, 4);
-    grid_sizer_button->Add(button_cancel, 0, wxALL, 4);
-    grid_sizer_button->AddGrowableCol(0);
+    grid_sizer_button->AddGrowableCol(1);
     grid_sizer_main->Add(grid_sizer_button, 1, wxBOTTOM|wxALIGN_CENTER_HORIZONTAL, 4);
     SetSizer(grid_sizer_main);
     grid_sizer_main->Fit(this);

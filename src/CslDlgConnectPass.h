@@ -21,10 +21,6 @@
 #ifndef CSLDLGCONNECTPASS_H
 #define CSLDLGCONNECTPASS_H
 
-/**
-    @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
-
 
 class CslConnectPassInfo
 {
@@ -44,11 +40,7 @@ class CslDlgConnectPass: public wxDialog
     public:
         // begin wxGlade: CslDlgConnectPass::ids
         // end wxGlade
-        CslDlgConnectPass(wxWindow* parent,CslConnectPassInfo *info,int id=wxID_ANY,
-                          const wxString& title=wxEmptyString,
-                          const wxPoint& pos=wxDefaultPosition,
-                          const wxSize& size=wxDefaultSize,
-                          long style=wxDEFAULT_DIALOG_STYLE);
+        CslDlgConnectPass(wxWindow* parent, CslConnectPassInfo *info);
 
     private:
         // begin wxGlade: CslDlgConnectPass::methods
@@ -63,10 +55,9 @@ class CslDlgConnectPass: public wxDialog
     protected:
         // begin wxGlade: CslDlgConnectPass::attributes
         wxStaticBox* sizer_ctrl_staticbox;
-        wxTextCtrl* text_ctrl_password;
-        wxCheckBox* checkbox_admin;
-        wxButton* button_ok;
-        wxButton* button_cancel;
+        wxTextCtrl* m_tcPassword;
+        wxCheckBox* m_cbAdmin;
+        wxSizer* m_bsDlg;
         // end wxGlade
 
         CslConnectPassInfo *m_info;

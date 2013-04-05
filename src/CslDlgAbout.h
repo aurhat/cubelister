@@ -61,18 +61,18 @@ class CslDlgAbout: public wxDialog
     protected:
         // begin wxGlade: CslDlgAbout::attributes
         CslPanelAboutImage* panel_bitmap;
-        wxStaticText* label_name;
-        wxStaticText* label_version;
-        wxStaticText* label_desc;
-        wxHyperlinkCtrl* hyperlink_web;
-        wxStaticText* label_copyright;
-        wxStaticText* label_wxversion;
-        wxTextCtrl* text_ctrl_credits;
-        wxPanel* notebook_pane_credits;
-        wxTextCtrl* text_ctrl_license;
-        wxPanel* notebook_pane_license;
-        wxNotebook* notebook;
-        wxButton* button_close;
+        wxStaticText* m_labelName;
+        wxStaticText* m_labelVersion;
+        wxStaticText* m_labelDescription;
+        wxHyperlinkCtrl* m_hlWeb;
+        wxStaticText* m_labelCopyright;
+        wxStaticText* m_labelwxVersion;
+        wxTextCtrl* m_tcCredits;
+        wxPanel* m_npCredits;
+        wxTextCtrl* m_tcLicense;
+        wxPanel* m_npLicense;
+        wxNotebook* m_notebook;
+        wxButton* m_btClose;
         // end wxGlade
 }; // wxGlade: end class
 

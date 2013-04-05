@@ -85,7 +85,7 @@ CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
     checkbox_update = new wxCheckBox(this, CHECK_UPDATE, _("Stop auto update when map &ends"));
     checkbox_map = new wxCheckBox(this, CHECK_MAP, _("&Show map if possible"));
     static_line = new wxStaticLine(this, wxID_ANY);
-    button_close = new wxButton(this, wxID_CLOSE, _("&Close"));
+    button_close = new wxButton(this, wxID_CLOSE, wxEmptyString);
 
     set_properties();
     do_layout();
@@ -137,7 +137,6 @@ void CslDlgExtended::do_layout()
 {
     // begin wxGlade: CslDlgExtended::do_layout
     wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(5, 1, 0, 0);
-    wxFlexGridSizer* grid_sizer_button = new wxFlexGridSizer(1, 1, 0, 0);
     wxFlexGridSizer* grid_sizer_checkboix = new wxFlexGridSizer(1, 2, 0, 0);
     wxFlexGridSizer* grid_sizer_info_team = new wxFlexGridSizer(1, 3, 0, 0);
     wxStaticBoxSizer* sizer_map_label = new wxStaticBoxSizer(sizer_map_label_staticbox, wxHORIZONTAL);
@@ -202,8 +201,7 @@ void CslDlgExtended::do_layout()
     grid_sizer_checkboix->AddGrowableCol(0);
     grid_sizer_main->Add(grid_sizer_checkboix, 1, wxEXPAND, 0);
     grid_sizer_main->Add(static_line, 0, wxLEFT|wxRIGHT|wxTOP|wxEXPAND, 4);
-    grid_sizer_button->Add(button_close, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_main->Add(grid_sizer_button, 1, wxTOP|wxBOTTOM|wxALIGN_RIGHT, 4);
+    grid_sizer_main->Add(button_close, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
     SetSizer(grid_sizer_main);
     grid_sizer_main->Fit(this);
     grid_sizer_main->AddGrowableRow(0);

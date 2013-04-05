@@ -69,19 +69,19 @@ CslDlgAbout::CslDlgAbout(wxWindow* parent,int id,const wxString& title,
         wxDialog(parent,id,title,pos,size,style)
 {
     // begin wxGlade: CslDlgAbout::CslDlgAbout
-    notebook = new wxNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0);
-    notebook_pane_license = new wxPanel(notebook, wxID_ANY);
-    notebook_pane_credits = new wxPanel(notebook, wxID_ANY);
+    m_notebook = new wxNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0);
+    m_npLicense = new wxPanel(m_notebook, wxID_ANY);
+    m_npCredits = new wxPanel(m_notebook, wxID_ANY);
     panel_bitmap = new CslPanelAboutImage(this, wxID_ANY);
-    label_name = new wxStaticText(this, wxID_ANY, wxEmptyString);
-    label_version = new wxStaticText(this, wxID_ANY, wxEmptyString);
-    label_desc = new wxStaticText(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
-    hyperlink_web = new wxHyperlinkCtrl(this, wxID_ANY, CSL_WEBADDR_STR, CSL_WEBADDR_STR);
-    label_copyright = new wxStaticText(this, wxID_ANY, wxEmptyString);
-    label_wxversion = new wxStaticText(this, wxID_ANY, wxEmptyString);
-    text_ctrl_credits = new wxTextCtrl(notebook_pane_credits, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxHSCROLL);
-    text_ctrl_license = new wxTextCtrl(notebook_pane_license, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxHSCROLL);
-    button_close = new wxButton(this, wxID_CLOSE, _("&Close"));
+    m_labelName = new wxStaticText(this, wxID_ANY, wxEmptyString);
+    m_labelVersion = new wxStaticText(this, wxID_ANY, wxEmptyString);
+    m_labelDescription = new wxStaticText(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+    m_hlWeb = new wxHyperlinkCtrl(this, wxID_ANY, CSL_WEBADDR_STR, CSL_WEBADDR_STR);
+    m_labelCopyright = new wxStaticText(this, wxID_ANY, wxEmptyString);
+    m_labelwxVersion = new wxStaticText(this, wxID_ANY, wxEmptyString);
+    m_tcCredits = new wxTextCtrl(m_npCredits, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxHSCROLL);
+    m_tcLicense = new wxTextCtrl(m_npLicense, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxHSCROLL);
+    m_btClose = new wxButton(this, wxID_CLOSE, wxEmptyString);
 
     set_properties();
     do_layout();
@@ -92,31 +92,31 @@ CslDlgAbout::CslDlgAbout(wxWindow* parent,int id,const wxString& title,
 void CslDlgAbout::set_properties()
 {
     // begin wxGlade: CslDlgAbout::set_properties
-    label_name->SetFont(wxFont(16, wxDECORATIVE, wxNORMAL, wxBOLD, 0, wxT("")));
-    label_version->SetFont(wxFont(12, wxDEFAULT, wxNORMAL, wxBOLD, 0, wxT("")));
-    button_close->SetDefault();
+    m_labelName->SetFont(wxFont(16, wxDECORATIVE, wxNORMAL, wxBOLD, 0, wxT("")));
+    m_labelVersion->SetFont(wxFont(12, wxDEFAULT, wxNORMAL, wxBOLD, 0, wxT("")));
+    m_btClose->SetDefault();
     // end wxGlade
 
     wxString s;
 
+    s << _("Compiled using:") << wxT(" ") << CSL_WXVERSION_STR;
+
     SetTitle(_("About Cube Server Lister (CSL)"));
 
-    wxFont font=label_copyright->GetFont();
+    wxFont font = m_labelCopyright->GetFont();
     //font.SetPointSize(font.GetPointSize()-1);
     font.SetStyle(wxFONTSTYLE_ITALIC);
-    label_copyright->SetFont(font);
+    m_labelCopyright->SetFont(font);
 
-    font=hyperlink_web->GetFont();
+    font = m_hlWeb->GetFont();
     font.SetWeight(wxFONTWEIGHT_BOLD);
-    hyperlink_web->SetFont(font);
+    m_hlWeb->SetFont(font);
 
-    s<<_("Compiled using:")<<wxT(" ")<<CSL_WXVERSION_STR;
-
-    label_name->SetLabel(CSL_NAME_STR);
-    label_version->SetLabel(CSL_VERSION_STR);
-    label_desc->SetLabel(CSL_DESCRIPTION_STR);
-    label_copyright->SetLabel(CSL_COPYRIGHT_STR);
-    label_wxversion->SetLabel(s);
+    m_labelName->SetLabel(CSL_NAME_STR);
+    m_labelVersion->SetLabel(CSL_VERSION_STR);
+    m_labelDescription->SetLabel(CSL_DESCRIPTION_STR);
+    m_labelCopyright->SetLabel(CSL_COPYRIGHT_STR);
+    m_labelwxVersion->SetLabel(s);
 
     s = wxString(_(
                      "Application icon:\n"
@@ -155,17 +155,17 @@ void CslDlgAbout::set_properties()
                  wxT("  http://flags.blogpotato.de\n")
                 );
 
-    text_ctrl_credits->SetValue(s);
-    text_ctrl_license->SetValue(g_csl_license_pre);
-    text_ctrl_license->AppendText(csl_license);
-    text_ctrl_credits->ShowPosition(0);
-    text_ctrl_license->ShowPosition(0);
+    m_tcCredits->SetValue(s);
+    m_tcLicense->SetValue(g_csl_license_pre);
+    m_tcLicense->AppendText(csl_license);
+    m_tcCredits->ShowPosition(0);
+    m_tcLicense->ShowPosition(0);
 
     panel_bitmap->SetMinSize(wxSize(256,256));
 #ifdef __WXMAC__
-    notebook->SetMinSize(wxSize(400,210));
+    m_notebook->SetMinSize(wxSize(400,210));
 #else
-    notebook->SetMinSize(wxSize(400,180));
+    m_notebook->SetMinSize(wxSize(400,180));
 #endif //__WXMAC__
 
     CSL_SET_WINDOW_ICON();
@@ -179,20 +179,20 @@ void CslDlgAbout::do_layout()
     wxGridSizer* sizer_license = new wxGridSizer(1, 1, 0, 0);
     wxGridSizer* sizer_credits = new wxGridSizer(1, 1, 0, 0);
     grid_sizer_main->Add(panel_bitmap, 1, wxALIGN_CENTER_HORIZONTAL, 0);
-    grid_sizer_main->Add(label_name, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
-    grid_sizer_main->Add(label_version, 0, wxALIGN_CENTER_HORIZONTAL, 2);
-    grid_sizer_main->Add(label_desc, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
-    grid_sizer_main->Add(hyperlink_web, 1, wxTOP|wxALIGN_CENTER_HORIZONTAL, 8);
-    grid_sizer_main->Add(label_copyright, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
-    grid_sizer_main->Add(label_wxversion, 0, wxTOP|wxALIGN_CENTER_HORIZONTAL, 8);
-    sizer_credits->Add(text_ctrl_credits, 0, wxALL|wxEXPAND, 4);
-    notebook_pane_credits->SetSizer(sizer_credits);
-    sizer_license->Add(text_ctrl_license, 0, wxALL|wxEXPAND, 4);
-    notebook_pane_license->SetSizer(sizer_license);
-    notebook->AddPage(notebook_pane_credits, _("Credits"));
-    notebook->AddPage(notebook_pane_license, _("License"));
-    grid_sizer_main->Add(notebook, 1, wxALL|wxEXPAND, 8);
-    grid_sizer_main->Add(button_close, 0, wxBOTTOM|wxALIGN_CENTER_HORIZONTAL, 8);
+    grid_sizer_main->Add(m_labelName, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
+    grid_sizer_main->Add(m_labelVersion, 0, wxALIGN_CENTER_HORIZONTAL, 2);
+    grid_sizer_main->Add(m_labelDescription, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
+    grid_sizer_main->Add(m_hlWeb, 1, wxTOP|wxALIGN_CENTER_HORIZONTAL, 8);
+    grid_sizer_main->Add(m_labelCopyright, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
+    grid_sizer_main->Add(m_labelwxVersion, 0, wxTOP|wxALIGN_CENTER_HORIZONTAL, 8);
+    sizer_credits->Add(m_tcCredits, 0, wxALL|wxEXPAND, 4);
+    m_npCredits->SetSizer(sizer_credits);
+    sizer_license->Add(m_tcLicense, 0, wxALL|wxEXPAND, 4);
+    m_npLicense->SetSizer(sizer_license);
+    m_notebook->AddPage(m_npCredits, _("Credits"));
+    m_notebook->AddPage(m_npLicense, _("License"));
+    grid_sizer_main->Add(m_notebook, 1, wxALL|wxEXPAND, 8);
+    grid_sizer_main->Add(m_btClose, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
     SetSizer(grid_sizer_main);
     grid_sizer_main->Fit(this);
     grid_sizer_main->AddGrowableRow(7);

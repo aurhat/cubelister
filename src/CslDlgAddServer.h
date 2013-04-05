@@ -32,11 +32,7 @@ class CslDlgAddServer: public wxDialog
         // begin wxGlade: CslDlgAddServer::ids
         // end wxGlade
 
-        CslDlgAddServer(wxWindow* parent, wxInt32 id = wxID_ANY,
-                        const wxString& title = wxEmptyString,
-                        const wxPoint& pos = wxDefaultPosition,
-                        const wxSize& size = wxDefaultSize,
-                        long style = wxDEFAULT_DIALOG_STYLE);
+        CslDlgAddServer(wxWindow* parent);
 
         CslServerInfo* InitDlg(CslServerInfo *info);
 
@@ -56,12 +52,11 @@ class CslDlgAddServer: public wxDialog
     protected:
         // begin wxGlade: CslDlgAddServer::attributes
         wxStaticBox* sizer_address_staticbox;
-        wxChoice* choice_gametype;
-        wxTextCtrl* text_ctrl_address;
-        wxSpinCtrl* spin_ctrl_gameport;
-        wxSpinCtrl* spin_ctrl_infoport;
-        wxButton* button_add;
-        wxButton* button_cancel;
+        wxChoice* m_choiceGameType;
+        wxTextCtrl* m_tcAddress;
+        wxSpinCtrl* m_scGamePort;
+        wxSpinCtrl* m_scInfoPort;
+        wxSizer* m_bsDlg;
         // end wxGlade
 
         CslServerInfo *m_info;

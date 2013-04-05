@@ -42,22 +42,20 @@ BEGIN_EVENT_TABLE(CslDlgAddServer,wxDialog)
 END_EVENT_TABLE()
 
 
-CslDlgAddServer::CslDlgAddServer(wxWindow* parent,int id,const wxString& title,
-                                 const wxPoint& pos,const wxSize& size,long style):
-        wxDialog(parent, id, title, pos, size, style),
+CslDlgAddServer::CslDlgAddServer(wxWindow* parent):
+        wxDialog(parent, wxID_ANY, wxEmptyString),
         m_info(NULL)
 {
     // begin wxGlade: CslDlgAddServer::CslDlgAddServer
     sizer_address_staticbox = new wxStaticBox(this, -1, wxEmptyString);
-    const wxString choice_gametype_choices[] = {
+    const wxString m_choiceGameType_choices[] = {
         _("default")
     };
-    choice_gametype = new wxChoice(this, CHOICE_CTRL_GAMETYPE, wxDefaultPosition, wxDefaultSize, 1, choice_gametype_choices, 0);
-    text_ctrl_address = new wxTextCtrl(this, TEXT_CTRL_ADDRESS, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
-    spin_ctrl_gameport = new wxSpinCtrl(this, SPIN_CTRL_GAMEPORT, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 65535);
-    spin_ctrl_infoport = new wxSpinCtrl(this, SPIN_CTRL_INFOPORT, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 65535);
-    button_add = new wxButton(this, wxID_ADD, _("Add"));
-    button_cancel = new wxButton(this, wxID_CANCEL, _("&Cancel"));
+    m_choiceGameType = new wxChoice(this, CHOICE_CTRL_GAMETYPE, wxDefaultPosition, wxDefaultSize, 1, m_choiceGameType_choices, 0);
+    m_tcAddress = new wxTextCtrl(this, TEXT_CTRL_ADDRESS, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
+    m_scGamePort = new wxSpinCtrl(this, SPIN_CTRL_GAMEPORT, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 65535);
+    m_scInfoPort = new wxSpinCtrl(this, SPIN_CTRL_INFOPORT, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 65535);
+    m_bsDlg = CreateButtonSizer(wxOK|wxCANCEL);
 
     set_properties();
     do_layout();
@@ -69,13 +67,14 @@ void CslDlgAddServer::set_properties()
 {
     // begin wxGlade: CslDlgAddServer::set_properties
     SetTitle(_("CSL - Add new server"));
-    choice_gametype->SetSelection(0);
-    text_ctrl_address->SetFocus();
-    spin_ctrl_gameport->SetMinSize(wxSize(80, -1));
-    spin_ctrl_infoport->SetMinSize(wxSize(80, -1));
-    button_add->Enable(false);
-    button_add->SetDefault();
+    m_choiceGameType->SetSelection(0);
+    m_tcAddress->SetFocus();
+    m_scGamePort->SetMinSize(wxSize(80, -1));
+    m_scInfoPort->SetMinSize(wxSize(80, -1));
     // end wxGlade
+
+    wxButton *buttonOK = (wxButton*)FindWindowById(wxID_OK, this);
+    buttonOK->Enable(false);
 
     CSL_SET_WINDOW_ICON();
 }
@@ -85,39 +84,41 @@ void CslDlgAddServer::do_layout()
 {
     // begin wxGlade: CslDlgAddServer::do_layout
     wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(2, 1, 0, 0);
-    wxFlexGridSizer* grid_sizer_button = new wxFlexGridSizer(1, 3, 0, 0);
     wxStaticBoxSizer* sizer_address = new wxStaticBoxSizer(sizer_address_staticbox, wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_input = new wxFlexGridSizer(3, 2, 0, 0);
     wxFlexGridSizer* grid_sizer_port = new wxFlexGridSizer(1, 3, 0, 0);
-    wxStaticText* label_game_static = new wxStaticText(this, wxID_ANY, _("Game:"));
-    grid_sizer_input->Add(label_game_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_input->Add(choice_gametype, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
-    wxStaticText* label_address_static = new wxStaticText(this, wxID_ANY, _("Address:"));
-    grid_sizer_input->Add(label_address_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_input->Add(text_ctrl_address, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
-    wxStaticText* label_gameport_static = new wxStaticText(this, wxID_ANY, _("Port:"));
-    grid_sizer_input->Add(label_gameport_static, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_port->Add(spin_ctrl_gameport, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
-    wxStaticText* label_infoport_static = new wxStaticText(this, wxID_ANY, _("Info port:"));
-    grid_sizer_port->Add(label_infoport_static, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
-    grid_sizer_port->Add(spin_ctrl_infoport, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    wxStaticText* label_game = new wxStaticText(this, wxID_ANY, _("Game:"));
+    grid_sizer_input->Add(label_game, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_input->Add(m_choiceGameType, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    wxStaticText* label_address = new wxStaticText(this, wxID_ANY, _("Address:"));
+    grid_sizer_input->Add(label_address, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_input->Add(m_tcAddress, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    wxStaticText* label_gameport = new wxStaticText(this, wxID_ANY, _("Port:"));
+    grid_sizer_input->Add(label_gameport, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_port->Add(m_scGamePort, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    wxStaticText* label_infoport = new wxStaticText(this, wxID_ANY, _("Info port:"));
+    grid_sizer_port->Add(label_infoport, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 8);
+    grid_sizer_port->Add(m_scInfoPort, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_port->AddGrowableRow(0);
     grid_sizer_port->AddGrowableCol(0);
     grid_sizer_port->AddGrowableCol(2);
     grid_sizer_input->Add(grid_sizer_port, 1, wxEXPAND, 0);
+    grid_sizer_input->AddGrowableRow(0);
     grid_sizer_input->AddGrowableRow(1);
+    grid_sizer_input->AddGrowableRow(2);
     grid_sizer_input->AddGrowableCol(1);
     sizer_address->Add(grid_sizer_input, 1, wxEXPAND, 0);
     grid_sizer_main->Add(sizer_address, 1, wxALL|wxEXPAND, 4);
-    grid_sizer_button->Add(1, 1, 0, 0, 0);
-    grid_sizer_button->Add(button_add, 0, wxALL|wxEXPAND, 4);
-    grid_sizer_button->Add(button_cancel, 0, wxALL|wxEXPAND, 4);
-    grid_sizer_button->AddGrowableCol(0);
-    grid_sizer_main->Add(grid_sizer_button, 1, wxBOTTOM|wxEXPAND, 4);
+    grid_sizer_main->Add(m_bsDlg, 1, wxALL|wxEXPAND, 4);
     SetSizer(grid_sizer_main);
     grid_sizer_main->Fit(this);
+    grid_sizer_main->AddGrowableRow(0);
     grid_sizer_main->AddGrowableCol(0);
     Layout();
     // end wxGlade
+
+    SetMinSize(GetClientSize());
+    grid_sizer_main->SetSizeHints(this);
 
     CSL_CENTRE_DIALOG();
 }
@@ -127,7 +128,7 @@ CslServerInfo* CslDlgAddServer::InitDlg(CslServerInfo *info)
     m_info = info;
     wxInt32 selected = -1;
 
-    choice_gametype->Clear();
+    m_choiceGameType->Clear();
 
     CslArrayCslGame& games=::wxGetApp().GetCslEngine()->GetGames();
 
@@ -138,11 +139,11 @@ CslServerInfo* CslDlgAddServer::InitDlg(CslServerInfo *info)
         if (selected<0 && info->GetGame().GetFourCC()==game->GetFourCC())
             selected = i;
 
-        choice_gametype->Append(game->GetName(), (void*)(wxUIntPtr)game->GetFourCC());
+        m_choiceGameType->Append(game->GetName(), (void*)(wxUIntPtr)game->GetFourCC());
     }
 
     if (!games.IsEmpty())
-        choice_gametype->SetSelection(selected>-1 ? selected : 0);
+        m_choiceGameType->SetSelection(selected>-1 ? selected : 0);
 
     UpdatePort(SPIN_CTRL_GAMEPORT);
 
@@ -151,7 +152,7 @@ CslServerInfo* CslDlgAddServer::InitDlg(CslServerInfo *info)
 
 void CslDlgAddServer::UpdatePort(wxInt32 type)
 {
-    wxUint32 fourcc=(wxUint32)(long)choice_gametype->GetClientData(choice_gametype->GetSelection());
+    wxUint32 fourcc=(wxUint32)(long)m_choiceGameType->GetClientData(m_choiceGameType->GetSelection());
     CslArrayCslGame& games=::wxGetApp().GetCslEngine()->GetGames();
 
     loopv(games)
@@ -161,9 +162,9 @@ void CslDlgAddServer::UpdatePort(wxInt32 type)
         if (game->GetFourCC()==fourcc)
         {
             if (type==SPIN_CTRL_GAMEPORT)
-                spin_ctrl_gameport->SetValue(game->GetDefaultGamePort());
+                m_scGamePort->SetValue(game->GetDefaultGamePort());
 
-             spin_ctrl_infoport->SetValue(game->GetInfoPort(spin_ctrl_gameport->GetValue()));
+             m_scInfoPort->SetValue(game->GetInfoPort(m_scGamePort->GetValue()));
              break;
         }
     }
@@ -171,6 +172,8 @@ void CslDlgAddServer::UpdatePort(wxInt32 type)
 
 void CslDlgAddServer::OnCommandEvent(wxCommandEvent& event)
 {
+    wxButton *buttonOK = (wxButton*)FindWindowById(wxID_OK, this);
+
     switch (event.GetId())
     {
         case CHOICE_CTRL_GAMETYPE:
@@ -184,16 +187,16 @@ void CslDlgAddServer::OnCommandEvent(wxCommandEvent& event)
         case TEXT_CTRL_ADDRESS:
             if (event.GetEventType()==wxEVT_COMMAND_TEXT_UPDATED)
             {
-                button_add->Enable(!text_ctrl_address->GetValue().IsEmpty());
+                buttonOK->Enable(!m_tcAddress->GetValue().IsEmpty());
                 break;
             }
             if (event.GetEventType()!=wxEVT_COMMAND_TEXT_ENTER)
                 break;
-        case wxID_ADD:
+        case wxID_OK:
         {
-            wxString host=text_ctrl_address->GetValue();
-            wxUint16 gameport=spin_ctrl_gameport->GetValue();
-            wxUint16 infoport=spin_ctrl_infoport->GetValue();
+            wxString host=m_tcAddress->GetValue();
+            wxUint16 gameport=m_scGamePort->GetValue();
+            wxUint16 infoport=m_scInfoPort->GetValue();
 
             // check again for empty host - since setting a default button on wxMAC
             // and hitting enter reaches this position, also if the the button was disabled
@@ -201,7 +204,7 @@ void CslDlgAddServer::OnCommandEvent(wxCommandEvent& event)
                 return;
 
             CslArrayCslGame& games=::wxGetApp().GetCslEngine()->GetGames();
-            wxUint32 fourcc=(wxUint32)(long)choice_gametype->GetClientData(choice_gametype->GetSelection());
+            wxUint32 fourcc=(wxUint32)(long)m_choiceGameType->GetClientData(m_choiceGameType->GetSelection());
 
             loopv(games)
             {
