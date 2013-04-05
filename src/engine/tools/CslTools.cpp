@@ -384,10 +384,11 @@ const wxString& GetHttpAgent()
     if (agent.IsEmpty())
     {
         wxPlatformInfo pinfo;
-        wxOperatingSystemId sid=pinfo.GetOperatingSystemId();
-        agent<<CSL_NAME_SHORT_STR<<wxT(" ")<<CSL_VERSION_STR<<wxT(" ");
-        agent<<wxT("(")<<pinfo.GetOperatingSystemFamilyName(sid);
-        agent<<wxT("; N; ")<<pinfo.GetOperatingSystemIdName(sid)<<wxT(")");
+        wxOperatingSystemId sid = pinfo.GetOperatingSystemId();
+
+        agent << CSL_NAME_SHORT_STR << wxT("/") << CSL_VERSION_STR << wxT(" ");
+        agent << wxT("(") << pinfo.GetOperatingSystemFamilyName(sid);
+        agent << wxT("; N; ")<<pinfo.GetOperatingSystemIdName(sid) << wxT(")");
     }
 
     return agent;
