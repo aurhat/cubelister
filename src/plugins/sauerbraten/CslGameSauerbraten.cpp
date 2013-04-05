@@ -131,35 +131,37 @@ inline const wxChar* CslGameSauerbraten::GetModeName(wxInt32 mode, wxInt32 prot)
                modes[mode] : T2C(_("unknown"));
     }
 
-    return _("unknown");
+    return T2C(_("unknown"));
 }
 
-inline const wxChar* CslGameSauerbraten::GetWeaponName(wxInt32 n, wxInt32 prot) const
+const wxString& CslGameSauerbraten::GetWeaponName(wxInt32 n, wxInt32 prot) const
 {
+    static const wxString unknown(_("unknown"));
+
     if (prot<257)
     {
-        static const wxChar* weapons[] =
+        static const wxString weapons[] =
         {
             _("Fist"), _("Shotgun"), _("Chaingun"), _("Rocketlauncher"),
             _("Rifle"), _("Grenadelauncher"), _("Pistol"), _("Fireball"),
             _("Iceball"), _("Slimeball"), _("Bite")
         };
         return (n>=0 && (size_t)n<sizeof(weapons)/sizeof(weapons[0])) ?
-               weapons[n] : T2C(_("unknown"));
+                   weapons[n] : unknown;
     }
     else
     {
-        static const wxChar* weapons[] =
+        static const wxString weapons[] =
         {
             _("Chainsaw"), _("Shotgun"), _("Chaingun"), _("Rocketlauncher"),
             _("Rifle"), _("Grenadelauncher"), _("Pistol"), _("Fireball"),
             _("Iceball"), _("Slimeball"), _("Bite")
         };
         return (n>=0 && (size_t)n<sizeof(weapons)/sizeof(weapons[0])) ?
-               weapons[n] : T2C(_("unknown"));
+                   weapons[n] : unknown;
     }
 
-    return _("unknown");
+    return unknown;
 }
 
 inline wxInt32 CslGameSauerbraten::GetPrivileges(wxInt32 n, wxInt32 prot) const

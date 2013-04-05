@@ -368,12 +368,12 @@ void CslListCtrlPlayerView::GetToolTipText(wxInt32 row,CslToolTipEvent& event)
             return;
 
         wxString s;
-        const wxChar **descriptions;
-        wxInt32 c=m_info->GetGame().GetPlayerstatsDescriptions(&descriptions);
+        const wxString *descriptions;
+        wxInt32 c = m_info->GetGame().GetPlayerstatsDescriptions(&descriptions);
 
         event.Title=_("Player information");
 
-        for (wxInt32 i=0; i<c; i++)
+        loopi(c)
         {
             if (!FormatStats(s, data, i).IsEmpty())
             {
@@ -431,14 +431,13 @@ void CslListCtrlPlayerView::UpdateData()
     }
 
     wxString s;
+    wxInt32 i, j;
     wxListItem item;
-    wxInt32 i, j, dlen;
     CslPlayerStatsData *data;
-    const wxChar **descriptions;
+    const wxString *descriptions;
     CslEngine *engine = ::wxGetApp().GetCslEngine();
-    const CslPlayerStats& stats=m_info->PlayerStats;
-
-    dlen=m_info->GetGame().GetPlayerstatsDescriptions(&descriptions);
+    const CslPlayerStats& stats = m_info->PlayerStats;
+    wxInt32 dlen = m_info->GetGame().GetPlayerstatsDescriptions(&descriptions);
 
     // check if parent already did it
     bool freeze = !IsFrozen();
@@ -566,9 +565,10 @@ void CslListCtrlPlayerView::SetServerInfo(CslServerInfo *info)
     if (!info)
         return;
 
-    const wxChar **desc;
+    const wxString *desc;
+    wxInt32 c = info->GetGame().GetPlayerstatsDescriptions(&desc);
 
-    for (wxInt32 i = 0, l = info->GetGame().GetPlayerstatsDescriptions(&desc); i<l; i++)
+    loopi(c)
         ListSetColumn(i, desc[i]);
 }
 

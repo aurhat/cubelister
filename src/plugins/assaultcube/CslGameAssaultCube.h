@@ -51,7 +51,7 @@ class CSL_DLL_PLUGINS CslGameAssaultCube : public CslGame
         const wxChar* GetModeName(wxInt32 mode) const;
 
         //implementations for base class
-        const wxChar* GetWeaponName(wxInt32 n, wxInt32 prot) const;
+        const wxString& GetWeaponName(wxInt32 n, wxInt32 prot) const;
         bool ModeHasFlags(wxInt32 mode, wxInt32 prot) const { return mode==5 || (mode>=13 && mode<=15); }
         wxInt32 GetBestTeam(CslTeamStats& stats, wxInt32 prot) const;
         wxUint16 GetDefaultGamePort() const { return CSL_DEFAULT_PORT_AC; }

@@ -302,27 +302,28 @@ inline wxString CslGameRedEclipse::GetVersionName(wxInt32 prot) const
         return versions[v];
 }
 
-inline const wxChar* CslGameRedEclipse::GetWeaponName(wxInt32 n, wxInt32 prot) const
+inline const wxString& CslGameRedEclipse::GetWeaponName(wxInt32 n, wxInt32 prot) const
 {
-    static const wxChar* weapons[] =
+    static const wxString unknown(_("unknown"));
+
+    static const wxString weapons[] =
     {
         _("Melee"), _("Pistol"), _("Sword"), _("Shotgun"),
         _("SMG"), _("Flamer"), _("Plasma"), _("Rifle"),
         _("Grenade"), _("Rocket")
     };
-    return (n>=0 && (size_t)n<sizeof(weapons)/sizeof(weapons[0])) ?
-           weapons[n] : T2C(_("unknown"));
+    return (n>=0 && (size_t)n<sizeof(weapons)/sizeof(weapons[0])) ? weapons[n] : unknown;
 }
 
-inline wxInt32 CslGameRedEclipse::GetPlayerstatsDescriptions(const wxChar ***desc) const
+wxInt32 CslGameRedEclipse::GetPlayerstatsDescriptions(const wxString **desc) const
 {
-    static const wxChar *descriptions[]=
+    static const wxString descriptions[] =
     {
         _("Player"), _("Team"), _("Frags"), _("Deaths"), _("Teamkills"),
         _("Ping"), _("KpD"), _("Accuracy"), _("Health"), _("Spree"), _("Weapon")
     };
 
-    *desc=descriptions;
+    *desc = descriptions;
 
     return sizeof(descriptions)/sizeof(descriptions[0]);
 }

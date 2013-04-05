@@ -100,32 +100,34 @@ inline const wxChar* CslGameAssaultCube::GetModeName(wxInt32 mode) const
            modes[mode] : T2C(_("unknown"));
 }
 
-inline const wxChar* CslGameAssaultCube::GetWeaponName(wxInt32 n, wxInt32 prot) const
+inline const wxString& CslGameAssaultCube::GetWeaponName(wxInt32 n, wxInt32 prot) const
 {
+    static const wxString unknown(_("unknown"));
+
     if (prot<=1128) // < 1.1 series
     {
-        static const wxChar* weapons[] =
+        static const wxString weapons[] =
         {
             _("Knife"), _("Pistol"), _("Shotgun"), _("Subgun"),
             _("Sniper"), _("Assault"), _("Grenade"), _("Akimbo")
         };
 
         return (n>=0 && (size_t)n<sizeof(weapons)/sizeof(weapons[0])) ?
-                weapons[n] : T2C(_("unknown"));
+                weapons[n] : unknown;
     }
     else
     {
-        static const wxChar* weapons[] =
+        static const wxString weapons[] =
         {
             _("Knife"), _("Pistol"), _("Carbine"), _("Shotgun"), _("Subgun"),
             _("Sniper"), _("Assault"), _("Combat Pistol"), _("Grenade"), _("Akimbo")
         };
 
         return (n>=0 && (size_t)n<sizeof(weapons)/sizeof(weapons[0])) ?
-                weapons[n] : T2C(_("unknown"));
+                weapons[n] : unknown;
     }
 
-    return _("unknown");
+    return unknown;
 }
 
 inline wxInt32 CslGameAssaultCube::GetBestTeam(CslTeamStats& stats, wxInt32 prot) const

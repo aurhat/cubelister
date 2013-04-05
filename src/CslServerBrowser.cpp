@@ -48,7 +48,7 @@ enum
     COLUMN_MAX
 };
 
-static const wxChar *ColumnNames[] =
+static const wxString ColumnNames[] =
 {
     _("Host"),
     _("Name"),

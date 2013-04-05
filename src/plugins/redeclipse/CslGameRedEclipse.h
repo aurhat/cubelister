@@ -48,8 +48,8 @@ class CSL_DLL_PLUGINS CslGameRedEclipse : public CslGame
         wxString GetModeName(wxInt32 mode, wxInt32 muts) const;
 
         //implementations for base class
-        wxInt32 GetPlayerstatsDescriptions(const wxChar ***desc) const;
-        const wxChar* GetWeaponName(wxInt32 n, wxInt32 prot) const;
+        wxInt32 GetPlayerstatsDescriptions(const wxString **desc) const;
+        const wxString& GetWeaponName(wxInt32 n, wxInt32 prot) const;
         wxInt32 GetBestTeam(CslTeamStats& stats, wxInt32 prot) const;
         wxUint16 GetDefaultGamePort() const { return CSL_DEFAULT_PORT_RE; }
         wxUint16 GetInfoPort(wxUint16 port=0) const { return port ? port+1 : CSL_DEFAULT_PORT_RE+1; }

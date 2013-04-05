@@ -49,7 +49,7 @@ class CSL_DLL_PLUGINS CslGameSauerbraten : public CslGame
         wxInt32 InjectConfig(const wxString& param, wxString& error);
 
         //implementations for base class
-        const wxChar* GetWeaponName(wxInt32 n, wxInt32 prot) const;
+        const wxString& GetWeaponName(wxInt32 n, wxInt32 prot) const;
         wxInt32 GetPrivileges(wxInt32 n, wxInt32 prot) const;
         bool ModeHasFlags(wxInt32 mode, wxInt32 prot) const;
         bool ModeHasBases(wxInt32 mode, wxInt32 prot) const;

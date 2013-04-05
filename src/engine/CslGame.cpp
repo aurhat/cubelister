@@ -259,17 +259,24 @@ void CslGame::GetExtServers(CslArrayCslServerInfo& servers, bool all)
     }
 }
 
-wxInt32 CslGame::GetPlayerstatsDescriptions(const wxChar ***desc) const
+wxInt32 CslGame::GetPlayerstatsDescriptions(const wxString **desc) const
 {
-    static const wxChar *descriptions[]=
+    static const wxString descriptions[] =
     {
         _("Player"), _("Team"), _("Frags"), _("Deaths"), _("Teamkills"),
         _("Ping"), _("KpD"), _("Accuracy"), _("Health"), _("Armour"), _("Weapon")
     };
 
-    *desc=descriptions;
+    *desc = descriptions;
 
     return sizeof(descriptions)/sizeof(descriptions[0]);
+}
+
+const wxString& CslGame::GetWeaponName(wxInt32 n, wxInt32 prot) const
+{
+    static wxString unknown;
+
+    return unknown;
 }
 
 void CslGame::AddIcon(wxInt32 type, wxInt32 size, const void *data, wxUint32 datasize)
