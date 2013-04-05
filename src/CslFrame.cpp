@@ -279,19 +279,19 @@ CslFrame::~CslFrame()
 void CslFrame::CreateMainMenu()
 {
     wxMenu *menu;
-    wxMenuBar *menubar=new wxMenuBar();
+    wxMenuBar *menubar = new wxMenuBar();
 
     // Do not add the File menu on wxMAC, since Preferences and Exit are
     // getting moved to the "Mac menu" so the File menu is empty then.
     // Add Prefernces and Exit to any other menu.
 #ifndef __WXMAC__
-    menu=new wxMenu();
+    menu = new wxMenu();
     menubar->Append(menu,_("&File"));
     CslMenu::AddItem(*menu, wxID_PREFERENCES, _("&Settings"), wxART_SETTINGS);
     CslMenu::AddItem(*menu, wxID_EXIT, _("&Exit"), wxART_QUIT);
 #endif
 
-    menuMaster=new wxMenu();
+    menuMaster = new wxMenu();
     CslMenu::AddItem(*menuMaster, MENU_UPDATE,              _("&Update from master\tF5"), wxART_RELOAD);
     menuMaster->AppendSeparator();
     CslMenu::AddItem(*menuMaster, MENU_ADD,                 _("Add a &new master ..."),   wxART_ADD_BOOKMARK);
@@ -307,7 +307,7 @@ void CslFrame::CreateMainMenu()
     CslMenu::AddItem(*menuMaster, wxID_ABOUT,               _("A&bout"),                  wxART_ABOUT);
 #endif
 
-    menu=new wxMenu();
+    menu = new wxMenu();
     CslMenu::AddItem(*menu, MENU_VIEW_GAMES,         _("Show games"),                wxART_NONE, wxITEM_CHECK);
     CslMenu::AddItem(*menu, MENU_VIEW_SERVER_INFO,   _("Show server information"),   wxART_NONE, wxITEM_CHECK);
     CslMenu::AddItem(*menu, MENU_VIEW_PLAYER_LIST,   _("Show players"),              wxART_NONE, wxITEM_CHECK);
@@ -325,7 +325,7 @@ void CslFrame::CreateMainMenu()
     menubar->Append(menu,_("&View"));
 
 #ifndef __WXMAC__
-    menu=new wxMenu();
+    menu = new wxMenu();
     CslMenu::AddItem(*menu, wxID_ABOUT, _("A&bout"), wxART_ABOUT);
     menubar->Append(menu, _("&Help"));
 #endif
@@ -334,9 +334,11 @@ void CslFrame::CreateMainMenu()
 
     CslMenu::SetMainMenu(menubar);
 
-    CslMenu::EnableItem(MENU_ADD,false);
-    CslMenu::EnableItem(MENU_DEL,false);
-    CslMenu::EnableItem(MENU_UPDATE,false);
+    CslMenu::EnableItem(MENU_ADD, false);
+    CslMenu::EnableItem(MENU_DEL, false);
+    CslMenu::EnableItem(MENU_UPDATE, false);
+    CslMenu::EnableItem(MENU_GAME_SERVER_COUNTRY, false);
+    CslMenu::EnableItem(MENU_GAME_PLAYER_COUNTRY, false);
     CslMenu::CheckItem(MENU_GAME_SEARCH_LAN, CslGetSettings().SearchLAN);
     CslMenu::CheckItem(MENU_VIEW_AUTO_SORT, CslGetSettings().AutoSortColumns);
 }
