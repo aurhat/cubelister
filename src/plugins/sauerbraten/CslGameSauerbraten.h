@@ -21,20 +21,16 @@
 #ifndef CSLGAMESAUERBRATEN_H
 #define CSLGAMESAUERBRATEN_H
 
-/**
- @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
+#define CSL_DEFAULT_NAME_SB        wxT("Sauerbraten")
+#define CSL_LAST_PROTOCOL_SB       259
 
-#define CSL_DEFAULT_NAME_SB           wxT("Sauerbraten")
-#define CSL_LAST_PROTOCOL_SB          259
+#define CSL_FOURCC_SB              "SRBN"
 
-#define CSL_FOURCC_SB                 "SRBN"
+#define CSL_DEFAULT_PORT_SB        28785
+#define CSL_DEFAULT_BCAST_PORT_SB  28784
 
-#define CSL_DEFAULT_PORT_SB           28785
-#define CSL_DEFAULT_BCAST_PORT_SB     28784
+#define CSL_DEFAULT_MASTER_SB      wxT("tcp://sauerbraten.org:28787/list\n")
 
-#define CSL_DEFAULT_MASTER_SB         wxT("sauerbraten.org")
-#define CSL_DEFAULT_MASTER_PORT_SB    28787
 
 class CSL_DLL_PLUGINS CslGameSauerbraten : public CslGame
 {

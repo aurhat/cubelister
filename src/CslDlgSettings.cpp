@@ -22,6 +22,7 @@
 #include "CslEngine.h"
 #include "CslApp.h"
 #include "CslArt.h"
+#include "CslGeoIP.h"
 #include "CslTTS.h"
 #include "CslPanelGameSettings.h"
 #include "CslDlgSettings.h"
@@ -63,7 +64,11 @@ enum
     CHECK_TTS,
     BUTTON_TEST_TTS,
 
-    CHECK_GAME_OUTPUT
+    CHECK_GAME_OUTPUT,
+
+    RADIO_GEOIP_COUNTRY,
+    RADIO_GEOIP_CITY,
+    CHECK_GEOIP_UPDATE,
 };
 
 
@@ -80,9 +85,10 @@ CslDlgSettings::CslDlgSettings(wxWindow* parent,int id,const wxString& title,
     sizer_colours_server_staticbox = new wxStaticBox(notebook_pane_colour, -1, _("Server"));
     sizer_colours_player_staticbox = new wxStaticBox(notebook_pane_colour, -1, _("Player"));
     sizer_times_staticbox = new wxStaticBox(notebook_pane_other, -1, _("Times && Intervals"));
-    sizer_systray_staticbox = new wxStaticBox(notebook_pane_other, -1, _("System tray"));
     sizer_tts_staticbox = new wxStaticBox(notebook_pane_other, -1, _("Text to speech"));
     sizer_ping_staticbox = new wxStaticBox(notebook_pane_other, -1, _("Ping thresholds"));
+    sizer_systray_staticbox = new wxStaticBox(notebook_pane_other, -1, _("System tray"));
+    sizer_geoip_staticbox = new wxStaticBox(notebook_pane_other, -1, _("GeoIP"));
     sizer_output_staticbox = new wxStaticBox(notebook_pane_other, -1, _("Game output"));
     notebook_pane_games = new wxPanel(notebook_settings, wxID_ANY);
     notebook_games = new wxListbook(notebook_pane_games, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0);
@@ -104,18 +110,20 @@ CslDlgSettings::CslDlgSettings(wxWindow* parent,int id,const wxString& title,
     checkbox_server_cleanup_favourites = new wxCheckBox(notebook_pane_other, wxID_ANY, _("Keep favourites"));
     checkbox_server_cleanup_stats = new wxCheckBox(notebook_pane_other, wxID_ANY, _("Keep servers with statistics"));
     spin_ctrl_tooltip_delay = new wxSpinCtrl(notebook_pane_other, SPIN_TOOLTIP_DELAY, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_AUTO_URL, 0, 100);
-    checkbox_systray = new wxCheckBox(notebook_pane_other, CHECK_SYSTRAY, _("Enable to system tray icon"));
-    checkbox_systray_close = new wxCheckBox(notebook_pane_other, wxID_ANY, _("Minimise on close"));
-    checkbox_tts = new wxCheckBox(notebook_pane_other, CHECK_TTS, _("Enable text to speech"));
+    checkbox_tts = new wxCheckBox(notebook_pane_other, CHECK_TTS, _("Enable"));
     label_tts_volume = new wxStaticText(notebook_pane_other, wxID_ANY, _("Volume"));
     spin_ctrl_tts_volume = new wxSpinCtrl(notebook_pane_other, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_AUTO_URL, 1, 100);
     button_test_tts = new wxButton(notebook_pane_other, BUTTON_TEST_TTS, _("Test"));
     spin_ctrl_ping_good = new wxSpinCtrl(notebook_pane_other, SPIN_PING_GOOD, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_AUTO_URL, 0, 100);
     spin_ctrl_ping_bad = new wxSpinCtrl(notebook_pane_other, SPIN_PING_BAD, wxT(""), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_AUTO_URL, 0, 100);
+    checkbox_systray = new wxCheckBox(notebook_pane_other, CHECK_SYSTRAY, _("Enable"));
+    checkbox_systray_close = new wxCheckBox(notebook_pane_other, wxID_ANY, _("Minimise on close"));
+    radio_btn_geoip_country = new wxRadioButton(notebook_pane_other, RADIO_GEOIP_COUNTRY, _("Country"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+    radio_btn_geoip_city = new wxRadioButton(notebook_pane_other, RADIO_GEOIP_CITY, _("City"));
+    checkbox_geoip_update = new wxCheckBox(notebook_pane_other, CHECK_GEOIP_UPDATE, _("Auto update"));
     checkbox_game_output = new wxCheckBox(notebook_pane_other, CHECK_GAME_OUTPUT, _("Auto &save game output to:"));
     dirpicker_game_output = new wxDirPickerCtrl(notebook_pane_other, wxID_ANY, m_settings.GameOutputPath, _("Select game output path"), wxDefaultPosition, wxDefaultSize, wxDIRP_DEFAULT_STYLE|wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST);
-    button_ok = new wxButton(this, wxID_OK, _("&Ok"));
-    button_cancel = new wxButton(this, wxID_CANCEL, _("&Cancel"));
+    m_bsDlg = CreateButtonSizer(wxOK|wxCANCEL);
 
     set_properties();
     do_layout();
@@ -170,17 +178,18 @@ void CslDlgSettings::set_properties()
     spin_ctrl_ping_bad->SetValue(m_settings.PingBad);
 
     /* server lists */
-    SetButtonColour(button_colour_server_empty, button_ok, m_settings.ColServerEmpty);
-    SetButtonColour(button_colour_server_offline, button_ok, m_settings.ColServerOff);
-    SetButtonColour(button_colour_server_full, button_ok, m_settings.ColServerFull);
-    SetButtonColour(button_colour_server_mm1, button_ok, m_settings.ColServerMM1);
-    SetButtonColour(button_colour_server_mm2, button_ok, m_settings.ColServerMM2);
-    SetButtonColour(button_colour_server_mm3, button_ok, m_settings.ColServerMM3);
+    SetButtonColour(button_colour_server_empty, button_test_tts, m_settings.ColServerEmpty);
+    SetButtonColour(button_colour_server_offline, button_test_tts, m_settings.ColServerOff);
+    SetButtonColour(button_colour_server_full, button_test_tts, m_settings.ColServerFull);
+    SetButtonColour(button_colour_server_mm1, button_test_tts, m_settings.ColServerMM1);
+    SetButtonColour(button_colour_server_mm2, button_test_tts, m_settings.ColServerMM2);
+    SetButtonColour(button_colour_server_mm3, button_test_tts, m_settings.ColServerMM3);
+
     /* player lists */
-    SetButtonColour(button_colour_player_master, button_ok, m_settings.ColPlayerMaster);
-    SetButtonColour(button_colour_player_auth, button_ok, m_settings.ColPlayerAuth);
-    SetButtonColour(button_colour_player_admin, button_ok, m_settings.ColPlayerAdmin);
-    SetButtonColour(button_colour_player_spectator, button_ok, m_settings.ColPlayerSpectator);
+    SetButtonColour(button_colour_player_master, button_test_tts, m_settings.ColPlayerMaster);
+    SetButtonColour(button_colour_player_auth, button_test_tts, m_settings.ColPlayerAuth);
+    SetButtonColour(button_colour_player_admin, button_test_tts, m_settings.ColPlayerAdmin);
+    SetButtonColour(button_colour_player_spectator, button_test_tts, m_settings.ColPlayerSpectator);
 
 #ifndef __WXMAC__
     if (CSL_FLAG_CHECK(CslGetSettings().Systray, CSL_USE_SYSTRAY))
@@ -204,6 +213,14 @@ void CslDlgSettings::set_properties()
     spin_ctrl_tts_volume->Enable(CslTTS::IsOk() && CslGetSettings().TTS);
     button_test_tts->Enable(CslTTS::IsOk() && CslGetSettings().TTS);
 
+    /* geoip */
+    if (m_settings.GeoIPType==0)
+        radio_btn_geoip_country->SetValue(true);
+    else
+        radio_btn_geoip_city->SetValue(true);
+    checkbox_geoip_update->SetValue(m_settings.GeoIPAutoUpdate);
+
+    /* game output */
     checkbox_game_output->SetValue(m_settings.AutoSaveOutput);
     dirpicker_game_output->SetPath(m_settings.GameOutputPath);
     dirpicker_game_output->Enable(m_settings.AutoSaveOutput);
@@ -240,17 +257,19 @@ void CslDlgSettings::do_layout()
 
     // begin wxGlade: CslDlgSettings::do_layout
     wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(2, 1, 0, 0);
-    wxFlexGridSizer* grid_sizer_button = new wxFlexGridSizer(1, 3, 0, 0);
-    wxFlexGridSizer* grid_sizer_pane_other = new wxFlexGridSizer(5, 1, 0, 0);
+    wxFlexGridSizer* grid_sizer_pane_other = new wxFlexGridSizer(3, 1, 0, 0);
     wxStaticBoxSizer* sizer_output = new wxStaticBoxSizer(sizer_output_staticbox, wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_output = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* grid_sizer_tts_ping_tray_geoip = new wxFlexGridSizer(2, 2, 0, 0);
+    wxStaticBoxSizer* sizer_geoip = new wxStaticBoxSizer(sizer_geoip_staticbox, wxHORIZONTAL);
+    wxFlexGridSizer* grid_sizer_geoip = new wxFlexGridSizer(1, 3, 0, 0);
+    wxStaticBoxSizer* sizer_systray = new wxStaticBoxSizer(sizer_systray_staticbox, wxHORIZONTAL);
+    wxFlexGridSizer* grid_sizer_systray = new wxFlexGridSizer(1, 2, 0, 0);
     wxStaticBoxSizer* sizer_ping = new wxStaticBoxSizer(sizer_ping_staticbox, wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_ping = new wxFlexGridSizer(1, 4, 0, 0);
     wxStaticBoxSizer* sizer_tts = new wxStaticBoxSizer(sizer_tts_staticbox, wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_tts = new wxFlexGridSizer(1, 4, 0, 0);
     wxFlexGridSizer* grid_sizer_spin_ctrl_tts_volume = new wxFlexGridSizer(3, 1, 0, 0);
-    wxStaticBoxSizer* sizer_systray = new wxStaticBoxSizer(sizer_systray_staticbox, wxHORIZONTAL);
-    wxFlexGridSizer* grid_sizer_systray = new wxFlexGridSizer(1, 2, 0, 0);
     wxStaticBoxSizer* sizer_times = new wxStaticBoxSizer(sizer_times_staticbox, wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_times = new wxFlexGridSizer(5, 3, 0, 0);
     wxFlexGridSizer* grid_sizer_server_cleanup = new wxFlexGridSizer(1, 2, 0, 0);
@@ -345,10 +364,6 @@ void CslDlgSettings::do_layout()
     grid_sizer_times->AddGrowableCol(1);
     sizer_times->Add(grid_sizer_times, 1, wxEXPAND, 0);
     grid_sizer_pane_other->Add(sizer_times, 1, wxALL|wxEXPAND, 4);
-    grid_sizer_systray->Add(checkbox_systray, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_systray->Add(checkbox_systray_close, 0, wxALL|wxALIGN_RIGHT, 4);
-    sizer_systray->Add(grid_sizer_systray, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 0);
-    grid_sizer_pane_other->Add(sizer_systray, 1, wxALL|wxEXPAND, 4);
     grid_sizer_tts->Add(checkbox_tts, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_tts->Add(label_tts_volume, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_spin_ctrl_tts_volume->Add(1, 1, 0, 0, 0);
@@ -360,7 +375,7 @@ void CslDlgSettings::do_layout()
     grid_sizer_tts->Add(grid_sizer_spin_ctrl_tts_volume, 1, wxEXPAND, 0);
     grid_sizer_tts->Add(button_test_tts, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     sizer_tts->Add(grid_sizer_tts, 1, wxEXPAND, 0);
-    grid_sizer_pane_other->Add(sizer_tts, 1, wxALL|wxEXPAND, 4);
+    grid_sizer_tts_ping_tray_geoip->Add(sizer_tts, 1, wxALL|wxEXPAND, 4);
     wxStaticText* label_ping_good = new wxStaticText(notebook_pane_other, wxID_ANY, _("Good"));
     grid_sizer_ping->Add(label_ping_good, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_ping->Add(spin_ctrl_ping_good, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
@@ -368,7 +383,19 @@ void CslDlgSettings::do_layout()
     grid_sizer_ping->Add(label_ping_bad, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     grid_sizer_ping->Add(spin_ctrl_ping_bad, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
     sizer_ping->Add(grid_sizer_ping, 1, wxEXPAND, 0);
-    grid_sizer_pane_other->Add(sizer_ping, 1, wxALL|wxEXPAND, 4);
+    grid_sizer_tts_ping_tray_geoip->Add(sizer_ping, 1, wxALL|wxEXPAND, 4);
+    grid_sizer_systray->Add(checkbox_systray, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_systray->Add(checkbox_systray_close, 0, wxALL|wxALIGN_RIGHT, 4);
+    sizer_systray->Add(grid_sizer_systray, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 0);
+    grid_sizer_tts_ping_tray_geoip->Add(sizer_systray, 1, wxALL|wxEXPAND, 4);
+    grid_sizer_geoip->Add(radio_btn_geoip_country, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_geoip->Add(radio_btn_geoip_city, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_geoip->Add(checkbox_geoip_update, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    sizer_geoip->Add(grid_sizer_geoip, 1, wxEXPAND, 0);
+    grid_sizer_tts_ping_tray_geoip->Add(sizer_geoip, 1, wxALL|wxEXPAND, 4);
+    grid_sizer_tts_ping_tray_geoip->AddGrowableCol(0);
+    grid_sizer_tts_ping_tray_geoip->AddGrowableCol(1);
+    grid_sizer_pane_other->Add(grid_sizer_tts_ping_tray_geoip, 1, wxEXPAND, 0);
     grid_sizer_output->Add(checkbox_game_output, 0, wxALL, 4);
     grid_sizer_output->Add(dirpicker_game_output, 1, wxEXPAND, 0);
     grid_sizer_output->AddGrowableCol(1);
@@ -380,11 +407,7 @@ void CslDlgSettings::do_layout()
     notebook_settings->AddPage(notebook_pane_colour, _("Gui"));
     notebook_settings->AddPage(notebook_pane_other, _("Other"));
     grid_sizer_main->Add(notebook_settings, 1, wxALL|wxEXPAND, 4);
-    grid_sizer_button->Add(20, 1, 0, 0, 0);
-    grid_sizer_button->Add(button_ok, 0, wxALL, 4);
-    grid_sizer_button->Add(button_cancel, 0, wxALL, 4);
-    grid_sizer_button->AddGrowableCol(0);
-    grid_sizer_main->Add(grid_sizer_button, 1, wxEXPAND, 0);
+    grid_sizer_main->Add(m_bsDlg, 1, wxALL|wxEXPAND, 4);
     SetSizer(grid_sizer_main);
     grid_sizer_main->Fit(this);
     grid_sizer_main->AddGrowableRow(0);
@@ -535,7 +558,7 @@ void CslDlgSettings::OnCommandEvent(wxCommandEvent& event)
                 break;
 
             *colour = color_new;
-            SetButtonColour(button_color, button_ok, color_new);
+            SetButtonColour(button_color, button_test_tts, color_new);
             break;
         }
 
@@ -562,6 +585,7 @@ void CslDlgSettings::OnCommandEvent(wxCommandEvent& event)
             break;
 
         case wxID_CANCEL:
+            EndModal(wxID_CANCEL);
             break;
         case wxID_OK:
         {
@@ -586,6 +610,9 @@ void CslDlgSettings::OnCommandEvent(wxCommandEvent& event)
             m_settings.GameOutputPath=dirpicker_game_output->GetPath();
             m_settings.AutoSaveOutput=checkbox_game_output->IsChecked();
 
+            m_settings.GeoIPType = radio_btn_geoip_country->GetValue() ? 0 : 1;
+            m_settings.GeoIPAutoUpdate = checkbox_geoip_update->IsChecked();
+
             if (!ValidateSettings())
                 return;
             for (wxUint32 i=0;i<notebook_games->GetPageCount();i++)
@@ -600,6 +627,9 @@ void CslDlgSettings::OnCommandEvent(wxCommandEvent& event)
             CslTTSSettings tts(m_settings.TTS, m_settings.TTSVolume);
             CslTTS::SetSettings(tts);
 
+            if (CslGeoIP::GetType()!=m_settings.GeoIPType)
+                CslGeoIP::Load(m_settings.GeoIPType);
+
             CslGetSettings() = m_settings;
 
             EndModal(wxID_OK);
@@ -610,18 +640,17 @@ void CslDlgSettings::OnCommandEvent(wxCommandEvent& event)
     event.Skip();
 }
 
-void CslDlgSettings::SetButtonColour(wxBitmapButton *button,wxButton *refButton,wxColour& colour)
+void CslDlgSettings::SetButtonColour(wxBitmapButton *button, wxButton *refButton, const wxColour& colour)
 {
-    wxInt32 w,h;
-    wxColour col=colour;
-    refButton->GetClientSize(&w,&h);
+    wxInt32 w, h;
+    refButton->GetClientSize(&w, &h);
 
     wxMemoryDC memDC;
-    wxBitmap bmp(w-16,h-8);
+    wxBitmap bmp(w-16, h-8);
 
     memDC.SelectObject(bmp);
-    memDC.SetBrush(wxBrush(col));
-    memDC.DrawRectangle(0,0,w-16,h-8);
+    memDC.SetBrush(wxBrush(colour));
+    memDC.DrawRectangle(0, 0, w-16, h-8);
     memDC.SelectObject(wxNullBitmap);
 
     button->SetBitmapLabel(bmp);
@@ -631,8 +660,8 @@ bool CslDlgSettings::ValidateSettings()
 {
     if (m_settings.PingGood>m_settings.PingBad)
     {
-        wxMessageBox(    _("Threshold for good ping can't be higher than\n"
-                     wxT_2("threshold for bad ping.")), _("Error"), wxICON_ERROR, this);
+        wxMessageBox(_("Threshold for good ping can't be higher than\nthreshold for bad ping."),
+                     _("Error"), wxICON_ERROR, this);
         return false;
     }
 

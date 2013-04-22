@@ -85,7 +85,7 @@ bool CslTTS::Init(const CslTTSSettings& settings)
         (hr = g_csl_tts->SetInterest(SPFEI(SPEI_END_INPUT_STREAM), SPFEI(SPEI_END_INPUT_STREAM)))!=S_OK)
     {
         g_csl_tts = NULL;
-        CSL_LOG_DEBUG("Failed to initialise TTS (%s)\n", _com_error(hr).ErrorMessage());
+        CSL_LOG_DEBUG("failed to initialise TTS (%s)\n", _com_error(hr).ErrorMessage());
     }
     else
     {
@@ -108,14 +108,14 @@ bool CslTTS::Init(const CslTTSSettings& settings)
                               U2C(::wxGetUserName()), SPD_MODE_THREADED)))
     {
         if (spd_set_punctuation(g_csl_tts, SPD_PUNCT_NONE))
-            CSL_LOG_DEBUG("Failed to set punctuation mode.\n");
+            CSL_LOG_DEBUG("failed to set punctuation mode.\n");
         if (spd_set_spelling(g_csl_tts, SPD_SPELL_ON))
-            CSL_LOG_DEBUG("Failed to set spelling mode.\n");
+            CSL_LOG_DEBUG("failed to set spelling mode.\n");
 
         self.m_ok = true;
     }
     else
-        CSL_LOG_DEBUG("Failed to connect to speech-dispatcher.\n");
+        CSL_LOG_DEBUG("failed to connect to speech-dispatcher.\n");
 #endif //__WXMSW__
 
     SetSettings(settings);

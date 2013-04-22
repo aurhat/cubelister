@@ -21,11 +21,6 @@
 #ifndef CSLDLGCONNECTWAIT_H
 #define CSLDLGCONNECTWAIT_H
 
-/**
- @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
-
-
 class CslDlgConnectWait: public wxDialog
 {
     public:

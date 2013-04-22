@@ -30,7 +30,7 @@ CslGameCube::CslGameCube()
     m_name=CSL_DEFAULT_NAME_CB;
     m_fourcc=CSL_BUILD_FOURCC(CSL_FOURCC_CB);
     m_capabilities=CSL_CAPABILITY_CONNECT_PASS;
-    m_defaultMasterConnection=CslMasterConnection(CSL_DEFAULT_MASTER_CB, CSL_DEFAULT_MASTER_PATH_CB);
+    m_defaultMasterURI = CSL_DEFAULT_MASTER_CB;
 
     AddIcon(CSL_BITMAP_TYPE_PNG, 16, cb_16_png, sizeof(cb_16_png));
     AddIcon(CSL_BITMAP_TYPE_PNG, 24, cb_24_png, sizeof(cb_24_png));

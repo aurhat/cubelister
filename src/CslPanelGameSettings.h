@@ -25,7 +25,6 @@
 
 // end wxGlade
 
-
 class CslPanelGameSettings: public wxPanel {
     public:
         // begin wxGlade: CslPanelGameSettings::ids

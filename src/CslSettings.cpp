@@ -40,16 +40,18 @@ CslListCtrlSettings& CslSettings::GetListSettings(const wxString& name)
 
 void CslSettings::LoadSettings()
 {
-    CslSettings& settings=GetInstance();
-    CslEngine *engine=::wxGetApp().GetCslEngine();
+    const wxString cfgFile = ::wxGetApp().GetHomeDir() + CSL_SETTINGS_FILE;
 
-    if (!::wxFileExists(CSL_SETTINGS_FILE))
+    if (!::wxFileExists(cfgFile))
         return;
 
-    long int val;
-    wxString s;
+    CslSettings& settings = GetInstance();
+    CslEngine *engine = ::wxGetApp().GetCslEngine();
 
-    wxFileConfig config(wxT(""), wxT(""), CSL_SETTINGS_FILE, wxT(""),
+    wxString s;
+    long int val;
+
+    wxFileConfig config(wxT(""), wxT(""), cfgFile, wxT(""),
                         wxCONFIG_USE_LOCAL_FILE, wxConvLocal);
 
     config.SetPath(wxT("/Version"));
@@ -108,9 +110,12 @@ void CslSettings::LoadSettings()
         else
             settings.PingBad=val;
     }
+    if (config.Read(wxT("ScreenOutputPath"), &s)) settings.ScreenOutputPath=s;
+    if (settings.ScreenOutputPath.IsEmpty())
+        settings.ScreenOutputPath = ::wxGetApp().GetHomeDir();
     if (config.Read(wxT("GameOutputPath"), &s)) settings.GameOutputPath=s;
     if (settings.GameOutputPath.IsEmpty())
-        settings.GameOutputPath=wxStandardPaths().GetUserDataDir();
+        settings.GameOutputPath = ::wxGetApp().GetHomeDir();
     if (config.Read(wxT("AutoSaveOutput"), &val)) settings.AutoSaveOutput=val!=0;
     if (config.Read(wxT("LastSelectedGame"), &s)) settings.LastGame=s;
     if (config.Read(wxT("MinPlaytime"), &val))
@@ -118,6 +123,15 @@ void CslSettings::LoadSettings()
         if (val>=CSL_MIN_PLAYTIME_MIN && val<=CSL_MIN_PLAYTIME_MAX)
             settings.MinPlaytime=val;
     }
+
+    /* GeoIP */
+    config.SetPath(wxT("/GeoIP"));
+    if (config.Read(wxT("GeoIPType"), &val)) settings.GeoIPType = clamp((int)val, 0, 1);
+    if (config.Read(wxT("GeoIPAutoUpdate"), &val)) settings.GeoIPAutoUpdate = val!=0;
+    if (config.Read(wxT("GeoIPCountryLastCheck"), &val)) settings.GeoIPCountryLastCheck = val;
+    if (config.Read(wxT("GeoIPCountryLastDate"), &val)) settings.GeoIPCountryLastDate = val;
+    if (config.Read(wxT("GeoIPCityLastCheck"), &val)) settings.GeoIPCityLastCheck = val;
+    if (config.Read(wxT("GeoIPCityLastDate"), &val)) settings.GeoIPCityLastDate = val;
 
     /* Lists */
     config.SetPath(wxT("/List"));
@@ -182,16 +196,17 @@ void CslSettings::LoadSettings()
 
 void CslSettings::SaveSettings()
 {
-    wxString dir=::wxPathOnly(CSL_SETTINGS_FILE);
+    const wxString cfgFile = ::wxGetApp().GetHomeDir() + CSL_SETTINGS_FILE;
+    const wxString dir = ::wxPathOnly(cfgFile);
 
     CslSettings& settings=GetInstance();
     CslEngine *engine=::wxGetApp().GetCslEngine();
     wxAuiManager& AuiMgr=((CslFrame*)wxGetApp().GetTopWindow())->GetAuiManager();
 
-    if (!::wxDirExists(dir))
-        ::wxMkdir(dir, 0700);
+    if (!::wxDirExists(dir) && !wxFileName::Mkdir(dir, 0700, wxPATH_MKDIR_FULL))
+        return;
 
-    wxFileConfig config(wxT(""), wxT(""), CSL_SETTINGS_FILE, wxT(""),
+    wxFileConfig config(wxT(""), wxT(""), cfgFile, wxT(""),
                         wxCONFIG_USE_LOCAL_FILE, wxConvLocal);
     config.SetUmask(0077);
     config.DeleteAll();
@@ -223,10 +238,20 @@ void CslSettings::SaveSettings()
     config.Write(wxT("TooltipDelay"), (long int)settings.TooltipDelay);
     config.Write(wxT("PingGood"), (long int)settings.PingGood);
     config.Write(wxT("PingBad"), (long int)settings.PingBad);
+    config.Write(wxT("ScreenOutputPath"), settings.ScreenOutputPath);
     config.Write(wxT("GameOutputPath"), settings.GameOutputPath);
     config.Write(wxT("AutoSaveOutput"), settings.AutoSaveOutput);
     config.Write(wxT("LastSelectedGame"), settings.LastGame);
     config.Write(wxT("MinPlaytime"), (long int)settings.MinPlaytime);
+
+    /* GeoIP */
+    config.SetPath(wxT("/GeoIP"));
+    config.Write(wxT("GeoIPType") ,settings.GeoIPType);
+    config.Write(wxT("GeoIPAutoUpdate"), (long int)settings.GeoIPAutoUpdate);
+    config.Write(wxT("GeoIPCountryLastCheck"), settings.GeoIPCountryLastCheck);
+    config.Write(wxT("GeoIPCountryLastDate"), settings.GeoIPCountryLastDate);
+    config.Write(wxT("GeoIPCityLastCheck"), settings.GeoIPCityLastCheck);
+    config.Write(wxT("GeoIPCityLastDate"), settings.GeoIPCityLastDate);
 
     /* ListCtrl */
     config.SetPath(wxT("/List"));
@@ -294,11 +319,10 @@ WX_DEFINE_ARRAY(CslIDMapping*, CslArrayCslIDMapping);
 
 bool CslSettings::LoadServers(wxUint32 *numm, wxUint32 *nums)
 {
-    if (!::wxFileExists(CSL_SERVERS_FILE))
-        return false;
+    const wxString cfgFile = ::wxGetApp().GetHomeDir() + CSL_SERVERS_FILE;
 
-    CslEngine *engine=::wxGetApp().GetCslEngine();
-    CslFrame *frame=(CslFrame*)::wxGetApp().GetTopWindow();
+    if (!::wxFileExists(cfgFile))
+        return false;
 
     long int val;
     bool read_server;
@@ -316,12 +340,18 @@ bool CslSettings::LoadServers(wxUint32 *numm, wxUint32 *nums)
     wxUint32 playTimeLastGame=0;
     wxUint32 playTimeTotal=0;
     wxUint32 connectedTimes=0;
+    wxUint32 version = 0;
     wxInt32 gt;
 
-    wxFileConfig config(wxT(""), wxT(""), CSL_SERVERS_FILE, wxT(""),
+    wxFileConfig config(wxT(""), wxT(""), cfgFile, wxT(""),
                         wxCONFIG_USE_LOCAL_FILE, wxConvLocal);
 
-    CslArrayCslGame& games=engine->GetGames();
+    CslEngine *engine = ::wxGetApp().GetCslEngine();
+    CslArrayCslGame& games = engine->GetGames();
+    CslFrame *frame = (CslFrame*)::wxGetApp().GetTopWindow();
+
+    config.SetPath(wxT("/Version"));
+    if (config.Read(wxT("Version"), &val)) version = val;
 
     for (gt=0; gt<(wxInt32)games.GetCount(); gt++)
     {
@@ -332,28 +362,30 @@ bool CslSettings::LoadServers(wxUint32 *numm, wxUint32 *nums)
         while (1)
         {
             long int id;
-            CslMasterConnection connection;
-            master=NULL;
+            master = NULL;
 
             config.SetPath(s+wxString::Format(wxT("/Master/%d"), mc++));
 
-            if (config.Read(wxT("Address"), &addr))
+            if (config.Read(wxT("Address"), &addr) &&
+                config.Read(wxT("ID"), &id))
             {
-                if (config.Read(wxT("ID"), &id))
+                if (version<2)
                 {
-                    val=0;
-                    config.Read(wxT("Port"), &val, 0); port=val;
-                    config.Read(wxT("Type"), &val, CslMasterConnection::CONNECTION_HTTP);
-                    if (val==CslMasterConnection::CONNECTION_HTTP)
-                    {
-                        port=port ? port:CSL_DEFAULT_MASTER_WEB_PORT;
-                        if (config.Read(wxT("Path"), &path))
-                            master = CslMaster::Create(CslMasterConnection(addr, path, port));
-                    }
-                    else if (port)
-                        master = CslMaster::Create(CslMasterConnection(addr, port));
+                    val = 0;
+                    config.Read(wxT("Port"), &val, 0); port = val;
+                    config.Read(wxT("Type"), &val, 0);
+                    config.Read(wxT("Path"), &path);
+
+                    if (path.IsEmpty() && val)
+                        path = wxT("/list\n");
+
+                    master = CslMaster::Create(CslMaster::CreateURI(val ? wxT("tcp") : wxT("http"),
+                                                                    addr, port, path));
                 }
+                else
+                    master = CslMaster::Create(addr);
             }
+
             if (!master)
                 break;
 
@@ -474,22 +506,22 @@ bool CslSettings::LoadServers(wxUint32 *numm, wxUint32 *nums)
 
 void CslSettings::SaveServers()
 {
-    wxString s=::wxPathOnly(CSL_SERVERS_FILE);
+    const wxString cfgFile = ::wxGetApp().GetHomeDir() + CSL_SERVERS_FILE;
+    const wxString dir = ::wxPathOnly(cfgFile);
 
-    if (!::wxDirExists(s))
-        if (!::wxMkdir(s, 0700))
-            return;
+    if (!::wxDirExists(dir) && !wxFileName::Mkdir(dir, 0700, wxPATH_MKDIR_FULL))
+        return;
 
     CslEngine *engine=::wxGetApp().GetCslEngine();
 
-    wxFileConfig config(wxT(""), wxT(""), CSL_SERVERS_FILE, wxT(""),
+    wxFileConfig config(wxT(""), wxT(""), cfgFile, wxT(""),
                         wxCONFIG_USE_LOCAL_FILE, wxConvLocal);
     config.SetUmask(0077);
     config.DeleteAll();
 
+    wxString s;
     wxInt32 mc, sc;
     CslGame *game;
-    CslMaster *master;
     CslServerInfo *info;
 
     CslArrayCslGame& games=engine->GetGames();
@@ -511,15 +543,11 @@ void CslSettings::SaveServers()
 
         loopvj(masters)
         {
-            master=masters[j];
-            CslMasterConnection& connection=master->GetConnection();
+            wxString uri = masters[j]->GetURI().BuildURI();
 
             config.SetPath(s+s.Format(wxT("/Master/%d"), mc++));
-            config.Write(wxT("Type"), connection.Type);
-            config.Write(wxT("Address"), connection.Address);
-            config.Write(wxT("Port"), connection.Port);
-            config.Write(wxT("Path"), connection.Path);
-            config.Write(wxT("ID"), master->GetId());
+            config.Write(wxT("Address"), uri);
+            config.Write(wxT("ID"), masters[j]->GetId());
         }
 
         CslArrayCslServerInfo& servers=game->GetServers();

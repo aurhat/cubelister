@@ -22,12 +22,7 @@
 #ifndef CSLMENU_H
 #define CSLMENU_H
 
-/**
- @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
-
 #include <CslArt.h>
-
 
 #define MENU_SERVER_EXT_FULL_STR          _("Full ...")
 #define MENU_SERVER_EXT_MICRO_STR         _("Micro")

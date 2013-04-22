@@ -28,6 +28,9 @@
 #include <arpa/inet.h>
 #endif // __WXMSW__
 
+IMPLEMENT_DYNAMIC_CLASS(CslFileTime, wxObject);
+IMPLEMENT_DYNAMIC_CLASS(CslFileProperties, wxObject);
+
 DEFINE_EVENT_TYPE(wxCSL_EVT_THREAD_TERMINATE)
 
 wxMutex g_csl_printf_mutex;
@@ -35,14 +38,19 @@ wxMutex g_csl_printf_mutex;
 void Debug_Printf(const char *file, int line, const char *func, const char *fmt, ...)
 {
     const char *filename = strstr(file, CSL_PATHDIV_MB "src" CSL_PATHDIV_MB);
-    filename=filename ? filename+1 : file;
+    filename = filename ? filename+5 : file;
+
     va_list ArgList;
     va_start(ArgList, fmt);
+
     g_csl_printf_mutex.Lock();
-    fprintf(stdout, "%u:%s:%d:%s(): ", GetTicks(), filename, line, func);
+
+    fprintf(stdout, "%li:%s:%d:%s: ", GetTicks(), filename, line, func);
     vfprintf(stdout, fmt, ArgList);
     fflush(stdout);
+
     g_csl_printf_mutex.Unlock();
+
     va_end(ArgList);
 }
 
@@ -171,7 +179,7 @@ void GetSystemIPV4Addresses(CslArrayCslIPV4Addr& addresses)
         mask=(wxUint32)((sockaddr_in*)&(ifi[i].iiNetmask))->sin_addr.S_un.S_addr;
 
         CslIPV4Addr *addr = new CslIPV4Addr(ip, 0, mask);
-        addresses.Add(addr);
+        addresses.push_back(addr);
 
         CSL_LOG_DEBUG("%s\n", U2C(addr->Format(wxT("%i / %m"))));
     }
@@ -223,7 +231,7 @@ cleanup:
         }
 
         CslIPV4Addr *addr = new CslIPV4Addr(ip, 0, mask);
-        addresses.Add(addr);
+        addresses.push_back(addr);
 
         CSL_LOG_DEBUG("%s\n", U2C(addr->Format(wxT("%i / %m"))));
     }
@@ -298,34 +306,70 @@ wxString FormatSeconds(wxUint32 time, bool space, bool full)
 
     if (dy)
     {
-        s<<s.Format(wxT("%d"), dy);
+        s << s.Format(wxT("%d"), dy);
         if (space)
-            s<<wxT(" ");
-        s<<(full ? (dy==1 ? _("day") : _("days")) : _("d"))<<wxT(" ");
+            s << wxT(" ");
+        s << (full ? wxPLURAL("day", "days", dy) : wxT("d")) << wxT(" ");
     }
     if (hr)
     {
-        s+=s.Format(wxT("%d"), hr);
+        s << s.Format(wxT("%d"), hr);
         if (space)
-            s<<wxT(" ");
-        s<<(full ? (hr==1 ? _("hour") : _("hours")) : _("h"))<<wxT(" ");
+            s << wxT(" ");
+        s << (full ? wxPLURAL("hour", "hours", hr) : wxT("h")) << wxT(" ");
     }
     if (mn)
     {
-        s<<s.Format(wxT("%d"), mn);
+        s << s.Format(wxT("%d"), mn);
         if (space)
-            s<<wxT(" ");
-        s<<(full ? (mn==1 ? _("minute") : _("minutes")) : _("min"))<<wxT(" ");
+            s << wxT(" ");
+        s << (full ? wxPLURAL("minute", "minutes", mn) : wxT("min")) << wxT(" ");
     }
     if (sc)
     {
-        s<<s.Format(wxT("%d"), sc);
+        s << s.Format(wxT("%d"), sc);
         if (space)
-            s<<wxT(" ");
-        s<<(full ? (sc==1 ? _("second") : _("seconds")) : _("sec"))<<wxT(" ");
+            s << wxT(" ");
+        s << (full ? wxPLURAL("second", "seconds", sc) : wxT("sec")) << wxT(" ");
     }
 
     return s.Trim(true);
+}
+
+wxString ToRfc2822(const wxDateTime& date, bool isUTC)
+{
+    if (!date.IsValid())
+        return wxEmptyString;
+
+    char *prevlocale = setlocale(LC_TIME, NULL);
+    setlocale(LC_TIME, "C");
+
+    wxString rfc2822;
+
+    if (isUTC)
+        rfc2822 = date.Format(wxT("%a, %d %b %Y %T GMT"));
+    else
+        rfc2822 = date.ToUTC().Format(wxT("%a, %d %b %Y %T GMT"));
+
+    if (prevlocale)
+        setlocale(LC_TIME, prevlocale);
+
+    return rfc2822;
+}
+
+wxDateTime FromRfc2822(const wxString& date, bool toUTC)
+{
+    wxDateTime rfc2822;
+
+    rfc2822.wxDateTime::ParseRfc822Date(date.c_str());
+
+    if (!rfc2822.IsValid())
+        return wxDefaultDateTime;
+
+    if (toUTC)
+        rfc2822.MakeUTC();
+
+    return rfc2822;
 }
 
 #ifdef __WXMSW__
@@ -334,8 +378,8 @@ wxString FormatSeconds(wxUint32 time, bool space, bool full)
 #if !defined(_WINSOCK2API_) && !defined(_WINSOCKAPI_)
 struct timeval
 {
-    long tv_sec;
-    long tv_usec;
+    time_t tv_sec;
+    time_t tv_usec;
 };
 #endif // !defined(_WINSOCK2API_) && !defined(_WINSOCKAPI_)
 int gettimeofday(struct timeval* tv, void *WXUNUSED(dummy))
@@ -347,8 +391,10 @@ int gettimeofday(struct timeval* tv, void *WXUNUSED(dummy))
     } now;
 
     GetSystemTimeAsFileTime(&now.ft);
-    tv->tv_usec=(long)((now.ns100/10LL)%1000000LL);
-    tv->tv_sec=(long)((now.ns100-116444736000000000LL)/10000000LL);
+
+    tv->tv_usec = (time_t)((now.ns100 / 10LL) % 1000000LL);
+    tv->tv_sec = (time_t)((now.ns100 - 116444736000000000LL) / 10000000LL);
+
     return 0;
 }
 #endif //USE_WIN32_TICK
@@ -356,24 +402,26 @@ int gettimeofday(struct timeval* tv, void *WXUNUSED(dummy))
 #include <sys/time.h>
 #endif //__WXMSW__
 
-wxUint32 GetTicks()
+time_t GetTicks()
 {
-    static wxUint32 init=0;
-    wxUint32 ticks;
+    static time_t init = 0;
+
+    time_t ticks;
 #if defined(__WXMSW__) && defined(CSL_USE_WIN32_TICK)
-    ticks=GetTickCount();
+    ticks = GetTickCount();
 #else
     struct timeval tv;
     gettimeofday(&tv, NULL);
-    wxUint32 r=tv.tv_usec/1000;
-    wxUint64 v=tv.tv_sec*1000;
-    ticks=v+r-init;
+    time_t r = tv.tv_usec / 1000;
+    time_t v = tv.tv_sec * 1000;
+    ticks = v + r - init;
 #endif
     if (!init)
     {
-        init=ticks;
+        init = ticks;
         return 0;
     }
+
     return ticks;
 }
 
@@ -394,72 +442,116 @@ const wxString& GetHttpAgent()
     return agent;
 }
 
-static wxArrayString datadirs;
-static wxArrayString plugindirs;
-
-wxString FileName(const wxString& path, bool native)
+wxString GetTempDir()
 {
-    wxFileName f=wxFileName::FileName(path, native ? wxPATH_NATIVE : wxPATH_UNIX);
-
-    return f.GetFullPath(wxPATH_NATIVE);
+    return ::DirName(wxFileName::GetTempDir()) +
+                     wxString(CSL_NAME_SHORT_STR).Lower() +
+                     wxT("-") + ::wxGetUserId();
 }
 
-wxString DirName(const wxString& path, bool native)
+wxString FileName(const wxString& path, const wxString& cwd)
 {
-    wxFileName f=wxFileName::DirName(path, native ? wxPATH_NATIVE : wxPATH_UNIX);
+    wxFileName fn(path, wxPATH_DOS);
 
-    return f.GetPath(wxPATH_GET_VOLUME|wxPATH_GET_SEPARATOR, wxPATH_NATIVE);
+    wxInt32 flags = wxPATH_NORM_ALL;
+
+    if (!fn.IsRelative() || cwd.IsEmpty())
+        flags &= ~wxPATH_NORM_ABSOLUTE;
+
+    fn.Normalize(flags, cwd);
+
+    return fn.GetFullPath(wxPATH_NATIVE);
 }
 
-void AddDir(const wxString& path, bool native, wxArrayString& array)
+wxString DirName(const wxString& path, const wxString& cwd)
 {
-    wxString pathname=DirName(path, native);
+    wxFileName fn(path, wxEmptyString, wxPATH_DOS);
 
-    for (wxInt32 i=0, j=array.GetCount(); i<j; i++)
+    wxInt32 flags = wxPATH_NORM_ALL;
+
+    if (!fn.IsRelative() || cwd.IsEmpty())
+        flags &= ~wxPATH_NORM_ABSOLUTE;
+
+    fn.Normalize(flags, cwd);
+
+    return fn.GetPathWithSep(wxPATH_NATIVE);
+}
+
+wxString AddDir(const wxString& path, wxArrayString& array, const wxString& cwd)
+{
+    wxString name = DirName(path, cwd);
+
+    loopv(array)
     {
-        if (array.Item(i)==pathname)
-            return;
+        if (array[i]==name)
+            return wxEmptyString;
     }
 
-    array.Add(pathname);
+    array.push_back(name);
+
+    return name;
 }
 
-void RemoveDir(const wxString& path, wxArrayString& array)
+wxString RemoveDir(const wxString& path, wxArrayString& array)
 {
-    for (wxInt32 i=0, j=array.GetCount(); i<j; i++)
+    loopv(array)
     {
-        if (array.Item(i)==path)
+        if (array[i]==path)
         {
-            array.RemoveAt(i);
-            return;
+            array.erase(array.begin() + i);
+            return path;
         }
-    }
-}
-
-wxString FindFile(const wxString& path, wxArrayString& array)
-{
-    wxString file;
-    wxString pathname=FileName(path);
-
-    for (wxInt32 i=0, j=array.GetCount(); i<j; i++)
-    {
-        file=array.Item(i)+pathname;
-
-        if (wxFile::Exists(file))
-            return file;
     }
 
     return wxEmptyString;
 }
 
-void AddPluginDir(const wxString& path, bool native)
+wxString FindFile(const wxString& name, wxArrayString& paths, bool first)
 {
-    AddDir(path, native, plugindirs);
+    wxString file;
+    wxString pathName = FileName(name);
+
+    loopv(paths)
+    {
+        file = paths[i] + pathName;
+
+        if (wxFile::Exists(file))
+            return file;
+
+        if (first)
+            break;
+    }
+
+    return wxEmptyString;
 }
 
-void RemovePluginDir(const wxString& path)
+static wxArrayString datadirs;
+static wxArrayString plugindirs;
+
+wxString AddPluginDir(const wxString& path, const wxString& cwd)
 {
-    RemoveDir(path, plugindirs);
+    wxString ret = AddDir(path, plugindirs, cwd);
+
+    CSL_DO_DEBUG
+    (
+        if (!ret.IsEmpty())
+            CSL_LOG_DEBUG("added plugin dir: %s\n", U2C(ret));
+    );
+
+    return ret;
+}
+
+wxString RemovePluginDir(const wxString& path)
+{
+    wxString ret = RemoveDir(path, plugindirs);
+
+    CSL_DO_DEBUG
+    (
+        if (!ret.IsEmpty())
+            CSL_LOG_DEBUG("removed plugin dir: %s\n", U2C(ret));
+    );
+
+    return ret;
 }
 
 wxArrayString GetPluginDirs()
@@ -467,14 +559,30 @@ wxArrayString GetPluginDirs()
     return plugindirs;
 }
 
-void AddDataDir(const wxString& path, bool native)
+wxString AddDataDir(const wxString& path, const wxString& cwd)
 {
-    AddDir(path, native, datadirs);
+    wxString ret = AddDir(path, datadirs, cwd);
+
+    CSL_DO_DEBUG
+    (
+        if (!ret.IsEmpty())
+            CSL_LOG_DEBUG("added data dir: %s\n", U2C(ret));
+    );
+
+    return ret;
 }
 
-void RemoveDataDir(const wxString& path)
+wxString RemoveDataDir(const wxString& path)
 {
-    RemoveDir(path, datadirs);
+    wxString ret = RemoveDir(path, datadirs);
+
+    CSL_DO_DEBUG
+    (
+        if (!ret.IsEmpty())
+            CSL_LOG_DEBUG("removed data dir: %s\n", U2C(ret));
+    );
+
+    return ret;
 }
 
 wxArrayString GetDataDirs()
@@ -482,9 +590,9 @@ wxArrayString GetDataDirs()
     return datadirs;
 }
 
-wxString FindPackageFile(const wxString& filename)
+wxString FindPackageFile(const wxString& name, bool home)
 {
-    return FindFile(filename, datadirs);
+    return FindFile(name, datadirs, home);
 }
 
 wxInt32 FindFiles(const wxString& path, const wxString& filespec, wxArrayString& results)

@@ -21,9 +21,6 @@
 #ifndef CSL_VERSION_H
 #define CSL_VERSION_H
 
-/**
- @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
 #define CSL_STRINGIFY(x) #x
 #define CSL_TO_STRING(x) CSL_STRINGIFY(x)
 #define CSL_VERSION_TO_STRING(a, b, c, d) CSL_TO_STRING(a.b.c.d)
@@ -31,7 +28,7 @@
 #define __CSL_VERSION_MAJOR        0
 #define __CSL_VERSION_MINOR        8
 #define __CSL_VERSION_RELEASE      1
-#define __CSL_VERSION_SUBRELEASE  93
+#define __CSL_VERSION_SUBRELEASE  94
 
 #define __CSL_NAME_STR         "Cube Server Lister (CSL)"
 #define __CSL_NAME_SHORT_STR   "CSL"

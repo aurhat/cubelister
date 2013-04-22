@@ -65,9 +65,9 @@ wxThread::ExitCode CslDNSResolver::Entry()
     {
         if (!m_queries.size())
         {
-            CSL_LOG_DEBUG("Resolver waiting\n");
+            CSL_LOG_DEBUG("resolver waiting\n");
             m_condition->Wait();
-            CSL_LOG_DEBUG("Resolver signaled\n");
+            CSL_LOG_DEBUG("resolver signaled\n");
         }
 
         if (m_terminate || !m_queries.size())

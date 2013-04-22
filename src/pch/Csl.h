@@ -21,10 +21,6 @@
 #ifndef CSL_H
 #define CSL_H
 
-/**
-    @author Glen Masgai <mimosius@gmx.de>
-*/
-
 #ifdef _WINDOWS
 #if defined(_DEBUG) && defined(_MSC_VER)
 #define _CRTDBG_MAP_ALLOC
@@ -43,7 +39,6 @@
 #include <wx/colordlg.h>
 #include <wx/datectrl.h>
 #include <wx/dateevt.h>
-#include <wx/filename.h>
 #include <wx/filepicker.h>
 #include <wx/hyperlink.h>
 #include <wx/imaglist.h>
@@ -58,7 +53,6 @@
 #include <wx/taskbar.h>
 #include <wx/treectrl.h>
 #include <wx/wupdlock.h>
-#include <wx/wizard.h>
 #else
 #if wxCHECK_VERSION(2, 9, 0)
 #include <wx/evtloop.h>
@@ -66,22 +60,9 @@
 #endif //wxUSE_GUI
 #include <wx/dir.h>
 #include <wx/dynlib.h>
-#include <wx/fileconf.h>
 #include <wx/file.h>
 #include <wx/filename.h>
-#include <wx/ipc.h>
-#include <wx/mstream.h>
-#include <wx/process.h>
-#include <wx/protocol/http.h>
-#include <wx/snglinst.h>
 #include <wx/socket.h>
-#include <wx/stdpaths.h>
-#include <wx/tokenzr.h>
-#include <wx/uri.h>
-#include <wx/wfstream.h>
-#ifdef __WXMAC__
-#include <wx/sysopt.h>
-#endif //__WXMAC__
 
 #include <CslTools.h>
 #include <CslVersion.h>

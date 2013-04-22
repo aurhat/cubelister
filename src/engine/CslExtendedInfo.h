@@ -21,10 +21,6 @@
 #ifndef CSLEXTENDEDINFO_H
 #define CSLEXTENDEDINFO_H
 
-/**
- @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
-
 #define CSL_EX_VERSION_MIN      102
 #define CSL_EX_VERSION_MAX      105
 // commands

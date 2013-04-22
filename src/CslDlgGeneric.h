@@ -21,10 +21,6 @@
 #ifndef CSLDLGGENERIC_H
 #define CSLDLGGENERIC_H
 
-/**
- @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
-
 #define CSL_DLG_GENERIC_DEFAULT     0
 #define CSL_DLG_GENERIC_RESIZE   1<<0
 #define CSL_DLG_GENERIC_OK       1<<1

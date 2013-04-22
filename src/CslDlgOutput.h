@@ -21,7 +21,6 @@
 #ifndef CSLDLGOUTPUT_H
 #define CSLDLGOUTPUT_H
 
-
 class CslDlgOutput: public wxDialog
 {
     public:

@@ -26,24 +26,25 @@ BEGIN_EVENT_TABLE(CslStatusBar, wxStatusBar)
     EVT_SIZE(CslStatusBar::OnSize)
 END_EVENT_TABLE()
 
-enum { FIELD_LIGHT = 0, FIELD1, FIELD_END };
+
 
 CslStatusBar* CslStatusBar::m_self = NULL;
 
 
 CslStatusBar::CslStatusBar(wxWindow *parent) :
         wxStatusBar(parent, wxID_ANY, wxST_SIZEGRIP),
-        m_light(LIGHT_GREY)
+        m_light(-1)
 {
-    SetMinHeight(16);
-    SetFieldsCount(FIELD_END);
-    int styles[FIELD_END] = { wxSB_FLAT, wxSB_FLAT };
-    SetStatusStyles(FIELD_END, styles);
-    int widths[FIELD_END] = { 20, -2 };
-    SetStatusWidths(FIELD_END, widths);
+    const int widths[2] = { 20, -1 };
+    const int styles[2] = { wxSB_FLAT, wxSB_FLAT };
 
-    m_bmp = new CslBufferedStaticBitmap(this, wxSize(16,16));
-    SetLight(m_light);
+    SetMinHeight(16);
+    SetFieldsCount(2);
+    SetStatusStyles(2, styles);
+    SetStatusWidths(2, widths);
+
+    m_bmp = new CslBufferedStaticBitmap(this, wxSize(16, 16));
+    SetLight(LIGHT_GREY);
 }
 
 void CslStatusBar::OnSize(wxSizeEvent& event)

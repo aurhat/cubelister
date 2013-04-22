@@ -21,23 +21,18 @@
 #ifndef CSLGAMEASSAULTCUBE_H
 #define CSLGAMEASSAULTCUBE_H
 
-/**
- @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
+#define CSL_DEFAULT_NAME_AC         wxT("AssaultCube")
+#define CSL_LAST_PROTOCOL_AC        1132
 
-#define CSL_DEFAULT_NAME_AC           wxT("AssaultCube")
-#define CSL_LAST_PROTOCOL_AC          1132
+#define CSL_FOURCC_AC               "ATCE"
 
-#define CSL_FOURCC_AC                 "ATCE"
+#define CSL_DEFAULT_PORT_AC         28763
+#define CSL_DEFAULT_BCAST_PORT_AC   28762
 
-#define CSL_DEFAULT_PORT_AC           28763
-#define CSL_DEFAULT_BCAST_PORT_AC     28762
+#define CSL_DEFAULT_MASTER_AC       wxT("tcp://assault.cubers.net:28760/list\n")
 
-#define CSL_DEFAULT_MASTER_AC         wxT("assault.cubers.net")
-#define CSL_DEFAULT_MASTER_PORT_AC    28760
-
-#define CSL_DEFAULT_INJECT_DIR_AC     wxT("config/")
-#define CSL_DEFAULT_INJECT_FILE_AC    wxT("autoexec.cfg")
+#define CSL_DEFAULT_INJECT_DIR_AC   wxT("config/")
+#define CSL_DEFAULT_INJECT_FILE_AC  wxT("autoexec.cfg")
 
 
 class CSL_DLL_PLUGINS CslGameAssaultCube : public CslGame

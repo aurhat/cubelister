@@ -21,10 +21,6 @@
 #ifndef CSLDYNLIB_H
 #define CSLDYNLIB_H
 
-/**
-    @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
-
 #ifdef CSL_DLL_BUILD
 #    ifdef CSL_TOOLS_EXPORTS
 #        define CSL_DLL_TOOLS  WXEXPORT

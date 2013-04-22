@@ -22,14 +22,17 @@
 #include "CslEngine.h"
 
 DEFINE_EVENT_TYPE(wxCSL_EVT_PONG)
+DEFINE_EVENT_TYPE(wxCSL_EVT_MASTER_UPDATE)
 
-BEGIN_EVENT_TABLE(CslEngine,wxEvtHandler)
-    CSL_EVT_PING(CslEngine::OnPong)
-    CSL_EVT_DNS_RESOLVE(CslEngine::OnResolve)
+BEGIN_EVENT_TABLE(CslEngine, wxEvtHandler)
+CSL_EVT_PING(CslEngine::OnPong)
+CSL_EVT_DNS_RESOLVE(CslEngine::OnResolve)
+CSL_EVT_PROTO_INPUT(wxID_ANY, CslEngine::OnCslProtocolInput)
 END_EVENT_TABLE()
 
 
 IMPLEMENT_DYNAMIC_CLASS(CslPongEvent, wxEvent)
+IMPLEMENT_DYNAMIC_CLASS(CslMasterUpdateEvent, wxEvent)
 
 
 CslEngine::CslEngine() : wxEvtHandler(),
@@ -404,107 +407,35 @@ bool CslEngine::BroadcastPing(CslGame *game)
     return PingDefault(&info);
 }
 
-wxInt32 CslEngine::UpdateFromMaster(CslMaster *master)
+bool CslEngine::UpdateFromMaster(CslMaster *master)
 {
-    wxInt32 num=0;
-    char buf[32768];
-    const CslMasterConnection& connection=master->GetConnection();
+    if (master->IsUpdating())
+        return false;
 
-    if (connection.Type==CslMasterConnection::CONNECTION_HTTP)
+    const wxURI& uri = master->GetURI();
+
+    loopv(m_masterUpdates)
     {
-        wxHTTP http;
-        wxInputStream *stream;
-        http.SetTimeout(10);
-
-        if (!http.Connect(connection.Address,connection.Port))
-            return -1;
-        http.SetHeader(wxT("User-Agent"),GetHttpAgent());
-        if (!(stream=http.GetInputStream(connection.Path)))
-            return -1;
-
-        if (http.GetResponse()!=200)
-            return -1;
-
-        if (!stream->GetSize())
-            return -1;
-
-        stream->Read((void*)buf,32768);
-        buf[stream->LastRead()]=0;
-
-        delete stream;
-    }
-    else if (connection.Type==CslMasterConnection::CONNECTION_TCP)
-    {
-        wxSocketClient sock(wxSOCKET_BLOCK|wxSOCKET_WAITALL);
-        sock.SetTimeout(10);
-        wxIPV4address addr;
-        addr.Hostname(connection.Address);
-        addr.Service(connection.Port);
-
-        if (!sock.Connect(addr,true))
-            return -1;
-
-        sock.Write((void*)"list\n",5);
-        if (sock.LastCount()!=5)
-            return -1;
-
-        sock.Read((void*)buf,32768);
-        buf[sock.LastCount()]=0;
-    }
-    else
-        return -1;
-
-    master->UnrefServers();
-
-    CslGame *game=master->GetGame();
-    char *p,*port,*iport,*host=(char*)buf;
-    bool parse=true;
-
-    while (parse && (host=strstr(host,"addserver")))
-    {
-        host+=9;
-        port=iport=NULL;
-
-        if (!(host=strpbrk(host,"0123456789")))
-            return num ? num:-1;
-        if (!(p=strpbrk(host," \t\r\n")))
-            parse=false;
-        else if (*p=='\r' || *p=='\n')
-            *p=0;
-        else
-        {
-            if ((port=strpbrk(p,"0123456789")))
-            {
-                *p=0;
-                p=port+strspn(port,"0123456789");
-
-                if ((iport=strpbrk(p," \t\r\n")) && (*p==' ' || *p=='\t') && *p!='\r' && *p!='\n')
-                {
-                    *p=0;
-
-                    if ((iport=strpbrk(iport+1,"0123456789")))
-                        p=iport+strspn(iport,"0123456789");
-                }
-                else
-                    iport=NULL;
-            }
-            *p=0;
-        }
-
-        CslServerInfo *info=new CslServerInfo(game,C2U(host),port ? atoi(port):0,iport ? atoi(iport):0);
-
-        if (!game->AddServer(info,master->GetId()))
-            delete info;
-
-        num++;
-
-        if (parse)
-            host=p+1;
+        m_masterUpdates[i]->GetInput()==uri;
+        return false;
     }
 
-    ResetPingSends(NULL,master);
+    CslProtocolInput *proto = new CslProtocolInput(this, wxID_ANY, uri);
 
-    return num;
+    proto->SetMaxRead(65536);
+    proto->SetChunkSize(65536);
+    proto->SetClientData(master);
+
+    if (proto->Run()!=wxTHREAD_NO_ERROR)
+    {
+        delete proto;
+        return false;
+    }
+
+    master->SetIsUpdating(true);
+    m_masterUpdates.push_back(proto);
+
+    return true;
 }
 
 void CslEngine::ResetPingSends(CslGame *game,CslMaster *master)
@@ -679,8 +610,8 @@ bool CslEngine::ParsePong(CslServerInfo *info, CslNetPacket& packet)
                 {
                     if (rid>-1 && stats.m_ids.Index(rid)==wxNOT_FOUND)
                     {
-                        CSL_LOG_DEBUG("%s (%s) ERROR(%d): resend id not found (%d | %lu).\n", U2C(msg_type),
-                                      U2C(info->GetBestDescription()), GetTicks(), rid, stats.m_ids.GetCount());
+                        CSL_LOG_DEBUG("%s (%s) ERROR: resend id not found (%d | %lu).\n", U2C(msg_type),
+                                      U2C(info->GetBestDescription()), rid, stats.m_ids.GetCount());
                         break;
                     }
 
@@ -1042,10 +973,69 @@ void CslEngine::OnResolve(CslDNSResolveEvent& event)
 
             if (servers.Index(info)!=wxNOT_FOUND)
             {
-                 info->m_addr.Create(ip, info->m_addr.GetPort());
+                info->m_addr.Create(ip, info->m_addr.GetPort());
                 info->Domain = event.GetDomain();
             }
             break;
         }
     }
+}
+
+void CslEngine::OnCslProtocolInput(CslProtocolInputEvent& event)
+{
+    if (event.IsTerminate())
+        return;
+
+    CslProtocolInput *proto = NULL;
+    CslMaster *master = (CslMaster*)event.GetClientData();
+
+    wxURI uri = master->GetURI();
+
+    loopv(m_masterUpdates)
+    {
+        proto = m_masterUpdates[i];
+
+        if (proto->GetInput()==uri)
+            break;
+        else
+            proto = NULL;
+    }
+
+    if (!proto)
+    {
+        wxASSERT(proto!=NULL);
+        return;
+    }
+
+    CslMasterUpdateEvent evt(master);
+
+    if (!event.IsError())
+    {
+        wxMemoryBuffer& buf = event.GetBuffer();
+        char *response = (char*)buf.GetData();
+        size_t size = buf.GetDataLen();
+
+        if (buf.GetDataLen())
+        {
+            CslGame *game = master->GetGame();
+            wxInt32 count = game->ParseMasterResponse(master, response, size);
+
+            if (count)
+                ResetPingSends(NULL, master);
+
+            evt.SetCount(count);
+        }
+    }
+
+    ProcessEvent(evt);
+
+    master->SetIsUpdating(false);
+
+    loopv(m_masterUpdates) if (m_masterUpdates[i]==proto)
+    {
+        m_masterUpdates.erase(m_masterUpdates.begin()+i);
+        break;
+    }
+
+    delete proto;
 }

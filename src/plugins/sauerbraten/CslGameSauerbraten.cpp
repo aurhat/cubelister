@@ -69,8 +69,7 @@ CslGameSauerbraten::CslGameSauerbraten()
     m_capabilities = CSL_CAPABILITY_EXTINFO | CSL_CAPABILITY_CUSTOM_CONFIG |
                      CSL_CAPABILITY_CONNECT_PASS | CSL_CAPABILITY_CONNECT_ADMIN_PASS;
 
-    m_defaultMasterConnection = CslMasterConnection(CSL_DEFAULT_MASTER_SB,
-                                                    CSL_DEFAULT_MASTER_PORT_SB);
+    m_defaultMasterURI = CSL_DEFAULT_MASTER_SB;
 
     AddIcon(CSL_BITMAP_TYPE_PNG, 16, sb_16_png, sizeof(sb_16_png));
     AddIcon(CSL_BITMAP_TYPE_PNG, 24, sb_24_png, sizeof(sb_24_png));

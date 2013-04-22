@@ -21,10 +21,6 @@
 #ifndef CSLFRAME_H
 #define CSLFRAME_H
 
-/**
- @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
-
 #include "CslDlgExtended.h"
 #include "CslDlgSettings.h"
 #include "CslDlgOutput.h"
@@ -40,7 +36,7 @@
 #include "CslStatusBar.h"
 #include "CslIPC.h"
 #include "CslTTS.h"
-#include "CslVersionCheck.h"
+
 
 class CslTaskBarIcon;
 
@@ -73,6 +69,7 @@ class CslFrame: public wxFrame, public CslPluginMgr, public CslPluginHost
             { return this; }
         wxEvtHandler* GetEvtHandler()
             { return this; }
+        wxString GetHomeDir();
 
         wxInt32 GetFreeId();
         wxInt32 GetFreeIds(wxInt32 count, wxInt32 ids[]);
@@ -114,6 +111,12 @@ class CslFrame: public wxFrame, public CslPluginMgr, public CslPluginHost
         CslGame* TreeGamesGetSelectedGame(wxTreeItemId *item = NULL);
         CslMaster* TreeGamesGetSelectedMaster(wxTreeItemId *item = NULL);
 
+        wxString CheckVersion(wxInputStream& input);
+
+        void InitProtocolInputs();
+        void DeinitProtocolInputs();
+        void CheckProtocolInputs();
+
         void UpdateMaster();
         void ConnectToServer(CslServerInfo *info = NULL,
                              wxInt32 pass = CslGameConnection::NO_PASS);
@@ -122,6 +125,7 @@ class CslFrame: public wxFrame, public CslPluginMgr, public CslPluginHost
         void SaveLocators();
 
         void OnPong(CslPongEvent& event);
+        void OnMasterUpdate(CslMasterUpdateEvent& event);
         void OnTimer(wxTimerEvent& event);
         void OnListItemSelected(wxListEvent& event);
         void OnListItemActivated(wxListEvent& event);
@@ -138,7 +142,7 @@ class CslFrame: public wxFrame, public CslPluginMgr, public CslPluginHost
         void OnClose(wxCloseEvent& event);
         void OnAuiPaneClose(wxAuiManagerEvent& event);
         void OnToolTip(CslToolTipEvent& event);
-        void OnVersionCheck(wxCommandEvent& event);
+        void OnCslProtocolInput(CslProtocolInputEvent& event);
         void OnEndProcess(wxCommandEvent& event);
         void OnIPC(CslIpcEvent& event);
 
@@ -171,7 +175,12 @@ class CslFrame: public wxFrame, public CslPluginMgr, public CslPluginHost
 
         CslEngine *m_engine;
         CslIpcServer *m_ipcServer;
-        CslVersionCheckThread *m_versionCheckThread;
+
+        CslProtocolInput *m_protocolInput;
+        wxArrayPtrVoid m_protocolInputCookies;
+
+        time_t m_lastVersionCheck;
+        time_t m_lastVersionDate;
 
         CslDlgOutput *m_outputDlg;
         CslDlgExtended *m_extendedDlg;

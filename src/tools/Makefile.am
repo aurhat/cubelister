@@ -1,8 +1,10 @@
+METASOURCES = AUTO
+
 INCLUDES = -I$(top_srcdir)/src -I$(top_srcdir)/src/engine \
 	-I$(top_srcdir)/src/engine/tools -I$(top_srcdir)/src/irc/libircclient/include \
 	-I$(top_srcdir)/src/plugin -I$(top_builddir)/src/pch \
 	-I$(top_srcdir)/src/img/flags
-METASOURCES = AUTO
+
 lib_LTLIBRARIES = libcslguitools.la
 libcslguitools_la_SOURCES = CslArt.cpp CslGeoIP.cpp CslGuiTools.cpp CslListCtrl.cpp \
 	CslMenu.cpp CslPanelMap.cpp CslTTS.cpp CslToolTip.cpp
@@ -14,8 +16,9 @@ include_HEADERS = CslArt.h CslGeoIP.h CslGuiTools.h \
 	CslTTS.h CslToolTip.h
 
 libcslguitools_la_LIBADD += ${SPEECHD_LIBS}
+libcslguitools_la_LDFLAGS = -version-info ${PKG_LIB_VERSION}
 
-if with_internal_geoip
+if WITH_INTERNAL_GEOIP
 INCLUDES += -I$(top_srcdir)/src/external/libGeoIP
 libcslguitools_la_SOURCES += $(top_srcdir)/src/external/libGeoIP/GeoIPInternal.c
 else

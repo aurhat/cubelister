@@ -130,8 +130,10 @@ void CslPanelSearch::OnShow(wxShowEvent& event)
 
 void CslPanelSearch::OnKeypress(wxKeyEvent& event)
 {
+    wxWindow *wnd = wxDynamicCast(event.GetEventObject(), wxWindow);
+
     if (event.GetKeyCode()==WXK_ESCAPE &&
-        WindowHasChildWindow(m_search_ctrl, wxWindow::FindFocus()))
+        WindowHasChildWindow(m_search_ctrl, wnd))
     {
         m_search_ctrl->Clear();
 

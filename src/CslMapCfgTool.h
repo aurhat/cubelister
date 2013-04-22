@@ -21,11 +21,6 @@
 #ifndef CSLMAPCFGTOOL_H
 #define CSLMAPCFGTOOL_H
 
-/**
- @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
-
-
 class CslMapToolPanelMap : public CslPanelMap
 {
     public:

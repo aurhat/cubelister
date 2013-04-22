@@ -25,10 +25,10 @@
 
 
 BEGIN_EVENT_TABLE(CslDlgAddMaster,wxDialog)
-    EVT_TEXT(wxID_ANY,CslDlgAddMaster::OnCommandEvent)
-    EVT_TEXT_ENTER(wxID_ANY,CslDlgAddMaster::OnCommandEvent)
-    EVT_CHOICE(wxID_ANY,CslDlgAddMaster::OnCommandEvent)
-    EVT_BUTTON(wxID_ADD,CslDlgAddMaster::OnCommandEvent)
+    EVT_TEXT(wxID_ANY, CslDlgAddMaster::OnCommandEvent)
+    EVT_TEXT_ENTER(wxID_ANY, CslDlgAddMaster::OnCommandEvent)
+    EVT_CHOICE(wxID_ANY, CslDlgAddMaster::OnCommandEvent)
+    EVT_BUTTON(wxID_OK, CslDlgAddMaster::OnCommandEvent)
 END_EVENT_TABLE()
 
 enum
@@ -42,7 +42,7 @@ enum
 
 CslDlgAddMaster::CslDlgAddMaster(wxWindow* parent):
         wxDialog(parent, wxID_ANY, wxEmptyString),
-        m_fourcc(NULL)
+        m_modified(false), m_fourcc(NULL)
 {
     // begin wxGlade: CslDlgAddMaster::CslDlgAddMaster
     sizer_master_staticbox = new wxStaticBox(this, -1, wxEmptyString);
@@ -131,35 +131,79 @@ void CslDlgAddMaster::do_layout()
 
 void CslDlgAddMaster::InitDlg(wxUint32 *fourcc)
 {
-    wxInt32 id=-1;
-
-    m_fourcc=fourcc;
+    m_fourcc = fourcc;
 
     m_choiceGameType->Clear();
     m_choiceMasterType->Clear();
 
-    CslArrayCslGame& games=::wxGetApp().GetCslEngine()->GetGames();
+    wxInt32 selected = -1;
+    CslGame *game;
+    CslArrayCslGame& games = ::wxGetApp().GetCslEngine()->GetGames();
+
     loopv(games)
     {
-        wxUint32 fcc=games[i]->GetFourCC();
-        m_choiceGameType->Append(games[i]->GetName(), (void*)(wxUIntPtr)fcc);
+        game = games[i];
+        wxUint32 fcc = game->GetFourCC();
+        m_choiceGameType->Append(game->GetName(), (void*)(wxUIntPtr)fcc);
 
         if (*fourcc==fcc)
-            id=i;
+            selected = i;
     }
 
-    m_choiceMasterType->Append(wxT("HTTP"),(void*)CslMasterConnection::CONNECTION_HTTP);
-    m_choiceMasterType->Append(wxT("TCP"),(void*)CslMasterConnection::CONNECTION_TCP);
+    m_choiceMasterType->Append(wxT("HTTP"));
+    m_choiceMasterType->Append(wxT("TCP"));
 
-    m_choiceGameType->SetSelection(id<0 ? 0 : id);
-    m_choiceMasterType->SetSelection(0);
-    m_scPort->SetValue(CSL_DEFAULT_MASTER_WEB_PORT);
+    m_choiceGameType->SetSelection(selected<0 ? 0 : selected);
+
+    SetGameDefaultValues();
 }
 
 bool CslDlgAddMaster::IsValid()
 {
-    return !(m_tcAddress->GetValue().IsEmpty() ||
-            (m_tcPath->GetValue().IsEmpty() && m_tcPath->IsEnabled()));
+    return !m_tcAddress->GetValue().IsEmpty();
+}
+
+void CslDlgAddMaster::SetGameDefaultValues()
+{
+    CslGame *game = GetSelectedGame();
+
+    if (game)
+    {
+        wxURI uri(game->GetDefaultMasterURI());
+        bool http = uri.GetScheme().CmpNoCase(wxT("http"))==0;
+        wxUint16 port = uri.HasPort() ? ::wxAtoi(uri.GetPort()) : 80;
+
+        m_choiceMasterType->SetSelection(http ? 0 : 1);
+        m_scPort->SetValue(port);
+    }
+    else
+    {
+        m_choiceMasterType->SetSelection(0);
+        m_scPort->SetValue(80);
+    }
+}
+
+CslGame* CslDlgAddMaster::GetSelectedGame(wxUint32 *pos)
+{
+    CslArrayCslGame& games = ::wxGetApp().GetCslEngine()->GetGames();
+
+    wxInt32 selection = m_choiceGameType->GetSelection();
+    wxUint32 fourcc = (wxUint32)(wxIntPtr)m_choiceGameType->GetClientData(selection);
+
+    loopv(games)
+    {
+        CslGame *game = games[i];
+
+        if (fourcc==game->GetFourCC())
+        {
+            if (pos)
+                *pos = i;
+
+            return game;
+        }
+    }
+
+    return NULL;
 }
 
 void CslDlgAddMaster::OnCommandEvent(wxCommandEvent& event)
@@ -170,18 +214,19 @@ void CslDlgAddMaster::OnCommandEvent(wxCommandEvent& event)
     {
         case CHOICE_CTRL_MASTERTYPE:
         {
-            bool path=(wxInt32)(long)m_choiceMasterType->GetClientData(m_choiceMasterType->GetSelection())==
-                          CslMasterConnection::CONNECTION_HTTP;
-            m_tcPath->Enable(path);
+            m_modified = true;
             buttonOK->Enable(IsValid());
             break;
         }
 
         case CHOICE_CTRL_GAMETYPE:
+            if (!m_modified)
+                SetGameDefaultValues();
         case TEXT_CTRL_ADDRESS:
         case TEXT_CTRL_PATH:
             if (event.GetEventType()==wxEVT_COMMAND_TEXT_UPDATED)
             {
+                m_modified = true;
                 buttonOK->Enable(IsValid());
                 break;
             }
@@ -195,52 +240,34 @@ void CslDlgAddMaster::OnCommandEvent(wxCommandEvent& event)
             if (!IsValid())
                 break;
 
-            wxUint32 fourcc=(wxUint32)(long)m_choiceGameType->GetClientData(m_choiceGameType->GetSelection());
-            wxInt32 type=(wxInt32)(long)m_choiceMasterType->GetClientData(m_choiceMasterType->GetSelection());
-            CslGame *game=NULL;
-            CslArrayCslGame& games=::wxGetApp().GetCslEngine()->GetGames();
 
-            loopv(games)
-            {
-                if (games[i]->GetFourCC()==fourcc)
-                {
-                    game=games[i];
-                    *m_fourcc=i;
-                    break;
-                }
-            }
+            CslGame *game = GetSelectedGame(m_fourcc);
+
             if (!game)
             {
                 EndModal(wxID_CANCEL);
                 break;
             }
 
-            CslMasterConnection connection;
-            wxString addr=m_tcAddress->GetValue();
-            wxString path=m_tcPath->GetValue();
-            wxUint16 port=m_scPort->GetValue();
+            wxURI uri(CslMaster::CreateURI(m_choiceMasterType->GetStringSelection(),
+                                           m_tcAddress->GetValue(),
+                                           m_scPort->GetValue(),
+                                           m_tcPath->GetValue()));
 
-            if (type==CslMasterConnection::CONNECTION_HTTP)
-            {
-                if (!path.StartsWith(wxT("/")))
-                    path=wxT("/")+path;
-                connection=CslMasterConnection(addr,path,port);
-            }
-            else
-                connection=CslMasterConnection(addr,port);
 
-            CslArrayCslMaster& masters=game->GetMasters();
+            CslArrayCslMaster& masters = game->GetMasters();
+
             loopv(masters)
             {
-                if (masters[i]->GetConnection()==connection)
+                if (masters[i]->GetURI()==uri)
                 {
-                    wxMessageBox(_("Master already exists!"),_("Error"),wxICON_ERROR,this);
+                    wxMessageBox(_("Master already exists!"), _("Error"), wxICON_ERROR, this);
                     return;
                 }
             }
 
-            CslMaster *master = CslMaster::Create(connection);
-            game->AddMaster(master);
+            game->AddMaster(CslMaster::Create(uri));
+
             EndModal(wxID_OK);
             break;
         }

@@ -1,5 +1,3 @@
-// generic useful stuff for any C++ program
-
 #ifndef CUBE_TOOLS_H
 #define CUBE_TOOLS_H
 

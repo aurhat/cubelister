@@ -1,0 +1,19 @@
+# not a GNU package. You can remove this line, if
+# have all needed files, that a GNU package needs
+AUTOMAKE_OPTIONS = foreign 1.4
+
+PO_SUBDIRS = po po-engine PO_PLUGINS
+
+SUBDIRS = src data $(PO_SUBDIRS)
+
+update-gmo:
+	@list='$(PO_SUBDIRS)'; \
+	for subdir in $$list; do \
+	    (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) update-gmo) || true; \
+	done
+
+update-po:
+	@list='$(PO_SUBDIRS)'; \
+	for subdir in $$list; do \
+	    (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) update-po) || true; \
+	done

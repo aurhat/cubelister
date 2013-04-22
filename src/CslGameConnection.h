@@ -21,10 +21,6 @@
 #ifndef CSLGAMECONNECTION_H
 #define CSLGAMECONNECTION_H
 
-/**
- @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
-
 #include "CslGameProcess.h"
 
 class CslGameConnection

@@ -22,7 +22,7 @@
 #include "CslArt.h"
 #include "CslPanelMap.h"
 #include "CslMapCfgTool.h"
-
+#include <wx/wfstream.h>
 
 enum
 {

@@ -6,469 +6,1114 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-17 14:43+0200\n"
+"Report-Msgid-Bugs-To: mimosius@users.sourceforge.net\n"
+"POT-Creation-Date: 2013-04-22 17:14+0200\n"
 "PO-Revision-Date: 2012-03-02 08:50+0100\n"
 "Last-Translator: SandMan <sandman@the-conquerors.net>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/CslDlgAbout.cpp:97
-#: ../src/CslDlgExtended.cpp:96
-#: ../src/CslDlgGeneric.h:64
-#: ../src/CslDlgOutput.cpp:68
-#: ../src/CslDlgTraffic.cpp:49
-msgid "&Close"
-msgstr "&Zavřít"
+#: ../src/CslFrame.cpp:1699
+#, fuzzy, c-format
+msgid " (%d Players)"
+msgstr "%d hráčů"
 
-#. end wxGlade
-#: ../src/CslDlgAbout.cpp:113
-msgid "About Cube Server Lister (CSL)"
-msgstr "Co je Cube Server Lister (CSL)"
+#: ../src/CslPanelServerView.cpp:108
+msgid " on "
+msgstr " na "
 
-#: ../src/CslDlgAbout.cpp:116
-msgid "Application icon:\n"
-msgstr "Ikona aplikace:\n"
+#: ../src/CslDlgOutput.cpp:54 ../src/CslDlgOutput.cpp:378
+#, c-format
+msgid "%d matches"
+msgstr "%d zápasů"
 
-#: ../src/CslDlgAbout.cpp:122
-msgid "Map previews:\n"
-msgstr "Náhledy map:\n"
+#: ../src/CslDlgExtended.cpp:360 ../src/CslDlgExtended.cpp:601
+#, c-format
+msgid "%d players"
+msgstr "%d hráčů"
 
-#: ../src/CslDlgAbout.cpp:132
-msgid "Translations:\n"
-msgstr "Překlady:\n"
+#: ../src/CslFrame.cpp:1649 ../src/CslFrame.cpp:2164
+#, fuzzy, c-format
+msgid "%d players on %d servers"
+msgstr "Výsledky hledání: %d hráčů na %d serverů"
 
-#: ../src/CslDlgAbout.cpp:138
-msgid "Previous extended info server patches:\n"
-msgstr "Předcházející záplaty rozšířených informací o serveru:\n"
+#: ../src/CslFrame.cpp:2149
+#, fuzzy, c-format
+msgid "%d servers"
+msgstr "&Hledat"
 
-#: ../src/CslDlgAbout.cpp:144
-msgid "Country Flags:\n"
-msgstr "Vlajky zemí:\n"
+#: ../src/CslGameProcess.cpp:54
+#, c-format
+msgid "%s returned with code: %d"
+msgstr "%s vrátil kód: %d"
 
-#: ../src/CslDlgAbout.cpp:195
-msgid "Credits"
-msgstr "Kredity"
+#: ../src/CslDlgOutput.cpp:55
+msgid "&Back"
+msgstr "&Zpět"
 
-#: ../src/CslDlgAbout.cpp:196
-msgid "License"
-msgstr "Licence"
-
-#: ../src/CslDlgAddMaster.cpp:49
-#: ../src/CslDlgAddMaster.cpp:54
-#: ../src/CslDlgAddServer.cpp:46
-msgid "default"
-msgstr "výchozí"
-
-#: ../src/CslDlgAddMaster.cpp:60
-#: ../src/CslDlgAddServer.cpp:51
-msgid "Add"
-msgstr "Přidat"
-
-#: ../src/CslDlgAddMaster.cpp:61
-#: ../src/CslDlgAddServer.cpp:52
-#: ../src/CslDlgConnectPass.cpp:42
 #: ../src/CslDlgConnectWait.cpp:37
-#: ../src/CslDlgSettings.cpp:268
 msgid "&Cancel"
 msgstr "&Zrušit"
 
-#. begin wxGlade: CslDlgAddMaster::set_properties
-#: ../src/CslDlgAddMaster.cpp:71
-msgid "CSL - Add new Master"
-msgstr "CSL - Přidat nový Hlavní server"
+#: ../src/CslMapCfgTool.cpp:213
+msgid "&Clear"
+msgstr ""
 
-#: ../src/CslDlgAddMaster.cpp:91
-#: ../src/CslDlgAddServer.cpp:82
-msgid "Game:"
-msgstr "Hra:"
+#: ../src/CslDlgOutput.cpp:65 ../src/CslMapCfgTool.cpp:214
+msgid "&Close"
+msgstr "&Zavřít"
 
-#: ../src/CslDlgAddMaster.cpp:94
-msgid "Master type:"
-msgstr "Typ Hlavního serveru:"
+#: ../src/CslFrame.cpp:342 ../src/CslFrame.cpp:357
+msgid "&Exit"
+msgstr "&Odejít"
 
-#: ../src/CslDlgAddMaster.cpp:100
-#: ../src/CslDlgAddServer.cpp:85
-msgid "Address:"
-msgstr "Adresa:"
+#: ../src/CslFrame.cpp:340
+msgid "&File"
+msgstr "&Soubor"
 
-#: ../src/CslDlgAddMaster.cpp:103
-#: ../src/CslDlgAddServer.cpp:88
-msgid "Port:"
-msgstr "Port:"
+#: ../src/CslDlgOutput.cpp:57
+msgid "&Filter chat"
+msgstr "&Filtrovat chat"
 
-#: ../src/CslDlgAddMaster.cpp:107
-msgid "Path:"
-msgstr "Cesta:"
+#: ../src/CslDlgOutput.cpp:56
+msgid "&Forward"
+msgstr "&Vpřed"
 
-#: ../src/CslDlgAddMaster.cpp:232
-msgid "Master already exists!"
-msgstr "Hlavní server již existuje!"
+#: ../src/CslFrame.cpp:354
+#, fuzzy
+msgid "&Game"
+msgstr "Hra"
 
-#: ../src/CslDlgAddMaster.cpp:232
-#: ../src/CslDlgSettings.cpp:564
-#: ../src/CslDlgSettings.cpp:601
-#: ../src/CslDlgSettings.cpp:608
-#: ../src/CslFrame.cpp:171
-#: ../src/CslFrame.cpp:1219
-#: ../src/CslFrame.cpp:1250
-#: ../src/CslFrame.cpp:1264
-#: ../src/CslFrame.cpp:2419
-#: ../src/CslListCtrlServer.cpp:465
-msgid "Error"
-msgstr "Chyba"
+#: ../src/CslFrame.cpp:381
+msgid "&Help"
+msgstr "&Nápověda"
 
-#. begin wxGlade: CslDlgAddServer::set_properties
-#: ../src/CslDlgAddServer.cpp:63
-msgid "CSL - Add new server"
-msgstr "CSL - Přidat nový server"
+#: ../src/CslDlgOutput.cpp:63 ../src/CslMapCfgTool.cpp:211
+msgid "&Open"
+msgstr "&Otevřít"
+
+#: ../src/CslPanelSearch.cpp:47
+msgid "&Players"
+msgstr "&Hráči"
+
+#: ../src/CslFrame.cpp:351
+msgid "&Players by country"
+msgstr ""
+
+#: ../src/CslFrame.cpp:427 ../src/CslFrame.cpp:432
+msgid "&Plugins"
+msgstr ""
+
+#: ../src/CslFrame.cpp:349
+msgid "&Remove master"
+msgstr "&Odstranit hlavní server"
+
+#: ../src/CslDlgOutput.cpp:64 ../src/CslMapCfgTool.cpp:212
+msgid "&Save"
+msgstr "&Uložit"
+
+#: ../src/CslPanelSearch.cpp:51
+msgid "&Search"
+msgstr "&Hledat"
+
+#: ../src/CslFrame.cpp:353
+#, fuzzy
+msgid "&Search for LAN servers"
+msgstr "Výsledek hledání: %d serverů"
+
+#: ../src/CslFrame.cpp:350
+msgid "&Servers by country"
+msgstr ""
+
+#: ../src/CslFrame.cpp:341 ../src/CslFrame.cpp:356
+msgid "&Settings"
+msgstr "&Nastavení"
+
+#: ../src/CslDlgExtended.cpp:86
+msgid "&Show map if possible"
+msgstr "&Ukázat mapu když je to možné"
+
+#: ../src/CslFrame.cpp:346
+msgid "&Update from master\tF5"
+msgstr "&Aktualizovat z hlavního serveru \tF5"
+
+#: ../src/CslFrame.cpp:376
+msgid "&View"
+msgstr "&Zobrazit"
+
+#: ../src/CslDlgConnectWait.cpp:38
+msgid "&Wait"
+msgstr ""
+
+#: ../src/CslPanelServerView.cpp:285
+msgid "- connecting -"
+msgstr "- připojuje se -"
+
+#: ../src/CslMapCfgTool.cpp:191 ../src/CslMapCfgTool.cpp:199
+msgid "0"
+msgstr ""
+
+#: ../src/CslDlgOutput.cpp:59
+msgid "0 (Low)"
+msgstr "0 (Nízká)"
+
+#: ../src/CslDlgOutput.cpp:60
+msgid "1 (Default)"
+msgstr "1 (Výchozí)"
+
+#: ../src/CslDlgSettings.cpp:579
+msgid "1, 2, square root of 9. TTS test."
+msgstr ""
+
+#: ../src/CslFrame.cpp:1206
+#, fuzzy, c-format
+msgid ""
+"A new %s version (%s)\n"
+" of Cube Server Lister is available.\n"
+msgstr ""
+"Je dostupná nová verze (%s)\n"
+"Cube Server Listeru\n"
+
+#: ../src/CslFrame.cpp:358 ../src/CslFrame.cpp:380
+msgid "A&bout"
+msgstr "&Co je CSL"
+
+#: ../src/CslFrame.cpp:132
+#, fuzzy
+msgid "About"
+msgstr "&Co je CSL"
+
+#: ../src/CslDlgAbout.cpp:104
+msgid "About Cube Server Lister (CSL)"
+msgstr "Co je Cube Server Lister (CSL)"
+
+#: ../src/CslPanelServerView.cpp:592
+msgid "Accuracy"
+msgstr "Přesnost"
 
 #: ../src/CslDlgConnectPass.cpp:40
 msgid "Ad&min connect"
 msgstr "&Připojit jako administrátor"
 
-#: ../src/CslDlgConnectPass.cpp:41
-#: ../src/CslDlgConnectWait.cpp:36
-#: ../src/CslDlgSettings.cpp:267
-msgid "&Ok"
-msgstr "&Ok"
+#: ../src/CslMapCfgTool.cpp:194 ../src/CslMapCfgTool.cpp:202
+msgid "Add"
+msgstr "Přidat"
 
-#. begin wxGlade: CslDlgConnectPass::set_properties
-#: ../src/CslDlgConnectPass.cpp:52
-msgid "CSL - Server password"
-msgstr "CSL - Serverové heslo"
+#: ../src/CslFrame.cpp:348
+msgid "Add a &new master ..."
+msgstr "Přidat &nový hlavní server ..."
 
-#: ../src/CslDlgConnectPass.cpp:70
-msgid "Password:"
-msgstr "Heslo:"
+#: ../src/CslServerInfo.cpp:52
+msgid "Address"
+msgstr "Adresa"
 
-#: ../src/CslDlgConnectWait.cpp:35
-msgid "Set as default waiting time."
-msgstr "Použít jako výchozí čekací doba."
+#: ../src/CslDlgAddMaster.cpp:103 ../src/CslDlgAddServer.cpp:93
+msgid "Address:"
+msgstr "Adresa:"
+
+#: ../src/CslDlgSettings.cpp:317
+msgid "Admin"
+msgstr ""
+
+#: ../src/CslDlgAbout.cpp:122
+msgid "Application icon:\n"
+msgstr "Ikona aplikace:\n"
+
+#: ../src/CslPanelServerView.cpp:594
+msgid "Armour"
+msgstr "Brnění"
+
+#: ../src/CslDlgSettings.cpp:314
+msgid "Auth master"
+msgstr ""
+
+#: ../src/CslMapCfgTool.cpp:283
+msgid "Author:"
+msgstr ""
+
+#: ../src/CslDlgSettings.cpp:124
+msgid "Auto &save game output to:"
+msgstr "Automaticky &uložit výstup hry do:"
+
+#: ../src/CslDlgSettings.cpp:123
+msgid "Auto update"
+msgstr ""
+
+#: ../src/CslFrame.cpp:373
+msgid "Auto-sort\tCTRL+L"
+msgstr ""
+
+#: ../src/CslDlgSettings.cpp:382
+msgid "Bad"
+msgstr "Špatné"
+
+#: ../src/CslMapCfgTool.cpp:272
+msgid "Bases:"
+msgstr ""
+
+#: ../src/CslServerInfo.cpp:166
+msgid "Broken protocol."
+msgstr ""
+
+#: ../src/CslDlgConnectWait.cpp:39
+#, fuzzy
+msgid "C&onnect"
+msgstr "Počet připojení"
+
+#. begin wxGlade: CslDlgAddMaster::set_properties
+#: ../src/CslDlgAddMaster.cpp:70
+msgid "CSL - Add new Master"
+msgstr "CSL - Přidat nový Hlavní server"
+
+#. begin wxGlade: CslDlgAddServer::set_properties
+#: ../src/CslDlgAddServer.cpp:69
+msgid "CSL - Add new server"
+msgstr "CSL - Přidat nový server"
+
+#. begin wxGlade: CslDlgExtended::set_properties
+#: ../src/CslDlgExtended.cpp:104 ../src/CslDlgExtended.cpp:624
+msgid "CSL - Extended info"
+msgstr "CSL - Rozšířené informace"
+
+#. begin wxGlade: CslDlgOutput::set_properties
+#: ../src/CslDlgOutput.cpp:79 ../src/CslDlgOutput.cpp:525
+msgid "CSL - Game output"
+msgstr "CSL - Výstup hry"
+
+#. begin wxGlade: CslMapCfgTool::set_properties
+#: ../src/CslMapCfgTool.cpp:224
+msgid "CSL - Map config tool"
+msgstr ""
 
 #. begin wxGlade: CslDlgConnectWait::set_properties
-#: ../src/CslDlgConnectWait.cpp:48
+#: ../src/CslDlgConnectWait.cpp:50
 msgid "CSL - Server full"
 msgstr "CSL - Server je obsazený"
 
-#: ../src/CslDlgConnectWait.cpp:65
+#. begin wxGlade: CslDlgConnectPass::set_properties
+#: ../src/CslDlgConnectPass.cpp:51
+msgid "CSL - Server password"
+msgstr "CSL - Serverové heslo"
+
+#. begin wxGlade: CslDlgOutput::CslDlgOutput
+#: ../src/CslDlgOutput.cpp:50
+msgid "Chat"
+msgstr "Chat"
+
+#: ../src/CslFrame.cpp:1245 ../src/CslFrame.cpp:1253
+msgid "Checking for GeoIP update."
+msgstr ""
+
+#: ../src/CslFrame.cpp:1236
+#, c-format
+msgid "Checking for new %s version."
+msgstr ""
+
+#: ../src/CslDlgSettings.cpp:122
+msgid "City"
+msgstr ""
+
+#: ../src/CslDlgSettings.cpp:347
+msgid "Cleanup dead servers (days)"
+msgstr "Odstranit nečinné servery (dny)"
+
+#: ../src/CslDlgAbout.cpp:102
+msgid "Compiled using:"
+msgstr ""
+
+#: ../src/CslMapCfgTool.cpp:412 ../src/CslMapCfgTool.cpp:460
+msgid "Config files (*.cfg)|*.cfg"
+msgstr ""
+
+#: ../src/CslGameConnection.cpp:217
+#, c-format
+msgid "Connected to: '%s (%s)'"
+msgstr ""
+
+#: ../src/CslServerInfo.cpp:62
+msgid "Connects"
+msgstr "Počet připojení"
+
+#: ../src/CslFrame.cpp:2293
+#, fuzzy
+msgid "Copy server passwords too?"
+msgstr "CSL - Serverové heslo"
+
+#: ../src/CslPanelCountryView.cpp:122
+msgid "Count"
+msgstr ""
+
+#: ../src/CslDlgSettings.cpp:121 ../src/CslPanelCountryView.cpp:121
+#: ../src/CslPanelServerView.cpp:385
+#, fuzzy
+msgid "Country"
+msgstr "Vlajky zemí:\n"
+
+#: ../src/CslDlgAbout.cpp:152
+msgid "Country Flags:\n"
+msgstr "Vlajky zemí:\n"
+
+#: ../src/CslDlgAbout.cpp:192
+msgid "Credits"
+msgstr "Kredity"
+
+#: ../src/CslDlgAbout.cpp:145
+msgid "Cube & Cube2 Engine Developers:\n"
+msgstr ""
+
+#: ../src/CslFrame.cpp:509
+msgid "Cube Server Lister"
+msgstr "Cube Server Lister"
+
+#. begin wxGlade: CslDlgSettings::set_properties
+#: ../src/CslDlgSettings.cpp:136
+msgid "Cube Server Lister - Settings"
+msgstr "Cube Server Lister - Nastavení"
+
+#: ../src/CslPanelTraffic.cpp:59
+msgid "Data"
+msgstr "Data"
+
+#: ../src/CslPanelTraffic.cpp:61
+msgid "Data (raw)"
+msgstr "Data (raw)"
+
+#: ../src/CslPanelServerView.cpp:587
+msgid "Deaths"
+msgstr "Zabití"
+
+#: ../src/CslDlgSettings.cpp:106
+msgid "Don't update when playing"
+msgstr "Neaktualizovat při hře"
+
+#: ../src/CslDlgSettings.cpp:286
+msgid "Empty"
+msgstr "Prázdné"
+
+#: ../src/CslDlgSettings.cpp:113 ../src/CslDlgSettings.cpp:119
+msgid "Enable"
+msgstr ""
+
+#: ../src/CslMapCfgTool.cpp:507
+msgid "Enter new version number"
+msgstr ""
+
+#: ../src/CslDlgAddMaster.cpp:265 ../src/CslDlgSettings.cpp:622
+#: ../src/CslDlgSettings.cpp:664 ../src/CslDlgSettings.cpp:671
+#: ../src/CslGameConnection.cpp:115 ../src/CslGameConnection.cpp:151
+#: ../src/CslGameConnection.cpp:206 ../src/CslGameProcess.cpp:55
+#: ../src/CslMapCfgTool.cpp:520 ../src/CslServerBrowser.cpp:197
+msgid "Error"
+msgstr "Chyba"
+
+#: ../src/CslMapCfgTool.cpp:388
+msgid "Error - Image too large!"
+msgstr ""
+
+#: ../src/CslFrame.cpp:1665
+#, fuzzy
+msgid "Error on update from master:"
+msgstr "Chyba při aktualizaci z hlavního serveru:"
+
+#: ../src/CslFrame.cpp:2818
+#, fuzzy
+msgid "Error!"
+msgstr "Chyba"
+
+#: ../src/CslFrame.cpp:135
+#, fuzzy
+msgid "Exit"
+msgstr "&Odejít"
+
+#: ../src/CslServerInfo.cpp:169
+msgid "Extended info not supported."
+msgstr "Rozšířené informace nejsou podporovány"
+
+#: ../src/CslFrame.cpp:2593
+msgid "Failed to initialise GeoIP database."
+msgstr ""
+
+#: ../src/CslFrame.cpp:199
+#, fuzzy
 msgid ""
-"The server is full at the moment.\n"
-"Wait for a free slot?"
+"Failed to initialise!\n"
+"Try to restart the application."
+msgstr ""
+"Iniciace programu se nezdařila!\n"
+"Zkuste restartovat aplikaci."
+
+#: ../src/CslFrame.cpp:2636
+#, fuzzy
+msgid "Failed to read from:"
+msgstr "Spuštění bylo neúspěšné:"
+
+#: ../src/CslGameConnection.cpp:206
+msgid "Failed to start: "
+msgstr "Spuštění bylo neúspěšné:"
+
+#: ../src/CslFrame.cpp:2638
+#, fuzzy
+msgid "Failed to write to:"
+msgstr "Spuštění bylo neúspěšné:"
+
+#: ../src/CslFrame.cpp:200
+msgid "Fatal error!"
+msgstr "Fatal error!"
+
+#: ../src/CslFrame.cpp:591
+#, fuzzy
+msgid "Favourites & LAN servers"
+msgstr "Oblíbené servery"
+
+#: ../src/CslDlgOutput.cpp:251
+msgid "File"
+msgstr "Soubor"
+
+#: ../src/CslFrame.cpp:765
+#, fuzzy
+msgid "Filters:"
+msgstr "Filtrovat"
+
+#: ../src/CslDlgExtended.cpp:423
+msgid "Flag score"
+msgstr "Skóre na vlajky"
+
+#: ../src/CslPanelServerView.cpp:586
+msgid "Frags"
+msgstr "Fragy"
+
+#: ../src/CslDlgSettings.cpp:300
+msgid "Full"
+msgstr "Obsazené"
+
+#: ../src/CslServerInfo.cpp:54
+msgid "Game"
+msgstr "Hra"
+
+#. begin wxGlade: CslPanelGameSettings::CslPanelGameSettings
+#: ../src/CslPanelGameSettings.cpp:50
+#, fuzzy
+msgid "Game executable"
+msgstr "Program hry"
+
+#: ../src/CslDlgExtended.cpp:65
+msgid "Game information"
+msgstr "Informace o hře"
+
+#: ../src/CslDlgSettings.cpp:92
+msgid "Game output"
+msgstr "Výstup hry"
+
+#: ../src/CslPanelGameSettings.cpp:96
+#, fuzzy
+msgid "Game parameters"
+msgstr "Parametry hry:"
+
+#: ../src/CslPanelGameSettings.cpp:91
+#, fuzzy
+msgid "Game path"
+msgstr "Výstup hry"
+
+#: ../src/CslFrame.cpp:2463
+#, fuzzy
+msgid "Game running"
+msgstr "CSL je již spuštěno"
+
+#: ../src/CslPanelGameSettings.cpp:53
+msgid "Game userdir"
+msgstr ""
+
+#: ../src/CslDlgAddMaster.cpp:93 ../src/CslDlgAddServer.cpp:90
+msgid "Game:"
+msgstr "Hra:"
+
+#: ../src/CslDlgSettings.cpp:406 ../src/CslFrame.cpp:589
+msgid "Games"
+msgstr "Hry"
+
+#: ../src/CslDlgSettings.cpp:91
+msgid "GeoIP"
+msgstr ""
+
+#: ../src/CslServerInfo.cpp:129
+#, fuzzy
+msgid "GeoIP database not loaded."
+msgstr "GeoIP databáze nebyla nalezena"
+
+#: ../src/CslFrame.cpp:84
+#, fuzzy
+msgid "Getting"
+msgstr "&Nastavení"
+
+#: ../src/CslServerInfo.cpp:103
+msgid "Getting IP..."
+msgstr ""
+
+#: ../src/CslServerInfo.cpp:104
+msgid "Getting domain..."
+msgstr ""
+
+#: ../src/CslServerInfo.cpp:270
+#, fuzzy
+msgid "Go to servers website"
+msgstr "Přijato %d serverů z hlavního serveru"
+
+#: ../src/CslDlgSettings.cpp:379
+msgid "Good"
+msgstr "Dobré"
+
+#: ../src/CslFrame.cpp:1667
+#, fuzzy, c-format
+msgid "Got %d servers from master:"
+msgstr "Přijato %d serverů z hlavního serveru"
+
+#: ../src/CslPanelGameSettings.cpp:59
+msgid "Guess installation path"
+msgstr ""
+
+#: ../src/CslDlgSettings.cpp:407
+msgid "Gui"
+msgstr ""
+
+#: ../src/CslPanelServerView.cpp:593
+msgid "Health"
+msgstr "Zdraví"
+
+#: ../src/CslFrame.cpp:130
+msgid "Hide"
+msgstr ""
+
+#: ../src/CslServerBrowser.cpp:53 ../src/CslServerBrowser.cpp:1031
+msgid "Host"
+msgstr "Host"
+
+#: ../src/CslApp.cpp:87
+msgid "IPC command"
+msgstr ""
+
+#: ../src/CslDlgAddServer.cpp:99
+msgid "Info port:"
+msgstr ""
+
+#: ../src/CslPanelTraffic.cpp:63
+msgid "Input"
+msgstr "Vstup"
+
+#: ../src/CslFrame.cpp:2605
+msgid "Installing GeoIP database."
+msgstr ""
+
+#: ../src/CslFrame.cpp:2720
+msgid "Invalid URI: No action specified."
+msgstr ""
+
+#: ../src/CslFrame.cpp:2715
+msgid "Invalid URI: No server specified."
+msgstr ""
+
+#: ../src/CslFrame.cpp:2807
+msgid "Invalid URI: Unknown action."
+msgstr ""
+
+#: ../src/CslFrame.cpp:2754
+msgid "Invalid URI: Unknown game."
+msgstr ""
+
+#: ../src/CslDlgSettings.cpp:110
+msgid "Keep favourites"
+msgstr "Zachovávat oblíbené"
+
+#: ../src/CslDlgSettings.cpp:111
+msgid "Keep servers with statistics"
+msgstr "Zachovávat servery se statistikou"
+
+#: ../src/CslPanelServerView.cpp:591
+msgid "KpD"
+msgstr ""
+
+#: ../src/CslServerInfo.cpp:60
+msgid "Last play time"
+msgstr "Poslední délka hraní"
+
+#: ../src/CslServerInfo.cpp:59
+msgid "Last played"
+msgstr "Hráno naposledy"
+
+#: ../src/CslGameConnection.cpp:55
+#, fuzzy, c-format
+msgid "Last played on: '%s (%s)'"
+msgstr "Hráno naposledy"
+
+#: ../src/CslServerInfo.cpp:58
+msgid "Last seen"
+msgstr "Naposledy viděné"
+
+#: ../src/CslDlgOutput.cpp:130
+#, fuzzy
+msgid "Level"
+msgstr "Úroveň:"
+
+#: ../src/CslDlgAbout.cpp:193
+msgid "License"
+msgstr "Licence"
+
+#: ../src/CslMapCfgTool.cpp:210
+msgid "Load &image"
+msgstr ""
+
+#: ../src/CslServerInfo.cpp:53
+msgid "Location"
+msgstr "Lokace"
+
+#: ../src/CslDlgSettings.cpp:297
+msgid "Locked"
+msgstr ""
+
+#: ../src/CslDlgExtended.cpp:67 ../src/CslMapCfgTool.cpp:187
+#: ../src/CslMapCfgTool.cpp:395 ../src/CslMapCfgTool.cpp:665
+#: ../src/CslServerBrowser.cpp:58
+msgid "Map"
+msgstr "Mapa"
+
+#: ../src/CslDlgExtended.cpp:66
+msgid "Map information"
+msgstr "Informace o mapě"
+
+#: ../src/CslMapCfgTool.cpp:280
+msgid "Map name:"
+msgstr ""
+
+#: ../src/CslDlgAbout.cpp:128
+msgid "Map previews:\n"
+msgstr "Náhledy map:\n"
+
+#: ../src/CslDlgSettings.cpp:310
+#, fuzzy
+msgid "Master"
+msgstr "&Hlavní server"
+
+#: ../src/CslDlgAddMaster.cpp:265
+msgid "Master already exists!"
+msgstr "Hlavní server již existuje!"
+
+#: ../src/CslDlgSettings.cpp:290
+#, fuzzy
+msgid "Master control"
+msgstr "Typ Hlavního serveru:"
+
+#: ../src/CslFrame.cpp:590
+msgid "Master list servers"
+msgstr "Hlavní seznam serverů"
+
+#: ../src/CslDlgAddMaster.cpp:96
+msgid "Master type:"
+msgstr "Typ Hlavního serveru:"
+
+#: ../src/CslServerBrowser.cpp:61
+#, fuzzy
+msgid "Mastermode"
+msgstr "Mastermode 1"
+
+#: ../src/CslDlgSettings.cpp:120
+msgid "Minimise on close"
+msgstr ""
+
+#: ../src/CslDlgSettings.cpp:343
+#, fuzzy
+msgid "Minimum playtime for statistics (seconds):"
+msgstr "Minimální doba hraní pro statistiku (vteřiny):"
+
+#: ../src/CslServerBrowser.cpp:57
+msgid "Mode"
+msgstr "Režim"
+
+#: ../src/CslDlgExtended.cpp:179
+msgid "Mode:"
+msgstr "Režim:"
+
+#: ../src/CslServerBrowser.cpp:54
+msgid "Name"
+msgstr ""
+
+#: ../src/CslFrame.cpp:1205
+#, fuzzy, c-format
+msgid "New %s version %s"
+msgstr "Nová verze %s"
+
+#: ../src/CslFrame.cpp:1212
+#, c-format
+msgid "New version %s"
+msgstr "Nová verze %s"
+
+#: ../src/CslMapCfgTool.cpp:508
+#, fuzzy
+msgid "New version number"
+msgstr "Nová verze %s"
+
+#: ../src/CslPanelServerView.cpp:391
+#, fuzzy
+msgid "No GeoIP database loaded."
+msgstr "GeoIP databáze nebyla nalezena"
+
+#: ../src/CslServerInfo.cpp:105
+msgid "No IP"
+msgstr ""
+
+#: ../src/CslServerInfo.cpp:106
+msgid "No domain"
+msgstr ""
+
+#: ../src/CslDlgExtended.cpp:281
+#, fuzzy
+msgid "No map"
+msgstr "žádná mapa"
+
+#: ../src/CslDlgExtended.cpp:390
+msgid "No teams."
+msgstr "Bez týmů"
+
+#: ../src/CslFrame.cpp:1215 ../src/CslFrame.cpp:2634
+msgid "No update available."
+msgstr ""
+
+#: ../src/CslDlgExtended.cpp:486
+msgid "Not a team game."
+msgstr "Není týmová hra"
+
+#: ../src/CslDlgSettings.cpp:293
+msgid "Offline"
+msgstr "Offline"
+
+#: ../src/CslMapCfgTool.cpp:411
+#, fuzzy
+msgid "Open config"
+msgstr "Otevřít soubor logu"
+
+#: ../src/CslMapCfgTool.cpp:372
+#, fuzzy
+msgid "Open image"
+msgstr "Otevřít soubor logu"
+
+#: ../src/CslDlgOutput.cpp:226
+msgid "Open log file"
+msgstr "Otevřít soubor logu"
+
+#: ../src/CslDlgSettings.cpp:408
+msgid "Other"
+msgstr "Jiné"
+
+#: ../src/CslPanelTraffic.cpp:68
+msgid "Output"
+msgstr "Výstup"
+
+#: ../src/CslMapCfgTool.cpp:373
+msgid "PNG files (*.png)|*.png"
+msgstr ""
+
+#: ../src/CslPanelTraffic.cpp:57
+msgid "Packets"
+msgstr "Pakety"
+
+#: ../src/CslDlgConnectPass.cpp:66
+msgid "Password:"
+msgstr "Heslo:"
+
+#: ../src/CslDlgAddMaster.cpp:113
+msgid "Path:"
+msgstr "Cesta:"
+
+#: ../src/CslPanelServerView.cpp:590 ../src/CslServerBrowser.cpp:56
+msgid "Ping"
+msgstr "Ping"
+
+#: ../src/CslDlgSettings.cpp:89
+msgid "Ping thresholds"
+msgstr "Prahové úrovně pingů"
+
+#: ../src/CslGameConnection.cpp:61
+#, fuzzy
+msgid "Play time:"
+msgstr "Poslední délka hraní"
+
+#: ../src/CslDlgSettings.cpp:86 ../src/CslPanelPlayerSearch.cpp:53
+#: ../src/CslPanelServerView.cpp:583 ../src/CslServerBrowser.cpp:60
+msgid "Player"
+msgstr "Hráčů"
+
+#: ../src/CslFrame.cpp:597
+#, fuzzy
+msgid "Player countries"
+msgstr "Seznam hráčů"
+
+#: ../src/CslPanelServerView.cpp:374
+#, fuzzy
+msgid "Player information"
+msgstr "Informace o hře"
+
+#: ../src/CslFrame.cpp:595 ../src/CslPanelPlayerSearch.cpp:193
+msgid "Player search result"
+msgstr ""
+
+#: ../src/CslDlgExtended.cpp:185
+msgid "Players :"
+msgstr "Hráči :"
+
+#: ../src/CslDlgAddMaster.cpp:106 ../src/CslDlgAddServer.cpp:96
+msgid "Port:"
+msgstr "Port:"
+
+#: ../src/CslPanelGameSettings.cpp:99 ../src/CslPanelGameSettings.cpp:102
+msgid "Pre connect script"
+msgstr ""
+
+#: ../src/CslServerInfo.cpp:55
+msgid "Protocol version"
+msgstr "Verze protokolu"
+
+#: ../src/CslServerBrowser.cpp:167 ../src/CslServerBrowser.cpp:178
+#, fuzzy
+msgid "Really delete these servers?"
+msgstr "&Odstranit servery"
+
+#: ../src/CslMapCfgTool.cpp:195 ../src/CslMapCfgTool.cpp:203
+#, fuzzy
+msgid "Remove"
+msgstr "&Odstranit hlavní server"
+
+#: ../src/CslFrame.cpp:375
+msgid "Reset layout"
+msgstr "Resetovat layout"
+
+#: ../src/CslDlgSettings.cpp:304
+msgid "Restricted (password, banned, private)"
+msgstr ""
+
+#: ../src/CslPanelSearch.cpp:49
+msgid "Result:"
+msgstr ""
+
+#: ../src/CslMapCfgTool.cpp:459
+#, fuzzy
+msgid "Save config"
+msgstr "Uložit souboru logu"
+
+#: ../src/CslDlgOutput.cpp:551
+msgid "Save log file"
+msgstr "Uložit souboru logu"
+
+#: ../src/CslDlgOutput.cpp:51
+msgid "Search"
+msgstr "Hledat"
+
+#: ../src/CslFrame.cpp:594
+#, fuzzy
+msgid "Search Servers"
+msgstr "Výsledek hledání: %d serverů"
+
+#: ../src/CslDlgSettings.cpp:670
+msgid "Select a folder for game output logs or disable autosave."
+msgstr "Vyberte složku pro výstupové logy her nebo vypněte autoukládání"
+
+#: ../src/CslPanelGameSettings.cpp:51 ../src/CslPanelGameSettings.cpp:52
+#: ../src/CslPanelGameSettings.cpp:54
+#, fuzzy
+msgid "Select game installation path"
+msgstr "Vybrat cestu pro výstup hry"
+
+#: ../src/CslDlgSettings.cpp:125
+msgid "Select game output path"
+msgstr "Vybrat cestu pro výstup hry"
+
+#: ../src/CslFrame.cpp:592
+msgid "Selected server"
+msgstr "Vybraný server"
+
+#: ../src/CslFrame.cpp:1389
+msgid "Sending request to master: "
+msgstr "Odesílám požadavek na hlavní server:"
+
+#: ../src/CslPanelSearch.cpp:46
+#, fuzzy
+msgid "Serve&rs"
+msgstr "Server:"
+
+#: ../src/CslDlgSettings.cpp:85 ../src/CslPanelPlayerSearch.cpp:54
+#, fuzzy
+msgid "Server"
+msgstr "Server:"
+
+#: ../src/CslServerBrowser.cpp:195
+#, fuzzy, c-format
+msgid "Server \"%s\" is currently locked, so deletion is not possible!"
+msgstr ""
+"Server \"%s\" je právě uzamčen,\n"
+"odstranění není momentálně možné!"
+
+#: ../src/CslFrame.cpp:596
+#, fuzzy
+msgid "Server countries"
+msgstr "Server offline"
+
+#: ../src/CslServerInfo.cpp:186
+msgid "Server has no info message."
+msgstr ""
+
+#: ../src/CslFrame.cpp:598
+msgid "Server info"
+msgstr "Informace o serveru"
+
+#: ../src/CslServerBrowser.cpp:655 ../src/CslServerInfo.cpp:263
+#, fuzzy
+msgid "Server information"
+msgstr "Ukázat informace o serveru"
+
+#: ../src/CslServerInfo.cpp:57
+#, fuzzy
+msgid "Server message"
+msgstr "Seznam serverů"
+
+#: ../src/CslFrame.cpp:2267
+#, fuzzy
+msgid "Server message: "
+msgstr "Seznam serverů"
+
+#: ../src/CslDlgExtended.cpp:176
+msgid "Server:"
+msgstr "Server:"
+
+#: ../src/CslDlgConnectWait.cpp:36
+msgid "Set as default waiting time."
+msgstr "Použít jako výchozí čekací doba."
+
+#: ../src/CslFrame.cpp:133
+#, fuzzy
+msgid "Settings"
+msgstr "&Nastavení"
+
+#: ../src/CslFrame.cpp:130
+msgid "Show"
+msgstr ""
+
+#: ../src/CslFrame.cpp:366
+msgid "Show Traffic"
+msgstr ""
+
+#: ../src/CslFrame.cpp:368
+#, fuzzy
+msgid "Show countries list"
+msgstr "Ukázat oblíbené"
+
+#: ../src/CslFrame.cpp:369
+msgid "Show favourites"
+msgstr "Ukázat oblíbené"
+
+#: ../src/CslFrame.cpp:371
+msgid "Show game output\tCTRL+O"
+msgstr "Ukázat výstup hry\tCTRL+O"
+
+#: ../src/CslFrame.cpp:362
+msgid "Show games"
+msgstr "Ukázat hry"
+
+#: ../src/CslFrame.cpp:367
+#, fuzzy
+msgid "Show player search result"
+msgstr "Ukázat seznam hráčů"
+
+#: ../src/CslFrame.cpp:364
+#, fuzzy
+msgid "Show players"
+msgstr "Ukázat seznam hráčů"
+
+#: ../src/CslFrame.cpp:365
+#, fuzzy
+msgid "Show search\tCTRL+F"
+msgstr "Ukázat panel hledání\tCTRL+F"
+
+#: ../src/CslFrame.cpp:363
+msgid "Show server information"
+msgstr "Ukázat informace o serveru"
+
+#: ../src/CslPanelServerView.cpp:292
+msgid "Spectator"
+msgstr "Divák"
+
+#: ../src/CslDlgSettings.cpp:321
+msgid "Spectator (background)"
+msgstr ""
+
+#: ../src/CslPanelGameSettings.cpp:58
+msgid "Standard package"
+msgstr ""
+
+#: ../src/CslDlgExtended.cpp:85
+msgid "Stop auto update when map &ends"
+msgstr "Zastavit automatické obnovování když mapa &končí"
+
+#: ../src/CslDlgSettings.cpp:90
+msgid "System tray"
+msgstr ""
+
+#: ../src/CslPanelServerView.cpp:585
+msgid "Team"
+msgstr "Tým"
+
+#. begin wxGlade: CslDlgExtended::CslDlgExtended
+#: ../src/CslDlgExtended.cpp:64 ../src/CslDlgExtended.cpp:423
+#: ../src/CslDlgExtended.cpp:426
+msgid "Team score"
+msgstr "Skóre týmu"
+
+#: ../src/CslPanelServerView.cpp:588
+msgid "Teamkills"
+msgstr "Zabití spoluhráče"
+
+#: ../src/CslDlgSettings.cpp:116
+msgid "Test"
+msgstr ""
+
+#: ../src/CslDlgOutput.cpp:25
+msgid "Text files (*.txt)|*.txt"
+msgstr "Textové soubory (*.txt)|*.txt"
+
+#: ../src/CslDlgSettings.cpp:88
+msgid "Text to speech"
+msgstr ""
+
+#: ../src/CslMapCfgTool.cpp:387
+msgid "The image should not be greater than 400x300"
+msgstr ""
+
+#: ../src/CslDlgConnectWait.cpp:69
+#, fuzzy
+msgid "The server is full at the moment. Wait for a free slot?"
 msgstr ""
 "Server je momentálně obsazený.\n"
 "Čekat na volný slot?"
 
-#: ../src/CslDlgConnectWait.cpp:67
-msgid "Time to wait (sec):"
-msgstr "Doba k čekání (vteřiny):"
-
-#. begin wxGlade: CslDlgExtended::CslDlgExtended
-#: ../src/CslDlgExtended.cpp:72
-#: ../src/CslDlgExtended.cpp:430
-#: ../src/CslDlgExtended.cpp:433
-msgid "Team score"
-msgstr "Skóre týmu"
-
-#: ../src/CslDlgExtended.cpp:73
-msgid "Game information"
-msgstr "Informace o hře"
-
-#: ../src/CslDlgExtended.cpp:74
-msgid "Map information"
-msgstr "Informace o mapě"
-
-#: ../src/CslDlgExtended.cpp:75
-#: ../src/CslListCtrlServer.cpp:717
-msgid "Map"
-msgstr "Mapa"
-
-#: ../src/CslDlgExtended.cpp:91
-#: ../src/CslDlgExtended.cpp:326
-msgid "by"
-msgstr "od"
-
-#: ../src/CslDlgExtended.cpp:93
-msgid "Stop auto update when map &ends"
-msgstr "Zastavit automatické obnovování když mapa &končí"
-
-#: ../src/CslDlgExtended.cpp:94
-msgid "&Show map if possible"
-msgstr "&Ukázat mapu když je to možné"
-
-#. begin wxGlade: CslDlgExtended::set_properties
-#: ../src/CslDlgExtended.cpp:112
-#: ../src/CslDlgExtended.cpp:622
-msgid "CSL - Extended info"
-msgstr "CSL - Rozšířené informace"
-
-#: ../src/CslDlgExtended.cpp:182
-msgid "Server:"
-msgstr "Server:"
-
-#: ../src/CslDlgExtended.cpp:185
-msgid "Mode:"
-msgstr "Režim:"
-
-#: ../src/CslDlgExtended.cpp:188
-msgid "Time remaining:"
-msgstr "Zbývající čas:"
-
-#: ../src/CslDlgExtended.cpp:191
-msgid "Players :"
-msgstr "Hráči :"
-
-#: ../src/CslDlgExtended.cpp:304
-msgid "no map"
-msgstr "žádná mapa"
-
-#: ../src/CslDlgExtended.cpp:363
-#: ../src/CslDlgExtended.cpp:599
-#, c-format
-msgid "%d players"
-msgstr "%d hráčů"
-
-#: ../src/CslDlgExtended.cpp:430
-msgid "Flag score"
-msgstr "Skóre na vlajky"
-
-#: ../src/CslDlgExtended.cpp:466
-#: ../src/CslDlgExtended.cpp:468
-msgid "WINNER"
-msgstr "VÍTĚZ"
-
-#: ../src/CslDlgExtended.cpp:483
-msgid "No teams."
-msgstr "Bez týmů"
-
-#: ../src/CslDlgExtended.cpp:485
-msgid "Not a team game."
-msgstr "Není týmová hra"
-
-#: ../src/CslDlgExtended.cpp:497
-#: ../src/CslDlgExtended.cpp:619
-msgid "Time is up"
-msgstr "Čas vypršel"
-
-#: ../src/CslDlgOutput.cpp:27
-msgid "Text files (*.txt)|*.txt"
-msgstr "Textové soubory (*.txt)|*.txt"
-
-#. begin wxGlade: CslDlgOutput::CslDlgOutput
-#: ../src/CslDlgOutput.cpp:52
-msgid "Chat"
-msgstr "Chat"
-
-#: ../src/CslDlgOutput.cpp:53
-msgid "Search"
-msgstr "Hledat"
-
-#: ../src/CslDlgOutput.cpp:56
-#: ../src/CslDlgOutput.cpp:364
-#, c-format
-msgid "%d matches"
-msgstr "%d zápasů"
-
-#: ../src/CslDlgOutput.cpp:57
-msgid "&Back"
-msgstr "&Zpět"
-
-#: ../src/CslDlgOutput.cpp:58
-msgid "&Forward"
-msgstr "&Vpřed"
-
-#: ../src/CslDlgOutput.cpp:59
-msgid "&Filter chat"
-msgstr "&Filtrovat chat"
-
-#: ../src/CslDlgOutput.cpp:62
-msgid "0 (Low)"
-msgstr "0 (Nízká)"
-
-#: ../src/CslDlgOutput.cpp:63
-msgid "1 (Default)"
-msgstr "1 (Výchozí)"
-
-#: ../src/CslDlgOutput.cpp:66
-msgid "&Open"
-msgstr "&Otevřít"
-
-#: ../src/CslDlgOutput.cpp:67
-msgid "&Save"
-msgstr "&Uložit"
-
-#. begin wxGlade: CslDlgOutput::set_properties
-#: ../src/CslDlgOutput.cpp:82
-#: ../src/CslDlgOutput.cpp:512
-msgid "CSL - Game output"
-msgstr "CSL - Výstup hry"
-
-#: ../src/CslDlgOutput.cpp:129
-msgid "Level:"
-msgstr "Úroveň:"
-
-#: ../src/CslDlgOutput.cpp:217
-msgid "Open log file"
-msgstr "Otevřít soubor logu"
-
-#: ../src/CslDlgOutput.cpp:240
-msgid "File"
-msgstr "Soubor"
-
-#: ../src/CslDlgOutput.cpp:550
-msgid "Save log file"
-msgstr "Uložit souboru logu"
-
-#: ../src/CslDlgSettings.cpp:75
-msgid "Executables (*.exe; *.bat; *.cmd)|*.exe;*.bat;*.cmd"
-msgstr "Programy (*.exe; *.bat; *.cmd)|*.exe;*.bat;*.cmd"
-
-#: ../src/CslDlgSettings.cpp:89
-msgid "Game executable:"
-msgstr "Program hry"
-
-#: ../src/CslDlgSettings.cpp:92
-#, c-format
-msgid "Select %s executable"
-msgstr "Vybrat %s program"
-
-#: ../src/CslDlgSettings.cpp:99
-msgid "Game directory:"
-msgstr "Adresář hry"
-
-#: ../src/CslDlgSettings.cpp:102
-#, c-format
-msgid "Select %s game path"
-msgstr "Vybrat cestu ke hře %s "
-
-#: ../src/CslDlgSettings.cpp:108
-msgid "Config directory:"
-msgstr "Složka konfigurací"
-
-#: ../src/CslDlgSettings.cpp:111
-#, c-format
-msgid "Select %s config path"
-msgstr "Vybrat složku konfigurací %s"
-
-#: ../src/CslDlgSettings.cpp:117
-msgid "Game parameters:"
-msgstr "Parametry hry:"
-
-#: ../src/CslDlgSettings.cpp:124
-msgid "Configuration:"
-msgstr "Konfigurace"
-
-#: ../src/CslDlgSettings.cpp:127
-msgid "Expert configuration"
-msgstr "Rozšířená konfigurace"
-
-#: ../src/CslDlgSettings.cpp:244
-msgid "Server lists"
-msgstr "Seznam serverů"
-
-#: ../src/CslDlgSettings.cpp:245
-msgid "Times && Intervals"
-msgstr "Časy && Intervaly"
-
-#: ../src/CslDlgSettings.cpp:246
-msgid "Ping thresholds"
-msgstr "Prahové úrovně pingů"
-
-#: ../src/CslDlgSettings.cpp:247
-msgid "Game output"
-msgstr "Výstup hry"
-
-#: ../src/CslDlgSettings.cpp:257
-msgid "Don't update when playing"
-msgstr "Neaktualizovat při hře"
-
-#: ../src/CslDlgSettings.cpp:261
-msgid "Keep favourites"
-msgstr "Zachovávat oblíbené"
-
-#: ../src/CslDlgSettings.cpp:262
-msgid "Keep servers with statistics"
-msgstr "Zachovávat servery se statistikou"
-
-#: ../src/CslDlgSettings.cpp:265
-msgid "Auto &save game output to:"
-msgstr "Automaticky &uložit výstup hry do:"
-
-#: ../src/CslDlgSettings.cpp:266
-msgid "Select game output path"
-msgstr "Vybrat cestu pro výstup hry"
-
-#. begin wxGlade: CslDlgSettings::set_properties
-#: ../src/CslDlgSettings.cpp:278
-msgid "Cube Server Lister - Settings"
-msgstr "Cube Server Lister - Nastavení"
-
-#: ../src/CslDlgSettings.cpp:359
-msgid "Server empty"
-msgstr "Prázdný server"
-
-#: ../src/CslDlgSettings.cpp:363
-msgid "Mastermode 1"
-msgstr "Mastermode 1"
-
-#: ../src/CslDlgSettings.cpp:366
-msgid "Server offline"
-msgstr "Server offline"
-
-#: ../src/CslDlgSettings.cpp:370
-#: ../src/CslMenu.h:54
-msgid "Mastermode 2"
-msgstr "Mastermode 2"
-
-#: ../src/CslDlgSettings.cpp:373
-msgid "Server full"
-msgstr "Obsazený server"
-
-#: ../src/CslDlgSettings.cpp:377
-#: ../src/CslMenu.h:55
-msgid "Mastermode 3"
-msgstr "Mastermode 3"
-
-#: ../src/CslDlgSettings.cpp:386
-msgid "Update interval (sec):"
-msgstr "Interval aktualizace (vteřiny):"
-
-#: ../src/CslDlgSettings.cpp:390
-msgid "Wait on full server (sec):"
-msgstr "Doba čekání při obsazeném serveru (vteřiny):"
-
-#: ../src/CslDlgSettings.cpp:394
-msgid "Minimum playtime for statistics (sec):"
-msgstr "Minimální doba hraní pro statistiku (vteřiny):"
-
-#: ../src/CslDlgSettings.cpp:398
-msgid "Cleanup dead servers (days)"
-msgstr "Odstranit nečinné servery (dny)"
-
-#: ../src/CslDlgSettings.cpp:407
-msgid "Good"
-msgstr "Dobré"
-
-#: ../src/CslDlgSettings.cpp:411
-msgid "Bad"
-msgstr "Špatné"
-
-#: ../src/CslDlgSettings.cpp:424
-#: ../src/CslFrame.cpp:696
-msgid "Games"
-msgstr "Hry"
-
-#: ../src/CslDlgSettings.cpp:425
-msgid "Colours"
-msgstr "Barvy"
-
-#: ../src/CslDlgSettings.cpp:426
-msgid "Other"
-msgstr "Jiné"
-
-#: ../src/CslDlgSettings.cpp:600
+#: ../src/CslFrame.cpp:2462
+#, fuzzy
+msgid ""
+"There is currently a game running.\n"
+"Detach the game process and continue?"
+msgstr ""
+"Hra je právě spuštěna.\n"
+"Ukončete hru a zkuste znovu."
+
+#: ../src/CslMapCfgTool.cpp:519
+#, fuzzy
+msgid "This version already exits!"
+msgstr "Hlavní server již existuje!"
+
+#: ../src/CslServerInfo.cpp:164
+msgid "This version of extended info is not supported."
+msgstr "Tato verze rozšířených informací není podporována"
+
+#: ../src/CslDlgSettings.cpp:663
+#, fuzzy
 msgid ""
 "Threshold for good ping can't be higher than\n"
 "threshold for bad ping."
@@ -476,815 +1121,524 @@ msgstr ""
 "Práh pro dobrý ping nemůže být vyšší než\n"
 "práh pro špatný ping."
 
-#: ../src/CslDlgSettings.cpp:607
-msgid "Select a folder for game output logs or disable autosave."
-msgstr "Vyberte složku pro výstupové logy her nebo vypněte autoukládání"
+#: ../src/CslServerBrowser.cpp:59
+msgid "Time"
+msgstr "Čas"
 
-#. begin wxGlade: CslDlgTraffic::set_properties
-#: ../src/CslDlgTraffic.cpp:60
-msgid "CSL - Traffic statistics"
-msgstr "CSL - Statistika provozu"
+#: ../src/CslDlgExtended.cpp:499 ../src/CslDlgExtended.cpp:621
+msgid "Time is up"
+msgstr "Čas vypršel"
 
-#: ../src/CslDlgTraffic.cpp:74
-msgid "Packets"
-msgstr "Pakety"
+#: ../src/CslDlgExtended.cpp:182
+msgid "Time remaining:"
+msgstr "Zbývající čas:"
 
-#: ../src/CslDlgTraffic.cpp:77
-msgid "Data"
-msgstr "Data"
+#: ../src/CslDlgConnectWait.cpp:71
+msgid "Time to wait (sec):"
+msgstr "Doba k čekání (vteřiny):"
 
-#: ../src/CslDlgTraffic.cpp:80
-msgid "Data (raw)"
-msgstr "Data (raw)"
+#: ../src/CslDlgSettings.cpp:87
+msgid "Times && Intervals"
+msgstr "Časy && Intervaly"
 
-#: ../src/CslDlgTraffic.cpp:83
-msgid "Input"
-msgstr "Vstup"
-
-#: ../src/CslDlgTraffic.cpp:88
-msgid "Output"
-msgstr "Výstup"
-
-#: ../src/CslFrame.cpp:170
-#, c-format
-msgid "%s returned with code: %d"
-msgstr "%s vrátil kód: %d"
-
-#: ../src/CslFrame.cpp:350
-msgid " on "
-msgstr " na "
-
-#: ../src/CslFrame.cpp:354
-msgid "Minute"
-msgstr "Minuta"
-
-#: ../src/CslFrame.cpp:354
-msgid "Minutes"
-msgstr "Minuty"
-
-#: ../src/CslFrame.cpp:466
-msgid ""
-"Failed to initialise internal engine!\n"
-"Please try to restart the application."
+#: ../src/CslDlgSettings.cpp:362
+msgid "To disable tooltips, set this value to 0."
 msgstr ""
-"Iniciace programu se nezdařila!\n"
-"Zkuste restartovat aplikaci."
 
-#: ../src/CslFrame.cpp:468
-msgid "Fatal error!"
-msgstr "Fatal error!"
+#: ../src/CslDlgSettings.cpp:359
+msgid "Tooltip delay (milliseconds)"
+msgstr ""
 
-#: ../src/CslFrame.cpp:517
-msgid "&File"
-msgstr "&Soubor"
+#: ../src/CslServerInfo.cpp:61
+msgid "Total play time"
+msgstr "Celková délka hraní"
 
-#: ../src/CslFrame.cpp:518
-#: ../src/CslFrame.cpp:529
-msgid "&Settings"
-msgstr "&Nastavení"
-
-#: ../src/CslFrame.cpp:519
-#: ../src/CslFrame.cpp:530
-msgid "&Exit"
-msgstr "&Odejít"
-
-#: ../src/CslFrame.cpp:523
-msgid "&Update from master\tF5"
-msgstr "&Aktualizovat z hlavního serveru \tF5"
-
-#: ../src/CslFrame.cpp:525
-msgid "Add a &new master ..."
-msgstr "Přidat &nový hlavní server ..."
-
-#: ../src/CslFrame.cpp:526
-msgid "&Remove master"
-msgstr "&Odstranit hlavní server"
-
-#: ../src/CslFrame.cpp:527
-msgid "&Master"
-msgstr "&Hlavní server"
-
-#: ../src/CslFrame.cpp:531
-#: ../src/CslFrame.cpp:557
-msgid "A&bout"
-msgstr "&Co je CSL"
-
-#: ../src/CslFrame.cpp:535
-msgid "Show games"
-msgstr "Ukázat hry"
-
-#: ../src/CslFrame.cpp:537
-msgid "Show server information"
-msgstr "Ukázat informace o serveru"
-
-#: ../src/CslFrame.cpp:539
-msgid "Show player list"
-msgstr "Ukázat seznam hráčů"
-
-#: ../src/CslFrame.cpp:541
-msgid "Show favourites"
-msgstr "Ukázat oblíbené"
-
-#: ../src/CslFrame.cpp:544
-msgid "Show search bar\tCTRL+F"
-msgstr "Ukázat panel hledání\tCTRL+F"
-
-#: ../src/CslFrame.cpp:546
-msgid "Show game output\tCTRL+O"
-msgstr "Ukázat výstup hry\tCTRL+O"
-
-#: ../src/CslFrame.cpp:548
-msgid "&Traffic statistics"
-msgstr "&Statistika provozu"
-
-#: ../src/CslFrame.cpp:550
-msgid "Sort lists automatically\tCTRL+L"
-msgstr "Automaticky seřadit seznam\tCTRL+L"
-
-#: ../src/CslFrame.cpp:552
-msgid "Reset layout"
-msgstr "Resetovat layout"
-
-#: ../src/CslFrame.cpp:553
-msgid "&View"
-msgstr "&Zobrazit"
-
-#: ../src/CslFrame.cpp:558
-msgid "&Help"
-msgstr "&Nápověda"
-
-#: ../src/CslFrame.cpp:589
-msgid "&Search"
-msgstr "&Hledat"
-
-#: ../src/CslFrame.cpp:593
-msgid "Se&rvers"
-msgstr "&Hledat"
-
-#: ../src/CslFrame.cpp:595
-msgid "&Players"
-msgstr "&Hráči"
-
-#: ../src/CslFrame.cpp:614
-msgid "Cube Server Lister"
-msgstr "Cube Server Lister"
-
-#: ../src/CslFrame.cpp:621
-#: ../src/CslFrame.cpp:2160
-#: ../src/CslFrame.cpp:2176
-#, c-format
-msgid "Search result: %d servers"
-msgstr "Výsledek hledání: %d serverů"
-
-#: ../src/CslFrame.cpp:667
-msgid "Search:"
-msgstr "Hledat:"
-
-#. sizer_search->AddGrowableCol(3);
-#: ../src/CslFrame.cpp:684
-msgid "Master list servers"
-msgstr "Hlavní seznam serverů"
-
-#: ../src/CslFrame.cpp:685
-msgid "Favourite servers"
-msgstr "Oblíbené servery"
-
-#: ../src/CslFrame.cpp:686
-msgid "Selected server"
-msgstr "Vybraný server"
-
-#: ../src/CslFrame.cpp:687
-msgid "Server info"
-msgstr "Informace o serveru"
-
-#: ../src/CslFrame.cpp:916
+#: ../src/CslFrame.cpp:1013
 #, c-format
 msgid "Total play time for game %s: %s"
 msgstr "Celková délka hraní hry %s: %s"
 
-#: ../src/CslFrame.cpp:922
+#: ../src/CslFrame.cpp:593
+msgid "Traffic"
+msgstr ""
+
+#: ../src/CslDlgAbout.cpp:138
+msgid "Translations:\n"
+msgstr "Překlady:\n"
+
+#: ../src/CslPanelCountryView.cpp:183
+msgid "Unknown"
+msgstr "Neznámý"
+
+#: ../src/CslPanelServerView.cpp:402 ../src/CslServerInfo.cpp:143
+msgid "Unknown location."
+msgstr ""
+
+#: ../src/CslDlgSettings.cpp:329
+#, fuzzy
+msgid "Update interval (seconds):"
+msgstr "Interval aktualizace (vteřiny):"
+
+#: ../src/CslServerInfo.cpp:56
+msgid "Uptime"
+msgstr "Doba provozu"
+
+#: ../src/CslServerBrowser.cpp:55
+msgid "Version"
+msgstr "Verze"
+
+#: ../src/CslMapCfgTool.cpp:264
+#, fuzzy
+msgid "Version:"
+msgstr "Verze"
+
+#: ../src/CslMapCfgTool.cpp:507
+#, fuzzy
+msgid "Version: "
+msgstr "Verze"
+
+#: ../src/CslDlgSettings.cpp:114
+msgid "Volume"
+msgstr ""
+
+#: ../src/CslDlgExtended.cpp:458 ../src/CslDlgExtended.cpp:465
+msgid "WINNER"
+msgstr "VÍTĚZ"
+
+#: ../src/CslDlgSettings.cpp:339
+#, fuzzy
+msgid "Wait on full server (seconds):"
+msgstr "Doba čekání při obsazeném serveru (vteřiny):"
+
+#: ../src/CslGameConnection.cpp:94
+#, fuzzy, c-format
+msgid ""
+"Waiting %s for a free slot on '%s (%s)' (press ESC to abort or join an other "
+"server)"
+msgstr ""
+"Čekám %s na volný slot na \"%s\" (stiskněte ESC pro zrušení nebo pro "
+"připojení na jiný server)"
+
+#: ../src/CslFrame.cpp:2293 ../src/CslServerBrowser.cpp:168
+#: ../src/CslServerBrowser.cpp:179
+msgid "Warning"
+msgstr "Varování"
+
+#: ../src/CslPanelServerView.cpp:595
+msgid "Weapon"
+msgstr "Zbraň"
+
+#: ../src/CslServerBrowser.cpp:166
+#, fuzzy
+msgid "You are about to delete servers which are favourites."
+msgstr "Chcete odstranit také servery které jsou také oblíbené!\n"
+
+#: ../src/CslServerBrowser.cpp:177
+#, fuzzy
+msgid "You are about to delete servers which have statistics."
+msgstr "Chcete odstranit servery o kterých máte statistiky!\n"
+
+#: ../src/CslGameConnection.cpp:114
+msgid "You are currently playing, so quit the game and try again."
+msgstr "Právě teď hrajete, ukončete hru a zkuste znovu."
+
+#: ../src/CslApp.cpp:84
+msgid "add data dir"
+msgstr ""
+
+#: ../src/CslApp.cpp:85
+msgid "add plugin dir"
+msgstr ""
+
+#: ../src/CslDlgExtended.cpp:83 ../src/CslDlgExtended.cpp:324
+msgid "by"
+msgstr "od"
+
+#: ../src/CslPanelServerView.cpp:333
+msgid "dead"
+msgstr "mrtvý"
+
+#: ../src/CslDlgAddMaster.cpp:50 ../src/CslDlgAddMaster.cpp:54
+#: ../src/CslDlgAddServer.cpp:52
+msgid "default"
+msgstr "výchozí"
+
+#: ../src/CslPanelServerView.cpp:335
+msgid "editing"
+msgstr "editující"
+
+#: ../src/CslPanelServerView.cpp:393 ../src/CslServerInfo.cpp:131
+msgid "local network"
+msgstr ""
+
+#: ../src/CslFrame.cpp:1019
 #, c-format
 msgid "most played server: '%s' (total play time: %s)"
 msgstr "nejvíce hraný server: '%s' (celkový čas: %s)"
 
-#: ../src/CslFrame.cpp:958
-msgid "  (Filters: "
-msgstr "  (Filtry: "
-
-#: ../src/CslFrame.cpp:1196
-msgid "Sending request to master: "
-msgstr "Odesílám požadavek na hlavní server:"
-
-#: ../src/CslFrame.cpp:1199
-msgid "Error on update from master: "
-msgstr "Chyba při aktualizaci z hlavního serveru:"
-
-#: ../src/CslFrame.cpp:1204
-#, c-format
-msgid "Got %d servers from master"
-msgstr "Přijato %d serverů z hlavního serveru"
-
-#: ../src/CslFrame.cpp:1218
-msgid "You are currently playing, so quit the game and try again."
-msgstr "Právě teď hrajete, ukončete hru a zkuste znovu."
-
-#: ../src/CslFrame.cpp:1264
-msgid "Failed to start: "
-msgstr "Spuštění bylo neúspěšné:"
-
-#: ../src/CslFrame.cpp:1830
-#: ../src/CslFrame.cpp:2195
-#: ../src/CslFrame.cpp:2266
-#, c-format
-msgid "Search result: %d players on %d servers"
-msgstr "Výsledky hledání: %d hráčů na %d serverů"
-
-#: ../src/CslFrame.cpp:1908
-#, c-format
-msgid "Waiting %s for a free slot on \"%s\" (press ESC to abort or join another server)"
-msgstr "Čekám %s na volný slot na \"%s\" (stiskněte ESC pro zrušení nebo pro připojení na jiný server)"
-
-#: ../src/CslFrame.cpp:2417
-msgid ""
-"There is currently a game running.\n"
-"Quit the game first and try again."
-msgstr ""
-"Hra je právě spuštěna.\n"
-"Ukončete hru a zkuste znovu."
-
-#: ../src/CslFrame.cpp:2423
-msgid "CSL terminating"
-msgstr "CSL se ukončuje"
-
-#: ../src/CslFrame.cpp:2424
-msgid "Waiting for engine to terminate ..."
-msgstr "Čeká se na ukončení engine ..."
-
-#: ../src/CslFrame.cpp:2524
-#, c-format
-msgid "New version %s"
-msgstr "Nová verze %s"
-
-#: ../src/CslFrame.cpp:2525
-#, c-format
-msgid ""
-"There is a new version (%s)\n"
-"of Cube Server Lister available.\n"
-msgstr ""
-"Je dostupná nová verze (%s)\n"
-"Cube Server Listeru\n"
-
-#: ../src/CslFrame.cpp:2586
-msgid "CSL already running"
-msgstr "CSL je již spuštěno"
-
-#: ../src/CslFrame.cpp:2587
-msgid "CSL is already running."
-msgstr "CSL je již spuštěno"
-
-#: ../src/CslListCtrlInfo.cpp:58
-msgid "Address"
-msgstr "Adresa"
-
-#: ../src/CslListCtrlInfo.cpp:59
-msgid "Location"
-msgstr "Lokace"
-
-#: ../src/CslListCtrlInfo.cpp:60
-msgid "Game"
-msgstr "Hra"
-
-#: ../src/CslListCtrlInfo.cpp:61
-msgid "Protocol version"
-msgstr "Verze protokolu"
-
-#: ../src/CslListCtrlInfo.cpp:62
-msgid "Uptime"
-msgstr "Doba provozu"
-
-#: ../src/CslListCtrlInfo.cpp:63
-msgid "Last seen"
-msgstr "Naposledy viděné"
-
-#: ../src/CslListCtrlInfo.cpp:64
-msgid "Last played"
-msgstr "Hráno naposledy"
-
-#: ../src/CslListCtrlInfo.cpp:65
-msgid "Last play time"
-msgstr "Poslední délka hraní"
-
-#: ../src/CslListCtrlInfo.cpp:66
-msgid "Total play time"
-msgstr "Celková délka hraní"
-
-#: ../src/CslListCtrlInfo.cpp:67
-msgid "Connects"
-msgstr "Počet připojení"
-
-#: ../src/CslListCtrlInfo.cpp:96
-#: ../src/engine/CslGameAssaultCube.cpp:68
-#: ../src/engine/CslGameAssaultCube.cpp:79
-#: ../src/engine/CslGameBloodFrontier.cpp:151
-#: ../src/engine/CslGameCube.cpp:62
-#: ../src/engine/CslGameSauerbraten.cpp:74
-#: ../src/engine/CslGameSauerbraten.cpp:86
-msgid "unknown"
-msgstr "neznámo"
-
-#: ../src/CslListCtrlInfo.cpp:142
-msgid "GeoIP database not found."
-msgstr "GeoIP databáze nebyla nalezena"
-
-#: ../src/CslListCtrlInfo.cpp:172
-msgid "This version of extended info is not supported."
-msgstr "Tato verze rozšířených informací není podporována"
-
-#: ../src/CslListCtrlInfo.cpp:175
-msgid "Extended info not supported."
-msgstr "Rozšířené informace nejsou podporovány"
-
-#: ../src/CslListCtrlPlayer.cpp:198
-#: ../src/CslListCtrlServer.cpp:294
-msgid "Extended information"
-msgstr "Rozšířené informace"
-
-#: ../src/CslListCtrlPlayer.cpp:206
-#: ../src/CslListCtrlServer.cpp:300
-#: ../src/CslMenu.h:51
-msgid "Full"
-msgstr "Obsazené"
-
-#: ../src/CslListCtrlPlayer.cpp:210
-#: ../src/CslListCtrlServer.cpp:302
-msgid "Micro"
-msgstr "Mikro"
-
-#: ../src/CslListCtrlPlayer.cpp:212
-#: ../src/CslListCtrlServer.cpp:303
-msgid "Mini"
-msgstr "Minimální"
-
-#: ../src/CslListCtrlPlayer.cpp:214
-#: ../src/CslListCtrlServer.cpp:304
-msgid "Default"
-msgstr "Výchozí"
-
-#: ../src/CslListCtrlPlayer.cpp:295
-#, c-format
-msgid "Name: %s   Country: %s"
-msgstr "Jméno: %s   Země: %s"
-
-#: ../src/CslListCtrlPlayer.cpp:297
-msgid "Unknown"
-msgstr "Neznámý"
-
-#: ../src/CslListCtrlPlayer.cpp:297
-msgid "GeoIP database not found"
-msgstr "GeoIP databáze nenalezena"
-
-#: ../src/CslListCtrlPlayer.cpp:310
-msgid "Player list"
-msgstr "Seznam hráčů"
-
-#: ../src/CslListCtrlPlayer.cpp:312
-msgid " for server: "
-msgstr "pro server:"
-
-#: ../src/CslListCtrlPlayer.cpp:354
-msgid "- connecting -"
-msgstr "- připojuje se -"
-
-#: ../src/CslListCtrlPlayer.cpp:362
-msgid "Spectator"
-msgstr "Divák"
-
-#: ../src/CslListCtrlPlayer.cpp:376
-#: ../src/CslListCtrlPlayer.cpp:388
-#: ../src/CslListCtrlPlayer.cpp:396
+#: ../src/CslPanelServerView.cpp:331 ../src/CslPanelServerView.cpp:344
+#: ../src/CslServerBrowser.cpp:665
 msgid "no data"
 msgstr "žádná data"
 
-#: ../src/CslListCtrlPlayer.cpp:378
-msgid "dead"
-msgstr "mrtvý"
-
-#: ../src/CslListCtrlPlayer.cpp:380
-msgid "editing"
-msgstr "editující"
-
-#: ../src/CslListCtrlPlayer.cpp:553
-#: ../src/CslListCtrlServer.cpp:727
-#: ../src/engine/CslGameBloodFrontier.cpp:156
-#: ../src/engine/CslGame.cpp:263
-msgid "Player"
-msgstr "Hráčů"
-
-#: ../src/CslListCtrlPlayer.cpp:559
-#: ../src/engine/CslGameBloodFrontier.cpp:157
-#: ../src/engine/CslGame.cpp:264
-msgid "Team"
-msgstr "Tým"
-
-#: ../src/CslListCtrlPlayer.cpp:563
-#: ../src/engine/CslGameBloodFrontier.cpp:158
-#: ../src/engine/CslGame.cpp:265
-msgid "Frags"
-msgstr "Fragy"
-
-#: ../src/CslListCtrlPlayer.cpp:567
-#: ../src/engine/CslGameBloodFrontier.cpp:159
-#: ../src/engine/CslGame.cpp:266
-msgid "Deaths"
-msgstr "Zabití"
-
-#: ../src/CslListCtrlPlayer.cpp:571
-#: ../src/engine/CslGameBloodFrontier.cpp:160
-#: ../src/engine/CslGame.cpp:267
-msgid "Teamkills"
-msgstr "Zabití spoluhráče"
-
-#: ../src/CslListCtrlPlayer.cpp:577
-#: ../src/engine/CslGameBloodFrontier.cpp:161
-#: ../src/engine/CslGame.cpp:268
-msgid "Accuracy"
-msgstr "Přesnost"
-
-#: ../src/CslListCtrlPlayer.cpp:581
-#: ../src/engine/CslGameBloodFrontier.cpp:162
-#: ../src/engine/CslGame.cpp:269
-msgid "Health"
-msgstr "Zdraví"
-
-#: ../src/CslListCtrlPlayer.cpp:585
-#: ../src/engine/CslGame.cpp:270
-msgid "Armour"
-msgstr "Brnění"
-
-#: ../src/CslListCtrlPlayer.cpp:589
-#: ../src/engine/CslGameBloodFrontier.cpp:164
-#: ../src/engine/CslGame.cpp:271
-msgid "Weapon"
-msgstr "Zbraň"
-
-#: ../src/CslListCtrlServer.cpp:412
-msgid ""
-"\n"
-"Choose Yes to keep these servers, No to delete them or\n"
-"Cancel the operation."
-msgstr ""
-"\n"
-"Zvolte Ano pro zachování těchto serverů, Ne k jejich odstranění\n"
-"Zrušit operaci."
-
-#: ../src/CslListCtrlServer.cpp:430
-msgid "You are about to delete servers which are also favourites!\n"
-msgstr "Chcete odstranit také servery které jsou také oblíbené!\n"
-
-#: ../src/CslListCtrlServer.cpp:432
-#: ../src/CslListCtrlServer.cpp:442
-msgid "Warning"
-msgstr "Varování"
-
-#: ../src/CslListCtrlServer.cpp:440
-msgid "You are about to delete servers which have statistics!\n"
-msgstr "Chcete odstranit servery o kterých máte statistiky!\n"
-
-#: ../src/CslListCtrlServer.cpp:463
-#, c-format
-msgid ""
-"Server \"%s\" is currently locked,\n"
-"so deletion is not possible!"
-msgstr ""
-"Server \"%s\" je právě uzamčen,\n"
-"odstranění není momentálně možné!"
-
-#: ../src/CslListCtrlServer.cpp:695
-msgid "Host"
-msgstr "Host"
-
-#: ../src/CslListCtrlServer.cpp:699
-msgid "Description"
-msgstr "Popis"
-
-#: ../src/CslListCtrlServer.cpp:703
-#: ../src/CslMenu.h:56
-msgid "Version"
-msgstr "Verze"
-
-#: ../src/CslListCtrlServer.cpp:708
-msgid "Ping"
-msgstr "Ping"
-
-#: ../src/CslListCtrlServer.cpp:713
-msgid "Mode"
-msgstr "Režim"
-
-#: ../src/CslListCtrlServer.cpp:722
-msgid "Time"
-msgstr "Čas"
-
-#: ../src/CslListCtrlServer.cpp:731
-msgid "MM"
-msgstr "MM"
-
-#: ../src/CslListCtrlServer.cpp:1070
+#: ../src/CslServerBrowser.cpp:736
 msgid "no limit"
 msgstr "bez limitu"
 
-#: ../src/CslMenu.h:40
-msgid "&Connect"
-msgstr "&Připojit"
-
-#: ../src/CslMenu.h:41
-msgid "Connect (&Password)"
-msgstr "Připojit (&Heslo)"
-
-#: ../src/CslMenu.h:42
-msgid "C&opy to clipboard"
-msgstr "&Kopírovat do schránky"
-
-#: ../src/CslMenu.h:43
-msgid "&Add to favourites"
-msgstr "&Přidat k oblíbeným"
-
-#: ../src/CslMenu.h:44
-msgid "&Add server ..."
-msgstr "&Přidat server ..."
-
-#: ../src/CslMenu.h:45
-msgid "&Remove from favourites"
-msgstr "O&dstranit z oblíbených"
-
-#: ../src/CslMenu.h:46
-msgid "&Delete server"
-msgstr "&Odstranit server"
-
-#: ../src/CslMenu.h:47
-msgid "&Delete servers"
-msgstr "&Odstranit servery"
-
-#: ../src/CslMenu.h:49
-msgid "Filter"
-msgstr "Filtrovat"
-
-#: ../src/CslMenu.h:50
-msgid "Offline"
-msgstr "Offline"
-
-#: ../src/CslMenu.h:52
-msgid "Empty"
-msgstr "Prázdné"
-
-#: ../src/CslMenu.h:53
-msgid "Not empty"
-msgstr "Částečně obsazené"
-
-#: ../src/engine/CslGameAssaultCube.cpp:75
-msgid "Knife"
-msgstr "Nůž"
-
-#: ../src/engine/CslGameAssaultCube.cpp:75
-#: ../src/engine/CslGameBloodFrontier.cpp:147
-#: ../src/engine/CslGameSauerbraten.cpp:82
-msgid "Pistol"
-msgstr "Pistole"
-
-#: ../src/engine/CslGameAssaultCube.cpp:75
-#: ../src/engine/CslGameBloodFrontier.cpp:147
-#: ../src/engine/CslGameSauerbraten.cpp:81
-msgid "Shotgun"
-msgstr "Brokovnice"
-
-#: ../src/engine/CslGameAssaultCube.cpp:75
-msgid "Subgun"
-msgstr "Subpuška"
-
-#: ../src/engine/CslGameAssaultCube.cpp:76
-msgid "Sniper"
-msgstr "Snajpr"
-
-#: ../src/engine/CslGameAssaultCube.cpp:76
-msgid "Assault"
-msgstr "Útočná puška"
-
-#: ../src/engine/CslGameAssaultCube.cpp:76
-msgid "Grenade"
-msgstr "Granáty"
-
-#: ../src/engine/CslGameAssaultCube.cpp:76
-msgid "Pistol (auto)"
-msgstr "Pistol (auto)"
-
-#: ../src/engine/CslGameAssaultCube.cpp:181
-msgid ""
-"Client binary for game AssaultCube not found!\n"
-"Check your settings."
+#: ../src/CslPanelSearch.cpp:161 ../src/CslPanelSearch.cpp:177
+msgid "none"
 msgstr ""
-"Cesta k programu hry AssaultCube nenalezena!\n"
-"Zkontrolujete nastavení."
 
-#: ../src/engine/CslGameAssaultCube.cpp:186
-msgid ""
-"Game path for game AssaultCube not found!\n"
-"Check your settings."
+#: ../src/CslApp.cpp:86
+msgid "set home dir"
 msgstr ""
-"Cesta ke hře AssaultCube nenalezena!\n"
-"Zkontrolujete nastavení."
 
-#: ../src/engine/CslGameAssaultCube.cpp:191
-msgid ""
-"Config path for game AssaultCube not found!\n"
-"Check your settings."
+#: ../src/CslApp.cpp:83
+msgid "show this help"
 msgstr ""
-"Cesta ke konfiguracím hry AssaultCube nenalezena!\n"
-"Zkontrolujete nastavení."
 
-#: ../src/engine/CslGameBloodFrontier.cpp:147
-#: ../src/engine/CslGameSauerbraten.cpp:81
-msgid "Chaingun"
-msgstr "Kulomet"
+#: ../src/CslApp.cpp:82
+#, fuzzy
+msgid "show version"
+msgstr "Nová verze %s"
 
-#: ../src/engine/CslGameBloodFrontier.cpp:148
-msgid "Grenades"
-msgstr "Granáty"
+#: ../src/CslServerInfo.cpp:156 ../src/CslServerInfo.cpp:195
+#: ../src/CslServerInfo.cpp:204
+msgid "unknown"
+msgstr "neznámo"
 
-#: ../src/engine/CslGameBloodFrontier.cpp:148
-msgid "Flamer"
-msgstr "Plamenomet"
+#, fuzzy
+#~ msgid "A new %s version (%s)\n"
+#~ msgstr "Nová verze %s"
 
-#: ../src/engine/CslGameBloodFrontier.cpp:148
-#: ../src/engine/CslGameSauerbraten.cpp:82
-msgid "Rifle"
-msgstr "Puška"
+#, fuzzy
+#~ msgid "Failed to initialise internal engine!\n"
+#~ msgstr ""
+#~ "Iniciace programu se nezdařila!\n"
+#~ "Zkuste restartovat aplikaci."
 
-#: ../src/engine/CslGameBloodFrontier.cpp:163
-msgid "Spree"
-msgstr "Záchvat"
+#~ msgid "Previous extended info server patches:\n"
+#~ msgstr "Předcházející záplaty rozšířených informací o serveru:\n"
 
-#: ../src/engine/CslGameBloodFrontier.cpp:275
-msgid ""
-"Client binary for game Blood Frontier not found!\n"
-"Check your settings."
-msgstr ""
-"Cesta k programu hry Blood Frontier nenalezena!\n"
-"Zkontrolujete nastavení."
+#~ msgid "&Ok"
+#~ msgstr "&Ok"
 
-#: ../src/engine/CslGameBloodFrontier.cpp:280
-msgid ""
-"Game path for game Blood Frontier not found!\n"
-"Check your settings."
-msgstr ""
-"Cesta ke hře Blood Frontier nenalezena!\n"
-"Zkontrolujete nastavení."
+#~ msgid "Executables (*.exe; *.bat; *.cmd)|*.exe;*.bat;*.cmd"
+#~ msgstr "Programy (*.exe; *.bat; *.cmd)|*.exe;*.bat;*.cmd"
 
-#: ../src/engine/CslGameBloodFrontier.cpp:285
-msgid ""
-"Config path for game Blood Frontier not found!\n"
-"Check your settings."
-msgstr ""
-"Cesta ke konfiguracím hry Blood Frontier nenalezena!\n"
-"Zkontrolujete nastavení."
+#~ msgid "Select %s executable"
+#~ msgstr "Vybrat %s program"
 
-#: ../src/engine/CslGameCube.cpp:116
-msgid ""
-"Client binary for game Cube not found!\n"
-"Check your settings."
-msgstr ""
-"Cesta k programu hry Cube nenalezena!\n"
-"Zkontrolujete nastavení."
+#~ msgid "Game directory:"
+#~ msgstr "Adresář hry"
 
-#: ../src/engine/CslGameCube.cpp:121
-msgid ""
-"Game path for game Cube not found!\n"
-"Check your settings."
-msgstr ""
-"Game path for game Cube not found!\n"
-"Check check your settings."
+#~ msgid "Select %s game path"
+#~ msgstr "Vybrat cestu ke hře %s "
 
-#: ../src/engine/CslGameSauerbraten.cpp:81
-msgid "Fist"
-msgstr "Pěst"
+#~ msgid "Config directory:"
+#~ msgstr "Složka konfigurací"
 
-#: ../src/engine/CslGameSauerbraten.cpp:81
-msgid "Rocketlauncher"
-msgstr "Raketomet"
+#~ msgid "Select %s config path"
+#~ msgstr "Vybrat složku konfigurací %s"
 
-#: ../src/engine/CslGameSauerbraten.cpp:82
-msgid "Grenadelauncher"
-msgstr "Granátomet"
+#~ msgid "Configuration:"
+#~ msgstr "Konfigurace"
 
-#: ../src/engine/CslGameSauerbraten.cpp:82
-msgid "Fireball"
-msgstr "Ohnivá koule"
+#~ msgid "Expert configuration"
+#~ msgstr "Rozšířená konfigurace"
 
-#: ../src/engine/CslGameSauerbraten.cpp:83
-msgid "Iceball"
-msgstr "Ledová koule"
+#~ msgid "Server empty"
+#~ msgstr "Prázdný server"
 
-#: ../src/engine/CslGameSauerbraten.cpp:83
-msgid "Slimeball"
-msgstr "Koule slizu"
+#~ msgid "Mastermode 2"
+#~ msgstr "Mastermode 2"
 
-#: ../src/engine/CslGameSauerbraten.cpp:83
-msgid "Bite"
-msgstr "Kousat"
+#~ msgid "Server full"
+#~ msgstr "Obsazený server"
 
-#: ../src/engine/CslGameSauerbraten.cpp:204
-msgid ""
-"Client binary for game Sauerbraten not found!\n"
-"Check your settings."
-msgstr ""
-"Cesta k programu hry Sauerbraten nenalezena!\n"
-"Zkontrolujete nastavení."
+#~ msgid "Mastermode 3"
+#~ msgstr "Mastermode 3"
 
-#: ../src/engine/CslGameSauerbraten.cpp:209
-msgid ""
-"Game path for game Sauerbraten not found!\n"
-"Check your settings."
-msgstr ""
-"Cesta ke hře Sauerbraten nenalezena!\n"
-"Zkontrolujete nastavení."
+#~ msgid "Colours"
+#~ msgstr "Barvy"
 
-#: ../src/engine/CslGameSauerbraten.cpp:214
-msgid ""
-"Config path for game Sauerbraten not found!\n"
-"Check your settings."
-msgstr ""
-"Cesta ke konfiguracím hry Sauerbraten nenalezena!\n"
-"Zkontrolujete nastavení."
+#~ msgid "CSL - Traffic statistics"
+#~ msgstr "CSL - Statistika provozu"
 
-#: ../src/engine/CslGameSauerbraten.cpp:300
-#, c-format
-msgid "Couldn't find \"%s\""
-msgstr "Nelze nalézt \"%s\""
+#~ msgid "Minute"
+#~ msgstr "Minuta"
 
-#: ../src/engine/CslTools.cpp:154
-msgid "day"
-msgstr "den"
+#~ msgid "Minutes"
+#~ msgstr "Minuty"
 
-#: ../src/engine/CslTools.cpp:156
-msgid "days"
-msgstr "dnů"
+#~ msgid "&Traffic statistics"
+#~ msgstr "&Statistika provozu"
 
-#: ../src/engine/CslTools.cpp:159
-msgid "d"
-msgstr "d"
+#~ msgid "Sort lists automatically\tCTRL+L"
+#~ msgstr "Automaticky seřadit seznam\tCTRL+L"
 
-#: ../src/engine/CslTools.cpp:170
-msgid "hour"
-msgstr "hodina"
+#~ msgid "Search:"
+#~ msgstr "Hledat:"
 
-#: ../src/engine/CslTools.cpp:172
-msgid "hours"
-msgstr "hodin"
+#~ msgid "  (Filters: "
+#~ msgstr "  (Filtry: "
 
-#: ../src/engine/CslTools.cpp:175
-msgid "h"
-msgstr "h"
+#~ msgid "CSL terminating"
+#~ msgstr "CSL se ukončuje"
 
-#: ../src/engine/CslTools.cpp:186
-msgid "minute"
-msgstr "minuta"
+#~ msgid "Waiting for engine to terminate ..."
+#~ msgstr "Čeká se na ukončení engine ..."
 
-#: ../src/engine/CslTools.cpp:188
-msgid "minutes"
-msgstr "minut"
+#~ msgid "CSL is already running."
+#~ msgstr "CSL je již spuštěno"
 
-#: ../src/engine/CslTools.cpp:191
-msgid "min"
-msgstr "min"
+#~ msgid "Extended information"
+#~ msgstr "Rozšířené informace"
 
-#: ../src/engine/CslTools.cpp:202
-msgid "second"
-msgstr "sekunda"
+#~ msgid "Micro"
+#~ msgstr "Mikro"
 
-#: ../src/engine/CslTools.cpp:204
-msgid "seconds"
-msgstr "sekund"
+#~ msgid "Mini"
+#~ msgstr "Minimální"
 
-#: ../src/engine/CslTools.cpp:207
-msgid "sec"
-msgstr "sec"
+#~ msgid "Default"
+#~ msgstr "Výchozí"
 
-#. *
-#. @author Glen Masgai <mimosius@gmx.de>
-#.
-#: ../src/engine/CslVersion.h:28
-msgid "Cube Server Lister (CSL)"
-msgstr "Cube Server Lister (CSL)"
+#~ msgid "Name: %s   Country: %s"
+#~ msgstr "Jméno: %s   Země: %s"
 
-#: ../src/engine/CslVersion.h:35
-msgid "Tool to monitor cubeengine-based servers."
-msgstr "Nástroj ke sledování serverů cubeengine her."
+#~ msgid "GeoIP database not found"
+#~ msgstr "GeoIP databáze nenalezena"
 
-#: ../data/csl.desktop.in.h:1
-msgid "Monitor Cubeengine based servers."
-msgstr "Sledovat servery cubeengine her."
+#~ msgid " for server: "
+#~ msgstr "pro server:"
 
-#: ../data/csl.desktop.in.h:2
-msgid "Server Lister"
-msgstr "Server Lister"
+#~ msgid ""
+#~ "\n"
+#~ "Choose Yes to keep these servers, No to delete them or\n"
+#~ "Cancel the operation."
+#~ msgstr ""
+#~ "\n"
+#~ "Zvolte Ano pro zachování těchto serverů, Ne k jejich odstranění\n"
+#~ "Zrušit operaci."
+
+#~ msgid "Description"
+#~ msgstr "Popis"
+
+#~ msgid "MM"
+#~ msgstr "MM"
+
+#~ msgid "&Connect"
+#~ msgstr "&Připojit"
+
+#~ msgid "Connect (&Password)"
+#~ msgstr "Připojit (&Heslo)"
+
+#~ msgid "C&opy to clipboard"
+#~ msgstr "&Kopírovat do schránky"
+
+#~ msgid "&Add to favourites"
+#~ msgstr "&Přidat k oblíbeným"
+
+#~ msgid "&Add server ..."
+#~ msgstr "&Přidat server ..."
+
+#~ msgid "&Remove from favourites"
+#~ msgstr "O&dstranit z oblíbených"
+
+#~ msgid "&Delete server"
+#~ msgstr "&Odstranit server"
+
+#~ msgid "Not empty"
+#~ msgstr "Částečně obsazené"
+
+#~ msgid "Knife"
+#~ msgstr "Nůž"
+
+#~ msgid "Pistol"
+#~ msgstr "Pistole"
+
+#~ msgid "Shotgun"
+#~ msgstr "Brokovnice"
+
+#~ msgid "Subgun"
+#~ msgstr "Subpuška"
+
+#~ msgid "Sniper"
+#~ msgstr "Snajpr"
+
+#~ msgid "Assault"
+#~ msgstr "Útočná puška"
+
+#~ msgid "Grenade"
+#~ msgstr "Granáty"
+
+#~ msgid "Pistol (auto)"
+#~ msgstr "Pistol (auto)"
+
+#~ msgid ""
+#~ "Client binary for game AssaultCube not found!\n"
+#~ "Check your settings."
+#~ msgstr ""
+#~ "Cesta k programu hry AssaultCube nenalezena!\n"
+#~ "Zkontrolujete nastavení."
+
+#~ msgid ""
+#~ "Game path for game AssaultCube not found!\n"
+#~ "Check your settings."
+#~ msgstr ""
+#~ "Cesta ke hře AssaultCube nenalezena!\n"
+#~ "Zkontrolujete nastavení."
+
+#~ msgid ""
+#~ "Config path for game AssaultCube not found!\n"
+#~ "Check your settings."
+#~ msgstr ""
+#~ "Cesta ke konfiguracím hry AssaultCube nenalezena!\n"
+#~ "Zkontrolujete nastavení."
+
+#~ msgid "Chaingun"
+#~ msgstr "Kulomet"
+
+#~ msgid "Grenades"
+#~ msgstr "Granáty"
+
+#~ msgid "Flamer"
+#~ msgstr "Plamenomet"
+
+#~ msgid "Rifle"
+#~ msgstr "Puška"
+
+#~ msgid "Spree"
+#~ msgstr "Záchvat"
+
+#~ msgid ""
+#~ "Client binary for game Blood Frontier not found!\n"
+#~ "Check your settings."
+#~ msgstr ""
+#~ "Cesta k programu hry Blood Frontier nenalezena!\n"
+#~ "Zkontrolujete nastavení."
+
+#~ msgid ""
+#~ "Game path for game Blood Frontier not found!\n"
+#~ "Check your settings."
+#~ msgstr ""
+#~ "Cesta ke hře Blood Frontier nenalezena!\n"
+#~ "Zkontrolujete nastavení."
+
+#~ msgid ""
+#~ "Config path for game Blood Frontier not found!\n"
+#~ "Check your settings."
+#~ msgstr ""
+#~ "Cesta ke konfiguracím hry Blood Frontier nenalezena!\n"
+#~ "Zkontrolujete nastavení."
+
+#~ msgid ""
+#~ "Client binary for game Cube not found!\n"
+#~ "Check your settings."
+#~ msgstr ""
+#~ "Cesta k programu hry Cube nenalezena!\n"
+#~ "Zkontrolujete nastavení."
+
+#~ msgid ""
+#~ "Game path for game Cube not found!\n"
+#~ "Check your settings."
+#~ msgstr ""
+#~ "Game path for game Cube not found!\n"
+#~ "Check check your settings."
+
+#~ msgid "Fist"
+#~ msgstr "Pěst"
+
+#~ msgid "Rocketlauncher"
+#~ msgstr "Raketomet"
+
+#~ msgid "Grenadelauncher"
+#~ msgstr "Granátomet"
+
+#~ msgid "Fireball"
+#~ msgstr "Ohnivá koule"
+
+#~ msgid "Iceball"
+#~ msgstr "Ledová koule"
+
+#~ msgid "Slimeball"
+#~ msgstr "Koule slizu"
+
+#~ msgid "Bite"
+#~ msgstr "Kousat"
+
+#~ msgid ""
+#~ "Client binary for game Sauerbraten not found!\n"
+#~ "Check your settings."
+#~ msgstr ""
+#~ "Cesta k programu hry Sauerbraten nenalezena!\n"
+#~ "Zkontrolujete nastavení."
+
+#~ msgid ""
+#~ "Game path for game Sauerbraten not found!\n"
+#~ "Check your settings."
+#~ msgstr ""
+#~ "Cesta ke hře Sauerbraten nenalezena!\n"
+#~ "Zkontrolujete nastavení."
+
+#~ msgid ""
+#~ "Config path for game Sauerbraten not found!\n"
+#~ "Check your settings."
+#~ msgstr ""
+#~ "Cesta ke konfiguracím hry Sauerbraten nenalezena!\n"
+#~ "Zkontrolujete nastavení."
+
+#~ msgid "Couldn't find \"%s\""
+#~ msgstr "Nelze nalézt \"%s\""
+
+#~ msgid "day"
+#~ msgstr "den"
+
+#~ msgid "days"
+#~ msgstr "dnů"
+
+#~ msgid "d"
+#~ msgstr "d"
+
+#~ msgid "hour"
+#~ msgstr "hodina"
+
+#~ msgid "hours"
+#~ msgstr "hodin"
+
+#~ msgid "h"
+#~ msgstr "h"
+
+#~ msgid "minute"
+#~ msgstr "minuta"
+
+#~ msgid "minutes"
+#~ msgstr "minut"
+
+#~ msgid "min"
+#~ msgstr "min"
+
+#~ msgid "second"
+#~ msgstr "sekunda"
+
+#~ msgid "seconds"
+#~ msgstr "sekund"
+
+#~ msgid "sec"
+#~ msgstr "sec"
+
+#~ msgid "Cube Server Lister (CSL)"
+#~ msgstr "Cube Server Lister (CSL)"
+
+#~ msgid "Tool to monitor cubeengine-based servers."
+#~ msgstr "Nástroj ke sledování serverů cubeengine her."
+
+#~ msgid "Monitor Cubeengine based servers."
+#~ msgstr "Sledovat servery cubeengine her."
+
+#~ msgid "Server Lister"
+#~ msgstr "Server Lister"
 
 #~ msgid "&Remove from master"
 #~ msgstr "&Odebrat z hlavního serveru"

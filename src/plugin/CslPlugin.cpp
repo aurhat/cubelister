@@ -60,11 +60,8 @@ wxInt32 CslPluginMgr::LoadPlugins(CslPluginHost *host)
     wxArrayString files;
     wxArrayString dirs=GetPluginDirs();
 
-    for (wxInt32 i = 0, l = dirs.GetCount(); i<l; i++)
-    {
-        wxString path = dirs.Item(i)+wxT("plugins");
-        c += FindFiles(path, m_extension, files);
-    }
+    loopv(dirs)
+        c += FindFiles(dirs[i] + wxT("plugins"), m_extension, files);
 
     files.Sort(true);
 
@@ -78,19 +75,19 @@ wxInt32 CslPluginMgr::LoadPlugins(CslPluginHost *host)
 
         if (!p->IsLoaded())
         {
-            CSL_LOG_DEBUG("Couldn't load plugin %s\n", U2C(file));
+            CSL_LOG_DEBUG("couldn't load plugin %s\n", U2C(file));
             goto fail;
         }
         if (p->m_pluginInfo->APIVersion!=CSL_PLUGIN_VERSION_API)
         {
-            CSL_LOG_DEBUG("Couldn't load plugin %s. Invalid API version (%d!=%d)\n",
+            CSL_LOG_DEBUG("couldn't load plugin %s. Invalid API version (%d!=%d)\n",
                           U2C(file), p->m_pluginInfo->APIVersion, CSL_PLUGIN_VERSION_API);
             goto fail;
         }
         if (p->m_pluginInfo->Type<CSL_PLUGIN_TYPE_ENGINE ||
             p->m_pluginInfo->Type>CSL_PLUGIN_TYPE_GUI)
         {
-            CSL_LOG_DEBUG("Couldn't load plugin %s. Invalid Type (%d)\n",
+            CSL_LOG_DEBUG("couldn't load plugin %s. Invalid Type (%d)\n",
                           U2C(file), p->m_pluginInfo->Type);
             goto fail;
         }
@@ -101,13 +98,13 @@ wxInt32 CslPluginMgr::LoadPlugins(CslPluginHost *host)
         {
             if (m_plugins[i]->m_pluginInfo->FourCC==p->m_pluginInfo->FourCC)
             {
-                CSL_LOG_DEBUG("Couldn't load plugin %s. Plugin was already loaded.\n", U2C(file));
+                CSL_LOG_DEBUG("couldn't load plugin %s. Plugin was already loaded.\n", U2C(file));
                 goto fail;
             }
         }
         if (!p->m_pluginInfo->InitFn(host))
         {
-            CSL_LOG_DEBUG("Couldn't load plugin %s. Create() failed.\n", U2C(file));
+            CSL_LOG_DEBUG("couldn't load plugin %s. Create() failed.\n", U2C(file));
             goto fail;
         }
 

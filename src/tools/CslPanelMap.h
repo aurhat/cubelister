@@ -21,10 +21,7 @@
 #ifndef CSLPANELMAP_H
 #define CSLPANELMAP_H
 
-/**
- @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
-
+#include <wx/fileconf.h>
 
 class CSL_DLL_GUITOOLS CslBaseInfo
 {

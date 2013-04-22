@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <Csl.h>
+#include <wx/mstream.h>
 
 DEFINE_EVENT_TYPE(wxCSL_EVT_SETTINGS_CHANGED)
 

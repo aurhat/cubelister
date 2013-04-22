@@ -21,16 +21,13 @@
 #ifndef CSLIPC_H
 #define CSLIPC_H
 
-/**
-    @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
+#include <wx/ipc.h>
 
-
-#define CSL_IPC_HOST wxT("localhost")
+#define CSL_IPC_HOST                wxT("localhost")
 #ifdef __WXMSW__
-#define CSL_IPC_SERV wxT("CSL_IPC")
+#define CSL_IPC_SERV                wxT("CSL_IPC")
 #else
-#define CSL_IPC_SERV wxString(CSL_USER_DIR+wxT("sock"))
+#define CSL_IPC_SERV                wxString(GetHomeDir()+wxT("sock"))
 #endif
 #define CSL_IPC_TOPIC               wxT("CSL_IPC_CONTROL")
 

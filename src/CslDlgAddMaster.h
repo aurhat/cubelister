@@ -21,11 +21,6 @@
 #ifndef CSLDLGADDMASTER_H
 #define CSLDLGADDMASTER_H
 
-/**
- @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
-
-
 class CslDlgAddMaster: public wxDialog
 {
     public:
@@ -46,6 +41,10 @@ class CslDlgAddMaster: public wxDialog
         DECLARE_EVENT_TABLE()
 
     protected:
+        bool IsValid();
+        void SetGameDefaultValues();
+        CslGame* GetSelectedGame(wxUint32 *pos = NULL);
+
         // begin wxGlade: CslDlgAddMaster::attributes
         wxStaticBox* sizer_master_staticbox;
         wxChoice* m_choiceGameType;
@@ -56,9 +55,8 @@ class CslDlgAddMaster: public wxDialog
         wxSizer* m_bsDlg;
         // end wxGlade
 
+        bool m_modified;
         wxUint32 *m_fourcc;
-
-        bool IsValid();
 }; // wxGlade: end class
 
 

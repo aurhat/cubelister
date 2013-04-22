@@ -21,10 +21,6 @@
 #ifndef CSLART_H
 #define CSLART_H
 
-/**
-    @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
-
 #ifndef wxART_NONE
 #define wxART_NONE             wxART_MAKE_ART_ID(wxART_NONE)
 #endif

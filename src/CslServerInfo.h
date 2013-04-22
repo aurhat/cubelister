@@ -21,12 +21,7 @@
 #ifndef CSLLISTCTRLINFO_H
 #define CSLLISTCTRLINFO_H
 
-/**
- @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
-
 #include "CslListCtrl.h"
-
 
 class CslListCtrlInfo : public CslListCtrl
 {

@@ -21,9 +21,8 @@
 #ifndef CSLAPP_H
 #define CSLAPP_H
 
-/**
-    @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
+#include <wx/cmdline.h>
+#include <wx/snglinst.h>
 
 class CslApp: public wxApp
 {
@@ -36,16 +35,32 @@ class CslApp: public wxApp
             CSL_SHUTDOWN_ERROR
         };
 
-        const wxString& GetLanguage() const { return m_lang; }
+        CslApp() :
+                m_shutdown(CSL_SHUTDOWN_NONE),
+                m_single(NULL),
+                m_engine(NULL)
+            { }
 
+        const wxString& GetHomeDir() const { return m_home; }
+        const wxString& GetLanguage() const { return m_lang; }
+        wxInt32 GetShutdown() const { return m_shutdown; }
         CslEngine* GetCslEngine() { return m_engine; }
 
-        void Shutdown(wxInt32 val) { m_shutdown=val; }
-        wxInt32 Shutdown() const { return m_shutdown; }
+        void SetShutdown(wxInt32 val) { m_shutdown = val; }
+
+    private:
+        bool OnInit();
+        int OnRun();
+        int OnExit();
+        void OnFatalException();
+        void OnEndSession(wxCloseEvent& event);
+        int FilterEvent(wxEvent& event);
 
         void IpcCall(const wxString& value,wxEvtHandler *evtHandler=NULL) const;
 
-    private:
+        DECLARE_EVENT_TABLE()
+
+        wxString m_home;
         wxString m_lang;
         wxLocale m_locale;
         wxString m_appPath;
@@ -53,18 +68,6 @@ class CslApp: public wxApp
         wxSingleInstanceChecker *m_single;
 
         CslEngine *m_engine;
-
-        bool OnInit();
-        int OnRun();
-        int OnExit();
-#ifndef _DEBUG
-        void OnFatalException();
-#endif //_DEBUG
-
-        int FilterEvent(wxEvent& event);
-        void OnEndSession(wxCloseEvent& event);
-
-        DECLARE_EVENT_TABLE()
 };
 
 DECLARE_APP(CslApp);

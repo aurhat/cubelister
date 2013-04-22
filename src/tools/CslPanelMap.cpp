@@ -20,6 +20,7 @@
 
 #include "Csl.h"
 #include "CslPanelMap.h"
+#include <wx/wfstream.h>
 
 BEGIN_EVENT_TABLE(CslPanelMap, wxPanel)
     EVT_PAINT(CslPanelMap::OnPaint)

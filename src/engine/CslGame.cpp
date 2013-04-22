@@ -20,11 +20,55 @@
 
 #include "Csl.h"
 #include "CslGame.h"
-
+#include <wx/mstream.h>
+#include <wx/txtstrm.h>
 
 /**
  *  class CslMaster
  */
+
+
+CslMaster::CslMaster(const wxURI& uri) :
+        m_ok(false),
+        m_id(0),
+        m_updating(false),
+        m_game(NULL)
+{
+    const wxString& scheme = uri.GetScheme();
+    const wxString& server = uri.GetServer();
+    const wxString& path   = uri.GetPath();
+    wxUint16 port          = ::wxAtoi(uri.GetPort());
+
+    m_uri = CreateURI(scheme, server, port, path);
+
+    m_ok = m_uri.HasScheme() &&
+           m_uri.HasServer() &&
+           m_uri.HasPort();
+}
+
+bool CslMaster::operator==(const CslMaster& master) const
+{
+    return m_uri.GetScheme().CmpNoCase(master.m_uri.GetScheme())==0 &&
+           m_uri.GetServer().CmpNoCase(master.m_uri.GetServer())==0 &&
+           m_uri.GetPath().CmpNoCase(master.m_uri.GetPath())==0 &&
+           m_uri.GetPort().Cmp(master.m_uri.GetPort())==0;
+}
+
+wxURI CslMaster::CreateURI(const wxString scheme,
+                           const wxString& address,
+                           wxUint16 port,
+                           const wxString& path)
+{
+    if (!port && scheme.CmpNoCase(wxT("http"))==0)
+        port = 80;
+
+    const wxChar *pathSep = path.StartsWith(wxT("/")) ? wxT("") : wxT("/");
+
+    return wxString::Format(wxT("%s://%s:%d%s%s"),
+                            scheme.Lower().c_str(),
+                            address.Lower().c_str(), port,
+                            pathSep, path.c_str());
+}
 
 void CslMaster::AddServer(CslServerInfo *info)
 {
@@ -62,6 +106,7 @@ void CslMaster::Init(CslGame *game,wxUint32 id)
     m_game=game;
     m_id=id;
 }
+
 
 /**
  *  class CslGame
@@ -120,6 +165,40 @@ void CslGame::DeleteMasters()
 {
     loopvrev(m_masters) DeleteMaster(m_masters[i]->GetId(),i);
     m_masters.Empty();
+}
+
+wxInt32 CslGame::ParseMasterResponse(CslMaster *master, char *response, size_t len)
+{
+    char host[128];
+    wxInt32 token, count = 0;
+    wxUint16  port, iport;
+
+    CslGame *game = master->GetGame();
+
+    wxMemoryInputStream mem(response, len);
+    wxTextInputStream text(mem);
+
+    master->UnrefServers();
+
+    while (!mem.Eof())
+    {
+        CslCharBuffer buf(CslWX2MB(text.ReadLine().Trim(false)));
+
+        host[0] = '\0';
+        port = iport = 0;
+
+        if ((token = sscanf(buf, "addserver %127s %hu %hu", host, &port, &iport))<1)
+            continue;
+
+        CslServerInfo *info = new CslServerInfo(game, C2U(host), port, iport);
+
+        if (!game->AddServer(info, master->GetId()))
+            delete info;
+
+        count++;
+    }
+
+    return count;
 }
 
 bool CslGame::AddServer(CslServerInfo *info,wxInt32 masterID)
@@ -303,6 +382,7 @@ const CslGameIcon* CslGame::GetIcon(wxInt32 size) const
 
     return NULL;
 }
+
 
 /**
  *  class CslServerInfo

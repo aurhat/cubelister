@@ -21,13 +21,7 @@
 #ifndef CSLGAME_H
 #define CSLGAME_H
 
-/**
- @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
-
 #include "CslExtendedInfo.h"
-
-#define CSL_DEFAULT_MASTER_WEB_PORT   80
 
 #define CSL_CAPABILITY_EXTINFO             1<<0
 #define CSL_CAPABILITY_CONNECT_PASS        1<<1
@@ -103,86 +97,56 @@ class CSL_DLL_ENGINE CslServerEvents
         bool HasEvent(wxUint32 flag) const { return CSL_FLAG_CHECK(m_events, flag); }
 
     private:
-        wxUint32 m_flags,m_events;
+        wxUint32 m_flags, m_events;
 };
 
-class CSL_DLL_ENGINE CslMasterConnection
-{
-    public:
-        enum { CONNECTION_ANY=-1, CONNECTION_HTTP, CONNECTION_TCP };
-
-        CslMasterConnection() : Type(CONNECTION_ANY), Port(0)
-        { }
-        CslMasterConnection(const wxString& address,
-                            const wxString& path,
-                            wxUint16 port=CSL_DEFAULT_MASTER_WEB_PORT) :
-                Type(CONNECTION_HTTP), Address(address), Path(path), Port(port)
-        { }
-        CslMasterConnection(const wxString& address,
-                            wxUint16 port) :
-                Type(CONNECTION_TCP), Address(address), Port(port)
-        { }
-
-        bool operator==(const CslMasterConnection& in) const
-        {
-            return Type==in.Type && Address==in.Address &&
-                   Path==in.Path && Port==in.Port;
-        }
-
-        wxInt32 Type;
-        wxString Address;
-        wxString Path;
-        wxUint16 Port;
-};
 
 class CSL_DLL_ENGINE CslMaster
 {
     friend class CslGame;
+    friend class CslEngine;
 
     public:
-        CslMaster() :
-            m_id(0), m_game(NULL)
-        { }
-        CslMaster(const CslMasterConnection& connection) :
-            m_id(0),m_game(NULL),m_connection(connection)
-        { }
+        CslMaster(const wxURI& uri);
         ~CslMaster() { UnrefServers(); }
 
-        static CslMaster* Create()
-        {
-            return new CslMaster();
-        }
-        static CslMaster* Create(const CslMasterConnection& connection)
-        {
-            return new CslMaster(connection);
-        }
+        bool operator==(const CslMaster& master) const;
+        bool operator!=(const CslMaster& master) const
+            { return !(*this == master); }
+
+        static CslMaster* Create(const wxURI& uri)
+            { return new CslMaster(uri); }
         static void Destroy(CslMaster *master)
-        {
-            delete master;
-        }
+            { delete master; }
 
-        bool operator==(const CslMaster& master) const
-        {
-            return m_connection==master.m_connection;
-        }
+        static wxURI CreateURI(const wxString scheme,
+                               const wxString& address,
+                               wxUint16 port,
+                               const wxString& path);
 
-        bool UnrefServer(CslServerInfo *info,wxInt32 pos=-1);
-        void UnrefServers();
-
-        CslGame* GetGame() const { return m_game; }
+        bool IsOk() const { return m_ok; }
         wxInt32 GetId() const { return m_id; }
-        CslMasterConnection& GetConnection() { return m_connection; }
+        wxURI& GetURI() { return m_uri; }
+        bool IsUpdating() const { return m_updating; }
+        CslGame* GetGame() const { return m_game; }
         CslArrayCslServerInfo& GetServers() { return m_servers; }
 
-    protected:
-        wxInt32 m_id;
-        CslGame *m_game;
-        CslMasterConnection m_connection;
-        CslArrayCslServerInfo m_servers;
+        bool UnrefServer(CslServerInfo *info, wxInt32 pos = -1);
+        void UnrefServers();
 
+    protected:
         void Init(CslGame *game, wxUint32 id);
         void AddServer(CslServerInfo *info);
+        void SetIsUpdating(bool updating) { m_updating = updating; }
+
+        bool m_ok;
+        wxInt32 m_id;
+        wxURI m_uri;
+        bool m_updating;
+        CslGame *m_game;
+        CslArrayCslServerInfo m_servers;
 };
+
 
 class CSL_DLL_ENGINE CslGameClientSettings
 {
@@ -201,6 +165,7 @@ class CSL_DLL_ENGINE CslGameClientSettings
         wxString Binary, GamePath, ConfigPath, Options, PreScript, PostScript;
         wxArrayString PackageDirs;
 };
+
 
 class CSL_DLL_ENGINE CslGameIcon
 {
@@ -238,17 +203,15 @@ class CSL_DLL_ENGINE CslGame
         wxInt32 AddMaster(CslMaster *master);
         bool DeleteMaster(wxInt32 masterID,wxInt32 pos=-1);
         void DeleteMasters();
-        private:
+        CslArrayCslMaster& GetMasters() { return m_masters; }
         bool AddServer(CslServerInfo *info,wxInt32 masterID=-1);
         bool DeleteServer(CslServerInfo *info);
-        public:
-        CslArrayCslMaster& GetMasters() { return m_masters; }
         CslArrayCslServerInfo& GetServers() { return m_servers; }
         void GetFavourites(CslArrayCslServerInfo& servers);
         void GetExtServers(CslArrayCslServerInfo& servers, bool all=false);
         CslServerInfo* FindServerByHost(const wxString& host, wxUint16 port);
         CslServerInfo* FindServerByAddr(const CslIPV4Addr& addr);
-        const CslMasterConnection& GetDefaultMasterConnection() const { return m_defaultMasterConnection; }
+        const wxURI& GetDefaultMasterURI() const { return m_defaultMasterURI; }
         static wxString& ProcessScript(const CslServerInfo& info,wxUint32 connectMode,wxString& script);
 
     protected:
@@ -260,7 +223,7 @@ class CSL_DLL_ENGINE CslGame
         wxUint32 m_capabilities;
         CslArrayCslGameIcon m_icons;
 
-        CslMasterConnection m_defaultMasterConnection;
+        wxURI m_defaultMasterURI;
         CslGameClientSettings m_clientSettings;
 
     public:
@@ -289,6 +252,8 @@ class CSL_DLL_ENGINE CslGame
         virtual wxUint16 GetDefaultGamePort() const = 0;
         virtual wxUint16 GetInfoPort(wxUint16 gamePort=0) const = 0;
         virtual wxUint16 GetBroadcastPort() { return 0; }
+        // parse master respone
+        virtual wxInt32 ParseMasterResponse(CslMaster *master, char *response, size_t len);
         // server query and response buffer handling
         virtual bool PingDefault(ucharbuf& buf, CslServerInfo& info) const { return false; }
         virtual bool ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const = 0;

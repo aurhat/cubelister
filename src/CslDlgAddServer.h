@@ -21,11 +21,6 @@
 #ifndef CSLDLGADDSERVER_H
 #define CSLDLGADDSERVER_H
 
-/**
- @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
-
-
 class CslDlgAddServer: public wxDialog
 {
     public:

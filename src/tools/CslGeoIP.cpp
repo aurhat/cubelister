@@ -23,66 +23,37 @@
 #include <GeoIP.h>
 #include <GeoIPCity.h>
 
-static GeoIP *g_geoIP=NULL;
+static GeoIP *g_geoIP = NULL;
 
-bool LoadDatabase(const wxString& name, GeoIPDBTypes type, GeoIPOptions options)
+wxString LoadDatabase(const wxString& path, GeoIPDBTypes type, GeoIPOptions options)
 {
-#ifdef CSL_EXTERNAL_GEOIP_DATABASE
-    if (GeoIP_db_avail(type))
+    if (::wxFileExists(path) && (g_geoIP = GeoIP_open(U2C(path), options)))
     {
-        if ((g_geoIP=GeoIP_open_type(type, options)))
-            CSL_LOG_DEBUG("Loaded external GeoIP database: %s\n", U2C(name));
-    }
-#endif //CSL_EXTERNAL_GEOIP_DATABASE
-
-    if (!g_geoIP && !name.IsEmpty())
-    {
-        wxString path=FindPackageFile(wxT("data/")+name);
-
-        if (!path.IsEmpty() && (g_geoIP = GeoIP_open(U2C(path), options)))
-            CSL_LOG_DEBUG("Loaded GeoIP database: %s\n", U2C(path));
-    }
-
-    if (g_geoIP)
+        CSL_LOG_DEBUG("loaded GeoIP database: %s\n", U2C(path));
         g_geoIP->charset = GEOIP_CHARSET_UTF8;
-
-    return g_geoIP!=NULL;
-}
-
-void UnloadDatabase()
-{
-    if (g_geoIP)
-    {
-        GeoIP_delete(g_geoIP);
-        g_geoIP=NULL;
     }
+
+    return g_geoIP ? path : wxT("");
 }
 
-CslGeoIP::CslGeoIP() : m_type(GEOIP_TYPE_UNKNOWN)
+CslGeoIP::CslGeoIP() : m_type(GEOIP_COUNTRY)
 {
-    if (LoadDatabase(wxT("GeoCity.dat"), GEOIP_CITY_EDITION_REV1, GEOIP_STANDARD))
-        m_type=GEOIP_TYPE_CITY;
-    else if (LoadDatabase(wxT("GeoLiteCity.dat"), GEOIP_CITY_EDITION_REV1, GEOIP_STANDARD))
-        m_type=GEOIP_TYPE_CITY;
-    else if (LoadDatabase(wxT("GeoIP.dat"), GEOIP_COUNTRY_EDITION, GEOIP_MEMORY_CACHE))
-        m_type=GEOIP_TYPE_COUNTRY;
-
-    for (wxInt32 i=0;; i++)
+    for (wxInt32 i = 0;; i++)
     {
-        const char *code=GeoIP_code_by_id(i);
-        const char *name=GeoIP_name_by_id(i);
+        const char *code = GeoIP_code_by_id(i);
+        const char *name = GeoIP_name_by_id(i);
 
         if (!code || !name)
             break;
 
-        m_country_codes.push_back(C2U(code));
-        m_country_names.push_back(C2U(name));
+        m_countryCodes.push_back(C2U(code));
+        m_countryNames.push_back(C2U(name));
     }
 }
 
 CslGeoIP::~CslGeoIP()
 {
-    UnloadDatabase();
+    Unload();
 
     WX_CLEAR_ARRAY(m_services);
 }
@@ -92,25 +63,85 @@ bool CslGeoIP::IsOk()
     return g_geoIP!=NULL;
 }
 
+wxInt32 CslGeoIP::GetType()
+{
+    CslGeoIP& self = GetInstance();
+    return self.m_type;
+}
+
+bool CslGeoIP::Load(wxInt32 type)
+{
+    CslGeoIP& self = GetInstance();
+
+    Unload();
+
+    switch (type)
+    {
+        case GEOIP_COUNTRY:
+            self.m_fileName = LoadDatabase(FindPackageFile(wxT("data/GeoIP.dat")),
+                                           GEOIP_COUNTRY_EDITION, GEOIP_MEMORY_CACHE);
+            self.m_type = GEOIP_COUNTRY;
+            break;
+
+        case GEOIP_CITY:
+            if ((self.m_fileName = LoadDatabase(FindPackageFile(wxT("data/GeoCity.dat")),
+                                                GEOIP_CITY_EDITION_REV1, GEOIP_STANDARD)).IsEmpty())
+                self.m_fileName = LoadDatabase(FindPackageFile(wxT("data/GeoLiteCity.dat")),
+                                               GEOIP_CITY_EDITION_REV1, GEOIP_STANDARD);
+                self.m_type = GEOIP_CITY;
+            break;
+    }
+
+    return g_geoIP!=NULL;
+}
+
+void CslGeoIP::Unload()
+{
+    if (g_geoIP)
+    {
+        GeoIP_delete(g_geoIP);
+        g_geoIP = NULL;
+    }
+}
+
+wxString CslGeoIP::GetFileName()
+{
+    CslGeoIP& self = GetInstance();
+    return self.m_fileName;
+}
+
+wxURI CslGeoIP::GetUpdateURI(wxInt32 type)
+{
+    static const wxChar* uris[] =
+    {
+        wxT("http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz"),
+        wxT("http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz")
+    };
+
+    wxInt32 t = type < 0 ? GetType() : clamp(type, 0, 1);
+
+    return wxString(uris[t]);
+}
+
 const char* CslGeoIP::GetCountryCodeByAddr(const char *host)
 {
-    CslGeoIP& self=GetInstance();
+    CslGeoIP& self = GetInstance();
 
-    if (!self.m_type)
+    if (!g_geoIP)
         return NULL;
 
-    GeoIPRecord *r=NULL;
-    const char *code=NULL;
+    GeoIPRecord *r = NULL;
+    const char *code = NULL;
 
     switch (self.m_type)
     {
-        case GEOIP_TYPE_COUNTRY:
-            code=GeoIP_country_code_by_addr(g_geoIP, host);
+        case GEOIP_COUNTRY:
+            code = GeoIP_country_code_by_addr(g_geoIP, host);
             break;
-        case GEOIP_TYPE_CITY:
-            if ((r=GeoIP_record_by_addr(g_geoIP, host)))
+        case GEOIP_CITY:
+            if ((r = GeoIP_record_by_addr(g_geoIP, host)))
             {
-                code=r->country_code;
+                code = r->country_code;
                 GeoIPRecord_delete(r);
             }
             break;
@@ -121,23 +152,23 @@ const char* CslGeoIP::GetCountryCodeByAddr(const char *host)
 
 const char* CslGeoIP::GetCountryCodeByIPnum(const unsigned long ipnum)
 {
-    CslGeoIP& self=GetInstance();
+    CslGeoIP& self = GetInstance();
 
-    if (!self.m_type)
+    if (!g_geoIP)
         return NULL;
 
-    GeoIPRecord *r=NULL;
-    const char *code=NULL;
+    GeoIPRecord *r = NULL;
+    const char *code = NULL;
 
     switch (self.m_type)
     {
-        case GEOIP_TYPE_COUNTRY:
-            code=GeoIP_country_code_by_ipnum(g_geoIP, wxUINT32_SWAP_ON_LE(ipnum));
+        case GEOIP_COUNTRY:
+            code = GeoIP_country_code_by_ipnum(g_geoIP, wxUINT32_SWAP_ON_LE(ipnum));
             break;
-        case GEOIP_TYPE_CITY:
-            if ((r=GeoIP_record_by_ipnum(g_geoIP, wxUINT32_SWAP_ON_LE(ipnum))))
+        case GEOIP_CITY:
+            if ((r = GeoIP_record_by_ipnum(g_geoIP, wxUINT32_SWAP_ON_LE(ipnum))))
             {
-                code=r->country_code;
+                code = r->country_code;
                 GeoIPRecord_delete(r);
             }
             break;
@@ -148,23 +179,23 @@ const char* CslGeoIP::GetCountryCodeByIPnum(const unsigned long ipnum)
 
 wxString CslGeoIP::GetCountryNameByAddr(const char *host)
 {
-    CslGeoIP& self=GetInstance();
+    CslGeoIP& self = GetInstance();
 
-    if (!self.m_type)
+    if (!g_geoIP)
         return wxEmptyString;
 
-    GeoIPRecord *r=NULL;
-    const char *country=NULL;
+    GeoIPRecord *r = NULL;
+    const char *country = NULL;
 
     switch (self.m_type)
     {
-        case GEOIP_TYPE_COUNTRY:
-            country=GeoIP_country_name_by_addr(g_geoIP, host);
+        case GEOIP_COUNTRY:
+            country = GeoIP_country_name_by_addr(g_geoIP, host);
             break;
-        case GEOIP_TYPE_CITY:
-            if ((r=GeoIP_record_by_addr(g_geoIP, host)))
+        case GEOIP_CITY:
+            if ((r = GeoIP_record_by_addr(g_geoIP, host)))
             {
-                country=r->country_name;
+                country = r->country_name;
                 GeoIPRecord_delete(r);
             }
             break;
@@ -175,23 +206,23 @@ wxString CslGeoIP::GetCountryNameByAddr(const char *host)
 
 wxString CslGeoIP::GetCountryNameByIPnum(const unsigned long ipnum)
 {
-    CslGeoIP& self=GetInstance();
+    CslGeoIP& self = GetInstance();
 
-    if (!self.m_type)
+    if (!g_geoIP)
         return wxEmptyString;
 
-    GeoIPRecord *r=NULL;
-    const char *country=NULL;
+    GeoIPRecord *r = NULL;
+    const char *country = NULL;
 
     switch (self.m_type)
     {
-        case GEOIP_TYPE_COUNTRY:
-            country=GeoIP_country_name_by_ipnum(g_geoIP, wxUINT32_SWAP_ON_LE(ipnum));
+        case GEOIP_COUNTRY:
+            country = GeoIP_country_name_by_ipnum(g_geoIP, wxUINT32_SWAP_ON_LE(ipnum));
             break;
-        case GEOIP_TYPE_CITY:
-            if ((r=GeoIP_record_by_ipnum(g_geoIP, wxUINT32_SWAP_ON_LE(ipnum))))
+        case GEOIP_CITY:
+            if ((r = GeoIP_record_by_ipnum(g_geoIP, wxUINT32_SWAP_ON_LE(ipnum))))
             {
-                country=r->country_name;
+                country = r->country_name;
                 GeoIPRecord_delete(r);
             }
             break;
@@ -202,16 +233,17 @@ wxString CslGeoIP::GetCountryNameByIPnum(const unsigned long ipnum)
 
 wxString CslGeoIP::GetCityNameByAddr(const char *host)
 {
-    wxString city;
-    CslGeoIP& self=GetInstance();
+    CslGeoIP& self = GetInstance();
 
-    if (self.m_type==GEOIP_TYPE_CITY)
+    wxString city;
+
+    if (g_geoIP && self.m_type==GEOIP_CITY)
     {
-        GeoIPRecord *r=GeoIP_record_by_addr(g_geoIP, host);
+        GeoIPRecord *r = GeoIP_record_by_addr(g_geoIP, host);
 
         if (r)
         {
-            city=C2U(r->city);
+            city = C2U(r->city);
             GeoIPRecord_delete(r);
         }
     }
@@ -221,16 +253,17 @@ wxString CslGeoIP::GetCityNameByAddr(const char *host)
 
 wxString CslGeoIP::GetCityNameByIPnum(const unsigned long ipnum)
 {
-    wxString city;
-    CslGeoIP& self=GetInstance();
+    CslGeoIP& self = GetInstance();
 
-    if (self.m_type==GEOIP_TYPE_CITY)
+    wxString city;
+
+    if (g_geoIP && self.m_type==GEOIP_CITY)
     {
-        GeoIPRecord *r=GeoIP_record_by_ipnum(g_geoIP, wxUINT32_SWAP_ON_LE(ipnum));
+        GeoIPRecord *r = GeoIP_record_by_ipnum(g_geoIP, wxUINT32_SWAP_ON_LE(ipnum));
 
         if (r)
         {
-            city=C2U(r->city);
+            city = C2U(r->city);
             GeoIPRecord_delete(r);
         }
     }
@@ -240,16 +273,16 @@ wxString CslGeoIP::GetCityNameByIPnum(const unsigned long ipnum)
 
 const wxArrayString& CslGeoIP::GetCountryCodes()
 {
-    CslGeoIP& self=GetInstance();
+    CslGeoIP& self = GetInstance();
 
-    return self.m_country_codes;
+    return self.m_countryCodes;
 }
 
 const wxArrayString& CslGeoIP::GetCountryNames()
 {
-    CslGeoIP& self=GetInstance();
+    CslGeoIP& self = GetInstance();
 
-    return self.m_country_names;
+    return self.m_countryNames;
 }
 
 void CslGeoIP::AddService(const wxString& name, const wxString& host, const wxString& path)

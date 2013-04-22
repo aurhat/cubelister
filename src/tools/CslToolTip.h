@@ -21,11 +21,6 @@
 #ifndef CSLTOOLTIP_H
 #define CSLTOOLTIP_H
 
-/**
-    @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
-
-
 class CslToolTipEvent;
 
 BEGIN_DECLARE_EVENT_TYPES()

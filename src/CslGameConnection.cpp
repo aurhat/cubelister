@@ -91,11 +91,10 @@ bool CslGameConnection::CountDown()
     if (--self.m_info->ConnectWait>0)
     {
         CslStatusBar::SetText(1, wxString::Format(
-                                  _("Waiting %s for a free slot on '%s (%s)' "
-                              wxT_2("(press ESC to abort or join another server)")),
-                              FormatSeconds(self.m_info->ConnectWait,true,true).c_str(),
-                              self.m_info->GetBestDescription().c_str(),
-                              self.m_info->GetGame().GetName().c_str()));
+                                     _("Waiting %s for a free slot on '%s (%s)' (press ESC to abort or join an other server)"),
+                                     FormatSeconds(self.m_info->ConnectWait,true,true).c_str(),
+                                     self.m_info->GetBestDescription().c_str(),
+                                     self.m_info->GetGame().GetName().c_str()));
         return true;
     }
     else

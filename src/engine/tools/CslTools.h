@@ -28,6 +28,7 @@
 #define strcasecmp _stricmp
 #endif //_MSC_VER
 
+#include <wx/uri.h>
 #include <CslDynlib.h>
 
 #ifdef __WXMSW__
@@ -40,26 +41,28 @@
 #define CSL_PATHDIV_WX wxT(CSL_PATHDIV_MB)
 #define CSL_NEWLINE_WX wxT(CSL_NEWLINE_MB)
 
-#define CSL_USER_DIR wxString(wxStandardPaths().GetUserDataDir()+CSL_PATHDIV_WX)
-
 #ifdef __WXMSW__
+#define chmod _chmod
 #define CSL_EXE_EXTENSIONS wxString(_("Executables (*.exe; *.bat; *.cmd)|*.exe;*.bat;*.cmd"))
 #else
 #define CSL_EXE_EXTENSIONS wxString(wxT("*"))
 #endif
 
 #ifdef __GNUC__
+#define CSL_PRETTY_FN __PRETTY_FUNCTION__
 #define CSL_PRINTF_CHECK(fmt, args) __attribute__((format(printf, fmt, args)))
 #else
+#define CSL_PRETTY_FN __FUNCTION__
 #define CSL_PRINTF_CHECK(fmt, args)
 #endif
 
-CSL_DLL_TOOLS void Debug_Printf(const char *file, int line, const char *func, const char *fmt, ...) CSL_PRINTF_CHECK(4, 5);
+CSL_DLL_TOOLS void Debug_Printf(const char *file, int line, const char *func,
+                                const char *fmt, ...) CSL_PRINTF_CHECK(4, 5);
 
 #ifdef CSL_DEBUG
 #define CSL_DEF_DEBUG(...)  __VA_ARGS__
 #define CSL_DO_DEBUG(body)  do { body; } while (0)
-#define CSL_LOG_DEBUG(...)  do { Debug_Printf(__FILE__, __LINE__, __FUNCTION__, ## __VA_ARGS__); } while (0)
+#define CSL_LOG_DEBUG(...)  Debug_Printf(__FILE__, __LINE__, CSL_PRETTY_FN, ## __VA_ARGS__)
 #else
 #define CSL_DEF_DEBUG(...)
 #define CSL_DO_DEBUG(body)  do { } while (0)
@@ -97,60 +100,16 @@ template<class T> inline T min(T a, T b) { return a < b ? a : b; }
 #define wxT_2(x) wxT(x)
 #endif
 
+#include <CslCharEncoding.h>
+#include <CslCubeEngineTools.h>
+
 typedef const char FourCCTag[4];
 static inline wxUint32 CSL_BUILD_FOURCC(FourCCTag tag)
 {
     return tag[0]|(tag[1]<<8)|(tag[2]<<16)|(tag[3]<<24);
 };
 
-class CslStopWatch : public wxStopWatch
-{
-    public:
-        CslStopWatch(bool dtor = true) :
-            m_on_dtor(dtor)
-        { }
-        ~CslStopWatch()
-        {
-            if (m_on_dtor)
-                Dump();
-        }
-        wxUint32 Elapsed()
-        {
-            return Time();
-        }
-        void Dump()
-        {
-            Debug_Printf(__FILE__, __LINE__, __FUNCTION__, "%lu ms\n", Time());
-        }
-
-    private:
-        bool m_on_dtor;
-};
-
-template<class T>
-class CslValueRestore
-{
-    public:
-        CslValueRestore(T& type, const T& set) :
-            m_type(&type), m_restore(type)
-        {
-            *m_type = set;
-        }
-        ~CslValueRestore()
-        {
-            *m_type = m_restore;
-        }
-
-    private:
-        CslValueRestore(const CslValueRestore&);
-        CslValueRestore& operator=(const CslValueRestore&);
-
-    protected:
-        T* m_type;
-        T m_restore;
-};
-
-// same as wxBITMAP_TYPE_xxxbut availale if wxUSE_GUI=0
+// same as wxBITMAP_TYPE_xxx but available if wxUSE_GUI=0
 // wrapper Csl2wxBitmapType(type) is in CslGuiTools.h
 enum
 {
@@ -177,8 +136,8 @@ enum
 };
 
 BEGIN_DECLARE_EVENT_TYPES()
-DECLARE_EXPORTED_EVENT_TYPE(CSL_DLL_TOOLS, wxCSL_EVT_THREAD_TERMINATE, wxID_ANY)
-END_DECLARE_EVENT_TYPES()
+        DECLARE_EXPORTED_EVENT_TYPE(CSL_DLL_TOOLS, wxCSL_EVT_THREAD_TERMINATE, wxID_ANY)
+        END_DECLARE_EVENT_TYPES()
 
 #define CSL_EVT_THREAD_TERMINATE(fn)                                             \
     DECLARE_EVENT_TABLE_ENTRY(                                                   \
@@ -188,11 +147,187 @@ END_DECLARE_EVENT_TYPES()
                                (wxObject*)NULL                                   \
                              ),
 
+
+class CslStopWatch : public wxStopWatch
+{
+    public:
+        CslStopWatch(bool dtor = true) :
+            m_onDtor(dtor)
+            { }
+        ~CslStopWatch()
+            { if (m_onDtor) Dump(); }
+
+        void Dump()
+            { Debug_Printf(__FILE__, __LINE__, CSL_PRETTY_FN, "%ld ms\n", Time()); }
+
+    private:
+        bool m_onDtor;
+};
+
+
+template<class T>
+class CslValueRestore
+{
+    public:
+        CslValueRestore(T& type, const T& set) :
+                m_type(&type), m_restore(type)
+            { *m_type = set;  }
+        ~CslValueRestore()
+            { *m_type = m_restore; }
+
+    private:
+        CslValueRestore(const CslValueRestore&);
+        CslValueRestore& operator=(const CslValueRestore&);
+
+    protected:
+        T* m_type;
+        T m_restore;
+};
+
+
+class CSL_DLL_TOOLS CslFileTime : public wxObject
+{
+    public:
+        CslFileTime(const wxDateTime& modify = wxDefaultDateTime,
+                    const wxDateTime& access = wxDefaultDateTime,
+                    const wxDateTime& create = wxDefaultDateTime) :
+                Modify(modify),
+                Access(access),
+                Create(create)
+            { }
+
+        void Check()
+        {
+            if (!Modify.IsValid())
+                Modify = wxDateTime::Now().MakeUTC();
+            if (!Access.IsValid())
+                Access = Modify;
+            if (!Create.IsValid())
+                Create = Modify;
+        }
+
+        bool Get(const wxFileName& fileName)
+        {
+            if (fileName.GetTimes(&Access, &Modify, &Create))
+            {
+                MakeUTC();
+                return true;
+            }
+
+            return false;
+        }
+
+        bool Set(wxFileName& fileName)
+        {
+            Check();
+
+            wxDateTime modify = Modify.FromTimezone(wxDateTime::UTC);
+            wxDateTime access = Access.FromTimezone(wxDateTime::UTC);
+            wxDateTime create = Create.FromTimezone(wxDateTime::UTC);
+
+            if (!fileName.SetTimes(&access, &modify, &create))
+                return false;
+
+            return true;
+        }
+
+        void MakeUTC()
+        {
+            Check();
+
+            Modify.MakeUTC();
+            Access.MakeUTC();
+            Create.MakeUTC();
+        }
+
+        wxDateTime Modify;
+        wxDateTime Access;
+        wxDateTime Create;
+
+    private:
+        DECLARE_DYNAMIC_CLASS(CslFileTime);
+};
+
+
+// same as wxTAR_xxx
+enum
+{
+    CSL_FILE_REGTYPE,   // regular file
+    CSL_FILE_LNKTYPE,   // hard link
+    CSL_FILE_SYMTYPE,   // symbolic link
+    CSL_FILE_CHRTYPE,   // character special
+    CSL_FILE_BLKTYPE,   // block special
+    CSL_FILE_DIRTYPE,   // directory
+    CSL_FILE_FIFOTYPE,  // named pipe
+    CSL_FILE_CONTTYPE   // contiguous file
+};
+
+class CSL_DLL_TOOLS CslFileProperties : public wxObject
+{
+    public:
+        CslFileProperties(const wxString& name = wxEmptyString,
+                          wxInt32 type = CSL_FILE_REGTYPE,
+                          wxInt32 mode = 0,
+                          size_t size = 0,
+                          const wxDateTime& modify = wxDefaultDateTime,
+                          const wxDateTime& access = wxDefaultDateTime,
+                          const wxDateTime& create = wxDefaultDateTime) :
+                Name(name),
+                Type(type),
+                Mode(mode ? mode : (type==CSL_FILE_DIRTYPE ? 0700 : 0600)),
+                Size(size),
+                Time(modify, access, create)
+            { }
+
+
+        bool Get()
+        {
+            const wxString filename = Name.GetFullPath();
+
+            if (Type==CSL_FILE_DIRTYPE && !wxFileName::DirExists(filename))
+                return false;
+            else if (!wxFileName::FileExists(filename))
+                return false;
+
+            if (!Time.Get(Name))
+                return false;
+
+            if ((Size = Name.GetSize().GetValue())==wxInvalidSize)
+                return false;
+        }
+
+        bool Set()
+        {
+            const wxString filename = Name.GetFullPath();
+
+            if (Type==CSL_FILE_DIRTYPE && !wxFileName::DirExists(filename))
+                return false;
+            else if (!wxFileName::FileExists(filename))
+                return false;
+
+            if (!Time.Set(Name))
+                return false;
+
+            if (chmod(U2C(filename), Mode)<0)
+                return false;
+
+            return true;
+        }
+
+        wxFileName Name;
+        wxInt32 Type;
+        wxInt32 Mode;
+        size_t Size;
+        CslFileTime Time;
+
+    private:
+        DECLARE_DYNAMIC_CLASS(CslFileProperties)
+};
+
+
 CSL_DLL_TOOLS wxUint32 BitCount32(wxUint32 value);
 
-#include <CslCharEncoding.h>
 #include <CslIPV4Addr.h>
-#include <CslCubeEngineTools.h>
 
 CSL_DLL_TOOLS wxString& CmdlineEscapeQuotes(wxString& str);
 CSL_DLL_TOOLS wxString& CmdlineEscapeSpaces(wxString& str);
@@ -210,17 +345,21 @@ CSL_DLL_TOOLS wxUint32 AtoN(const wxString& s);
 CSL_DLL_TOOLS wxString NtoA(wxUint32 ip);
 CSL_DLL_TOOLS wxString FormatBytes(wxUint64 size);
 CSL_DLL_TOOLS wxString FormatSeconds(wxUint32 time, bool space=false, bool full=false);
-CSL_DLL_TOOLS wxUint32 GetTicks();
+CSL_DLL_TOOLS wxString ToRfc2822(const wxDateTime& date, bool isUTC = true);
+CSL_DLL_TOOLS wxDateTime FromRfc2822(const wxString& date, bool toUTC = true);
+CSL_DLL_TOOLS time_t GetTicks();
 CSL_DLL_TOOLS const wxString& GetHttpAgent();
-CSL_DLL_TOOLS wxString FileName(const wxString& path, bool native=false);
-CSL_DLL_TOOLS wxString DirName(const wxString& path, bool native=false);
-CSL_DLL_TOOLS void AddPluginDir(const wxString& path, bool native=false);
-CSL_DLL_TOOLS void RemovePluginDir(const wxString& path);
+CSL_DLL_TOOLS wxString GetTempDir();
+CSL_DLL_TOOLS wxString FileName(const wxString& path, const wxString& cwd = wxEmptyString);
+CSL_DLL_TOOLS wxString DirName(const wxString& path, const wxString& cwd = wxEmptyString);
+CSL_DLL_TOOLS wxString FindFile(const wxString& name, wxArrayString& paths, bool first = false);
+CSL_DLL_TOOLS wxString AddPluginDir(const wxString& path, const wxString& cwd = wxEmptyString);
+CSL_DLL_TOOLS wxString RemovePluginDir(const wxString& path);
 CSL_DLL_TOOLS wxArrayString GetPluginDirs();
-CSL_DLL_TOOLS void AddDataDir(const wxString& path, bool native=false);
-CSL_DLL_TOOLS void RemoveDataDir(const wxString& path);
+CSL_DLL_TOOLS wxString AddDataDir(const wxString& path, const wxString& cwd = wxEmptyString);
+CSL_DLL_TOOLS wxString RemoveDataDir(const wxString& path);
 CSL_DLL_TOOLS wxArrayString GetDataDirs();
-CSL_DLL_TOOLS wxString FindPackageFile(const wxString& filename);
+CSL_DLL_TOOLS wxString FindPackageFile(const wxString& name, bool home = false);
 CSL_DLL_TOOLS wxInt32 FindFiles(const wxString& path, const wxString& filespec, wxArrayString& results);
 CSL_DLL_TOOLS bool HasDir(wxDir& dir, const wxString& path);
 CSL_DLL_TOOLS wxInt32 WriteTextFile(const wxString& filename, const wxString& data, const wxFile::OpenMode mode);

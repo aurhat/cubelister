@@ -21,7 +21,6 @@
 #ifndef CSLDLGCONNECTPASS_H
 #define CSLDLGCONNECTPASS_H
 
-
 class CslConnectPassInfo
 {
     public:

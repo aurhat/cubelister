@@ -25,7 +25,6 @@
 
 // end wxGlade
 
-
 class CslPanelSearch: public wxPanel {
     public:
         // begin wxGlade: CslPanelSearch::ids

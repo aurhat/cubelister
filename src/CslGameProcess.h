@@ -21,10 +21,7 @@
 #ifndef CSLGAMEPROCESS_H
 #define CSLGAMEPROCESS_H
 
-/**
-    @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
-
+#include <wx/process.h>
 
 BEGIN_DECLARE_EVENT_TYPES()
 DECLARE_LOCAL_EVENT_TYPE(wxCSL_EVT_PROCESS, wxID_ANY)

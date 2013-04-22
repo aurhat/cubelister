@@ -1,7 +1,7 @@
 ;Include Modern UI
 !include "MUI.nsh"
 
-!define CSL_VERSION 0.8.1.93
+!define CSL_VERSION 0.8.1.94
 
 ;The name of the installer
   Name "Cube Server Lister ${CSL_VERSION}"

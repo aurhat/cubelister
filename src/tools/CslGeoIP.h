@@ -21,10 +21,6 @@
 #ifndef CSLGEOIP_H
 #define CSLGEOIP_H
 
-/**
-    @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
-
 class CSL_DLL_GUITOOLS CslGeoIPService
 {
     public:
@@ -36,6 +32,7 @@ class CSL_DLL_GUITOOLS CslGeoIPService
 
 WX_DEFINE_USER_EXPORTED_ARRAY(CslGeoIPService*, CslGeoIPServices, class CSL_DLL_GUITOOLS);
 
+
 class CSL_DLL_GUITOOLS CslGeoIP
 {
     private:
@@ -44,14 +41,23 @@ class CSL_DLL_GUITOOLS CslGeoIP
 
         static CslGeoIP& GetInstance()
         {
-            static CslGeoIP geoIP;
-            return geoIP;
+            static CslGeoIP geoip;
+            return geoip;
         }
 
     public:
-        enum { GEOIP_TYPE_UNKNOWN, GEOIP_TYPE_COUNTRY, GEOIP_TYPE_CITY};
+        enum
+        {
+            GEOIP_COUNTRY,
+            GEOIP_CITY
+        };
 
         static bool IsOk();
+        static wxInt32 GetType();
+        static bool Load(wxInt32 type);
+        static void Unload();
+        static wxString GetFileName();
+        static wxURI GetUpdateURI(wxInt32 type = -1);
         static const char* GetCountryCodeByAddr(const char *host);
         static const char* GetCountryCodeByIPnum(const unsigned long ipnum);
         static wxString GetCountryNameByAddr(const char *host);
@@ -66,8 +72,9 @@ class CSL_DLL_GUITOOLS CslGeoIP
 
     private:
         wxInt32 m_type;
+        wxString m_fileName;
         CslGeoIPServices m_services;
-        wxArrayString m_country_codes, m_country_names;
+        wxArrayString m_countryCodes, m_countryNames;
 };
 
 #endif

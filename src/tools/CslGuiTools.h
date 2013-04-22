@@ -34,9 +34,9 @@ END_DECLARE_EVENT_TYPES()
                              ),
 
 
-inline long Csl2wxBitmapType(long type)
+inline wxBitmapType Csl2wxBitmapType(wxInt32 type)
 {
-    static const long types[] = {
+    static const wxBitmapType types[] = {
         wxBITMAP_TYPE_BMP,
         wxBITMAP_TYPE_GIF,
         wxBITMAP_TYPE_JPEG,
@@ -50,7 +50,8 @@ inline long Csl2wxBitmapType(long type)
         wxBITMAP_TYPE_ANI,
         wxBITMAP_TYPE_ANY
     };
-    return (type<0 || type>CSL_BITMAP_TYPE_ANY) ? wxBITMAP_TYPE_ANY : types[type];
+    return (type<0 || (size_t)type>sizeof(type)/sizeof(types[0])) ?
+                wxBITMAP_TYPE_ANY : types[type];
 }
 
 #define CSL_SET_WINDOW_ICON() \
@@ -78,13 +79,6 @@ inline long Csl2wxBitmapType(long type)
 
 WX_DEFINE_ARRAY(wxWindow*, CslArraywxWindow);
 
-template<size_t N>
-inline void EnableWindows(wxWindow* (&t)[N], bool enable)
-{
-    loopi(N) t[i]->Enable(enable);
-}
-
-
 class CSL_DLL_GUITOOLS CslBufferedStaticBitmap : public wxPanel
 {
     private:
@@ -108,7 +102,11 @@ class CSL_DLL_GUITOOLS CslBufferedStaticBitmap : public wxPanel
         wxSize m_bmpSize;
 };
 
-
+template<size_t N>
+inline void EnableWindows(wxWindow* (&t)[N], bool enable)
+{
+    loopi(N) t[i]->Enable(enable);
+}
 CSL_DLL_GUITOOLS wxBitmap AdjustBitmapSize(const char **data, const wxSize& size, const wxPoint& origin);
 CSL_DLL_GUITOOLS wxBitmap AdjustBitmapSize(const wxBitmap& bitmap, const wxSize& size, const wxPoint& origin);
 

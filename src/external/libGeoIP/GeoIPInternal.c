@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Glen Masgai                                *
+ *   Copyright (C) 2007-2013 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -38,6 +38,9 @@ int pread(unsigned int fd, char *buf, size_t count, int offset)
 }
 #endif //_MSC_VER
 
+#ifdef PACKAGE_VERSION
+#undef PACKAGE_VERSION
+#endif
 #define PACKAGE_VERSION  "1.4.8"
 
 #include "GeoIP.c"

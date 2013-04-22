@@ -21,20 +21,15 @@
 #ifndef CSLREDECLIPSE_H
 #define CSLREDECLIPSE_H
 
-/**
- @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
+#define CSL_DEFAULT_NAME_RE        wxT("Red Eclipse")
+#define CSL_LAST_PROTOCOL_RE       214
 
-#define CSL_DEFAULT_NAME_RE           wxT("Red Eclipse")
-#define CSL_LAST_PROTOCOL_RE          214
+#define CSL_FOURCC_RE              "RDEE"
 
-#define CSL_FOURCC_RE                 "RDEE"
+#define CSL_DEFAULT_PORT_RE        28801
+#define CSL_DEFAULT_BCAST_PORT_RE  28799
 
-#define CSL_DEFAULT_PORT_RE           28801
-#define CSL_DEFAULT_BCAST_PORT_RE     28799
-
-#define CSL_DEFAULT_MASTER_RE         wxT("play.redeclipse.net")
-#define CSL_DEFAULT_MASTER_PORT_RE    28800
+#define CSL_DEFAULT_MASTER_RE      wxT("tcp://play.redeclipse.net:28800/list\n")
 
 
 class CSL_DLL_PLUGINS CslGameRedEclipse : public CslGame

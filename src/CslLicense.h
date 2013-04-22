@@ -21,10 +21,6 @@
 #ifndef CSLLICENSE_H
 #define CSLLICENSE_H
 
-/**
-    @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
-
 const wxChar *csl_license = wxT("            GNU GENERAL PUBLIC LICENSE\n")
                             wxT("                    Version 2, June 1991\n")
                             wxT("\n")

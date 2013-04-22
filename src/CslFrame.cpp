@@ -27,54 +27,86 @@
 #include "CslDlgConnectWait.h"
 #include "CslDlgGeneric.h"
 #include "CslFrame.h"
-
-#define CSL_TIMER_SHOT 250
-
-
-BEGIN_EVENT_TABLE(CslFrame,wxFrame)
-    CSL_EVT_PONG(CslPongEvent::PLAYERSTATS, CslFrame::OnPong)
-    CSL_EVT_PONG(CslPongEvent::TEAMSTATS, CslFrame::OnPong)
-    CSL_EVT_PONG(CslPongEvent::EVENT, CslFrame::OnPong)
-    EVT_TIMER(wxID_ANY,CslFrame::OnTimer)
-    EVT_LIST_ITEM_SELECTED(wxID_ANY,CslFrame::OnListItemSelected)
-    EVT_LIST_ITEM_ACTIVATED(wxID_ANY,CslFrame::OnListItemActivated)
-    EVT_TREE_SEL_CHANGED(wxID_ANY,CslFrame::OnTreeSelChanged)
-    EVT_TREE_ITEM_RIGHT_CLICK(wxID_ANY,CslFrame::OnTreeRightClick)
-    EVT_MENU(wxID_ANY,CslFrame::OnCommandEvent)
-    EVT_TEXT(SEARCH_TEXT, CslFrame::OnCommandEvent)
-    EVT_TEXT_ENTER(SEARCH_TEXT, CslFrame::OnCommandEvent)
-    EVT_BUTTON(SEARCH_BUTTON_SEARCH,CslFrame::OnCommandEvent)
-    #ifndef __WXMAC__
-    EVT_ICONIZE(CslFrame::OnIconize)
-    EVT_TASKBAR_LEFT_DOWN(CslFrame::OnTrayIcon)
-    #endif
-    EVT_SHOW(CslFrame::OnShow)
-    EVT_CLOSE(CslFrame::OnClose)
-    CSL_EVT_TOOLTIP(wxID_ANY,CslFrame::OnToolTip)
-    CSL_EVT_VERSIONCHECK(wxID_ANY,CslFrame::OnVersionCheck)
-    CSL_EVT_PROCESS(wxID_ANY,CslFrame::OnEndProcess)
-    CSL_EVT_IPC(wxID_ANY,CslFrame::OnIPC)
-END_EVENT_TABLE()
+#include <wx/mstream.h>
+#include <wx/txtstrm.h>
+#include <wx/tokenzr.h>
+#include <memory>
 
 
-bool g_csl_about_shown    = false;
-bool g_csl_settings_shown = false;
+#define CSL_TIMER_SHOT  250
 
 
 class CslTreeItemData : public wxTreeItemData
 {
     public:
-        CslTreeItemData(CslGame* game) : m_game(game), m_master(NULL) {}
-        CslTreeItemData(CslMaster* master) : m_game(NULL), m_master(master) {}
+        CslTreeItemData(CslGame* game) :
+                Game(game),
+                Master(NULL)
+        { }
+        CslTreeItemData(CslMaster* master) :
+                Game(NULL),
+                Master(master)
+        { }
 
-        CslGame* GetGame() { return m_game; }
-        CslMaster* GetMaster() { return m_master; }
-
-    protected:
-        CslGame *m_game;
-        CslMaster *m_master;
+        CslGame *Game;
+        CslMaster *Master;
 };
 
+
+class CslProtocolInputCookie
+{
+    public:
+        enum { VERSION_CHECK = 0, GEOIP_COUNTRY, GEOIP_CITY, TEST_TARGZ, TEST_TCP };
+
+        CslProtocolInputCookie(wxInt32 id,
+                       wxURI src, const wxFileName& dst,
+                       wxString statusMsg = wxEmptyString,
+                       time_t *lastCheck = NULL,
+                       time_t *lastDate = NULL,
+                       time_t interval = 0,
+                       size_t chunkSize = 0, size_t maxSize = 0) :
+                Id(id),
+                URI(src),
+                Dest(dst),
+                StatusMsg(statusMsg),
+                LastCheck(lastCheck),
+                LastDate(lastDate),
+                CheckInterval(interval),
+                ChunkSize(chunkSize), MaxSize(maxSize),
+                Tries(0)
+            { }
+
+        static wxString GetStatusText(const CslProtocolInputCookie& cookie)
+        {
+            wxString text;
+
+            if (cookie.StatusMsg.IsEmpty())
+                text << _("Getting") << wxT(" ")
+                     << cookie.URI.BuildURI() << wxT(". ");
+            else
+                text << cookie.StatusMsg << wxT(" ");
+
+            return text;
+        }
+
+        wxString GetStatusText() const
+            { return GetStatusText(*this); }
+
+        wxInt32 Id;
+        wxURI URI;
+        wxFileName Dest;
+        wxString StatusMsg;
+        time_t *LastCheck;
+        time_t *LastDate;
+        time_t CheckInterval;
+        size_t ChunkSize;
+        size_t MaxSize;
+        wxInt32 Tries;
+};
+
+
+bool g_csl_about_shown    = false;
+bool g_csl_settings_shown = false;
 
 #ifndef __WXMAC__
 class CslTaskBarIcon : public wxTaskBarIcon
@@ -112,23 +144,47 @@ class CslTaskBarIcon : public wxTaskBarIcon
             // don't push the events to the parents handler queue
             // but process them, so the taskbar icon is blocked
             void OnCommandEvent(wxCommandEvent& event)
-            {
-                   m_parent->ProcessEvent(event);
-            }
+                { m_parent->ProcessEvent(event); }
             void OnLeftDown(wxTaskBarIconEvent& event)
-            {
-                   m_parent->ProcessEvent(event);
-            }
+                { m_parent->ProcessEvent(event); }
+
             DECLARE_EVENT_TABLE()
 
             wxEvtHandler *m_parent;
 };
 
 BEGIN_EVENT_TABLE(CslTaskBarIcon, wxTaskBarIcon)
-    EVT_MENU(wxID_ANY, CslTaskBarIcon::OnCommandEvent)
-    EVT_TASKBAR_LEFT_DOWN(CslTaskBarIcon::OnLeftDown)
+EVT_MENU(wxID_ANY, CslTaskBarIcon::OnCommandEvent)
+EVT_TASKBAR_LEFT_DOWN(CslTaskBarIcon::OnLeftDown)
 END_EVENT_TABLE()
 #endif // __WXMAC__
+
+
+BEGIN_EVENT_TABLE(CslFrame,wxFrame)
+CSL_EVT_PONG(CslPongEvent::PLAYERSTATS, CslFrame::OnPong)
+CSL_EVT_PONG(CslPongEvent::TEAMSTATS, CslFrame::OnPong)
+CSL_EVT_PONG(CslPongEvent::EVENT, CslFrame::OnPong)
+CSL_EVT_MASTER_UPDATE(CslFrame::OnMasterUpdate)
+EVT_TIMER(wxID_ANY,CslFrame::OnTimer)
+EVT_LIST_ITEM_SELECTED(wxID_ANY,CslFrame::OnListItemSelected)
+EVT_LIST_ITEM_ACTIVATED(wxID_ANY,CslFrame::OnListItemActivated)
+EVT_TREE_SEL_CHANGED(wxID_ANY,CslFrame::OnTreeSelChanged)
+EVT_TREE_ITEM_RIGHT_CLICK(wxID_ANY,CslFrame::OnTreeRightClick)
+EVT_MENU(wxID_ANY,CslFrame::OnCommandEvent)
+EVT_TEXT(SEARCH_TEXT, CslFrame::OnCommandEvent)
+EVT_TEXT_ENTER(SEARCH_TEXT, CslFrame::OnCommandEvent)
+EVT_BUTTON(SEARCH_BUTTON_SEARCH,CslFrame::OnCommandEvent)
+#ifndef __WXMAC__
+EVT_ICONIZE(CslFrame::OnIconize)
+EVT_TASKBAR_LEFT_DOWN(CslFrame::OnTrayIcon)
+#endif
+EVT_SHOW(CslFrame::OnShow)
+EVT_CLOSE(CslFrame::OnClose)
+CSL_EVT_TOOLTIP(wxID_ANY,CslFrame::OnToolTip)
+CSL_EVT_PROTO_INPUT(wxID_ANY,CslFrame::OnCslProtocolInput)
+CSL_EVT_PROCESS(wxID_ANY,CslFrame::OnEndProcess)
+CSL_EVT_IPC(wxID_ANY,CslFrame::OnIPC)
+END_EVENT_TABLE()
 
 
 CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
@@ -140,10 +196,9 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
 
     if (!m_engine->Init(this, CSL_UPDATE_INTERVAL_MIN, 1000/CSL_TIMER_SHOT))
     {
-        wxMessageBox(    _("Failed to initialise internal engine!\n"
-                     wxT_2("Please try to restart the application.")),
+        wxMessageBox(_("Failed to initialise!\nTry to restart the application."),
                      _("Fatal error!"), wxICON_ERROR, this);
-        ::wxGetApp().Shutdown(CslApp::CSL_SHUTDOWN_ERROR);
+        ::wxGetApp().SetShutdown(CslApp::CSL_SHUTDOWN_ERROR);
         Close();
         return;
     }
@@ -154,6 +209,8 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
     m_oldSelectedInfo = NULL;
 
     CslSettings::LoadSettings();
+
+    CslGeoIP::Load(CslGetSettings().GeoIPType);
 
     if (!LoadLocators())
     {
@@ -179,13 +236,13 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
     m_engine->SetUpdateInterval(CslGetSettings().UpdateInterval);
 
     CslGame *game;
-    const CslArrayCslGame& games=m_engine->GetGames();
+    const CslArrayCslGame& games = m_engine->GetGames();
 
     loopv(games)
     {
         game=games[i];
 
-        CslMaster *master = CslMaster::Create(game->GetDefaultMasterConnection());
+        CslMaster *master = CslMaster::Create(game->GetDefaultMasterURI());
 
         if (game->AddMaster(master)<0)
             CslMaster::Destroy(master);
@@ -206,7 +263,14 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
         TreeGamesScrollToSelection();
     }
 
-    CslMenu::EnableItem(MENU_ADD);
+    if (games.size())
+    {
+        CslMenu::EnableItem(MENU_ADD);
+        CslMenu::EnableItem(MENU_GAME_SERVER_COUNTRY);
+        CslMenu::EnableItem(MENU_GAME_PLAYER_COUNTRY);
+    }
+
+    InitProtocolInputs();
 
     m_timerUpdate=CslGetSettings().UpdateInterval/CSL_TIMER_SHOT;
     m_timerCount=0;
@@ -214,18 +278,11 @@ CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
     m_timer.SetOwner(this);
     m_timer.Start(CSL_TIMER_SHOT);
 
-    m_ipcServer = new CslIpcServer(this);
-    if (!m_ipcServer->Create(CSL_IPC_SERV))
+    if (!(m_ipcServer = new CslIpcServer(this))->Create(CSL_IPC_SERV))
     {
         CSL_LOG_DEBUG("couldn't create IPC server socket\n");
-        delete m_ipcServer;
-        m_ipcServer = NULL;
+        wxDELETE(m_ipcServer);
     }
-
-    m_versionCheckThread = new CslVersionCheckThread(this);
-
-    if (m_versionCheckThread->IsOk())
-        m_versionCheckThread->Run();
 
     LoadPlugins(this);
 }
@@ -235,11 +292,12 @@ CslFrame::~CslFrame()
     if (!m_engine->IsOk())
         return;
 
+    DeinitProtocolInputs();
+
 #ifndef __WXMAC__
     // delete the icon immediately so it doesn't receive any
     // mouse events anymore which causes crash at least on __WXMSW__
-    if (m_taskbar_icon)
-        delete m_taskbar_icon;
+    wxDELETE(m_taskbar_icon);
 #endif
 
     if (m_timer.IsRunning())
@@ -259,19 +317,12 @@ CslFrame::~CslFrame()
 
     UnloadPlugins(this);
 
-    if (m_ipcServer)
-    {
-        delete m_ipcServer;
-        m_ipcServer=NULL;
-    }
+    wxDELETE(m_ipcServer);
 
     CslTTS::DeInit();
 
     if (m_engine->IsOk())
         m_engine->DeInit();
-
-    if (m_versionCheckThread)
-        delete m_versionCheckThread;
 
     m_aui.UnInit();
 }
@@ -331,7 +382,6 @@ void CslFrame::CreateMainMenu()
 #endif
 
     SetMenuBar(menubar);
-
     CslMenu::SetMainMenu(menubar);
 
     CslMenu::EnableItem(MENU_ADD, false);
@@ -341,6 +391,11 @@ void CslFrame::CreateMainMenu()
     CslMenu::EnableItem(MENU_GAME_PLAYER_COUNTRY, false);
     CslMenu::CheckItem(MENU_GAME_SEARCH_LAN, CslGetSettings().SearchLAN);
     CslMenu::CheckItem(MENU_VIEW_AUTO_SORT, CslGetSettings().AutoSortColumns);
+}
+
+wxString CslFrame::GetHomeDir()
+{
+    return ::wxGetApp().GetHomeDir();
 }
 
 wxInt32 CslFrame::GetFreeId()
@@ -402,6 +457,8 @@ void CslFrame::CreateControls()
     m_imgListTree.Add(GET_ART_TOOLBAR(wxART_MASTER));
 
     tree_ctrl_games = new wxTreeCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, tree_style);
+    m_treeGamesRoot = tree_ctrl_games->AddRoot(wxEmptyString, -1, -1);
+
     list_ctrl_info = new CslListCtrlInfo(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, list_style|wxLC_NO_HEADER|wxLC_HRULES);
 
     player_info = new CslPanelServerView(this, wxT("players0"), list_style);
@@ -436,7 +493,7 @@ void CslFrame::SetProperties()
 #endif
     m_aui.SetManagedWindow(this);
 
-    SetTitle(_("Cube Server Lister"));
+    tree_ctrl_games->SetImageList(&m_imgListTree);
 
     player_info->ListCtrl()->ListInit(CslListCtrlPlayerView::SIZE_MINI);
 
@@ -449,8 +506,7 @@ void CslFrame::SetProperties()
     // the main frame using static event tables - connect them here
     ConnectEventRecursive(wxID_ANY, this, this, wxEVT_KEY_DOWN, wxKeyEventHandler(CslFrame::OnKeypress));
 
-    tree_ctrl_games->SetImageList(&m_imgListTree);
-    m_treeGamesRoot = tree_ctrl_games->AddRoot(wxEmptyString, -1, -1);
+    SetTitle(_("Cube Server Lister"));
 
 #ifdef __WXMSW__
     SetIcon(wxICON(appicon));
@@ -661,7 +717,7 @@ void CslFrame::CountryViewSetCaption(CslServerInfo *info)
             return;
 
         if (master)
-            caption << master->GetConnection().Address << wxT(" (") << game->GetName() << wxT(")");
+            caption << master->GetURI().GetServer() << wxT(" (") << game->GetName() << wxT(")");
         else
             caption << game->GetName();
     }
@@ -890,6 +946,11 @@ void CslFrame::ToggleShow(wxInt32 mode)
             Show(true);
 #endif
         Iconize(false);
+
+#ifndef __WXMAC__
+        if (CSL_FLAG_CHECK(CslGetSettings().Systray, CSL_USE_SYSTRAY))
+            Raise();
+#endif
     }
     else
     {
@@ -919,8 +980,7 @@ void CslFrame::ToggleTrayIcon()
     {
         ToggleShow(1);
 
-        delete m_taskbar_icon;
-        m_taskbar_icon = NULL;
+        wxDELETE(m_taskbar_icon);
     }
 }
 #endif
@@ -995,9 +1055,9 @@ wxTreeItemId CslFrame::TreeGamesFindItem(wxTreeItemId parent, CslGame *game, Csl
 
         if (game)
         {
-            if (data->GetGame()==game)
+            if (data->Game==game)
                 break;
-            else if (master && data->GetMaster()==master)
+            else if (master && data->Master==master)
                 break;
         }
 
@@ -1024,7 +1084,7 @@ void CslFrame::TreeGamesAddMaster(wxTreeItemId parent,CslMaster *master,bool foc
 
     wxTreeItemId item;
     CslTreeItemData *data=new CslTreeItemData(master);
-    item=tree_ctrl_games->AppendItem(parent,master->GetConnection().Address,0,-1,data);
+    item=tree_ctrl_games->AppendItem(parent, master->GetURI().GetServer(), 0, -1, data);
 
     if (focus)
         tree_ctrl_games->SelectItem(item);
@@ -1084,10 +1144,10 @@ CslGame* CslFrame::TreeGamesGetSelectedGame(wxTreeItemId *item)
         CslTreeItemData *data;
         if ((data=(CslTreeItemData*)tree_ctrl_games->GetItemData(id))==NULL)
             return NULL;
-        if (data->GetMaster())
-            return data->GetMaster()->GetGame();
+        if (data->Master)
+            return data->Master->GetGame();
         else
-            return data->GetGame();
+            return data->Game;
     }
 
     return NULL;
@@ -1103,15 +1163,167 @@ CslMaster* CslFrame::TreeGamesGetSelectedMaster(wxTreeItemId *item)
             *item=id;
 
         CslTreeItemData *data=(CslTreeItemData*)tree_ctrl_games->GetItemData(id);
-        return data ? data->GetMaster():NULL;
+        return data ? data->Master : NULL;
     }
 
     return NULL;
 }
 
+wxString CslFrame::CheckVersion(wxInputStream& input)
+{
+    wxString type;
+    wxString version;
+    bool update = false;
+
+    wxTextInputStream stream(input);
+
+    while (!input.Eof())
+    {
+        char buf[32];
+        CslCharBuffer line = CslWX2MB(stream.ReadLine());
+
+        if (sscanf(line.data(), "release:%31s", buf)==1)
+            type = wxT("Release");
+        else if (sscanf(line.data(), "testing:%31s", buf)==1)
+            type = wxT("Testing");
+
+        if (!type.IsEmpty())
+        {
+            version = C2U(buf);
+            version.Trim().Trim(true);
+
+            if (version.IsEmpty() && version.Cmp(CSL_VERSION_STR)>0)
+                update = true;
+
+            CSL_LOG_DEBUG("version check (%s): %s\n", U2C(type), buf);
+        }
+    }
+
+    if (update)
+    {
+        CslDlgGeneric *dlg = new CslDlgGeneric(this, CSL_DLG_GENERIC_URL|CSL_DLG_GENERIC_CLOSE,
+                                               wxString::Format(_("New %s version %s"), type.c_str(), version.c_str()),
+                                               wxString::Format(_("A new %s version (%s)\n of Cube Server Lister is available.\n"),
+                                                                type.c_str(), version.c_str()),
+                                               wxArtProvider::GetBitmap(wxART_INFORMATION ,wxART_CMN_DIALOG),
+                                               CSL_WEBADDR_STR);
+        dlg->Show();
+
+        return wxString::Format(_("New version %s"), version.c_str());
+    }
+
+    return _("No update available.");
+}
+
+void CslFrame::InitProtocolInputs()
+{
+    m_lastVersionCheck = 0;
+    m_lastVersionDate = 0;
+
+    m_protocolInput = NULL;
+
+    CslSettings& settings = CslGetSettings();
+    m_lastVersionDate = 0;
+
+    #define CSL_VERSION_CHECK_INTERVAL  (6*60*60)
+    #define CSL_GEOIP_CHECK_INTERVAL    (24*60*60)
+
+    m_protocolInputCookies.push_back(
+        new CslProtocolInputCookie(CslProtocolInputCookie::VERSION_CHECK,
+                                   wxString(CSL_WEBADDR_STR wxT("/latest.txt")),
+                                   //wxString(wxT("http://localhost/~mimosius/latest.txt")),
+                                   wxFileName(),
+                                   wxString::Format(_("Checking for new %s version."), CSL_NAME_SHORT_STR),
+                                   &m_lastVersionCheck, &m_lastVersionDate, CSL_VERSION_CHECK_INTERVAL,
+                                   1024, 1024));
+
+    m_protocolInputCookies.push_back(
+        new CslProtocolInputCookie(CslProtocolInputCookie::GEOIP_COUNTRY,
+                                   //wxString(wxT("http://masgai.eu/GeoIP.dat.gz")),
+                                   CslGeoIP::GetUpdateURI(CslGeoIP::GEOIP_COUNTRY),
+                                   wxFileName(wxT("%tmp%"), wxEmptyString),
+                                   _("Checking for GeoIP update."),
+                                   &settings.GeoIPCountryLastCheck, &settings.GeoIPCountryLastDate, CSL_GEOIP_CHECK_INTERVAL));
+
+    m_protocolInputCookies.push_back(
+        new CslProtocolInputCookie(CslProtocolInputCookie::GEOIP_CITY,
+                                   //wxString(wxT("http://localhost/~mimosius/GeoLiteCity.dat.gz")),
+                                   CslGeoIP::GetUpdateURI(CslGeoIP::GEOIP_CITY),
+                                   wxFileName(wxT("%tmp%"), wxEmptyString),
+                                   _("Checking for GeoIP update."),
+                                   &settings.GeoIPCityLastCheck, &settings.GeoIPCityLastDate, CSL_GEOIP_CHECK_INTERVAL));
+}
+
+void CslFrame::DeinitProtocolInputs()
+{
+    wxDELETE(m_protocolInput);
+
+    loopvrev(m_protocolInputCookies)
+    {
+        CslProtocolInputCookie *cookie = (CslProtocolInputCookie*)m_protocolInputCookies[i];
+        delete cookie;
+    }
+
+    m_protocolInputCookies.clear();
+}
+
+void CslFrame::CheckProtocolInputs()
+{
+    if (m_protocolInput)
+        return;
+
+    static wxInt32 next = -1;
+    next = min(next+1, (wxInt32)m_protocolInputCookies.size()) % m_protocolInputCookies.size();
+
+    time_t now = wxDateTime::Now().MakeUTC().GetTicks();
+
+    CslProtocolInputCookie& cookie = *(CslProtocolInputCookie*)m_protocolInputCookies[next];
+
+    switch (cookie.Id)
+    {
+        case CslProtocolInputCookie::GEOIP_COUNTRY:
+        case CslProtocolInputCookie::GEOIP_CITY:
+            if (cookie.Id-CslProtocolInputCookie::GEOIP_COUNTRY!=CslGeoIP::GetType())
+                return;
+            if (!CslGeoIP::IsOk())
+            {
+                *cookie.LastDate = 0;
+                *cookie.LastCheck = 0;
+            }
+            else if (!CslGetSettings().GeoIPAutoUpdate)
+                return;
+            break;
+    }
+
+    if (!*cookie.LastCheck || now-*cookie.LastCheck>=cookie.CheckInterval)
+    {
+        wxDateTime dt;
+        wxFileName dest(cookie.Dest);
+
+        if (*cookie.LastDate)
+            dt.Set(*cookie.LastDate);
+
+        if (dest.GetPath(0).StartsWith(wxT("%tmp%")))
+            cookie.Dest.AssignDir(::GetTempDir());
+
+        m_protocolInput = new CslProtocolInput(this, cookie.Id, cookie.URI, cookie.Dest, dt);
+
+        if (cookie.MaxSize>0)
+            m_protocolInput->SetMaxRead(cookie.MaxSize);
+        if (cookie.ChunkSize>0)
+            m_protocolInput->SetChunkSize(cookie.ChunkSize);
+
+        m_protocolInput->SetClientData(&cookie);
+        m_protocolInput->Run();
+
+        SetStatusText(cookie.GetStatusText(), 1);
+    }
+}
+
 void CslFrame::UpdateMaster()
 {
-    CslMaster *master=TreeGamesGetSelectedMaster();
+    CslMaster *master = TreeGamesGetSelectedMaster();
+
     if (!master)
         return;
 
@@ -1122,46 +1334,51 @@ void CslFrame::UpdateMaster()
     if (game)
     {
         CslServerInfo *info;
-        wxUint32 now=wxDateTime::Now().GetTicks();
-        CslArrayCslServerInfo& servers=game->GetServers();
+        wxUint32 now = wxDateTime::Now().GetTicks();
+        CslArrayCslServerInfo& servers = game->GetServers();
+        CslSettings& settings = CslGetSettings();
 
         loopvrev(servers)
         {
-            info=servers[i];
+            info = servers[i];
 
-            if (CslGetSettings().CleanupServers &&
-                now-info->LastSeen>CslGetSettings().CleanupServers &&
-                !(CslGetSettings().CleanupServersKeepFav && info->IsFavourite()) &&
-                !(CslGetSettings().CleanupServersKeepStats && info->HasStats()))
+            if (settings.CleanupServers &&
+                now-info->LastSeen > settings.CleanupServers &&
+                !(settings.CleanupServersKeepFav && info->IsFavourite()) &&
+                !(settings.CleanupServersKeepStats && info->HasStats()))
             {
                 loopvj(m_serverViews)
                 {
                     if (j!=0 && m_serverViews[j]->GetServerInfo()==info)
                     {
-                        info=NULL;
+                        info = NULL;
                         break;
                     }
                 }
 
                 if (info)
                 {
-                    CSL_LOG_DEBUG("Server cleanup: %s - %s (%s)\n", U2C(game->GetName()),
-                                  U2C(info->GetBestDescription()), U2C(info->Address().GetIPString()));
+                    CSL_LOG_DEBUG("server cleanup: %s - %s (%s)\n",
+                                  U2C(game->GetName()),
+                                  U2C(info->GetBestDescription()),
+                                  U2C(info->Address().GetIPString()));
 
                     if (m_serverViews.size() && m_serverViews[0]->GetServerInfo()==info)
                     {
                         m_serverViews[0]->SetServerInfo(NULL);
                         m_serverViews[0]->UpdateData();
-                        wxAuiPaneInfo& pane=m_aui.GetPane(m_serverViews[0]);
+
+                        wxAuiPaneInfo& pane = m_aui.GetPane(m_serverViews[0]);
+
                         if (pane.IsOk())
                         {
-                            pane.Caption(ServerViewGetCaption(NULL,true));
+                            pane.Caption(ServerViewGetCaption(NULL, true));
                             m_aui.Update();
                         }
                     }
 
                     if (info->IsFavourite())
-                        list_ctrl_favourites->RemoveServer(NULL,info,-1);
+                        list_ctrl_favourites->RemoveServer(NULL, info, -1);
 
                     m_engine->DeleteServer(game, info);
                 }
@@ -1169,19 +1386,9 @@ void CslFrame::UpdateMaster()
         }
     }
 
-    SetStatusText(_("Sending request to master: ")+master->GetConnection().Address,1);
-    wxInt32 num=m_engine->UpdateFromMaster(master);
-    if (num<0)
-        SetStatusText(_("Error on update from master: ")+master->GetConnection().Address,1);
-    else
-    {
-        m_timerCount=0;
-        list_ctrl_master->Clear();
-        SetStatusText(wxString::Format(_("Got %d servers from master"),num),1);
-    }
+    SetStatusText(_("Sending request to master: ") + master->GetURI().GetServer(), 1);
 
-    m_timerInit=true;
-    m_timer.Start(CSL_TIMER_SHOT);
+    m_engine->UpdateFromMaster(master);
 }
 
 void CslFrame::ConnectToServer(CslServerInfo *info,wxInt32 pass)
@@ -1212,15 +1419,17 @@ void CslFrame::ConnectToServer(CslServerInfo *info,wxInt32 pass)
 
 wxUint32 CslFrame::LoadLocators()
 {
-    if (!::wxFileExists(CSL_LOCATORS_FILE))
+    const wxString cfgFile = GetHomeDir() + CSL_LOCATORS_FILE;
+
+    if (!::wxFileExists(cfgFile))
         return 0;
 
     long int val;
     wxUint32 i=0;
     wxString Name,Host,Path;
 
-    wxFileConfig config(wxT(""),wxT(""),CSL_LOCATORS_FILE,wxT(""),
-                        wxCONFIG_USE_LOCAL_FILE,wxConvLocal);
+    wxFileConfig config(wxT(""), wxT(""), cfgFile, wxT(""),
+                        wxCONFIG_USE_LOCAL_FILE, wxConvLocal);
 
     config.SetPath(wxT("/Version"));
     config.Read(wxT("Version"), &val, 0);
@@ -1242,18 +1451,19 @@ wxUint32 CslFrame::LoadLocators()
 
 void CslFrame::SaveLocators()
 {
-    wxString s=::wxPathOnly(CSL_LOCATORS_FILE);
+    const wxString cfgFile = GetHomeDir() + CSL_LOCATORS_FILE;
+    const wxString dir = ::wxPathOnly(cfgFile);
 
-    if (!::wxDirExists(s))
-        if (!::wxMkdir(s,0700))
-            return;
+    if (!::wxDirExists(dir) && !wxFileName::Mkdir(dir, 0700, wxPATH_MKDIR_FULL))
+        return;
 
-    wxFileConfig config(wxT(""),wxT(""),CSL_LOCATORS_FILE,wxT(""),
-                        wxCONFIG_USE_LOCAL_FILE,wxConvLocal);
+    wxFileConfig config(wxT(""), wxT(""), cfgFile, wxT(""),
+                        wxCONFIG_USE_LOCAL_FILE, wxConvLocal);
     config.SetUmask(0077);
     config.DeleteAll();
 
     wxUint32 i;
+    wxString s;
     CslGeoIPService *service;
     const CslGeoIPServices& services=CslGeoIP::GetServices();
 
@@ -1442,6 +1652,25 @@ void CslFrame::OnPong(CslPongEvent& event)
     }
 }
 
+void CslFrame::OnMasterUpdate(CslMasterUpdateEvent& event)
+{
+    event.Skip();
+
+    list_ctrl_master->Clear();
+
+    wxInt32 count = event.GetCount();
+    wxString name = wxT(" ") + event.GetMaster()->GetURI().GetServer();
+
+    if (count<0)
+        SetStatusText(_("Error on update from master:") + name, 1);
+    else
+        SetStatusText(wxString::Format(_("Got %d servers from master:"), count) + name, 1);
+
+    m_timerInit = true;
+    m_timerCount = 0;
+    m_timer.Start(CSL_TIMER_SHOT);
+}
+
 void CslFrame::OnTimer(wxTimerEvent& event)
 {
     bool playing=CslGameConnection::IsPlaying();
@@ -1466,7 +1695,7 @@ void CslFrame::OnTimer(wxTimerEvent& event)
 
                 if (item.IsOk())
                 {
-                    wxString s = master ? master->GetConnection().Address : game->GetName();
+                    wxString s = master ? master->GetURI().GetServer() : game->GetName();
                     s << wxString::Format(_(" (%d Players)"), list_ctrl_master->GetPlayerCount());
 
                     if (tree_ctrl_games->GetItemText(item)!=s)
@@ -1483,6 +1712,9 @@ void CslFrame::OnTimer(wxTimerEvent& event)
             loopv(m_serverViews)
                 m_serverViews[i]->CheckServerStatus();
         }
+
+        if (m_timerCount%8==0)
+            CheckProtocolInputs();
 
         m_timerCount++;
 
@@ -1615,16 +1847,18 @@ void CslFrame::OnTreeSelChanged(wxTreeEvent& event)
 
     CslTreeItemData *data=(CslTreeItemData*)tree_ctrl_games->GetItemData(item);
 
-    CslGame *game=data->GetGame();
-    CslMaster *master=data->GetMaster();
-
     CslArrayCslServerInfo *servers;
+    CslGame *game = data->Game;
+    CslMaster *master = data->Master;
+
+    bool mu = !game && !master->IsUpdating();
+    bool md = mu && !(master->GetGame()->GetDefaultMasterURI()==master->GetURI());
+
+    CslMenu::EnableItem(MENU_DEL, md);
+    CslMenu::EnableItem(MENU_UPDATE, mu);
 
     if (!game)
     {
-        CslMenu::EnableItem(MENU_DEL);
-        CslMenu::EnableItem(MENU_UPDATE);
-
         servers=&master->GetServers();
 
         //find the game
@@ -1633,17 +1867,14 @@ void CslFrame::OnTreeSelChanged(wxTreeEvent& event)
             return;
 
         data=(CslTreeItemData*)tree_ctrl_games->GetItemData(item);
-        game=data->GetGame();
+        game=data->Game;
     }
     else
     {
-        CslMenu::EnableItem(MENU_DEL,false);
-        CslMenu::EnableItem(MENU_UPDATE,false);
         servers=&game->GetServers();
-    }
 
-    if (game)
-        CslGetSettings().LastGame=game->GetName();
+        CslGetSettings().LastGame = game->GetName();
+    }
 
     list_ctrl_master->Clear();
     SetTotalPlaytime(game);
@@ -1670,21 +1901,6 @@ void CslFrame::OnTreeRightClick(wxTreeEvent& event)
         tree_ctrl_games->SelectItem(item);
     }
 
-    CslTreeItemData *data=(CslTreeItemData*)tree_ctrl_games->GetItemData(item);
-    CslMaster *master=data->GetMaster();
-
-    if (master)
-    {
-        bool b=master->GetGame()->GetDefaultMasterConnection()==master->GetConnection();
-        CslMenu::EnableItem(MENU_DEL,!b);
-        CslMenu::EnableItem(MENU_UPDATE);
-    }
-    else
-    {
-        CslMenu::EnableItem(MENU_DEL,false);
-        CslMenu::EnableItem(MENU_UPDATE,false);
-    }
-
     PopupMenu(menuMaster);
 
     event.Skip();
@@ -1703,7 +1919,7 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             break;
 #endif
         case wxID_EXIT:
-            ::wxGetApp().Shutdown(CslApp::CSL_SHUTDOWN_NORMAL);
+            ::wxGetApp().SetShutdown(CslApp::CSL_SHUTDOWN_NORMAL);
             Close(false);
             break;
 
@@ -1740,11 +1956,12 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
             }
             else
             {
-                wxUint32 fourcc=TreeGamesGetSelectedGame()->GetFourCC();
-                CslDlgAddMaster *dlg = new CslDlgAddMaster(this);
-                dlg->InitDlg(&fourcc);
+                wxUint32 fourcc = TreeGamesGetSelectedGame()->GetFourCC();
 
-                if (dlg->ShowModal()==wxID_OK)
+                CslDlgAddMaster dlg(this);
+                dlg.InitDlg(&fourcc);
+
+                if (dlg.ShowModal()==wxID_OK)
                 {
                     CslGame *game=m_engine->GetGames()[fourcc];
                     CslMaster *master=game->GetMasters().Last();
@@ -1906,8 +2123,8 @@ void CslFrame::OnCommandEvent(wxCommandEvent& event)
         case wxID_ABOUT:
         {
             CslValueRestore<bool> shown(g_csl_about_shown, true);
-            CslDlgAbout *dlg = new CslDlgAbout(this);
-            dlg->ShowModal();
+            CslDlgAbout dlg(this);
+            dlg.ShowModal();
             break;
         }
 
@@ -2228,12 +2445,12 @@ void CslFrame::OnClose(wxCloseEvent& event)
     else if (event.GetEventObject()!=this)
         return;
 
-    if (::wxGetApp().Shutdown()!=CslApp::CSL_SHUTDOWN_FORCE)
+    if (::wxGetApp().GetShutdown()!=CslApp::CSL_SHUTDOWN_FORCE)
     {
 #ifndef __WXMAC__
         if (CSL_FLAG_CHECK(CslGetSettings().Systray, CSL_USE_SYSTRAY) &&
             CSL_FLAG_CHECK(CslGetSettings().Systray, CSL_SYSTRAY_CLOSE) &&
-            ::wxGetApp().Shutdown()!=CslApp::CSL_SHUTDOWN_NORMAL)
+            ::wxGetApp().GetShutdown()!=CslApp::CSL_SHUTDOWN_NORMAL)
         {
             ToggleShow(-1);
             return;
@@ -2242,8 +2459,7 @@ void CslFrame::OnClose(wxCloseEvent& event)
 #endif
             if (CslGameConnection::IsPlaying())
             {
-                if (wxMessageBox(    _("There is currently a game running.\n"
-                                 wxT_2("Detach the game process and continue?")),
+                if (wxMessageBox(_("There is currently a game running.\nDetach the game process and continue?"),
                                  _("Game running"), wxYES_NO|wxICON_QUESTION, this)==wxYES)
                     CslGameConnection::Detach();
                 else
@@ -2325,27 +2541,133 @@ void CslFrame::OnToolTip(CslToolTipEvent& event)
     event.Pos=::wxGetClientDisplayRect().GetBottomRight();
 }
 
-void CslFrame::OnVersionCheck(wxCommandEvent& event)
+void CslFrame::OnCslProtocolInput(CslProtocolInputEvent& event)
 {
-    const wxString& version = event.GetString();
+    if (!m_protocolInput)
+        return;
 
-    if (version.Cmp(CSL_VERSION_STR)>0)
+    wxString status;
+
+    CslProtocolInputCookie *cookie = (CslProtocolInputCookie*)event.GetClientData();
+    CslProtocolInputCookie *cookieUpdate = (CslProtocolInputCookie*)m_protocolInputCookies[event.GetId()];
+
+    wxInt32 statusCode = event.GetStatusCode();
+    CslFileProperties& fileProps = event.GetFileProperties();
+
+    static std::auto_ptr<wxMemoryBuffer> versionBuffer;
+
+    if (event.IsTerminate())
     {
-        CslDlgGeneric *dlg = new CslDlgGeneric(this,CSL_DLG_GENERIC_URL|CSL_DLG_GENERIC_CLOSE,
-                                               wxString::Format(    _("New version %s"), version.c_str()),
-                                               wxString::Format(    _("There is a new version (%s)\n"\
-                                                                wxT_2("of Cube Server Lister available.\n")),
-                                                                version.c_str()),
-                                               wxArtProvider::GetBitmap(wxART_INFORMATION ,wxART_CMN_DIALOG),
-                                               CSL_WEBADDR_STR);
-        dlg->Show();
+        time_t now = wxDateTime::Now().MakeUTC().GetTicks();
+
+        if (!event.IsError())
+        {
+            *cookieUpdate->LastCheck = now;
+
+            if (fileProps.Time.Modify.IsValid())
+                *cookieUpdate->LastDate = fileProps.Time.Modify.GetTicks();
+
+            switch (event.GetId())
+            {
+                case CslProtocolInputCookie::VERSION_CHECK:
+                {
+                    if (versionBuffer.get())
+                    {
+                        wxMemoryInputStream stream(versionBuffer->GetData(), versionBuffer->GetDataLen());
+
+                        status << cookie->StatusMsg << wxT(" ") << CheckVersion(stream);
+
+                        versionBuffer.reset();
+                    }
+                    break;
+                }
+
+                case CslProtocolInputCookie::GEOIP_COUNTRY:
+                case CslProtocolInputCookie::GEOIP_CITY:
+                {
+                    if (m_protocolInputCookies.Index(cookie)==wxNOT_FOUND)
+                    {
+                        // database was unpacked - try to load it
+
+                        if (!CslGeoIP::Load(cookie->Id-CslProtocolInputCookie::GEOIP_COUNTRY))
+                            status << _("Failed to initialise GeoIP database.") << wxT(" ")
+                                   << m_protocolInput->GetOutput().GetFullName();
+                    }
+                    else if (statusCode==200)
+                    {
+                        // database was downloaded - unpack
+
+                        wxFileName fn(m_protocolInput->GetOutput());
+
+                        cookie = new CslProtocolInputCookie(event.GetId(),
+                                                    wxT("archive:") + fn.GetFullPath(),
+                                                    wxFileName(GetHomeDir() + wxT("data"), wxEmptyString),
+                                                    _("Installing GeoIP database."));
+
+                        wxDELETE(m_protocolInput);
+
+                        m_protocolInput = new CslProtocolInput(this, cookie->Id, cookie->URI, cookie->Dest);
+                        m_protocolInput->SetClientData(cookie);
+                        m_protocolInput->Run();
+                        return;
+                    }
+                    break;
+                }
+            }
+        }
+        else
+            *cookieUpdate->LastCheck = now - cookieUpdate->CheckInterval + (++cookie->Tries*15);
+
+        wxDELETE(m_protocolInput);
+
+        if (m_protocolInputCookies.Index(cookie)==wxNOT_FOUND)
+            wxDELETE(cookie);
+    }
+    else
+    {
+        wxString inPath = m_protocolInput->GetInput().BuildURI();
+        wxString outPath = m_protocolInput->GetOutput().GetFullPath();
+
+        status = cookie->GetStatusText();
+
+        if (statusCode==304)
+            status << _("No update available.");
+        else if (event.IsInputError() || (statusCode && statusCode!=200))
+            status << _("Failed to read from:") << wxT(" ") << inPath;
+        else if (event.IsOutputError())
+            status << _("Failed to write to:") << wxT(" ") << outPath;
+        else
+        {
+            switch (event.GetId())
+            {
+                case CslProtocolInputCookie::VERSION_CHECK:
+                    if (event.GetBytesRead())
+                        versionBuffer.reset(new wxMemoryBuffer(event.GetBuffer()));
+                    break;
+            }
+
+            /*if (event.Output.Name.IsOk())
+                status << wxT("#") << event.Output.Name.GetFullPath();*/
+
+            status << wxT(" (") << FormatBytes(event.GetBytesRead());
+
+            size_t bytesRead = event.GetBytesRead();
+            size_t totalSize = event.GetTotalSize();
+
+            if (totalSize)
+            {
+                wxInt32 done = bytesRead/(float)totalSize*100;
+
+                status << wxT(" / ") << FormatBytes(bytesRead)
+                       << wxString::Format(wxT("  (%d%%)"), done);
+            }
+
+            status << wxT(")");
+        }
     }
 
-    if (m_versionCheckThread)
-    {
-        delete m_versionCheckThread;
-        m_versionCheckThread = NULL;
-    }
+    if (!status.IsEmpty())
+        SetStatusText(status, 1);
 }
 
 void CslFrame::OnEndProcess(wxCommandEvent& event)

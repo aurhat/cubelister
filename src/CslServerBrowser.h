@@ -21,12 +21,7 @@
 #ifndef CSLLISTCTRLSERVER_H
 #define CSLLISTCTRLSERVER_H
 
-/**
- @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
-
 #include "CslListCtrl.h"
-
 
 #define CSL_HIGHLIGHT_FOUND_SERVER   1<<0
 #define CSL_HIGHLIGHT_FOUND_PLAYER   1<<1

@@ -21,11 +21,6 @@
 #ifndef CSLDLGABOUT_H
 #define CSLDLGABOUT_H
 
-/**
-    @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
-
-
 class CslPanelAboutImage : public wxPanel
 {
     public:

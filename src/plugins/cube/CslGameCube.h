@@ -21,21 +21,16 @@
 #ifndef CSLGAMECUBE_H
 #define CSLGAMECUBE_H
 
-/**
- @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
+#define CSL_DEFAULT_NAME_CB         wxT("Cube")
+#define CSL_LAST_PROTOCOL_CB        122
 
-#define CSL_DEFAULT_NAME_CB           wxT("Cube")
-#define CSL_LAST_PROTOCOL_CB          122
+#define CSL_FOURCC_CB               "CUBE"
 
-#define CSL_FOURCC_CB                 "CUBE"
+#define CSL_DEFAULT_PORT_CB         28765
 
-#define CSL_DEFAULT_PORT_CB           28765
+#define CSL_DEFAULT_MASTER_CB       wxT("http://wouter.fov120.com/cube/masterserver/retrieve.do?item=list")
 
-#define CSL_DEFAULT_MASTER_CB         wxT("wouter.fov120.com")
-#define CSL_DEFAULT_MASTER_PATH_CB    wxT("/cube/masterserver/retrieve.do?item=list")
-
-#define CSL_DEFAULT_INJECT_FILE_CB    wxT("packages/base/metl3.cfg")
+#define CSL_DEFAULT_INJECT_FILE_CB  wxT("packages/base/metl3.cfg")
 
 
 class CSL_DLL_PLUGINS CslGameCube : public CslGame

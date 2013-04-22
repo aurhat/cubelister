@@ -1,6 +1,6 @@
-
 CLEANFILES = Csl.h.gch
 
+include_HEADERS = Csl.h
 
 if ENABLE_PCH
 noinst_DATA = Csl.h.gch
@@ -15,11 +15,11 @@ CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 include ./$(DEPDIR)/Csl.Po
 
 $(DEPDIR)/Csl.h.Po:
-	if test ! -d "$(DEPDIR)" \
+	@if test ! -d "$(DEPDIR)" \
 	then \
 	    mkdir $(DEPDIR); \
 	fi
-	touch $(DEPDIR)/Csl.h.Po
+	@touch $(DEPDIR)/Csl.h.Po
 
 %.h.gch: %.h
 	if $(CXXCOMPILE) -x c++-header -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -31,9 +31,8 @@ $(DEPDIR)/Csl.h.Po:
 endif
 
 copyheader:
-	if [ "$(abs_srcdir)" != "$(abs_builddir)" ]; then \
+	@if [ "$(abs_srcdir)" != "$(abs_builddir)" ]; then \
 	    cp -p $(srcdir)/Csl.h $(builddir)/; \
 	fi
 
 all: copyheader
-include_HEADERS = Csl.h

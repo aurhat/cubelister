@@ -21,12 +21,7 @@
 #ifndef CSLLISTCTRLPLAYERSEARCH_H
 #define CSLLISTCTRLPLAYERSEARCH_H
 
-/**
-    @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
-
 #include "CslListCtrl.h"
-
 
 class CslPlayerSearchEntry
 {

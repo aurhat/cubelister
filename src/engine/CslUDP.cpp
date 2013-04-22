@@ -62,7 +62,7 @@ CslUDP::CslUDP(wxEvtHandler *evtHandler) : wxEvtHandler(),
 
             if (++port==0xffff)
             {
-                CSL_LOG_DEBUG("Couldn't create socket\n");
+                CSL_LOG_DEBUG("couldn't create socket\n");
                 return;
             }
         }
@@ -74,7 +74,7 @@ CslUDP::CslUDP(wxEvtHandler *evtHandler) : wxEvtHandler(),
         }
     }
 
-    CSL_LOG_DEBUG("Ping port: %d\n", address.Service());
+    CSL_LOG_DEBUG("ping port: %d\n", address.Service());
 
     m_socket->SetEventHandler(*this);
     m_socket->SetNotify(wxSOCKET_INPUT_FLAG);
@@ -99,7 +99,7 @@ void CslUDP::OnSocketEvent(wxSocketEvent& event)
     if (m_socket->RecvFrom(addr, packet->Data(), CSL_MAX_PACKET_SIZE).Error())
     {
 #ifndef __WXMSW__
-        CSL_LOG_DEBUG("Error RecvFrom() failed. (%s)\n",
+        CSL_LOG_DEBUG("error RecvFrom() failed. (%s)\n",
                       U2C(GetSocketError(m_socket->LastError())));
 #endif
         CslNetPacket::Destroy(packet, true);
@@ -135,7 +135,7 @@ bool CslUDP::Send(const CslNetPacket& packet)
 
     if (m_socket->SendTo(addr.TowxIPV4Address(), packet.Data(), size).Error())
     {
-        CSL_LOG_DEBUG("Error sending packet to: %s\n (%s)\n",
+        CSL_LOG_DEBUG("error sending packet to: %s\n (%s)\n",
                       U2C(addr.Format(wxT("%i:%p"))),
                       U2C(GetSocketError(m_socket->LastError())));
         return false;

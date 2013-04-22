@@ -24,6 +24,7 @@
 #include <CslUDP.h>
 #include <CslGame.h>
 #include <CslDNSResolver.h>
+#include <CslProtocolInput.h>
 
 class CslEngine;
 
@@ -35,22 +36,34 @@ class CslEngine;
 
 BEGIN_DECLARE_EVENT_TYPES()
 DECLARE_EXPORTED_EVENT_TYPE(CSL_DLL_ENGINE, wxCSL_EVT_PONG, wxID_ANY)
+DECLARE_EXPORTED_EVENT_TYPE(CSL_DLL_ENGINE, wxCSL_EVT_MASTER_UPDATE, wxID_ANY)
 END_DECLARE_EVENT_TYPES()
 
 class CslPongEvent;
+class CslMasterUpdateEvent;
 
 typedef void (wxEvtHandler::*CslPongEventFunction)(CslPongEvent&);
+typedef void (wxEvtHandler::*CslMasterUpdateEventFunction)(CslMasterUpdateEvent&);
 
 #define CslPongEventHandler(fn) \
     (wxObjectEventFunction)(wxEventFunction)wxStaticCastEvent(CslPongEventFunction, &fn)
 
-#define CSL_EVT_PONG(id,fn) \
+#define CslMasterUpdateEventHandler(fn) \
+    (wxObjectEventFunction)(wxEventFunction)wxStaticCastEvent(CslMasterUpdateEventFunction, &fn)
+
+#define CSL_EVT_PONG(id, fn) \
     DECLARE_EVENT_TABLE_ENTRY( \
-                               wxCSL_EVT_PONG,id,wxID_ANY, \
+                               wxCSL_EVT_PONG, id, wxID_ANY, \
                                CslPongEventHandler(fn), \
                                (wxObject*)NULL \
                              ),
 
+#define CSL_EVT_MASTER_UPDATE(fn) \
+    DECLARE_EVENT_TABLE_ENTRY( \
+                               wxCSL_EVT_MASTER_UPDATE, wxID_ANY, wxID_ANY, \
+                               CslMasterUpdateEventHandler(fn), \
+                               (wxObject*)NULL \
+                             ),
 
 class CslPongEvent : public wxEvent
 {
@@ -63,16 +76,43 @@ class CslPongEvent : public wxEvent
         { }
 
         virtual wxEvent* Clone() const
-        {
-            return new CslPongEvent(*this);
-        }
+            { return new CslPongEvent(*this); }
 
         CslServerInfo* GetServerInfo() { return m_info; }
+        void SetServerInfo(CslServerInfo *info) { m_info = info; }
 
     private:
         CslServerInfo *m_info;
 
         DECLARE_DYNAMIC_CLASS_NO_ASSIGN(CslPongEvent)
+};
+
+
+class CslMasterUpdateEvent : public wxEvent
+{
+    public:
+        enum { PONG, UPTIME, PLAYERSTATS, TEAMSTATS, EVENT };
+
+        CslMasterUpdateEvent(CslMaster *master = NULL, wxInt32 count = -1) :
+                wxEvent(wxID_ANY, wxCSL_EVT_MASTER_UPDATE),
+                m_master(master),
+                m_count(count)
+        { }
+
+        virtual wxEvent* Clone() const
+            { return new CslMasterUpdateEvent(*this); }
+
+        CslMaster* GetMaster() { return m_master; }
+        wxInt32 GetCount() const { return m_count; }
+
+        void SetMaster(CslMaster *master) { m_master = master; }
+        void SetCount(wxInt32 count) { m_count = count; }
+
+    private:
+        CslMaster *m_master;
+        wxInt32 m_count;
+
+        DECLARE_DYNAMIC_CLASS_NO_ASSIGN(CslMasterUpdateEvent)
 };
 
 
@@ -114,7 +154,7 @@ class CSL_DLL_ENGINE CslEngine : public wxEvtHandler, public CslPluginMgr, publi
         void ResetPingSends(CslGame *game,CslMaster *master);
         void CheckResends();
 
-        wxInt32 UpdateFromMaster(CslMaster *master);
+        bool UpdateFromMaster(CslMaster *master);
 
         static bool PingOk(const CslServerInfo& info,wxInt32 interval)
             { return info.Ping>-1 && (wxInt32)(info.PingSend-info.PingResp)<interval*2; }
@@ -131,6 +171,7 @@ class CSL_DLL_ENGINE CslEngine : public wxEvtHandler, public CslPluginMgr, publi
 
         void OnPong(CslPingEvent& event);
         void OnResolve(CslDNSResolveEvent& event);
+        void OnCslProtocolInput(CslProtocolInputEvent& event);
 
         DECLARE_EVENT_TABLE()
 
@@ -139,6 +180,7 @@ class CSL_DLL_ENGINE CslEngine : public wxEvtHandler, public CslPluginMgr, publi
         CslDNSResolver *m_dnsResolver;
         wxUint32 m_lastEnumSystemIPV4Addresses;
         CslArrayCslIPV4Addr m_systemIPV4Addresses;
+        CslArrayCslProtocolInput m_masterUpdates;
         wxInt32 m_updateInterval, m_pingRatio;
         CslArrayCslGame m_games;
 };

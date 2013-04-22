@@ -53,7 +53,7 @@ CslGameAssaultCube::CslGameAssaultCube()
     m_fourcc=CSL_BUILD_FOURCC(CSL_FOURCC_AC);
     m_capabilities=CSL_CAPABILITY_EXTINFO | CSL_CAPABILITY_CUSTOM_CONFIG |
                    CSL_CAPABILITY_CONNECT_PASS | CSL_CAPABILITY_CONNECT_ADMIN_PASS;
-    m_defaultMasterConnection=CslMasterConnection(CSL_DEFAULT_MASTER_AC, CSL_DEFAULT_MASTER_PORT_AC);
+    m_defaultMasterURI = CSL_DEFAULT_MASTER_AC;
 #if defined(__WXGTK__) || defined(__WXX11__)
     m_clientSettings.ConfigPath=::wxGetHomeDir()+wxT("/.assaultcube_v1.0");
 #endif

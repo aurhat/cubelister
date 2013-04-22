@@ -15,8 +15,8 @@
     <projectname>csl</projectname>
     <projectdirectory>.</projectdirectory>
     <absoluteprojectpath>false</absoluteprojectpath>
-    <description/>
-    <defaultencoding/>
+    <description></description>
+    <defaultencoding></defaultencoding>
     <versioncontrol/>
   </general>
   <kdevautoproject>
@@ -50,7 +50,7 @@
     </run>
     <configurations>
       <debug>
-        <configargs>--with-wx-config=wx-config --disable-pch</configargs>
+        <configargs>--disable-pch --with-wx-config=&quot;wx-config-2.8 --unicode=yes --debug=yes&quot;</configargs>
         <builddir>debug</builddir>
         <ccompiler>kdevgccoptions</ccompiler>
         <cxxcompiler>kdevgppoptions</cxxcompiler>
@@ -73,20 +73,20 @@
         <f77compiler>kdevg77options</f77compiler>
         <cxxflags>-O3 -ggdb3</cxxflags>
         <envvars/>
-        <configargs>--with-wx-config=wx-config</configargs>
-        <topsourcedir/>
+        <configargs>--with-wx-config=&quot;wx-config-2.8 --unicode=yes --debug=no&quot;</configargs>
+        <topsourcedir></topsourcedir>
         <cppflags>-DCSL_DEBUG</cppflags>
-        <ldflags/>
-        <ccompilerbinary/>
-        <cxxcompilerbinary/>
-        <f77compilerbinary/>
+        <ldflags></ldflags>
+        <ccompilerbinary></ccompilerbinary>
+        <cxxcompilerbinary></cxxcompilerbinary>
+        <f77compilerbinary></f77compilerbinary>
         <cflags>-O3 -ggdb3</cflags>
-        <f77flags/>
+        <f77flags></f77flags>
       </release>
       <default>
         <envvars/>
         <configargs>--with-wx-config=/usr/bin/wx-config</configargs>
-        <builddir/>
+        <builddir>default</builddir>
         <topsourcedir/>
         <cppflags/>
         <ldflags/>
@@ -96,8 +96,8 @@
         <ccompilerbinary/>
         <cxxcompilerbinary/>
         <f77compilerbinary/>
-        <cflags>-g</cflags>
-        <cxxflags>-g</cxxflags>
+        <cflags/>
+        <cxxflags/>
         <f77flags/>
       </default>
       <debug-wx3>
@@ -266,7 +266,7 @@
       <includePaths>.;</includePaths>
     </codecompletion>
     <creategettersetter>
-      <prefixGet/>
+      <prefixGet></prefixGet>
       <prefixSet>set</prefixSet>
       <prefixVariable>m_,_</prefixVariable>
       <parameterName>theValue</parameterName>
@@ -282,18 +282,18 @@
   </cppsupportpart>
   <kdevdebugger>
     <general>
-      <gdbpath/>
+      <gdbpath></gdbpath>
       <dbgshell>libtool --mode=execute</dbgshell>
-      <configGdbScript/>
-      <runShellScript/>
-      <runGdbScript/>
+      <configGdbScript></configGdbScript>
+      <runShellScript></runShellScript>
+      <runGdbScript></runGdbScript>
       <breakonloadinglibs>true</breakonloadinglibs>
       <separatetty>false</separatetty>
       <floatingtoolbar>false</floatingtoolbar>
-      <raiseGDBOnStart>false</raiseGDBOnStart>
+      <raiseGDBOnStart>true</raiseGDBOnStart>
     </general>
     <display>
-      <staticmembers>false</staticmembers>
+      <staticmembers>true</staticmembers>
       <demanglenames>true</demanglenames>
       <outputradix>10</outputradix>
     </display>

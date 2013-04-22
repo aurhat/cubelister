@@ -23,10 +23,12 @@
 #include "CslFrame.h"
 #include "CslIPC.h"
 #include "CslApp.h"
+#include <wx/stdpaths.h>
 #ifndef _DEBUG
 #include <wx/debugrpt.h>
 #endif //_DEBUG
 #ifdef __WXMAC__
+#include <wx/sysopt.h>
 #include <Carbon/Carbon.h>
 #endif //__WXMAC__
 
@@ -61,48 +63,94 @@ static pascal OSErr MacCallbackGetUrl(const AppleEvent *in,AppleEvent *out,long 
 
 bool CslApp::OnInit()
 {
-#ifdef _DEBUG
+    wxTheApp->SetAppName(wxString(CSL_NAME_SHORT_STR).Lower());
+
+#ifdef CSL_DEBUG
     #ifdef _MSC_VER
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
     #endif
-#else
+#endif
+#if CSL_DEBUG < 1
     ::wxHandleFatalExceptions(true);
 #endif
 
-    m_engine = NULL;
-    m_single = NULL;
-    m_shutdown = CSL_SHUTDOWN_NONE;
+    wxString ipcCmd;
+    const wxString cwd = ::DirName(::wxPathOnly(argv[0]));
 
-    wxString cwd = DirName(wxPathOnly(wxTheApp->argv[0]));
+    static const wxCmdLineEntryDesc cmdLineDesc[] =
+    {
+        { wxCMD_LINE_SWITCH, NULL,       wxT_2("version"),   wxTRANSLATE("show version"),   wxCMD_LINE_VAL_NONE,   0                         },
+        { wxCMD_LINE_SWITCH, wxT_2("h"), wxT_2("help"),      wxTRANSLATE("show this help"), wxCMD_LINE_VAL_NONE,   wxCMD_LINE_OPTION_HELP    },
+        { wxCMD_LINE_OPTION, wxT_2("d"), wxT_2("datadir"),   wxTRANSLATE("add data dir"),   wxCMD_LINE_VAL_STRING, 0                         },
+        { wxCMD_LINE_OPTION, wxT_2("p"), wxT_2("plugindir"), wxTRANSLATE("add plugin dir"), wxCMD_LINE_VAL_STRING, 0                         },
+        { wxCMD_LINE_OPTION, wxT_2("q"), wxT_2("homedir"),   wxTRANSLATE("set home dir"),   wxCMD_LINE_VAL_STRING, 0                         },
+        { wxCMD_LINE_PARAM,  NULL,       NULL,               wxTRANSLATE("IPC command"),    wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL },
+        { wxCMD_LINE_NONE                                                                                                                    }
+    };
 
+
+    wxString sOpt;
+    wxCmdLineParser parser(cmdLineDesc, argc, argv);
+
+    switch (parser.Parse())
+    {
+        case -1:
+            return true;
+        case 0:
+            if (parser.Found(wxT("version")))
+            {
+                wxPrintf(wxT("%s\n"), CSL_VERSION_STR);
+                return true;
+            }
+            if (parser.Found(wxT("q"), &sOpt))
+                m_home = ::DirName(sOpt, cwd);
+            if (parser.Found(wxT("d"), &sOpt))
+                AddDataDir(sOpt, cwd);
+            if (parser.Found(wxT("p"), &sOpt))
+                AddPluginDir(sOpt, cwd);
+            break;
+        default:
+            // syntax error
+            break;
+    }
+
+    if (parser.GetParamCount())
+        ipcCmd = parser.GetParam(0);
+
+    if (m_home.IsEmpty())
+        m_home = ::DirName(wxStandardPaths().GetUserDataDir());
+
+    CSL_LOG_DEBUG("using home dir: %s\n", U2C(m_home));
+
+    AddDataDir(m_home, cwd);
 #ifdef PROJECTDIR
-    AddDataDir(wxT(PROJECTDIR), true);
-#endif //PROJECTDIR
-    AddDataDir(CSL_USER_DIR, true);
-#ifndef DATADIR
-    #ifdef __WXMAC__
-    AddDataDir(cwd+wxT("../Resources/"), true);
-    #else
-    AddDataDir(cwd, true);
-    #endif
+    if (::wxDirExists(wxT(PROJECTDIR)))
+        AddDataDir(wxT(PROJECTDIR), cwd);
+#endif
+#ifdef __WXMAC__
+    AddDataDir(wxT("../Resources"), cwd);
 #else
-    AddDataDir(wxT(DATADIR));
-#endif //DATADIR
+    AddDataDir(cwd);
+#endif
+#ifdef DATADIR
+    if (cwd!=m_home)
+        AddDataDir(wxT(DATADIR), cwd);
+#endif
 
-#ifdef BUILDDIR
-    AddPluginDir(wxT(BUILDDIR), true);
-#endif //BUILDDIR
-    AddPluginDir(CSL_USER_DIR, true);
-#ifndef PKGLIBDIR
-    #ifdef __WXMAC__
-    AddPluginDir(cwd+wxT("../"), true);
-    #endif
-    #ifdef __WXMSW__
-    AddPluginDir(cwd, true);
-    #endif
+    AddPluginDir(m_home, cwd);
+#ifdef __WXMAC__
+    AddPluginDir(wxT(".."), cwd);
 #else
-    AddPluginDir(wxT(PKGLIBDIR));
-#endif //PKGLIBDIR
+    AddPluginDir(cwd);
+#endif
+#ifdef BUILDDIR
+    if (::wxDirExists(wxT(BUILDDIR)))
+        AddPluginDir(wxT(BUILDDIR), cwd);
+#endif
+#ifdef PKGLIBDIR
+    if (cwd!=m_home)
+        AddPluginDir(wxT(PKGLIBDIR));
+#endif
 
     m_locale.Init(wxLANGUAGE_DEFAULT,
 #if wxCHECK_VERSION(2, 9, 0)
@@ -134,25 +182,20 @@ bool CslApp::OnInit()
     wxSetEnv(wxT("SDL_ENABLEAPPEVENTS"),wxT("1"));
     //TODO wxApp::SetExitOnFrameDelete(false);
     //register event handler for URI schemes
-    AEInstallEventHandler(kInternetEventClass,kAEGetURL,
-                          NewAEEventHandlerUPP((AEEventHandlerProcPtr)MacCallbackGetUrl),0,false);
+    AEInstallEventHandler(kInternetEventClass, kAEGetURL,
+                          NewAEEventHandlerUPP((AEEventHandlerProcPtr)MacCallbackGetUrl), 0, false);
 #endif //__WXMAC__
-
-    wxString cmdline;
-
-    for (wxInt32 i=1;i<wxApp::argc;i++)
-        cmdline << argv[i] << wxT(" ");
 
     wxString lock = wxString::Format(wxT(".%s-%s.lock"),CSL_NAME_SHORT_STR,wxGetUserId().c_str());
     m_single = new wxSingleInstanceChecker(lock);
 
     if (m_single->IsAnotherRunning())
     {
-        IpcCall(cmdline.IsEmpty() ? wxT("show") : cmdline);
+        IpcCall(ipcCmd.IsEmpty() ? wxT("show") : ipcCmd);
         return true;
     }
 
-    m_engine=new CslEngine;
+    m_engine = new CslEngine;
 
     wxInitAllImageHandlers();
 
@@ -164,8 +207,8 @@ bool CslApp::OnInit()
     SetTopWindow(frame);
     frame->Show();
 
-    if (cmdline.Find(CSL_URI_SCHEME_STR)!=wxNOT_FOUND)
-        IpcCall(cmdline, frame);
+    if (!ipcCmd.IsEmpty())
+        IpcCall(ipcCmd, frame);
 
     return true;
 }
@@ -176,6 +219,17 @@ int CslApp::OnRun()
         wxApp::OnRun();
 
     return m_shutdown>CSL_SHUTDOWN_NORMAL ? 1 : 0;
+}
+
+void CslApp::OnFatalException()
+{
+    wxDebugReport report;
+    wxDebugReportPreviewStd preview;
+
+    report.AddAll();
+
+    if (preview.Show(report))
+        report.Process();
 }
 
 int CslApp::OnExit()
@@ -206,35 +260,22 @@ int CslApp::FilterEvent(wxEvent& event)
     return -1;
 }
 
-#ifndef _DEBUG
-void CslApp::OnFatalException()
-{
-    wxDebugReport report;
-    wxDebugReportPreviewStd preview;
-
-    report.AddAll();
-
-    if (preview.Show(report))
-        report.Process();
-}
-#endif //_DEBUG
-
 void CslApp::IpcCall(const wxString& value,wxEvtHandler *evtHandler) const
 {
     if (evtHandler)
     {
-        CslIpcEvent evt(CslIpcEvent::IPC_COMMAND,value);
-        wxPostEvent(evtHandler,evt);
+        CslIpcEvent evt(CslIpcEvent::IPC_COMMAND, value);
+        wxPostEvent(evtHandler, evt);
     }
     else
     {
         CslIpcClient client;
 
-        if (client.Connect(CSL_IPC_HOST,CSL_IPC_SERV,CSL_IPC_TOPIC))
+        if (client.Connect(CSL_IPC_HOST, CSL_IPC_SERV, CSL_IPC_TOPIC))
 #if wxCHECK_VERSION(2,9,0)
-            client.GetConnection()->Poke(CSL_NAME_SHORT_STR,value.c_str());
+            client.GetConnection()->Poke(CSL_NAME_SHORT_STR, value.c_str());
 #else
-            client.GetConnection()->Poke(CSL_NAME_SHORT_STR,(wxChar*)value.c_str());
+            client.GetConnection()->Poke(CSL_NAME_SHORT_STR, (wxChar*)value.c_str());
 #endif //wxCHECK_VERSION
     }
 }

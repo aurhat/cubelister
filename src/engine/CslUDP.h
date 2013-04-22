@@ -21,10 +21,6 @@
 #ifndef CSLUDP_H
 #define CSLUDP_H
 
-/**
- @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
-
 #define CSL_MAX_PACKET_SIZE 5000
 #define CSL_UDP_OVERHEAD    42
 

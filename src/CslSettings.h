@@ -21,15 +21,11 @@
 #ifndef CSLSETTINGS_H
 #define CSLSETTINGS_H
 
-/**
- @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
-
 #include "CslEngine.h"
 
-#define CSL_SETTINGS_FILE  wxString(CSL_USER_DIR+wxT("settings.ini"))
-#define CSL_SERVERS_FILE   wxString(CSL_USER_DIR+wxT("servers.ini"))
-#define CSL_LOCATORS_FILE  wxString(CSL_USER_DIR+wxT("locators.ini"))
+#define CSL_SETTINGS_FILE  wxT("settings.ini")
+#define CSL_SERVERS_FILE   wxT("servers.ini")
+#define CSL_LOCATORS_FILE  wxT("locators.ini")
 
 /** Config file version changes
 *
@@ -40,8 +36,15 @@
 *
 **/
 
+/** Server config file version changes
+ *
+ *   1: initial version
+ *   2: master uri
+ *
+ **/
+
 #define CSL_CONFIG_VERSION         4
-#define CSL_SERVERCONFIG_VERSION   1
+#define CSL_SERVERCONFIG_VERSION   2
 #define CSL_LOCATORCONFIG_VERSION  1
 
 #define CSL_FRAME_MIN_WIDTH  800
@@ -127,6 +130,14 @@ class CslSettings
                 AutoSaveOutput(false),
                 MinPlaytime(CSL_MIN_PLAYTIME_STD),
 
+                /*GeoIP */
+                GeoIPType(0),
+                GeoIPAutoUpdate(true),
+                GeoIPCountryLastCheck(0),
+                GeoIPCountryLastDate(0),
+                GeoIPCityLastCheck(0),
+                GeoIPCityLastDate(0),
+
                 /* ListCtrl */
                 AutoSortColumns(true),
                  /* Server lists */
@@ -183,12 +194,21 @@ class CslSettings
         wxInt32 FilterMaster, FilterFavourites;
         wxInt32 WaitServerFull;
         wxInt32 PingGood, PingBad;
-        wxString GameOutputPath, ScreenOutputPath;
+        wxString ScreenOutputPath;
+        wxString GameOutputPath;
         wxUint32 CleanupServers;
         bool CleanupServersKeepFav, CleanupServersKeepStats;
         bool AutoSaveOutput;
         wxString LastGame;
         wxUint32 MinPlaytime;
+
+        /* GeoIP */
+        wxInt32 GeoIPType;
+        bool GeoIPAutoUpdate;
+        time_t GeoIPCountryLastCheck;
+        time_t GeoIPCountryLastDate;
+        time_t GeoIPCityLastCheck;
+        time_t GeoIPCityLastDate;
 
         /* ListCtrl*/
         bool AutoSortColumns;

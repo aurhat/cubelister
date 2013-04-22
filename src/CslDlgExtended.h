@@ -21,10 +21,6 @@
 #ifndef CSLDLGEXTENDED_H
 #define CSLDLGEXTENDED_H
 
-/**
- @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
-
 #include "CslPanelMap.h"
 #include "CslPanelServerView.h"
 

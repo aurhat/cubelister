@@ -21,12 +21,7 @@
 #ifndef CSLDLGSETTINGS_H
 #define CSLDLGSETTINGS_H
 
-/**
- @author Glen Masgai <mimosius@users.sourceforge.net>
-*/
-
 #include "CslSettings.h"
-
 
 class CslDlgSettings : public wxDialog
 {
@@ -54,9 +49,10 @@ class CslDlgSettings : public wxDialog
     protected:
         // begin wxGlade: CslDlgSettings::attributes
         wxStaticBox* sizer_output_staticbox;
+        wxStaticBox* sizer_geoip_staticbox;
+        wxStaticBox* sizer_systray_staticbox;
         wxStaticBox* sizer_ping_staticbox;
         wxStaticBox* sizer_tts_staticbox;
-        wxStaticBox* sizer_systray_staticbox;
         wxStaticBox* sizer_times_staticbox;
         wxStaticBox* sizer_colours_player_staticbox;
         wxStaticBox* sizer_colours_server_staticbox;
@@ -81,23 +77,25 @@ class CslDlgSettings : public wxDialog
         wxCheckBox* checkbox_server_cleanup_favourites;
         wxCheckBox* checkbox_server_cleanup_stats;
         wxSpinCtrl* spin_ctrl_tooltip_delay;
-        wxCheckBox* checkbox_systray;
-        wxCheckBox* checkbox_systray_close;
         wxCheckBox* checkbox_tts;
         wxStaticText* label_tts_volume;
         wxSpinCtrl* spin_ctrl_tts_volume;
         wxButton* button_test_tts;
         wxSpinCtrl* spin_ctrl_ping_good;
         wxSpinCtrl* spin_ctrl_ping_bad;
+        wxCheckBox* checkbox_systray;
+        wxCheckBox* checkbox_systray_close;
+        wxRadioButton* radio_btn_geoip_country;
+        wxRadioButton* radio_btn_geoip_city;
+        wxCheckBox* checkbox_geoip_update;
         wxCheckBox* checkbox_game_output;
         wxDirPickerCtrl* dirpicker_game_output;
         wxPanel* notebook_pane_other;
         wxNotebook* notebook_settings;
-        wxButton* button_ok;
-        wxButton* button_cancel;
+        wxSizer* m_bsDlg;
         // end wxGlade
 
-        void SetButtonColour(wxBitmapButton *button,wxButton *refButton,wxColour& colour);
+        void SetButtonColour(wxBitmapButton *button, wxButton *refButton, const wxColour& colour);
         bool ValidateSettings();
 }; // wxGlade: end class
 

@@ -21,11 +21,9 @@
 #ifndef CSLPANELTRAFFIC_H
 #define CSLPANELTRAFFIC_H
 
-
 // begin wxGlade: ::extracode
 
 // end wxGlade
-
 
 class CslPanelTraffic : public wxPanel {
     public:

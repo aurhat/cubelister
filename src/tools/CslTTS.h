@@ -21,10 +21,6 @@
 #ifndef CSLTTS_H
 #define CSLTTS_H
 
-/**
-    @author Glen Masgai <mimosius@gmx.de>
-*/
-
 #define CSL_TTS_DEFAULT_VOLUME  50
 
 class CSL_DLL_GUITOOLS CslTTSSettings : public wxObject

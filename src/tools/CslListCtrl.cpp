@@ -655,9 +655,8 @@ void CslListCtrl::ListSort(wxInt32 column)
 
 void CslListCtrl::CreateScreenShot()
 {
-    wxString file;
     wxBitmap bitmap;
-    wxWindow *window=GetScreenShotWindow();
+    wxWindow *window = GetScreenShotWindow();
 
     if (!BitmapFromWindow(window, bitmap))
     {
@@ -666,9 +665,10 @@ void CslListCtrl::CreateScreenShot()
         return;
     }
 
-    file=GetScreenShotFileName();
+    wxFileName fn(CslGetSettings().ScreenOutputPath, GetScreenShotFileName());
 
-    wxFileDialog dlg(window, _("Save screenshot"), wxEmptyString, file, _("PNG files (*.png)|*.png"),
+    wxFileDialog dlg(window, _("Save screenshot"), wxEmptyString,
+                     fn.GetFullName(), _("PNG files (*.png)|*.png"),
 #if wxCHECK_VERSION(2, 9, 0)
                      wxFD_SAVE|wxFD_OVERWRITE_PROMPT
 #else
@@ -676,15 +676,14 @@ void CslListCtrl::CreateScreenShot()
 #endif
                     );
     // wxGTK: hmm, doesn't work in the ctor?!
-    if (wxDirExists(CslGetSettings().ScreenOutputPath))
-        dlg.SetPath(CslGetSettings().ScreenOutputPath+CSL_PATHDIV_WX+file);
+    if (wxFileName::DirExists(fn.GetPath()))
+        dlg.SetPath(fn.GetFullPath());
     if (dlg.ShowModal()!=wxID_OK)
         return;
 
-    file=dlg.GetPath();
-    CslGetSettings().ScreenOutputPath=::wxPathOnly(file);
+    CslGetSettings().ScreenOutputPath=::wxPathOnly(dlg.GetPath());
 
-    bitmap.SaveFile(file, wxBITMAP_TYPE_PNG);
+    bitmap.SaveFile(dlg.GetPath(), wxBITMAP_TYPE_PNG);
 }
 
 wxString CslListCtrl::GetScreenShotFileName()
