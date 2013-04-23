@@ -2554,7 +2554,7 @@ void CslFrame::OnCslProtocolInput(CslProtocolInputEvent& event)
     wxInt32 statusCode = event.GetStatusCode();
     CslFileProperties& fileProps = event.GetFileProperties();
 
-    static std::auto_ptr<wxMemoryBuffer> versionBuffer;
+    static std::auto_ptr<CslMemoryBuffer> versionBuffer;
 
     if (event.IsTerminate())
     {
@@ -2642,7 +2642,10 @@ void CslFrame::OnCslProtocolInput(CslProtocolInputEvent& event)
             {
                 case CslProtocolInputCookie::VERSION_CHECK:
                     if (event.GetBytesRead())
-                        versionBuffer.reset(new wxMemoryBuffer(event.GetBuffer()));
+                    {
+                        CslMemoryBuffer& buf = event.GetBuffer();
+                        versionBuffer.reset(new CslMemoryBuffer(buf.GetData(), buf.GetDataLen()));
+                    }
                     break;
             }
 
