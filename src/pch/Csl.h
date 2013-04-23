@@ -22,16 +22,12 @@
 #define CSL_H
 
 #ifdef _WINDOWS
-#if defined(_DEBUG) && defined(_MSC_VER)
-#define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
-#define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
-#define new DEBUG_NEW
-#endif // _DEBUG && _MSC_VER
 #include <ws2tcpip.h>
 #endif //_WINDOWS
 #include <wx/wx.h>
+#ifdef _WINDOWS
+#include <wx/msw/msvcrt.h>
+#endif
 #if wxUSE_GUI
 #include <wx/artprov.h>
 #include <wx/aui/aui.h>

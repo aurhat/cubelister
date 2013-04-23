@@ -63,11 +63,10 @@ bool CslApp::OnInit()
 {
     SetAppName(wxString(CSL_NAME_SHORT_STR).Lower());
 
-#ifdef CSL_DEBUG
-    #ifdef _MSC_VER
-    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-    #endif
+#if defined(__WXMSW__)
+    wxCrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
+
 #if CSL_DEBUG < 1
     ::wxHandleFatalExceptions(true);
 #endif
