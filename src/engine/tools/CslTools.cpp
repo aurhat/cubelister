@@ -45,7 +45,7 @@ void Debug_Printf(const char *file, int line, const char *func, const char *fmt,
 
     g_csl_printf_mutex.Lock();
 
-    fprintf(stdout, "%li:%s:%d:%s: ", GetTicks(), filename, line, func);
+    fprintf(stdout, "%lld:%s:%d:%s: ", (long long int)GetTicks(), filename, line, func);
     vfprintf(stdout, fmt, ArgList);
     fflush(stdout);
 
