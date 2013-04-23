@@ -441,6 +441,8 @@ void CslProtocolInput::HandleProto(wxHTTP& http, CslProtocolInputEvent& event)
         ProcessInput(event);
 
         if (m_outputPath.IsOk() && event.m_fileProperties.Time.Modify.IsValid())
+        {
+            wxDELETE(m_outputStream);
             event.m_fileProperties.Set();
     }
     else
@@ -653,6 +655,8 @@ void CslProtocolInput::HandleProto(CslArchiveProto& archive, CslProtocolInputEve
         }
 
         if (ProcessInput(event) && createOutput)
+        {
+            wxDELETE(m_outputStream);
             event.m_fileProperties.Set();
     }
 }
