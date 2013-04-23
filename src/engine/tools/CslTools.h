@@ -294,6 +294,8 @@ class CSL_DLL_TOOLS CslFileProperties : public wxObject
 
             if ((Size = Name.GetSize().GetValue())==wxInvalidSize)
                 return false;
+
+            return true;
         }
 
         bool Set()
