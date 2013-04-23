@@ -700,8 +700,9 @@ inline size_t CslProtocolInput::DoRead(void *buf, size_t count, bool& doRead)
                 // wx 2.8 returns wxSTREAM_READ_ERROR if the socket was closed by the remote host
                 // this may happen if all bytes were read. wx 2.9 handles it properly in this case
             case wxSTREAM_READ_ERROR:
-                if (((wxSocketBase*)m_protocol)->Error() &&
-                    ((wxSocketBase*)m_protocol)->IsDisconnected())
+                if (((wxSocketBase*)m_protocol)->Error() && (
+                    ((wxSocketBase*)m_protocol)->IsDisconnected() ||
+                    ((wxSocketBase*)m_protocol)->LastError()==wxSOCKET_NOERROR))
                     break;
 #endif
             default:
