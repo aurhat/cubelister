@@ -305,10 +305,10 @@ class CSL_DLL_TOOLS CslFileProperties : public wxObject
             else if (!wxFileName::FileExists(filename))
                 return false;
 
-            if (!Time.Set(Name))
+            if (chmod(U2C(filename), Mode)<0)
                 return false;
 
-            if (chmod(U2C(filename), Mode)<0)
+            if (!Time.Set(Name))
                 return false;
 
             return true;
