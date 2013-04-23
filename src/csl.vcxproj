@@ -174,7 +174,7 @@ copy "$(SolutionDir)\src\external\wx\wx28\lib\vc_dll\wxmsw28ud_vc_csl.dll" "$(Ou
     </Link>
     <PostBuildEvent>
       <Command>"$(VCInstallDir)\bin\EditBin.exe" /subsystem:console "$(OutDir)$(ProjectName).exe"
-copy "$(SolutionDir)\src\external\wx\wx28\lib\vc_dll\wxmsw28ud_vc_csl.dll" "$(OutDir)"</Command>
+copy "$(SolutionDir)\src\external\wx\wx30\lib\vc_dll\wxmsw29*ud_vc_csl.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
