@@ -22,6 +22,8 @@
 #include <CslEngine.h>
 #include "CslGameSauerbraten.h"
 
+#include <wx/stdpaths.h>
+
 #include "../img/sb_16_png.h"
 #include "../img/sb_24_png.h"
 
