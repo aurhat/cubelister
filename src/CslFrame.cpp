@@ -1419,68 +1419,64 @@ void CslFrame::ConnectToServer(CslServerInfo *info,wxInt32 pass)
 
 wxUint32 CslFrame::LoadLocators()
 {
-    const wxString cfgFile = GetHomeDir() + CSL_LOCATORS_FILE;
+    wxFileConfig *cfg = CslSettings::OpenConfig(GetHomeDir() + CSL_LOCATORS_FILE, true);
 
-    if (!::wxFileExists(cfgFile))
+    if (!cfg)
         return 0;
 
     long int val;
     wxUint32 i=0;
     wxString Name,Host,Path;
 
-    wxFileConfig config(wxT(""), wxT(""), cfgFile, wxT(""),
-                        wxCONFIG_USE_LOCAL_FILE, wxConvLocal);
-
-    config.SetPath(wxT("/Version"));
-    config.Read(wxT("Version"), &val, 0);
+    cfg->SetPath(wxT("/Version"));
+    cfg->Read(wxT("Version"), &val, 0);
 
     for (;;)
     {
-        config.SetPath(wxString::Format(wxT("/%d"),i++));
+        cfg->SetPath(wxString::Format(wxT("/%d"),i++));
 
-        if (config.Read(wxT("Name"),&Name) &&
-            config.Read(wxT("Host"),&Host) &&
-            config.Read(wxT("Path"),&Path))
+        if (cfg->Read(wxT("Name"),&Name) &&
+            cfg->Read(wxT("Host"),&Host) &&
+            cfg->Read(wxT("Path"),&Path))
             CslGeoIP::AddService(Name,Host,Path);
         else
             break;
     }
+
+    delete cfg;
 
     return i;
 }
 
 void CslFrame::SaveLocators()
 {
-    const wxString cfgFile = GetHomeDir() + CSL_LOCATORS_FILE;
-    const wxString dir = ::wxPathOnly(cfgFile);
-
-    if (!::wxDirExists(dir) && !wxFileName::Mkdir(dir, 0700, wxPATH_MKDIR_FULL))
-        return;
-
-    wxFileConfig config(wxT(""), wxT(""), cfgFile, wxT(""),
-                        wxCONFIG_USE_LOCAL_FILE, wxConvLocal);
-    config.SetUmask(0077);
-    config.DeleteAll();
-
-    wxUint32 i;
-    wxString s;
-    CslGeoIPService *service;
-    const CslGeoIPServices& services=CslGeoIP::GetServices();
+    const CslGeoIPServices& services = CslGeoIP::GetServices();
 
     if (services.IsEmpty())
         return;
 
-    config.SetPath(wxT("/Version"));
-    config.Write(wxT("Version"),CSL_LOCATORCONFIG_VERSION);
+    wxFileConfig *cfg = CslSettings::OpenConfig(GetHomeDir() + CSL_LOCATORS_FILE, false);
+
+    if (!cfg)
+        return;
+
+    wxUint32 i;
+    wxString s;
+    CslGeoIPService *service;
+
+    cfg->DeleteAll();
+
+    cfg->SetPath(wxT("/Version"));
+    cfg->Write(wxT("Version"),CSL_LOCATORCONFIG_VERSION);
 
     for (i=0;i<services.GetCount();i++)
     {
         service=services.Item(i);
 
-        config.SetPath(wxString::Format(wxT("/%d"),i));
-        config.Write(wxT("Name"),service->Name);
-        config.Write(wxT("Host"),service->Host);
-        config.Write(wxT("Path"),service->Path);
+        cfg->SetPath(wxString::Format(wxT("/%d"),i));
+        cfg->Write(wxT("Name"),service->Name);
+        cfg->Write(wxT("Host"),service->Host);
+        cfg->Write(wxT("Path"),service->Path);
     }
 }
 

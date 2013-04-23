@@ -21,6 +21,7 @@
 #ifndef CSLSETTINGS_H
 #define CSLSETTINGS_H
 
+#include <wx/fileconf.h>
 #include "CslEngine.h"
 
 #define CSL_SETTINGS_FILE  wxT("settings.ini")
@@ -171,6 +172,7 @@ class CslSettings
         }
 
         static CslListCtrlSettings& GetListSettings(const wxString& name);
+        static wxFileConfig* OpenConfig(const wxString& name, bool read);
 
         static void LoadSettings();
         static void SaveSettings();
