@@ -2652,16 +2652,16 @@ void CslFrame::OnCslProtocolInput(CslProtocolInputEvent& event)
             /*if (event.Output.Name.IsOk())
                 status << wxT("#") << event.Output.Name.GetFullPath();*/
 
-            status << wxT(" (") << FormatBytes(event.GetBytesRead());
-
             size_t bytesRead = event.GetBytesRead();
             size_t totalSize = event.GetTotalSize();
+
+            status << wxT(" (") << FormatBytes(bytesRead);
 
             if (totalSize)
             {
                 wxInt32 done = bytesRead/(float)totalSize*100;
 
-                status << wxT(" / ") << FormatBytes(bytesRead)
+                status << wxT(" / ") << FormatBytes(totalSize)
                        << wxString::Format(wxT("  (%d%%)"), done);
             }
 
