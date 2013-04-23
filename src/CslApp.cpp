@@ -24,9 +24,7 @@
 #include "CslIPC.h"
 #include "CslApp.h"
 #include <wx/stdpaths.h>
-#ifndef _DEBUG
 #include <wx/debugrpt.h>
-#endif //_DEBUG
 #ifdef __WXMAC__
 #include <wx/sysopt.h>
 #include <Carbon/Carbon.h>
@@ -63,7 +61,7 @@ static pascal OSErr MacCallbackGetUrl(const AppleEvent *in,AppleEvent *out,long 
 
 bool CslApp::OnInit()
 {
-    wxTheApp->SetAppName(wxString(CSL_NAME_SHORT_STR).Lower());
+    SetAppName(wxString(CSL_NAME_SHORT_STR).Lower());
 
 #ifdef CSL_DEBUG
     #ifdef _MSC_VER

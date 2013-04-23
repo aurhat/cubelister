@@ -23,7 +23,7 @@
 
 #ifdef _MSC_VER
 #ifdef _DEBUG
-#define CSL_DEBUG
+#define CSL_DEBUG 1
 #endif
 #define strcasecmp _stricmp
 #endif //_MSC_VER
