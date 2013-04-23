@@ -30,6 +30,9 @@
     <ClCompile Include="..\..\pch\pch.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="CslProtocolInput.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CslCharEncoding.h">
@@ -45,6 +48,9 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="CslTools.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="CslProtocolInput.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

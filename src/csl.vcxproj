@@ -194,6 +194,7 @@ copy "$(SolutionDir)\src\external\wx\wx28\lib\vc_dll\wxmsw28ud_vc_csl.dll" "$(Ou
       <OmitFramePointers>true</OmitFramePointers>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_UNICODE;UNICODE;__CSL_FILENAME=\"$(TargetFileName)\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -233,6 +234,7 @@ copy "$(SolutionDir)\src\external\wx\wx28\lib\vc_dll\wxmsw28ud_vc_csl.dll" "$(Ou
       <OmitFramePointers>true</OmitFramePointers>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_UNICODE;UNICODE;__CSL_FILENAME=\"$(TargetFileName)\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -273,6 +275,7 @@ copy "$(SolutionDir)\src\external\wx\wx28\lib\vc_dll\wxmsw28ud_vc_csl.dll" "$(Ou
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
       <WarningLevel>Level3</WarningLevel>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_UNICODE;UNICODE;__CSL_FILENAME=\"$(TargetFileName)\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -312,6 +315,7 @@ copy "$(SolutionDir)\src\external\wx\wx28\lib\vc_dll\wxmsw28ud_vc_csl.dll" "$(Ou
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
       <WarningLevel>Level3</WarningLevel>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_UNICODE;UNICODE;__CSL_FILENAME=\"$(TargetFileName)\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -359,7 +363,6 @@ copy "$(SolutionDir)\src\external\wx\wx28\lib\vc_dll\wxmsw28ud_vc_csl.dll" "$(Ou
     <ClCompile Include="CslServerInfo.cpp" />
     <ClCompile Include="CslSettings.cpp" />
     <ClCompile Include="CslStatusBar.cpp" />
-    <ClCompile Include="CslVersionCheck.cpp" />
     <ClCompile Include="pch\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug-wx3|Win32'">Create</PrecompiledHeader>
@@ -397,7 +400,6 @@ copy "$(SolutionDir)\src\external\wx\wx28\lib\vc_dll\wxmsw28ud_vc_csl.dll" "$(Ou
     <ClInclude Include="CslLicense.h" />
     <ClInclude Include="CslSettings.h" />
     <ClInclude Include="CslStatusBar.h" />
-    <ClInclude Include="CslVersionCheck.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="csl.rc" />
