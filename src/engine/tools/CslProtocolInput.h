@@ -80,7 +80,7 @@ class CSL_DLL_TOOLS CslProtocolInputEvent : public wxEvent
         size_t GetTotalSize() const { return m_totalSize; }
         size_t GetBytesRead() const { return m_bytesRead; }
         CslFileProperties& GetFileProperties() { return m_fileProperties; }
-        wxMemoryBuffer& GetBuffer() { return m_buffer; }
+        CslMemoryBuffer& GetBuffer() { return m_buffer; }
         void* GetClientData() { return m_clientData; }
 
     protected:
@@ -92,7 +92,7 @@ class CSL_DLL_TOOLS CslProtocolInputEvent : public wxEvent
         size_t m_totalSize;
         size_t m_bytesRead;
         CslFileProperties m_fileProperties;
-        wxMemoryBuffer m_buffer;
+        CslMemoryBuffer m_buffer;
         void *m_clientData;
 
     private:

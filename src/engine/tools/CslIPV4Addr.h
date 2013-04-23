@@ -21,7 +21,7 @@
 #ifndef CSLNETADDR_H
 #define CSLNETADDR_H
 
-#include <CslTools.h>
+CSL_DLL_TOOLS wxUint32 BitCount32(wxUint32 value);
 
 class CSL_DLL_TOOLS CslIPV4Addr
 {

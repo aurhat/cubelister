@@ -366,7 +366,7 @@ wxThread::ExitCode CslProtocolInput::Entry()
     CSL_LOG_DEBUG("%s - processing time: %ld ms\n",
                   U2C(m_inputURI.BuildURI()), watch.Time());
 
-    event.m_buffer = wxMemoryBuffer(0);
+    event.m_buffer = CslMemoryBuffer(0);
     event.m_status |= CslProtocolInputEvent::TERMINATE;
 
     ::wxPostEvent(m_handler, event);
@@ -444,6 +444,7 @@ void CslProtocolInput::HandleProto(wxHTTP& http, CslProtocolInputEvent& event)
         {
             wxDELETE(m_outputStream);
             event.m_fileProperties.Set();
+        }
     }
     else
         goto error;
@@ -658,6 +659,7 @@ void CslProtocolInput::HandleProto(CslArchiveProto& archive, CslProtocolInputEve
         {
             wxDELETE(m_outputStream);
             event.m_fileProperties.Set();
+        }
     }
 }
 
@@ -711,7 +713,6 @@ inline size_t CslProtocolInput::DoRead(void *buf, size_t count, bool& doRead)
     return read;
 }
 
-
 bool CslProtocolInput::ProcessInput(CslProtocolInputEvent& event)
 {
     bool doRead = !m_terminate;
@@ -734,7 +735,7 @@ bool CslProtocolInput::ProcessInput(CslProtocolInputEvent& event)
 
         read = 0;
 
-        event.m_buffer = wxMemoryBuffer(left);
+        event.m_buffer = CslMemoryBuffer(left);
 
         char *buf = (char*)event.m_buffer.GetData();
 

@@ -102,6 +102,7 @@ template<class T> inline T min(T a, T b) { return a < b ? a : b; }
 
 #include <CslCharEncoding.h>
 #include <CslCubeEngineTools.h>
+#include <CslIPV4Addr.h>
 
 typedef const char FourCCTag[4];
 static inline wxUint32 CSL_BUILD_FOURCC(FourCCTag tag)
@@ -136,8 +137,8 @@ enum
 };
 
 BEGIN_DECLARE_EVENT_TYPES()
-        DECLARE_EXPORTED_EVENT_TYPE(CSL_DLL_TOOLS, wxCSL_EVT_THREAD_TERMINATE, wxID_ANY)
-        END_DECLARE_EVENT_TYPES()
+DECLARE_EXPORTED_EVENT_TYPE(CSL_DLL_TOOLS, wxCSL_EVT_THREAD_TERMINATE, wxID_ANY)
+END_DECLARE_EVENT_TYPES()
 
 #define CSL_EVT_THREAD_TERMINATE(fn)                                             \
     DECLARE_EVENT_TABLE_ENTRY(                                                   \
@@ -326,10 +327,29 @@ class CSL_DLL_TOOLS CslFileProperties : public wxObject
         DECLARE_DYNAMIC_CLASS(CslFileProperties)
 };
 
+#ifdef _MSC_VER
+#pragma warning(disable: 4275)
+#endif
 
-CSL_DLL_TOOLS wxUint32 BitCount32(wxUint32 value);
+class CSL_DLL_TOOLS CslMemoryBuffer : public wxMemoryBuffer
+{
+    public:
+        CslMemoryBuffer(const void *data, size_t size) :
+                wxMemoryBuffer(size)
+            { AppendData(data, size); }
 
-#include <CslIPV4Addr.h>
+        CslMemoryBuffer(size_t size = 0) :
+                wxMemoryBuffer(size)
+            { }
+
+        CslMemoryBuffer(const CslMemoryBuffer& src) :
+                wxMemoryBuffer(src)
+            { }
+};
+
+#ifdef _MSC_VER
+#pragma warning(default: 4275)
+#endif
 
 CSL_DLL_TOOLS wxString& CmdlineEscapeQuotes(wxString& str);
 CSL_DLL_TOOLS wxString& CmdlineEscapeSpaces(wxString& str);

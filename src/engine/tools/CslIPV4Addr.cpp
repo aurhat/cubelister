@@ -20,6 +20,14 @@
 
 #include "Csl.h"
 
+// MIT bit count
+wxUint32 BitCount32(wxUint32 value)
+{
+    register wxUint32 tmp;
+    tmp=value-((value>>1)&033333333333)-((value>>2)&011111111111);
+    return ((tmp+(tmp>>3))&030707070707)%63;
+}
+
 bool CslIPV4Addr::Create(const char *addr, wxUint16 port, wxUint32 netmask)
 {
     wxInt32 n;
