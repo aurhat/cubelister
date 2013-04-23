@@ -188,7 +188,7 @@ CslGame* CslDlgAddMaster::GetSelectedGame(wxUint32 *pos)
     CslArrayCslGame& games = ::wxGetApp().GetCslEngine()->GetGames();
 
     wxInt32 selection = m_choiceGameType->GetSelection();
-    wxUint32 fourcc = (wxUint32)(wxIntPtr)m_choiceGameType->GetClientData(selection);
+    wxUint32 fourcc = (wxUint32)(wxUIntPtr)m_choiceGameType->GetClientData(selection);
 
     loopv(games)
     {
