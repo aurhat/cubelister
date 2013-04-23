@@ -170,16 +170,18 @@ void CslListCtrl::OnEraseBackground(wxEraseEvent& event)
     //   HWND hwnd = (HWND)GetHWND();
     //   ListView_SetExtendedListViewStyle(hwnd, ListView_GetExtendedListViewStyle(hwnd)|LVS_EX_DOUBLEBUFFER);
 
-    if (GetItemCount()>0)
+    int count = GetItemCount();
+    int countPage = GetCountPerPage();
+
+    if (count>0 && countPage>=0)
     {
         long tItem, bItem;
         wxRect tRect, bRect;
-        wxDC *dc=event.GetDC();
-        wxSize imgSize=GetImageListSize();
-        const wxRect& cRect=GetClientRect();
+        wxSize imgSize = GetImageListSize();
+        const wxRect& cRect = GetClientRect();
 
-        tItem=GetTopItem();
-        bItem=tItem+GetCountPerPage();
+        tItem = GetTopItem();
+        bItem = tItem + countPage;
 
         if (bItem>=GetItemCount())
             bItem=GetItemCount()-1;
@@ -194,17 +196,19 @@ void CslListCtrl::OnEraseBackground(wxEraseEvent& event)
         if (imgSize!=wxDefaultSize)
         {
             GetItemRect(0, bRect, wxLIST_RECT_ICON);
-            bRect.height-=3;
+            bRect.height -= 3;
             wxRegion imgRegion(0, 0, imgSize.x, imgSize.y);
             imgRegion.Offset(bRect.x, bRect.y+1);
             region.Xor(imgRegion);
 
-            for (wxInt32 i=1; i<GetItemCount() && i<=bItem; i++)
+            for (wxInt32 i = 1; i<count && i<=bItem; i++)
             {
                 imgRegion.Offset(0, bRect.height+3);
                 region.Xor(imgRegion);
             }
         }
+
+        wxDC *dc = event.GetDC();
 
         dc->DestroyClippingRegion();
 #if wxCHECK_VERSION(2, 9, 0)
@@ -213,8 +217,8 @@ void CslListCtrl::OnEraseBackground(wxEraseEvent& event)
         dc->SetClippingRegion(region);
 #endif
 #if 0
-        static int c=0;
-        wxBitmap bmp=region.ConvertToBitmap();
+        static int c = 0;
+        wxBitmap bmp = region.ConvertToBitmap();
         if (bmp.Ok()) bmp.SaveFile(wxString::Format("%-2.2d.bmp", c++), wxBITMAP_TYPE_BMP);
 #endif
         //do erasing

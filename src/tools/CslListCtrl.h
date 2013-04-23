@@ -21,6 +21,7 @@
 #ifndef CSLLISTCTRL_H
 #define CSLLISTCTRL_H
 
+#include <CslEngine.h>
 #include <CslToolTip.h>
 
 BEGIN_DECLARE_EVENT_TYPES()
