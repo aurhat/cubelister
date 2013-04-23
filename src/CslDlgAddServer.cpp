@@ -43,7 +43,7 @@ END_EVENT_TABLE()
 
 
 CslDlgAddServer::CslDlgAddServer(wxWindow* parent):
-        wxDialog(parent, wxID_ANY, wxEmptyString),
+        wxDialog(parent, wxID_ANY, wxString(wxEmptyString)),
         m_info(NULL)
 {
     // begin wxGlade: CslDlgAddServer::CslDlgAddServer

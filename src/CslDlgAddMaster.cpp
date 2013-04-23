@@ -41,7 +41,7 @@ enum
 
 
 CslDlgAddMaster::CslDlgAddMaster(wxWindow* parent):
-        wxDialog(parent, wxID_ANY, wxEmptyString),
+        wxDialog(parent, wxID_ANY, wxString(wxEmptyString)),
         m_modified(false), m_fourcc(NULL)
 {
     // begin wxGlade: CslDlgAddMaster::CslDlgAddMaster

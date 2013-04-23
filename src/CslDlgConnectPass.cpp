@@ -31,7 +31,7 @@ enum { TEXT_PASSWORD = wxID_HIGHEST + 1, CHECK_ADMIN };
 
 
 CslDlgConnectPass::CslDlgConnectPass(wxWindow* parent, CslConnectPassInfo *info):
-        wxDialog(parent, wxID_ANY, wxEmptyString),
+        wxDialog(parent, wxID_ANY, wxString(wxEmptyString)),
         m_info(info)
 {
     // begin wxGlade: CslDlgConnectPass::CslDlgConnectPass
