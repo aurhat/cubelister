@@ -71,9 +71,9 @@ class CSL_DLL_TOOLS CslProtocolInputEvent : public wxEvent
         { }
 
         bool IsError() { return IsInputError() || IsOutputError(); }
-        bool IsInputError() { return m_status & ERROR_INPUT; }
-        bool IsOutputError() { return m_status & ERROR_OUTPUT; }
-        bool IsTerminate() { return m_status & CslProtocolInputEvent::TERMINATE; }
+        bool IsInputError() { return (m_status & ERROR_INPUT) != 0; }
+        bool IsOutputError() { return (m_status & ERROR_OUTPUT) != 0; }
+        bool IsTerminate() { return (m_status & CslProtocolInputEvent::TERMINATE) != 0; }
 
         wxUint32 GetStatus() const { return m_status; }
         wxInt32 GetStatusCode() const { return m_statusCode; }

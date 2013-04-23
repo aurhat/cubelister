@@ -248,10 +248,10 @@ void CslSettings::SaveSettings()
     config.SetPath(wxT("/GeoIP"));
     config.Write(wxT("GeoIPType") ,settings.GeoIPType);
     config.Write(wxT("GeoIPAutoUpdate"), (long int)settings.GeoIPAutoUpdate);
-    config.Write(wxT("GeoIPCountryLastCheck"), settings.GeoIPCountryLastCheck);
-    config.Write(wxT("GeoIPCountryLastDate"), settings.GeoIPCountryLastDate);
-    config.Write(wxT("GeoIPCityLastCheck"), settings.GeoIPCityLastCheck);
-    config.Write(wxT("GeoIPCityLastDate"), settings.GeoIPCityLastDate);
+    config.Write(wxT("GeoIPCountryLastCheck"), (long int)settings.GeoIPCountryLastCheck);
+    config.Write(wxT("GeoIPCountryLastDate"), (long int)settings.GeoIPCountryLastDate);
+    config.Write(wxT("GeoIPCityLastCheck"), (long int)settings.GeoIPCityLastCheck);
+    config.Write(wxT("GeoIPCityLastDate"), (long int)settings.GeoIPCityLastDate);
 
     /* ListCtrl */
     config.SetPath(wxT("/List"));
