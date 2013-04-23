@@ -40,6 +40,12 @@ IMPLEMENT_PROTOCOL(CslArchiveProto, wxT("archive"), NULL, false)
 
 wxInputStream* CslTcpProto::GetInputStream(const wxString& path)
 {
+    Notify(false);
+
+    SetFlags(wxSOCKET_BLOCK|wxSOCKET_WAITALL);
+
+    m_lastError = wxPROTO_NETERR;
+
     if (!path.IsEmpty())
     {
         CslCharBuffer buf = CslWX2MB(path);
@@ -47,10 +53,7 @@ wxInputStream* CslTcpProto::GetInputStream(const wxString& path)
         wxSocketBase::Write((void*)buf.data(), path.size());
 
         if (wxSocketBase::LastCount()!=path.size())
-        {
-            m_lastError = wxPROTO_NETERR;
             return NULL;
-        }
     }
 
     wxSocketInputStream *stream = new wxSocketInputStream(*this);
@@ -61,7 +64,6 @@ wxInputStream* CslTcpProto::GetInputStream(const wxString& path)
         return stream;
     }
 
-    m_lastError = wxPROTO_NETERR;
     delete stream;
 
     return NULL;
@@ -388,7 +390,6 @@ void CslProtocolInput::HandleProto(wxHTTP& http, CslProtocolInputEvent& event)
 
     http.SetHeader(wxT("User-Agent"), ::GetHttpAgent());
     http.SetTimeout(10);
-    http.Notify(false);
     http.Connect(addr, true);
 
     wxString srcPath(m_inputURI.GetPath());
@@ -460,9 +461,7 @@ void CslProtocolInput::HandleProto(CslTcpProto& tcp, CslProtocolInputEvent& even
     addr.Hostname(m_inputURI.GetServer());
     addr.Service((wxUint16)wxAtoi(m_inputURI.GetPort()));
 
-    tcp.Notify(false);
     tcp.SetTimeout(10);
-    tcp.SetFlags(wxSOCKET_BLOCK|wxSOCKET_WAITALL);
     tcp.Connect(addr, true);
 
     wxString srcPath(m_inputURI.Unescape(m_inputURI.GetPath()).AfterFirst('/'));
