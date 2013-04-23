@@ -392,11 +392,10 @@ void CslProtocolInput::HandleProto(wxHTTP& http, CslProtocolInputEvent& event)
     http.Connect(addr, true);
 
     wxString srcPath(m_inputURI.GetPath());
+    bool createOutput = m_outputPath.IsOk();
 
     m_inputStream = http.GetInputStream(srcPath);
     m_statusCode = http.GetResponse();
-
-    ::wxYieldIfNeeded();
 
     SetTotalSize();
     SetError(http.GetError());
@@ -407,17 +406,12 @@ void CslProtocolInput::HandleProto(wxHTTP& http, CslProtocolInputEvent& event)
     event.m_fileProperties.Name = m_outputPath;
     event.m_fileProperties.Time.Modify = ::FromRfc2822(http.GetHeader(wxT("Last-Modified")));
 
-    if (!m_outputPath.IsOk() || m_outputPath.IsDir())
+    if (!createOutput || m_outputPath.IsDir())
         event.m_fileProperties.Name.SetFullName(wxFileName(srcPath).GetFullName());
 
     m_critSection.Enter();
     m_outputPath = event.m_fileProperties.Name;
     m_critSection.Leave();
-
-#if 0
-    if (evt.Output.Time.Modify.IsValid())
-        CSL_LOG_DEBUG("modified: %s\n", U2C(evt.Output.Time.Modify.FromTimezone(wxDateTime::UTC).Format()));
-#endif
 
     if (m_protocolError!=wxPROTO_NOERR)
     {
@@ -431,7 +425,7 @@ void CslProtocolInput::HandleProto(wxHTTP& http, CslProtocolInputEvent& event)
 
     if (m_statusCode==200)
     {
-        if (m_outputPath.IsOk() && !CreateOutputStream(m_outputPath))
+        if (createOutput && !CreateOutputStream(m_outputPath))
         {
             SetError(wxPROTO_INVVAL);
             event.m_status |= CslProtocolInputEvent::ERROR_OUTPUT;
@@ -440,7 +434,7 @@ void CslProtocolInput::HandleProto(wxHTTP& http, CslProtocolInputEvent& event)
 
         ProcessInput(event);
 
-        if (m_outputPath.IsOk() && event.m_fileProperties.Time.Modify.IsValid())
+        if (createOutput && event.m_fileProperties.Time.Modify.IsValid())
         {
             wxDELETE(m_outputStream);
             event.m_fileProperties.Set();
