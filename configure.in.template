@@ -53,7 +53,7 @@ WXTEST
 # wxWidgets
 # ---------
 
-wx_ver_min2=2008008
+wx_ver_min2=2008010
 wx_ver_min3=2009004
 wx_ver=`echo $wx_version | $AWK 'BEGIN { FS = "."; } { printf "% d", ($1 * 1000 + $2) * 1000 + $3;}'`
 
@@ -64,7 +64,7 @@ then
   WX_LIBS="`$WXCONFIG --libs base,adv,core,net,richtext,qa,xml,html,xml,aui`"
   wx_type=`echo $WX_CXXFLAGS | sed 's/\(.*\)\(ansi\|unicode\)\(.*\)/\2/'`
 else
-  AC_MSG_ERROR([wxWidgets 2.8.8 (2.8 series) or 2.9.4 (3.0 series) or newer is required])
+  AC_MSG_ERROR([wxWidgets 2.8.10 (2.8 series) or 2.9.4 (3.0 series) or newer is required])
 fi
 
 AC_SUBST(WX_LIBS)

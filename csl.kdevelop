@@ -22,7 +22,7 @@
   <kdevautoproject>
     <general>
       <activetarget>src/csl</activetarget>
-      <useconfiguration>release</useconfiguration>
+      <useconfiguration>release-wx3</useconfiguration>
     </general>
     <run>
       <mainprogram>/home/mimosius/Documents/Development/csl</mainprogram>

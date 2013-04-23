@@ -1,102 +1,10 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <!DOCTYPE KDevPrjSession>
 <KDevPrjSession>
- <DocsAndViews NumberOfDocuments="29" >
-  <Doc0 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/projects/csl/csl/src/tools/CslGeoIP.cpp" >
-   <View0 Encoding="" Type="Source" />
-  </Doc0>
-  <Doc1 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/projects/csl/csl/src/CslFrame.cpp" >
-   <View0 Encoding="" Type="Source" />
-  </Doc1>
-  <Doc2 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/projects/csl/csl/src/engine/tools/CslProtocolInput.cpp" >
-   <View0 Encoding="" Type="Source" />
-  </Doc2>
-  <Doc3 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/projects/csl/csl/src/engine/tools/CslTools.h" >
-   <View0 Encoding="" Type="Source" />
-  </Doc3>
-  <Doc4 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/projects/csl/csl/src/CslDlgSettings.cpp" >
-   <View0 Encoding="" Type="Source" />
-  </Doc4>
-  <Doc5 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/projects/csl/csl/src/CslApp.cpp" >
-   <View0 Encoding="" line="57" Type="Source" />
-  </Doc5>
-  <Doc6 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/projects/csl/csl/src/engine/CslVersion.h" >
-   <View0 Encoding="" Type="Source" />
-  </Doc6>
-  <Doc7 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/projects/csl/csl/src/CslFrame.h" >
-   <View0 Encoding="" Type="Source" />
-  </Doc7>
-  <Doc8 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/projects/csl/csl/src/engine/tools/CslProtocolInput.h" >
-   <View0 Encoding="" Type="Source" />
-  </Doc8>
-  <Doc9 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/projects/csl/csl/src/engine/tools/CslTools.cpp" >
-   <View0 Encoding="" Type="Source" />
-  </Doc9>
-  <Doc10 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/projects/csl/csl/src/engine/CslEngine.h" >
-   <View0 Encoding="" Type="Source" />
-  </Doc10>
-  <Doc11 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/projects/csl/csl/src/engine/CslEngine.cpp" >
-   <View0 Encoding="" Type="Source" />
-  </Doc11>
-  <Doc12 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/projects/csl/csl/src/engine/CslGame.h" >
-   <View0 Encoding="" Type="Source" />
-  </Doc12>
-  <Doc13 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/projects/csl/csl/src/pch/Csl.h" >
-   <View0 Encoding="" Type="Source" />
-  </Doc13>
-  <Doc14 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/projects/csl/csl/src/CslDlgAddMaster.cpp" >
-   <View0 Encoding="" Type="Source" />
-  </Doc14>
-  <Doc15 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/projects/csl/csl/src/CslSettings.cpp" >
-   <View0 Encoding="" Type="Source" />
-  </Doc15>
-  <Doc16 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/projects/csl/csl/src/CslSettings.h" >
-   <View0 Encoding="" Type="Source" />
-  </Doc16>
-  <Doc17 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/projects/csl/csl/src/engine/CslGame.cpp" >
-   <View0 Encoding="" Type="Source" />
-  </Doc17>
-  <Doc18 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/projects/csl/csl/src/CslServerBrowser.cpp" >
-   <View0 Encoding="" Type="Source" />
-  </Doc18>
-  <Doc19 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/projects/csl/csl/src/CslServerBrowser.h" >
-   <View0 Encoding="" Type="Source" />
-  </Doc19>
-  <Doc20 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/projects/csl/csl/src/CslDlgAddMaster.h" >
-   <View0 Encoding="" Type="Source" />
-  </Doc20>
-  <Doc21 NumberOfViews="1" URL="file:///usr/src/debug/wxGTK-2.8.12/src/common/string.cpp" >
-   <View0 Encoding="" line="0" Type="Source" />
-  </Doc21>
-  <Doc22 NumberOfViews="1" URL="file:///usr/src/debug/wxGTK-2.8.12/include/wx/string.h" >
-   <View0 Encoding="" Type="Source" />
-  </Doc22>
-  <Doc23 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/projects/csl/csl/src/engine/tools/CslCharEncoding.h" >
-   <View0 Encoding="" Type="Source" />
-  </Doc23>
-  <Doc24 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/projects/csl/csl/src/tools/CslGeoIP.h" >
-   <View0 Encoding="" Type="Source" />
-  </Doc24>
-  <Doc25 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/projects/csl/csl/src/plugins/assaultcube/CslGameAssaultCube.h" >
-   <View0 Encoding="" Type="Source" />
-  </Doc25>
-  <Doc26 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/projects/csl/csl/src/plugins/sauerbraten/CslGameSauerbraten.h" >
-   <View0 Encoding="" Type="Source" />
-  </Doc26>
-  <Doc27 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/projects/csl/csl/src/engine/tools/CslCharEncoding.cpp" >
-   <View0 Encoding="" Type="Source" />
-  </Doc27>
-  <Doc28 NumberOfViews="1" URL="file:///home/mimosius/Documents/Development/projects/csl/csl/src/plugins/assaultcube/CslGameAssaultCube.cpp" >
-   <View0 Encoding="" line="99" Type="Source" />
-  </Doc28>
- </DocsAndViews>
+ <DocsAndViews NumberOfDocuments="0" />
  <pluginList>
   <kdevdebugger>
-   <breakpointList>
-    <breakpoint0 location="/home/mimosius/Documents/Development/projects/csl/csl/src/engine/CslGame.cpp:187" type="1" tracingFormatString="" traceFormatStringEnabled="0" condition="" tracingEnabled="0" enabled="1" >
-     <tracedExpressions/>
-    </breakpoint0>
-   </breakpointList>
+   <breakpointList/>
    <showInternalCommands value="0" />
   </kdevdebugger>
   <kdevastyle>
