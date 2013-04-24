@@ -21,7 +21,7 @@
 #ifndef CSLPLUGIN_H
 #define CSLPLUGIN_H
 
-#define CSL_PLUGIN_VERSION_API  2
+#define CSL_PLUGIN_VERSION_API  3
 
 #define CSL_PLUGIN_EVENT_ID_MIN_GUI     (wxID_HIGHEST + 20000)
 #define CSL_PLUGIN_EVENT_ID_MIN_ENGINE  (wxID_HIGHEST + 40000)
@@ -117,7 +117,8 @@ class CSL_DLL_PLUGIN CslPluginHost
     public:
         virtual wxWindow* GetMainWindow() { return NULL; }
         virtual wxEvtHandler* GetEvtHandler() { return NULL; }
-        virtual wxString GetHomeDir() { return wxEmptyString; }
+        virtual wxString GetHomeDir(wxPathFormat format = wxPATH_NATIVE)
+		    { return wxEmptyString; }
 
         virtual wxInt32 GetFreeId() { return -1; }
         virtual wxInt32 GetFreeIds(wxInt32 count, wxInt32 ids[]) { return -1; }

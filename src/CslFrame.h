@@ -66,7 +66,7 @@ class CslFrame: public wxFrame, public CslPluginMgr, public CslPluginHost
             { return this; }
         wxEvtHandler* GetEvtHandler()
             { return this; }
-        wxString GetHomeDir();
+        wxString GetHomeDir(wxPathFormat format = wxPATH_NATIVE);
 
         wxInt32 GetFreeId();
         wxInt32 GetFreeIds(wxInt32 count, wxInt32 ids[]);

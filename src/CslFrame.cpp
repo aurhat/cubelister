@@ -392,9 +392,9 @@ void CslFrame::CreateMainMenu()
     CslMenu::CheckItem(MENU_VIEW_AUTO_SORT, CslGetSettings().AutoSortColumns);
 }
 
-wxString CslFrame::GetHomeDir()
+wxString CslFrame::GetHomeDir(wxPathFormat format)
 {
-    return ::wxGetApp().GetHomeDir();
+    return ::wxGetApp().GetHomeDir(format);
 }
 
 wxInt32 CslFrame::GetFreeId()
