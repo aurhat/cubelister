@@ -45,10 +45,7 @@ class CslFrame: public wxFrame, public CslPluginMgr, public CslPluginHost
     friend class CslTaskBarIcon;
 
     public:
-        CslFrame(wxWindow *parent,int id,const wxString& title,
-                 const wxPoint& pos = wxDefaultPosition,
-                 const wxSize& size = wxDefaultSize,
-                 long style = wxDEFAULT_FRAME_STYLE);
+        CslFrame();
         ~CslFrame();
 
         wxAuiManager& GetAuiManager()

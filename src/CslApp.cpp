@@ -59,6 +59,17 @@ static pascal OSErr MacCallbackGetUrl(const AppleEvent *in,AppleEvent *out,long 
 }
 #endif //__WXMAC__
 
+
+wxString CslApp::GetHomeDir(wxPathFormat format) const
+{
+    if (format==wxPATH_NATIVE)
+        return m_home;
+
+    wxFileName fn(m_home);
+
+    return fn.GetPathWithSep(format);
+}
+
 bool CslApp::OnInit()
 {
     SetAppName(wxString(CSL_NAME_SHORT_STR).Lower());
@@ -85,14 +96,14 @@ bool CslApp::OnInit()
         { wxCMD_LINE_NONE                                                                                                                    }
     };
 
-
     wxString sOpt;
     wxCmdLineParser parser(cmdLineDesc, argc, argv);
 
     switch (parser.Parse())
     {
-        case -1:
+        case -1: // help
             return true;
+
         case 0:
             if (parser.Found(wxT("version")))
             {
@@ -106,9 +117,9 @@ bool CslApp::OnInit()
             if (parser.Found(wxT("p"), &sOpt))
                 AddPluginDir(sOpt, cwd);
             break;
-        default:
-            // syntax error
-            break;
+
+        default: // syntax error
+            return true;
     }
 
     if (parser.GetParamCount())
@@ -116,6 +127,24 @@ bool CslApp::OnInit()
 
     if (m_home.IsEmpty())
         m_home = ::DirName(wxStandardPaths().GetUserDataDir());
+
+    if (!wxFileName::DirExists(m_home))
+    {
+        if (!wxFileName::Mkdir(m_home, 0700, wxPATH_MKDIR_FULL))
+        {
+            wxMessageBox(wxString::Format(_("Failed to create the home dir '%s'."),
+                                          m_home.c_str()),
+                         _("Fatal error!"), wxICON_ERROR);
+            return false;
+        }
+    }
+    else if (!wxFileName::IsDirWritable(m_home))
+    {
+        wxMessageBox(wxString::Format(_("Home dir '%s' isn't writable."),
+                                      m_home.c_str()),
+                     _("Fatal error!"), wxICON_ERROR);
+        return false;
+    }
 
     CSL_LOG_DEBUG("using home dir: %s\n", U2C(m_home));
 
@@ -173,20 +202,31 @@ bool CslApp::OnInit()
         m_lang=m_locale.GetCanonicalName();
 
 #ifdef __WXMAC__
-    wxSystemOptions::SetOption(wxT("mac.listctrl.always_use_generic"),1);
-    //enables Command-H, Command-M and Command-Q at least when not in fullscreen
+    wxSystemOptions::SetOption(wxT("mac.listctrl.always_use_generic"), 1);
+
+    // enables Command-H, Command-M and Command-Q at least when not in fullscreen
     wxSetEnv(wxT("SDL_SINGLEDISPLAY"),wxT("1"));
     wxSetEnv(wxT("SDL_ENABLEAPPEVENTS"),wxT("1"));
-    //TODO wxApp::SetExitOnFrameDelete(false);
-    //register event handler for URI schemes
+
+    // TODO wxApp::SetExitOnFrameDelete(false);
+
+    // register event handler for URI schemes
     AEInstallEventHandler(kInternetEventClass, kAEGetURL,
-                          NewAEEventHandlerUPP((AEEventHandlerProcPtr)MacCallbackGetUrl), 0, false);
+                          NewAEEventHandlerUPP((AEEventHandlerProcPtr)MacCallbackGetUrl),
+                          0, false);
 #endif //__WXMAC__
 
-    wxString lock = wxString::Format(wxT(".%s-%s.lock"),CSL_NAME_SHORT_STR,wxGetUserId().c_str());
-    m_single = new wxSingleInstanceChecker(lock);
+    m_single = new wxSingleInstanceChecker;
 
-    if (m_single->IsAnotherRunning())
+    wxString lock = wxString::Format(wxT("%s-%s.%s"), CSL_NAME_SHORT_STR, wxGetUserId().c_str(),
+#ifdef __WXMSW__
+                                     GetHomeDir(wxPATH_UNIX).c_str()
+#else
+                                     wxT("lock")
+#endif
+                                    ).Lower();
+
+    if (m_single->Create(lock, m_home) && m_single->IsAnotherRunning())
     {
         IpcCall(ipcCmd.IsEmpty() ? wxT("show") : ipcCmd);
         return true;
@@ -196,7 +236,7 @@ bool CslApp::OnInit()
 
     wxInitAllImageHandlers();
 
-    CslFrame* frame = new CslFrame(NULL,wxID_ANY,wxEmptyString,wxDefaultPosition);
+    CslFrame* frame = new CslFrame;
 
     if (m_shutdown!=CSL_SHUTDOWN_NONE)
         return true;
@@ -218,6 +258,14 @@ int CslApp::OnRun()
     return m_shutdown>CSL_SHUTDOWN_NORMAL ? 1 : 0;
 }
 
+int CslApp::OnExit()
+{
+    wxDELETE(m_engine);
+    wxDELETE(m_single);
+
+    return 0;
+}
+
 void CslApp::OnFatalException()
 {
     wxDebugReport report;
@@ -227,17 +275,6 @@ void CslApp::OnFatalException()
 
     if (preview.Show(report))
         report.Process();
-}
-
-int CslApp::OnExit()
-{
-    if (m_engine)
-        delete m_engine;
-
-    if (m_single)
-        delete m_single;
-
-    return 0;
 }
 
 void CslApp::OnEndSession(wxCloseEvent& event)
@@ -257,12 +294,13 @@ int CslApp::FilterEvent(wxEvent& event)
     return -1;
 }
 
-void CslApp::IpcCall(const wxString& value,wxEvtHandler *evtHandler) const
+void CslApp::IpcCall(const wxString& value, wxEvtHandler *evtHandler) const
 {
     if (evtHandler)
     {
         CslIpcEvent evt(CslIpcEvent::IPC_COMMAND, value);
-        wxPostEvent(evtHandler, evt);
+
+        ::wxPostEvent(evtHandler, evt);
     }
     else
     {

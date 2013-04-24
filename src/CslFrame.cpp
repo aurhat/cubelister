@@ -187,9 +187,8 @@ CSL_EVT_IPC(wxID_ANY,CslFrame::OnIPC)
 END_EVENT_TABLE()
 
 
-CslFrame::CslFrame(wxWindow* parent,int id,const wxString& title,
-                   const wxPoint& pos,const wxSize& size,long style):
-        wxFrame(parent, id, title, pos, size, wxDEFAULT_FRAME_STYLE),
+CslFrame::CslFrame():
+        wxFrame(NULL, wxID_ANY, wxEmptyString),
         CslPluginMgr(CSL_PLUGIN_TYPE_GUI)
 {
     m_engine = ::wxGetApp().GetCslEngine();

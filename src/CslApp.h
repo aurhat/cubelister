@@ -41,7 +41,7 @@ class CslApp: public wxApp
                 m_engine(NULL)
             { }
 
-        const wxString& GetHomeDir() const { return m_home; }
+        wxString GetHomeDir(wxPathFormat format = wxPATH_NATIVE) const;
         const wxString& GetLanguage() const { return m_lang; }
         wxInt32 GetShutdown() const { return m_shutdown; }
         CslEngine* GetCslEngine() { return m_engine; }
@@ -56,7 +56,7 @@ class CslApp: public wxApp
         void OnEndSession(wxCloseEvent& event);
         int FilterEvent(wxEvent& event);
 
-        void IpcCall(const wxString& value,wxEvtHandler *evtHandler=NULL);
+        void IpcCall(const wxString& value, wxEvtHandler *evtHandler = NULL) const;
 
         DECLARE_EVENT_TABLE()
 

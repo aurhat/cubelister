@@ -27,7 +27,6 @@ DEFINE_EVENT_TYPE(wxCSL_EVT_IPC)
 
 IMPLEMENT_DYNAMIC_CLASS(CslIpcEvent, wxEvent)
 
-
 bool CslIpcConnection::OnPoke(const wxString& topic,
                               const wxString& item,
 #if wxCHECK_VERSION(2, 9, 0)
