@@ -96,7 +96,6 @@ bool CslApp::OnInit()
         { wxCMD_LINE_NONE                                                                                                                    }
     };
 
-
     wxString sOpt;
     wxCmdLineParser parser(cmdLineDesc, argc, argv);
 
@@ -104,6 +103,7 @@ bool CslApp::OnInit()
     {
         case -1: // help
             return true;
+
         case 0:
             if (parser.Found(wxT("version")))
             {
@@ -216,10 +216,17 @@ bool CslApp::OnInit()
                           0, false);
 #endif //__WXMAC__
 
-    wxString lock = wxString::Format(wxT(".%s-%s.lock"),CSL_NAME_SHORT_STR,wxGetUserId().c_str());
-    m_single = new wxSingleInstanceChecker(lock);
+    m_single = new wxSingleInstanceChecker;
 
-    if (m_single->IsAnotherRunning())
+    wxString lock = wxString::Format(wxT("%s-%s.%s"), CSL_NAME_SHORT_STR, wxGetUserId().c_str(),
+#ifdef __WXMSW__
+                                     GetHomeDir(wxPATH_UNIX).c_str()
+#else
+                                     wxT("lock")
+#endif
+                                    ).Lower();
+
+    if (m_single->Create(lock, m_home) && m_single->IsAnotherRunning())
     {
         IpcCall(ipcCmd.IsEmpty() ? wxT("show") : ipcCmd);
         return true;
@@ -229,7 +236,7 @@ bool CslApp::OnInit()
 
     wxInitAllImageHandlers();
 
-    CslFrame* frame = new CslFrame(NULL,wxID_ANY,wxEmptyString,wxDefaultPosition);
+    CslFrame* frame = new CslFrame;
 
     if (m_shutdown!=CSL_SHUTDOWN_NONE)
         return true;
@@ -251,6 +258,14 @@ int CslApp::OnRun()
     return m_shutdown>CSL_SHUTDOWN_NORMAL ? 1 : 0;
 }
 
+int CslApp::OnExit()
+{
+    wxDELETE(m_engine);
+    wxDELETE(m_single);
+
+    return 0;
+}
+
 void CslApp::OnFatalException()
 {
     wxDebugReport report;
@@ -260,17 +275,6 @@ void CslApp::OnFatalException()
 
     if (preview.Show(report))
         report.Process();
-}
-
-int CslApp::OnExit()
-{
-    if (m_engine)
-        delete m_engine;
-
-    if (m_single)
-        delete m_single;
-
-    return 0;
 }
 
 void CslApp::OnEndSession(wxCloseEvent& event)

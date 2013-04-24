@@ -25,9 +25,9 @@
 
 #define CSL_IPC_HOST                wxT("localhost")
 #ifdef __WXMSW__
-#define CSL_IPC_SERV                wxT("CSL_IPC")
+#define CSL_IPC_SERV                wxT("CSL_IPC-") + GetHomeDir(wxPATH_UNIX);
 #else
-#define CSL_IPC_SERV                wxString(GetHomeDir() + wxT("sock"))
+#define CSL_IPC_SERV                wxString(GetHomeDir() + wxT("ipc_sock"))
 #endif
 #define CSL_IPC_TOPIC               wxT("CSL_IPC_CONTROL")
 
