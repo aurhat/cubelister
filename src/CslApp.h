@@ -41,7 +41,7 @@ class CslApp: public wxApp
                 m_engine(NULL)
             { }
 
-        const wxString& GetHomeDir() const { return m_home; }
+        wxString GetHomeDir(wxPathFormat format = wxPATH_NATIVE) const;
         const wxString& GetLanguage() const { return m_lang; }
         wxInt32 GetShutdown() const { return m_shutdown; }
         CslEngine* GetCslEngine() { return m_engine; }

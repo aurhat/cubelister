@@ -59,6 +59,17 @@ static pascal OSErr MacCallbackGetUrl(const AppleEvent *in,AppleEvent *out,long 
 }
 #endif //__WXMAC__
 
+
+wxString CslApp::GetHomeDir(wxPathFormat format) const
+{
+    if (format==wxPATH_NATIVE)
+        return m_home;
+
+    wxFileName fn(m_home);
+
+    return fn.GetPathWithSep(format);
+}
+
 bool CslApp::OnInit()
 {
     SetAppName(wxString(CSL_NAME_SHORT_STR).Lower());
