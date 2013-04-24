@@ -91,7 +91,7 @@ bool CslApp::OnInit()
 
     switch (parser.Parse())
     {
-        case -1:
+        case -1: // help
             return true;
         case 0:
             if (parser.Found(wxT("version")))
@@ -106,9 +106,9 @@ bool CslApp::OnInit()
             if (parser.Found(wxT("p"), &sOpt))
                 AddPluginDir(sOpt, cwd);
             break;
-        default:
-            // syntax error
-            break;
+
+        default: // syntax error
+            return true;
     }
 
     if (parser.GetParamCount())
@@ -116,6 +116,24 @@ bool CslApp::OnInit()
 
     if (m_home.IsEmpty())
         m_home = ::DirName(wxStandardPaths().GetUserDataDir());
+
+    if (!wxFileName::DirExists(m_home))
+    {
+        if (!wxFileName::Mkdir(m_home, 0700, wxPATH_MKDIR_FULL))
+        {
+            wxMessageBox(wxString::Format(_("Failed to create the home dir '%s'."),
+                                          m_home.c_str()),
+                         _("Fatal error!"), wxICON_ERROR);
+            return false;
+        }
+    }
+    else if (!wxFileName::IsDirWritable(m_home))
+    {
+        wxMessageBox(wxString::Format(_("Home dir '%s' isn't writable."),
+                                      m_home.c_str()),
+                     _("Fatal error!"), wxICON_ERROR);
+        return false;
+    }
 
     CSL_LOG_DEBUG("using home dir: %s\n", U2C(m_home));
 
@@ -173,14 +191,18 @@ bool CslApp::OnInit()
         m_lang=m_locale.GetCanonicalName();
 
 #ifdef __WXMAC__
-    wxSystemOptions::SetOption(wxT("mac.listctrl.always_use_generic"),1);
-    //enables Command-H, Command-M and Command-Q at least when not in fullscreen
+    wxSystemOptions::SetOption(wxT("mac.listctrl.always_use_generic"), 1);
+
+    // enables Command-H, Command-M and Command-Q at least when not in fullscreen
     wxSetEnv(wxT("SDL_SINGLEDISPLAY"),wxT("1"));
     wxSetEnv(wxT("SDL_ENABLEAPPEVENTS"),wxT("1"));
-    //TODO wxApp::SetExitOnFrameDelete(false);
-    //register event handler for URI schemes
+
+    // TODO wxApp::SetExitOnFrameDelete(false);
+
+    // register event handler for URI schemes
     AEInstallEventHandler(kInternetEventClass, kAEGetURL,
-                          NewAEEventHandlerUPP((AEEventHandlerProcPtr)MacCallbackGetUrl), 0, false);
+                          NewAEEventHandlerUPP((AEEventHandlerProcPtr)MacCallbackGetUrl),
+                          0, false);
 #endif //__WXMAC__
 
     wxString lock = wxString::Format(wxT(".%s-%s.lock"),CSL_NAME_SHORT_STR,wxGetUserId().c_str());
