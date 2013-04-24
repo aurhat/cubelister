@@ -290,12 +290,13 @@ int CslApp::FilterEvent(wxEvent& event)
     return -1;
 }
 
-void CslApp::IpcCall(const wxString& value,wxEvtHandler *evtHandler) const
+void CslApp::IpcCall(const wxString& value, wxEvtHandler *evtHandler) const
 {
     if (evtHandler)
     {
         CslIpcEvent evt(CslIpcEvent::IPC_COMMAND, value);
-        wxPostEvent(evtHandler, evt);
+
+        ::wxPostEvent(evtHandler, evt);
     }
     else
     {
