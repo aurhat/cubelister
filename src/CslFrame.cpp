@@ -2684,7 +2684,7 @@ void CslFrame::OnIPC(CslIpcEvent& event)
 {
     wxString error;
 
-    switch (event.Type)
+    switch (event.GetType())
     {
         case CslIpcEvent::IPC_DISCONNECT:
             if (m_ipcServer)
@@ -2692,65 +2692,68 @@ void CslFrame::OnIPC(CslIpcEvent& event)
             break;
 
         case CslIpcEvent::IPC_COMMAND:
-            if (!event.Request.IsEmpty())
-            {
-                CSL_LOG_DEBUG("IPC request: %s\n",U2C(event.Request));
+        {
+            const wxString& request = event.GetRequest();
 
-                if (event.Request.Cmp(wxT("show"))==0)
+            if (!request.IsEmpty())
+            {
+                CSL_LOG_DEBUG("IPC request: %s\n", U2C(request));
+
+                if (request==wxT("show"))
                     ToggleShow(1);
                 else
                 {
                     wxInt32 i;
-                    wxString s,token;
-                    wxString host,pass;
-                    CslGame *game=NULL;
-                    wxUint16 port=0,iport=0;
-                    bool connect=false,addfavourites=false;
+                    wxString s, token;
+                    wxString host, pass;
+                    CslGame *game = NULL;
+                    wxUint16 port = 0, iport = 0;
+                    bool connect = false, addfavourites = false;
 
-                    wxURI uri(event.Request);
+                    wxURI uri(request);
 
                     if (!uri.HasServer())
                     {
-                        error=_("Invalid URI: No server specified.");
+                        error = _("Invalid URI: No server specified.");
                         break;
                     }
                     if (!uri.HasQuery())
                     {
-                        error=_("Invalid URI: No action specified.");
+                        error = _("Invalid URI: No action specified.");
                         break;
                     }
 
-                    wxStringTokenizer tkz(uri.GetQuery(),wxT("&"));
+                    wxStringTokenizer tkz(uri.GetQuery(), wxT("&"));
 
                     while (tkz.HasMoreTokens())
                     {
-                        token=tkz.GetNextToken();
+                        token = tkz.GetNextToken();
 
-                        if ((i=token.Find(wxT("=")))==wxNOT_FOUND)
+                        if ((i = token.Find(wxT("=")))==wxNOT_FOUND)
                             continue;
 
-                        if (token.Mid(0,i).CmpNoCase(CSL_URI_INFOPORT_STR)==0)
-                            iport=wxAtoi(token.Mid(i+1));
-                        else if (token.Mid(0,i).CmpNoCase(CSL_URI_GAME_STR)==0)
+                        if (token.Mid(0, i).CmpNoCase(CSL_URI_INFOPORT_STR)==0)
+                            iport = wxAtoi(token.Mid(i+1));
+                        else if (token.Mid(0, i).CmpNoCase(CSL_URI_GAME_STR)==0)
                         {
-                            s=token.Mid(i+1);
-                            s.Replace(wxT("%20"),wxT(" "));
-                            game=m_engine->FindGame(s);
+                            s = token.Mid(i+1);
+                            s.Replace(wxT("%20"), wxT(" "));
+                            game = m_engine->FindGame(s);
                         }
                         else if (token.Mid(0,i).CmpNoCase(CSL_URI_ACTION_STR)==0)
                         {
-                            s=token.Mid(i+1);
+                            s = token.Mid(i+1);
 
                             if (s.CmpNoCase(CSL_URI_ACTION_CONNECT_STR)==0)
-                                connect=true;
+                                connect = true;
                             else if (s.CmpNoCase(CSL_URI_ACTION_ADDFAV_STR)==0)
-                                addfavourites=true;
+                                addfavourites = true;
                         }
                     }
 
                     if (!game)
                     {
-                        error=_("Invalid URI: Unknown game.");
+                        error = _("Invalid URI: Unknown game.");
                         break;
                     }
 
@@ -2761,24 +2764,24 @@ void CslFrame::OnIPC(CslIpcEvent& event)
 
                         if (CSL_CAP_CONNECT_PASS(game->GetCapabilities()))
                         {
-                            pass=uri.GetUserInfo();
-                            pass.Replace(wxT("%20"),wxT(" "));
+                            pass = uri.GetUserInfo();
+                            pass.Replace(wxT("%20"), wxT(" "));
                         }
 
-                        host=uri.GetServer();
-                        if (!(port=wxAtoi(uri.GetPort())))
-                            port=game->GetDefaultGamePort();
+                        host = uri.GetServer();
+                        if (!(port = wxAtoi(uri.GetPort())))
+                            port = game->GetDefaultGamePort();
                         if (!iport)
-                            iport=game->GetInfoPort(port);
+                            iport = game->GetInfoPort(port);
 
                         addr.Service(iport);
                         addr.Hostname(host);
                         addr.Hostname();
 
-                        if (!(info=game->FindServerByAddr(CslIPV4Addr(addr))))
+                        if (!(info = game->FindServerByAddr(CslIPV4Addr(addr))))
                         {
                             info = CslServerInfo::Create(game, host, port, iport);
-                            info->View=CslServerInfo::CSL_VIEW_DEFAULT;
+                            info->View = CslServerInfo::CSL_VIEW_DEFAULT;
 
                             if (!m_engine->AddServer(game, info))
                             {
@@ -2798,16 +2801,17 @@ void CslFrame::OnIPC(CslIpcEvent& event)
                         }
 
                         if (connect)
-                            ConnectToServer(info,pass.IsEmpty() ?
+                            ConnectToServer(info, pass.IsEmpty() ?
                                             CslGameConnection::NO_PASS :
                                             CslGameConnection::USE_PASS);
                     }
                     else
-                        error=_("Invalid URI: Unknown action.");
+                        error = _("Invalid URI: Unknown action.");
                 }
             }
 
             break;
+        }
 
         default:
             break;

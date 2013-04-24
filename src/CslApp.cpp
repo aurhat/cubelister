@@ -268,11 +268,13 @@ void CslApp::IpcCall(const wxString& value,wxEvtHandler *evtHandler) const
     {
         CslIpcClient client;
 
-        if (client.Connect(CSL_IPC_HOST, CSL_IPC_SERV, CSL_IPC_TOPIC))
-#if wxCHECK_VERSION(2,9,0)
-            client.GetConnection()->Poke(CSL_NAME_SHORT_STR, value.c_str());
-#else
-            client.GetConnection()->Poke(CSL_NAME_SHORT_STR, (wxChar*)value.c_str());
-#endif //wxCHECK_VERSION
+        if (!client.Connect(CSL_IPC_HOST, CSL_IPC_SERV, CSL_IPC_TOPIC))
+            return;
+
+        // always convert to char* to gain compatibility
+        // with wx 2.8 / 2.9 and ansi / unicode
+
+        client.GetConnection()->Poke(CSL_NAME_SHORT_STR, (wxChar*)U2C(value),
+                                     value.Len(), wxIPC_PRIVATE);
     }
 }

@@ -56,7 +56,7 @@ class CslApp: public wxApp
         void OnEndSession(wxCloseEvent& event);
         int FilterEvent(wxEvent& event);
 
-        void IpcCall(const wxString& value,wxEvtHandler *evtHandler=NULL) const;
+        void IpcCall(const wxString& value,wxEvtHandler *evtHandler=NULL);
 
         DECLARE_EVENT_TABLE()
 

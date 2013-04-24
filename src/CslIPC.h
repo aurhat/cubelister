@@ -27,7 +27,7 @@
 #ifdef __WXMSW__
 #define CSL_IPC_SERV                wxT("CSL_IPC")
 #else
-#define CSL_IPC_SERV                wxString(GetHomeDir()+wxT("sock"))
+#define CSL_IPC_SERV                wxString(GetHomeDir() + wxT("sock"))
 #endif
 #define CSL_IPC_TOPIC               wxT("CSL_IPC_CONTROL")
 
@@ -60,40 +60,63 @@ class CslIpcEvent : public wxEvent
     public:
         enum { IPC_CONNECT, IPC_DISCONNECT, IPC_COMMAND };
 
-        CslIpcEvent(wxInt32 type=-1,const wxString& request=wxEmptyString) :
-                wxEvent(wxID_ANY,wxCSL_EVT_IPC),
-                Type(type),Request(request) {}
+        CslIpcEvent(wxInt32 type = -1, const wxString& request = wxT("")) :
+                wxEvent(wxID_ANY, wxCSL_EVT_IPC),
+                m_type(type), m_request(request)
+            { }
+        virtual ~CslIpcEvent()
+            { }
 
         virtual wxEvent* Clone() const
-        {
-            return new CslIpcEvent(*this);
-        }
+            { return new CslIpcEvent(*this); }
 
-        wxInt32 Type;
-        wxString Request;
+        wxInt32 GetType() const { return m_type; }
+        const wxString& GetRequest() const { return m_request; }
+
+    protected:
+        wxInt32 m_type;
+        wxString m_request;
+
+    private:
+        DECLARE_DYNAMIC_CLASS_NO_ASSIGN(CslIpcEvent)
 };
+
 
 class CslIpcConnection : public wxConnection
 {
     public:
-        CslIpcConnection(wxEvtHandler *evtHandler=NULL);
+        CslIpcConnection(wxEvtHandler *evtHandler = NULL) :
+                m_evtHandler(evtHandler)
+        { }
+        virtual ~CslIpcConnection()
+        { }
 
     protected:
-        wxEvtHandler *m_evtHandler;
+        virtual bool OnPoke(const wxString& topic,
+                            const wxString& item,
+#if wxCHECK_VERSION(2, 9, 0)
+                            const void *data,
+                            size_t size,
+#else
+                            wxChar *data,
+                            int size,
+#endif
+                            wxIPCFormat format);
 
-        virtual bool OnPoke(const wxString& topic,const wxString& item,
-                            wxChar *data,int size,wxIPCFormat format);
         virtual bool OnDisconnect();
+
+        wxEvtHandler *m_evtHandler;
 };
 
 
 class CslIpcBase
 {
     public:
-        CslIpcBase() : m_connection(NULL) {}
-        ~CslIpcBase() {}
+        CslIpcBase() : m_connection(NULL) { }
 
-        static wxString CreateURI(const CslServerInfo& info,bool pass,bool connect,bool addfav);
+        void Disconnect();
+
+        static wxString CreateURI(const CslServerInfo& info, bool pass, bool connect, bool addfav);
 
     protected:
         CslIpcConnection *m_connection;
@@ -103,30 +126,31 @@ class CslIpcBase
 class CslIpcServer : public CslIpcBase, public wxServer
 {
     public:
-        CslIpcServer(wxEvtHandler *evtHandler);
-        ~CslIpcServer();
-
-        void Disconnect();
+        CslIpcServer(wxEvtHandler *evtHandler) :
+                m_evtHandler(evtHandler)
+            { }
+        ~CslIpcServer()
+            { Disconnect(); }
 
     protected:
-        wxEvtHandler *m_evtHandler;
-
         wxConnectionBase* OnAcceptConnection(const wxString& topic);
+
+        wxEvtHandler *m_evtHandler;
 };
 
 
 class CslIpcClient: public CslIpcBase, public wxClient
 {
     public:
-        CslIpcClient();
-        ~CslIpcClient();
+        CslIpcClient() { };
+        ~CslIpcClient() { Disconnect(); }
 
-        bool Connect(const wxString& host,const wxString& service,const wxString& topic);
-        void Disconnect();
+        bool Connect(const wxString& host, const wxString& service, const wxString& topic);
         CslIpcConnection* GetConnection() { return m_connection; };
 
     protected:
-        wxConnectionBase* OnMakeConnection();
+        wxConnectionBase* OnMakeConnection()
+            { return new CslIpcConnection; }
 };
 
 #endif // CSLIPC_H

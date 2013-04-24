@@ -24,135 +24,112 @@
 
 DEFINE_EVENT_TYPE(wxCSL_EVT_IPC)
 
-CslIpcConnection::CslIpcConnection(wxEvtHandler *evtHandler) :
-        wxConnection(),
-        m_evtHandler(evtHandler)
-{
-}
 
-bool CslIpcConnection::OnPoke(const wxString& topic,const wxString& item,
-                              wxChar *data,int size,wxIPCFormat format)
+IMPLEMENT_DYNAMIC_CLASS(CslIpcEvent, wxEvent)
+
+
+bool CslIpcConnection::OnPoke(const wxString& topic,
+                              const wxString& item,
+#if wxCHECK_VERSION(2, 9, 0)
+                              const void *data,
+                              size_t size,
+#else
+                              wxChar *data,
+                              int size,
+#endif
+                              wxIPCFormat format)
 {
-    if (m_evtHandler && format==wxIPC_TEXT && topic==CSL_IPC_TOPIC)
+    if (m_evtHandler && topic==CSL_IPC_TOPIC && format==wxIPC_PRIVATE && size<512)
     {
-        CslIpcEvent evt(CslIpcEvent::IPC_COMMAND,data);
-        wxPostEvent(m_evtHandler,evt);
+        CslCharBuffer buf(size, (char*)data);
+
+        CslIpcEvent evt(CslIpcEvent::IPC_COMMAND, C2U(buf));
+
+        ::wxPostEvent(m_evtHandler, evt);
     }
 
-    return wxConnection::OnPoke(topic,item,data,size,format);
+    return wxConnection::OnPoke(topic, item, data, size, format);
 }
 
 bool CslIpcConnection::OnDisconnect()
 {
     CslIpcEvent evt(CslIpcEvent::IPC_DISCONNECT);
+
     wxPostEvent(m_evtHandler,evt);
 
     return true;
 }
 
 
+void CslIpcBase::Disconnect()
+{
+    if (m_connection)
+    {
+        m_connection->Disconnect();
+
+        wxDELETE(m_connection);
+    }
+}
+
 wxString CslIpcBase::CreateURI(const CslServerInfo& info,bool pass,bool connect,bool addfav)
 {
-    wxString s,s1;
+    wxString s, s1;
 
-    s<<CSL_URI_SCHEME_STR;
+    s << CSL_URI_SCHEME_STR;
 
     if (pass && !info.Password.IsEmpty())
     {
-        s1<<info.Password<<wxT("@");
-        s1.Replace(wxT(" "),wxT("%20"));
-        s<<s1;
+        s1 << info.Password << wxT("@");
+        s1.Replace(wxT(" "), wxT("%20"));
+        s << s1;
         s1.Empty();
     }
 
-    s<<info.Host;
+    s << info.Host;
     if (info.GetGame().GetDefaultGamePort()!=info.GamePort)
-        s<<wxT(":")<<info.GamePort;
+        s << wxT(":") << info.GamePort;
 
-    s<<wxT("?")<<CSL_URI_GAME_STR;
-    s1<<info.GetGame().GetName();
-    s1.Replace(wxT(" "),wxT("%20"));
-    s<<wxT("=")<<s1<<wxT("&");
+    s << wxT("?") << CSL_URI_GAME_STR;
+    s1 << info.GetGame().GetName();
+    s1.Replace(wxT(" "), wxT("%20"));
+    s << wxT("=") << s1 << wxT("&");
     s1.Empty();
 
     if (info.Address().GetPort()!=info.GetGame().GetInfoPort(info.GamePort))
-        s<<CSL_URI_INFOPORT_STR<<wxT("=")<<info.Address().GetPort()<<wxT("&");
+        s << CSL_URI_INFOPORT_STR << wxT("=") << info.Address().GetPort() << wxT("&");
 
     if (connect)
-        s1<<CSL_URI_ACTION_STR<<wxT("=")<<CSL_URI_ACTION_CONNECT_STR;
+        s1 << CSL_URI_ACTION_STR << wxT("=") << CSL_URI_ACTION_CONNECT_STR;
+
     if (addfav)
     {
         if (!s1.IsEmpty())
-            s1<<wxT("&");
-        s1<<CSL_URI_ACTION_STR<<wxT("=")<<CSL_URI_ACTION_ADDFAV_STR;
+            s1 << wxT("&");
+
+        s1 << CSL_URI_ACTION_STR << wxT("=") << CSL_URI_ACTION_ADDFAV_STR;
     }
-    s<<s1;
+
+    s << s1;
 
     return s;
 }
 
 
-CslIpcServer::CslIpcServer(wxEvtHandler *evtHandler) :
-        CslIpcBase(), wxServer(),
-        m_evtHandler(evtHandler)
-{
-}
-
-CslIpcServer::~CslIpcServer()
-{
-    Disconnect();
-}
-
-wxConnectionBase *CslIpcServer::OnAcceptConnection(const wxString& topic)
+wxConnectionBase* CslIpcServer::OnAcceptConnection(const wxString& topic)
 {
     if (!m_connection && topic==CSL_IPC_TOPIC)
     {
-        m_connection=new CslIpcConnection(m_evtHandler);
+        m_connection = new CslIpcConnection(m_evtHandler);
         return m_connection;
     }
 
     return NULL;
 }
 
-void CslIpcServer::Disconnect()
-{
-    if (m_connection)
-    {
-        m_connection->Disconnect();
-        delete m_connection;
-        m_connection=NULL;
-    }
-}
-
-
-CslIpcClient::CslIpcClient() :
-        CslIpcBase(), wxClient()
-{
-}
-
-CslIpcClient::~CslIpcClient()
-{
-    Disconnect();
-}
 
 bool CslIpcClient::Connect(const wxString& host,const wxString& service,const wxString& topic)
 {
     m_connection=(CslIpcConnection*)MakeConnection(host,service,topic);
 
     return m_connection!=NULL;
-}
-
-wxConnectionBase *CslIpcClient::OnMakeConnection()
-{
-    return new CslIpcConnection;
-}
-
-void CslIpcClient::Disconnect()
-{
-    if (m_connection)
-    {
-        m_connection->Disconnect();
-        delete m_connection;
-        m_connection=NULL;
-    }
 }
