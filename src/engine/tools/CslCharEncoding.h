@@ -27,10 +27,11 @@
 #define T2C(x) x
 #endif
 
-// this is the wx(W)Charbuffer class from wxWidgets 2.8 (buffer.h).
-// the new template based ones within wxWidgets 2.9+ ares using
-// reference counters, which causes trouble with static CRT builds,
-// so don't use any wx-function which returns wx(W)Charbuffer !
+// this is the wx(W)Charbuffer class (slightly modified) from
+// wxWidgets 2.8 (buffer.h). the new template based ones within
+// wxWidgets 2.9+ ares using reference counters, which causes
+// trouble with static CRT builds, so don't use any wx-function
+// which returns wx(W)Charbuffer !
 
 #define CSL_DEFINE_STRING_BUFFER(classname, chartype, strdupfunc)           \
 class CSL_DLL_TOOLS classname                                               \
@@ -41,10 +42,13 @@ public:                                                                     \
     {                                                                       \
     }                                                                       \
                                                                             \
-    classname(size_t len)                                                   \
+    classname(size_t len, const chartype *str = NULL)                       \
         : m_str((chartype *)malloc((len + 1)*sizeof(chartype)))             \
     {                                                                       \
         m_str[len] = (chartype)0;                                           \
+                                                                            \
+        if (str)                                                            \
+            memcpy(m_str, str, len);                                        \
     }                                                                       \
                                                                             \
     ~classname() { free(m_str); }                                           \
