@@ -52,7 +52,9 @@ class CslApp: public wxApp
         bool OnInit();
         int OnRun();
         int OnExit();
+#if wxUSE_DEBUGREPORT && wxUSE_ON_FATAL_EXCEPTION
         void OnFatalException();
+#endif
         void OnEndSession(wxCloseEvent& event);
         int FilterEvent(wxEvent& event);
 

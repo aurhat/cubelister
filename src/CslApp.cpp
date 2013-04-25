@@ -17,18 +17,19 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-
 #include "Csl.h"
 #include "CslEngine.h"
 #include "CslFrame.h"
 #include "CslIPC.h"
 #include "CslApp.h"
 #include <wx/stdpaths.h>
-#include <wx/debugrpt.h>
 #ifdef __WXMAC__
 #include <wx/sysopt.h>
 #include <Carbon/Carbon.h>
 #endif //__WXMAC__
+#if wxUSE_DEBUGREPORT && wxUSE_ON_FATAL_EXCEPTION
+#include <wx/debugrpt.h>
+#endif
 
 IMPLEMENT_APP(CslApp)
 
@@ -79,7 +80,9 @@ bool CslApp::OnInit()
 #endif
 
 #if CSL_DEBUG < 1
+#if wxUSE_DEBUGREPORT && wxUSE_ON_FATAL_EXCEPTION
     ::wxHandleFatalExceptions(true);
+#endif
 #endif
 
     wxString ipcCmd;
@@ -266,6 +269,7 @@ int CslApp::OnExit()
     return 0;
 }
 
+#if wxUSE_DEBUGREPORT && wxUSE_ON_FATAL_EXCEPTION
 void CslApp::OnFatalException()
 {
     wxDebugReport report;
@@ -276,6 +280,7 @@ void CslApp::OnFatalException()
     if (preview.Show(report))
         report.Process();
 }
+#endif
 
 void CslApp::OnEndSession(wxCloseEvent& event)
 {
