@@ -339,9 +339,9 @@ wxString ToRfc2822(const wxDateTime& date, bool isUTC)
     wxString rfc2822;
 
     if (isUTC)
-        rfc2822 = date.Format(wxT("%a, %d %b %Y %T GMT"));
+        rfc2822 = date.Format(wxT("%a, %d %b %Y %H:%M:%S GMT"));
     else
-        rfc2822 = date.ToUTC().Format(wxT("%a, %d %b %Y %T GMT"));
+        rfc2822 = date.ToUTC().Format(wxT("%a, %d %b %Y %H:%M:%S GMT"));
 
     if (prevlocale)
         setlocale(LC_TIME, prevlocale);
