@@ -3,7 +3,7 @@ SUBDIRS = pch plugin engine tools plugins
 bin_PROGRAMS = csl cslmapcfgtool
 
 AM_CPPFLAGS = -DPROJECTDIR=\"$(abs_top_srcdir)\" -DBUILDDIR=\"$(abs_builddir)\" \
-	-DLOCALEDIR=\"$(localedir)\" -DDATADIR=\"$(datadir)/csl\" -DPKGLIBDIR=\"$(pkglibdir)\"
+	-DLOCALEDIR=\"$(localedir)\" -DDATADIR=\"$(datadir)/csl\" -DPKGLIBDIR=\"$(pkglibdir)\" \
 	-I$(top_srcdir)/src/engine -I$(top_srcdir)/src/engine/tools \
 	-I$(top_srcdir)/src/plugin -I$(top_srcdir)/src/tools \
 	-I$(top_builddir)/src/pch -I$(top_srcdir)/src/img/flags
