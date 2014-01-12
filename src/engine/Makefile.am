@@ -2,7 +2,7 @@ METASOURCES = AUTO
 
 SUBDIRS = tools
 
-INCLUDES = -I$(top_srcdir)/src/engine/tools -I$(top_srcdir)/src/plugin \
+AM_CPPFLAGS = -I$(top_srcdir)/src/engine/tools -I$(top_srcdir)/src/plugin \
 	-I$(top_srcdir)/src/tools -I$(top_builddir)/src/pch
 
 lib_LTLIBRARIES = libcslengine.la

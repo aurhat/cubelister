@@ -5,11 +5,11 @@ include_HEADERS = Csl.h
 if ENABLE_PCH
 noinst_DATA = Csl.h.gch
 
-INCLUDES = -I$(top_srcdir)/src -I$(top_srcdir)/src/engine \
+AM_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/src/engine \
 	-I$(top_srcdir)/src/engine/tools -I$(top_srcdir)/src/tools -I$(top_builddir)/src
 #AM_CXXFLAGS = -DLOCALEDIR=\"$(localedir)\" -DDATADIR=\"$(datadir)/csl\"
 
-CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_AM_CPPFLAGS) $(AM_CPPFLAGS) \
     $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 
 include ./$(DEPDIR)/Csl.Po

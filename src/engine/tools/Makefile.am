@@ -1,4 +1,4 @@
-INCLUDES = -I$(top_srcdir)/src/engine -I$(top_srcdir)/src/tools \
+AM_CPPFLAGS = -I$(top_srcdir)/src/engine -I$(top_srcdir)/src/tools \
 	-I$(top_builddir)/src/pch
 
 METASOURCES = AUTO

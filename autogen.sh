@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -e
 
@@ -6,7 +6,7 @@ function get_output_indent
 {
     declare -i i=0
     declare -i len=0
-    local line=`grep "Install prefix..." configure.in.template`
+    local line=`grep "Install prefix..." configure.ac.template`
 
     if [ -n "$line" ]; then
         line=`echo -n "${line#*\"}"`
@@ -57,7 +57,7 @@ function get_plugins
     sed -e s,"PLUGINS_INTLTOOL","${plugins_intltool}",\
         -e s,"PLUGINS_MAKEFILES","${plugins_makefiles}",\
         -e s,"PLUGINS_ENABLED","${plugins_enabled}",\
-        configure.in.template >configure.in
+        configure.ac.template >configure.ac
 }
 
 function get_autotools

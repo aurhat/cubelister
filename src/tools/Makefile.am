@@ -1,6 +1,6 @@
 METASOURCES = AUTO
 
-INCLUDES = -I$(top_srcdir)/src -I$(top_srcdir)/src/engine \
+AM_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/src/engine \
 	-I$(top_srcdir)/src/engine/tools -I$(top_srcdir)/src/irc/libircclient/include \
 	-I$(top_srcdir)/src/plugin -I$(top_builddir)/src/pch \
 	-I$(top_srcdir)/src/img/flags
@@ -19,7 +19,7 @@ libcslguitools_la_LIBADD += ${SPEECHD_LIBS}
 libcslguitools_la_LDFLAGS = -version-info ${PKG_LIB_VERSION}
 
 if WITH_INTERNAL_GEOIP
-INCLUDES += -I$(top_srcdir)/src/external/libGeoIP
+AM_CPPFLAGS += -I$(top_srcdir)/src/external/libGeoIP
 libcslguitools_la_SOURCES += $(top_srcdir)/src/external/libGeoIP/GeoIPInternal.c
 else
 libcslguitools_la_LIBADD += -lGeoIP
