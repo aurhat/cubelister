@@ -311,10 +311,10 @@ bool CslProtocolInput::CreateOutputStream(const wxFileName& fileName)
     const wxString dstFile = fileName.GetFullName();
 
     if (dstFile.IsEmpty())
-        return NULL;
+        return false;
 
     if (!wxDir::Exists(dstPath) && !wxFileName::Mkdir(dstPath, 0700, wxPATH_MKDIR_FULL))
-        return NULL;
+        return false;
 
     m_outputStream = new wxFileOutputStream(dstPath + dstFile);
 

@@ -113,9 +113,10 @@ class CSL_DLL_TOOLS CslTcpProto : public wxProtocol
 
 #if !wxCHECK_VERSION(2, 9, 0)
         wxProtocolError GetError() { return m_lastError; }
+#else
+        wxString GetContentType() const { return wxEmptyString; }
 #endif
         bool Abort() { return true; }
-        wxString GetContentType() const { return wxEmptyString; }
 
         wxInputStream* GetInputStream(const wxString& path);
 
@@ -142,9 +143,10 @@ class CSL_DLL_TOOLS CslArchiveProto : public wxProtocol
 
 #if !wxCHECK_VERSION(2, 9, 0)
         wxProtocolError GetError() { return m_lastError; }
+#else
+        wxString GetContentType() const { return wxEmptyString; }
 #endif
         bool Abort() { return true; }
-        wxString GetContentType() const { return wxEmptyString; }
 
         wxInputStream* GetInputStream(const wxString& path);
 

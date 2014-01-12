@@ -118,7 +118,7 @@ class CSL_DLL_PLUGIN CslPluginHost
         virtual wxWindow* GetMainWindow() { return NULL; }
         virtual wxEvtHandler* GetEvtHandler() { return NULL; }
         virtual wxString GetHomeDir(wxPathFormat format = wxPATH_NATIVE)
-		    { return wxEmptyString; }
+            { return wxEmptyString; }
 
         virtual wxInt32 GetFreeId() { return -1; }
         virtual wxInt32 GetFreeIds(wxInt32 count, wxInt32 ids[]) { return -1; }

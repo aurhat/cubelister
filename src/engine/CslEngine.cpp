@@ -414,11 +414,8 @@ bool CslEngine::UpdateFromMaster(CslMaster *master)
 
     const wxURI& uri = master->GetURI();
 
-    loopv(m_masterUpdates)
-    {
-        m_masterUpdates[i]->GetInput()==uri;
+    loopv(m_masterUpdates) if (m_masterUpdates[i]->GetInput()==uri)
         return false;
-    }
 
     CslProtocolInput *proto = new CslProtocolInput(this, wxID_ANY, uri);
 
@@ -989,16 +986,12 @@ void CslEngine::OnCslProtocolInput(CslProtocolInputEvent& event)
     CslProtocolInput *proto = NULL;
     CslMaster *master = (CslMaster*)event.GetClientData();
 
-    wxURI uri = master->GetURI();
+    const wxURI& uri = master->GetURI();
 
-    loopv(m_masterUpdates)
+    loopv(m_masterUpdates) if (m_masterUpdates[i]->GetInput()==uri)
     {
         proto = m_masterUpdates[i];
-
-        if (proto->GetInput()==uri)
-            break;
-        else
-            proto = NULL;
+        break;
     }
 
     if (!proto)
