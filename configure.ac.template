@@ -60,7 +60,7 @@ wx_ver=`echo $wx_version | $AWK 'BEGIN { FS = "."; } { printf "% d", ($1 * 1000 
 if test $(($wx_ver/1000)) -ge 2009 -a "$wx_ver" -ge "$wx_ver_min3" || \
    test $(($wx_ver/1000)) -lt 2009 -a "$wx_ver" -ge "$wx_ver_min2"
 then
-  WX_CXXFLAGS=" `$WXCONFIG --cxxflags | sed -e 's/-fno-exceptions//'`"
+  WX_CXXFLAGS=" `$WXCONFIG --cxxflags | sed -e 's/-fno-exceptions/g/;s/-I/-isystem /g'`"
   WX_LIBS="`$WXCONFIG --libs base,adv,core,net,richtext,qa,xml,html,xml,aui`"
   wx_type=`echo $WX_CXXFLAGS | sed 's/\(.*\)\(ansi\|unicode\)\(.*\)/\2/'`
 else
