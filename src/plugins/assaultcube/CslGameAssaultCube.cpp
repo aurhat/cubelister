@@ -68,21 +68,24 @@ CslGameAssaultCube::~CslGameAssaultCube()
 
 inline wxString CslGameAssaultCube::GetVersionName(wxInt32 prot) const
 {
-    static const wxChar* versions[] =
-    {   wxT("1.1.0.4"),
-        wxT("1.1.0.2"), wxT("1.1.0.1"), wxT("1.1.0.0"),
-        wxT("1.0.x"), wxT("1.0.0b2"), wxT("1.0.0b1"),
-        wxT("0.93.x"), wxT("0.92"), wxT("0.91.x"), wxT("0.90")
-    };
+    switch (prot)
+    {
+        case 1201: return wxT("1.2.0.x");
+        case 1200: return wxT("1.2.0.0");
+        case 1132: return wxT("1.1.0.4");
+        case 1131: return wxT("1.1.0.2");
+        case 1130: return wxT("1.1.0.1");
+        case 1129: return wxT("1.1.0.0");
+        case 1128: return wxT("1.1.x");
+        case 1127: return wxT("1.1.0b2");
+        case 1126: return wxT("1.1.0b1");
+        case 1125: return wxT("0.93.x");
+        case 1124: return wxT("0.92");
+        case 1123: return wxT("0.91.x");
+        case 1122: return wxT("0.90");
+    }
 
-    static wxInt32 count=sizeof(versions)/sizeof(versions[0]);
-
-    wxInt32 v=CSL_LAST_PROTOCOL_AC-prot;
-
-    if (v<0 || v>=count || !versions[v])
-        return wxString::Format(wxT("%d"), prot);
-    else
-        return versions[v];
+    return wxString::Format(wxT("%d"), prot);
 }
 
 inline const wxChar* CslGameAssaultCube::GetModeName(wxInt32 mode) const
@@ -93,7 +96,9 @@ inline const wxChar* CslGameAssaultCube::GetModeName(wxInt32 mode) const
         wxT("team survivor"), wxT("ctf"), wxT("pistol frenzy"), wxT("bot team deathmatch"),
         wxT("bot deathmatch"), wxT("last swiss standing"), wxT("one shot, one kill"),
         wxT("team one shot, one kill"), wxT("bot one shot, one kill"),
-        wxT("hunt the flag"), wxT("team keep the flag"), wxT("keep the flag")
+        wxT("hunt the flag"), wxT("team keep the flag"), wxT("keep the flag"),
+        wxT("team pistol frenzy"), wxT("team last swiss standing"), wxT("bot pistol frenzy"),
+        wxT("bot last swiss standing"), wxT("bot team survivor"), wxT("bot team one shot, one kill")
     };
 
     return (mode>=0 && (size_t)mode<sizeof(modes)/sizeof(modes[0])) ?
@@ -104,7 +109,7 @@ inline const wxString& CslGameAssaultCube::GetWeaponName(wxInt32 n, wxInt32 prot
 {
     static const wxString unknown(_("unknown"));
 
-    if (prot<=1128) // < 1.1 series
+    if (prot<=1128) // < 1.1.x series
     {
         static const wxString weapons[] =
         {
@@ -115,12 +120,23 @@ inline const wxString& CslGameAssaultCube::GetWeaponName(wxInt32 n, wxInt32 prot
         return (n>=0 && (size_t)n<sizeof(weapons)/sizeof(weapons[0])) ?
                 weapons[n] : unknown;
     }
-    else
+    else if (prot<1200) // 1.1.0.x series
     {
         static const wxString weapons[] =
         {
             _("Knife"), _("Pistol"), _("Carbine"), _("Shotgun"), _("Subgun"),
             _("Sniper"), _("Assault"), _("Combat Pistol"), _("Grenade"), _("Akimbo")
+        };
+
+        return (n>=0 && (size_t)n<sizeof(weapons)/sizeof(weapons[0])) ?
+                weapons[n] : unknown;
+    }
+    else // 1.2.0.x series
+    {
+        static const wxString weapons[] =
+        {
+            _("Knife"), _("Pistol"), _("TMP-M&A CB"), _("V19-SG"), _("A-ARD/10"),
+            _("AD-81 SR"), _("MTP-57"), _("Combat Pistol"), _("Grenade"), _("Akimbo")
         };
 
         return (n>=0 && (size_t)n<sizeof(weapons)/sizeof(weapons[0])) ?
@@ -206,7 +222,7 @@ bool CslGameAssaultCube::ParseDefaultPong(ucharbuf& buf, CslServerInfo& info) co
     info.TimeRemain=max(0, getint(buf));
     if (info.Protocol<1126) // <= 0.93
         info.TimeRemain++;
-    if (info.Protocol<1133) // <= 1.1.0.5
+    if (info.Protocol>=1200) // <= 1.2.0.x
         info.TimeRemain*=60;
     getstring(text, buf);
     info.Map=C2U(FilterCubeString(text, 1));
