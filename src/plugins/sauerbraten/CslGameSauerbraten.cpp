@@ -54,7 +54,7 @@ static const wxChar* CLIENT_GAME_REQUIRES[] =
 #endif
 
 #if defined(__WXMSW__)
-const wxString CLIENT_CFG_DIR = wxStandardPaths().GetDocumentsDir() + wxT("My Games");
+const wxString CLIENT_CFG_DIR = wxStandardPaths::Get().GetDocumentsDir() + wxT("My Games");
 #elif defined(__WXMAC__)
 const wxString CLIENT_CFG_DIR = ::wxGetHomeDir() + wxT("/Library/Application Support/sauerbraten")
 #elif defined(__WXGTK__) || defined(__WXX11__)

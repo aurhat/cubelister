@@ -129,7 +129,7 @@ bool CslApp::OnInit()
         ipcCmd = parser.GetParam(0);
 
     if (m_home.IsEmpty())
-        m_home = ::DirName(wxStandardPaths().GetUserDataDir());
+        m_home = ::DirName(wxStandardPaths::Get().GetUserDataDir());
 
     if (!wxFileName::DirExists(m_home))
     {
