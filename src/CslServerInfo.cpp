@@ -158,7 +158,7 @@ void CslListCtrlInfo::UpdateServer(CslServerInfo *info, bool noresolve)
 
     if (info->ExtInfoStatus!=CSL_EXT_STATUS_FALSE)
     {
-        if (info->ExtInfoStatus ==CSL_EXT_STATUS_OK)
+        if (info->ExtInfoStatus==CSL_EXT_STATUS_OK)
             s = FormatSeconds(info->Uptime);
         else if (info->Protocol<CSL_EX_VERSION_MIN || info->Protocol>=CSL_EX_VERSION_MAX)
             s = _("This version of extended info is not supported.");
@@ -180,7 +180,8 @@ void CslListCtrlInfo::UpdateServer(CslServerInfo *info, bool noresolve)
         }
 
         s = info->InfoText.Mid(0, i)+(i<l ? wxT(" ...") : wxT(""));
-        s.Replace(wxT("\r\n"),wxT(" "));
+        s.Replace(wxT("\r\n"), wxT(" "));
+        s.Replace(wxT("\n"), wxT(" "));
     }
     else
         s = _("Server has no info message.");
@@ -235,7 +236,7 @@ void CslListCtrlInfo::Resolve()
     }
 }
 
-void CslListCtrlInfo::GetToolTipText(wxInt32 WXUNUSED(row),CslToolTipEvent& event)
+void CslListCtrlInfo::GetToolTipText(wxInt32 WXUNUSED(row), CslToolTipEvent& event)
 {
     wxString attr, val;
     wxListItem item;
