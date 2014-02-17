@@ -84,7 +84,7 @@ class CslDlgExtended: public wxDialog
         wxStaticText* label_server;
         wxStaticText* label_mode;
         wxStaticText* label_remaining;
-        wxStaticText* label_records;
+        wxStaticText* label_players;
         wxStaticText* label_map;
         wxStaticText* label_author_prefix;
         wxStaticText* label_author;

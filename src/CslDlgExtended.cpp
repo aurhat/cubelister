@@ -78,7 +78,7 @@ CslDlgExtended::CslDlgExtended(wxWindow* parent,int id,const wxString& title,
     label_server = new wxStaticText(this, wxID_ANY, wxEmptyString);
     label_mode = new wxStaticText(this, wxID_ANY, wxEmptyString);
     label_remaining = new wxStaticText(this, wxID_ANY, wxEmptyString);
-    label_records = new wxStaticText(this, wxID_ANY, wxEmptyString);
+    label_players = new wxStaticText(this, wxID_ANY, wxEmptyString);
     label_map = new wxStaticText(this, wxID_ANY, wxEmptyString);
     label_author_prefix = new wxStaticText(this, wxID_ANY, _("by"));
     label_author = new wxStaticText(this, wxID_ANY, wxEmptyString);
@@ -182,9 +182,9 @@ void CslDlgExtended::do_layout()
     wxStaticText* label_remaining_static = new wxStaticText(this, wxID_ANY, _("Time remaining:"));
     grid_sizer_info->Add(label_remaining_static, 0, wxALL, 4);
     grid_sizer_info->Add(label_remaining, 0, wxALL, 4);
-    wxStaticText* label_records_static = new wxStaticText(this, wxID_ANY, _("Players :"));
-    grid_sizer_info->Add(label_records_static, 0, wxALL, 4);
-    grid_sizer_info->Add(label_records, 0, wxALL, 4);
+    wxStaticText* label_players_static = new wxStaticText(this, wxID_ANY, _("Players:"));
+    grid_sizer_info->Add(label_players_static, 0, wxALL, 4);
+    grid_sizer_info->Add(label_players, 0, wxALL, 4);
     sizer_info->Add(grid_sizer_info, 1, wxALIGN_CENTER_VERTICAL, 0);
     grid_sizer_info_team->Add(sizer_info, 1, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 4);
     grid_sizer_map_label->Add(label_map, 0, wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 4);
@@ -357,7 +357,7 @@ void CslDlgExtended::UpdatePlayerData()
         return;
 
     list_ctrl_players->UpdateData();
-    label_records->SetLabel(wxString::Format(_("%d players"),list_ctrl_players->GetItemCount()));
+    label_players->SetLabel(wxString::Format(_("%d players"), list_ctrl_players->GetItemCount()));
 }
 
 void CslDlgExtended::UpdateTeamData()
@@ -598,7 +598,7 @@ void CslDlgExtended::DoShow(CslServerInfo *info)
     if (m_info!=info)
     {
         list_ctrl_players->DeleteAllItems();
-        label_records->SetLabel(wxString::Format(_("%d players"),0));
+        label_players->SetLabel(wxString::Format(_("%d players"), 0));
     }
 
     m_info=info;
