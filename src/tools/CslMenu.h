@@ -1,6 +1,6 @@
 
 /***************************************************************************
- *   Copyright (C) 2007-2013 by Glen Masgai                                *
+ *   Copyright (C) 2007-2014 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *

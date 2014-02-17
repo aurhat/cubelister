@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2013 by Glen Masgai                                *
+ *   Copyright (C) 2007-2014 by Glen Masgai                                *
  *   mimosius@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -40,7 +40,7 @@
                                                      __CSL_VERSION_MINOR, \
                                                      __CSL_VERSION_RELEASE, \
                                                      __CSL_VERSION_SUBRELEASE)
-#define __CSL_COPYRIGHT_STR    "(C) 2007-2013, Glen Masgai <mimosius@users.sourceforge.net>"
+#define __CSL_COPYRIGHT_STR    "(C) 2007-2014, Glen Masgai <mimosius@users.sourceforge.net>"
 #define __CSL_DESCRIPTION_STR  "Tool to monitor cubeengine-based servers."
 
 #define CSL_NAME_STR           wxT(__CSL_NAME_STR)
