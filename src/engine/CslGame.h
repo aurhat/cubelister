@@ -256,6 +256,7 @@ class CSL_DLL_ENGINE CslGame
         virtual wxInt32 ParseMasterResponse(CslMaster *master, char *response, size_t len);
         // server query and response buffer handling
         virtual bool PingDefault(ucharbuf& buf, CslServerInfo& info) const { return false; }
+        virtual bool PingEx(ucharbuf& buf, CslServerInfo& info) const { return false; }
         virtual bool ParseDefaultPong(ucharbuf& buf,CslServerInfo& info) const = 0;
         virtual bool ParsePlayerPong(wxInt32 protocol, ucharbuf& buf, CslPlayerStatsData& info) const { return false; }
         virtual bool ParseTeamPong(wxInt32 protocol, ucharbuf& buf, CslTeamStatsData& info) const { return false; }

@@ -234,7 +234,10 @@ bool CslEngine::PingExUptime(CslServerInfo *info)
 
     //CSL_LOG_DEBUG("uptime %s - %d\n",U2C(info.GetBestDescription()),GetTicks());
     ucharbuf p(ping, sizeof(ping));
-    putint(p, 0);
+
+    if (!info->GetGame().PingEx(p, *info))
+        putint(p, 0);
+
     putint(p, CSL_EX_PING_UPTIME);
 
     CslNetPacket packet(p.length(), ping, &info->Address());
