@@ -357,7 +357,7 @@ void CslDlgExtended::UpdatePlayerData()
         return;
 
     list_ctrl_players->UpdateData();
-    label_players->SetLabel(wxString::Format(_("%d players"), list_ctrl_players->GetItemCount()));
+    label_players->SetLabel(wxString::Format(wxT("%d"), list_ctrl_players->GetItemCount()));
 }
 
 void CslDlgExtended::UpdateTeamData()
@@ -598,7 +598,7 @@ void CslDlgExtended::DoShow(CslServerInfo *info)
     if (m_info!=info)
     {
         list_ctrl_players->DeleteAllItems();
-        label_players->SetLabel(wxString::Format(_("%d players"), 0));
+        label_players->SetLabel(wxString::Format(wxT("%d"), 0));
     }
 
     m_info=info;
