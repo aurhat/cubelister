@@ -28,11 +28,11 @@
 // extra info requestable since 1.0.2, prot 1128
 enum
 {
-    PONGFLAG_PASSWORD   = 1<<0,
-    PONGFLAG_BANNED     = 1<<1,
-    PONGFLAG_BLACKLIST  = 1<<2,
-    PONGFLAG_MASTERMODE = 1<<6,
-    PONGFLAG_NUM        = 1<<7
+    PONGFLAG_PASSWORD   = 0,
+    PONGFLAG_BANNED     = 1,
+    PONGFLAG_BLACKLIST,
+    PONGFLAG_MASTERMODE = 6,
+    PONGFLAG_NUM
 };
 
 enum
@@ -241,9 +241,10 @@ bool CslGameAssaultCube::ParseDefaultPong(ucharbuf& buf, CslServerInfo& info) co
 
     if (info.Protocol>=1128 && buf.remaining()) // >=1.0.x
     {
-        i=getint(buf);
+        i = getint(buf);
+        wxInt32 mm = i>>PONGFLAG_MASTERMODE;
 
-        if (i&PONGFLAG_MASTERMODE)
+        if (mm==1)
         {
             if (info.HasRegisteredEvent(CslServerEvents::EVENT_PRIVATE) &&
                 CSL_MM_IS_VALID(l) && !CSL_SERVER_IS_PRIVATE(l))
@@ -251,20 +252,28 @@ bool CslGameAssaultCube::ParseDefaultPong(ucharbuf& buf, CslServerInfo& info) co
             info.MMDescription=wxT("P");
             info.MM=CSL_SERVER_PRIVATE;
         }
+        else if (mm==2)
+        {
+            if (info.HasRegisteredEvent(CslServerEvents::EVENT_LOCKED) &&
+                CSL_MM_IS_VALID(l) && !CSL_SERVER_IS_LOCKED(l))
+                info.SetEvents(CslServerEvents::EVENT_LOCKED);
+            info.MMDescription=wxT("L");
+            info.MM=CSL_SERVER_LOCKED;
+        }
         else
             info.MMDescription=wxT("O");
-        if (i&PONGFLAG_BANNED)
+
+        if (i&(1<<PONGFLAG_BANNED))
         {
             info.MMDescription<<wxT("/BAN");
             CSL_FLAG_SET(info.MM, CSL_SERVER_BAN);
         }
-        if (i&PONGFLAG_BLACKLIST)
+        if (i&(1<<PONGFLAG_BLACKLIST))
         {
             info.MMDescription<<wxT("/BLACK");
             CSL_FLAG_SET(info.MM, CSL_SERVER_BLACKLIST);
         }
-
-        if (i&PONGFLAG_PASSWORD)
+        if (i&(1<<PONGFLAG_PASSWORD))
         {
             info.MMDescription<<wxT("/PASS");
             CSL_FLAG_SET(info.MM, CSL_SERVER_PASSWORD);
