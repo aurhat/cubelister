@@ -411,7 +411,7 @@ void CslServerInfo::Init(CSL_SERVERINFO_CTOR_ARGS_CPP)
 {
     m_game=game;
     Host=host;
-    GamePort=gamePort ? gamePort:game ? game->GetDefaultGamePort():0;
+    GamePort=gamePort ? gamePort : (game ? game->GetDefaultGamePort() : 0);
     Protocol=-1;
     Ping=-1;
     TimeRemain=-2;
@@ -433,7 +433,7 @@ void CslServerInfo::Init(CSL_SERVERINFO_CTOR_ARGS_CPP)
     PasswordAdmin=passAdm;
     Search=false;
     m_lock=0;
-       m_addr.Create(host, infoPort ? infoPort : (GamePort ? GamePort+1 : 0));
+    m_addr.Create(host, infoPort ? infoPort : (game ? game->GetInfoPort(GamePort) : 0));
 }
 
 CslServerInfo* CslServerInfo::Create(CSL_SERVERINFO_CTOR_ARGS_CPP)
