@@ -30,123 +30,104 @@ enum { CS_ALIVE, CS_DEAD, CS_SPAWNING, CS_EDITING, CS_SPECTATOR, CS_WAITING };
 
 enum
 {
-    G_DEMO        = 0,
-    G_EDITMODE,
-    G_CAMPAIGN,
-    G_DEATHMATCH,
-    G_CAPTURE,
-    G_DEFEND,
-    G_BOMBER,
-    G_TRIAL,
-    G_MAX,
-    G_START       = G_EDITMODE,
-    G_PLAY        = G_CAMPAIGN,
-    G_FIGHT       = G_DEATHMATCH,
-    G_RAND        = G_BOMBER-G_DEATHMATCH+1
+    G_DEMO = 0, G_EDITMODE, G_DEATHMATCH, G_CAPTURE, G_DEFEND, G_BOMBER, G_TRIAL, G_GAUNTLET, G_MAX,
+    G_START = G_EDITMODE, G_PLAY = G_DEATHMATCH, G_FIGHT = G_DEATHMATCH,
+    G_RAND = G_BOMBER-G_DEATHMATCH+1, G_COUNT = G_MAX-G_PLAY,
+    G_NEVER = (1<<G_DEMO)|(1<<G_EDITMODE)|(1<<G_GAUNTLET),
+    G_LIMIT = (1<<G_DEATHMATCH)|(1<<G_CAPTURE)|(1<<G_DEFEND)|(1<<G_BOMBER),
+    G_ALL = (1<<G_DEMO)|(1<<G_EDITMODE)|(1<<G_DEATHMATCH)|(1<<G_CAPTURE)|(1<<G_DEFEND)|(1<<G_BOMBER)|(1<<G_TRIAL)|(1<<G_GAUNTLET),
+    G_SW = (1<<G_TRIAL),
 };
 
 enum
 {
-    G_M_NONE      = 0,
-    G_M_TEAM      = 1<<0,
-    G_M_INSTA     = 1<<1,
-    G_M_MEDIEVAL  = 1<<2,
-    G_M_BALLISTIC = 1<<3,
-    G_M_DUEL      = 1<<4,
-    G_M_SURVIVOR  = 1<<5,
-    G_M_ARENA     = 1<<6,
-    G_M_ONSLAUGHT = 1<<7,
-    G_M_JETPACK   = 1<<8,
-    G_M_VAMPIRE   = 1<<9,
-    G_M_EXPERT    = 1<<10,
-    G_M_RESIZE    = 1<<11,
-    G_M_GSP1      = 1<<12,
-    G_M_GSP2      = 1<<13,
-    G_M_GSP3      = 1<<14,
-    G_M_ALL       = G_M_TEAM|G_M_INSTA|G_M_MEDIEVAL|G_M_BALLISTIC|G_M_DUEL|G_M_SURVIVOR|G_M_ARENA|
-                    G_M_ONSLAUGHT|G_M_JETPACK|G_M_VAMPIRE|G_M_EXPERT|G_M_RESIZE|G_M_GSP1|G_M_GSP2|G_M_GSP3,
-    G_M_FILTER    = G_M_TEAM|G_M_INSTA|G_M_MEDIEVAL|G_M_BALLISTIC|G_M_DUEL|G_M_SURVIVOR|G_M_ARENA|
-                    G_M_ONSLAUGHT|G_M_JETPACK|G_M_VAMPIRE|G_M_RESIZE|G_M_GSP1|G_M_GSP2|G_M_GSP3,
-    G_M_GSN       = 3,
-    G_M_GSP       = 12,
-    G_M_NUM       = 15
+    G_M_MULTI = 0, G_M_FFA, G_M_COOP, G_M_INSTA, G_M_MEDIEVAL, G_M_KABOOM, G_M_DUEL, G_M_SURVIVOR,
+    G_M_CLASSIC, G_M_ONSLAUGHT, G_M_JETPACK, G_M_VAMPIRE, G_M_EXPERT, G_M_RESIZE,
+    G_M_GSP, G_M_GSP1 = G_M_GSP, G_M_GSP2, G_M_GSP3, G_M_NUM,
+    G_M_GSN = G_M_NUM-G_M_GSP,
+    G_M_ALL = (1<<G_M_MULTI)|(1<<G_M_FFA)|(1<<G_M_COOP)|(1<<G_M_INSTA)|(1<<G_M_MEDIEVAL)|(1<<G_M_KABOOM)|(1<<G_M_DUEL)|(1<<G_M_SURVIVOR)|(1<<G_M_CLASSIC)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_VAMPIRE)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE)|(1<<G_M_GSP1)|(1<<G_M_GSP2)|(1<<G_M_GSP3),
+    G_M_FILTER = (1<<G_M_MULTI)|(1<<G_M_FFA)|(1<<G_M_COOP)|(1<<G_M_INSTA)|(1<<G_M_MEDIEVAL)|(1<<G_M_KABOOM)|(1<<G_M_DUEL)|(1<<G_M_SURVIVOR)|(1<<G_M_CLASSIC)|(1<<G_M_ONSLAUGHT)|(1<<G_M_VAMPIRE)|(1<<G_M_RESIZE)|(1<<G_M_GSP1)|(1<<G_M_GSP2)|(1<<G_M_GSP3),
+    G_M_ROTATE = (1<<G_M_FFA),
+    G_M_SW = (1<<G_M_INSTA)|(1<<G_M_MEDIEVAL)|(1<<G_M_KABOOM),
+    G_M_DK = (1<<G_M_DUEL)|(1<<G_M_SURVIVOR),
+    G_M_IM = (1<<G_M_INSTA)|(1<<G_M_MEDIEVAL),
 };
 
-static const struct
+enum { G_F_GSP = 0, G_F_NUM };
+
+struct gametypes
 {
-    int type, implied, mutators[G_M_GSN+1];
-    const wxChar *name, *gsp[G_M_GSN];
+    int type, flags, implied, mutators[G_M_GSN+1];
+    const wxChar *name, *sname, *gsp[G_M_GSN];
 }
-gametype[] =
-{
+gametype[] = {
     {
-        G_DEMO, G_M_NONE,
-        {
-            G_M_NONE, G_M_NONE, G_M_NONE, G_M_NONE
-        },
-        wxT("demo"), { wxT(""), wxT(""), wxT("") },
+        G_DEMO, 0, 0, { 0, 0, 0, 0 },
+        wxT("demo"), wxT("demo"), { wxT(""), wxT(""), wxT("") },
     },
     {
-        G_EDITMODE, G_M_NONE,
+        G_EDITMODE, 0, (1<<G_M_FFA)|(1<<G_M_CLASSIC),
         {
-            G_M_TEAM|G_M_INSTA|G_M_ARENA|G_M_MEDIEVAL|G_M_BALLISTIC|G_M_JETPACK|G_M_VAMPIRE|G_M_EXPERT|G_M_RESIZE,
-            G_M_NONE, G_M_NONE, G_M_NONE
+            (1<<G_M_FFA)|(1<<G_M_CLASSIC)|(1<<G_M_JETPACK),
+            0, 0, 0
         },
-        wxT("editing"), { wxT(""), wxT(""), wxT("") },
+        wxT("editing"), wxT("editing"), { wxT(""), wxT(""), wxT("") },
     },
     {
-        G_CAMPAIGN, G_M_TEAM,
+        G_DEATHMATCH, 0, 0,
         {
-            G_M_TEAM|G_M_INSTA|G_M_ARENA|G_M_MEDIEVAL|G_M_BALLISTIC|G_M_JETPACK|G_M_VAMPIRE|G_M_EXPERT|G_M_RESIZE,
-            G_M_NONE, G_M_NONE, G_M_NONE
+            (1<<G_M_MULTI)|(1<<G_M_FFA)|(1<<G_M_COOP)|(1<<G_M_INSTA)|(1<<G_M_DUEL)|(1<<G_M_SURVIVOR)|(1<<G_M_CLASSIC)|(1<<G_M_MEDIEVAL)|(1<<G_M_KABOOM)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_VAMPIRE)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE),
+            0, 0, 0
         },
-        wxT("campaign"), { wxT(""), wxT(""), wxT("") },
+        wxT("deathmatch"), wxT("dm"), { wxT(""), wxT(""), wxT("") }
     },
     {
-        G_DEATHMATCH, G_M_NONE,
+        G_CAPTURE, 0, 0,
         {
-            G_M_TEAM|G_M_INSTA|G_M_DUEL|G_M_SURVIVOR|G_M_ARENA|G_M_MEDIEVAL|G_M_BALLISTIC|G_M_ONSLAUGHT|G_M_JETPACK|G_M_VAMPIRE|G_M_EXPERT|G_M_RESIZE,
-            G_M_NONE, G_M_NONE, G_M_NONE
+            (1<<G_M_MULTI)|(1<<G_M_COOP)|(1<<G_M_INSTA)|(1<<G_M_DUEL)|(1<<G_M_SURVIVOR)|(1<<G_M_CLASSIC)|(1<<G_M_MEDIEVAL)|(1<<G_M_KABOOM)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_VAMPIRE)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE)|(1<<G_M_GSP1)|(1<<G_M_GSP2)|(1<<G_M_GSP3),
+            (1<<G_M_MULTI)|(1<<G_M_COOP)|(1<<G_M_INSTA)|(1<<G_M_DUEL)|(1<<G_M_SURVIVOR)|(1<<G_M_CLASSIC)|(1<<G_M_MEDIEVAL)|(1<<G_M_KABOOM)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_VAMPIRE)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE)|(1<<G_M_GSP1),
+            (1<<G_M_MULTI)|(1<<G_M_COOP)|(1<<G_M_INSTA)|(1<<G_M_DUEL)|(1<<G_M_SURVIVOR)|(1<<G_M_CLASSIC)|(1<<G_M_MEDIEVAL)|(1<<G_M_KABOOM)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_VAMPIRE)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE)|(1<<G_M_GSP2),
+            (1<<G_M_MULTI)|(1<<G_M_COOP)|(1<<G_M_INSTA)|(1<<G_M_DUEL)|(1<<G_M_SURVIVOR)|(1<<G_M_CLASSIC)|(1<<G_M_MEDIEVAL)|(1<<G_M_KABOOM)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_VAMPIRE)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE)|(1<<G_M_GSP3)
         },
-        wxT("deathmatch"), { wxT(""), wxT(""), wxT("") }
+        wxT("capture-the-flag"), wxT("capture"), { wxT("quick"), wxT("defend"), wxT("protect") },
     },
     {
-        G_CAPTURE, G_M_TEAM,
+        G_DEFEND, 0, 0,
         {
-            G_M_TEAM|G_M_INSTA|G_M_DUEL|G_M_SURVIVOR|G_M_ARENA|G_M_MEDIEVAL|G_M_BALLISTIC|G_M_ONSLAUGHT|G_M_JETPACK|G_M_VAMPIRE|G_M_EXPERT|G_M_RESIZE|G_M_GSP1|G_M_GSP2|G_M_GSP3,
-            G_M_TEAM|G_M_INSTA|G_M_DUEL|G_M_SURVIVOR|G_M_ARENA|G_M_MEDIEVAL|G_M_BALLISTIC|G_M_ONSLAUGHT|G_M_JETPACK|G_M_VAMPIRE|G_M_EXPERT|G_M_RESIZE|G_M_GSP1,
-            G_M_TEAM|G_M_INSTA|G_M_DUEL|G_M_SURVIVOR|G_M_ARENA|G_M_MEDIEVAL|G_M_BALLISTIC|G_M_ONSLAUGHT|G_M_JETPACK|G_M_VAMPIRE|G_M_EXPERT|G_M_RESIZE|G_M_GSP2,
-            G_M_TEAM|G_M_INSTA|G_M_DUEL|G_M_SURVIVOR|G_M_ARENA|G_M_MEDIEVAL|G_M_BALLISTIC|G_M_ONSLAUGHT|G_M_JETPACK|G_M_VAMPIRE|G_M_EXPERT|G_M_RESIZE|G_M_GSP3
+            (1<<G_M_MULTI)|(1<<G_M_COOP)|(1<<G_M_INSTA)|(1<<G_M_CLASSIC)|(1<<G_M_MEDIEVAL)|(1<<G_M_KABOOM)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_VAMPIRE)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE)|(1<<G_M_GSP1)|(1<<G_M_GSP2),
+            (1<<G_M_MULTI)|(1<<G_M_COOP)|(1<<G_M_INSTA)|(1<<G_M_CLASSIC)|(1<<G_M_MEDIEVAL)|(1<<G_M_KABOOM)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_VAMPIRE)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE)|(1<<G_M_GSP1)|(1<<G_M_GSP2),
+            (1<<G_M_MULTI)|(1<<G_M_COOP)|(1<<G_M_INSTA)|(1<<G_M_CLASSIC)|(1<<G_M_MEDIEVAL)|(1<<G_M_KABOOM)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_VAMPIRE)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE)|(1<<G_M_GSP1)|(1<<G_M_GSP2),
+            0
         },
-        wxT("ctf"), { wxT("return"), wxT("defend"), wxT("protect") }
+        wxT("defend-and-control"), wxT("defend"), { wxT("quick"), wxT("king"), wxT("") },
     },
     {
-        G_DEFEND, G_M_TEAM,
+        G_BOMBER, (1<<G_F_GSP), 0,
         {
-            G_M_TEAM|G_M_INSTA|G_M_ARENA|G_M_MEDIEVAL|G_M_BALLISTIC|G_M_ONSLAUGHT|G_M_JETPACK|G_M_VAMPIRE|G_M_EXPERT|G_M_RESIZE|G_M_GSP1|G_M_GSP2,
-            G_M_TEAM|G_M_INSTA|G_M_ARENA|G_M_MEDIEVAL|G_M_BALLISTIC|G_M_ONSLAUGHT|G_M_JETPACK|G_M_VAMPIRE|G_M_EXPERT|G_M_RESIZE|G_M_GSP1,
-            G_M_TEAM|G_M_INSTA|G_M_ARENA|G_M_MEDIEVAL|G_M_BALLISTIC|G_M_ONSLAUGHT|G_M_JETPACK|G_M_VAMPIRE|G_M_EXPERT|G_M_RESIZE|G_M_GSP2,
-            G_M_NONE
+            (1<<G_M_MULTI)|(1<<G_M_COOP)|(1<<G_M_INSTA)|(1<<G_M_DUEL)|(1<<G_M_SURVIVOR)|(1<<G_M_CLASSIC)|(1<<G_M_MEDIEVAL)|(1<<G_M_KABOOM)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_VAMPIRE)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE)|(1<<G_M_GSP1)|(1<<G_M_GSP2),
+            (1<<G_M_MULTI)|(1<<G_M_FFA)|(1<<G_M_COOP)|(1<<G_M_INSTA)|(1<<G_M_CLASSIC)|(1<<G_M_MEDIEVAL)|(1<<G_M_KABOOM)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_VAMPIRE)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE)|(1<<G_M_GSP1),
+            (1<<G_M_MULTI)|(1<<G_M_COOP)|(1<<G_M_INSTA)|(1<<G_M_DUEL)|(1<<G_M_SURVIVOR)|(1<<G_M_CLASSIC)|(1<<G_M_MEDIEVAL)|(1<<G_M_KABOOM)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_VAMPIRE)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE)|(1<<G_M_GSP2),
+            0
         },
-        wxT("dtf"), { wxT("quick"), wxT("conquer"), wxT("") }
+        wxT("bomber-ball"), wxT("bomber"), { wxT("hold"), wxT("touchdown"), wxT("") },
     },
     {
-        G_BOMBER, G_M_NONE,
+        G_TRIAL, 0, 0,
         {
-            G_M_TEAM|G_M_INSTA|G_M_DUEL|G_M_SURVIVOR|G_M_ARENA|G_M_MEDIEVAL|G_M_BALLISTIC|G_M_ONSLAUGHT|G_M_JETPACK|G_M_VAMPIRE|G_M_EXPERT|G_M_RESIZE|G_M_GSP1|G_M_GSP2,
-            G_M_TEAM|G_M_INSTA|G_M_DUEL|G_M_SURVIVOR|G_M_ARENA|G_M_MEDIEVAL|G_M_BALLISTIC|G_M_ONSLAUGHT|G_M_JETPACK|G_M_VAMPIRE|G_M_EXPERT|G_M_RESIZE|G_M_GSP1|G_M_GSP2,
-            G_M_TEAM|G_M_INSTA|G_M_DUEL|G_M_SURVIVOR|G_M_ARENA|G_M_MEDIEVAL|G_M_BALLISTIC|G_M_ONSLAUGHT|G_M_JETPACK|G_M_VAMPIRE|G_M_EXPERT|G_M_RESIZE|G_M_GSP1|G_M_GSP2,
-            G_M_NONE
+            (1<<G_M_FFA)|(1<<G_M_INSTA)|(1<<G_M_CLASSIC)|(1<<G_M_MEDIEVAL)|(1<<G_M_KABOOM)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_VAMPIRE)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE),
+            0, 0, 0
         },
-        wxT("bomber-ball"), { wxT("multi"), wxT("hold"), wxT("") },
+        wxT("time-trial"), wxT("trial"), { wxT(""), wxT(""), wxT("") },
     },
     {
-        G_TRIAL, G_M_NONE,
+        G_GAUNTLET, 0, 0,
         {
-            G_M_TEAM|G_M_INSTA|G_M_ARENA|G_M_MEDIEVAL|G_M_BALLISTIC|G_M_ONSLAUGHT|G_M_JETPACK|G_M_VAMPIRE|G_M_EXPERT|G_M_RESIZE,
-            G_M_NONE, G_M_NONE, G_M_NONE
+            (1<<G_M_INSTA)|(1<<G_M_CLASSIC)|(1<<G_M_MEDIEVAL)|(1<<G_M_KABOOM)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_VAMPIRE)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE)|(1<<G_M_GSP1)|(1<<G_M_GSP2),
+            (1<<G_M_INSTA)|(1<<G_M_CLASSIC)|(1<<G_M_MEDIEVAL)|(1<<G_M_KABOOM)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_VAMPIRE)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE)|(1<<G_M_GSP1)|(1<<G_M_GSP2),
+            (1<<G_M_INSTA)|(1<<G_M_CLASSIC)|(1<<G_M_MEDIEVAL)|(1<<G_M_KABOOM)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_VAMPIRE)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE)|(1<<G_M_GSP1)|(1<<G_M_GSP2),
+            0
         },
-        wxT("time-trial"), { wxT(""), wxT(""), wxT("") },
+        wxT("gauntlet"), wxT("gauntlet"), { wxT("timed"), wxT("hard"), wxT("") },
     },
 };
 
@@ -155,80 +136,104 @@ static const struct
     int type, implied, mutators;
     const wxChar *name;
 }
-mutstype[] =
-{
+mutstype[] = {
     {
-        G_M_TEAM, G_M_TEAM, G_M_TEAM|G_M_INSTA|G_M_DUEL|G_M_SURVIVOR|G_M_ARENA|G_M_MEDIEVAL|G_M_BALLISTIC|G_M_ONSLAUGHT|G_M_JETPACK|G_M_VAMPIRE|G_M_EXPERT|G_M_RESIZE|G_M_GSP1|G_M_GSP2|G_M_GSP3,
-        wxT("team")
+        G_M_MULTI, (1<<G_M_MULTI),
+        (1<<G_M_MULTI)|(1<<G_M_COOP)|(1<<G_M_INSTA)|(1<<G_M_DUEL)|(1<<G_M_SURVIVOR)|(1<<G_M_CLASSIC)|(1<<G_M_MEDIEVAL)|(1<<G_M_KABOOM)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_VAMPIRE)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE)|(1<<G_M_GSP1)|(1<<G_M_GSP2)|(1<<G_M_GSP3),
+        wxT("multi")
     },
     {
-        G_M_INSTA, G_M_INSTA, G_M_TEAM|G_M_INSTA|G_M_DUEL|G_M_SURVIVOR|G_M_ARENA|G_M_MEDIEVAL|G_M_BALLISTIC|G_M_ONSLAUGHT|G_M_JETPACK|G_M_VAMPIRE|G_M_EXPERT|G_M_RESIZE|G_M_GSP1|G_M_GSP2|G_M_GSP3,
+        G_M_FFA, (1<<G_M_FFA),
+        (1<<G_M_FFA)|(1<<G_M_INSTA)|(1<<G_M_DUEL)|(1<<G_M_SURVIVOR)|(1<<G_M_CLASSIC)|(1<<G_M_MEDIEVAL)|(1<<G_M_KABOOM)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_VAMPIRE)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE)|(1<<G_M_GSP1)|(1<<G_M_GSP2)|(1<<G_M_GSP3),
+        wxT("ffa")
+    },
+    {
+        G_M_COOP, (1<<G_M_COOP),
+        (1<<G_M_MULTI)|(1<<G_M_COOP)|(1<<G_M_INSTA)|(1<<G_M_DUEL)|(1<<G_M_SURVIVOR)|(1<<G_M_CLASSIC)|(1<<G_M_MEDIEVAL)|(1<<G_M_KABOOM)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_VAMPIRE)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE)|(1<<G_M_GSP1)|(1<<G_M_GSP2)|(1<<G_M_GSP3),
+        wxT("coop")
+    },
+    {
+        G_M_INSTA, (1<<G_M_INSTA),
+        (1<<G_M_MULTI)|(1<<G_M_FFA)|(1<<G_M_COOP)|(1<<G_M_INSTA)|(1<<G_M_DUEL)|(1<<G_M_SURVIVOR)|(1<<G_M_MEDIEVAL)|(1<<G_M_KABOOM)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE)|(1<<G_M_GSP1)|(1<<G_M_GSP2)|(1<<G_M_GSP3),
         wxT("instagib")
     },
     {
-        G_M_MEDIEVAL, G_M_MEDIEVAL, G_M_TEAM|G_M_INSTA|G_M_DUEL|G_M_SURVIVOR|G_M_MEDIEVAL|G_M_ONSLAUGHT|G_M_JETPACK|G_M_VAMPIRE|G_M_EXPERT|G_M_RESIZE|G_M_GSP1|G_M_GSP2|G_M_GSP3,
+        G_M_MEDIEVAL, (1<<G_M_MEDIEVAL),
+        (1<<G_M_MULTI)|(1<<G_M_FFA)|(1<<G_M_COOP)|(1<<G_M_INSTA)|(1<<G_M_DUEL)|(1<<G_M_SURVIVOR)|(1<<G_M_MEDIEVAL)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_VAMPIRE)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE)|(1<<G_M_GSP1)|(1<<G_M_GSP2)|(1<<G_M_GSP3),
         wxT("medieval")
     },
     {
-        G_M_BALLISTIC, G_M_BALLISTIC, G_M_TEAM|G_M_INSTA|G_M_DUEL|G_M_SURVIVOR|G_M_BALLISTIC|G_M_ONSLAUGHT|G_M_JETPACK|G_M_VAMPIRE|G_M_EXPERT|G_M_RESIZE|G_M_GSP1|G_M_GSP2|G_M_GSP3,
-        wxT("ballistic")
+        G_M_KABOOM,  (1<<G_M_KABOOM),
+        (1<<G_M_MULTI)|(1<<G_M_FFA)|(1<<G_M_COOP)|(1<<G_M_INSTA)|(1<<G_M_DUEL)|(1<<G_M_SURVIVOR)|(1<<G_M_KABOOM)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_VAMPIRE)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE)|(1<<G_M_GSP1)|(1<<G_M_GSP2)|(1<<G_M_GSP3),
+        wxT("kaboom")
     },
     {
-        G_M_DUEL, G_M_DUEL, G_M_TEAM|G_M_INSTA|G_M_DUEL|G_M_ARENA|G_M_MEDIEVAL|G_M_BALLISTIC|G_M_ONSLAUGHT|G_M_JETPACK|G_M_VAMPIRE|G_M_EXPERT|G_M_RESIZE|G_M_GSP1|G_M_GSP2|G_M_GSP3,
+        G_M_DUEL, (1<<G_M_DUEL),
+        (1<<G_M_MULTI)|(1<<G_M_FFA)|(1<<G_M_COOP)|(1<<G_M_INSTA)|(1<<G_M_DUEL)|(1<<G_M_CLASSIC)|(1<<G_M_MEDIEVAL)|(1<<G_M_KABOOM)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_VAMPIRE)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE)|(1<<G_M_GSP1)|(1<<G_M_GSP2)|(1<<G_M_GSP3),
         wxT("duel")
     },
     {
-        G_M_SURVIVOR, G_M_SURVIVOR, G_M_TEAM|G_M_INSTA|G_M_SURVIVOR|G_M_ARENA|G_M_MEDIEVAL|G_M_BALLISTIC|G_M_ONSLAUGHT|G_M_JETPACK|G_M_VAMPIRE|G_M_EXPERT|G_M_RESIZE|G_M_GSP1|G_M_GSP2|G_M_GSP3,
+        G_M_SURVIVOR, (1<<G_M_SURVIVOR),
+        (1<<G_M_MULTI)|(1<<G_M_FFA)|(1<<G_M_COOP)|(1<<G_M_INSTA)|(1<<G_M_SURVIVOR)|(1<<G_M_CLASSIC)|(1<<G_M_MEDIEVAL)|(1<<G_M_KABOOM)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_VAMPIRE)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE)|(1<<G_M_GSP1)|(1<<G_M_GSP2)|(1<<G_M_GSP3),
         wxT("survivor")
     },
     {
-        G_M_ARENA, G_M_ARENA, G_M_TEAM|G_M_INSTA|G_M_DUEL|G_M_SURVIVOR|G_M_ARENA|G_M_ONSLAUGHT|G_M_JETPACK|G_M_VAMPIRE|G_M_EXPERT|G_M_RESIZE|G_M_GSP1|G_M_GSP2|G_M_GSP3,
-        wxT("arena")
+        G_M_CLASSIC, (1<<G_M_CLASSIC),
+        (1<<G_M_MULTI)|(1<<G_M_FFA)|(1<<G_M_COOP)|(1<<G_M_DUEL)|(1<<G_M_SURVIVOR)|(1<<G_M_CLASSIC)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_VAMPIRE)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE)|(1<<G_M_GSP1)|(1<<G_M_GSP2)|(1<<G_M_GSP3),
+        wxT("classic")
     },
     {
-        G_M_ONSLAUGHT, G_M_ONSLAUGHT, G_M_TEAM|G_M_INSTA|G_M_MEDIEVAL|G_M_BALLISTIC|G_M_DUEL|G_M_SURVIVOR|G_M_ARENA|G_M_ONSLAUGHT|G_M_JETPACK|G_M_VAMPIRE|G_M_EXPERT|G_M_RESIZE|G_M_GSP1|G_M_GSP2|G_M_GSP3,
+        G_M_ONSLAUGHT, (1<<G_M_ONSLAUGHT),
+        (1<<G_M_MULTI)|(1<<G_M_FFA)|(1<<G_M_COOP)|(1<<G_M_INSTA)|(1<<G_M_MEDIEVAL)|(1<<G_M_KABOOM)|(1<<G_M_DUEL)|(1<<G_M_SURVIVOR)|(1<<G_M_CLASSIC)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_VAMPIRE)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE)|(1<<G_M_GSP1)|(1<<G_M_GSP2)|(1<<G_M_GSP3),
         wxT("onslaught")
     },
     {
-        G_M_JETPACK, G_M_JETPACK, G_M_TEAM|G_M_INSTA|G_M_MEDIEVAL|G_M_BALLISTIC|G_M_DUEL|G_M_SURVIVOR|G_M_ARENA|G_M_ONSLAUGHT|G_M_JETPACK|G_M_VAMPIRE|G_M_EXPERT|G_M_RESIZE|G_M_GSP1|G_M_GSP2|G_M_GSP3,
+        G_M_JETPACK, (1<<G_M_JETPACK),
+        (1<<G_M_MULTI)|(1<<G_M_FFA)|(1<<G_M_COOP)|(1<<G_M_INSTA)|(1<<G_M_MEDIEVAL)|(1<<G_M_KABOOM)|(1<<G_M_DUEL)|(1<<G_M_SURVIVOR)|(1<<G_M_CLASSIC)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_VAMPIRE)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE)|(1<<G_M_GSP1)|(1<<G_M_GSP2)|(1<<G_M_GSP3),
         wxT("jetpack")
     },
     {
-        G_M_VAMPIRE, G_M_VAMPIRE, G_M_TEAM|G_M_INSTA|G_M_MEDIEVAL|G_M_BALLISTIC|G_M_DUEL|G_M_SURVIVOR|G_M_ARENA|G_M_ONSLAUGHT|G_M_JETPACK|G_M_VAMPIRE|G_M_EXPERT|G_M_RESIZE|G_M_GSP1|G_M_GSP2|G_M_GSP3,
+        G_M_VAMPIRE, (1<<G_M_VAMPIRE),
+        (1<<G_M_MULTI)|(1<<G_M_FFA)|(1<<G_M_COOP)|(1<<G_M_MEDIEVAL)|(1<<G_M_KABOOM)|(1<<G_M_DUEL)|(1<<G_M_SURVIVOR)|(1<<G_M_CLASSIC)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_VAMPIRE)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE)|(1<<G_M_GSP1)|(1<<G_M_GSP2)|(1<<G_M_GSP3),
         wxT("vampire")
     },
     {
-        G_M_EXPERT, G_M_EXPERT, G_M_TEAM|G_M_INSTA|G_M_MEDIEVAL|G_M_BALLISTIC|G_M_DUEL|G_M_SURVIVOR|G_M_ARENA|G_M_ONSLAUGHT|G_M_JETPACK|G_M_VAMPIRE|G_M_EXPERT|G_M_RESIZE|G_M_GSP1|G_M_GSP2|G_M_GSP3,
+        G_M_EXPERT, (1<<G_M_EXPERT),
+        (1<<G_M_MULTI)|(1<<G_M_FFA)|(1<<G_M_COOP)|(1<<G_M_INSTA)|(1<<G_M_MEDIEVAL)|(1<<G_M_KABOOM)|(1<<G_M_DUEL)|(1<<G_M_SURVIVOR)|(1<<G_M_CLASSIC)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_VAMPIRE)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE)|(1<<G_M_GSP1)|(1<<G_M_GSP2)|(1<<G_M_GSP3),
         wxT("expert")
     },
     {
-        G_M_RESIZE, G_M_RESIZE, G_M_TEAM|G_M_INSTA|G_M_MEDIEVAL|G_M_BALLISTIC|G_M_DUEL|G_M_SURVIVOR|G_M_ARENA|G_M_ONSLAUGHT|G_M_JETPACK|G_M_VAMPIRE|G_M_EXPERT|G_M_RESIZE|G_M_GSP1|G_M_GSP2|G_M_GSP3,
+        G_M_RESIZE, (1<<G_M_RESIZE),
+        (1<<G_M_MULTI)|(1<<G_M_FFA)|(1<<G_M_COOP)|(1<<G_M_INSTA)|(1<<G_M_MEDIEVAL)|(1<<G_M_KABOOM)|(1<<G_M_DUEL)|(1<<G_M_SURVIVOR)|(1<<G_M_CLASSIC)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_VAMPIRE)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE)|(1<<G_M_GSP1)|(1<<G_M_GSP2)|(1<<G_M_GSP3),
         wxT("resize")
     },
     {
-        G_M_GSP1, G_M_GSP1, G_M_TEAM|G_M_INSTA|G_M_MEDIEVAL|G_M_BALLISTIC|G_M_DUEL|G_M_SURVIVOR|G_M_ARENA|G_M_ONSLAUGHT|G_M_JETPACK|G_M_VAMPIRE|G_M_EXPERT|G_M_RESIZE|G_M_GSP1|G_M_GSP2|G_M_GSP3,
-        wxT("")
+        G_M_GSP1, (1<<G_M_GSP1),
+        (1<<G_M_MULTI)|(1<<G_M_FFA)|(1<<G_M_COOP)|(1<<G_M_INSTA)|(1<<G_M_MEDIEVAL)|(1<<G_M_KABOOM)|(1<<G_M_DUEL)|(1<<G_M_SURVIVOR)|(1<<G_M_CLASSIC)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_VAMPIRE)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE)|(1<<G_M_GSP1)|(1<<G_M_GSP2)|(1<<G_M_GSP3),
+        wxT("gsp1")
     },
     {
-        G_M_GSP2, G_M_GSP2, G_M_TEAM|G_M_INSTA|G_M_MEDIEVAL|G_M_BALLISTIC|G_M_DUEL|G_M_SURVIVOR|G_M_ARENA|G_M_ONSLAUGHT|G_M_JETPACK|G_M_VAMPIRE|G_M_EXPERT|G_M_RESIZE|G_M_GSP1|G_M_GSP2|G_M_GSP3,
-        wxT("")
+        G_M_GSP2, (1<<G_M_GSP2),
+        (1<<G_M_MULTI)|(1<<G_M_FFA)|(1<<G_M_COOP)|(1<<G_M_INSTA)|(1<<G_M_MEDIEVAL)|(1<<G_M_KABOOM)|(1<<G_M_DUEL)|(1<<G_M_SURVIVOR)|(1<<G_M_CLASSIC)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_VAMPIRE)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE)|(1<<G_M_GSP1)|(1<<G_M_GSP2)|(1<<G_M_GSP3),
+        wxT("gsp2")
     },
     {
-        G_M_GSP3, G_M_GSP3, G_M_TEAM|G_M_INSTA|G_M_MEDIEVAL|G_M_BALLISTIC|G_M_DUEL|G_M_SURVIVOR|G_M_ARENA|G_M_ONSLAUGHT|G_M_JETPACK|G_M_VAMPIRE|G_M_EXPERT|G_M_RESIZE|G_M_GSP1|G_M_GSP2|G_M_GSP3,
-        wxT("")
+        G_M_GSP3, (1<<G_M_GSP3),
+        (1<<G_M_MULTI)|(1<<G_M_FFA)|(1<<G_M_COOP)|(1<<G_M_INSTA)|(1<<G_M_MEDIEVAL)|(1<<G_M_KABOOM)|(1<<G_M_DUEL)|(1<<G_M_SURVIVOR)|(1<<G_M_CLASSIC)|(1<<G_M_ONSLAUGHT)|(1<<G_M_JETPACK)|(1<<G_M_VAMPIRE)|(1<<G_M_EXPERT)|(1<<G_M_RESIZE)|(1<<G_M_GSP1)|(1<<G_M_GSP2)|(1<<G_M_GSP3),
+        wxT("gsp3")
     },
 };
 
 #define m_game(a)      (a > -1 && a < G_MAX)
-#define m_implied(a,b) (gametype[a].implied|(a == G_BOMBER && !((b|gametype[a].implied) & G_M_GSP2) ? G_M_TEAM : G_M_NONE))
 
 
 CslGameRedEclipse::CslGameRedEclipse()
 {
     m_name=CSL_DEFAULT_NAME_RE;
     m_fourcc=CSL_BUILD_FOURCC(CSL_FOURCC_RE);
-    m_capabilities=CSL_CAPABILITY_EXTINFO | CSL_CAPABILITY_CUSTOM_CONFIG |
-                   CSL_CAPABILITY_CONNECT_PASS | CSL_CAPABILITY_CONNECT_ADMIN_PASS;
+    m_capabilities=CSL_CAPABILITY_CUSTOM_CONFIG |
+                   CSL_CAPABILITY_CONNECT_PASS |
+                   CSL_CAPABILITY_CONNECT_ADMIN_PASS;
     m_defaultMasterURI = CSL_DEFAULT_MASTER_RE;
 #ifdef __WXMAC__
     m_clientSettings.ConfigPath=::wxGetHomeDir();
@@ -248,38 +253,34 @@ CslGameRedEclipse::~CslGameRedEclipse()
 wxString CslGameRedEclipse::GetModeName(wxInt32 mode, wxInt32 muts) const
 {
     if (!m_game(mode))
-        return _("unknown");
+        mode = G_DEATHMATCH;
 
-    wxString name=gametype[mode].name;
+    if (gametype[mode].implied)
+        muts |= gametype[mode].implied;
+
+    wxString name = gametype[mode].sname;
 
     if (gametype[mode].mutators[0] && muts)
     {
-        const wxChar *mut;
         wxString addition;
+        wxInt32 implied = gametype[mode].implied;
 
-        loopi(G_M_NUM)
+        loopi(G_M_NUM) if(muts&(1<<mutstype[i].type)) implied |= mutstype[i].implied&~(1<<mutstype[i].type);
+        loopi(G_M_NUM) if(muts&(1<<mutstype[i].type) && (!implied || !(implied&(1<<mutstype[i].type))))
         {
-            wxInt32 implied=m_implied(mode, muts);
+            const wxChar *mut = i < G_M_GSP ? mutstype[i].name : gametype[mode].gsp[i-G_M_GSP];
 
-            if ((gametype[mode].mutators[0]&mutstype[i].type) &&
-                (muts&mutstype[i].type) &&
-                (!implied || !(implied&mutstype[i].type)))
-            {
-                mut=i<G_M_GSP ? mutstype[i].name : gametype[mode].gsp[i-G_M_GSP];
+            if (!mut || !mut[0])
+                continue;
 
-                if (mut[0]=='\0')
-                    continue;
+            if (!addition.IsEmpty())
+                addition << wxT("/");
 
-                if (!addition.IsEmpty())
-                    addition<<wxT("/");
-
-                addition<<mut;
-            }
+            addition << mut;
         }
 
         if (!addition.IsEmpty())
             name<<wxT(" (")<<addition<<wxT(")");
-
     }
 
     return name;
@@ -287,45 +288,16 @@ wxString CslGameRedEclipse::GetModeName(wxInt32 mode, wxInt32 muts) const
 
 inline wxString CslGameRedEclipse::GetVersionName(wxInt32 prot) const
 {
-    static const wxChar* versions[] =
+    switch (prot)
     {
-        wxT("Cosmic"), NULL, NULL, wxT("Supernova"), wxT("Ides")
-    };
+        case 220: return wxT("Elara");
+        case 217: return wxT("Galactic");
+        case 214: return wxT("Cosmic");
+        case 211: return wxT("Supernova");
+        case 210: return wxT("Ides");
+    }
 
-    static wxInt32 count=sizeof(versions)/sizeof(versions[0]);
-
-    wxInt32 v=CSL_LAST_PROTOCOL_RE-prot;
-
-    if (v<0 || v>=count || !versions[v])
-        return wxString::Format(wxT("%d"), prot);
-    else
-        return versions[v];
-}
-
-inline const wxString& CslGameRedEclipse::GetWeaponName(wxInt32 n, wxInt32 prot) const
-{
-    static const wxString unknown(_("unknown"));
-
-    static const wxString weapons[] =
-    {
-        _("Melee"), _("Pistol"), _("Sword"), _("Shotgun"),
-        _("SMG"), _("Flamer"), _("Plasma"), _("Rifle"),
-        _("Grenade"), _("Rocket")
-    };
-    return (n>=0 && (size_t)n<sizeof(weapons)/sizeof(weapons[0])) ? weapons[n] : unknown;
-}
-
-wxInt32 CslGameRedEclipse::GetPlayerstatsDescriptions(const wxString **desc) const
-{
-    static const wxString descriptions[] =
-    {
-        _("Player"), _("Team"), _("Frags"), _("Deaths"), _("Teamkills"),
-        _("Ping"), _("KpD"), _("Accuracy"), _("Health"), _("Spree"), _("Weapon")
-    };
-
-    *desc = descriptions;
-
-    return sizeof(descriptions)/sizeof(descriptions[0]);
+    return wxString::Format(wxT("%d"), prot);
 }
 
 inline wxInt32 CslGameRedEclipse::GetBestTeam(CslTeamStats& stats, wxInt32 prot) const
@@ -442,58 +414,6 @@ bool CslGameRedEclipse::ParseDefaultPong(ucharbuf& buf, CslServerInfo& info) con
     info.Map = CslCharEncoding::CubeMB2WX(FilterCubeString(text, 1));
     getstring(text, buf);
     info.SetDescription(CslCharEncoding::CubeMB2WX(FilterCubeString(text, 1)));
-
-    return !buf.overread();
-}
-
-bool CslGameRedEclipse::ParsePlayerPong(wxInt32 protocol, ucharbuf& buf, CslPlayerStatsData& info) const
-{
-    char text[MAXSTRLEN];
-
-    info.ID=getint(buf);
-    if (protocol>=104)
-        info.Ping=getint(buf);
-    getstring(text, buf);
-    info.Name=CslCharEncoding::CubeMB2WX(FilterCubeString(text, 1));
-    getstring(text, buf);
-    info.Team=CslCharEncoding::CubeMB2WX(FilterCubeString(text, 1));
-    info.Frags=getint(buf);
-    if (protocol>=104)
-        info.Flagscore=getint(buf);
-    info.Deaths=getint(buf);
-    info.Teamkills=getint(buf);
-    if (protocol>=103)
-        info.Accuracy=getint(buf);
-    info.Health=getint(buf);
-    info.Armour=getint(buf);
-    info.Weapon=getint(buf);
-    info.KpD=max(0, info.Frags)/(float)max(1, info.Deaths);
-    info.Privileges=getint(buf);
-    switch (getint(buf))
-    {
-        case CS_ALIVE:     info.State=CSL_PLAYER_STATE_ALIVE; break;
-        case CS_DEAD:      info.State=CSL_PLAYER_STATE_DEAD; break;
-        case CS_SPAWNING:  info.State=CSL_PLAYER_STATE_SPAWNING; break;
-        case CS_EDITING:   info.State=CSL_PLAYER_STATE_EDITING; break;
-        case CS_SPECTATOR: info.State=CSL_PLAYER_STATE_SPECTATOR; break;
-        case CS_WAITING:   info.State=CSL_PLAYER_STATE_WAITING; break;
-        default:           info.State=CSL_PLAYER_STATE_UNKNOWN; break;
-    }
-
-    return !buf.overread();
-}
-
-bool CslGameRedEclipse::ParseTeamPong(wxInt32 protocol, ucharbuf& buf, CslTeamStatsData& info) const
-{
-    wxInt32 l;
-    char text[MAXSTRLEN];
-
-    getstring(text, buf);
-    info.Name=CslCharEncoding::CubeMB2WX(FilterCubeString(text, 1));
-    info.Score=getint(buf);
-    l=getint(buf);
-    while (l-->0)
-        info.Bases.push_back(getint(buf));
 
     return !buf.overread();
 }

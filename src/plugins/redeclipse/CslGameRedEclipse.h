@@ -22,7 +22,7 @@
 #define CSLREDECLIPSE_H
 
 #define CSL_DEFAULT_NAME_RE        wxT("Red Eclipse")
-#define CSL_LAST_PROTOCOL_RE       214
+#define CSL_LAST_PROTOCOL_RE       220
 
 #define CSL_FOURCC_RE              "RDEE"
 
@@ -43,16 +43,12 @@ class CSL_DLL_PLUGINS CslGameRedEclipse : public CslGame
         wxString GetModeName(wxInt32 mode, wxInt32 muts) const;
 
         //implementations for base class
-        wxInt32 GetPlayerstatsDescriptions(const wxString **desc) const;
-        const wxString& GetWeaponName(wxInt32 n, wxInt32 prot) const;
         wxInt32 GetBestTeam(CslTeamStats& stats, wxInt32 prot) const;
         wxUint16 GetDefaultGamePort() const { return CSL_DEFAULT_PORT_RE; }
         wxUint16 GetInfoPort(wxUint16 port=0) const { return port ? port+1 : CSL_DEFAULT_PORT_RE+1; }
         wxUint16 GetBroadcastPort() { return CSL_DEFAULT_BCAST_PORT_RE; }
         bool PingDefault(ucharbuf& buf, CslServerInfo& info) const;
         bool ParseDefaultPong(ucharbuf& buf, CslServerInfo& info) const;
-        bool ParsePlayerPong(wxInt32 protocol, ucharbuf& buf, CslPlayerStatsData& info) const ;
-        bool ParseTeamPong(wxInt32 protocol, ucharbuf& buf, CslTeamStatsData& info) const;
         CslGameClientSettings GuessClientSettings(const wxString& path) const;
         wxString ValidateClientSettings(CslGameClientSettings& settings) const;
         void SetClientSettings(const CslGameClientSettings& settings);
