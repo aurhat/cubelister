@@ -261,7 +261,10 @@ bool CslEngine::PingExPlayerInfo(CslServerInfo *info, wxInt32 pid, bool force)
         info->PlayerStats.Reset();
 
     ucharbuf p(ping, sizeof(ping));
-    putint(p, 0);
+
+    if (!info->GetGame().PingEx(p, *info))
+        putint(p, 0);
+
     putint(p, CSL_EX_PING_PLAYERSTATS);
     putint(p, pid);
 
@@ -289,7 +292,10 @@ bool CslEngine::PingExTeamInfo(CslServerInfo *info, bool force)
     info->TeamStats.Reset();
 
     ucharbuf p(ping, sizeof(ping));
-    putint(p, 0);
+
+    if (!info->GetGame().PingEx(p, *info))
+        putint(p, 0);
+
     putint(p, CSL_EX_PING_TEAMSTATS);
 
     CslNetPacket packet(p.length(), ping, &info->Address());
