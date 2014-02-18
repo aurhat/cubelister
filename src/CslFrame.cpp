@@ -216,9 +216,6 @@ CslFrame::CslFrame():
         CslGeoIP::AddService(wxT("GeoIPTool"),
                              wxT("http://geoiptool.com/"),
                              wxT("?IP="));
-        CslGeoIP::AddService(wxT("MaxMind (Demo)"),
-                             wxT("http://www.maxmind.com/"),
-                             wxT("app/locate_demo_ip?ips="));
         CslGeoIP::AddService(wxT("NetIP"),
                              wxT("http://www.netip.de/"),
                              wxT("search?query="));
