@@ -36,7 +36,7 @@ enum
 BEGIN_EVENT_TABLE(CslDlgAddServer,wxDialog)
     EVT_TEXT(wxID_ANY,CslDlgAddServer::OnCommandEvent)
     EVT_CHOICE(wxID_ANY,CslDlgAddServer::OnCommandEvent)
-    EVT_BUTTON(wxID_ADD,CslDlgAddServer::OnCommandEvent)
+    EVT_BUTTON(wxID_ANY,CslDlgAddServer::OnCommandEvent)
     EVT_TEXT_ENTER(wxID_ANY,CslDlgAddServer::OnCommandEvent)
     EVT_SPINCTRL(wxID_ANY,CslDlgAddServer::OnSpinCtrl)
 END_EVENT_TABLE()
@@ -224,12 +224,10 @@ void CslDlgAddServer::OnCommandEvent(wxCommandEvent& event)
                     break;
                 }
             }
-
-            EndModal(wxID_CANCEL);
-            break;
         }
 
-        default:
+        case wxID_CANCEL:
+            EndModal(wxID_CANCEL);
             break;
     }
 }

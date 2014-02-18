@@ -28,7 +28,7 @@ BEGIN_EVENT_TABLE(CslDlgAddMaster,wxDialog)
     EVT_TEXT(wxID_ANY, CslDlgAddMaster::OnCommandEvent)
     EVT_TEXT_ENTER(wxID_ANY, CslDlgAddMaster::OnCommandEvent)
     EVT_CHOICE(wxID_ANY, CslDlgAddMaster::OnCommandEvent)
-    EVT_BUTTON(wxID_OK, CslDlgAddMaster::OnCommandEvent)
+    EVT_BUTTON(wxID_ANY, CslDlgAddMaster::OnCommandEvent)
 END_EVENT_TABLE()
 
 enum
@@ -271,7 +271,9 @@ void CslDlgAddMaster::OnCommandEvent(wxCommandEvent& event)
             EndModal(wxID_OK);
             break;
         }
-        default:
+
+        case wxID_CANCEL:
+            EndModal(wxID_CANCEL);
             break;
     }
 }
