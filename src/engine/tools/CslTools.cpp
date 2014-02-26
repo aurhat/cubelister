@@ -21,11 +21,11 @@
 #include <Csl.h>
 // GetSystemIPAddresses()
 #ifndef __WXMSW__
-#include <sys/ioctl.h>
-#include <net/if.h>
-#include <netinet/in.h>
-#include <stdio.h>
 #include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <ifaddrs.h>
 #endif // __WXMSW__
 
 IMPLEMENT_DYNAMIC_CLASS(CslFileTime, wxObject);
@@ -180,57 +180,29 @@ cleanup:
     if (closesocket(sock)==SOCKET_ERROR)
         CSL_LOG_DEBUG("closesocket() failed (WSA error: %d).\n", WSAGetLastError());
 #else
-    int len, sock;
-    char buf[4096];
-    struct ifreq *ifr;
-    struct ifconf ifc;
+    struct ifaddrs *ifa, *ifaddr;
 
-    if ((sock=socket(AF_INET, SOCK_DGRAM, 0))<0)
+    if (getifaddrs(&ifaddr)==-1)
     {
-        CSL_LOG_DEBUG("socket() failed.");
+        CSL_LOG_DEBUG("getifaddrs() failed.");
         return;
     }
 
-    ifc.ifc_len=sizeof(buf);
-    ifc.ifc_buf=buf;
-
-    if (ioctl(sock, SIOCGIFCONF, &ifc)<0)
+    for (ifa = ifaddr; ifa; ifa = ifa->ifa_next)
     {
-        CSL_LOG_DEBUG("ioctl(SIOCGIFCONF) failed.\n");
-        goto cleanup;
+        if (ifa->ifa_addr && ifa->ifa_addr->sa_family==AF_INET)
+        {
+            ip=(wxUint32)((sockaddr_in *)ifa->ifa_addr)->sin_addr.s_addr;
+            mask=(wxUint32)((sockaddr_in*)ifa->ifa_netmask)->sin_addr.s_addr;
+
+            CslIPV4Addr *addr = new CslIPV4Addr(ip, 0, mask);
+            addresses.push_back(addr);
+
+            CSL_LOG_DEBUG("%s\n", U2C(addr->Format(wxT("%i / %m"))));
+        }
     }
 
-    ifr=ifc.ifc_req;
-    len=ifc.ifc_len/sizeof(struct ifreq);
-
-    for (int i=0; i<len; i++)
-    {
-        struct ifreq *item=&ifr[i];
-
-        ip=(wxUint32)((sockaddr_in*)&item->ifr_addr)->sin_addr.s_addr;
-
-        if (ioctl(sock, SIOCGIFNETMASK, item)<0)
-        {
-            CSL_LOG_DEBUG("ioctl(SIOCGIFNETMASK) failed.\n");
-            continue;
-        }
-        mask=(wxUint32)((sockaddr_in*)&item->ifr_netmask)->sin_addr.s_addr;
-
-        if (ioctl(sock, SIOCGIFBRDADDR, item)<0)
-        {
-            CSL_LOG_DEBUG("ioctl(SIOCGIFBRDADDR) failed.\n");
-            continue;
-        }
-
-        CslIPV4Addr *addr = new CslIPV4Addr(ip, 0, mask);
-        addresses.push_back(addr);
-
-        CSL_LOG_DEBUG("%s\n", U2C(addr->Format(wxT("%i / %m"))));
-    }
-
-cleanup:
-    if (close(sock)<0)
-        CSL_LOG_DEBUG("close() failed.\n");
+    freeifaddrs(ifaddr);
 #endif // __WXMSW__
 }
 
