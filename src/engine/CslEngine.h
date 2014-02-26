@@ -149,7 +149,7 @@ class CSL_DLL_ENGINE CslEngine : public wxEvtHandler, public CslPluginMgr, publi
         wxUint32 PingServers(CslGame *game,bool force=false);
         bool PingEx(CslServerInfo *info,bool force=false);
         wxUint32 PingServersEx(bool force=false);
-        bool BroadcastPing(CslGame *game);
+        wxInt32 BroadcastPing(CslGame *game, bool limited = false);
 
         void ResetPingSends(CslGame *game,CslMaster *master);
         void CheckResends();

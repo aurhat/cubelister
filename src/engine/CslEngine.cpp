@@ -404,16 +404,39 @@ wxUint32 CslEngine::PingServersEx(bool force)
     return c;
 }
 
-bool CslEngine::BroadcastPing(CslGame *game)
+wxInt32 CslEngine::BroadcastPing(CslGame *game, bool limited)
 {
     wxUint16 port;
+    wxInt32 count = 0;
 
     if (!(port=game->GetBroadcastPort()))
-        return false;
+        return -1;
 
-    CslServerInfo info(game, wxT("255.255.255.255"), port, port);
+    if (limited)
+    {
+        CSL_LOG_DEBUG("bcast: 255.255.255.255\n");
 
-    return PingDefault(&info);
+        CslServerInfo info(game, wxT("255.255.255.255"), port, port);
+
+        if (PingDefault(&info))
+            count++;
+    }
+    else
+    {
+        EnumSystemIPV4Addresses();
+
+        loopv(m_systemIPV4Addresses)
+        {
+            CSL_LOG_DEBUG("bcast: %s\n", U2C(m_systemIPV4Addresses[i]->Format(wxT("%b"))));
+
+            CslServerInfo info(game, m_systemIPV4Addresses[i]->Format(wxT("%b")), port, port);
+
+            if (PingDefault(&info))
+                count++;
+        }
+    }
+
+    return count;
 }
 
 bool CslEngine::UpdateFromMaster(CslMaster *master)
@@ -456,10 +479,17 @@ void CslEngine::ResetPingSends(CslGame *game,CslMaster *master)
 
 wxInt32 CslEngine::EnumSystemIPV4Addresses()
 {
-    FreeSystemIPV4Addresses(m_systemIPV4Addresses);
-    GetSystemIPV4Addresses(m_systemIPV4Addresses);
+    wxUint32 now = GetTicks();
 
-    return m_systemIPV4Addresses.GetCount();
+    if (!m_lastEnumSystemIPV4Addresses || now-m_lastEnumSystemIPV4Addresses>=1000*60)
+    {
+        m_lastEnumSystemIPV4Addresses = now;
+
+        FreeSystemIPV4Addresses(m_systemIPV4Addresses);
+        GetSystemIPV4Addresses(m_systemIPV4Addresses);
+    }
+
+    return m_systemIPV4Addresses.size();
 }
 
 bool CslEngine::ParseDefaultPong(CslServerInfo *info, ucharbuf& buf)
@@ -921,13 +951,7 @@ void CslEngine::OnPong(CslPingEvent& event)
     // check for broadcast response
     if (!info)
     {
-        wxUint32 now = GetTicks();
-
-        if (!m_lastEnumSystemIPV4Addresses || now-m_lastEnumSystemIPV4Addresses>=1000*60)
-        {
-            EnumSystemIPV4Addresses();
-            m_lastEnumSystemIPV4Addresses = now;
-        }
+        EnumSystemIPV4Addresses();
 
         if (!IsLocalIPV4(addr, &m_systemIPV4Addresses))
         {
