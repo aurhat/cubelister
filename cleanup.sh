@@ -1,8 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 test "${PWD##*/}" = "csl" || exit 1
 
-make distclean >/dev/null 2>&1
+MAKE=${MAKE:-$(which gmake 2>/dev/null || echo "make")}
+
+$MAKE distclean >/dev/null 2>&1
 
 find . -name "*~" -exec rm -f {} \;
 find . -name "*.bak" -exec rm -f {} \;
@@ -19,11 +21,13 @@ do
   rm -Rf \
    aclocal.m4      \
    autom4te.cache  \
+   compile         \
    configure       \
    config.log      \
    config.sub      \
    config.status   \
    config.guess    \
+   configure.ac    \
    configure.in    \
    doc             \
    Doxyfile        \

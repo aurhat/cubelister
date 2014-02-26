@@ -2,7 +2,7 @@
 
 set -e
 
-function get_output_indent
+function get_output_indent()
 {
     declare -i i=0
     declare -i len=0
@@ -16,16 +16,29 @@ function get_output_indent
     OUTPUT_STATUS_INDENT=`printf "%${len}s" ' '`
 }
 
-function get_plugins
+function newline_escape()
+{
+    local nl
+    local result
+
+    for l in "$@"; do
+        result+="${nl}${l}"
+        test -z "$nl" && nl="\\\\\n"
+    done
+
+    echo -e "$result"
+}
+
+function get_plugins()
 {
     local p
     local indent
     local plug_name
-    local plugins_enabled
-    local plugins_makefiles
     local plugins_podir
-    local plugins_intltool
     declare -a plugins
+    declare -a plugins_enabled
+    declare -a plugins_intltool
+    declare -a plugins_makefiles
     declare -r PLUGIN_DIR="src/plugins"
 
     for p in `find $PLUGIN_DIR -maxdepth 1 -type d | sort`
@@ -34,33 +47,33 @@ function get_plugins
 
         plug_name=`basename $p`
         plugins+=($plug_name)
-        plugins_enabled+="${indent}${plug_name}"
-        plugins_makefiles+="${p}/Makefile \\\\\n\t  "
+        plugins_enabled+=("${indent}${plug_name}")
+        plugins_makefiles+=("\t  ${p}/Makefile")
 
         if [ -f "${p}/po/POTFILES.in" ]; then
             local podir="po-plugin-${plug_name}"
             plugins_podir+="${podir} "
-            plugins_intltool+="IT_PO_SUBDIR([${podir}])\n"
-            plugins_makefiles+="${podir}/Makefile.in \\\\\n\t  "
+            plugins_intltool+=("IT_PO_SUBDIR([${podir}])")
+            plugins_makefiles+=("\t  ${podir}/Makefile.in")
             PO_PLUGINS+=($p)
         fi
 
-        test -z $indent && indent="\n$OUTPUT_STATUS_INDENT"
+        test -z $indent && indent="${OUTPUT_STATUS_INDENT}"
     done
 
     sed s,"PO_PLUGINS","${plugins_podir}", \
         Makefile.am.template >Makefile.am
 
-    sed s,"#SUBDIRS\s*=.*","SUBDIRS = ${plugins[*]}", \
+    sed s,"#SUBDIRS[[:space:]]*=.*","SUBDIRS = ${plugins[*]}",\
         $PLUGIN_DIR/Makefile.am.template >$PLUGIN_DIR/Makefile.am
 
-    sed -e s,"PLUGINS_INTLTOOL","${plugins_intltool}",\
-        -e s,"PLUGINS_MAKEFILES","${plugins_makefiles}",\
-        -e s,"PLUGINS_ENABLED","${plugins_enabled}",\
+    sed -e s,"PLUGINS_INTLTOOL","$(newline_escape "${plugins_intltool[@]}")",\
+        -e s,"PLUGINS_MAKEFILES","$(newline_escape "${plugins_makefiles[@]}")",\
+        -e s,"PLUGINS_ENABLED","$(newline_escape "${plugins_enabled[@]}")",\
         configure.ac.template >configure.ac
 }
 
-function get_autotools
+function get_autotools()
 {
     local t tool
     declare -a tools="ACLOCAL AUTOCONF AUTOHEADER AUTOMAKE INTLTOOLIZE LIBTOOLIZE"
@@ -70,7 +83,7 @@ function get_autotools
       if [ -n "${!t}" ]; then
           tool=${!t}
       else
-          tool=`echo $t | tr '[A-Z]' '[a-z]'`
+          tool=`echo $t | tr '[:upper:]' '[:lower:]'`
       fi
       if [ -z `which $tool` &> /dev/null ]; then
           echo "Error: $tool not found." >&2
@@ -80,7 +93,7 @@ function get_autotools
     done
 }
 
-function run_autotools
+function run_autotools()
 {
     $ACLOCAL --force $VERBOSE
     $LIBTOOLIZE $DEBUG --automake --force $AUTOTOOLSCOPY
@@ -91,7 +104,7 @@ function run_autotools
     $AUTOCONF $DEBUG $VERBOSE
 }
 
-function update_po_dir
+function update_po_dir()
 {
     local l linguas
     local domain=${1:+"-${1}"}
@@ -99,7 +112,7 @@ function update_po_dir
 
     pushd $path >/dev/null
 
-    for l in `find -name "*.po" |sort`
+    for l in `find . -name "*.po" |sort`
     do
         l=${l##*/}; l=${l%.po}
         linguas="${linguas}${l}\n"
@@ -110,15 +123,18 @@ function update_po_dir
         test ! -r Makevars && $COPYTOOL ../po/Makevars .
     fi
 
-    sed -e '/^\(GETTEXT_PACKAGE\|subdir\) =/s/[    ]*$/'$domain'/' \
-        -i Makefile.in.in
+    sed -E "/^(GETTEXT_PACKAGE|subdir) =/s/[    ]*$/$domain/"\
+        Makefile.in.in > Makefile.in.in.ag
+
+    test -L Makefile.in.in && rm Makefile.in.in
+    mv Makefile.in.in.ag Makefile.in.in
 
     echo -en $linguas >LINGUAS
 
     popd >/dev/null
 }
 
-function update_po_dirs
+function update_po_dirs()
 {
    update_po_dir
    update_po_dir "engine"
@@ -138,7 +154,7 @@ function update_po_dirs
    done
 }
 
-function show_help
+function show_help()
 {
     echo
     echo "autogen.sh usage:"
