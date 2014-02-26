@@ -103,6 +103,10 @@ wxString CslIPV4Addr::Format(const wxString& fmt) const
 
         if (c=='%') switch ((c=fmt.GetChar(++i)))
         {
+            case 'b': // broadcast address
+                buf<<NtoA(m_ip|(~m_mask));
+                break;
+
             case 'f': // start address (from)
                 buf<<NtoA(m_ip&m_mask);
                 break;
