@@ -518,7 +518,6 @@ bool CslEngine::ParseDefaultPong(CslServerInfo *info, ucharbuf& buf)
 bool CslEngine::ParsePong(CslServerInfo *info, CslNetPacket& packet)
 {
     wxInt32 vi;
-    wxUint32 vu;
     bool ret=true;
     ucharbuf p((uchar*)packet.Data(),packet.Size());
 
@@ -537,12 +536,13 @@ bool CslEngine::ParsePong(CslServerInfo *info, CslNetPacket& packet)
 #ifdef CSL_DEBUG
                 msg_type=wxT("uptime");
 #endif
-                vu=p.length(); // remember buffer position
+                wxInt32 pl = p.length(); // remember buffer position
+
                 if (getint(p)!=-1)  // check ack
                 {
-                    info->ExtInfoStatus=CSL_EXT_STATUS_FALSE;
-                    p.len=vu;
-                    ret=ParseDefaultPong(info, p);
+                    info->ExtInfoStatus = CSL_EXT_STATUS_FALSE;
+                    p.len = pl;
+                    ret = ParseDefaultPong(info, p);
                     break;
                 }
 
@@ -647,7 +647,8 @@ bool CslEngine::ParsePong(CslServerInfo *info, CslNetPacket& packet)
                     if (rid>-1 && stats.m_ids.Index(rid)==wxNOT_FOUND)
                     {
                         CSL_LOG_DEBUG("%s (%s) ERROR: resend id not found (%d | %lu).\n", U2C(msg_type),
-                                      U2C(info->GetBestDescription()), rid, stats.m_ids.GetCount());
+                                      U2C(info->GetBestDescription()), rid,
+                                      (long unsigned int)stats.m_ids.GetCount());
                         break;
                     }
 

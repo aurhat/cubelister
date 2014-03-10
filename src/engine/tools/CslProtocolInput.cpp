@@ -421,8 +421,8 @@ void CslProtocolInput::HandleProto(wxHTTP& http, CslProtocolInputEvent& event)
     }
 
     CSL_LOG_DEBUG("%s - code: %d - size: %lu\n",
-                  U2C(m_inputURI.BuildURI()),
-                  m_statusCode, m_totalSize);
+                  U2C(m_inputURI.BuildURI()), m_statusCode,
+                  (long unsigned int)m_totalSize);
 
     if (m_statusCode==200)
     {
