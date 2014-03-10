@@ -44,18 +44,10 @@ CslEngine::CslEngine() : wxEvtHandler(),
 
 CslEngine::~CslEngine()
 {
-    if (m_udpSock)
-        delete m_udpSock;
-
-    if (m_dnsResolver)
-    {
-        m_dnsResolver->Terminate();
-        m_dnsResolver->Wait();
-        delete m_dnsResolver;
-    }
+    DeInit();
 }
 
-bool CslEngine::Init(wxEvtHandler *handler,wxInt32 interval,wxInt32 pingRatio)
+bool CslEngine::Init(wxEvtHandler *handler, wxInt32 interval, wxInt32 pingRatio)
 {
     if (m_ok)
         return false;
@@ -65,34 +57,24 @@ bool CslEngine::Init(wxEvtHandler *handler,wxInt32 interval,wxInt32 pingRatio)
     m_udpSock = new CslUDP(this);
 
     if (!m_udpSock || !(m_udpSock->IsOk()))
-    {
-        delete m_udpSock;
-        m_udpSock = NULL;
         goto error;
-    }
 
     m_dnsResolver = new CslDNSResolver(this);
 
-    if (!m_dnsResolver->IsOk() || m_dnsResolver->Run()!=wxTHREAD_NO_ERROR)
-    {
-        delete m_dnsResolver;
-        m_dnsResolver = NULL;
+    if (!m_dnsResolver || !m_dnsResolver->IsOk() ||
+        m_dnsResolver->Run()!=wxTHREAD_NO_ERROR)
         goto error;
-    }
 
     m_pingRatio = pingRatio;
     m_updateInterval = interval;
 
-    SetNextHandler(handler);
-
     LoadPlugins(this);
 
-    m_ok = true;
+    SetNextHandler(handler);
 
-    return true;
+    return (m_ok = true);
 
 error:
-    m_ok = true;
     DeInit();
 
     return false;
@@ -100,18 +82,27 @@ error:
 
 void CslEngine::DeInit()
 {
-    if (!m_ok)
-        return;
+    m_ok = false;
 
     SetNextHandler(NULL);
+
+    wxDELETE(m_udpSock);
+
+    if (m_dnsResolver)
+    {
+        m_dnsResolver->Terminate();
+        m_dnsResolver->Wait();
+
+        wxDELETE(m_dnsResolver);
+    }
+
+    WX_CLEAR_ARRAY(m_masterUpdates);
 
     UnloadPlugins(this);
 
     m_games.Empty();
 
     FreeSystemIPV4Addresses(m_systemIPV4Addresses);
-
-    m_ok = false;
 }
 
 bool CslEngine::AddGame(CslGame *game)
