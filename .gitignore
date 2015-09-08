@@ -33,6 +33,8 @@ MANIFEST
 *.mo
 *.gmo
 *.o
+*.la
+*.lo
 *.dll
 *.exe
 *.obj
@@ -55,3 +57,7 @@ Debug
 Unicode-Debug/
 Release/
 Unicode-Release/
+src/pch/Csl.h.gch
+src/csl
+src/cslmapcfgtool
+
