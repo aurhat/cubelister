@@ -29,7 +29,7 @@
 #define CSL_DEFAULT_PORT_AC         28763
 #define CSL_DEFAULT_BCAST_PORT_AC   28762
 
-#define CSL_DEFAULT_MASTER_AC       wxT("tcp://assault.cubers.net:28760/list\n")
+#define CSL_DEFAULT_MASTER_AC       wxT("tcp://ms.cubers.net:28760/list\n")
 
 #define CSL_DEFAULT_INJECT_DIR_AC   wxT("config/")
 #define CSL_DEFAULT_INJECT_FILE_AC  wxT("autoexec.cfg")
