@@ -55,7 +55,7 @@ CslGameAssaultCube::CslGameAssaultCube()
                    CSL_CAPABILITY_CONNECT_PASS | CSL_CAPABILITY_CONNECT_ADMIN_PASS;
     m_defaultMasterURI = CSL_DEFAULT_MASTER_AC;
 #if defined(__WXGTK__) || defined(__WXX11__)
-    m_clientSettings.ConfigPath=::wxGetHomeDir()+wxT("/.assaultcube_v1.0");
+    m_clientSettings.ConfigPath=::wxGetHomeDir()+wxT("/.assaultcube_v1.2");
 #endif
 
     AddIcon(CSL_BITMAP_TYPE_PNG, 16, ac_16_png, sizeof(ac_16_png));
@@ -514,6 +514,24 @@ wxInt32 CslGameAssaultCube::GameEnd(wxString& error)
     return CSL_ERROR_NONE;
 }
 
+bool CslGameAssaultCube::GetMapImagePaths(wxArrayString& paths) const
+{
+    wxInt32 pos;
+    wxString path;
+
+    if (!m_clientSettings.GamePath.IsEmpty())
+    {
+        path<<m_clientSettings.GamePath<<wxT("packages")<<CSL_PATHDIV_WX<<wxT("maps")<<CSL_PATHDIV_WX<<wxT("official")<<CSL_PATHDIV_WX<<wxT("preview")<<CSL_PATHDIV_WX;
+        paths.Add(path);
+    }
+
+    //TODO look for extra package directories
+    if ((pos=m_clientSettings.Options.Find(wxT("-k")))!=wxNOT_FOUND)
+    {
+    }
+
+    return !paths.IsEmpty();
+}
 
 CslGameAssaultCube *assaultcube = NULL;
 

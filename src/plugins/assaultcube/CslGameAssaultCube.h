@@ -61,6 +61,7 @@ class CSL_DLL_PLUGINS CslGameAssaultCube : public CslGame
         void SetClientSettings(const CslGameClientSettings& settings);
         wxString GameStart(CslServerInfo *info, wxInt32 mode, wxString& error);
         wxInt32 GameEnd(wxString& error);
+        bool GetMapImagePaths(wxArrayString& paths) const;
 };
 
 #endif //CSLGAMEASSAULTCUBE_H
