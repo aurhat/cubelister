@@ -31,9 +31,6 @@
 
 #define CSL_DEFAULT_MASTER_AC       wxT("tcp://ms.cubers.net:28760/list\n")
 
-#define CSL_DEFAULT_INJECT_DIR_AC   wxT("config/")
-#define CSL_DEFAULT_INJECT_FILE_AC  wxT("autoexec.cfg")
-
 
 class CSL_DLL_PLUGINS CslGameAssaultCube : public CslGame
 {
