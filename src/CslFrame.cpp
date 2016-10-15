@@ -1881,6 +1881,7 @@ void CslFrame::OnTreeSelChanged(wxTreeEvent& event)
 void CslFrame::OnTreeRightClick(wxTreeEvent& event)
 {
     const wxTreeItemId& item = event.GetItem();
+    wxPoint point = event.GetPoint();
 
     // the "right-clicked" item is the selected one?
     // change the selection if necessary
@@ -1893,7 +1894,7 @@ void CslFrame::OnTreeRightClick(wxTreeEvent& event)
         tree_ctrl_games->SelectItem(item);
     }
 
-    PopupMenu(menuMaster);
+    DoPopupMenu(menuMaster, point.x, point.y);
 
     event.Skip();
 }
