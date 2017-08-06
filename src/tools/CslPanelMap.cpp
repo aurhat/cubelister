@@ -103,7 +103,7 @@ bool CslMapInfo::LoadMapImage(const wxString& map, const wxString& path)
     }
     else if (::wxFileExists(file+wxT(".png")))
     {
-        if (!m_bitmap.LoadFile(file+wxT(".png"), wxBITMAP_TYPE_PNG))
+        if (m_bitmap.LoadFile(file+wxT(".png"), wxBITMAP_TYPE_PNG))
             ok=true;
     }
 
