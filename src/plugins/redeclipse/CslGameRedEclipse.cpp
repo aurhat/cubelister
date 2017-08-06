@@ -552,6 +552,24 @@ wxInt32 CslGameRedEclipse::GameEnd(wxString& error)
     return CSL_ERROR_NONE;
 }
 
+bool CslGameRedEclipse::GetMapImagePaths(wxArrayString& paths) const
+{
+    wxInt32 pos;
+    wxString path;
+
+    if (!m_clientSettings.GamePath.IsEmpty())
+    {
+        path<<m_clientSettings.GamePath<<wxT("data")<<CSL_PATHDIV_WX<<wxT("maps")<<CSL_PATHDIV_WX;
+        paths.Add(path);
+    }
+
+    //TODO look for extra package directories
+    if ((pos=m_clientSettings.Options.Find(wxT("-p")))!=wxNOT_FOUND)
+    {
+    }
+
+    return !paths.IsEmpty();
+}
 
 CslGameRedEclipse *redeclipse = NULL;
 
