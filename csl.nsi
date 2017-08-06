@@ -145,7 +145,7 @@
     LangString TITLE_Section5a ${LANG_GERMAN} "Startmenü"
     LangString TITLE_Section5b ${LANG_GERMAN} "Desktop"
 
-    LangString DESC_Section1 ${LANG_ENGLISH} "Main progrom."
+    LangString DESC_Section1 ${LANG_ENGLISH} "Main program."
     LangString DESC_Section2 ${LANG_ENGLISH} "Tool to create map config files necessary for map preview."
     LangString DESC_Section3 ${LANG_ENGLISH} "Images and config files for map preview."
     LangString DESC_Section4 ${LANG_ENGLISH} "Some translations."

@@ -509,7 +509,7 @@ bool CslGameAssaultCube::GetMapImagePaths(wxArrayString& paths) const
     }
 
     //TODO look for extra package directories
-    if ((pos=m_clientSettings.Options.Find(wxT("-k")))!=wxNOT_FOUND)
+    if ((pos=m_clientSettings.Options.Find(wxT("--mod")))!=wxNOT_FOUND)
     {
     }
 
