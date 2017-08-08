@@ -227,7 +227,7 @@ class CSL_DLL_GUITOOLS CslListCtrl : public wxListCtrl
 #endif
         wxInt32 GetHeaderHeight()
         {
-#ifdef __WXMSW__
+#if defined(__WXMSW__) || wxCHECK_VERSION(3, 0, 0)
             return 0;
 #else
             return HasHeader() ? ((wxWindow*)m_headerWin)->GetSize().GetHeight() : 0;
