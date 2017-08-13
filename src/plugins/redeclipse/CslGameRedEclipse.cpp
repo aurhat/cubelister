@@ -555,7 +555,13 @@ wxInt32 CslGameRedEclipse::GameEnd(wxString& error)
 bool CslGameRedEclipse::GetMapImagePaths(wxArrayString& paths) const
 {
     wxInt32 pos;
-    wxString path;
+    wxString path, custom_path;
+
+    if (!m_clientSettings.ConfigPath.IsEmpty())
+    {
+        custom_path<<m_clientSettings.ConfigPath<<wxT("maps")<<CSL_PATHDIV_WX;
+        paths.Add(custom_path);
+    }
 
     if (!m_clientSettings.GamePath.IsEmpty())
     {

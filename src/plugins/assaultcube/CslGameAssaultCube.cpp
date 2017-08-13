@@ -500,7 +500,19 @@ wxInt32 CslGameAssaultCube::GameEnd(wxString& error)
 bool CslGameAssaultCube::GetMapImagePaths(wxArrayString& paths) const
 {
     wxInt32 pos;
-    wxString path;
+    wxString path, custom_path, custom_path_official;
+
+    if (!m_clientSettings.ConfigPath.IsEmpty())
+    {
+        custom_path<<m_clientSettings.ConfigPath<<wxT("packages")<<CSL_PATHDIV_WX<<wxT("maps")<<CSL_PATHDIV_WX<<wxT("preview")<<CSL_PATHDIV_WX;
+        paths.Add(custom_path);
+    }
+
+    if (!m_clientSettings.ConfigPath.IsEmpty())
+    {
+        custom_path_official<<m_clientSettings.ConfigPath<<wxT("packages")<<CSL_PATHDIV_WX<<wxT("maps")<<CSL_PATHDIV_WX<<wxT("official")<<CSL_PATHDIV_WX<<wxT("preview")<<CSL_PATHDIV_WX;
+        paths.Add(custom_path_official);
+    }
 
     if (!m_clientSettings.GamePath.IsEmpty())
     {

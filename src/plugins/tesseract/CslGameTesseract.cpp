@@ -506,7 +506,13 @@ wxInt32 CslGameTesseract::GameEnd(wxString& error)
 bool CslGameTesseract::GetMapImagePaths(wxArrayString& paths) const
 {
     wxInt32 pos;
-    wxString path;
+    wxString path, custom_path;
+
+    if (!m_clientSettings.ConfigPath.IsEmpty())
+    {
+        custom_path<<m_clientSettings.ConfigPath<<wxT("media")<<CSL_PATHDIV_WX<<wxT("map")<<CSL_PATHDIV_WX;
+        paths.Add(custom_path);
+    }
 
     if (!m_clientSettings.GamePath.IsEmpty())
     {
