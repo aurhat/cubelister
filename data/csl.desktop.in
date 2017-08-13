@@ -1,5 +1,4 @@
 [Desktop Entry]
-Encoding=UTF-8
 Name=Cube Server Lister
 _GenericName=Server Lister
 _Comment=Monitor Cubeengine based servers.
@@ -8,4 +7,4 @@ Exec=csl
 StartupNotify=true
 Terminal=false
 Icon=csl.png
-Categories=Game
+Categories=Game;
