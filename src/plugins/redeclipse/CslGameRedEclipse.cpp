@@ -290,11 +290,14 @@ inline wxString CslGameRedEclipse::GetVersionName(wxInt32 prot) const
 {
     switch (prot)
     {
-        case 220: return wxT("Elara");
-        case 217: return wxT("Galactic");
-        case 214: return wxT("Cosmic");
-        case 211: return wxT("Supernova");
-        case 210: return wxT("Ides");
+        case 230:
+        case 229: return wxT("1.5.x Elysium");
+        case 226: return wxT("1.5.x Aurora");
+        case 220: return wxT("1.4 Elara");
+        case 217: return wxT("1.3 Galactic");
+        case 214: return wxT("1.2 Cosmic");
+        case 211: return wxT("1.1 Supernova");
+        case 210: return wxT("1.0 Ides");
     }
 
     return wxString::Format(wxT("%d"), prot);
