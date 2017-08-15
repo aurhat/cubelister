@@ -171,6 +171,9 @@ bool CslApp::OnInit()
     AddPluginDir(wxT(".."), cwd);
 #else
     AddPluginDir(cwd);
+    #if defined(__WXGTK__) || defined(__WXX11__)
+        AddPluginDir(cwd + wxT("lib/csl/"), cwd);
+    #endif
 #endif
 #ifdef BUILDDIR
     if (::wxDirExists(wxT(BUILDDIR)))
