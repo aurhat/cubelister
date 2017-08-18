@@ -1173,7 +1173,7 @@ wxString CslFrame::CheckVersion(wxInputStream& input)
 
     wxTextInputStream stream(input);
 
-    while (!input.Eof())
+    while (input.CanRead() & !update)
     {
         char buf[32];
         CslCharBuffer line = CslWX2MB(stream.ReadLine());
@@ -1188,7 +1188,7 @@ wxString CslFrame::CheckVersion(wxInputStream& input)
             version = C2U(buf);
             version.Trim().Trim(true);
 
-            if (version.IsEmpty() && version.Cmp(CSL_VERSION_STR)>0)
+            if (!version.IsEmpty() && version.Cmp(CSL_VERSION_STR)>0)
                 update = true;
 
             CSL_LOG_DEBUG("version check (%s): %s\n", U2C(type), buf);
@@ -1227,7 +1227,7 @@ void CslFrame::InitProtocolInputs()
     m_protocolInputCookies.push_back(
         new CslProtocolInputCookie(CslProtocolInputCookie::VERSION_CHECK,
                                    wxString(CSL_WEBADDR_STR wxT("/latest.txt")),
-                                   //wxString(wxT("http://localhost/~mimosius/latest.txt")),
+                                   //wxString(wxT("http://localhost/latest.txt")),
                                    wxFileName(),
                                    wxString::Format(_("Checking for new %s version."), CSL_NAME_SHORT_STR),
                                    &m_lastVersionCheck, &m_lastVersionDate, CSL_VERSION_CHECK_INTERVAL,
@@ -1235,7 +1235,7 @@ void CslFrame::InitProtocolInputs()
 
     m_protocolInputCookies.push_back(
         new CslProtocolInputCookie(CslProtocolInputCookie::GEOIP_COUNTRY,
-                                   //wxString(wxT("http://masgai.eu/GeoIP.dat.gz")),
+                                   //wxString(wxT("http://localhost/GeoIP.dat.gz")),
                                    CslGeoIP::GetUpdateURI(CslGeoIP::GEOIP_COUNTRY),
                                    wxFileName(wxT("%tmp%"), wxEmptyString),
                                    _("Checking for GeoIP update."),
@@ -1243,7 +1243,7 @@ void CslFrame::InitProtocolInputs()
 
     m_protocolInputCookies.push_back(
         new CslProtocolInputCookie(CslProtocolInputCookie::GEOIP_CITY,
-                                   //wxString(wxT("http://localhost/~mimosius/GeoLiteCity.dat.gz")),
+                                   //wxString(wxT("http://localhost/GeoLiteCity.dat.gz")),
                                    CslGeoIP::GetUpdateURI(CslGeoIP::GEOIP_CITY),
                                    wxFileName(wxT("%tmp%"), wxEmptyString),
                                    _("Checking for GeoIP update."),
