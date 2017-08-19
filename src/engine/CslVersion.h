@@ -49,7 +49,9 @@
 #define CSL_DESCRIPTION_STR    _("Tool to monitor cubeengine-based servers.")
 #define CSL_COPYRIGHT_STR      _(__CSL_DESCRIPTION_STR)
 
-#define CSL_WEBADDR_STR        wxT("http://cubelister.sourceforge.net")
+//#define CSL_WEBADDR_STR        wxT("http://cubelister.sourceforge.net")
+#define CSL_WEBADDR_STR        wxT("https://github.com/aurhat/cubelister")
+#define CSL_WEBSITE_STR        wxT("http://aurhat.github.io/cubelister")
 
 #ifdef UNICODE
     #if wxUSE_UNICODE_UTF8

@@ -1202,7 +1202,7 @@ wxString CslFrame::CheckVersion(wxInputStream& input)
                                                wxString::Format(_("A new %s version (%s)\n of Cube Server Lister is available.\n"),
                                                                 type.c_str(), version.c_str()),
                                                wxArtProvider::GetBitmap(wxART_INFORMATION ,wxART_CMN_DIALOG),
-                                               CSL_WEBADDR_STR);
+                                               wxString(CSL_WEBADDR_STR "/releases"));
         dlg->Show();
 
         return wxString::Format(_("New version %s"), version.c_str());
@@ -1226,7 +1226,7 @@ void CslFrame::InitProtocolInputs()
 
     m_protocolInputCookies.push_back(
         new CslProtocolInputCookie(CslProtocolInputCookie::VERSION_CHECK,
-                                   wxString(CSL_WEBADDR_STR wxT("/latest.txt")),
+                                   wxString(CSL_WEBSITE_STR wxT("/latest.txt")),
                                    //wxString(wxT("http://localhost/latest.txt")),
                                    wxFileName(),
                                    wxString::Format(_("Checking for new %s version."), CSL_NAME_SHORT_STR),
