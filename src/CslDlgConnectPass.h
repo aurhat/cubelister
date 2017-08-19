@@ -37,27 +37,27 @@ class CslConnectPassInfo
 class CslDlgConnectPass: public wxDialog
 {
     public:
-        // begin wxGlade: CslDlgConnectPass::ids
-        // end wxGlade
+    // begin wxGlade: CslDlgConnectPass::ids
+    // end wxGlade
         CslDlgConnectPass(wxWindow* parent, CslConnectPassInfo *info);
 
     private:
-        // begin wxGlade: CslDlgConnectPass::methods
-        void set_properties();
-        void do_layout();
-        // end wxGlade
+    // begin wxGlade: CslDlgConnectPass::methods
+    void set_properties();
+    void do_layout();
+    // end wxGlade
 
         void OnCommandEvent(wxCommandEvent& event);
 
         DECLARE_EVENT_TABLE()
 
     protected:
-        // begin wxGlade: CslDlgConnectPass::attributes
-        wxStaticBox* sizer_ctrl_staticbox;
-        wxTextCtrl* m_tcPassword;
-        wxCheckBox* m_cbAdmin;
-        wxSizer* m_bsDlg;
-        // end wxGlade
+    // begin wxGlade: CslDlgConnectPass::attributes
+    wxStaticBox* sizer_ctrl_staticbox;
+    wxTextCtrl* m_tcPassword;
+    wxCheckBox* m_cbAdmin;
+    wxSizer* m_bsDlg;
+    // end wxGlade
 
         CslConnectPassInfo *m_info;
 }; // wxGlade: end class

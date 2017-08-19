@@ -47,9 +47,9 @@ CslDlgOutput::CslDlgOutput(wxWindow* parent,int id,const wxString& title,
         wxDialog(parent, id, title, pos, size, style)
 {
     // begin wxGlade: CslDlgOutput::CslDlgOutput
-    sizer_conv_filter_staticbox = new wxStaticBox(this, -1, _("Chat"));
-    sizer_search_staticbox = new wxStaticBox(this, -1, _("Search"));
-    text_ctrl_output = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxHSCROLL|wxTE_RICH|wxTE_RICH2|wxTE_AUTO_URL);
+    sizer_conv_filter_staticbox = new wxStaticBox(this, wxID_ANY, _("Chat"));
+    sizer_search_staticbox = new wxStaticBox(this, wxID_ANY, _("Search"));
+    text_ctrl_output = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxTE_AUTO_URL|wxTE_MULTILINE|wxTE_READONLY|wxTE_RICH|wxTE_RICH2);
     text_ctrl_search = new wxTextCtrl(this, TEXT_SEARCH, wxEmptyString);
     label_matches = new wxStaticText(this, wxID_ANY, _("%d matches"));
     button_search_prev = new wxButton(this, wxID_BACKWARD, _("&Back"));
@@ -57,9 +57,9 @@ CslDlgOutput::CslDlgOutput(wxWindow* parent,int id,const wxString& title,
     checkbox_conv_filter = new wxCheckBox(this, CHECK_CONV_FILTER, _("&Filter chat"));
     const wxString choice_conv_filter_choices[] = {
         _("0 (Low)"),
-        _("1 (Default)")
+        _("1 (Default)"),
     };
-    choice_conv_filter = new wxChoice(this, CHOICE_CONV_FILTER, wxDefaultPosition, wxDefaultSize, 2, choice_conv_filter_choices, 0);
+    choice_conv_filter = new wxChoice(this, CHOICE_CONV_FILTER, wxDefaultPosition, wxDefaultSize, 2, choice_conv_filter_choices);
     button_load = new wxButton(this, wxID_OPEN, _("&Open"));
     button_save = new wxButton(this, wxID_SAVE, _("&Save"));
     button_close = new wxButton(this, wxID_CLOSE, _("&Close"));
@@ -79,8 +79,8 @@ void CslDlgOutput::set_properties()
     SetTitle(_("CSL - Game output"));
     text_ctrl_output->SetMinSize(wxSize(-1,300));
     text_ctrl_search->SetMinSize(wxSize(120,-1));
-    button_search_prev->Enable(false);
-    button_search_next->Enable(false);
+    button_search_prev->Enable(0);
+    button_search_next->Enable(0);
     choice_conv_filter->SetSelection(0);
     button_close->SetDefault();
     // end wxGlade
@@ -101,8 +101,10 @@ void CslDlgOutput::do_layout()
     wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(3, 1, 0, 0);
     wxFlexGridSizer* grid_sizer_button = new wxFlexGridSizer(1, 4, 0, 0);
     wxFlexGridSizer* grid_sizer_control = new wxFlexGridSizer(1, 2, 0, 0);
+    sizer_conv_filter_staticbox->Lower();
     wxStaticBoxSizer* sizer_conv_filter = new wxStaticBoxSizer(sizer_conv_filter_staticbox, wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_conv_filter = new wxFlexGridSizer(1, 3, 0, 0);
+    sizer_search_staticbox->Lower();
     wxStaticBoxSizer* sizer_search = new wxStaticBoxSizer(sizer_search_staticbox, wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_search = new wxFlexGridSizer(1, 2, 0, 0);
     wxBoxSizer* sizer_search_button = new wxBoxSizer(wxHORIZONTAL);
@@ -110,8 +112,8 @@ void CslDlgOutput::do_layout()
     wxFlexGridSizer* grid_sizer_search_text = new wxFlexGridSizer(1, 3, 0, 0);
     grid_sizer_main->Add(text_ctrl_output, 0, wxALL|wxEXPAND, 4);
     grid_sizer_search_input->Add(1, 1, 0, 0, 0);
-    grid_sizer_search_text->Add(text_ctrl_search, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_search_text->Add(label_matches, 0, wxLEFT|wxRIGHT|wxALIGN_CENTER_VERTICAL, 6);
+    grid_sizer_search_text->Add(text_ctrl_search, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxEXPAND, 4);
+    grid_sizer_search_text->Add(label_matches, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT, 6);
     grid_sizer_search_text->Add(20, 1, 0, 0, 0);
     grid_sizer_search_text->AddGrowableCol(0);
     grid_sizer_search_input->Add(grid_sizer_search_text, 1, wxEXPAND, 0);
@@ -119,17 +121,17 @@ void CslDlgOutput::do_layout()
     grid_sizer_search_input->AddGrowableRow(0);
     grid_sizer_search_input->AddGrowableRow(2);
     grid_sizer_search_input->AddGrowableCol(0);
-    grid_sizer_search->Add(grid_sizer_search_input, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 0);
+    grid_sizer_search->Add(grid_sizer_search_input, 1, wxALIGN_CENTER_VERTICAL|wxEXPAND, 0);
     sizer_search_button->Add(button_search_prev, 0, wxALL, 4);
     sizer_search_button->Add(button_search_next, 0, wxALL, 4);
     grid_sizer_search->Add(sizer_search_button, 1, wxEXPAND, 0);
     grid_sizer_search->AddGrowableCol(0);
     sizer_search->Add(grid_sizer_search, 1, wxEXPAND, 0);
     grid_sizer_control->Add(sizer_search, 1, wxALL|wxEXPAND, 4);
-    grid_sizer_conv_filter->Add(checkbox_conv_filter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_conv_filter->Add(checkbox_conv_filter, 0, wxALIGN_CENTER_VERTICAL|wxALL, 4);
     wxStaticText* label_filter_level = new wxStaticText(this, wxID_ANY, _("Level"));
-    grid_sizer_conv_filter->Add(label_filter_level, 0, wxLEFT|wxTOP|wxBOTTOM|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_conv_filter->Add(choice_conv_filter, 0, wxLEFT|wxRIGHT|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_conv_filter->Add(label_filter_level, 0, wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxLEFT|wxTOP, 4);
+    grid_sizer_conv_filter->Add(choice_conv_filter, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT, 4);
     sizer_conv_filter->Add(grid_sizer_conv_filter, 1, wxALIGN_CENTER_VERTICAL, 0);
     grid_sizer_control->Add(sizer_conv_filter, 1, wxALL|wxEXPAND, 4);
     grid_sizer_control->AddGrowableCol(0);
@@ -138,7 +140,7 @@ void CslDlgOutput::do_layout()
     grid_sizer_button->Add(button_save, 0, wxALL, 4);
     grid_sizer_button->Add(8, 1, 0, 0, 0);
     grid_sizer_button->Add(button_close, 0, wxALL, 4);
-    grid_sizer_main->Add(grid_sizer_button, 1, wxBOTTOM|wxALIGN_RIGHT, 4);
+    grid_sizer_main->Add(grid_sizer_button, 1, wxALIGN_RIGHT|wxBOTTOM, 4);
     SetSizer(grid_sizer_main);
     grid_sizer_main->Fit(this);
     grid_sizer_main->AddGrowableRow(0);

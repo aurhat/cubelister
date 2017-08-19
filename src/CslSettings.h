@@ -131,6 +131,10 @@ class CslSettings
                 AutoSaveOutput(false),
                 MinPlaytime(CSL_MIN_PLAYTIME_STD),
 
+                /* Checking for program updates */
+                CheckReleaseVersion(true),
+                CheckTestingVersion(false),
+
                 /*GeoIP */
                 GeoIPType(0),
                 GeoIPAutoUpdate(true),
@@ -203,6 +207,10 @@ class CslSettings
         bool AutoSaveOutput;
         wxString LastGame;
         wxUint32 MinPlaytime;
+
+        /* Checking for program updates */
+        bool CheckReleaseVersion;
+        bool CheckTestingVersion;
 
         /* GeoIP */
         wxInt32 GeoIPType;

@@ -35,7 +35,7 @@ CslDlgConnectPass::CslDlgConnectPass(wxWindow* parent, CslConnectPassInfo *info)
         m_info(info)
 {
     // begin wxGlade: CslDlgConnectPass::CslDlgConnectPass
-    sizer_ctrl_staticbox = new wxStaticBox(this, -1, wxEmptyString);
+    sizer_ctrl_staticbox = new wxStaticBox(this, wxID_ANY, wxEmptyString);
     m_tcPassword = new wxTextCtrl(this, TEXT_PASSWORD, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
     m_cbAdmin = new wxCheckBox(this, CHECK_ADMIN, _("Ad&min connect"));
     m_bsDlg = CreateButtonSizer(wxOK|wxCANCEL);
@@ -61,14 +61,15 @@ void CslDlgConnectPass::do_layout()
 {
     // begin wxGlade: CslDlgConnectPass::do_layout
     wxFlexGridSizer* grid_sizer_main = new wxFlexGridSizer(2, 1, 0, 0);
+    sizer_ctrl_staticbox->Lower();
     wxStaticBoxSizer* sizer_ctrl = new wxStaticBoxSizer(sizer_ctrl_staticbox, wxVERTICAL);
     wxFlexGridSizer* grid_sizer_password = new wxFlexGridSizer(1, 2, 0, 0);
     wxStaticText* label_password = new wxStaticText(this, wxID_ANY, _("Password:"));
-    grid_sizer_password->Add(label_password, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
-    grid_sizer_password->Add(m_tcPassword, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 4);
+    grid_sizer_password->Add(label_password, 0, wxALIGN_CENTER_VERTICAL|wxALL, 4);
+    grid_sizer_password->Add(m_tcPassword, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxEXPAND, 4);
     grid_sizer_password->AddGrowableCol(1);
     sizer_ctrl->Add(grid_sizer_password, 1, wxEXPAND, 0);
-    sizer_ctrl->Add(m_cbAdmin, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
+    sizer_ctrl->Add(m_cbAdmin, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 4);
     grid_sizer_main->Add(sizer_ctrl, 1, wxALL|wxEXPAND, 4);
     grid_sizer_main->Add(m_bsDlg, 1, wxALL|wxEXPAND, 4);
     SetSizer(grid_sizer_main);

@@ -1178,9 +1178,9 @@ wxString CslFrame::CheckVersion(wxInputStream& input)
         char buf[32];
         CslCharBuffer line = CslWX2MB(stream.ReadLine());
 
-        if (sscanf(line.data(), "release:%31s", buf)==1)
+        if (CslGetSettings().CheckReleaseVersion && sscanf(line.data(), "release:%31s", buf)==1 )
             type = wxT("Release");
-        else if (sscanf(line.data(), "testing:%31s", buf)==1)
+        else if (CslGetSettings().CheckTestingVersion && sscanf(line.data(), "testing:%31s", buf)==1)
             type = wxT("Testing");
 
         if (!type.IsEmpty())
@@ -1277,6 +1277,10 @@ void CslFrame::CheckProtocolInputs()
 
     switch (cookie.Id)
     {
+        case CslProtocolInputCookie::VERSION_CHECK:
+            if(!CslGetSettings().CheckReleaseVersion && !CslGetSettings().CheckTestingVersion)
+                return;
+            break;
         case CslProtocolInputCookie::GEOIP_COUNTRY:
         case CslProtocolInputCookie::GEOIP_CITY:
             if (cookie.Id-CslProtocolInputCookie::GEOIP_COUNTRY!=CslGeoIP::GetType())

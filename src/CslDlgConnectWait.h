@@ -24,18 +24,18 @@
 class CslDlgConnectWait: public wxDialog
 {
     public:
-        // begin wxGlade: CslDlgConnectWait::ids
-        // end wxGlade
+    // begin wxGlade: CslDlgConnectWait::ids
+    // end wxGlade
 
         CslDlgConnectWait(wxWindow* parent,wxInt32 *time,int id=wxID_ANY,const wxString& title=wxEmptyString,
                           const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize,
                           long style=wxDEFAULT_DIALOG_STYLE);
 
     private:
-        // begin wxGlade: CslDlgConnectWait::methods
-        void set_properties();
-        void do_layout();
-        // end wxGlade
+    // begin wxGlade: CslDlgConnectWait::methods
+    void set_properties();
+    void do_layout();
+    // end wxGlade
 
         wxInt32 *m_time;
         void OnButton(wxCommandEvent& event);
@@ -43,13 +43,13 @@ class CslDlgConnectWait: public wxDialog
         DECLARE_EVENT_TABLE()
 
     protected:
-        // begin wxGlade: CslDlgConnectWait::attributes
-        wxSpinCtrl* spin_ctrl_time;
-        wxCheckBox* checkbox_default;
-        wxButton* button_cancel;
-        wxButton* button_ok;
-        wxButton* button_connect;
-        // end wxGlade
+    // begin wxGlade: CslDlgConnectWait::attributes
+    wxSpinCtrl* spin_ctrl_time;
+    wxCheckBox* checkbox_default;
+    wxButton* button_cancel;
+    wxButton* button_ok;
+    wxButton* button_connect;
+    // end wxGlade
 }; // wxGlade: end class
 
 

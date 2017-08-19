@@ -24,7 +24,6 @@
 #include "img/csl_256_png.h"
 
 // begin wxGlade: ::extracode
-
 // end wxGlade
 
 BEGIN_EVENT_TABLE(CslPanelAboutImage, wxPanel)
@@ -69,18 +68,18 @@ CslDlgAbout::CslDlgAbout(wxWindow* parent,int id,const wxString& title,
         wxDialog(parent,id,title,pos,size,style)
 {
     // begin wxGlade: CslDlgAbout::CslDlgAbout
-    m_notebook = new wxNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0);
+    m_notebook = new wxNotebook(this, wxID_ANY);
     m_npLicense = new wxPanel(m_notebook, wxID_ANY);
     m_npCredits = new wxPanel(m_notebook, wxID_ANY);
     panel_bitmap = new CslPanelAboutImage(this, wxID_ANY);
     m_labelName = new wxStaticText(this, wxID_ANY, wxEmptyString);
     m_labelVersion = new wxStaticText(this, wxID_ANY, wxEmptyString);
-    m_labelDescription = new wxStaticText(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+    m_labelDescription = new wxStaticText(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
     m_hlWeb = new wxHyperlinkCtrl(this, wxID_ANY, CSL_WEBADDR_STR, CSL_WEBADDR_STR);
     m_labelCopyright = new wxStaticText(this, wxID_ANY, wxEmptyString);
     m_labelwxVersion = new wxStaticText(this, wxID_ANY, wxEmptyString);
-    m_tcCredits = new wxTextCtrl(m_npCredits, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxHSCROLL);
-    m_tcLicense = new wxTextCtrl(m_npLicense, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxHSCROLL);
+    m_tcCredits = new wxTextCtrl(m_npCredits, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxTE_MULTILINE|wxTE_READONLY);
+    m_tcLicense = new wxTextCtrl(m_npLicense, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxTE_MULTILINE|wxTE_READONLY);
     m_btClose = new wxButton(this, wxID_CLOSE, wxEmptyString);
 
     set_properties();
@@ -179,12 +178,12 @@ void CslDlgAbout::do_layout()
     wxGridSizer* sizer_license = new wxGridSizer(1, 1, 0, 0);
     wxGridSizer* sizer_credits = new wxGridSizer(1, 1, 0, 0);
     grid_sizer_main->Add(panel_bitmap, 1, wxALIGN_CENTER_HORIZONTAL, 0);
-    grid_sizer_main->Add(m_labelName, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
+    grid_sizer_main->Add(m_labelName, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 4);
     grid_sizer_main->Add(m_labelVersion, 0, wxALIGN_CENTER_HORIZONTAL, 2);
-    grid_sizer_main->Add(m_labelDescription, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
-    grid_sizer_main->Add(m_hlWeb, 1, wxTOP|wxALIGN_CENTER_HORIZONTAL, 8);
-    grid_sizer_main->Add(m_labelCopyright, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
-    grid_sizer_main->Add(m_labelwxVersion, 0, wxTOP|wxALIGN_CENTER_HORIZONTAL, 8);
+    grid_sizer_main->Add(m_labelDescription, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 4);
+    grid_sizer_main->Add(m_hlWeb, 1, wxALIGN_CENTER_HORIZONTAL|wxTOP, 8);
+    grid_sizer_main->Add(m_labelCopyright, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 4);
+    grid_sizer_main->Add(m_labelwxVersion, 0, wxALIGN_CENTER_HORIZONTAL|wxTOP, 8);
     sizer_credits->Add(m_tcCredits, 0, wxALL|wxEXPAND, 4);
     m_npCredits->SetSizer(sizer_credits);
     sizer_license->Add(m_tcLicense, 0, wxALL|wxEXPAND, 4);
@@ -192,7 +191,7 @@ void CslDlgAbout::do_layout()
     m_notebook->AddPage(m_npCredits, _("Credits"));
     m_notebook->AddPage(m_npLicense, _("License"));
     grid_sizer_main->Add(m_notebook, 1, wxALL|wxEXPAND, 8);
-    grid_sizer_main->Add(m_btClose, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 4);
+    grid_sizer_main->Add(m_btClose, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 4);
     SetSizer(grid_sizer_main);
     grid_sizer_main->Fit(this);
     grid_sizer_main->AddGrowableRow(7);

@@ -161,6 +161,10 @@ void CslSettings::LoadSettings()
             settings.MinPlaytime=val;
     }
 
+    /* Checking for program updates */
+    if (cfg->Read(wxT("CheckReleaseVersion"), &val)) settings.CheckReleaseVersion = val!=0;
+    if (cfg->Read(wxT("CheckTestingVersion"), &val)) settings.CheckTestingVersion = val!=0;
+
     /* GeoIP */
     cfg->SetPath(wxT("/GeoIP"));
     if (cfg->Read(wxT("GeoIPType"), &val)) settings.GeoIPType = clamp((int)val, 0, 1);
@@ -278,6 +282,10 @@ void CslSettings::SaveSettings()
     cfg->Write(wxT("AutoSaveOutput"), settings.AutoSaveOutput);
     cfg->Write(wxT("LastSelectedGame"), settings.LastGame);
     cfg->Write(wxT("MinPlaytime"), (long int)settings.MinPlaytime);
+
+    /* Checking for program updates */
+    cfg->Write(wxT("CheckReleaseVersion"), (long int)settings.CheckReleaseVersion);
+    cfg->Write(wxT("CheckTestingVersion"), (long int)settings.CheckTestingVersion);
 
     /* GeoIP */
     cfg->SetPath(wxT("/GeoIP"));

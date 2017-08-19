@@ -36,17 +36,17 @@ class CslPanelAboutImage : public wxPanel
 class CslDlgAbout: public wxDialog
 {
     public:
-        // begin wxGlade: CslDlgAbout::ids
-        // end wxGlade
+    // begin wxGlade: CslDlgAbout::ids
+    // end wxGlade
         CslDlgAbout(wxWindow* parent,int id=wxID_ANY,const wxString& title=wxEmptyString,
                     const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize,
                     long style=wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
 
     private:
-        // begin wxGlade: CslDlgAbout::methods
-        void set_properties();
-        void do_layout();
-        // end wxGlade
+    // begin wxGlade: CslDlgAbout::methods
+    void set_properties();
+    void do_layout();
+    // end wxGlade
 
         void OnClose(wxCloseEvent& event);
         void OnCommandEvent(wxCommandEvent& event);
@@ -54,21 +54,21 @@ class CslDlgAbout: public wxDialog
         DECLARE_EVENT_TABLE();
 
     protected:
-        // begin wxGlade: CslDlgAbout::attributes
-        CslPanelAboutImage* panel_bitmap;
-        wxStaticText* m_labelName;
-        wxStaticText* m_labelVersion;
-        wxStaticText* m_labelDescription;
-        wxHyperlinkCtrl* m_hlWeb;
-        wxStaticText* m_labelCopyright;
-        wxStaticText* m_labelwxVersion;
-        wxTextCtrl* m_tcCredits;
-        wxPanel* m_npCredits;
-        wxTextCtrl* m_tcLicense;
-        wxPanel* m_npLicense;
-        wxNotebook* m_notebook;
-        wxButton* m_btClose;
-        // end wxGlade
+    // begin wxGlade: CslDlgAbout::attributes
+    CslPanelAboutImage* panel_bitmap;
+    wxStaticText* m_labelName;
+    wxStaticText* m_labelVersion;
+    wxStaticText* m_labelDescription;
+    wxHyperlinkCtrl* m_hlWeb;
+    wxStaticText* m_labelCopyright;
+    wxStaticText* m_labelwxVersion;
+    wxTextCtrl* m_tcCredits;
+    wxPanel* m_npCredits;
+    wxTextCtrl* m_tcLicense;
+    wxPanel* m_npLicense;
+    wxNotebook* m_notebook;
+    wxButton* m_btClose;
+    // end wxGlade
 }; // wxGlade: end class
 
 

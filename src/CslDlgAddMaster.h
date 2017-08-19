@@ -24,17 +24,17 @@
 class CslDlgAddMaster: public wxDialog
 {
     public:
-        // begin wxGlade: CslDlgAddMaster::ids
-        // end wxGlade
+    // begin wxGlade: CslDlgAddMaster::ids
+    // end wxGlade
         CslDlgAddMaster(wxWindow* parent);
 
         void InitDlg(wxUint32 *fourcc);
 
     private:
-        // begin wxGlade: CslDlgAddMaster::methods
-        void set_properties();
-        void do_layout();
-        // end wxGlade
+    // begin wxGlade: CslDlgAddMaster::methods
+    void set_properties();
+    void do_layout();
+    // end wxGlade
 
         void OnCommandEvent(wxCommandEvent& event);
 
@@ -45,15 +45,15 @@ class CslDlgAddMaster: public wxDialog
         void SetGameDefaultValues();
         CslGame* GetSelectedGame(wxUint32 *pos = NULL);
 
-        // begin wxGlade: CslDlgAddMaster::attributes
-        wxStaticBox* sizer_master_staticbox;
-        wxChoice* m_choiceGameType;
-        wxChoice* m_choiceMasterType;
-        wxTextCtrl* m_tcAddress;
-        wxSpinCtrl* m_scPort;
-        wxTextCtrl* m_tcPath;
-        wxSizer* m_bsDlg;
-        // end wxGlade
+    // begin wxGlade: CslDlgAddMaster::attributes
+    wxStaticBox* sizer_master_staticbox;
+    wxChoice* m_choiceGameType;
+    wxChoice* m_choiceMasterType;
+    wxTextCtrl* m_tcAddress;
+    wxSpinCtrl* m_scPort;
+    wxTextCtrl* m_tcPath;
+    wxSizer* m_bsDlg;
+    // end wxGlade
 
         bool m_modified;
         wxUint32 *m_fourcc;

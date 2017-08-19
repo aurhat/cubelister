@@ -24,18 +24,18 @@
 class CslDlgAddServer: public wxDialog
 {
     public:
-        // begin wxGlade: CslDlgAddServer::ids
-        // end wxGlade
+    // begin wxGlade: CslDlgAddServer::ids
+    // end wxGlade
 
         CslDlgAddServer(wxWindow* parent);
 
         CslServerInfo* InitDlg(CslServerInfo *info);
 
     private:
-        // begin wxGlade: CslDlgAddServer::methods
-        void set_properties();
-        void do_layout();
-        // end wxGlade
+    // begin wxGlade: CslDlgAddServer::methods
+    void set_properties();
+    void do_layout();
+    // end wxGlade
 
         void UpdatePort(wxInt32 type);
 
@@ -45,14 +45,14 @@ class CslDlgAddServer: public wxDialog
         DECLARE_EVENT_TABLE()
 
     protected:
-        // begin wxGlade: CslDlgAddServer::attributes
-        wxStaticBox* sizer_address_staticbox;
-        wxChoice* m_choiceGameType;
-        wxTextCtrl* m_tcAddress;
-        wxSpinCtrl* m_scGamePort;
-        wxSpinCtrl* m_scInfoPort;
-        wxSizer* m_bsDlg;
-        // end wxGlade
+    // begin wxGlade: CslDlgAddServer::attributes
+    wxStaticBox* sizer_address_staticbox;
+    wxChoice* m_choiceGameType;
+    wxTextCtrl* m_tcAddress;
+    wxSpinCtrl* m_scGamePort;
+    wxSpinCtrl* m_scInfoPort;
+    wxSizer* m_bsDlg;
+    // end wxGlade
 
         CslServerInfo *m_info;
 
