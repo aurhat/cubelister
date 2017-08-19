@@ -1,2 +1,2 @@
-release:0.8.1.79
-testing:0.8.2.1
+release:0.8.0
+testing:0.8.2
