@@ -1,5 +1,0 @@
-XGETTEXT_OPTIONS = -c -s --from-code=UTF-8 -k_ -kwxTRANSLATE -kwxPLURAL:1,2
-
-MSGID_BUGS_ADDRESS = mimosius@users.sourceforge.net
-
-COPYRIGHT_HOLDER = The CSL Development Team.
