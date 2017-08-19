@@ -456,18 +456,20 @@ CslGameClientSettings CslGameSauerbraten::GuessClientSettings(const wxString& pa
 
 wxString CslGameSauerbraten::ValidateClientSettings(CslGameClientSettings& settings) const
 {
-
-    if (!::wxFileExists(settings.Binary))
+    if (!settings.Binary.IsEmpty())
     {
-        return _("Client binary for game Sauerbraten not found!\n");
-    }
-    if (settings.GamePath.IsEmpty() || !::wxDirExists(settings.GamePath))
-    {
-        return _("Game path for game Sauerbraten not found!\n");
-    }
-    if (settings.ConfigPath.IsEmpty() || !::wxDirExists(settings.ConfigPath))
-    {
-        return _("Config path for game Sauerbraten not found!\n");
+        if (!::wxFileExists(settings.Binary))
+        {
+            return _("Client binary for game Sauerbraten not found!\n");
+        }
+        if (settings.GamePath.IsEmpty() || !::wxDirExists(settings.GamePath))
+        {
+            return _("Game path for game Sauerbraten not found!\n");
+        }
+        if (settings.ConfigPath.IsEmpty() || !::wxDirExists(settings.ConfigPath))
+        {
+            return _("Config path for game Sauerbraten not found!\n");
+        }
     }
 
     return wxEmptyString;

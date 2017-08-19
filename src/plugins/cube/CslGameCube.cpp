@@ -102,6 +102,15 @@ CslGameClientSettings CslGameCube::GuessClientSettings(const wxString& path) con
 
 wxString CslGameCube::ValidateClientSettings(CslGameClientSettings& settings) const
 {
+
+    if (!settings.Binary.IsEmpty())
+    {
+        if (!::wxFileExists(settings.Binary))
+        {
+            return _("Client binary for game Cube not found!\n");
+        }
+    }
+
     return wxEmptyString;
 }
 

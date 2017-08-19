@@ -379,6 +379,22 @@ CslGameClientSettings CslGameAssaultCube::GuessClientSettings(const wxString& pa
 
 wxString CslGameAssaultCube::ValidateClientSettings(CslGameClientSettings& settings) const
 {
+    if (!settings.Binary.IsEmpty())
+    {
+        if (!::wxFileExists(settings.Binary))
+        {
+            return _("Client binary for game AssaultCube not found!\n");
+        }
+        if (settings.GamePath.IsEmpty() || !::wxDirExists(settings.GamePath))
+        {
+            return _("Game path for game AssaultCube not found!\n");
+        }
+        if (settings.ConfigPath.IsEmpty() || !::wxDirExists(settings.ConfigPath))
+        {
+            return _("Config path for game AssaultCube not found!\n");
+        }
+    }
+
     return wxEmptyString;
 }
 

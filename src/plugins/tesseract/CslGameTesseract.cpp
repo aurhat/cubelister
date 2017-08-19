@@ -392,18 +392,20 @@ CslGameClientSettings CslGameTesseract::GuessClientSettings(const wxString& path
 
 wxString CslGameTesseract::ValidateClientSettings(CslGameClientSettings& settings) const
 {
-
-    if (!::wxFileExists(settings.Binary))
+    if (!settings.Binary.IsEmpty())
     {
-        return _("Client binary for game Tesseract not found!\n");
-    }
-    if (settings.GamePath.IsEmpty() || !::wxDirExists(settings.GamePath))
-    {
-        return _("Game path for game Tesseract not found!\n");
-    }
-    if (settings.ConfigPath.IsEmpty() || !::wxDirExists(settings.ConfigPath))
-    {
-        return _("Config path for game Tesseract not found!\n");
+        if (!::wxFileExists(settings.Binary))
+        {
+            return _("Client binary for game Tesseract not found!\n");
+        }
+        if (settings.GamePath.IsEmpty() || !::wxDirExists(settings.GamePath))
+        {
+            return _("Game path for game Tesseract not found!\n");
+        }
+        if (settings.ConfigPath.IsEmpty() || !::wxDirExists(settings.ConfigPath))
+        {
+            return _("Config path for game Tesseract not found!\n");
+        }
     }
 
     return wxEmptyString;

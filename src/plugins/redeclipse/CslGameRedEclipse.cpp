@@ -428,6 +428,23 @@ CslGameClientSettings CslGameRedEclipse::GuessClientSettings(const wxString& pat
 
 wxString CslGameRedEclipse::ValidateClientSettings(CslGameClientSettings& settings) const
 {
+
+    if (!settings.Binary.IsEmpty())
+    {
+        if (!::wxFileExists(settings.Binary))
+        {
+            return _("Client binary for game Red Eclipse not found!\n");
+        }
+        if (settings.GamePath.IsEmpty() || !::wxDirExists(settings.GamePath))
+        {
+            return _("Game path for game Red Eclipse not found!\n");
+        }
+        if (settings.ConfigPath.IsEmpty() || !::wxDirExists(settings.ConfigPath))
+        {
+            return _("Config path for game Red Eclipse not found!\n");
+        }
+    }
+
     return wxEmptyString;
 }
 
