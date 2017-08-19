@@ -54,9 +54,14 @@ CslGameAssaultCube::CslGameAssaultCube()
     m_capabilities=CSL_CAPABILITY_EXTINFO | CSL_CAPABILITY_CUSTOM_CONFIG |
                    CSL_CAPABILITY_CONNECT_PASS | CSL_CAPABILITY_CONNECT_ADMIN_PASS;
     m_defaultMasterURI = CSL_DEFAULT_MASTER_AC;
-#if defined(__WXGTK__) || defined(__WXX11__)
-    m_clientSettings.ConfigPath=::wxGetHomeDir()+wxT("/.assaultcube_v1.2");
-#endif
+
+#if defined(__WXMSW__)
+    m_clientSettings.ConfigPath = wxStandardPaths::Get().GetDocumentsDir() + wxT("\AssaultCube_v1.2");
+#elif defined(__WXMAC__)
+    m_clientSettings.ConfigPath = ::wxGetHomeDir() + wxT("/Library/Application Support/assaultcube_1.2");
+#elif defined(__WXGTK__) || defined(__WXX11__)
+    m_clientSettings.ConfigPath = ::wxGetHomeDir() + wxT("/.assaultcube_v1.2");
+#endif //__WXMSW__
 
     AddIcon(CSL_BITMAP_TYPE_PNG, 16, ac_16_png, sizeof(ac_16_png));
     AddIcon(CSL_BITMAP_TYPE_PNG, 24, ac_24_png, sizeof(ac_24_png));

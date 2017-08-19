@@ -54,11 +54,11 @@ static const wxChar* CLIENT_GAME_REQUIRES[] =
 #endif
 
 #if defined(__WXMSW__)
-const wxString CLIENT_CFG_DIR = wxStandardPaths::Get().GetDocumentsDir() + wxT("My Games");
+    const wxString CLIENT_CFG_DIR = wxStandardPaths::Get().GetDocumentsDir() + wxT("\My Games\Tesseract");
 #elif defined(__WXMAC__)
-const wxString CLIENT_CFG_DIR = ::wxGetHomeDir() + wxT("/Library/Application Support/tesseract")
+    const wxString CLIENT_CFG_DIR = ::wxGetHomeDir() + wxT("/Library/Application Support/tesseract");
 #elif defined(__WXGTK__) || defined(__WXX11__)
-const wxString CLIENT_CFG_DIR = ::wxGetHomeDir() + wxT("/.tesseract");
+    const wxString CLIENT_CFG_DIR = ::wxGetHomeDir() + wxT("/.tesseract");
 #endif //__WXMSW__
 
 
@@ -66,12 +66,20 @@ CslGameTesseract::CslGameTesseract()
 {
     m_name = CSL_DEFAULT_NAME_TR;
 
-    m_fourcc=CSL_BUILD_FOURCC(CSL_FOURCC_TR);
+    m_fourcc = CSL_BUILD_FOURCC(CSL_FOURCC_TR);
 
     m_capabilities = CSL_CAPABILITY_EXTINFO | CSL_CAPABILITY_CUSTOM_CONFIG |
                      CSL_CAPABILITY_CONNECT_PASS | CSL_CAPABILITY_CONNECT_ADMIN_PASS;
 
     m_defaultMasterURI = CSL_DEFAULT_MASTER_TR;
+
+#if defined(__WXMSW__)
+    m_clientSettings.ConfigPath =  wxStandardPaths::Get().GetDocumentsDir() + wxT("\My Games\Tesseract");
+#elif defined(__WXMAC__)
+    m_clientSettings.ConfigPath =  ::wxGetHomeDir() + wxT("/Library/Application Support/tesseract")
+#elif defined(__WXGTK__) || defined(__WXX11__)
+    m_clientSettings.ConfigPath =  ::wxGetHomeDir() + wxT("/.tesseract");
+#endif //__WXMSW__
 
     AddIcon(CSL_BITMAP_TYPE_PNG, 16, tr_16_png, sizeof(tr_16_png));
     AddIcon(CSL_BITMAP_TYPE_PNG, 24, tr_24_png, sizeof(tr_24_png));

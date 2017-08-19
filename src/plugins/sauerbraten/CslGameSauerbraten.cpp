@@ -54,24 +54,31 @@ static const wxChar* CLIENT_GAME_REQUIRES[] =
 #endif
 
 #if defined(__WXMSW__)
-const wxString CLIENT_CFG_DIR = wxStandardPaths::Get().GetDocumentsDir() + wxT("My Games");
+    const wxString CLIENT_CFG_DIR = wxStandardPaths::Get().GetDocumentsDir() + wxT("\My Games\Sauerbraten");
 #elif defined(__WXMAC__)
-const wxString CLIENT_CFG_DIR = ::wxGetHomeDir() + wxT("/Library/Application Support/sauerbraten")
+    const wxString CLIENT_CFG_DIR = ::wxGetHomeDir() + wxT("/Library/Application Support/sauerbraten");
 #elif defined(__WXGTK__) || defined(__WXX11__)
-const wxString CLIENT_CFG_DIR = ::wxGetHomeDir() + wxT("/.sauerbraten");
+    const wxString CLIENT_CFG_DIR = ::wxGetHomeDir() + wxT("/.sauerbraten");
 #endif //__WXMSW__
-
 
 CslGameSauerbraten::CslGameSauerbraten()
 {
     m_name = CSL_DEFAULT_NAME_SB;
 
-    m_fourcc=CSL_BUILD_FOURCC(CSL_FOURCC_SB);
+    m_fourcc = CSL_BUILD_FOURCC(CSL_FOURCC_SB);
 
     m_capabilities = CSL_CAPABILITY_EXTINFO | CSL_CAPABILITY_CUSTOM_CONFIG |
                      CSL_CAPABILITY_CONNECT_PASS | CSL_CAPABILITY_CONNECT_ADMIN_PASS;
 
     m_defaultMasterURI = CSL_DEFAULT_MASTER_SB;
+
+#if defined(__WXMSW__)
+    m_clientSettings.ConfigPath = wxStandardPaths::Get().GetDocumentsDir() + wxT("\My Games\Sauerbraten");
+#elif defined(__WXMAC__)
+    m_clientSettings.ConfigPath = ::wxGetHomeDir() + wxT("/Library/Application Support/sauerbraten");
+#elif defined(__WXGTK__) || defined(__WXX11__)
+    m_clientSettings.ConfigPath = ::wxGetHomeDir() + wxT("/.sauerbraten");
+#endif
 
     AddIcon(CSL_BITMAP_TYPE_PNG, 16, sb_16_png, sizeof(sb_16_png));
     AddIcon(CSL_BITMAP_TYPE_PNG, 24, sb_24_png, sizeof(sb_24_png));

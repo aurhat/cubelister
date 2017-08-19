@@ -235,12 +235,14 @@ CslGameRedEclipse::CslGameRedEclipse()
                    CSL_CAPABILITY_CONNECT_PASS |
                    CSL_CAPABILITY_CONNECT_ADMIN_PASS;
     m_defaultMasterURI = CSL_DEFAULT_MASTER_RE;
-#ifdef __WXMAC__
-    m_clientSettings.ConfigPath=::wxGetHomeDir();
-    m_clientSettings.ConfigPath<<wxT("/Library/Application Support/redeclipse");
+
+#if defined(__WXMSW__)
+    m_clientSettings.ConfigPath = wxStandardPaths::Get().GetDocumentsDir() + wxT("\My Games\Red Eclipse");
+#elif defined(__WXMAC__)
+    m_clientSettings.ConfigPath = ::wxGetHomeDir() + wxT("/Library/Application Support/redeclipse");
 #elif defined(__WXGTK__) || defined(__WXX11__)
-    m_clientSettings.ConfigPath=::wxGetHomeDir()+wxT("/.redeclipse");
-#endif
+    m_clientSettings.ConfigPath = ::wxGetHomeDir() + wxT("/.redeclipse");
+#endif //__WXMSW__
 
     AddIcon(CSL_BITMAP_TYPE_PNG, 16, re_16_png, sizeof(re_16_png));
     AddIcon(CSL_BITMAP_TYPE_PNG, 24, re_24_png, sizeof(re_24_png));
