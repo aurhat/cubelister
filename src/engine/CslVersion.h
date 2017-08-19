@@ -23,23 +23,21 @@
 
 #define CSL_STRINGIFY(x) #x
 #define CSL_TO_STRING(x) CSL_STRINGIFY(x)
-#define CSL_VERSION_TO_STRING(a, b, c, d) CSL_TO_STRING(a.b.c.d)
+#define CSL_VERSION_TO_STRING(a, b, c) CSL_TO_STRING(a.b.c)
 
 #define __CSL_VERSION_MAJOR        0
 #define __CSL_VERSION_MINOR        8
-#define __CSL_VERSION_RELEASE      1
-#define __CSL_VERSION_SUBRELEASE  94
+#define __CSL_VERSION_PATCH        2
 
 #define __CSL_NAME_STR         "Cube Server Lister (CSL)"
 #define __CSL_NAME_SHORT_STR   "CSL"
 #define __CSL_VERSION          __CSL_VERSION_MAJOR, \
                                __CSL_VERSION_MINOR, \
-                               __CSL_VERSION_RELEASE, \
-                               __CSL_VERSION_SUBRELEASE
+                               __CSL_VERSION_PATCH
+
 #define __CSL_VERSION_STR      CSL_VERSION_TO_STRING(__CSL_VERSION_MAJOR, \
                                                      __CSL_VERSION_MINOR, \
-                                                     __CSL_VERSION_RELEASE, \
-                                                     __CSL_VERSION_SUBRELEASE)
+                                                     __CSL_VERSION_PATCH)
 #define __CSL_COPYRIGHT_STR    "(C) 2007-2014, Glen Masgai <mimosius@users.sourceforge.net>"
 #define __CSL_DESCRIPTION_STR  "Tool to monitor cubeengine-based servers."
 
