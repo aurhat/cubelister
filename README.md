@@ -9,6 +9,8 @@
 
 The goal of this project is to provide a fast and useful cross-platform **server monitor**.
 
+https://github.com/aurhat/cubelister repository contains fixes and updates to the last publicly available development version of CSL (from mimosius's private repository).
+
 ## Basic features:
 
  * Free cross-platform application, available under a GNU open source [license](http://cubelister.sourceforge.net/?page=license).
@@ -23,4 +25,4 @@ The goal of this project is to provide a fast and useful cross-platform **server
 ## Notes:
 
 1. [CSL thread on AssaultCube forum](https://forum.cubers.net/thread-8532.html) : additional informations + installers of previous 0.8.1.79 version for Windows and Mac.
-2. [wxWidgets](https://www.wxwidgets.org/) 3.0.2 or later is recommended to use with CSL to have it stable.
+2. [wxWidgets](https://www.wxwidgets.org/) 3.0.3 or later is recommended to use with CSL to have it stable.
